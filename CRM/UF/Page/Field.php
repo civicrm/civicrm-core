@@ -64,7 +64,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    *
    * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(

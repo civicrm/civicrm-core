@@ -401,10 +401,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Rewrite various system urls to https
-   *
-   * @param null
-   *
-   * @return void
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -473,7 +469,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       if (!$contactID) {
         return FALSE;
       }
-      else { //success
+      else {
+        //success
         if ($loadCMSBootstrap) {
           $bootStrapParams = array();
           if ($name && $password) {
@@ -515,7 +512,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * e.g. for drupal : records a watchdog message about the new session,
    * saves the login timestamp, calls hook_user op 'login' and generates a new session.
    *
-   * @param array params
+   * @param array $params
    *
    * FIXME: Document values accepted/required by $params
    */
@@ -763,7 +760,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Check is user logged in.
    *
-   * @return boolean
+   * @return bool
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;

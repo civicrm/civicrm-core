@@ -50,7 +50,7 @@ class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
    * @param string $dataName
    * @param array $browser
    */
-  function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
+  public function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
     parent::__construct($name, $data, $dataName, $browser);
 
     require_once 'CiviTest/ReleaseTestSettings.php';

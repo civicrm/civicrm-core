@@ -57,7 +57,6 @@ WHERE  e.contact_id = c.id
 AND    e.is_primary = 1
 AND    c.id IN ( $contactIDs )";
 
-
     $rows = array();
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {

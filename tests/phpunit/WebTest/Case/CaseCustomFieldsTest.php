@@ -68,7 +68,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       'edit-2-access-all-cases-and-activities',
       'edit-2-access-my-cases-and-activities',
       'edit-2-administer-civicase',
-      'edit-2-delete-in-civicase'
+      'edit-2-delete-in-civicase',
     );
     $this->changePermissions($permission);
 
@@ -209,7 +209,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/custom/group/field", array(
           'reset' => 1,
           'action' => 'browse',
-          'gid' => $customGrpId1
+          'gid' => $customGrpId1,
         ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
@@ -241,7 +241,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/custom/group/field", array(
           'reset' => 1,
           'action' => 'browse',
-          'gid' => $customGrpId1
+          'gid' => $customGrpId1,
         ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
@@ -268,7 +268,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
           'action' => 'delete',
           'reset' => '1',
           'gid' => $customGrpId1,
-          'id' => $cValue
+          'id' => $cValue,
         ));
       $this->clickLink("_qf_DeleteField_next-bottom");
     }
@@ -314,7 +314,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       'edit-2-access-all-cases-and-activities',
       'edit-2-access-my-cases-and-activities',
       'edit-2-administer-civicase',
-      'edit-2-delete-in-civicase'
+      'edit-2-delete-in-civicase',
     );
     $this->changePermissions($permission);
 

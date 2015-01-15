@@ -47,8 +47,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   /**
    * called when action is browse
-   *
-   * @return null
    */
   public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
@@ -157,7 +155,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id]) // membership is active
         && CRM_Utils_Array::value('relationship_type_id', $statusANDType[$dao->id]) // membership type allows inheritance
         && empty($dao->owner_membership_id)
-      ) { // not an related membership
+      ) {
+        // not an related membership
         $query = "
  SELECT COUNT(m.id)
    FROM civicrm_membership m
@@ -168,7 +167,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
         $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', array(1 => $num_related)) : ts('%1 out of %2', array(
             1 => $num_related,
-            2 => $max_related
+            2 => $max_related,
           ))
         );
       }
@@ -465,7 +464,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  static function &links(
+  public static function &links(
     $status = 'all',
     $isPaymentProcessor = NULL,
     $accessContribution = NULL,
@@ -578,8 +577,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @param int $contactId
    * @param int $membershipId
-   *
-   * @return null
    */
   public static function associatedContribution($contactId = NULL, $membershipId = NULL) {
     $controller = new CRM_Core_Controller_Simple(
