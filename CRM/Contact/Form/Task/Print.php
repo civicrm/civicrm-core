@@ -62,7 +62,7 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
           '=',
           1,
           0,
-          0
+          0,
         );
       }
     }

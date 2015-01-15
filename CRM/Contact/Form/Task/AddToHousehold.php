@@ -62,7 +62,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
 
     $this->add('select', 'relationship_type_id', ts('Relationship Type'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) +
       CRM_Contact_BAO_Relationship::getRelationType("Household"), TRUE
     );
@@ -164,27 +164,27 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
             'count' => $valid,
             'plural' => '%count %2 %3 relationships created',
             2 => $relationship,
-            3 => $house
-          ))
+            3 => $house,
+        )),
       );
       if ($duplicate) {
         $status[] = ts('%count was skipped because the contact is already %2 %3', array(
             'count' => $duplicate,
             'plural' => '%count were skipped because the contacts are already %2 %3',
             2 => $relationship,
-            3 => $house
+            3 => $house,
           ));
       }
       if ($invalid) {
         $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array(
             'count' => $invalid,
-            'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'
+            'plural' => '%count relationships were not created because the contact is not of the right type for this relationship',
           ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts('Relationship created.', array(
             'count' => $valid,
-            'plural' => 'Relationships created.'
+            'plural' => 'Relationships created.',
           )), 'success', array('expires' => 0));
     }
   }
@@ -285,8 +285,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
 
         $contact_type = '<img src="' . $config->resourceBase . 'i/contact_';
 
-        $searchRows[$contactID]['type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-            $result->contact_sub_type : $result->contact_type
+        $searchRows[$contactID]['type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
         );
       }
 

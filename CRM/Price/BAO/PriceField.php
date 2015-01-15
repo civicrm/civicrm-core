@@ -201,7 +201,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     if (!empty($fieldOptions['is_full'])) {
       $element->freeze();
     }
-    return;
+    return NULL;
   }
 
   /**
@@ -309,7 +309,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $priceVal = implode($seperator, array(
             $customOption[$optionKey][$valueFieldName] + $taxAmount,
             $count,
-            $max_value
+            $max_value,
           ));
 
         $extra = array();
@@ -326,7 +326,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
           $useRequired = 0;
         }
-        elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {
+          //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
 
@@ -500,7 +501,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $element = &$qf->add('select', $elementName, $label,
           array(
-            '' => ts('- select -')
+            '' => ts('- select -'),
           ) + $selectOption,
           $useRequired && $field->is_required,
           array('price' => json_encode($priceVal))
@@ -622,7 +623,7 @@ WHERE
 
     $dao = CRM_Core_DAO::executeQuery($query, array(
         1 => array($optionGroupName, 'String'),
-        2 => array($optionLabel, 'String')
+        2 => array($optionLabel, 'String'),
       ));
 
     while ($dao->fetch()) {
@@ -636,7 +637,7 @@ WHERE
    * @param int $id
    *   Field Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function deleteField($id) {
@@ -688,7 +689,6 @@ WHERE
    * @param bool $allowNoneSelection
    *
    */
-
   public static function priceSetValidation($priceSetId, $fields, &$error, $allowNoneSelection = FALSE) {
     // check for at least one positive
     // amount price field should be selected.

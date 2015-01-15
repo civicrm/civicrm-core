@@ -468,8 +468,10 @@ class CRM_Utils_REST {
     return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/api/explorer'));
   }
 
-  /** used to load a template "inline", eg. for ajax, without having to build a menu for each template */
-  static function loadTemplate() {
+  /**
+   * used to load a template "inline", eg. for ajax, without having to build a menu for each template
+   */
+  public static function loadTemplate() {
     $request = CRM_Utils_Request::retrieve('q', 'String');
     if (FALSE !== strpos($request, '..')) {
       die ("SECURITY FATAL: the url can't contain '..'. Please report the issue on the forum at civicrm.org");
@@ -522,10 +524,11 @@ class CRM_Utils_REST {
     }
   }
 
-  /** This is a wrapper so you can call an api via json (it returns json too)
+  /**
+   * This is a wrapper so you can call an api via json (it returns json too)
    * http://example.org/civicrm/api/json?entity=Contact&action=Get"&json={"contact_type":"Individual","email.get.email":{}} to take all the emails from individuals
    * works for POST & GET (POST recommended)
-   **/
+   */
   public static function ajaxJson() {
     $requestParams = CRM_Utils_Request::exportValues();
 
@@ -559,8 +562,7 @@ class CRM_Utils_REST {
     if (!is_array($params)) {
       CRM_Utils_JSON::output(array(
           'is_error' => 1,
-          'error_message',
-          'invalid json format: ?{"param_with_double_quote":"value"}'
+          'error_message' => 'invalid json format: ?{"param_with_double_quote":"value"}',
         ));
     }
 

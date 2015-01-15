@@ -200,7 +200,7 @@ class CRM_Core_Action {
    * @return string
    *   the html string
    */
-  static function formLink(
+  public static function formLink(
     $links,
     $mask,
     $values,
@@ -320,8 +320,6 @@ class CRM_Core_Action {
 
   /**
    * Get the mask for a permission (view, edit or null)
-   *
-   * @param string the permission
    *
    * @return int
    *   the mask for the above permission
