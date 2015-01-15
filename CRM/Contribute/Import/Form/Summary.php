@@ -122,7 +122,7 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
       'validPledgePaymentRowCount',
       'invalidPledgePaymentRowCount',
       'downloadPledgePaymentErrorRecordsUrl',
-      'downloadSoftCreditErrorRecordsUrl'
+      'downloadSoftCreditErrorRecordsUrl',
     );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));

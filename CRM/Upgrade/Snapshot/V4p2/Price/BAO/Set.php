@@ -252,7 +252,7 @@ WHERE     ct.id = cp.contribution_type_id AND
    * @param int $id
    *   Price Set id.
    *
-   * @return boolean
+   * @return bool
    *   false if fields exist for this set, true if the
    *   set could be deleted
    *
@@ -767,7 +767,7 @@ WHERE  id = %1";
    *
    * @return void
    */
-  static function buildPriceSet(&$form) {
+  public static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');
     $userid = $form->getVar('_userID');
     if (!$priceSetId) {
@@ -778,7 +778,7 @@ WHERE  id = %1";
     $className = CRM_Utils_System::getClassName($form);
     if (in_array($className, array(
       'CRM_Contribute_Form_Contribution',
-      'CRM_Member_Form_Membership'
+      'CRM_Member_Form_Membership',
     ))) {
       $validFieldsOnly = FALSE;
     }
@@ -844,7 +844,7 @@ WHERE  id = %1";
    * check the current Membership
    * having end date null.
    */
-  static function checkCurrentMembership(&$options, $userid) {
+  public static function checkCurrentMembership(&$options, $userid) {
     if (!$userid || empty($options)) {
       return;
     }
@@ -878,7 +878,7 @@ WHERE  id = %1";
    *
    * @return array
    */
-  static function setDefaultPriceSet(&$form, &$defaults) {
+  public static function setDefaultPriceSet(&$form, &$defaults) {
     if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
       return $defaults;
     }
@@ -901,7 +901,7 @@ WHERE  id = %1";
   /**
    * Get field ids of a price set
    *
-   * @param int id Price Set id
+   * @param int $id Price Set id
    *
    * @return array
    *   Array of the field ids
@@ -925,7 +925,7 @@ WHERE  id = %1";
    *
    * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    */
-  static function copy($id) {
+  public static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
 
     $title = ts('[Copy id %1]', array(1 => $maxId + 1));
@@ -972,7 +972,7 @@ WHERE  id = %1";
    *
    * @return bool
    */
-  function checkPermission($sid) {
+  public function checkPermission($sid) {
     if ($sid &&
       self::eventPriceSetDomainID()
     ) {
