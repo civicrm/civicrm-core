@@ -73,7 +73,7 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     if (count($this->_memberIds) > $this->_maxMembers) {
       CRM_Core_Session::setStatus(ts("The maximum number of members you can select for Batch Update is %1. You have selected %2. Please select fewer members from your search results and try again.", array(
             1 => $this->_maxMembers,
-            2 => count($this->_memberIds)
+            2 => count($this->_memberIds),
           )), ts('Batch Update Error'), 'error');
       $validate = TRUE;
     }
@@ -101,7 +101,7 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
       array(
-        '' => ts('- select profile -')
+        '' => ts('- select profile -'),
       ) + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));

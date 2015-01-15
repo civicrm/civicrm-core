@@ -69,7 +69,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    * @return CRM_Contact_Form_Search_Custom_GroupTestDataProvider
    */
   public function dataProvider() {
-    return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider;
+    return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider();
   }
 
   public function setUp() {

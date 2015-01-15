@@ -282,7 +282,7 @@ class Requirements {
     $results = array(
       'title' => 'CiviCRM InnoDB support',
       'severity' => $this::REQUIREMENT_ERROR,
-      'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.'
+      'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.',
     );
 
     $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);

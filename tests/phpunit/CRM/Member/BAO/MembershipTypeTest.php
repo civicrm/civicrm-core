@@ -63,9 +63,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->contactDelete($this->_indiviContactID);
   }
 
-  /* check function add()
-     *
-     */
+  /**
+   * check function add()
+   *
+   */
   public function testAdd() {
     $ids = array();
     $params = array(
@@ -93,9 +94,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function retrive()
-     *
-     */
+  /**
+   * check function retrive()
+   *
+   */
   public function testRetrieve() {
     $ids = array();
     $params = array(
@@ -120,9 +122,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function isActive()
-     *
-     */
+  /**
+   * check function isActive()
+   *
+   */
   public function testSetIsActive() {
     $ids = array();
     $params = array(
@@ -152,9 +155,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function del()
-     *
-     */
+  /**
+   * check function del()
+   *
+   */
   public function testdel() {
     $ids = array();
     $params = array(
@@ -178,9 +182,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, TRUE, 'Verify membership deleted.');
   }
 
-  /* check function convertDayFormat( )
-     *
-     */
+  /**
+   * check function convertDayFormat( )
+   *
+   */
   public function testConvertDayFormat() {
     $ids = array();
     $params = array(
@@ -208,9 +213,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getMembershipTypes( )
-     *
-     */
+  /**
+   * check function getMembershipTypes( )
+   *
+   */
   public function testGetMembershipTypes() {
     $ids = array();
     $params = array(
@@ -233,9 +239,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getMembershipTypeDetails( )
-     *
-     */
+  /**
+   * check function getMembershipTypeDetails( )
+   *
+   */
   public function testGetMembershipTypeDetails() {
     $ids = array();
     $params = array(
@@ -260,9 +267,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getDatesForMembershipType( )
-     *
-     */
+  /**
+   * check function getDatesForMembershipType( )
+   *
+   */
   public function testGetDatesForMembershipType() {
     $ids = array();
     $params = array(
@@ -286,9 +294,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getRenewalDatesForMembershipType( )
-     *
-     */
+  /**
+   * check function getRenewalDatesForMembershipType( )
+   *
+   */
   public function testGetRenewalDatesForMembershipType() {
     $ids = array();
     $params = array(
@@ -329,9 +338,10 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function getMembershipTypesByOrg( )
-     *
-     */
+  /**
+   * check function getMembershipTypesByOrg( )
+   *
+   */
   public function testGetMembershipTypesByOrg() {
     $ids = array();
     $params = array(
