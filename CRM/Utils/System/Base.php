@@ -142,7 +142,7 @@ abstract class CRM_Utils_System_Base {
    * @return string
    *   Formatted url.
    */
-  function languageNegotiationURL(
+  public function languageNegotiationURL(
     $url,
     $addLanguagePart = TRUE,
     $removeLanguagePart = FALSE
@@ -177,7 +177,7 @@ abstract class CRM_Utils_System_Base {
    * @param string $username
    *
    * @throws CRM_Core_Exception
-   * @return int|NULL
+   * @return;
    */
   public function getUfId($username) {
     $className = get_class($this);
@@ -218,9 +218,9 @@ abstract class CRM_Utils_System_Base {
    * @param string $dir
    *
    * @return array
-   * - $url, (Joomla - non admin url)
-   * - $siteName,
-   * - $siteRoot
+   *   - $url, (Joomla - non admin url)
+   *   - $siteName,
+   *   - $siteRoot
    */
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
@@ -311,7 +311,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get currently logged in user uf id.
    *
-   * @return int
+   * @return;
    *   $userID logged in user uf id.
    */
   public function getLoggedInUfID() {
@@ -320,7 +320,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return string
+   * @return;
    *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {

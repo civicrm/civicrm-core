@@ -326,6 +326,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'priceSetID' => CRM_Utils_Array::value('priceSetID', $values),
         'title' => $title,
         'isShare' => CRM_Utils_Array::value('is_share', $values),
+        'thankyou_title' => CRM_Utils_Array::value('thankyou_title', $values),
       );
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {

@@ -117,7 +117,7 @@ WHERE  contact_id = {$params['contact_id']}
    * @param array $entityBlock
    *   Input parameters to find object.
    *
-   * @return boolean
+   * @return bool
    */
   public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('email', $entityBlock);

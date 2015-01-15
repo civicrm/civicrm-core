@@ -350,7 +350,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param int $id
    *   Campaign page id.
    *
-   * @return null
+   * @return;
    */
   public static function deleteById($id) {
     CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
@@ -582,7 +582,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param $is_active
    *
-   * @return null
+   * @return;
    */
   public static function setIsActive($id, $is_active) {
     switch ($is_active) {
@@ -778,7 +778,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param int $id
    *   Pcp block id.
    *
-   * @return Boolean
+   * @return Bool
    */
   public static function getPcpBlockInUse($id) {
     $query = "
@@ -797,7 +797,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param int $profileId
    *   Supporter's profile id.
    *
-   * @return boolean
+   * @return bool
    */
   public static function checkEmailProfile($profileId) {
     $query = "
@@ -847,7 +847,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * @param int $pcpId
    * @param $component
    *
-   * @return String
+   * @return string
    */
   public static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);
@@ -872,7 +872,7 @@ WHERE pcp.id = %1";
    *
    * @param $component
    *
-   * @return String
+   * @return string
    */
   public static function getPcpEntityTable($component) {
     $entity_table_map = array(

@@ -71,36 +71,36 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $angularModules = array();
     $angularModules['angularFileUpload'] = array(
       'ext' => 'civicrm',
-      'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js')
+      'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
     );
     $angularModules['crmApp'] = array('ext' => 'civicrm', 'js' => array('js/angular-crmApp.js'));
     $angularModules['crmAttachment'] = array(
       'ext' => 'civicrm',
       'js' => array('js/angular-crmAttachment.js'),
-      'css' => array('css/angular-crmAttachment.css')
+      'css' => array('css/angular-crmAttachment.css'),
     );
     $angularModules['crmUi'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js')
+      'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
     );
     $angularModules['crmUtil'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-util.js'));
     // https://github.com/jwstadler/angular-jquery-dialog-service
     $angularModules['dialogService'] = array(
       'ext' => 'civicrm',
-      'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js')
+      'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
     );
     $angularModules['ngSanitize'] = array('ext' => 'civicrm', 'js' => array('js/angular-sanitize.js'));
     $angularModules['ui.utils'] = array(
       'ext' => 'civicrm',
-      'js' => array('bower_components/angular-ui-utils/ui-utils.min.js')
+      'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
     );
     $angularModules['ui.sortable'] = array(
       'ext' => 'civicrm',
-      'js' => array('bower_components/angular-ui-sortable/sortable.min.js')
+      'js' => array('bower_components/angular-ui-sortable/sortable.min.js'),
     );
     $angularModules['unsavedChanges'] = array(
       'ext' => 'civicrm',
-      'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js')
+      'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'),
     );
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {

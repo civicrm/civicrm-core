@@ -47,7 +47,7 @@ class CRM_Core_I18n_SchemaStructure_2_2_0 {
   /**
    * @return mixed
    */
-  static function &indices() {
+  public static function &indices() {
     static $result = NULL;
     if (!$result) {
       $result = unserialize('a:4:{s:20:"civicrm_custom_group";a:1:{s:16:"UI_title_extends";a:4:{s:4:"name";s:16:"UI_title_extends";s:5:"field";a:2:{i:0;s:5:"title";i:1;s:7:"extends";}s:11:"localizable";b:1;s:6:"unique";b:1;}}s:20:"civicrm_custom_field";a:1:{s:24:"UI_label_custom_group_id";a:4:{s:4:"name";s:24:"UI_label_custom_group_id";s:5:"field";a:2:{i:0;s:5:"label";i:1;s:15:"custom_group_id";}s:11:"localizable";b:1;s:6:"unique";b:1;}}s:17:"civicrm_price_set";a:1:{s:8:"UI_title";a:4:{s:4:"name";s:8:"UI_title";s:5:"field";a:1:{i:0;s:5:"title";}s:11:"localizable";b:1;s:6:"unique";b:1;}}s:15:"civicrm_contact";a:5:{s:15:"index_sort_name";a:3:{s:4:"name";s:15:"index_sort_name";s:5:"field";a:1:{i:0;s:9:"sort_name";}s:11:"localizable";b:1;}s:16:"index_first_name";a:3:{s:4:"name";s:16:"index_first_name";s:5:"field";a:1:{i:0;s:10:"first_name";}s:11:"localizable";b:1;}s:15:"index_last_name";a:3:{s:4:"name";s:15:"index_last_name";s:5:"field";a:1:{i:0;s:9:"last_name";}s:11:"localizable";b:1;}s:20:"index_household_name";a:3:{s:4:"name";s:20:"index_household_name";s:5:"field";a:1:{i:0;s:14:"household_name";}s:11:"localizable";b:1;}s:23:"index_organization_name";a:3:{s:4:"name";s:23:"index_organization_name";s:5:"field";a:1:{i:0;s:17:"organization_name";}s:11:"localizable";b:1;}}}');

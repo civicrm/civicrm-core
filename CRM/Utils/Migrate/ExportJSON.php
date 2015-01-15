@@ -185,7 +185,7 @@ WHERE      g.name IN ( $nameString )
    * @param $whereField
    * @param null $additionalWhereCond
    */
-  function table(
+  public function table(
     &$ids,
     $tableName,
     &$fields,
@@ -590,7 +590,7 @@ WHERE ac.contact_id IN ( $ids )
    * @param null $lastExportTime
    * @param bool $discoverContacts
    */
-  function run(
+  public function run(
     $fileName,
     $lastExportTime = NULL,
     $discoverContacts = FALSE

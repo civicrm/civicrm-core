@@ -45,8 +45,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @return string
    */
-
-  abstract function getBAOName();
+  abstract protected function getBAOName();
 
   /**
    * An array of action links
@@ -54,21 +53,21 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @return array
    *   (reference)
    */
-  abstract function &links();
+  abstract protected function &links();
 
   /**
    * Name of the edit form class
    *
    * @return string
    */
-  abstract function editForm();
+  abstract protected function editForm();
 
   /**
    * Name of the form
    *
    * @return string
    */
-  abstract function editName();
+  abstract protected function editName();
 
   /**
    * UserContext to pop back to
@@ -78,7 +77,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @return string
    */
-  abstract function userContext($mode = NULL);
+  abstract protected function userContext($mode = NULL);
 
   /**
    * Get userContext params
@@ -300,7 +299,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     if (!empty($values['name']) && in_array($values['name'], array(
         'encounter_medium',
         'case_type',
-        'case_status'
+        'case_status',
       ))
     ) {
       static $caseCount = NULL;
