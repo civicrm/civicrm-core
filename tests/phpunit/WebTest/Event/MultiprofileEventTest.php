@@ -270,7 +270,9 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $customGrpId1
+   * Get custom field ID.
+   *
+   * @param int $customGrpId1
    *
    * @return array
    */

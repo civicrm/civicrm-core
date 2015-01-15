@@ -285,8 +285,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for create( )
-   * test with missing params.
+   * Test case for create.
+   *
+   * Test with missing params.
    */
   public function testCreateWithEmptyParams() {
     $params = array(
@@ -300,8 +301,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for create( )
-   * test with all params.
+   * Test case for create.
+   *
+   * Test with all params.
    * ( create and update modes ).
    */
   public function testCreateWithAll() {
@@ -1159,7 +1161,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getPrimaryEmail( )
+   * Test case for getPrimaryEmail.
    */
   public function testGetPrimaryEmail() {
     //get the contact params
@@ -1454,7 +1456,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure that civicrm_contact.modified_date is updated when manipulating an email.
    */
-  public function testTimestamps_phone() {
+  public function testTimestampsPhone() {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test) {
@@ -1486,10 +1488,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when contact-related
-   * custom data
+   * Ensure that civicrm_contact.modified_date is updated correctly.
+   *
+   * Looking at it when contact-related custom data is updated.
    */
-  public function testTimestamps_custom() {
+  public function testTimestampsCustom() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $this->assertNotNull($customGroup);
     $fields = array(
