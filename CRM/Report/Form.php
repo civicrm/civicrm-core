@@ -240,7 +240,10 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var integer
    */
   protected $_offsetValue = NULL;
-  protected $_sections = NULL;
+  /**
+   * @var null
+   */
+  public $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
 
