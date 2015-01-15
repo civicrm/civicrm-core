@@ -30,11 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
- *
+ * SMS Form.
  */
 class CRM_SMS_Form_Provider extends CRM_Core_Form {
   protected $_id = NULL;

@@ -36,7 +36,7 @@
  */
 
 /**
- * Handle a confirm event
+ * Handle a confirm event.
  *
  * @param array $params
  *   Associative array of property.
@@ -45,7 +45,6 @@
  * @throws Exception
  * @return array
  *   api result array
- * {@getfields mailing_event_confirm_create}
  */
 function civicrm_api3_mailing_event_confirm_create($params) {
 

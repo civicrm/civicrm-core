@@ -43,7 +43,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     require_once 'CiviTest/CiviMailUtils.php';
     $this->mut = new CiviMailUtils($this, TRUE);
 
-    $this->fixtures['rolling_membership'] = array(// createTestObject
+    $this->fixtures['rolling_membership'] = array(
       'membership_type_id' => array(
         'period_type' => 'rolling',
         'duration_unit' => 'month',

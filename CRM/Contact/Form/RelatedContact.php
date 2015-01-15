@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -65,9 +64,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   protected $_defaults = array();
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @return void
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     // reset action from the session

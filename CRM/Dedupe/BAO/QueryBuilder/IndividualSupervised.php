@@ -7,7 +7,9 @@
 class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
   /**
-   * @param $rg
+   * Record - what do I do?
+   *
+   * @param object $rg
    *
    * @return array
    */
@@ -35,7 +37,9 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
   }
 
   /**
-   * @param $rg
+   * Internal - what do I do.
+   *
+   * @param object $rg
    *
    * @return array
    */

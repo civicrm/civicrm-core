@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -1711,7 +1710,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * get the Activities of a target contact
+   * Get the Activities of a target contact.
    *
    * @param int $contactId
    *   Id of the contact whose activities need to find.
@@ -1784,7 +1783,7 @@ WHERE      activity.id IN ($activityIds)";
   }
 
   /**
-   * Add activity for Membership/Event/Contribution
+   * Add activity for Membership/Event/Contribution.
    *
    * @param object $activity
    *   (reference) particular component object.
@@ -1903,13 +1902,13 @@ SELECT  display_name
   }
 
   /**
-   * Get Parent activity for currently viewed activity
+   * Get Parent activity for currently viewed activity.
    *
    * @param int $activityId
    *   Current activity id.
    *
    * @return int
-   *   $parentId  Id of parent activity otherwise false.
+   *   Id of parent activity otherwise false.
    */
   public static function getParentActivity($activityId) {
     static $parentActivities = array();
@@ -1931,7 +1930,7 @@ SELECT  display_name
   }
 
   /**
-   * Get total count of prior revision of currently viewd activity
+   * Get total count of prior revision of currently viewed activity.
    *
    * @param $activityID
    *   Current activity id.

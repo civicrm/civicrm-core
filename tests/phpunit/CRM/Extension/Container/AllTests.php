@@ -44,6 +44,7 @@ class CRM_Extension_Container_AllTests extends CiviTestSuite {
   private static $instance = NULL;
 
   /**
+   * Get instance.
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {

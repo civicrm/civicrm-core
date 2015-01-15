@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -89,9 +88,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   /**
    * Build all the data structures needed to build the form
    *
-   * @param
-   *
-   * @return void
+   * @param object $this
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -338,17 +335,13 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * add the rules for form.
-   *
-   * @return void
+   * Add the rules for form.
    */
   public function addRules() {
   }
 
   /**
    * Build the form object
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
@@ -356,16 +349,14 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
   /**
    * Process the form after the input has been submitted and validated
-   *
-   *
-   * @return void
    */
   public function postProcess() {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Simple shell that derived classes can call to add form buttons.
+   *
+   * Allows customized title for the main Submit
    *
    * @param string $title
    *   Title of the main button.
@@ -373,8 +364,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

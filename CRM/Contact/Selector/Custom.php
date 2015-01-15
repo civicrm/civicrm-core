@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
- *
  */
 
 /**
