@@ -68,7 +68,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $id
    *   Mapping id.
    *
-   * @return boo
+   * @return bool
    */
   public static function del($id) {
     // delete from mapping_field table
@@ -204,7 +204,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param string $mapTypeId
    *   mapping Type.
    *
-   * @return boo
+   * @return bool
    */
   public static function checkMapping($nameField, $mapTypeId) {
     $mapping = new CRM_Core_DAO_Mapping();
