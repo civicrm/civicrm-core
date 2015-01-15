@@ -22,7 +22,7 @@
  * WARY of this when coding
  *
  * -----------------------------------------------------------------------------------------------
- **/
+ */
 class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
   const

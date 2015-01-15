@@ -77,8 +77,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -99,8 +97,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -344,8 +340,6 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   /**
    * Process the form
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
@@ -415,23 +409,21 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     if (!$this->_reportId && $survey->id && !empty($params['create_report'])) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
-      $this->_params =
-        array(
-          'name' => "survey_{$survey->id}",
-          'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
-          'status_id_op' => 'eq',
-          'status_id_value' => $activityStatus['Scheduled'], // reserved status
-          'survey_id_value' => array($survey->id),
-          'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
-        );
+      $this->_params = array(
+        'name' => "survey_{$survey->id}",
+        'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
+        'status_id_op' => 'eq',
+        'status_id_value' => $activityStatus['Scheduled'], // reserved status
+        'survey_id_value' => array($survey->id),
+        'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
+      );
       //Default value of order by
-      $this->_params['order_bys'] =
-        array(
-          1 => array(
-            'column' => 'sort_name',
-            'order' => 'ASC',
-          ),
-        );
+      $this->_params['order_bys'] = array(
+        1 => array(
+          'column' => 'sort_name',
+          'order' => 'ASC',
+        ),
+      );
       // for WalkList or default
       $displayFields = array(
         'id',
@@ -445,25 +437,24 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') ==
         $this->_values['activity_type_id']
       ) {
-        $this->_params['order_bys'] =
-          array(
-            1 => array(
-              'column' => 'street_name',
-              'order' => 'ASC',
-            ),
-            2 => array(
-              'column' => 'street_number_odd_even',
-              'order' => 'ASC',
-            ),
-            3 => array(
-              'column' => 'street_number',
-              'order' => 'ASC',
-            ),
-            4 => array(
-              'column' => 'sort_name',
-              'order' => 'ASC',
-            ),
-          );
+        $this->_params['order_bys'] = array(
+          1 => array(
+            'column' => 'street_name',
+            'order' => 'ASC',
+          ),
+          2 => array(
+            'column' => 'street_number_odd_even',
+            'order' => 'ASC',
+          ),
+          3 => array(
+            'column' => 'street_number',
+            'order' => 'ASC',
+          ),
+          4 => array(
+            'column' => 'sort_name',
+            'order' => 'ASC',
+          ),
+        );
       }
       elseif (CRM_Core_OptionGroup::getValue('activity_type', 'PhoneBank') ==
         $this->_values['activity_type_id']

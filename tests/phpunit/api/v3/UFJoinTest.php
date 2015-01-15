@@ -54,7 +54,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       )
     );
     $this->_apiversion = 3;
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
       $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
