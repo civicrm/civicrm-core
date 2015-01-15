@@ -34,7 +34,6 @@
 
 /**
  * This class generates form components generic to CiviCRM settings
- *
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
@@ -113,8 +112,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();

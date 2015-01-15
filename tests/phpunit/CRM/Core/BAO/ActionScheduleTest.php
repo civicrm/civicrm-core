@@ -69,25 +69,25 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_override' => 'NULL',
     );
 
-    $this->fixtures['phonecall'] = array(// createTestObject
+    $this->fixtures['phonecall'] = array(
       'status_id' => 1,
       'activity_type_id' => 2,
       'activity_date_time' => '20120615100000',
       'is_current_revision' => 1,
       'is_deleted' => 0,
     );
-    $this->fixtures['contact'] = array(// API
+    $this->fixtures['contact'] = array(
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-member@example.com',
     );
-    $this->fixtures['contact_birthdate'] = array(// API
+    $this->fixtures['contact_birthdate'] = array(
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-bday@example.com',
       'birth_date' => '20050707',
     );
-    $this->fixtures['sched_activity_1day'] = array(// create()
+    $this->fixtures['sched_activity_1day'] = array(
       'name' => 'One_Day_Phone_Call_Notice',
       'title' => 'One Day Phone Call Notice',
       'limit_to' => '1',

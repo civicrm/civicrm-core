@@ -1615,8 +1615,8 @@ WHERE id={$id}; ";
 
     $returnProperties = self::makeHierReturnProperties($fields, $contactId);
 
-    // we dont know the contents of return properties, but we need the lower level ids of the contact
-    // so add a few fields
+    // We don't know the contents of return properties, but we need the lower level ids of the contact
+    // so add a few fields.
     $returnProperties['first_name'] =
     $returnProperties['organization_name'] =
     $returnProperties['household_name'] =
@@ -1626,15 +1626,16 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Given a set of flat profile style field names, create a hierarchy
-   * for query to use and crete the right sql
+   * Given a set of flat profile style field names, create a hierarchy.
+   *
+   * This is for the query to use, create the right sql.
    *
    * @param $fields
    * @param int $contactId
    *   Contact id.
    *
    * @return array
-   *   a hierarchical property tree if appropriate
+   *   A hierarchical property tree if appropriate
    */
   public static function &makeHierReturnProperties($fields, $contactId = NULL) {
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
@@ -2529,8 +2530,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Given the component name and returns
-   * the count of participation of contact
+   * Given the component name and returns the count of participation of contact.
    *
    * @param string $component
    *   Input component name.
@@ -2616,8 +2616,6 @@ AND       civicrm_openid.is_primary = 1";
    *   Contact object after save.
    * @param bool $useDefaults
    *   Use default greeting values.
-   *
-   * @return void
    */
   public static function processGreetings(&$contact, $useDefaults = FALSE) {
     if ($useDefaults) {
@@ -3191,7 +3189,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Get a list of triggers for the contact table
+   * Get a list of triggers for the contact table.
    *
    * @see hook_civicrm_triggerInfo
    * @see CRM_Core_DAO::triggerRebuild
@@ -3255,8 +3253,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Check if contact is being used in civicrm_domain
-   * based on $contactId
+   * Check if contact is being used in civicrm_domain based on $contactId.
    *
    * @param int $contactId
    *   Contact id.
@@ -3265,8 +3262,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *   true if present else false.
    */
   public static function checkDomainContact($contactId) {
-    if (!$contactId)
+    if (!$contactId) {
       return FALSE;
+    }
     $domainId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $contactId, 'id', 'contact_id');
 
     if ($domainId) {
@@ -3279,6 +3277,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
 
   /**
    * Get options for a given contact field.
+   *
    * @see CRM_Core_DAO::buildOptions
    *
    * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
@@ -3314,12 +3313,13 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Delete a contact-related object that has an 'is_primary' field
+   * Delete a contact-related object that has an 'is_primary' field.
+   *
    * Ensures that is_primary gets assigned to another object if available
    * Also calls pre/post hooks
    *
-   * @var $type : object type
-   * @var $id : object id
+   * @var object $type
+   * @var int $id
    * @return bool
    */
   public static function deleteObjectWithPrimary($type, $id) {

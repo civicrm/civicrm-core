@@ -115,7 +115,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return \CRM_Contact_Selector_Custom
    */
-  function __construct(
+  public function __construct(
     $customSearchClass,
     $formValues = NULL,
     $params = NULL,
@@ -152,8 +152,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
    *
+   * Currently the links added for each row are
    * - View
    * - Edit
    *
@@ -212,8 +212,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Returns the column headers as an array of tuples:
-   * (name, sortName (key to the sort array))
+   * Returns the column headers as an array of tuples.
+   *
+   * Keys are name, sortName, key to the sort array.
    *
    * @param string $action
    *   The action being performed.
