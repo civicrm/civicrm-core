@@ -1025,7 +1025,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *  Test civicrm_update() Deliberately exclude contact_type as it should still
    *  cope using civicrm_api CRM-7645
    */
-
   public function testUpdateCreateWithID() {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -1686,8 +1685,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-    * Test id only format
-    */
+   * Test id only format
+   */
   public function testContactGetFormatID_only() {
     $this->createContactFromXML();
     $description = "This demonstrates use of the 'format.id_only' param.
@@ -1701,8 +1700,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-    * Test id only format
-    */
+   * Test id only format
+   */
   public function testContactGetFormatSingleValue() {
     $this->createContactFromXML();
     $description = "This demonstrates use of the 'format.single_value' param.

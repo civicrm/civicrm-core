@@ -37,7 +37,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
   /**
    * called when action is browse
    *
-   * @return null
+   * @return;
    */
   public function browse() {
     $count = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -84,7 +84,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
   public function edit($groupId = NULL) {
     $this->assign('edit', $this->_edit);
     if (!$this->_edit) {
-      return;
+      return NULL;
     }
 
     $action = CRM_Utils_Request::retrieve('action', 'String',
@@ -93,10 +93,8 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
     );
 
     if ($action == CRM_Core_Action::DELETE) {
-      $groupContactId =
-        CRM_Utils_Request::retrieve('gcid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-      $status =
-        CRM_Utils_Request::retrieve('st', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+      $status = CRM_Utils_Request::retrieve('st', 'String', CRM_Core_DAO::$_nullObject, TRUE);
       if (is_numeric($groupContactId) && $status) {
         CRM_Contact_Page_View_GroupContact::del($groupContactId, $status, $this->_contactId);
       }
@@ -132,7 +130,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * @return null
+   * @return;
    */
   public function run() {
     $this->edit();

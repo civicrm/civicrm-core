@@ -334,7 +334,7 @@ AND    v.is_active = 1
     $dao->free();
 
     // Do the regular upgrade
-    $upgrade = new CRM_Upgrade_Form;
+    $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
   }
 

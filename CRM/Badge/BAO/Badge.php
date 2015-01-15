@@ -268,8 +268,7 @@ class CRM_Badge_BAO_Badge {
       $data = $formattedRow['values'];
 
       if ($formattedRow['barcode']['type'] == 'barcode') {
-        $data['current_value'] =
-          $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+        $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
       }
       else {
         // view participant url

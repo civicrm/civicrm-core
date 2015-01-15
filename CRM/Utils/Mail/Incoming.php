@@ -324,7 +324,7 @@ class CRM_Utils_Mail_Incoming {
     // we definitely need a contact id for the from address
     // if we dont have one, skip this email
     if (empty($params['from']['id'])) {
-      return;
+      return NULL;
     }
 
     $emailFields = array('to', 'cc', 'bcc');

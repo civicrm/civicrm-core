@@ -69,8 +69,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
-   *
    * @return array
    *   array of action links that we need to display for the browse screen
    */
@@ -112,8 +110,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
 
   /**
    * Browse all custom group fields.
-   *
-   * @param null
    *
    * @return void
    */
@@ -265,8 +261,6 @@ ORDER BY weight, label
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    *
-   * @param null
-   *
    * @return void
    */
   public function run() {
@@ -288,7 +282,7 @@ ORDER BY weight, label
       array(
         'title' => ts('Custom Data Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 

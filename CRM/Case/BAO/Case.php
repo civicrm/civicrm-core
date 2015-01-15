@@ -198,7 +198,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param int $caseID
    *
-   * @return Void
+   * @return;
    */
   public static function deleteCaseContact($caseID) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -1857,7 +1857,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $where = $groupBy = ' ';
 
     if (!$caseID) {
-      return;
+      return NULL;
     }
 
     if ($latestDate) {
@@ -2001,7 +2001,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    */
   public static function getCaseManagerContact($caseType, $caseId) {
     if (!$caseType || !$caseId) {
-      return;
+      return NULL;
     }
 
     $caseManagerContact = array();
@@ -3379,7 +3379,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   Whatever is known about this dao object.
    *

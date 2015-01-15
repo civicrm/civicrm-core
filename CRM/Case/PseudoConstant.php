@@ -106,7 +106,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all redaction rules
    */
-
   public static function redactionRule($filter = NULL) {
     // if ( ! self::$redactionRule ) {
     self::$redactionRule = array();

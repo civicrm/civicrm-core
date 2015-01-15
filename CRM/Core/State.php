@@ -108,8 +108,6 @@ class CRM_Core_State {
   /**
    * Given an CRM Form, jump to the previous page
    *
-   * @param object the CRM_Core_Form element under consideration
-   *
    * @return mixed
    *   does a jump to the back state
    */
@@ -125,8 +123,6 @@ class CRM_Core_State {
 
   /**
    * Given an CRM Form, jump to the next page
-   *
-   * @param object the CRM_Core_Form element under consideration
    *
    * @return mixed
    *   does a jump to the nextstate
@@ -161,8 +157,6 @@ class CRM_Core_State {
    * Mark this page as valid for the QFC framework. This is needed as
    * we build more advanced functionality into the StateMachine
    *
-   * @param object the QFC data container
-   *
    * @return void
    */
   public function validate(&$data) {
@@ -172,8 +166,6 @@ class CRM_Core_State {
   /**
    * Mark this page as invalid for the QFC framework. This is needed as
    * we build more advanced functionality into the StateMachine
-   *
-   * @param object the QFC data container
    *
    * @return void
    */
@@ -192,8 +184,6 @@ class CRM_Core_State {
 
   /**
    * Setter for name
-   *
-   * @param string
    *
    * @return void
    */
