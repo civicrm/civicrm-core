@@ -243,7 +243,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * @var null
    */
-  public $_sections = NULL;
+  protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
 
@@ -339,7 +339,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * @var int
    */
-  protected $_section;
+  public $_section;
 
   /**
    * @var string Report description.
