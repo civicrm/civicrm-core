@@ -99,7 +99,7 @@ class CRM_Utils_Signer {
           $params[$paramName] = (string) $params[$paramName];
         }
       }
-      else { // $paramName is not included or ===NULL
+      else {// $paramName is not included or ===NULL
         $params[$paramName] = '';
       }
       $message['payload'][$paramName] = $params[$paramName];

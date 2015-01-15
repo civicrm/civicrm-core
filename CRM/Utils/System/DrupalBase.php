@@ -59,13 +59,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param string dir base civicrm directory
+   * @param string $dir base civicrm directory
    * Return default Site Settings
    * @return array
    *   array
-   * - $url, (Joomla - non admin url)
-   * - $siteName,
-   * - $siteRoot
+   *   - $url, (Joomla - non admin url)
+   *   - $siteName,
+   *   - $siteRoot
    */
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
@@ -92,7 +92,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Check if a resource url is within the drupal directory and format appropriately
    *
-   * @param url (reference)
+   * @param $url (reference)
    *
    * @return bool
    *   TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
@@ -166,7 +166,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return string
    *   an HTML string containing a link to the given path.
    */
-  function url(
+  public function url(
     $path = NULL, $query = NULL, $absolute = FALSE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
@@ -278,7 +278,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     if (CRM_Core_Session::singleton()
         ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array(
           'cms:administer users',
-          'cms:view user account'
+          'cms:view user account',
         ))
     ) {
       return CRM_Utils_System::url('user/' . $uid);
@@ -479,7 +479,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
    *
-   * @param array params
+   * @param array $params
    *
    * FIXME: Document values accepted/required by $params
    */

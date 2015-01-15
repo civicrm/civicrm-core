@@ -10,7 +10,6 @@ describe('Mailing Controllers', function() {
       ctrl = $controller('mailingCtrl', {$scope: scope});
     }));
 
-
     it('should check if 5 groups are there', function() {
       expect(scope.cool_api.length).toBe(3);
 

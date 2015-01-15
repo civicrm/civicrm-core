@@ -52,16 +52,16 @@ class CRM_Core_IDS {
    * This function includes the IDS vendor parts and runs the
    * detection routines on the request array.
    *
-   * @param object cake controller object
+   * @param object $args cake controller object
    *
-   * @return boolean
+   * @return bool
    */
   public function check(&$args) {
     // lets bypass a few civicrm urls from this check
     static $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
     $path = implode('/', $args);
     if (in_array($path, $skip)) {
-      return;
+      return NULL;
     }
 
     #add request url and user agent
@@ -162,7 +162,6 @@ class CRM_Core_IDS {
       CRM_Core_Error::movedSiteError($configFile);
     }
 
-
     // also create the .htaccess file so we prevent the reading of the log and ini files
     // via a browser, CRM-3875
     CRM_Utils_File::restrictAccess($config->configAndLogDir);
@@ -179,7 +178,7 @@ class CRM_Core_IDS {
    *
    * @param IDS_Report $result
    *
-   * @return boolean
+   * @return bool
    */
   private function react(IDS_Report $result) {
 
@@ -210,14 +209,12 @@ class CRM_Core_IDS {
    * @param array $result
    * @param int $reaction
    *
-   * @return boolean
+   * @return bool
    */
   private function log($result, $reaction = 0) {
     $ip = (isset($_SERVER['SERVER_ADDR']) &&
-      $_SERVER['SERVER_ADDR'] != '127.0.0.1'
-    ) ? $_SERVER['SERVER_ADDR'] : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ?
-      $_SERVER['HTTP_X_FORWARDED_FOR'] :
-      '127.0.0.1'
+      $_SERVER['SERVER_ADDR'] != '127.0.0.1') ? $_SERVER['SERVER_ADDR'] : (
+      isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
     );
 
     $data = array();
