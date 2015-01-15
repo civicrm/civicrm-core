@@ -3164,7 +3164,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *   Array of all core or all custom table names extending civicrm_contact
    * @param string $contactRefColumn
    *   'contact_id' if processing core tables, 'entity_id' if processing custom tables
-   * @return void
    *
    * @link https://issues.civicrm.org/jira/browse/CRM-15602
    * @see triggerInfo
@@ -3292,7 +3291,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *

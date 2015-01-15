@@ -95,32 +95,32 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
       'first second',
       CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL,
       CRM_Utils_QueryFormatter::MODE_WILDWORDS,
-      '+*first* +*second*'
+      '+*first* +*second*',
     );
     $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL,
       CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX,
-      '+first* +second*'
+      '+first* +second*',
     );
 
     $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SOLR,
       CRM_Utils_QueryFormatter::MODE_NONE,
-      'first second'
+      'first second',
     );
     $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SOLR,
       CRM_Utils_QueryFormatter::MODE_PHRASE,
-      '"first second"'
+      '"first second"',
     );
     $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SOLR,
       CRM_Utils_QueryFormatter::MODE_WILDPHRASE,
-      '"*first second*"'
+      '"*first second*"',
     );
     $cases[] = array(
       'first second',
@@ -135,31 +135,71 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
       'first* second*',
     );
 
-    // if user supplies wildcards, then ignore mode
+    // If user supplies wildcards, then ignore mode.
     foreach (array(
                CRM_Utils_QueryFormatter::MODE_NONE,
                CRM_Utils_QueryFormatter::MODE_WILDPHRASE,
                CRM_Utils_QueryFormatter::MODE_WILDWORDS,
                CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX,
              ) as $mode) {
-      $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SQL_LIKE, $mode, 'first% second');
-      $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SQL_FTS, $mode, 'first* second');
-      $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL, $mode, '+first* +second');
-      $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SOLR, $mode, 'first* second');
-      $cases[] = array('first second%', CRM_Utils_QueryFormatter::LANG_SQL_LIKE, $mode, 'first second%');
-      $cases[] = array('first second%', CRM_Utils_QueryFormatter::LANG_SQL_FTS, $mode, 'first second*');
-      $cases[] = array('first second%', CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL, $mode, '+first +second*');
-      $cases[] = array('first second%', CRM_Utils_QueryFormatter::LANG_SOLR, $mode, 'first second*');
+      $cases[] = array(
+        'first% second',
+        CRM_Utils_QueryFormatter::LANG_SQL_LIKE,
+        $mode,
+        'first% second',
+      );
+      $cases[] = array(
+        'first% second',
+        CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+        $mode,
+        'first* second',
+      );
+      $cases[] = array(
+        'first% second',
+        CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL,
+        $mode,
+        '+first* +second',
+      );
+      $cases[] = array(
+        'first% second',
+        CRM_Utils_QueryFormatter::LANG_SOLR,
+        $mode,
+        'first* second',
+      );
+      $cases[] = array(
+        'first second%',
+        CRM_Utils_QueryFormatter::LANG_SQL_LIKE,
+        $mode,
+        'first second%',
+      );
+      $cases[] = array(
+        'first second%',
+        CRM_Utils_QueryFormatter::LANG_SQL_FTS,
+        $mode,
+        'first second*',
+      );
+      $cases[] = array(
+        'first second%',
+        CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL,
+        $mode,
+        '+first +second*',
+      );
+      $cases[] = array(
+        'first second%',
+        CRM_Utils_QueryFormatter::LANG_SOLR,
+        $mode,
+        'first second*',
+      );
     }
 
     return $cases;
   }
 
   /**
-   * @param $text
-   * @param $language
-   * @param $mode
-   * @param $expectedText
+   * @param string $text
+   * @param string $language
+   * @param string $mode
+   * @param string $expectedText
    * @dataProvider dataProvider
    */
   public function testFormat($text, $language, $mode, $expectedText) {
