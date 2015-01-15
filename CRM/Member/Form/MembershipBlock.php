@@ -82,7 +82,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         CRM_Core_DAO::commonRetrieveAll('CRM_Price_DAO_PriceField', 'price_set_id', $priceSetId, $pFIDs, $return = array(
             'html_type',
             'name',
-            'label'
+            'label',
           ));
         foreach ($pFIDs as $pid => $pValue) {
           if ($pValue['html_type'] == 'Radio' && $pValue['name'] == 'membership_amount') {

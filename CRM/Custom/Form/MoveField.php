@@ -116,8 +116,8 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     }
 
     $customGroup = array(
-        '' => ts('- select -')
-      ) + $customGroup;
+      '' => ts('- select -'),
+    ) + $customGroup;
     $this->add('select',
       'dst_group_id',
       ts('Destination'),
