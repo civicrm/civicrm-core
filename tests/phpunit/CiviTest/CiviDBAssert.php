@@ -150,7 +150,7 @@ class CiviDBAssert {
    * @param $expectedValue
    * @param string $message
    */
-  function assertDBCompareValue(
+  public function assertDBCompareValue(
     &$testCase, $daoName, $searchValue, $returnColumn, $searchColumn,
     $expectedValue, $message
   ) {

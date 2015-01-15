@@ -73,7 +73,7 @@ class CRM_Core_Page_AJAX {
         // FIXME: This is done to maintain current wire protocol, but it might be
         // simpler to just require different 'types' for pages and forms
         if (preg_match('/^CRM_[a-zA-Z0-9]+_Page_Inline_/', $className)) {
-          $page = new $className;
+          $page = new $className();
           $page->run();
         }
         else {

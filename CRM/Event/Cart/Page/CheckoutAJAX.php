@@ -14,7 +14,7 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
     $params_array = array(
       'cart_id' => $cart->id,
       'contact_id' => CRM_Event_Cart_Form_Cart::find_or_create_contact(),
-      'event_id' => $event_id
+      'event_id' => $event_id,
     );
 
     //XXX security?

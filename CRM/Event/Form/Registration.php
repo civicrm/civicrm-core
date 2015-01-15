@@ -393,8 +393,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('values', $this->_values);
       $this->set('fields', $this->_fields);
 
-      $this->_availableRegistrations =
-        CRM_Event_BAO_Participant::eventFull(
+      $this->_availableRegistrations
+        = CRM_Event_BAO_Participant::eventFull(
           $this->_values['event']['id'], TRUE,
           CRM_Utils_Array::value('has_waitlist', $this->_values['event'])
         );
@@ -832,7 +832,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
-      return;
+      return NULL;
     }
     $params = $form->_params;
     $transaction = new CRM_Core_Transaction();
@@ -879,8 +879,7 @@ WHERE  v.option_group_id = g.id
       ),
       'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),
       'source' => CRM_Utils_String::ellipsify(
-        isset($params['participant_source']) ?
-          CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
+        isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
         $participantFields['participant_source']['maxlength']
       ),
       'fee_level' => CRM_Utils_Array::value('amount_level', $params),
@@ -1290,8 +1289,8 @@ WHERE  v.option_group_id = g.id
             $optionMaxValues[$priceFieldId][$optId] = $currentMaxValue;
           }
           else {
-            $optionMaxValues[$priceFieldId][$optId] =
-              $currentMaxValue + CRM_Utils_Array::value($optId, CRM_Utils_Array::value($priceFieldId, $optionMaxValues), 0);
+            $optionMaxValues[$priceFieldId][$optId]
+              = $currentMaxValue + CRM_Utils_Array::value($optId, CRM_Utils_Array::value($priceFieldId, $optionMaxValues), 0);
           }
 
         }
@@ -1308,16 +1307,16 @@ WHERE  v.option_group_id = g.id
         if ($optMax && $total > $optMax) {
           $errors['soldOutOptions'][] = ts('Option %1 has sold out.', array(1 => $feeBlock[$fieldId]['options'][$optId]['label']));
           if ($opDbCount && ($opDbCount >= $optMax)) {
-            $errors[$currentParticipantNum]["price_{$fieldId}"] =
-              ts('Sorry, this option is currently sold out.');
+            $errors[$currentParticipantNum]["price_{$fieldId}"]
+              = ts('Sorry, this option is currently sold out.');
           }
           elseif (($optMax - $opDbCount) == 1) {
-            $errors[$currentParticipantNum]["price_{$fieldId}"] =
-              ts('Sorry, currently only a single seat is available for this option.', array(1 => ($optMax - $opDbCount)));
+            $errors[$currentParticipantNum]["price_{$fieldId}"]
+              = ts('Sorry, currently only a single seat is available for this option.', array(1 => ($optMax - $opDbCount)));
           }
           else {
-            $errors[$currentParticipantNum]["price_{$fieldId}"] =
-              ts('Sorry, currently only %1 seats are available for this option.', array(1 => ($optMax - $opDbCount)));
+            $errors[$currentParticipantNum]["price_{$fieldId}"]
+              = ts('Sorry, currently only %1 seats are available for this option.', array(1 => ($optMax - $opDbCount)));
           }
         }
       }
