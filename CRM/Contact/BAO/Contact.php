@@ -2556,12 +2556,14 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Core_BAO_EntityTag::getContactTags($contactId, TRUE);
 
       case 'rel':
+
         return CRM_Contact_BAO_Relationship::getRelationship($contactId,
           CRM_Contact_BAO_Relationship::CURRENT,
           0, 1
         );
 
       case 'group':
+
         return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE);
 
       case 'log':
@@ -2617,7 +2619,7 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Process greetings and cache
+   * Process greetings and cache.
    *
    * @param object $contact
    *   Contact object after save.
@@ -3089,8 +3091,9 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
-   * Retrieve display name of contact that address is shared
-   * based on $masterAddressId or $contactId .
+   * Retrieve display name of contact that address is shared.
+   *
+   * This is based on $masterAddressId or $contactId .
    *
    * @param int $masterAddressId
    *   Master id.
@@ -3125,11 +3128,12 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Get the creation/modification times for a contact
+   * Get the creation/modification times for a contact.
    *
    * @param int $contactId
    *
-   * @return array('created_date' => $, 'modified_date' => $)
+   * @return array
+   *  Dates - ('created_date' => $, 'modified_date' => $)
    */
   public static function getTimestamps($contactId) {
     $timestamps = CRM_Core_DAO::executeQuery(
@@ -3152,8 +3156,10 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Generate triggers to update the timestamp on the corresponding civicrm_contact row,
-   * on insert/update/delete to a table that extends civicrm_contact.
+   * Generate triggers to update the timestamp.
+   *
+   * The corresponding civicrm_contact row is updated on insert/update/delete
+   * to a table that extends civicrm_contact.
    * Don't regenerate triggers for all such tables if only asked for one table.
    *
    * @param array $info

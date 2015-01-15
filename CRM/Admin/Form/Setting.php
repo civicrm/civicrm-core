@@ -111,7 +111,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
