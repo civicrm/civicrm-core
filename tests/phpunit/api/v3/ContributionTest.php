@@ -586,7 +586,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test note created correctly
+   * Test note created correctly.
    */
   public function testCreateContributionWithNote() {
     $description = "Demonstrates creating contribution with Note Entity";
@@ -680,8 +680,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ));
     $params = $this->_params + array(
-        'soft_credit_to' => $contact2['id'],
-      );
+      'soft_credit_to' => $contact2['id'],
+    );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
@@ -702,8 +702,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ));
     $params = $this->_params + array(
-        'honor_contact_id' => $contact2['id'],
-      );
+      'honor_contact_id' => $contact2['id'],
+    );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
@@ -718,7 +718,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code
+   *  Test  using example code.
    */
   public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
@@ -782,7 +782,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
 
   /**
-   * Function tests that additional financial records are created when online contribution is created
+   * Function tests that additional financial records are created when online contribution is created.
    */
   public function testCreateContributionOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -814,6 +814,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check handling of financial type.
+   *
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
@@ -824,6 +826,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check handling of financial type.
+   *
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
