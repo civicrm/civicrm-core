@@ -33,8 +33,7 @@
  */
 
 /**
- * This class is for activity functions
- *
+ * This class is for activity functions.s
  */
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
@@ -2126,11 +2125,11 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Restore the activity
+   * Restore the activity.
    *
    * @param array $params
    *
-   * @return void
+   * @return CRM_Activity_DAO_Activity
    */
   public static function restoreActivity(&$params) {
     $activity = new CRM_Activity_DAO_Activity();

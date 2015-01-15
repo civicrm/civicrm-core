@@ -38,7 +38,7 @@
 class CRM_Contact_Form_Edit_Phone {
 
   /**
-   * Build the form object elements for a phone object
+   * Build the form object elements for a phone object.
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
@@ -46,8 +46,6 @@ class CRM_Contact_Form_Edit_Phone {
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this

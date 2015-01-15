@@ -36,7 +36,6 @@
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
@@ -250,7 +249,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param null $action
    *
    * @return int
    *   Total number of rows

@@ -34,7 +34,6 @@
 
 /**
  * This class generates form components for search-result tasks
- *
  */
 class CRM_Contact_Form_Task extends CRM_Core_Form {
 
@@ -323,9 +322,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
 
   /**
-   * Set default values for the form. Relationship that in edit/view action
-   * the default values are retrieved from the database
+   * Set default values for the form. Relationship that in edit/view action.
    *
+   * The default values are retrieved from the database.
    *
    * @return array
    */
@@ -348,7 +347,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
   }
