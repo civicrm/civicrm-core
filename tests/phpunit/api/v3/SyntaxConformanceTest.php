@@ -65,13 +65,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     'Survey' => 'CiviCampaign',
   );
 
-  /* they are two types of missing APIs:
-     - Those that are to be implemented
-     (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
-       Those that don't exist
-         and that will never exist (eg an obsoleted Entity
-         they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
-    */
+  /**
+   * Set up function.
+   *
+   * There are two types of missing APIs:
+   * Those that are to be implemented
+   * (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
+   * Those that don't exist
+   * and that will never exist (eg an obsoleted Entity
+   * they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
+   */
   public function setUp() {
     parent::setUp();
     $this->enableCiviCampaign();

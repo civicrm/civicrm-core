@@ -2097,7 +2097,6 @@ AND cl.modified_id  = c.id
    *
    * @return string|bool
    *   if file exists returns $activityTypeFile activity filename otherwise false.
-   *
    */
   public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
@@ -2203,7 +2202,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Get the allowed profile fields for Activities
+   * Get the allowed profile fields for Activities.
    *
    * @return array
    *   array of activity profile Fields
@@ -2239,8 +2238,10 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * This function deletes the activity record related to contact record,
-   * when there are no target and assignee record w/ other contact.
+   * This function deletes the activity record related to contact record.
+   *
+   * This is conditional on there being no target and assignee record
+   * with other contacts.
    *
    * @param int $contactId
    *   ContactId.
@@ -2589,7 +2590,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * copy custom fields and attachments from an existing activity to another.
+   * Copy custom fields and attachments from an existing activity to another.
+   *
    * @see CRM_Case_Page_AJAX::_convertToCaseActivity()
    *
    * @param array $params
@@ -2633,6 +2635,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get activity contact.
+   *
    * @param int $activityId
    * @param int $recordTypeID
    * @param string $column
@@ -2667,6 +2671,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Set api filter.
+   *
+   * @todo Document what this is for.
+   *
    * @param array $params
    */
   public function setApiFilter(&$params) {

@@ -32,6 +32,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_BAO_ActionScheduleTest
  */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
+
   /**
    * @var object see CiviTest/CiviMailUtils
    */
@@ -56,7 +57,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_override' => 0,
     );
 
-    $this->fixtures['rolling_membership_past'] = array(// createTestObject
+    $this->fixtures['rolling_membership_past'] = array(
       'membership_type_id' => array(
         'period_type' => 'rolling',
         'duration_unit' => 'month',
