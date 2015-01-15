@@ -484,7 +484,7 @@ class CRM_Utils_Migrate_Export {
               'Individual',
               'Organization',
               'Household',
-              'Case'
+              'Case',
             ))) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
