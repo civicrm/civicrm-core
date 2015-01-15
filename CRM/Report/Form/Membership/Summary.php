@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
 
@@ -43,12 +42,11 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   );
 
   /**
-   */
-  /**
+   * Constructor function.
    */
   public function __construct() {
     // UI for selecting columns to appear in the report list
-    // array conatining the columns, group_bys and filters build and provided to Form
+    // array containing the columns, group_bys and filters build and provided to Form
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -139,18 +137,27 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
+  /**
+   * Pre-process function.
+   */
   public function preProcess() {
     $this->assign('reportTitle', ts('Membership Summary Report'));
     parent::preProcess();
   }
 
   /**
+   * Set default values.
+   *
    * @return array
+   *   Default values.
    */
   public function setDefaultValues() {
     return parent::setDefaultValues();
   }
 
+  /**
+   * Generate select clause.
+   */
   public function select() {
     $select = array();
     $this->_columnHeaders = array();
@@ -179,6 +186,8 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
   }
 
   /**
+   * Set form rules.
+   *
    * @param $fields
    * @param $files
    * @param $self
@@ -205,12 +214,12 @@ LEFT  JOIN civicrm_membership_type  {$this->_aliases['civicrm_membership_type']}
 LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
        ON {$this->_aliases['civicrm_membership']}.contact_id = {$this->_aliases['civicrm_contribution']}.contact_id
 ";
-    //  include address field if address column is to be included
+    // Include address table if address column is to be included.
     if ($this->_addressField) {
       $this->_from .= "LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
 
-    // include email field if email column is to be included
+    // Include email table if email column is to be included.
     if ($this->_emailField) {
       $this->_from .= "LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
@@ -259,7 +268,9 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
   }
 
   /**
-   * @param $rows
+   * Generate statistics (bottom section of the report).
+   *
+   * @param array $rows
    *
    * @return array
    */
@@ -363,7 +374,9 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
   }
 
   /**
-   * @param $rows
+   * Make changes to how data is displayed.
+   *
+   * @param array $rows
    */
   public function alterDisplay(&$rows) {
     // custom code to alter rows
@@ -418,12 +431,13 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url('civicrm/report/member/detail',
+        $url = CRM_Utils_System::url(
+          'civicrm/report/member/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl
         );
-        $rows[$rowNum]['civicrm_contact_sort_name'] =
-          "<a href='$url'>" . $row["civicrm_contact_sort_name"] . '</a>';
+        $rows[$rowNum]['civicrm_contact_sort_name']
+          = "<a href='$url'>" . $row["civicrm_contact_sort_name"] . '</a>';
         $entryFound = TRUE;
       }
 

@@ -30,12 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * This class generates form components generic to CiviCRM settings
- *
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
@@ -44,10 +42,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   * default values are retrieved from the database
    *
-   *
-   * @return void
+   * Default values are retrieved from the database.
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
@@ -89,10 +85,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       //Set defaults for autocomplete and contact reference options
       $this->_defaults['autocompleteContactSearch'] = array(
-          '1' => 1
+          '1' => 1,
         ) + $autoSearchFields;
       $this->_defaults['autocompleteContactReference'] = array(
-          '1' => 1
+          '1' => 1,
         ) + $cRSearchFields;
 
       // we can handle all the ones defined in the metadata here. Others to be converted
@@ -116,8 +112,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -169,10 +163,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
-   *
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     // store the submitted values in an array

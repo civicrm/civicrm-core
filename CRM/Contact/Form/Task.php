@@ -30,12 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * This class generates form components for search-result tasks
- *
  */
 class CRM_Contact_Form_Task extends CRM_Core_Form {
 
@@ -87,17 +85,15 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   static protected $_searchFormValues;
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @param
-   *
-   * @return void
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     self::preProcessCommon($this);
   }
 
   /**
+   * Common pre-processing function.
+   *
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
@@ -258,7 +254,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
     }
 
-
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
@@ -277,8 +272,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Get the contact id for custom search
-   * we are not using prev/next table incase of custom search
+   * Get the contact id for custom search.
+   *
+   * we are not using prev/next table in case of custom search
    */
   public function getContactIds() {
     // need to perform action on all contacts
@@ -326,9 +322,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
 
   /**
-   * Set default values for the form. Relationship that in edit/view action
-   * the default values are retrieved from the database
+   * Set default values for the form. Relationship that in edit/view action.
    *
+   * The default values are retrieved from the database.
    *
    * @return array
    */
@@ -338,34 +334,28 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * add the rules for form.
-   *
-   * @return void
+   * Add the rules for form.
    */
   public function addRules() {
   }
 
   /**
    * Build the form object
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
   }
 
   /**
-   * Process the form after the input has been submitted and validated
-   *
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Simple shell that derived classes can call to add form buttons.
+   *
+   * Allows customized title for the main Submit
    *
    * @param string $title
    *   Title of the main button.
@@ -373,8 +363,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

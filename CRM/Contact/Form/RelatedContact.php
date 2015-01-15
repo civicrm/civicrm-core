@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -39,7 +38,6 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
@@ -65,9 +63,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   protected $_defaults = array();
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @return void
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     // reset action from the session
@@ -114,9 +110,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     $params = array();
@@ -155,9 +149,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -167,7 +158,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     foreach (array(
                'phone',
                'email',
-               'address'
+               'address',
              ) as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];

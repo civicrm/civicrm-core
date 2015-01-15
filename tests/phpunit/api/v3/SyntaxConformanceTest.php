@@ -66,8 +66,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   );
 
   /* they are two types of missing APIs:
-       - Those that are to be implemented
-         (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
+     - Those that are to be implemented
+     (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
        Those that don't exist
          and that will never exist (eg an obsoleted Entity
          they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
@@ -83,7 +83,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'ReportTemplate',
       'System',
-      'Setting'
+      'Setting',
     );
     $this->toBeImplemented['create'] = array(
       'SurveyRespondant',
@@ -94,7 +94,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomSearch',
       'Extension',
       'ReportTemplate',
-      'System'
+      'System',
     );
     $this->toBeImplemented['delete'] = array(
       'MembershipPayment',
@@ -104,7 +104,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFMatch',
       'Extension',
       'LocationType',
-      'System'
+      'System',
     );
     $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain', 'Setting');
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
@@ -120,11 +120,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param null $skip
+   * Generate list of all entities.
+   *
+   * @param array $skip
+   *   Entities to skip.
    *
    * @return array
    */
-  public static function entities($skip = NULL) {
+  public static function entities($skip = array()) {
     // The order of operations in here is screwy. In the case where SYNTAX_CONFORMANCE_ENTITIES is
     // defined, we should be able to parse+return it immediately. However, some weird dependency
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
@@ -149,6 +152,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get list of entities for get test.
+   *
    * @return array
    */
   public static function entities_get() {
