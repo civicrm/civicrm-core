@@ -7,7 +7,7 @@
 class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
   /**
-   * Record - what do I do?
+   * Record - what do I do.
    *
    * @param object $rg
    *

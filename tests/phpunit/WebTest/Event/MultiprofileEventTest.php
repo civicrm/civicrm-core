@@ -410,14 +410,16 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $profilefield
+   * Test profile creation.
+   *
+*@param $profileField
    * @param int $location
    * @param $type
    *
    * @return null
    */
-  public function _testCreateProfile($profilefield, $location = 0, $type) {
-    $locationfields = array(
+  public function _testCreateProfile($profileField, $location = 0, $type) {
+    $locationFields = array(
       'supplemental_address_1',
       'supplemental_address_2',
       'city',
@@ -429,22 +431,22 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     );
 
     // Add new profile.
-    $profilename = "Profile_" . substr(sha1(rand()), 0, 7);
+    $profileName = "Profile_" . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-top');
 
     //Name of profile
-    $this->type('title', $profilename);
+    $this->type('title', $profileName);
     $this->click('uf_group_type_Profile');
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileId = $this->urlArg('gid');
 
     //Add field to profile_testCreateProfile
-    foreach ($profilefield as $key => $value) {
+    foreach ($profileField as $key => $value) {
       $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
-      if (in_array($value, $locationfields)) {
+      if (in_array($value, $locationFields)) {
         $this->select("field_name[0]", "value={$type}");
         $this->select("field_name[1]", "value={$value}");
         $this->select("field_name[2]", "value={$location}");

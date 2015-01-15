@@ -8,7 +8,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
 
   public function dataProvider() {
-    $cases = array(); // array(0=>$inputText, 1=>$language, 2=>$options, 3=>$expectedText)
+    // Array(0=>$inputText, 1=>$language, 2=>$options, 3=>$expectedText).
+    $cases = array();
 
     $cases[] = array(
       'first second',
@@ -125,13 +126,13 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
       'first second',
       CRM_Utils_QueryFormatter::LANG_SOLR,
       CRM_Utils_QueryFormatter::MODE_WILDWORDS,
-      '*first* *second*'
+      '*first* *second*',
     );
     $cases[] = array(
       'first second',
       CRM_Utils_QueryFormatter::LANG_SOLR,
       CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX,
-      'first* second*'
+      'first* second*',
     );
 
     // if user supplies wildcards, then ignore mode
@@ -139,7 +140,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
                CRM_Utils_QueryFormatter::MODE_NONE,
                CRM_Utils_QueryFormatter::MODE_WILDPHRASE,
                CRM_Utils_QueryFormatter::MODE_WILDWORDS,
-               CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX
+               CRM_Utils_QueryFormatter::MODE_WILDWORDS_SUFFIX,
              ) as $mode) {
       $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SQL_LIKE, $mode, 'first% second');
       $cases[] = array('first% second', CRM_Utils_QueryFormatter::LANG_SQL_FTS, $mode, 'first* second');

@@ -52,7 +52,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   static $_importableFields = NULL;
 
   /**
-   * Check if there is absolute minimum of data to add the object
+   * Check if there is absolute minimum of data to add the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -1499,7 +1499,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * @param int $toID
    *   The contact id of the recipient.
    * @param $tokenText
-   * @param $tokenHtml
    * @param array $smsParams
    *   The params used for sending sms.
    * @param int $activityID
@@ -1652,7 +1651,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important and should be done in the
@@ -1967,7 +1966,7 @@ AND id < {$activityID}
   }
 
   /**
-   * Get all prior activities of currently viewed activity
+   * Get all prior activities of currently viewed activity.
    *
    * @param $activityID
    *   Current activity id.
@@ -2018,7 +2017,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Find the latest revision of a given activity
+   * Find the latest revision of a given activity.
    *
    * @param int $activityID
    *   Prior activity id.
@@ -2051,7 +2050,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Create a follow up a given activity
+   * Create a follow up a given activity.
    *
    * @param int $activityId
    *   activity id of parent activity.
@@ -2142,7 +2141,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Get the exportable fields for Activities
+   * Get the exportable fields for Activities.
    *
    * @param string $name
    *   If it is called by case $name = Case else $name = Activity.
@@ -2440,13 +2439,13 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * wrapper for ajax activity selector
+   * Wrapper for ajax activity selector.
    *
    * @param array $params
    *   Associated array for params record id.
    *
    * @return array
-   *   associated array of contact activities
+   *   Associated array of contact activities
    */
   public static function getContactActivitySelector(&$params) {
     // format the params

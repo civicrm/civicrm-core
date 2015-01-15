@@ -495,8 +495,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for resolveDefaults( )
-   * test all pseudoConstant, stateProvince, country.
+   * Test case for resolveDefaults( ).
+   *
+   * Test all pseudoConstant, stateProvince, country.
    */
   public function testResolveDefaults() {
     $params = array(
