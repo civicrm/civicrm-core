@@ -965,13 +965,15 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
 
-    // Get group counts
+    // Get group counts - executes one query for regular groups and another for smart groups
     foreach ($groupsToCount as $table => $groups) {
-      $where = "group_id IN (" . implode(',', $groups) . ")";
+      $where = "g.group_id IN (" . implode(',', $groups) . ")";
       if ($table == 'civicrm_group_contact') {
-        $where .= " AND status = 'Added'";
+        $where .= " AND g.status = 'Added'";
       }
-      $dao = CRM_Core_DAO::executeQuery("SELECT group_id, COUNT(id) as `count` FROM $table WHERE $where GROUP BY group_id");
+      // Exclude deleted contacts
+      $where .= " and c.id = g.contact_id AND c.is_deleted = 0";
+      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(g.id) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
       while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
