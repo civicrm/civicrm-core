@@ -29,7 +29,7 @@
  * If an result of class error is returned it is treated as a failure
  *
  * -----------------------------------------------------------------------------------------------
- **/
+ */
 
 /**
  * From Payment processor documentation
@@ -63,7 +63,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    */
   static private $_singleton = NULL;
 
-  /**********************************************************
+  /**
    * Constructor
    *
    * @param string $mode
@@ -79,12 +79,12 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
   }
 
-  /**********************************************************
+  /**
    * This function is set up and put here to make the mapping of fields
    * from the params object  as visually clear as possible for easy editing
    *
    *  Comment out irrelevant fields
-   **********************************************************/
+   */
   public function mapProcessorFieldstoParams($params) {
     /*concatenate full customer name first  - code from EWAY gateway
          */
@@ -139,10 +139,10 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     return $requestFields;
   }
 
-  /**********************************************************
+  /**
    * This function sends request and receives response from
    * the processor
-   **********************************************************/
+   */
   public function doDirectPayment(&$params) {
     if ($params['is_recur'] == TRUE) {
       CRM_Core_Error::fatal(ts('%1 - recurring payments not implemented', array(1 => $paymentProcessor)));
@@ -315,9 +315,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     return $contribution->find();
   }
 
-  /**************************************************
+  /**
    * Produces error message and returns from class
-   **************************************************/
+   */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
@@ -330,14 +330,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     return $e;
   }
 
-  /**************************************************
+  /**
    * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
+   */
   public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /********************************************************************************************
+  /**
    * This public function checks to see if we have the right processor config values set
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
@@ -348,10 +348,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ******************************************************************************************
+   *  function checkConfig( $mode )           CiviCRM V1.9 Declaration
+   * CiviCRM V2.0 Declaration
    */
-  //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
-  // CiviCRM V2.0 Declaration
   public function checkConfig() {
     $errorMsg = array();
 

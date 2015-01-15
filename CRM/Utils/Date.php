@@ -719,7 +719,7 @@ class CRM_Utils_Date {
    * 'day' => '25', 'month' => '10',
    *                              'year' => '2007' );
    *
-   * @param array $dayParamsArray of the day, month, year.
+   * @param array $dayParams of the day, month, year.
    *   Array of the day, month, year.
    *                             values.
    * @param string $format
@@ -1437,7 +1437,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('month', +1, $from);
+            $to = self::intervalAdd('month', 1, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
         }
@@ -1537,7 +1537,7 @@ class CRM_Utils_Date {
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             $from = self::intervalAdd('day', -1 * ($now['wday']) + 7, $from);
-            $to = self::intervalAdd('day', +6, $from);
+            $to = self::intervalAdd('day', 6, $from);
             break;
 
           case 'starting':
@@ -1546,7 +1546,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('day', +7, $from);
+            $to = self::intervalAdd('day', 7, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
         }
@@ -1606,7 +1606,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', +1, $to);
+            $to = self::intervalAdd('day', 1, $to);
             $from['d'] = $to['d'];
             $from['M'] = $to['M'];
             $from['Y'] = $to['Y'];
@@ -1618,7 +1618,7 @@ class CRM_Utils_Date {
 
     foreach (array(
                'from',
-               'to'
+               'to',
              ) as $item) {
       if (!empty($$item)) {
         $dateRange[$item] = self::format($$item);

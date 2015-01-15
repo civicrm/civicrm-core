@@ -36,13 +36,13 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   /**
    * @param array $params
    *
-   * @return $this|null
+   * @return this|null
    */
   public static function add(&$params) {
     if (empty($params)) {
       return NULL;
     }
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     return $dao->save();
   }
@@ -50,7 +50,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   /**
    * @param array $params
    *
-   * @return $this|null
+   * @return this|null
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -70,7 +70,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
    */
   public static function deleteParticipantStatusType($id) {
     // return early if there are participants with this status
-    $participant = new CRM_Event_DAO_Participant;
+    $participant = new CRM_Event_DAO_Participant();
     $participant->status_id = $id;
     if ($participant->find()) {
       return FALSE;
@@ -78,7 +78,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
     CRM_Utils_Weight::delWeight('CRM_Event_DAO_ParticipantStatusType', $id);
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->id = $id;
     $dao->find(TRUE);
     $dao->delete();
@@ -94,7 +94,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   public static function retrieve(&$params, &$defaults) {
     $result = NULL;
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     if ($dao->find(TRUE)) {
       CRM_Core_DAO::storeValues($dao, $defaults);

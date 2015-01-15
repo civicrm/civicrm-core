@@ -69,7 +69,7 @@ function civicrm_api3_contact_create($params) {
       $defLocType = CRM_Core_BAO_LocationType::getDefault();
       $params['email'] = array(
         1 => array(
-      'email' => $email,
+          'email' => $email,
           'is_primary' => 1,
           'location_type_id' => ($defLocType->id) ? $defLocType->id : 1,
         ),
@@ -80,8 +80,8 @@ function civicrm_api3_contact_create($params) {
   if (!empty($params['home_url'])) {
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $params['website'] = array(
-    1 => array(
-    'website_type_id' => key($websiteTypes),
+      1 => array(
+        'website_type_id' => key($websiteTypes),
         'url' => $params['home_url'],
       ),
     );
@@ -140,8 +140,6 @@ function _civicrm_api3_contact_create_spec(&$params) {
 
 /**
  * Retrieve one or more contacts, given a set of search params
- *
- * @param array input parameters
  *
  * @return array
  *   API Result Array
@@ -819,7 +817,7 @@ LIMIT    0, {$limit}
       if ($listCurrentEmployer && !empty($currEmpDetails)) {
         $contactList = array(
           array(
-          'data' => $currEmpDetails['data'],
+            'data' => $currEmpDetails['data'],
             'id'   => $currEmpDetails['id'],
           ),
         );

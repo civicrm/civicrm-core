@@ -163,7 +163,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param bool $first
-   * @return void|boolean
+   * @return void|bool
    */
   public function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
@@ -227,7 +227,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       case 'recurring_payment_profile_created':
         if (in_array($recur->contribution_status_id, array(
               array_search('Pending', $contributionStatuses),
-              array_search('In Progress', $contributionStatuses)
+              array_search('In Progress', $contributionStatuses),
             ))
           && !empty($recur->processor_id)
         ) {
@@ -389,14 +389,14 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * (with the input parameters) & call this & all will be done
    *
    * @todo the references to POST throughout this class need to be removed
-   * @return void|boolean
+   * @return void|bool
    */
   public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
     if ($this->_isPaymentExpress) {
       $this->handlePaymentExpress();
-      return;
+      return NULL;
     }
     $objects = $ids = $input = array();
     $this->_component = $input['component'] = self::getValue('m');
@@ -542,7 +542,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
     $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array(
         'return' => 'contact_id, id',
-        'invoice_id' => $input['invoice']
+        'invoice_id' => $input['invoice'],
       ));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
@@ -557,8 +557,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", array(
         1 => array(
           $ids['contribution'],
-          'Integer'
-        )
+          'Integer',
+        ),
       ));
     // only handle component at this stage - not terribly sure how a recurring event payment would arise
     // & suspec main function may be a victom of copy & paste
