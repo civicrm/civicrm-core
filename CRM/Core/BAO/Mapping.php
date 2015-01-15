@@ -68,7 +68,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $id
    *   Mapping id.
    *
-   * @return boolean
+   * @return boo
    */
   public static function del($id) {
     // delete from mapping_field table
@@ -204,7 +204,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param string $mapTypeId
    *   mapping Type.
    *
-   * @return boolean
+   * @return boo
    */
   public static function checkMapping($nameField, $mapTypeId) {
     $mapping = new CRM_Core_DAO_Mapping();
@@ -363,7 +363,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       foreach (array(
                  'groups',
                  'tags',
-                 'notes'
+                 'notes',
                ) as $value) {
         unset($fields['Individual'][$value]);
         unset($fields['Household'][$value]);
@@ -388,7 +388,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         $fields['Contact']['note_body'] = array('title' => $noteTitle . ': ' . ts('Body Only'), 'name' => 'note_body');
         $fields['Contact']['note_subject'] = array(
           'title' => $noteTitle . ': ' . ts('Subject Only'),
-          'name' => 'note_subject'
+          'name' => 'note_subject',
         );
       }
     }
@@ -472,8 +472,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $csRelationships = array();
 
       if ($mappingType == 'Export') {
-        $subTypeRelationshipTypes =
-          CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
+        $subTypeRelationshipTypes
+          = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
             FALSE, 'label', TRUE, $subType);
 
         foreach ($subTypeRelationshipTypes as $key => $var) {
@@ -1109,8 +1109,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         0,
       );
     }
-
-
     return $fields;
   }
 
@@ -1190,7 +1188,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $mappingFields->delete();
 
     if (empty($params['mapper'])) {
-      return;
+      return NULL;
     }
 
     //save record in mapping field table

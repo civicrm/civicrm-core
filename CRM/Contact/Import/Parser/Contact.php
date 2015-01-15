@@ -102,7 +102,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Class constructor
    */
-  function __construct(
+  public function __construct(
     &$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL, $mapperImProvider = NULL, $mapperRelated = NULL, $mapperRelatedContactType = NULL, $mapperRelatedContactDetails = NULL, $mapperRelatedContactLocType = NULL, $mapperRelatedContactPhoneType = NULL, $mapperRelatedContactImProvider = NULL,
     $mapperWebsiteType = NULL, $mapperRelatedContactWebsiteType = NULL
   ) {
@@ -148,8 +148,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     //Relationship importables
-    $this->_relationships = $relations =
-      CRM_Contact_BAO_Relationship::getContactRelationshipType(
+    $this->_relationships = $relations
+      = CRM_Contact_BAO_Relationship::getContactRelationshipType(
         NULL, NULL, NULL, $this->_contactType,
         FALSE, 'label', TRUE, $this->_contactSubType
       );
@@ -250,7 +250,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -262,7 +262,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function preview(&$values) {
@@ -275,7 +275,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return boo
    *   the result of this processing
    */
   public function summary(&$values) {
@@ -449,7 +449,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @param bool $doGeocodeAddress
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
@@ -1013,8 +1013,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
         }
         // else skip does nothing and just returns an error code.
-
-
         if ($cid) {
           $contact = array(
             'contact_id' => $cid,

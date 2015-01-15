@@ -74,7 +74,7 @@ class CRM_Contact_Form_Edit_Address {
     //make location type required for inline edit
     $form->addSelect("address[$blockId][location_type_id]", array(
         'entity' => 'address',
-        'class' => 'eight'
+        'class' => 'eight',
       ) + $js, $inlineEdit);
 
     if (!$inlineEdit) {
@@ -118,12 +118,12 @@ class CRM_Contact_Form_Edit_Address {
       'postal_code' => array(
         ts('Zip / Postal Code'),
         array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')),
-        NULL
+        NULL,
       ),
       'postal_code_suffix' => array(
         ts('Postal Code Suffix'),
         array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'),
-        NULL
+        NULL,
       ),
       'country_id' => array(ts('Country'), $attributes['country_id'], 'country'),
       'state_province_id' => array(ts('State/Province'), $attributes['state_province_id'], NULL),
@@ -144,7 +144,7 @@ class CRM_Contact_Form_Edit_Address {
         if (in_array($nameWithoutID, array(
             'street_number',
             'street_name',
-            'street_unit'
+            'street_unit',
           )) && !empty($addressOptions['street_address_parsing'])
         ) {
           $continue = FALSE;
@@ -265,7 +265,7 @@ class CRM_Contact_Form_Edit_Address {
       $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
           'new_individual',
           'new_organization',
-          'new_household'
+          'new_household',
         ), 'shared_address');
       $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
@@ -359,7 +359,7 @@ class CRM_Contact_Form_Edit_Address {
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
             'options' => CRM_Core_BAO_Address::getValues(array(
                 'entity_id' => $master_cid,
-                'contact_id' => $master_cid
+                'contact_id' => $master_cid,
               )),
             'master_id' => $addressValue['master_id'],
           );
@@ -387,11 +387,11 @@ class CRM_Contact_Form_Edit_Address {
                      'street_number',
                      'street_number_suffix',
                      'street_name',
-                     'street_unit'
+                     'street_unit',
                    ) as $fld) {
             if (in_array($fld, array(
               'street_name',
-              'street_unit'
+              'street_unit',
             ))) {
               $streetAddress .= ' ';
             }

@@ -101,8 +101,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
-  /*
-   */
   public function testgetfieldspledge() {
     $result = $this->callAPISuccess('pledge', 'getfields', array('action' => 'get'));
     $this->assertEquals(1, $result['values']['next_pay_date']['api.return']);
@@ -184,7 +182,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($oldPledge['id'], $earlyPledge['id'], ' check correct pledge returned ' . __LINE__);
   }
 
-  /*
+  /**
    * create 2 pledges - see if we can get by status id
    */
   public function testGetOverduePledge() {
@@ -207,7 +205,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
    * create 2 pledges - see if we can get by status id
    */
   public function testSortParamPledge() {
@@ -264,7 +262,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
-  /*
+  /**
    * Test that pledge with weekly schedule calculates dates correctly
    */
   public function testCreatePledgeWeeklySchedule() {
@@ -279,7 +277,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     //ensure that correct number of payments created & last payment has the right date
     $payments = $this->callAPISuccess('PledgePayment', 'Get', array(
       'pledge_id' => $pledge['id'],
-      'sequential' => 1
+      'sequential' => 1,
     ));
     $this->assertEquals($payments['count'], 5, 'In line ' . __LINE__);
     $this->assertEquals('2011-07-06 00:00:00', $payments['values'][4]['scheduled_date'], 'In line ' . __LINE__);
@@ -331,10 +329,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
-  /*
-  * test that using original_installment_amount rather than pledge_original_installment_amount works
-  * Pledge field behaviour is a bit random & so pledge has come to try to handle both unique & non -unique fields
-  */
+  /**
+   * test that using original_installment_amount rather than pledge_original_installment_amount works
+   * Pledge field behaviour is a bit random & so pledge has come to try to handle both unique & non -unique fields
+   */
   public function testCreatePledgeWithNonUnique() {
     $params = $this->_params;
     $params['original_installment_amount'] = $params['pledge_original_installment_amount'];
@@ -468,7 +466,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccess('pledge', 'delete', $new_params);
   }
 
-  ///////////////// civicrm_pledge_delete methods
   public function testDeleteEmptyParamsPledge() {
     $pledge = $this->callAPIFailure('pledge', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
