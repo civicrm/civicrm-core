@@ -109,7 +109,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'LocationType',
       'System',
     );
-    $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain', 'Setting');
+    $this->onlyIDNonZeroCount['get'] = array(
+      'ActivityType',
+      'Entity',
+      'Domain',
+      'Setting',
+    );
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
     $this->deletableTestObjects = array();
   }
@@ -165,6 +170,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities for create tests.
+   *
    * @return array
    */
   public static function entities_create() {
@@ -233,6 +240,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities to be skipped on get tests.
+   *
    * @param bool $sequential
    *
    * @return array
@@ -243,7 +252,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventConfirm',
       'MailingEventResubscribe',
       'MailingEventUnsubscribe',
-      'Location'
+      'Location',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;

@@ -1187,7 +1187,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
-    $contactIds, // FIXME a param with no default shouldn't be last
+    // FIXME a param with no default shouldn't be last
+    $contactIds,
     $additionalDetails = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
@@ -2163,8 +2164,16 @@ AND cl.modified_id  = c.id
         );
 
         $Activityfields = array(
-          'activity_type' => array('title' => ts('Activity Type'), 'name' => 'activity_type', 'type' => CRM_Utils_Type::T_STRING),
-          'activity_status' => array('title' => ts('Activity Status'), 'name' => 'activity_status', 'type' => CRM_Utils_Type::T_STRING),
+          'activity_type' => array(
+            'title' => ts('Activity Type'),
+            'name' => 'activity_type',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'activity_status' => array(
+            'title' => ts('Activity Status'),
+            'name' => 'activity_status',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         );
         $fields = array_merge($Activityfields, $exportableFields);
       }
@@ -2288,7 +2297,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Does user has sufficient permission for view/edit activity record?
+   * Does user has sufficient permission for view/edit activity record.
    *
    * @param int $activityId
    *   Activity record id.
@@ -2656,6 +2665,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get source contact id.
+   *
    * @param int $activityId
    *
    * @return null

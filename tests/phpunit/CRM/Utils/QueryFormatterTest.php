@@ -196,10 +196,13 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test format.
+   *
    * @param string $text
    * @param string $language
    * @param string $mode
    * @param string $expectedText
+   *
    * @dataProvider dataProvider
    */
   public function testFormat($text, $language, $mode, $expectedText) {
