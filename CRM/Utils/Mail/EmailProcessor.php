@@ -46,12 +46,12 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the default mailbox (ie. that is used by civiMail for the bounce)
    *
-   * @return boolean
-   *   always returns true (for the api). at a later stage we should
-   *                 fix this to return true on success / false on failure etc
+   * @return bool
+   *   Always returns true (for the api). at a later stage we should
+   *   fix this to return true on success / false on failure etc.
    */
   public static function processBounces() {
-    $dao = new CRM_Core_DAO_MailSettings;
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = TRUE;
     $dao->find();
@@ -101,7 +101,7 @@ class CRM_Utils_Mail_EmailProcessor {
    * @return void
    */
   public static function processActivities() {
-    $dao = new CRM_Core_DAO_MailSettings;
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
     $dao->find();
@@ -124,7 +124,7 @@ class CRM_Utils_Mail_EmailProcessor {
    * @return void
    */
   public static function process($civiMail = TRUE) {
-    $dao = new CRM_Core_DAO_MailSettings;
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
 
@@ -143,8 +143,8 @@ class CRM_Utils_Mail_EmailProcessor {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
 
-    $emailActivityTypeId =
-      (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
+    $emailActivityTypeId
+      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
         'activity_type',
         'Inbound Email',
         'name'

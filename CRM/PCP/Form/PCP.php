@@ -42,10 +42,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built
-   *
-   * @param null
-   *
-   * @return void
    */
   public function preProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -122,8 +118,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -138,10 +132,6 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -191,22 +181,18 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *
    * @param array $fields
    *   Posted values of the form.
-   *
-   * @param $files
+   * @param array $files
    * @param CRM_Core_Form $form
    *
-   * @return array
+   * @return array|NULL
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $form) {
+    return NULL;
   }
 
   /**
    * Process the form
-   *
-   * @param null
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

@@ -143,7 +143,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * Drop triggers for all logged tables.
    */
   public function dropTriggers($tableName = NULL) {
-    $dao = new CRM_Core_DAO;
+    $dao = new CRM_Core_DAO();
 
     if ($tableName) {
       $tableNames = array($tableName);
@@ -347,13 +347,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao = new CRM_Report_DAO_ReportInstance;
+      $dao = new CRM_Report_DAO_ReportInstance();
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->title = $titles[$report];
       $dao->permission = 'administer CiviCRM';
-      if ($report == 'logging/contact/summary')
+      if ($report == 'logging/contact/summary') {
         $dao->is_reserved = 1;
+      }
       $dao->insert();
     }
   }
@@ -407,13 +408,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
           $columnSpecs[$dao->TABLE_NAME] = array();
         }
-        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] =
-          array(
-            'COLUMN_NAME' => $dao->COLUMN_NAME,
-            'DATA_TYPE' => $dao->DATA_TYPE,
-            'IS_NULLABLE' => $dao->IS_NULLABLE,
-            'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
-          );
+        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = array(
+          'COLUMN_NAME' => $dao->COLUMN_NAME,
+          'DATA_TYPE' => $dao->DATA_TYPE,
+          'IS_NULLABLE' => $dao->IS_NULLABLE,
+          'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
+        );
       }
     }
     return $columnSpecs[$table];
@@ -530,7 +530,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao = new CRM_Report_DAO_ReportInstance;
+      $dao = new CRM_Report_DAO_ReportInstance();
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();

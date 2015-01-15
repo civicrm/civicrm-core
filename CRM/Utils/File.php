@@ -44,7 +44,7 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean
+   * @return bool
    *   true if file is ascii
    */
   public static function isAscii($name) {
@@ -72,7 +72,7 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean
+   * @return bool
    *   true if file is html
    */
   public static function isHtml($name) {
@@ -177,10 +177,10 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $source
-   * @param $destination
+   * @param string $source
+   * @param string $destination
    */
-  static function copyDir($source, $destination) {
+  public static function copyDir($source, $destination) {
     if ($dh = opendir($source)) {
       @mkdir($destination);
       while (FALSE !== ($file = readdir($dh))) {
@@ -203,7 +203,7 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean
+   * @return bool
    *   whether the file was recoded properly
    */
   public static function toUtf8($name) {
@@ -348,7 +348,7 @@ class CRM_Utils_File {
    * @param string $name
    *   Name of file.
    *
-   * @return boolean
+   * @return bool
    *   whether the file can be include()d or require()d
    */
   public static function isIncludable($name) {

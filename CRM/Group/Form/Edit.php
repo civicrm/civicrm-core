@@ -95,7 +95,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           'url' => CRM_Utils_System::url('civicrm/group',
             'reset=1'
           ),
-        )
+        ),
       );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
@@ -126,8 +126,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $groupValues = array(
           'id' => $this->_id,
           'title' => $this->_title,
-          'saved_search_id' =>
-            isset($this->_groupValues['saved_search_id']) ? $this->_groupValues['saved_search_id'] : '',
+          'saved_search_id' => isset($this->_groupValues['saved_search_id']) ? $this->_groupValues['saved_search_id'] : '',
         );
         if (isset($this->_groupValues['saved_search_id'])) {
           $groupValues['mapping_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch',
@@ -140,13 +139,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           );
         }
         if (!empty($this->_groupValues['created_id'])) {
-          $groupValues['created_by'] =
-            CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'], 'sort_name', 'id');
+          $groupValues['created_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'], 'sort_name', 'id');
         }
 
         if (!empty($this->_groupValues['modified_id'])) {
-          $groupValues['modified_by'] =
-            CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'], 'sort_name', 'id');
+          $groupValues['modified_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'], 'sort_name', 'id');
         }
 
         $this->assign_by_ref('group', $groupValues);
@@ -284,8 +281,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     $this->addButtons(array(
         array(
           'type' => 'upload',
-          'name' =>
-            ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
+          'name' => ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
           'isDefault' => TRUE,
         ),
         array(

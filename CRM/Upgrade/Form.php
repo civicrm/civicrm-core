@@ -98,7 +98,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @param string $method
    * @param null|string $name
    */
-  function __construct(
+  public function __construct(
     $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
@@ -658,7 +658,7 @@ SET    version = '$version'
     if ($upgrade->checkVersionRelease($rev, 'alpha1')) {
       if (!(is_callable(array(
         $versionObject,
-        'verifyPreDBstate'
+        'verifyPreDBstate',
       )))
       ) {
         CRM_Core_Error::fatal("verifyPreDBstate method was not found for $rev");
@@ -678,7 +678,7 @@ SET    version = '$version'
 
     if (is_callable(array(
       $versionObject,
-      $phpFunctionName
+      $phpFunctionName,
     ))) {
       $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
     }
@@ -689,7 +689,7 @@ SET    version = '$version'
     // set post-upgrade-message if any
     if (is_callable(array(
       $versionObject,
-      'setPostUpgradeMessage'
+      'setPostUpgradeMessage',
     ))) {
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
@@ -778,7 +778,7 @@ SET    version = '$version'
         $versionObject = $this->incrementalPhpObject($rev);
         if (is_callable(array(
           $versionObject,
-          'setPreUpgradeMessage'
+          'setPreUpgradeMessage',
         ))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }

@@ -90,7 +90,6 @@ WHERE  cacheKey     = %3 AND
       $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
       $sqlPrev = $sql . $wherePrev;
 
-
       $dao = CRM_Core_DAO::executeQuery($sqlPrev, $p);
       if ($dao->fetch()) {
         $pos['prev']['id1'] = $dao->entity_id1;
@@ -147,10 +146,7 @@ WHERE  cacheKey     = %3 AND
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
     $params = array(1 => array($entityTable, 'String'));
 
-    $pair =
-      !$isViceVersa ?
-        "entity_id1 = %2 AND entity_id2 = %3" :
-        "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
+    $pair = !$isViceVersa ? "entity_id1 = %2 AND entity_id2 = %3" : "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
     $params[2] = array($id1, 'Integer');
     $params[3] = array($id2, 'Integer');
@@ -408,11 +404,11 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
    * @param string $entity_table
    *   Entity table.
    *
-   * @return array
+   * @return array|NULL
    */
   public static function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
     if (!$cacheKey) {
-      return;
+      return NULL;
     }
     $params = array();
 

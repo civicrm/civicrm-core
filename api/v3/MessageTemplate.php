@@ -59,9 +59,8 @@ function _civicrm_api3_message_template_create_spec(&$params) {
 /**
  * @param array $params
  *
- * @return boolean
- *   | error  true if successfull, error otherwise
- * {@getfields message_template_delete}
+ * @return bool
+ *   API result array
  */
 function civicrm_api3_message_template_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

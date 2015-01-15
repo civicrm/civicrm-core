@@ -222,7 +222,7 @@ WHERE  id IN ( $idString )
    * @param string $inputCheck
    *   Checksum to match against.
    *
-   * @return boolean
+   * @return bool
    *   true if valid, else false
    */
   public static function validChecksum($contactID, $inputCheck) {
@@ -329,10 +329,8 @@ UNION
         'relationship_type_id' => $relTypeId . '_a_b',
         'contact_check' => array($organization => TRUE),
       );
-      list($valid, $invalid, $duplicate,
-        $saved, $relationshipIds
-        ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
-
+      list($valid, $invalid, $duplicate, $saved, $relationshipIds)
+        = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
@@ -606,7 +604,7 @@ UPDATE civicrm_contact
       // check permission on acl basis.
       if (in_array($task, array(
         'view',
-        'edit'
+        'edit',
       ))) {
         $aclPermission = CRM_Core_Permission::VIEW;
         if ($task == 'edit') {
@@ -724,7 +722,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
     foreach ($returnProperties as $property => $ignore) {
       $value = (in_array($property, array(
         'city',
-        'street_address'
+        'street_address',
       ))) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
@@ -1079,13 +1077,16 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $greetingType
    *   Greeting type.
    *
-   * @return int
-   *   or null
+   * @return int|NULL
    */
   public static function defaultGreeting($contactType, $greetingType) {
-    $contactTypeFilters = array('Individual' => 1, 'Household' => 2, 'Organization' => 3);
+    $contactTypeFilters = array(
+      'Individual' => 1,
+      'Household' => 2,
+      'Organization' => 3,
+    );
     if (!isset($contactTypeFilters[$contactType])) {
-      return;
+      return NULL;
     }
     $filter = $contactTypeFilters[$contactType];
 
