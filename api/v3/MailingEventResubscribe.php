@@ -33,19 +33,15 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * Subscribe from mailing group
+ * Subscribe from mailing group.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
  *
  * @return array
  *   api result array
- * {@getfields mailing_event_subscribe_create}
  */
 function civicrm_api3_mailing_event_resubscribe_create($params) {
 
@@ -67,9 +63,10 @@ function civicrm_api3_mailing_event_resubscribe_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */

@@ -31,7 +31,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 
@@ -67,7 +66,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * Upload and move the file if valid to the uploaded directory
+   * Upload and move the file if valid to the uploaded directory.
    *
    * @param CRM_Core_Form $page
    *   The CRM_Core_Form object.
@@ -77,8 +76,6 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
    *   The name of the page which index the data container with.
    * @param string $uploadName
    *   The name of the uploaded file.
-   *
-   * @return void
    */
   public function upload(&$page, &$data, $pageName, $uploadName) {
     // make sure uploadName exists in the QF array
@@ -101,7 +98,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
         if (!$status) {
           CRM_Core_Error::statusBounce(ts('We could not move the uploaded file %1 to the upload directory %2. Please verify that the \'Temporary Files\' setting points to a valid path which is writable by your web server.', array(
                 1 => $value['name'],
-                2 => $this->_uploadDir
+                2 => $this->_uploadDir,
               )));
         }
         if (!empty($data['values'][$pageName][$uploadName]['name'])) {
@@ -123,8 +120,6 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
    *   CRM_Core_Form the current form-page.
    * @param string $actionName
    *   Current action name, as one Action object can serve multiple actions.
-   *
-   * @return void
    */
   public function perform(&$page, $actionName) {
     // like in Action_Next
@@ -134,11 +129,13 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
     // the above buildForm potentially changes the action function with different args
     // so basically the rug might have been pulled from us, so we actually just check
     // and potentially call the right one
-    // this allows standalong form uploads to work nicely
+    // this allows standalone form uploads to work nicely
     $page->controller->_actions['upload']->realPerform($page, $actionName);
   }
 
   /**
+   * @todo what do I do?
+   *
    * @param CRM_Core_Form $page
    * @param string $actionName
    *

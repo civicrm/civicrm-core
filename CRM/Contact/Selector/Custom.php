@@ -412,6 +412,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
+   * Generate contact ID query.
+   *
    * @param array $params
    * @param $action
    * @param int $sortID
@@ -420,7 +422,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  public function &contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $params = array();
     $sql = $this->_search->contactIDs($params);
 
@@ -428,7 +430,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Add actions.
+   *
+   * @param array $rows
    */
   public function addActions(&$rows) {
     $links = self::links($this->_key);
@@ -453,7 +457,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Remove actions.
+   *
+   * @param array $rows
    */
   public function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {

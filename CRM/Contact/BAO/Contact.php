@@ -689,7 +689,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -741,7 +741,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Get the display name of a contact
+   * Get the display name of a contact.
    *
    * @param int $id
    *   Id of the contact.
@@ -916,13 +916,14 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Return relative path
+   * Return relative path.
+   *
    * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
    *
    * @param string $absolutePath
    *   Absolute path.
    *
-   * @return String
+   * @return string
    *   Relative url of uploaded image
    */
   public static function getRelativePath($absolutePath) {
@@ -956,7 +957,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Return proportional height and width of the image
+   * Return proportional height and width of the image.
    *
    * @param int $imageWidth
    *   Width of image.
@@ -964,8 +965,8 @@ WHERE id={$id}; ";
    * @param int $imageHeight
    *   Height of image.
    *
-   * @return Array
-   *   thumb dimension of image
+   * @return array
+   *   Thumb dimension of image
    */
   public static function getThumbSize($imageWidth, $imageHeight) {
     $thumbWidth = 100;
@@ -988,7 +989,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Validate type of contact image
+   * Validate type of contact image.
    *
    * @param array $params
    * @param string $imageIndex
@@ -998,7 +999,7 @@ WHERE id={$id}; ";
    * @param string $opType
    *   Type of operation like fatal, bounce etc.
    *
-   * @return boolean
+   * @return bool
    *   true if valid image extension
    */
   public static function processImageParams(
@@ -1036,7 +1037,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Extract contact id from url for deleting contact image
+   * Extract contact id from url for deleting contact image.
    */
   public static function processImage() {
 
@@ -1057,15 +1058,13 @@ WHERE id={$id}; ";
   }
 
   /**
-   *  Function to set is_delete true or restore deleted contact
+   * Function to set is_delete true or restore deleted contact.
    *
    * @param int $contact
    *   Contact DAO object.
    * @param bool $restore
    *   True to set the is_delete = 1 else false to restore deleted contact,
    *                                i.e. is_delete = 0
-   *
-   * @return void
    */
   public static function contactTrashRestore($contact, $restore = FALSE) {
     $op = ($restore ? 'restore' : 'trash');
@@ -1096,8 +1095,6 @@ WHERE id={$id}; ";
    *
    * @return string
    *   contact_type if $id found else null ""
-   *
-   *
    */
   public static function getContactType($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'contact_type');
@@ -1113,8 +1110,6 @@ WHERE id={$id}; ";
    *
    * @return string
    *   contact_sub_type if $id found else null ""
-   *
-   *
    */
   public static function getContactSubType($id, $implodeDelimiter = NULL) {
     $subtype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'contact_sub_type');
@@ -1137,8 +1132,6 @@ WHERE id={$id}; ";
    *   Id of the contact whose contact sub/contact type is needed.
    *
    * @return array
-   *
-   *
    */
   public static function getContactTypes($id) {
     $params = array('id' => $id);
@@ -1151,8 +1144,9 @@ WHERE id={$id}; ";
 
     if ($contact) {
       $contactTypes = array();
-      if ($contact->contact_sub_type)
+      if ($contact->contact_sub_type) {
         $contactTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($contact->contact_sub_type, CRM_Core_DAO::VALUE_SEPARATOR));
+      }
       array_unshift($contactTypes, $contact->contact_type);
 
       return $contactTypes;
@@ -1163,7 +1157,7 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important
@@ -1365,9 +1359,9 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object.
    *
-   * currentlty we are using importable fields as exportable fields
+   * Currently we are using importable fields as exportable fields
    *
    * @param int|string $contactType contact Type
    * @param bool $status
@@ -1459,7 +1453,6 @@ WHERE id={$id}; ";
         $fields = array_merge($fields,
           CRM_Core_DAO_Worldregion::export()
         );
-
 
         $fields = array_merge($fields,
           CRM_Contact_DAO_Contact::export()
@@ -1606,14 +1599,15 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Get the all contact details(Hierarchical)
+   * Get the all contact details (Hierarchical).
    *
    * @param int $contactId
    *   Contact id.
    * @param array $fields
    *   Fields array.
    *
-   * @return $values array contains the contact details
+   * @return array
+   *   Contact details
    */
   public static function getHierContactDetails($contactId, &$fields) {
     $params = array(array('contact_id', '=', $contactId, 0, 0));
