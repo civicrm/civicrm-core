@@ -85,15 +85,15 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   static protected $_searchFormValues;
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @param object $this
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     self::preProcessCommon($this);
   }
 
   /**
+   * Common pre-processing function.
+   *
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
@@ -272,8 +272,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Get the contact id for custom search
-   * we are not using prev/next table incase of custom search
+   * Get the contact id for custom search.
+   *
+   * we are not using prev/next table in case of custom search
    */
   public function getContactIds() {
     // need to perform action on all contacts

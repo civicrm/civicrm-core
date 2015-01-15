@@ -260,7 +260,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -370,11 +370,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Given the current formValues, gets the query in local
-   * language
+   * Given the current formValues, gets the query in local language.
    *
-   * @param array (
-   * reference)   $formValues   submitted formValues
+   * @param array $formValues   submitted formValues
    *
    * @return array
    *   which contains an array of strings

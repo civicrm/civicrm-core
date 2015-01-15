@@ -53,7 +53,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
    *
    * @return \CRM_Core_Controller_Simple
    */
-  function __construct(
+  public function __construct(
     $path,
     $title,
     $mode = NULL,
@@ -127,8 +127,10 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   }
 
   /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
+   * A wrapper for getTemplateFileName.
+   *
+   * This includes calling the hook to  prevent us from having to copy & paste
+   * the logic of calling the hook
    */
   public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();

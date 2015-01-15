@@ -149,9 +149,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

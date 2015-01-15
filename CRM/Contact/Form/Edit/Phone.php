@@ -62,7 +62,7 @@ class CRM_Contact_Form_Edit_Phone {
     $form->addSelect("phone[$blockId][phone_type_id]", array(
         'entity' => 'phone',
         'class' => 'eight',
-        'placeholder' => NULL
+        'placeholder' => NULL,
       ));
 
     //main phone number with crm_phone class
@@ -75,7 +75,7 @@ class CRM_Contact_Form_Edit_Phone {
       $form->addSelect("phone[$blockId][location_type_id]", array(
           'entity' => 'phone',
           'class' => 'eight',
-          'placeholder' => NULL
+          'placeholder' => NULL,
         ));
 
       //is_Primary radio
