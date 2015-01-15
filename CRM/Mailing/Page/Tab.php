@@ -30,12 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * This class handle mailing and contact related functions
- *
  */
 class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
   /**
@@ -48,17 +46,13 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
   public $_contactId = NULL;
 
   /**
-   * called when action is browse
-   *
-   * @return null
+   * Called when action is browse.
    */
   public function browse() {
   }
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @return void
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -70,23 +64,20 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
     $this->assign('contactId', $this->_contactId);
     $this->assign('displayName', $displayName);
 
-    // check logged in url permission
+    // Check logged in url permission.
     CRM_Contact_Page_View::checkUserPermission($this);
 
-    // set page title
     CRM_Utils_System::setTitle(ts('Mailings sent to %1', array(1 => $displayName)));
   }
 
   /**
-   * the main function that is called when the page loads,
-   * it decides the which action has to be taken for the page.
+   * The main function that is called when the page loads.
    *
-   * @return null
+   * It decides the which action has to be taken for the page.
    */
   public function run() {
     $this->preProcess();
     $this->browse();
-
-    return parent::run();
+    parent::run();
   }
 }
