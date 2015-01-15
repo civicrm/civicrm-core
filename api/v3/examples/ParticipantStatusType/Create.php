@@ -1,67 +1,83 @@
 <?php
 /**
- * Test Generated example of using participant_status_type create API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function participant_status_type_create_example(){
-$params = array(
-  'name' => 'test status',
-  'label' => 'I am a test',
-  'class' => 'Positive',
-  'is_reserved' => 0,
-  'is_active' => 1,
-  'is_counted' => 1,
-  'visibility_id' => 1,
-  'weight' => 10,
-);
 
-try{
-  $result = civicrm_api3('participant_status_type', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using participant_status_type create API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function participant_status_type_create_example() {
+  $params = array(
+    'name' => 'test status',
+    'label' => 'I am a test',
+    'class' => 'Positive',
+    'is_reserved' => 0,
+    'is_active' => 1,
+    'is_counted' => 1,
+    'visibility_id' => 1,
+    'weight' => 10,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('participant_status_type', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function participant_status_type_create_expectedresult(){
+function participant_status_type_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 16,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 16,
+    'values' => array(
       '16' => array(
-          'id' => '16',
-          'name' => 'test status',
-          'label' => 'I am a test',
-          'class' => '14',
-          'is_reserved' => 0,
-          'is_active' => '1',
-          'is_counted' => '1',
-          'weight' => '10',
-          'visibility_id' => '1',
-        ),
+        'id' => '16',
+        'name' => 'test status',
+        'label' => 'I am a test',
+        'class' => '14',
+        'is_reserved' => 0,
+        'is_active' => '1',
+        'is_counted' => '1',
+        'weight' => '10',
+        'visibility_id' => '1',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCreateParticipantStatusType and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testCreateParticipantStatusType
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantStatusTypeTest.php
 *
 * You can see the outcome of the API tests at

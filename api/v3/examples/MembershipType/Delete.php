@@ -1,47 +1,63 @@
 <?php
 /**
- * Test Generated example of using membership_type delete API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function membership_type_delete_example(){
-$params = array(
-  'id' => 4,
-);
 
-try{
-  $result = civicrm_api3('membership_type', 'delete', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using membership_type delete API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function membership_type_delete_example() {
+  $params = array(
+    'id' => 4,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('membership_type', 'delete', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function membership_type_delete_expectedresult(){
+function membership_type_delete_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'values' => true,
-);
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'values' => TRUE,
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testDelete and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testDelete
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTypeTest.php
 *
 * You can see the outcome of the API tests at

@@ -1,67 +1,89 @@
 <?php
 /**
- * Test Generated example of using contact getactions API
- * Getting the available actions for an entity. *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function contact_getactions_example(){
-$params = array();
 
-try{
-  $result = civicrm_api3('contact', 'getactions', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using contact getactions API.
+ *
+ * Getting the available actions for an entity.
+ *
+ * @return array
+ *   API result array
+ */
+function contact_getactions_example() {
+  $params = array();
 
-return $result;
+  try{
+    $result = civicrm_api3('contact', 'getactions', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function contact_getactions_expectedresult(){
+function contact_getactions_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 17,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 22,
+    'values' => array(
       '0' => 'create',
       '1' => 'delete',
-      '2' => 'get',
-      '3' => 'getactions',
-      '4' => 'getcount',
-      '5' => 'getfields',
-      '6' => 'getlist',
-      '7' => 'getoptions',
-      '8' => 'getquick',
-      '9' => 'getrefcount',
-      '10' => 'getsingle',
-      '11' => 'getvalue',
-      '12' => 'merge',
-      '13' => 'proximity',
-      '14' => 'replace',
-      '15' => 'setvalue',
-      '16' => 'update',
+      '2' => 'example_action1',
+      '3' => 'example_action2',
+      '4' => 'get',
+      '5' => 'getactions',
+      '6' => 'getcount',
+      '7' => 'getfields',
+      '8' => 'getlist',
+      '9' => 'getoptions',
+      '10' => 'getquick',
+      '11' => 'getrefcount',
+      '12' => 'getsingle',
+      '13' => 'getvalue',
+      '14' => 'merge',
+      '15' => 'proximity',
+      '16' => 'replace',
+      '17' => 'setvalue',
+      '18' => 'type_create',
+      '19' => 'type_delete',
+      '20' => 'type_get',
+      '21' => 'update',
     ),
-  'deprecated' => array(
+    'deprecated' => array(
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',
       'update' => 'The "update" action is deprecated. Use "create" with an id instead.',
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testGetActions and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testGetActions
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at

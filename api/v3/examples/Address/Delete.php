@@ -1,47 +1,63 @@
 <?php
 /**
- * Test Generated example of using address delete API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function address_delete_example(){
-$params = array(
-  'id' => 6,
-);
 
-try{
-  $result = civicrm_api3('address', 'delete', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using address delete API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function address_delete_example() {
+  $params = array(
+    'id' => 1,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('address', 'delete', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function address_delete_expectedresult(){
+function address_delete_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'values' => true,
-);
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'values' => TRUE,
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testDeleteAddress and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testDeleteAddress
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/AddressTest.php
 *
 * You can see the outcome of the API tests at

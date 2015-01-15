@@ -1,70 +1,88 @@
 <?php
 /**
- * Test Generated example of using event getsingle API
- * demonstrates use of return is_full  *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function event_getsingle_example(){
-$params = array(
-  'id' => 1,
-  'return.is_full' => 1,
-);
 
-try{
-  $result = civicrm_api3('event', 'getsingle', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using event getsingle API.
+ *
+ * demonstrates use of return is_full 
+ *
+ * @return array
+ *   API result array
+ */
+function event_getsingle_example() {
+  $params = array(
+    'id' => 1,
+    'return.is_full' => 1,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('event', 'getsingle', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function event_getsingle_expectedresult(){
+function event_getsingle_expectedresult() {
 
   $expectedResult = array(
-  'id' => '1',
-  'title' => 'Annual CiviCRM meet',
-  'event_title' => 'Annual CiviCRM meet',
-  'event_type_id' => '1',
-  'participant_listing_id' => 0,
-  'is_public' => '1',
-  'start_date' => '2008-10-21 00:00:00',
-  'event_start_date' => '2008-10-21 00:00:00',
-  'is_online_registration' => 0,
-  'max_participants' => '1',
-  'is_monetary' => 0,
-  'is_map' => 0,
-  'is_active' => '1',
-  'is_show_location' => '1',
-  'default_role_id' => '1',
-  'is_email_confirm' => 0,
-  'is_pay_later' => 0,
-  'is_partial_payment' => 0,
-  'is_multiple_registrations' => 0,
-  'allow_same_participant_emails' => 0,
-  'is_template' => 0,
-  'created_date' => '2014-09-28 23:20:52',
-  'is_share' => '1',
-  'is_confirm_enabled' => '1',
-  'available_places' => 0,
-  'is_full' => '1',
-);
+    'id' => '1',
+    'title' => 'Annual CiviCRM meet',
+    'event_title' => 'Annual CiviCRM meet',
+    'event_type_id' => '1',
+    'participant_listing_id' => 0,
+    'is_public' => '1',
+    'start_date' => '2008-10-21 00:00:00',
+    'event_start_date' => '2008-10-21 00:00:00',
+    'is_online_registration' => 0,
+    'max_participants' => '1',
+    'is_monetary' => 0,
+    'is_map' => 0,
+    'is_active' => '1',
+    'is_show_location' => '1',
+    'default_role_id' => '1',
+    'is_email_confirm' => 0,
+    'is_pay_later' => 0,
+    'is_partial_payment' => 0,
+    'is_multiple_registrations' => 0,
+    'allow_same_participant_emails' => 0,
+    'is_template' => 0,
+    'created_date' => '2015-01-15 02:10:12',
+    'is_share' => '1',
+    'is_confirm_enabled' => '1',
+    'is_billing_required' => 0,
+    'available_places' => 0,
+    'is_full' => '1',
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testGetSingleReturnIsFull and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testGetSingleReturnIsFull
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EventTest.php
 *
 * You can see the outcome of the API tests at
