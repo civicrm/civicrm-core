@@ -352,7 +352,6 @@ class CRM_Extension_Manager {
         case self::STATUS_INSTALLED_MISSING:
           throw new CRM_Extension_Exception("Cannot uninstall extension; disable it first: $key");
 
-          break;
         case self::STATUS_DISABLED:
           list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
           $typeManager->onPreUninstall($info);

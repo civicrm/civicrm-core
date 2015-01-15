@@ -61,7 +61,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   associated array
    *
    */
-  static function processConfirm(
+  public static function processConfirm(
     &$form,
     &$paymentParams,
     &$premiumParams,
@@ -511,7 +511,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
         1 => array(
           'email' => $params['email'],
           'location_type_id' => $billingLocTypeId,
-        )
+        ),
       );
     }
 
@@ -568,7 +568,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     if (!in_array($type, array(
       'paypal',
       'google',
-      'csv'
+      'csv',
     ))
     ) {
       // return the params as is
@@ -806,10 +806,10 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     // if this is a recurring contribution then process it first
     if ($params['trxn_type'] == 'subscrpayment') {
       // see if a recurring record already exists
-      $recurring = new CRM_Contribute_BAO_ContributionRecur;
+      $recurring = new CRM_Contribute_BAO_ContributionRecur();
       $recurring->processor_id = $params['processor_id'];
       if (!$recurring->find(TRUE)) {
-        $recurring = new CRM_Contribute_BAO_ContributionRecur;
+        $recurring = new CRM_Contribute_BAO_ContributionRecur();
         $recurring->invoice_id = $params['invoice_id'];
         $recurring->find(TRUE);
       }

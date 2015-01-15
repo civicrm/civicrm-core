@@ -86,8 +86,6 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Retrieve the default payment processor
    *
-   * @param NULL
-   *
    * @return object
    *   The default payment processor object on success,
    *                          null otherwise
@@ -175,7 +173,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @param int $paymentProcessorTypeId
    *   ID of the processor to be deleted.
    *
-   * @return bool
+   * @return bool|NULL
    */
   public static function del($paymentProcessorTypeId) {
     $query = "
@@ -188,7 +186,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
 
     if ($dao->fetch()) {
       CRM_Core_Session::setStatus(ts('There is a Payment Processor associated with selected Payment Processor type, hence it can not be deleted.'), ts('Deletion Error'), 'error');
-      return;
+      return NULL;
     }
 
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();

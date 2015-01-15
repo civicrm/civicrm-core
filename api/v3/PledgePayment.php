@@ -131,9 +131,7 @@ function civicrm_api3_pledge_payment_get($params) {
  * Gets field for civicrm_pledge_payment functions
  *
  * @param array $params
- *
- * @return array
- *   fields valid for other functions
+ *   Modifiable list of fields allowed for the PledgePayment.get action.
  */
 function civicrm_api3_pledge_payment_get_spec(&$params) {
   $params['option.create_new'] = array('title' => "Create new field rather than update an unpaid payment");

@@ -407,8 +407,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     foreach ($this->_component as $val) {
       if (!empty($select[$val])) {
-        $this->_selectComponent[$val] =
-          "SELECT " . implode(', ', $select[$val]) . " ";
+        $this->_selectComponent[$val] = "SELECT " . implode(', ', $select[$val]) . " ";
         unset($select[$val]);
       }
     }
@@ -784,15 +783,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
       //unset Conmponent id and contact id from display
       foreach ($this->_columnHeadersComponent as $componentTitle => $headers) {
-        $id_header =
-          'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_' .
+        $id_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_' .
           substr_replace($componentTitle, '', -11, 11) . '_id';
-        $contact_header =
-          'civicrm_' . substr_replace($componentTitle, '', -11, 11) .
+        $contact_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) .
           '_contact_id';
         if ($componentTitle == 'activity_civireport') {
-          $id_header =
-            'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_id';
+          $id_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_id';
         }
 
         unset($this->_columnHeadersComponent[$componentTitle][$id_header]);
@@ -862,8 +858,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           // handle contribution
           if ($component == 'contribution_civireport') {
             if ($val = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] =
-                CRM_Contribute_PseudoConstant::financialType($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($val, FALSE);
             }
 
             if ($val = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {

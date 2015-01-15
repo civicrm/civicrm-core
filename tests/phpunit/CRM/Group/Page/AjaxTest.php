@@ -37,12 +37,12 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->_permissionedDisabledGroup = $this->groupCreate(array(
         'title' => 'pick-me-disabled',
         'is_active' => 0,
-        'name' => 'pick-me-disabled'
+        'name' => 'pick-me-disabled',
       ));
     $this->_permissionedGroup = $this->groupCreate(array(
         'title' => 'pick-me-active',
         'is_active' => 1,
-        'name' => 'pick-me-active'
+        'name' => 'pick-me-active',
       ));
     $this->groupCreate(array('title' => 'not-me-disabled', 'is_active' => 0, 'name' => 'not-me-disabled'));
     $this->groupCreate(array('title' => 'not-me-active', 'is_active' => 1, 'name' => 'not-me-active'));

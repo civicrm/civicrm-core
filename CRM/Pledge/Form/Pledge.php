@@ -237,7 +237,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array(
           'create' => TRUE,
-          'api' => array('extra' => array('email'))
+          'api' => array('extra' => array('email')),
         ), TRUE);
     }
 
@@ -332,9 +332,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
     $element = &$this->add('select', 'frequency_unit',
       ts('Frequency'),
-      array(
-        '' => ts('- select -')
-      ) + $freqUnitsDisplay,
+      array('' => ts('- select -')) + $freqUnitsDisplay,
       TRUE
     );
 
@@ -405,9 +403,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $pledgePages[$value['entity_id']] = $pages[$value['entity_id']];
     }
     $ele = $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
-      array(
-        '' => ts('- select -')
-      ) + $pledgePages
+      array('' => ts('- select -')) + $pledgePages
     );
 
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
@@ -637,7 +633,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         if (count($processors) > 0) {
           $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a> OR <a href='%2'>submit a credit card payment</a>.", array(
                 1 => $contribURL,
-                2 => $creditURL
+                2 => $creditURL,
               ));
         }
         else {

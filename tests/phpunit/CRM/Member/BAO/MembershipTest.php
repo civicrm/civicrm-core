@@ -519,18 +519,17 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
 
-    $membershipRenewal = new CRM_Core_Form;
-    $membershipRenewal->controller = new CRM_Core_Controller;
+    $membershipRenewal = new CRM_Core_Form();
+    $membershipRenewal->controller = new CRM_Core_Controller();
     $isTestMembership = 0;
-    $MembershipRenew =
-      CRM_Member_BAO_Membership::renewMembershipFormWrapper(
-        $contactId,
-        $this->_membershipTypeID,
-        $isTestMembership,
-        $membershipRenewal,
-        NULL,
-        NULL
-      );
+    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
+      $contactId,
+      $this->_membershipTypeID,
+      $isTestMembership,
+      $membershipRenewal,
+      NULL,
+      NULL
+    );
     $endDate = date("Y-m-d", strtotime($membership->end_date . " +1 year"));
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
@@ -601,8 +600,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
 
-    $membershipRenewal = new CRM_Core_Form;
-    $membershipRenewal->controller = new CRM_Core_Controller;
+    $membershipRenewal = new CRM_Core_Form();
+    $membershipRenewal->controller = new CRM_Core_Controller();
     $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper($contactId, $this->_membershipTypeID, $isTestMembership = 0, $membershipRenewal, NULL, NULL);
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',

@@ -55,7 +55,7 @@ p.error {
 p.warning {
   padding: 0.5em;
   background-color: #e70;
-  border: 1px #A70 solid;
+  border: 1px #a70 solid;
   color: white;
   clear: both;
 }
