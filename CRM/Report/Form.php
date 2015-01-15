@@ -344,7 +344,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * @var string Report description.
    */
-  protected $_description;
+  public $_description;
 
   /**
    * @var bool Is an address field selected.
