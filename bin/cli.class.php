@@ -30,12 +30,12 @@
  * In addition, there are several additional classes that inherit
  * civicrm_cli to do more precise functions.
  *
- **/
+ */
 
 /**
  * base class for doing all command line operations via civicrm
  * used by cli.php
- **/
+ */
 class civicrm_cli {
   // required values that must be passed
   // via the command line
@@ -312,18 +312,18 @@ class civicrm_cli {
 /**
  * class used by csv/export.php to export records from
  * the database in a csv file format.
- **/
+ */
 class civicrm_cli_csv_exporter extends civicrm_cli {
   var $separator = ',';
 
   /**
    */
-  function __construct() {
+  public function __construct() {
     $this->_required_arguments = array('entity');
     parent::initialize();
   }
 
-  function run() {
+  public function run() {
     $out = fopen("php://output", 'w');
     fputcsv($out, $this->columns, $this->separator, '"');
 
@@ -355,20 +355,20 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
  * and civicrm_cli_csv_deleter to add or delete
  * records based on those found in a csv file
  * passed to the script.
- **/
+ */
 class civicrm_cli_csv_file extends civicrm_cli {
   var $header;
   var $separator = ',';
 
   /**
    */
-  function __construct() {
+  public function __construct() {
     $this->_required_arguments = array('entity', 'file');
     $this->_additional_arguments = array('f' => 'file');
     parent::initialize();
   }
 
-  function run() {
+  public function run() {
     $this->row = 1;
     $handle = fopen($this->_file, "r");
 
@@ -400,7 +400,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
       $this->processLine($params);
     }
     fclose($handle);
-    return;
+    return NULL;
   }
 
   /* return a params as expected */
@@ -409,7 +409,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
    *
    * @return array
    */
-  function convertLine($data) {
+  public function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
       //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR
@@ -428,12 +428,12 @@ class civicrm_cli_csv_file extends civicrm_cli {
  * class for processing records to add
  * used by csv/import.php
  *
- **/
+ */
 class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
   /**
    * @param array $params
    */
-  function processline($params) {
+  public function processline($params) {
     $result = civicrm_api($this->_entity, 'Create', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
@@ -448,12 +448,12 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
  * class for processing records to delete
  * used by csv/delete.php
  *
- **/
+ */
 class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
   /**
    * @param array $params
    */
-  function processline($params) {
+  public function processline($params) {
     $result = civicrm_api($this->_entity, 'Delete', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
