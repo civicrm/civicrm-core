@@ -64,7 +64,6 @@ function _civicrm_api3_im_create_spec(&$params) {
  * Deletes an existing IM
  *
  * @param array $params
- * {@getfields im_delete}
  *
  * @return array
  *   API result Array

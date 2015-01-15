@@ -7,26 +7,31 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Contact_BAO_ContactTest
  */
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
+
+  /**
+   * Set up function.
+   */
   public function setUp() {
     parent::setUp();
   }
 
   /**
-   * Test case for add( )
+   * Test case for add( ).
+   *
    * test with empty params.
    */
   public function testAddWithEmptyParams() {
     $params = array();
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check Contact object
+    // Now check Contact object.
     $this->assertNull($contact);
   }
 
   /**
-   * Test case for add( )
-   * test with names
-   * (create and update modes)
+   * Test case for add( ).
+   *
+   * Test with names (create and update modes)
    */
   public function testAddWithNames() {
     $firstName = 'Shane';
@@ -39,14 +44,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check $contact is object of contact DAO..
+    // Now check $contact is object of contact DAO.
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $this->assertEquals($firstName, $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($lastName, $contact->last_name, 'Check for last name creation.');
 
     $contactId = $contact->id;
 
-    //update and change first name and last name, using add( )
+    // Update and change first name and last name, using add( ).
     $firstName = 'Jane';
     $params = array(
       'first_name' => $firstName,
@@ -56,7 +61,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check $contact is object of contact DAO..
+    // Now check $contact is object of contact DAO.
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $this->assertEquals($firstName, $contact->first_name, 'Check for updated first name.');
 
@@ -65,25 +70,22 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for add( )
-   * test with all contact params
-   * (creat and update modes)
+   * Test case for add.
+   *
+   * Test with all contact params
+   * (create and update modes)
    */
   public function testAddWithAll() {
-    //take the common contact params
+    // Take the common contact params.
     $params = $this->contactParams();
 
     unset($params['location']);
     $prefComm = $params['preferred_communication_method'];
-
-    //create the contact using add()
     $contact = CRM_Contact_BAO_Contact::add($params);
     $contactId = $contact->id;
 
-    //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
 
-    //Now check values of object with params.
     $this->assertEquals($params['first_name'], $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($params['last_name'], $contact->last_name, 'Check for last name creation.');
     $this->assertEquals($params['middle_name'], $contact->middle_name, 'Check for middle name creation.');
@@ -121,7 +123,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
     $this->assertAttributesEquals($checkPrefComm, $prefComm);
 
-    //now update the contact using add( )
     $updateParams = array(
       'contact_type' => 'Individual',
       'first_name' => 'Jane',
@@ -162,14 +163,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $prefComm = $updateParams['preferred_communication_method'];
     $updateParams['contact_id'] = $contactId;
-    //create the contact using add()
     $contact = CRM_Contact_BAO_Contact::create($updateParams);
     $contactId = $contact->id;
 
-    //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
 
-    //Now check values of object with params.
     $this->assertEquals($updateParams['first_name'], $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($updateParams['last_name'], $contact->last_name, 'Check for last name creation.');
     $this->assertEquals($updateParams['middle_name'], $contact->middle_name, 'Check for middle name creation.');
@@ -211,13 +209,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
     $this->assertAttributesEquals($checkPrefComm, $prefComm);
 
-    //cleanup DB by deleting the contact
     Contact::delete($contactId);
   }
 
   /**
-   * Test case for add( )
-   * test with All contact types.
+   * Test case for add( ) with All contact types.
    */
   public function testAddWithAllContactTypes() {
     $firstName = 'Bill';
@@ -484,16 +480,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
     $compareParams = array('phone' => '9766323895');
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
-    //As we are not updating note
-    //Now check DB for New Note
-    $noteId = $this->assertDBNotNull('CRM_Core_DAO_Note', $updateParams['note'], 'id', 'note',
+    // As we are not updating note.
+    // Now check DB for New Note.
+    $this->assertDBNotNull('CRM_Core_DAO_Note', $updateParams['note'], 'id', 'note',
       'Database check for New created note '
     );
 
-    //delete all notes related to contact
+    // Delete all notes related to contact.
     CRM_Core_BAO_Note::cleanContactNotes($contactId);
 
-    //cleanup DB by deleting the contact
+    // Cleanup DB by deleting the contact.
     Contact::delete($contactId);
     $this->quickCleanup(array('civicrm_contact', 'civicrm_note'));
   }
