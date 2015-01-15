@@ -524,10 +524,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * Create last viewed link to recently updated contact.
    *
    * @param array $crudLinkSpec
-   *   With keys:.
-   *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
-   *   - entity_table: string, eg "civicrm_contact"
-   *   - entity_id: int
+   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *  - entity_table: string, eg "civicrm_contact"
+   *  - entity_id: int
+   *
    * @return array|NULL
    *   NULL if unavailable, or
    *   [path: string, query: string, title: string]
@@ -759,7 +759,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Delete a contact and all its associated records
+   * Delete a contact and all its associated records.
    *
    * @param int $id
    *   Id of the contact to delete.
@@ -768,8 +768,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param bool $skipUndelete
    *   Whether to force contact delete or not.
    *
-   * @return boolean
-   *   true if contact deleted, false otherwise
+   * @return bool
+   *   Was contact deleted?
    */
   public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE) {
 
@@ -818,7 +818,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Utils_Hook::post($action, $contactType, $contact->id, $contact);
       return TRUE;
     }
-
 
     // currently we only clear employer cache.
     // we are not deleting inherited membership if any.
@@ -896,13 +895,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Delete the image of a contact
+   * Delete the image of a contact.
    *
    * @param int $id
    *   Id of the contact.
    *
-   * @return boolean
-   *   true if contact image is deleted
+   * @return bool
+   *   Was contact image deleted?
    */
   public static function deleteContactImage($id) {
     if (!$id) {

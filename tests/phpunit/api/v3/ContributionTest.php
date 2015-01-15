@@ -543,9 +543,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create test with unique field name on source
+   * Create test with unique field name on source.
    */
-  public function testCreateContributionSourceInvalidContac() {
+  public function testCreateContributionSourceInvalidContact() {
 
     $params = array(
       'contact_id' => 999,
@@ -645,29 +645,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * This is the test for creating soft credits - however a 'get' is not yet possible via API
-   * as the current BAO functions are contact-centric (from what I can find)
+   * This is the test for creating soft credits.
    */
-  public function testCreateContributionWithSoftCredt() {
+  public function testCreateContributionWithSoftCredit() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile = "ContributionCreateWithSoftCredit";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
       'display_name' => 'superman',
       'contact_type' => 'Individual',
     ));
-    $softparams = array(
+    $softParams = array(
       'contact_id' => $contact2['id'],
       'amount' => 50,
       'soft_credit_type_id' => 3,
     );
 
-    $params = $this->_params + array('soft_credit' => array(1 => $softparams));
+    $params = $this->_params + array('soft_credit' => array(1 => $softParams));
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
-    $this->assertEquals($softparams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
-    $this->assertEquals($softparams['amount'], $result['values'][0]['soft_credit'][1]['amount']);
-    $this->assertEquals($softparams['soft_credit_type_id'], $result['values'][0]['soft_credit'][1]['soft_credit_type']);
+    $this->assertEquals($softParams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
+    $this->assertEquals($softParams['amount'], $result['values'][0]['soft_credit'][1]['amount']);
+    $this->assertEquals($softParams['soft_credit_type_id'], $result['values'][0]['soft_credit'][1]['soft_credit_type']);
 
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));

@@ -715,9 +715,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for createProfileContac( )
-   * test with all params.
-   * ( create and update modes )
+   * Test case for createProfileContact.
    */
   public function testCreateProfileContact() {
     $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
@@ -1108,7 +1106,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getContactDetails( )
+   * Test case for getContactDetails( ).
    */
   public function testGetContactDetails() {
     //get the contact params
@@ -1134,8 +1132,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for
-   * importableFields( ) and exportableFields( )
+   * Test case for importableFields( ) and exportableFields( ).
    */
   public function testFields() {
     $allImpFileds = CRM_Contact_BAO_Contact::importableFields('All');
@@ -1302,23 +1299,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
-  //    /**
-  //     * test logged in user has permissions for
-  //     * various  operation types
-  //     */
-  //    function testPermissionedContact()
-  //    {
-  //        $contactId = Contact::createIndividual();
-  //        require_once 'CRM/Contact/BAO/Contact/Permission.php';
-  //        $userViewPermission = CRM_Contact_BAO_Contact_Permission::allow($contactId);
-  //        $this->assertEquals( $userViewPermission, true, 'Check user for view contact permission.' );
-  //
-  //        $userEditPermission = CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT);
-  //        $this->assertEquals( $userEditPermission, true, 'Check user for edit contact permission.' );
-  //
-  //        Contact::delete($contactId);
-  //    }
-
   /**
    * Build common params
    */
@@ -1418,9 +1398,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Ensure that created_date and modified_date are set
+   * Ensure that created_date and modified_date are set.
    */
-  public function testTimestamps_contact() {
+  public function testTimestampContact() {
     $test = $this;
     $this->_testTimestamps(array(
       'UPDATE' => function ($contactId) use ($test) {
@@ -1429,16 +1409,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'contact_type' => 'Individual',
           'contact_id' => $contactId,
         );
-        $contact = CRM_Contact_BAO_Contact::add($params);
-        $test->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
+      $contact = CRM_Contact_BAO_Contact::add($params);
+      $test->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
       },
     ));
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record
+   * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record.
    */
-  public function testTimestamps_email() {
+  public function testTimestampsEmail() {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test) {
