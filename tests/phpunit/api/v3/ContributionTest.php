@@ -272,23 +272,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('contribution', 'create', $params);
   }
-  /*
-   * ensure we continue to support contribution_type_id as part of the api commitment to
-   * stability
-   *///////////////// civicrm_contribution_
-
-  public function testCreateLegacyBehaviour() {
-    $params = array(
-      'contribution_id' => FALSE,
-      'contact_id' => 1,
-      'total_amount' => 1,
-      'check_permissions' => FALSE,
-      'contribution_type_id' => 3,
-    );
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
-    $this->assertEquals(3, $contribution['financial_type_id']);
-  }
 
   /**
    * Check with complete array + custom field
@@ -314,7 +297,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite

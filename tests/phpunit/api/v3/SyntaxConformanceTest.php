@@ -265,6 +265,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities to be skipped for get call.
+   *
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
    * support id in API but in this case the underlying tables are crying out for a restructure
    * & it just doesn't make sense, on the otherhand Event need id to be existant as pseudo property
