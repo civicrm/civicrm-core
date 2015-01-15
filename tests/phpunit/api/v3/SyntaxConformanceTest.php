@@ -317,7 +317,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Domain',
       'Profile',
       'CustomValue',
-      'Setting'
+      'Setting',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;

@@ -702,7 +702,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code.
+   * Test using example code.
    */
   public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
@@ -822,8 +822,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when online contribution with pay later option
-   * is created
+   * Tests that additional financial records are created.
+   *
+   * Checks when online contribution with pay later option is created
    */
   public function testCreateContributionPayLaterOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -887,7 +888,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that BAO defaults work
+   * Test that BAO defaults work.
    */
   public function testCreateBAODefaults() {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
@@ -1152,7 +1153,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00);
-    $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId );
+    $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId);
     $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument);
     $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00);
     $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount);
