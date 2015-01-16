@@ -60,7 +60,7 @@ function civicrm_api3_system_log_create($params) {
 /**
  * @param array $params
  *
- * @return;
+ * @return void
  */
 function _civicrm_api3_system_log_create_spec(&$params) {
   require_once 'api/v3/System.php';

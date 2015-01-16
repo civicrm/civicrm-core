@@ -198,7 +198,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param int $caseID
    *
-   * @return;
+   * @return void
    */
   public static function deleteCaseContact($caseID) {
     $caseContact = new CRM_Case_DAO_CaseContact();

@@ -164,7 +164,7 @@ function civicrm_api3_report_template_getstatistics($params) {
  * @param array $params
  *   Input parameters.
  *
- * @return;
+ * @return void
  *   details of found instances
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
