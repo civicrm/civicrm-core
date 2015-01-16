@@ -237,8 +237,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Rewrite various system urls to https
    *
-   * @param null
-   *
    * @return void
    */
   public function mapConfigToSSL() {
@@ -286,7 +284,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return string
    *   an HTML string containing a link to the given path.
    */
-  function url(
+  public function url(
     $path = NULL,
     $query = NULL,
     $absolute = FALSE,
@@ -667,7 +665,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Check is user logged in.
    *
-   * @return boolean
+   * @return bool
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -755,7 +753,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param CRM_Core_Form $form
    */
   public function getLoginDestination(&$form) {
-    return;
+    return NULL;
   }
 
   /**

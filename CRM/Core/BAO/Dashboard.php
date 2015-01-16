@@ -159,7 +159,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlets = array();
     $getDashlets = civicrm_api3("Dashboard", "get", array(
         'domain_id' => CRM_Core_Config::domainID(),
-        'option.limit' => 0
+        'option.limit' => 0,
       ));
     $contactID = CRM_Core_Session::singleton()->get('userID');
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
@@ -198,7 +198,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   Comma separated list.
    * @param string $operator
    *
-   * @return boolean
+   * @return bool
    *   true if use has permission else false
    */
   public static function checkPermission($permission, $operator) {
@@ -226,7 +226,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         // hack to handle case permissions
         if (!$componentName && in_array($key, array(
             'access my cases and activities',
-            'access all cases and activities'
+            'access all cases and activities',
           ))
         ) {
           $componentName = 'CiviCase';
@@ -365,7 +365,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashletIDs = array();
     if (is_array($columns)) {
       foreach ($columns as $colNo => $dashlets) {
-        if (!is_integer($colNo)) {
+        if (!is_int($colNo)) {
           continue;
         }
         $weight = 1;

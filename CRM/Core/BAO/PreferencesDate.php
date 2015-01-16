@@ -75,7 +75,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
+   * @return void
    *   DAO object on sucess, null otherwise
    *
    */

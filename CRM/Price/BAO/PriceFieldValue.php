@@ -80,7 +80,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   public static function create(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
-      return;
+      return NULL;
     }
     if (!$id && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
@@ -221,7 +221,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param int $id
    *   Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function del($id) {
@@ -240,9 +240,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param int $entityId
    *   Id.
-   * @param string $entityTableEntity table.
+   * @param string $entityTable table.
    *   Entity table.
-   * @param string $financialTypeIDFinancial type id.
+   * @param string $financialTypeID type id.
    *   Financial type id.
    *
    */

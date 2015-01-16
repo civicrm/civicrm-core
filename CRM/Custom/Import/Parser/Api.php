@@ -30,7 +30,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
     $this->_fields = array_merge(array(
         'do_not_import' => array('title' => ts('- do not import -')),
-        'contact_id' => array('title' => ts('Contact ID'))
+        'contact_id' => array('title' => ts('Contact ID')),
       ), $importableFields);
   }
 
@@ -59,7 +59,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -71,7 +71,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function preview(&$values) {
@@ -82,7 +82,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    *   It is called from both the preview & the import actions
    *
@@ -136,7 +136,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
