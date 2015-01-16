@@ -56,13 +56,13 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
           'CiviMail.ignored',
           date('Y'),
           date('m'),
-          date('d')
+          date('d'),
         )));
     $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
           'CiviMail.processed',
           date('Y'),
           date('m'),
-          date('d')
+          date('d'),
         )));
   }
 
@@ -101,7 +101,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
       }
 
       $set = new ezcMailFileSet(array($file));
-      $parser = new ezcMailParser;
+      $parser = new ezcMailParser();
       //set property text attachment as file CRM-5408
       $parser->options->parseTextAttachmentsAsFiles = TRUE;
 

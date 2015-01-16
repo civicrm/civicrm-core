@@ -311,7 +311,7 @@ SELECT module,is_reserved
    * This is a first version and will be tweaked over a period of time
    *
    *
-   * @return boolean
+   * @return bool
    *   true if no error found
    */
   public function validate() {

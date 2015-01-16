@@ -119,7 +119,7 @@ class CRM_Core_Selector_Controller {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -127,7 +127,7 @@ class CRM_Core_Selector_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_print = FALSE;
 
@@ -169,7 +169,7 @@ class CRM_Core_Selector_Controller {
   /**
    * Should we compute actions dynamically (since they are quite verbose)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_dynamicAction = FALSE;
 
@@ -258,7 +258,7 @@ class CRM_Core_Selector_Controller {
    * @param int $reset
    *   Are we being reset.
    *
-   * @return boolean
+   * @return bool
    *   if the GET params are different from the session params
    */
   public function hasChanged($reset) {
@@ -496,7 +496,7 @@ class CRM_Core_Selector_Controller {
   /**
    * Getter for embedded
    *
-   * @return boolean
+   * @return bool
    *   return the embedded value
    */
   public function getEmbedded() {
@@ -517,7 +517,7 @@ class CRM_Core_Selector_Controller {
   /**
    * Getter for print
    *
-   * @return boolean
+   * @return bool
    *   return the print value
    */
   public function getPrint() {

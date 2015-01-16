@@ -73,7 +73,7 @@ class CRM_Export_BAO_Export {
    * @param string $queryOperator
    *
    */
-  static function exportComponents(
+  public static function exportComponents(
     $selectAll,
     $ids,
     $params,
@@ -322,8 +322,7 @@ class CRM_Export_BAO_Export {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
         if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
           // soft credit columns are not automatically populated, because contribution search doesn't require them by default
-          $componentReturnProperties =
-            array_merge(
+          $componentReturnProperties = array_merge(
               $componentReturnProperties,
               CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
         }
@@ -1692,7 +1691,7 @@ WHERE  id IN ( $deleteIDString )
    * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
    * i.e 'Hello Alan' => converted to => 'Alan'
    */
-  static function _trimNonTokens(
+  public static function _trimNonTokens(
     &$parsedString, $defaultGreeting,
     $addressMergeGreetings, $greetingType = 'postal_greeting'
   ) {

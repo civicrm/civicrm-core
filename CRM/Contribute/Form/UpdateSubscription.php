@@ -149,7 +149,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     // define the fields
     $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE,
       array(
-        'size' => 20
+        'size' => 20,
       ), TRUE,
       'currency', NULL, TRUE
     );
@@ -238,7 +238,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       if ($this->_subscriptionDetails->installments != $params['installments']) {
         $message .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", array(
               1 => $this->_subscriptionDetails->installments,
-              2 => $params['installments']
+              2 => $params['installments'],
             )) . ' ';
       }
 
@@ -315,8 +315,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {
-      if ($status)
+      if ($status) {
         CRM_Utils_System::setUFMessage($status);
+      }
       // keep result as 1, since we not displaying anything on the redirected page anyway
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=update&result=1"));

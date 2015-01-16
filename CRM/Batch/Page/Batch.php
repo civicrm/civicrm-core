@@ -58,8 +58,6 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
   /**
    * Get action Links
    *
-   * @return array
-   *   (reference) of action links
    */
   public function &links() {
   }
