@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmMailing/' + relPath;
+    return '~/crmMailing/' + relPath;
   };
 
   // The following directives have the same simple implementation -- load

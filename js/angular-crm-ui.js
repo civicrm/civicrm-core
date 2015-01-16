@@ -4,7 +4,7 @@
   var uidCount = 0;
 
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmUi/' + relPath;
+    return '~/crmUi/' + relPath;
   };
 
   angular.module('crmUi', [])

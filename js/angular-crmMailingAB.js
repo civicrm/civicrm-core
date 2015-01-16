@@ -4,7 +4,7 @@
     if (!module) {
       module = 'crmMailingAB';
     }
-    return CRM.resourceUrls.civicrm + '/partials/' + module + '/' + relPath;
+    return '~/' + module + '/' + relPath;
   };
 
   angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
