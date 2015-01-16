@@ -65,6 +65,9 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
       $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
+      if (!CRM_Utils_Array::value('owner_notify_id', $defaults)) {
+        $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
+      }
       $this->assign('pageId', $this->_id);
     }
 
@@ -74,6 +77,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       $defaults['is_tellfriend_enabled'] = 1;
       $defaults['tellfriend_limit'] = 5;
       $defaults['link_text'] = ts('Create your own fundraising page');
+      $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
 
       if ($ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')) {
         $defaults['notify_email'] = $ccReceipt;

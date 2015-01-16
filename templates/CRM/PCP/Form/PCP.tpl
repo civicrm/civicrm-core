@@ -65,6 +65,10 @@
         <td class="label">{$form.supporter_profile_id.label}</td>
         <td>{$form.supporter_profile_id.html} {help id="id-supporter_profile"}</td>
      </tr>
+     <tr class="crm-contribution-contributionpage-pcp-form-block-owner_notify_id">
+        <td class="label">{$form.owner_notify_id.label}</td>
+        <td>{$form.owner_notify_id.html} {help id="id-owner_notify"}</td>
+     </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-is_tellfriend_enabled">
         <td class="label">{$form.is_tellfriend_enabled.label}</td>
         <td>{$form.is_tellfriend_enabled.html} {help id="id-is_tellfriend"}</td>

@@ -392,7 +392,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
       $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
       $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
-      CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      //Send notification to owner for PCP
+      if ($contributionSoft->pcp_id) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
     }
     if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];

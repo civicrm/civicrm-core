@@ -69,6 +69,9 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
       $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
+      if (!CRM_Utils_Array::value('owner_notify_id', $defaults)) {
+        $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
+      }
       $this->assign('pageId', $this->_id);
     }
 
@@ -78,6 +81,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $defaults['is_tellfriend_enabled'] = 1;
       $defaults['tellfriend_limit'] = 5;
       $defaults['link_text'] = ts('Promote this event with a personal campaign page');
+      $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
 
       if ($this->_id &&
         $ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')

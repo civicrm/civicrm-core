@@ -1739,11 +1739,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($params['soft_credit_to'])) {
       $contributionSoftParams = array();
       foreach (array(
-                 'pcp_display_in_roll',
-                 'pcp_roll_nickname',
-                 'pcp_personal_note',
-                 'amount',
-               ) as $val) {
+          'pcp_display_in_roll',
+          'pcp_roll_nickname',
+          'pcp_personal_note',
+          'amount',
+        ) as $val) {
         if (!empty($params[$val])) {
           $contributionSoftParams[$val] = $params[$val];
         }
@@ -1757,7 +1757,54 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
 
-      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+
+      //Send notification to owner for PCP
+      if ($contributionSoft->id && $contributionSoft->pcp_id) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
+    }
+  }
+
+  /**
+   * Function used to send notification mail to pcp owner
+   * This is used by contribution and also event pcps
+   *
+   * @param object $contribution
+   * @param object $contributionSoft
+   *   Contribution object.
+   *
+   */
+
+  public static function pcpNotifyOwner($contribution, $contributionSoft) {
+    $component = $contribution->_component ? $contribution->_component : 'contribute';
+    $ownerNotifyID = CRM_PCP_BAO_PCP::getOwnerNotificationId($contributionSoft->pcp_id);
+    if ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'no_notifications', 'name') ||
+        ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name') &&
+         CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify'))) {
+      $pcpPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($contributionSoft->pcp_id, $component);
+      // set email in the template here
+      $donorName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contribution->contact_id, 'display_name');
+      $tplParams = array(
+        'page_title' => $pcpPageTitle,
+        'receive_date' => $contribution->receive_date,
+        'total_amount' => $contributionSoft->amount,
+        'donors_display_name' => $donorName,
+        'donors_email' => CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id),
+        'is_honor_roll_enabled' => $contributionSoft->pcp_display_in_roll,
+      );
+      $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      $sendTemplateParams = array(
+        'groupName' => 'msg_tpl_workflow_contribution',
+        'valueName' => 'pcp_owner_notify',
+        'contactId' => $contributionSoft->contact_id,
+        'toEmail' => CRM_Contact_BAO_Contact::getPrimaryEmail($contributionSoft->contact_id),
+        'toName' => $donorName,
+        'from' => "$domainValues[0] <$domainValues[1]>",
+        'tplParams' => $tplParams,
+        'PDFFilename' => 'receipt.pdf',
+      );
+      CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
   }
 
