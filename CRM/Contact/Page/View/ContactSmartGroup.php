@@ -42,7 +42,6 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
    */
   public function browse() {
     $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');

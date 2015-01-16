@@ -159,9 +159,9 @@ class CRM_Core_Payment_Form {
       'title' => ts('Country'),
       'cc_field' => TRUE,
       'attributes' => array(
-          '' => ts('- select -')
-        ) +
-        CRM_Core_PseudoConstant::country(),
+        '' => ts('- select -'),
+      ) +
+      CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
     );
     //CRM-15509 working towards giving control over billing fields to payment processors. For now removing tpl hard-coding
@@ -265,7 +265,7 @@ class CRM_Core_Payment_Form {
     // which was previously available only in some form flows
     if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
       $form->_paymentProcessor['object']->buildForm($form);
-      return;
+      return NULL;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));

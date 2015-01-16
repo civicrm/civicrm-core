@@ -152,7 +152,7 @@ SELECT id
     }
     $this->add('select', 'price_set_id', ts('Price Set'),
       array(
-        '' => ts('- none -')
+        '' => ts('- none -'),
       ) + $price,
       NULL, array('onchange' => "showHideAmountBlock( this.value, 'price_set_id' );")
     );
@@ -210,7 +210,7 @@ SELECT id
               'html_type',
               'name',
               'is_active',
-              'label'
+              'label',
             ));
           foreach ($priceFields as $priceField) {
             if ($priceField['id'] && $priceField['html_type'] == 'Radio' && $priceField['name'] == 'contribution_amount') {
@@ -466,7 +466,7 @@ SELECT id
 
       if (in_array($field, array(
         'min_amount',
-        'max_amount'
+        'max_amount',
       ))) {
         $val = CRM_Utils_Rule::cleanMoney($val);
       }

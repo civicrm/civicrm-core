@@ -220,7 +220,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param string $joinDate
    *   Join date of the member whose membership status is to be calculated.
    * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
-   * @param bool $excludeIsAdminExclude the statuses those having is_admin = 1.
+   * @param bool $excludeIsAdmin the statuses those having is_admin = 1.
    *   Exclude the statuses those having is_admin = 1.
    * @param int $membershipTypeID
    * @param array $membership
@@ -228,7 +228,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @return array
    */
-  static function getMembershipStatusByDate(
+  public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
     $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
   ) {

@@ -76,8 +76,8 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
     $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", array(
         1 => array(
           $participantPayment->contribution_id,
-          'Integer'
-        )
+          'Integer',
+        ),
       ));
     if ($lineItemCount == 1) {
       $sql = "UPDATE civicrm_line_item li
@@ -85,7 +85,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
       WHERE contribution_id = %2 AND entity_table = 'civicrm_contribution'";
       CRM_Core_DAO::executeQuery($sql, array(
           1 => array($participantPayment->participant_id, 'Integer'),
-          2 => array($participantPayment->contribution_id, 'Integer')
+          2 => array($participantPayment->contribution_id, 'Integer'),
         ));
     }
 
@@ -99,7 +99,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @param array $params
    *   Associative array whose values match the record to be deleted.
    *
-   * @return boolean
+   * @return bool
    *   true if deleted false otherwise
    */
   public static function deleteParticipantPayment($params) {

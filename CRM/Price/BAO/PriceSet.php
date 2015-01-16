@@ -279,7 +279,7 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param int $id
    *   Price Set id.
    *
-   * @return boolean
+   * @return bool
    *   false if fields exist for this set, true if the
    *   set could be deleted
    *
@@ -903,7 +903,7 @@ WHERE  id = %1";
     $className = CRM_Utils_System::getClassName($form);
     if (in_array($className, array(
       'CRM_Contribute_Form_Contribution',
-      'CRM_Member_Form_Membership'
+      'CRM_Member_Form_Membership',
     ))) {
       $validFieldsOnly = FALSE;
     }
@@ -1310,7 +1310,7 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @param int $id
    *   Id of the database record.
-   * @param bool $isQuickConfigValue we want to set the is_quick_config field.
+   * @param bool $isQuickConfig we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
@@ -1326,9 +1326,8 @@ GROUP BY     mt.member_of_contact_id";
    *
    */
   public static function checkMembershipPriceSet($id) {
-    $query =
-      "
-SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
+    $query
+      = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
 LEFT JOIN   civicrm_price_field pf ON pf.id = pfv.price_field_id
 LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id

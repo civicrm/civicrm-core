@@ -33,7 +33,7 @@
  * php bin/csv/export.php -e <entity> [ --field=value --field=value ] [ -s site.org ]
  * e.g.: php bin/csv/export.php -e Contact --email=jamie@progressivetech.org
  *
- **/
+ */
 require_once dirname(__DIR__) . '/cli.class.php';
 
 $entityExporter = new civicrm_cli_csv_exporter();
