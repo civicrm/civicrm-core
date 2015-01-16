@@ -117,8 +117,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     $this->assign('caseId', $this->_id);
     $output = CRM_Core_Selector_Controller::SESSION;
     $selector = new CRM_Activity_Selector_Activity($this->_contactId, $this->_permission, FALSE, 'case');
-    $controller =
-      new CRM_Core_Selector_Controller(
+    $controller = new CRM_Core_Selector_Controller(
         $selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
         NULL,
@@ -140,7 +139,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
+   * @return void
    */
   public function browse() {
 
@@ -225,8 +224,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  static
-  public function &links() {
+  static public function &links() {
     $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {

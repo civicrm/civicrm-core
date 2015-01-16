@@ -81,7 +81,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
       'slot_label_id',
       ts('Conference Slot'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $slots,
       FALSE
     );

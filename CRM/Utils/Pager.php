@@ -126,11 +126,11 @@ class CRM_Utils_Pager extends Pager_Sliding {
      */
     $this->_response['titleTop'] = ts('Page %1 of %2', array(
         1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
-        2 => $this->_response['numPages']
+        2 => $this->_response['numPages'],
       ));
     $this->_response['titleBottom'] = ts('Page %1 of %2', array(
         1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
-        2 => $this->_response['numPages']
+        2 => $this->_response['numPages'],
       ));
   }
 
@@ -251,8 +251,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
    * Use the pager class to get the pageId and Offset
-   *
-   * @param void
    *
    * @return array
    *   an array of the pageID and offset

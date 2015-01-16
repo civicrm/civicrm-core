@@ -67,14 +67,14 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
       //user came from interview form.
       foreach (array(
                  'surveyId',
                  'contactIds',
-                 'interviewerId'
+                 'interviewerId',
                ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
@@ -107,7 +107,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusIds = array();
     foreach (array(
-               'Scheduled'
+               'Scheduled',
              ) as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;

@@ -87,11 +87,11 @@ function civicrm_api3_domain_get($params) {
             'phone_type_id',
           $values['location']['phone'][1]
         )
-        ),
-        'phone' => CRM_Utils_Array::value(
+          ),
+          'phone' => CRM_Utils_Array::value(
           'phone',
         $values['location']['phone'][1]
-        ),
+          ),
         );
       }
 

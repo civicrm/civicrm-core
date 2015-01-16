@@ -46,18 +46,20 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       array(
         'type' => 'Sql',
         'name' => 'test-queue',
-      )
+      ),
     );
     $queueSpecs[] = array(
       array(
         'type' => 'Memory',
         'name' => 'test-queue',
-      )
+      ),
     );
     return $queueSpecs;
   }
 
-  /* ----------------------- Per-provider tests ----------------------- */
+  /**
+   * Per-provider tests
+   */
   public function setUp() {
     parent::setUp();
     $this->queueService = CRM_Queue_Service::singleton(TRUE);

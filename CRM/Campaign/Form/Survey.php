@@ -92,8 +92,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @param null
-   *
    * @return void
    */
   public function buildQuickForm() {
@@ -128,11 +126,10 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
         ),
       );
     }
-    $buttons[] =
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      );
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    );
     $this->addButtons($buttons);
 
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -151,10 +148,10 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
       $this->postProcessHook();
 
-      if ($this->_action & CRM_Core_Action::ADD)
+      if ($this->_action & CRM_Core_Action::ADD) {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/questions",
           "action=update&reset=1&id={$this->_surveyId}"));
-
+      }
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
       }

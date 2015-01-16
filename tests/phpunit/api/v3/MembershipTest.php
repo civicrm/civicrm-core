@@ -626,9 +626,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id'], " in line " . __LINE__);
   }
 
-  /*
-      * Check for useful message if contact doesn't exist
-      */
+  /**
+   * Check for useful message if contact doesn't exist
+   */
   public function testMembershipCreateWithInvalidContact() {
     $params = array(
       'contact_id' => 999,
@@ -833,7 +833,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * per CRM-15746 check that the id can be altered in an update hook
    */
-  function testMembershipUpdateCreateHookCRM15746() {
+  public function testMembershipUpdateCreateHookCRM15746() {
     $this->hookClass->setHook('civicrm_pre', array($this, 'hook_civicrm_pre_update_create_membership'));
     $result = $this->callAPISuccess('membership', 'create', $this->_params);
     $this->callAPISuccess('membership', 'create', array('id' => $result['id'], 'end_date' => '1 year ago'));
@@ -843,7 +843,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('membership', array(), 2);
   }
 
-  function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
+  public function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
     if ($objectName == 'Membership' && $op == 'edit') {
       $existingMembership = $this->callAPISuccessGetSingle('membership', array('id' => $params['id']));
       unset($params['id'], $params['membership_id']);
