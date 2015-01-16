@@ -657,6 +657,7 @@ class CRM_Core_Permission {
       'export own manual batches' => $prefix . ts('export own manual batches'),
       'export all manual batches' => $prefix . ts('export all manual batches'),
       'administer payment processors' => $prefix . ts('administer payment processors'),
+      'edit message templates' => $prefix . ts('edit message templates'),
     );
 
     return $permissions;
