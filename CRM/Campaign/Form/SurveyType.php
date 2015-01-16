@@ -64,11 +64,9 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
-   *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
@@ -97,8 +95,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   /**
    * Set default values for the form.
    * the default values are retrieved from the database.
-   *
-   * @param null
    *
    * @return array
    *   array of default values

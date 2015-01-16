@@ -419,8 +419,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
     $count = 0;
     $totalAmount = $average = array();
     while ($dao->fetch()) {
-      $totalAmount[] =
-        CRM_Utils_Money::format($dao->amount, $dao->currency) . '(' .
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . '(' .
         $dao->count . ')';
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;

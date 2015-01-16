@@ -35,7 +35,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for Individuals.
    */
   public function testIndividualImport() {
@@ -122,7 +122,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Organization.
    */
   public function testOrganizationImport() {
@@ -203,7 +203,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Household.
    */
   public function testHouseholdImport() {

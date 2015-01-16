@@ -35,7 +35,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for Individuals Duplicate Matching.
    */
   public function testIndividualDuplicateMatchingImport() {
@@ -136,7 +136,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Organization Duplicate Matching.
    */
   public function testOrganizationDuplicateMatchingImport() {
@@ -231,7 +231,7 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Household Duplicate Matching.
    */
   public function testHouseholdDuplicateMatchingImport() {

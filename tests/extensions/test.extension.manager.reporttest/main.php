@@ -6,8 +6,8 @@
 class test_extension_manager_reporttest extends CRM_Core_Report {
   /**
    */
-  function __construct() {
-    $logging        = new CRM_Logging_Schema;
+  public function __construct() {
+    $logging        = new CRM_Logging_Schema();
     $this->tables[] = 'civicrm_contact';
     $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
     $this->tables[] = 'civicrm_email';
@@ -25,7 +25,7 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     parent::__construct();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $layout = CRM_Utils_Request::retrieve('layout', 'String', $this);
     $this->assign('layout', $layout);
 

@@ -40,7 +40,7 @@ require_once 'CRM/Core/Config.php';
 class CRM_RespondentProcessor {
   /**
    */
-  function __construct() {
+  public function __construct() {
     $config = CRM_Core_Config::singleton();
 
     //this does not return on failure

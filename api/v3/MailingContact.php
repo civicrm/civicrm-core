@@ -60,7 +60,7 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
     //ie. because the api is an anomaly & passing in id is not valid
     throw new Exception('This api call does not accept api as a parameter');
   }
-  $options  = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
+  $options  = _civicrm_api3_get_options_from_params($params, TRUE, 'contribution', 'get');
   $fnName = '_civicrm_api3_mailing_contact_get_' . strtolower($params['type']);
   return $fnName(
       $params['contact_id'],
@@ -81,7 +81,7 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
   $params['contact_id']['title'] = 'Contact ID';
   $params['type'] = array(
     'api.default' => 'Delivered',
-    'title' => 'Type',// doesn't really explain the field - but not sure I understand it to explain it better
+    'title' => 'Type', // doesn't really explain the field - but not sure I understand it to explain it better
     'type' => CRM_Utils_Type::T_STRING,
     'options' => array(
       'Delivered' => 'Delivered',

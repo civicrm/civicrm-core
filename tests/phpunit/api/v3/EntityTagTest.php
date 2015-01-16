@@ -119,7 +119,9 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['not_added'], 1);
   }
 
-  ///////////////// civicrm_entity_tag_get methods
+  /**
+   * civicrm_entity_tag_get methods
+   */
   public function testGetNoEntityID() {
     $ContactId = $this->_individualID;
     $tagID = $this->_tagID;
@@ -178,7 +180,9 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $entity = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
   }
 
-  ///////////////// civicrm_entity_tag_Delete methods
+  /**
+   * civicrm_entity_tag_Delete methods
+   */
   public function testEntityTagDeleteNoTagId() {
     $entityTagParams = array(
       'contact_id_i' => $this->_individualID,
@@ -252,8 +256,9 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['not_removed'], 1);
   }
 
-  ///////////////// civicrm_tag_entities_get methods
-
+  /**
+   * civicrm_tag_entities_get methods
+   */
   public function testCommonContactEntityTagAdd() {
     $params = array(
       'contact_id' => $this->_individualID,

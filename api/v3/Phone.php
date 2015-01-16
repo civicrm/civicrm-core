@@ -72,7 +72,7 @@ function _civicrm_api3_phone_create_spec(&$params) {
  *
  * @return array
  *   Api Result
- * {@getfields phone_delete}
+ *   {@getfields phone_delete}
  * @example PhoneDelete.php
  */
 function civicrm_api3_phone_delete($params) {
