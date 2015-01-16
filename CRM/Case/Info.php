@@ -66,6 +66,9 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'ext' => 'civicrm',
       'js' => array('js/angular-crmCaseType.js'),
       'css' => array('css/angular-crmCaseType.css'),
+      'partials' => array(
+        'partials/crmCaseType/*.html',
+      ),
     );
 
     CRM_Core_Resources::singleton()->addSetting(array(
