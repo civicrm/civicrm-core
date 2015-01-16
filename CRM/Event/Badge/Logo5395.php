@@ -44,7 +44,7 @@ class CRM_Event_Badge_Logo5395 extends CRM_Event_Badge {
         'cap' => 'round',
         'join' => 'round',
         'dash' => '2,2',
-        'color' => array(0, 0, 200)
+        'color' => array(0, 0, 200),
       ));
 
     $this->pdf->SetFontSize(9);

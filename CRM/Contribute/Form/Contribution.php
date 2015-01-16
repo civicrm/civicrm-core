@@ -664,7 +664,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array(
           'create' => TRUE,
-          'api' => array('extra' => array('email'))
+          'api' => array('extra' => array('email')),
         ), TRUE);
     }
 
@@ -1550,8 +1550,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     );
 
     //get the payment processor id as per mode.
-    $this->_params['payment_processor'] = $params['payment_processor_id'] =
-      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor'] = $params['payment_processor_id']
+      = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();
@@ -1762,8 +1762,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_id,
       'Contribution'
     );
-
-
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
@@ -1818,7 +1816,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * @param array $paymentParams
    *
-   * @return array
    */
   public function cleanupDBAfterPaymentFailure($paymentParams, $message) {
     //make sure to cleanup db for recurring case.

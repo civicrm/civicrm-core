@@ -57,7 +57,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   public function setUp() {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
         'label' => 'PhoneBank',
-        'return' => 'value'
+        'return' => 'value',
       ), 'integer');
     $this->useTransaction();
     $this->enableCiviCampaign();

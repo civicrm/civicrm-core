@@ -72,7 +72,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       'activity_type_id',
       'activity_label',
       'target_contact_id',
-      'activity_subject'
+      'activity_subject',
     );
     foreach ($requiredFields as $val) {
       $highlightedFields[] = $val;
@@ -195,7 +195,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             $defaults["mapper[$i]"] = array(
               $this->defaultFromHeader($this->_columnHeaders[$i],
                 $headerPatterns
-              )
+              ),
             );
           }
           else {
