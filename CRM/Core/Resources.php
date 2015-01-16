@@ -443,14 +443,17 @@ class CRM_Core_Resources {
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
-   * @param string $file
+   * @param string|NULL $file
    *   file path -- relative to the extension base dir.
    *
    * @return bool|string
    *   full file path or FALSE if not found
    */
-  public function getPath($ext, $file) {
+  public function getPath($ext, $file = NULL) {
     // TODO consider caching results
+    if ($file === NULL) {
+      return $this->extMapper->keyToBasePath($ext);
+    }
     $path = $this->extMapper->keyToBasePath($ext) . '/' . $file;
     if (is_file($path)) {
       return $path;
@@ -478,6 +481,40 @@ class CRM_Core_Resources {
     }
     // TODO consider caching results
     return $this->extMapper->keyToUrl($ext) . '/' . $file;
+  }
+
+  /**
+   * Evaluate a glob pattern in the context of a particular extension.
+   *
+   * @param string $ext
+   *   Extension name; use 'civicrm' for core.
+   * @param string|array $patterns
+   *   Glob pattern; e.g. "*.html".
+   * @param null|int $flags
+   *   See glob().
+   * @return array
+   *   List of matching files, relative to the extension base dir.
+   * @see glob()
+   */
+  public function glob($ext, $patterns, $flags = NULL) {
+    $path = $this->getPath($ext);
+    $patterns = (array) $patterns;
+    $files = array();
+    foreach ($patterns as $pattern) {
+      if ($pattern{0} === '/') {
+        // Absolute path.
+        $files = array_merge($files, (array) glob($pattern, $flags));
+      }
+      else {
+        // Relative path.
+        $files = array_merge($files, (array) glob("$path/$pattern", $flags));
+      }
+    }
+    sort($files); // Deterministic order.
+    $files = array_unique($files);
+    return array_map(function ($file) use ($path) {
+      return CRM_Utils_File::relativize($file, "$path/");
+    }, $files);
   }
 
   /**
