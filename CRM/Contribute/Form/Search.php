@@ -75,7 +75,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -260,7 +260,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     foreach (array(
                'contribution_amount_low',
-               'contribution_amount_high'
+               'contribution_amount_high',
              ) as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
@@ -274,7 +274,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_soft_credit_type_id',
         'contribution_status_id',
         'contribution_source',
-        'contribution_trxn_id'
+        'contribution_trxn_id',
       );
       foreach ($specialParams as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);

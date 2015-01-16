@@ -97,8 +97,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get page orientations recognized by the DOMPDF package used to create PDF letters.
    *
-   * @param void
-   *
    * @return array
    *   array of page orientations
    */
@@ -111,8 +109,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Get measurement units recognized by the DOMPDF package used to create PDF letters.
-   *
-   * @param void
    *
    * @return array
    *   array of measurement units
@@ -128,8 +124,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Get Option Group ID for PDF Page Formats
-   *
-   * @param void
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
@@ -190,8 +184,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Get the default PDF Page Format values
-   *
-   * @param NULL
    *
    * @return array
    *   Name/value pairs containing the default PDF Page Format values.

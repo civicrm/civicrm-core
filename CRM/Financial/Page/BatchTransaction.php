@@ -104,8 +104,8 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
     if (isset(self::$_entityID)) {
       $statusID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
     }
-    $breadCrumb =
-      array(
+    $breadCrumb
+      = array(
         array(
           'title' => ts('Accounting Batches'),
           'url' => CRM_Utils_System::url('civicrm/financial/financialbatches',

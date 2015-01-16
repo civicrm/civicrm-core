@@ -68,7 +68,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function &getRedactionRules() {
     foreach (array(
                'redactionStringRules',
-               'redactionRegexRules'
+               'redactionRegexRules',
              ) as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
 
@@ -96,7 +96,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function &caseInfo(
+  public function &caseInfo(
     $clientID,
     $caseID
   ) {
@@ -323,7 +323,7 @@ WHERE      a.id = %1
       $clientID = CRM_Utils_Type::escape($clientID, 'Integer');
       if (!in_array($activityTypeInfo['name'], array(
         'Email',
-        'Inbound Email'
+        'Inbound Email',
       ))
       ) {
         $activity['editURL'] = CRM_Utils_System::url('civicrm/case/activity',
@@ -637,7 +637,7 @@ AND    cg.extends = 'Activity'";
         1 => array(
           $activityTypeID,
           'Integer',
-        )
+        ),
       );
       $dao = CRM_Core_DAO::executeQuery($query, $params);
 

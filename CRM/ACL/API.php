@@ -54,7 +54,7 @@ class CRM_ACL_API {
    * @param int $contactID
    *   The contactID for whom the check is made.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public static function check($str, $contactID = NULL) {
@@ -208,7 +208,7 @@ class CRM_ACL_API {
     //adding a way for unit tests to flush the cache
     if ($flush) {
       $cache = array();
-      return;
+      return NULL;
     }
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
