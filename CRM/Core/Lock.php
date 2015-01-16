@@ -148,7 +148,7 @@ class CRM_Core_Lock {
    *
    * @param string $jobLog
    * @throws CRM_Core_Exception
-   * @return boolean
+   * @return bool
    */
   public function hackyHandleBrokenCode($jobLog) {
     if (stristr($this->_name, 'job')) {

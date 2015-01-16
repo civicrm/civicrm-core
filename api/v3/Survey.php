@@ -44,7 +44,7 @@
  *
  * @return array
  *   api result array
- * {@getfields survey_create}
+ *   {@getfields survey_create}
  */
 function civicrm_api3_survey_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Survey');
@@ -71,7 +71,7 @@ function _civicrm_api3_survey_create_spec(&$params) {
  *
  * @return array
  *   API result Array of matching surveys
- * {@getfields survey_get}
+ *   {@getfields survey_get}
  */
 function civicrm_api3_survey_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Survey');
@@ -89,7 +89,7 @@ function civicrm_api3_survey_get($params) {
  *
  * @return array
  *   api result array
- * {@getfields survey_delete}
+ *   {@getfields survey_delete}
  */
 function civicrm_api3_survey_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

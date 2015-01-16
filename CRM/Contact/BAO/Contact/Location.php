@@ -52,7 +52,6 @@ class CRM_Contact_BAO_Contact_Location {
       $primaryClause = " AND civicrm_email.is_primary = 1";
     }
 
-
     $locationClause = NULL;
     if ($locationTypeID) {
       $locationClause = " AND civicrm_email.location_type_id = $locationTypeID";
@@ -95,7 +94,6 @@ WHERE     civicrm_contact.id = %1";
     if ($type) {
       $cond = " AND civicrm_phone.phone_type_id = '$type'";
     }
-
 
     $sql = "
    SELECT civicrm_contact.display_name, civicrm_phone.phone, civicrm_contact.do_not_sms
@@ -197,8 +195,7 @@ AND civicrm_contact.id IN $idString ";
       $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));
       $location['url'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->contact_id);
       $location['location_type'] = $dao->location_type;
-      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ?
-          $dao->contact_sub_type : $dao->contact_type, $imageUrlOnly, $dao->contact_id
+      $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ? $dao->contact_sub_type : $dao->contact_type, $imageUrlOnly, $dao->contact_id
       );
       $locations[] = $location;
     }

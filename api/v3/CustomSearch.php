@@ -12,7 +12,7 @@
  *
  * @return array
  *   details of found Option Values
- * {@getfields OptionValue_get}
+ *   {@getfields OptionValue_get}
  */
 function civicrm_api3_custom_search_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -33,7 +33,7 @@ function civicrm_api3_custom_search_get($params) {
  *
  * @return array
  *   Array of newly created option_value property values.
- * {@getfields OptionValue_create}
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_custom_search_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -72,7 +72,7 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
  *
  * @return array
  *   Api result
- * {@getfields ReportTemplate_create}
+ *   {@getfields ReportTemplate_create}
  */
 function civicrm_api3_custom_search_delete($params) {
   require_once 'api/v3/OptionValue.php';

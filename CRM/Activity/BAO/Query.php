@@ -460,11 +460,12 @@ class CRM_Activity_BAO_Query {
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_activity', NULL, TRUE, TRUE);
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveys(TRUE, FALSE, FALSE, TRUE);
-    if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
-      array('' => ts('- none -')) + $surveys, FALSE,
-      array('class' => 'crm-select2')
-    );
-
+    if ($surveys) {
+      $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
+                 array('' => ts('- none -')) + $surveys, FALSE,
+                 array('class' => 'crm-select2')
+                 );
+    }
     $extends = array('Activity');
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
     if ($groupDetails) {

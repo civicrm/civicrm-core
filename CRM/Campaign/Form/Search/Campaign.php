@@ -50,7 +50,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'campaign');
@@ -95,7 +95,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
     $this->add('select', 'campaign_type_id', ts('Campaign Type'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $campaignTypes
     );
 
@@ -106,7 +106,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
     $this->addElement('select', 'status_id', ts('Campaign Status'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $campaignStatus
     );
     $this->set('campaignStatus', $campaignStatus);

@@ -196,7 +196,7 @@ class CRM_Utils_VersionCheck {
    * Get the latest version number if it's newer than the local one
    *
    * @return string|null
-   * Returns version number of the latest release if it is greater than the local version
+   *   Returns version number of the latest release if it is greater than the local version
    */
   public function isNewerVersionAvailable() {
     $newerVersion = NULL;
@@ -309,7 +309,7 @@ class CRM_Utils_VersionCheck {
    * Get active payment processor types
    */
   private function getPayProcStats() {
-    $dao = new CRM_Financial_DAO_PaymentProcessor;
+    $dao = new CRM_Financial_DAO_PaymentProcessor();
     $dao->is_active = 1;
     $dao->find();
     $ppTypes = array();
@@ -353,7 +353,7 @@ class CRM_Utils_VersionCheck {
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
     );
     foreach ($tables as $daoName => $where) {
-      $dao = new $daoName;
+      $dao = new $daoName();
       if ($where) {
         $dao->whereAdd($where);
       }

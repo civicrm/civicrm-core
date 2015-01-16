@@ -145,7 +145,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @return \CRM_Campaign_Selector_Search
    */
-  function __construct(
+  public function __construct(
     &$queryParams,
     $action = CRM_Core_Action::NONE,
     $surveyClause = NULL,
@@ -183,8 +183,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @return array
    */
-  static
-  public function &links() {
+  static public function &links() {
     return self::$_links = array();
   }
 
@@ -307,7 +306,7 @@ FROM {$from}
   /**
    * @return array
    *   which contains an array of strings
-   **/
+   */
   public function getQILL() {
     return $this->_query->qill();
   }

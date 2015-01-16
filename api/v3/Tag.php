@@ -46,7 +46,7 @@
  *
  * @return array
  *   Array of newly created tag property values.
- * {@getfields tag_create}
+ *   {@getfields tag_create}
  */
 function civicrm_api3_tag_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,7 +73,7 @@ function _civicrm_api3_tag_create_spec(&$params) {
  *
  * @return array
  *   API result array
- * {@getfields tag_delete}
+ *   {@getfields tag_delete}
  */
 function civicrm_api3_tag_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -92,7 +92,7 @@ function civicrm_api3_tag_delete($params) {
  *
  * @return array
  *   details of found tags else error
- * {@getfields tag_get}
+ *   {@getfields tag_get}
  */
 function civicrm_api3_tag_get($params) {
 
