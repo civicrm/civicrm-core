@@ -17,6 +17,12 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    */
   protected $res;
 
+
+  /**
+   * @var Civi\Angular\Manager
+   */
+  protected $angular;
+
   /**
    * @param string $title
    *   Title of the page.
@@ -28,6 +34,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
   public function __construct($title = NULL, $mode = NULL, $res = NULL) {
     parent::__construct($title, $mode);
     $this->res = CRM_Core_Resources::singleton();
+    $this->angular = Civi\Core\Container::singleton()->get('angular');
   }
 
   /**
@@ -47,7 +54,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    * Register resources required by Angular.
    */
   public function registerResources() {
-    $modules = $this->getAngularModules();
+    $modules = $this->angular->getModules();
 
     $this->res->addSettingsFactory(function () use (&$modules) {
       // TODO optimization; client-side caching
@@ -65,101 +72,15 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
     $this->res->addScriptFile('civicrm', 'bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
     $headOffset = 0;
-    foreach ($modules as $module) {
-      if (!empty($module['css'])) {
-        foreach ($module['css'] as $file) {
-          $this->res->addStyleFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header', TRUE);
-        }
+    foreach ($modules as $moduleName => $module) {
+      foreach ($this->angular->getStyleUrls($moduleName) as $url) {
+        $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
       }
-      if (!empty($module['js'])) {
-        foreach ($module['js'] as $file) {
-          $this->res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header', TRUE);
-        }
+      foreach ($this->angular->getScriptUrls($moduleName) as $url) {
+        $this->res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+        // addScriptUrl() bypasses the normal string-localization of addScriptFile(),
+        // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
       }
     }
   }
-
-  /**
-   * Get a list of AngularJS modules which should be autoloaded
-   *
-   * @return array
-   *   (string $name => array('ext' => string $key, 'js' => array $paths, 'css' => array $paths))
-   */
-  public function getAngularModules() {
-    $angularModules = array();
-    $angularModules['angularFileUpload'] = array(
-      'ext' => 'civicrm',
-      'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
-    );
-    $angularModules['crmApp'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crmApp.js'),
-    );
-    $angularModules['crmAttachment'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crmAttachment.js'),
-      'css' => array('css/angular-crmAttachment.css'),
-      'partials' => array('partials/crmAttachment/*.html'),
-    );
-    $angularModules['crmUi'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
-      'partials' => array('partials/crmUi/*.html'),
-    );
-    $angularModules['crmUtil'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-crm-util.js'),
-    );
-    // https://github.com/jwstadler/angular-jquery-dialog-service
-    $angularModules['dialogService'] = array(
-      'ext' => 'civicrm',
-      'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
-    );
-    $angularModules['ngSanitize'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-sanitize.js'),
-    );
-    $angularModules['ui.utils'] = array(
-      'ext' => 'civicrm',
-      'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
-    );
-    $angularModules['ui.sortable'] = array(
-      'ext' => 'civicrm',
-      'js' => array('bower_components/angular-ui-sortable/sortable.min.js'),
-    );
-    $angularModules['unsavedChanges'] = array(
-      'ext' => 'civicrm',
-      'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'),
-    );
-
-    foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-      $angularModules = array_merge($angularModules, $component->getAngularModules());
-    }
-    CRM_Utils_Hook::angularModules($angularModules);
-    $angularModules = $this->resolvePatterns($angularModules);
-    return $angularModules;
-  }
-
-  /**
-   * @param array $modules
-   *   List of Angular modules.
-   * @return array
-   *   Updated list of Angular modules
-   */
-  public function resolvePatterns($modules) {
-    $newModules = array();
-
-    foreach ($modules as $moduleKey => $module) {
-      foreach (array('js', 'css', 'partials') as $fileset) {
-        if (!isset($module[$fileset])) {
-          continue;
-        }
-        $module[$fileset] = $this->res->glob($module['ext'], $module[$fileset]);
-      }
-      $newModules[$moduleKey] = $module;
-    }
-
-    return $newModules;
-  }
-
 }
