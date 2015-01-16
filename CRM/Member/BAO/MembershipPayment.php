@@ -69,7 +69,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     // OR the caller will have taken responsibility for updating the line items themselves so we will update using SQL here
     $membershipTypeID = civicrm_api3('membership', 'getvalue', array(
         'id' => $dao->membership_id,
-        'return' => 'membership_type_id'
+        'return' => 'membership_type_id',
       ));
     $sql = "UPDATE civicrm_line_item li
       LEFT JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
@@ -79,7 +79,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     CRM_Core_DAO::executeQuery($sql, array(
         1 => array($dao->membership_id, 'Integer'),
         2 => array($membershipTypeID, 'Integer'),
-        3 => array($dao->contribution_id, 'Integer')
+        3 => array($dao->contribution_id, 'Integer'),
       ));
     return $dao;
   }

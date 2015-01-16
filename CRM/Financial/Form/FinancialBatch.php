@@ -64,14 +64,14 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
             'edit own manual batches',
             'edit all manual batches',
           ),
-          'actionName' => 'edit'
+          'actionName' => 'edit',
         ),
         CRM_Core_Action::DELETE => array(
           'permission' => array(
             'delete own manual batches',
             'delete all manual batches',
           ),
-          'actionName' => 'delete'
+          'actionName' => 'delete',
         ),
       );
 
@@ -296,7 +296,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @param int $userContactID
    * @param string $actionName
    *
-   * @return array
    *   list of errors to be posted back to the form
    */
   public function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {

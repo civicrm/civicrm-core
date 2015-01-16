@@ -50,7 +50,6 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param string $fileName
    *   The name of the file to save the label in.
    *
-   * @return null
    */
   public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
@@ -84,7 +83,6 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @return array
    *   Array of rows for labels
    */
-
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
     $locName = NULL;
     //get the address format sequence from the config file
@@ -214,7 +212,7 @@ class CRM_Contact_Form_Task_LabelCommon {
                   'email',
                   'phone',
                   'im',
-                  'openid'
+                  'openid',
                 ))) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];

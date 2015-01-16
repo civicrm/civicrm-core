@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         foreach (array(
                    'Individual',
                    'Organization',
-                   'Household'
+                   'Household',
                  ) as $contactType) {
           if (in_array($contactType, $onBehalfProfile) &&
             (in_array('Membership', $onBehalfProfile) ||
@@ -176,7 +176,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         foreach (array(
                    'Individual',
                    'Organization',
-                   'Household'
+                   'Household',
                  ) as $contactType) {
           if (in_array($contactType, $postProfile) &&
             (in_array('Membership', $postProfile) ||
@@ -687,7 +687,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
-    if (sizeof($unitVals) == 1) {
+    if (count($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
       $unit = $unitVals[0];
       $form->add('hidden', 'frequency_unit', $unit);

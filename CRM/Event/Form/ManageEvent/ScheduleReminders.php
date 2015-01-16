@@ -64,7 +64,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
         else {
           $action += CRM_Core_Action::ENABLE;
         }
-        $scheduleReminder = new CRM_Admin_Page_ScheduleReminders;
+        $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
         $links = $scheduleReminder->links();
         $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&compId={$this->_id}";
         $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&compId={$this->_id}";

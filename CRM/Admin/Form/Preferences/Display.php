@@ -118,8 +118,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       $defaults['editor_id'] = $this->_config->editor_id;
     }
     if (empty($this->_config->display_name_format)) {
-      $defaults['display_name_format'] =
-        "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
+      $defaults['display_name_format'] = "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
     }
     else {
       $defaults['display_name_format'] = $this->_config->display_name_format;
