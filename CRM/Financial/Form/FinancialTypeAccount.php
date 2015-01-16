@@ -171,7 +171,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
           '6' => 1, //Asset
           '7' => 4, //cost of sales
           '8' => 1, //premium inventory
-          '9' => 3 //discount account is,
+          '9' => 3, //discount account is,
         );
 
         $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
@@ -181,8 +181,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       }
       else {
         $financialAccountSelect = array(
-            'select' => ts('- select -'),
-          ) + CRM_Contribute_PseudoConstant::financialAccount();
+          'select' => ts('- select -'),
+        ) + CRM_Contribute_PseudoConstant::financialAccount();
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -193,7 +193,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         '6' => 1, //Asset
         '7' => 4, //cost of sales
         '8' => 1, //premium inventory
-        '9' => 3 //discount account is,
+        '9' => 3, //discount account is,
       );
 
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
@@ -223,7 +223,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         array(
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        )
+        ),
       )
     );
     $this->addFormRule(array('CRM_Financial_Form_FinancialTypeAccount', 'formRule'), $this);

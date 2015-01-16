@@ -11,7 +11,7 @@ interface API_Wrapper {
    * @return array
    *   modified $apiRequest
    */
-  function fromApiInput($apiRequest);
+  public function fromApiInput($apiRequest);
 
   /**
    * @param array $apiRequest
@@ -20,5 +20,5 @@ interface API_Wrapper {
    * @return array
    *   modified $result
    */
-  function toApiOutput($apiRequest, $result);
+  public function toApiOutput($apiRequest, $result);
 }

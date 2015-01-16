@@ -92,7 +92,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_membership',
       'civicrm_membership_log',
       'civicrm_contribution',
-      'civicrm_membership_payment'
+      'civicrm_membership_payment',
     );
     $this->quickCleanup($tablesToTruncate);
     $this->relationshipTypeDelete($this->_relationshipTypeId);

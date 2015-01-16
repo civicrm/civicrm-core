@@ -64,16 +64,16 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
     $this->_participantID = $this->participantCreate(array(
         'contact_id' => $this->_contactID,
-        'event_id' => $this->_eventID
+        'event_id' => $this->_eventID,
       ));
     $this->_contactID2 = $this->individualCreate();
     $this->_participantID2 = $this->participantCreate(array(
         'contact_id' => $this->_contactID2,
-        'event_id' => $this->_eventID
+        'event_id' => $this->_eventID,
       ));
     $this->_participantID3 = $this->participantCreate(array(
         'contact_id' => $this->_contactID2,
-        'event_id' => $this->_eventID
+        'event_id' => $this->_eventID,
       ));
     $this->_params = array(
       'contact_id' => $this->_contactID,
@@ -190,7 +190,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $event = $this->eventCreate(NULL);
     $this->callAPISuccess('participant', 'create', array(
         'event_id' => $event['id'],
-        'contact_id' => $this->_contactID
+        'contact_id' => $this->_contactID,
       ));
 
     $description = "use nested get to get an event";

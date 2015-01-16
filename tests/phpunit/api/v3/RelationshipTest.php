@@ -717,7 +717,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
   }
 
-  /*
+  /**
    * Test using various operators
    */
   public function testGetTypeOperators() {

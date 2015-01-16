@@ -256,8 +256,6 @@ SELECT label, value
    * Generate the select clause and the associated tables
    * for the from clause
    *
-   * @param NULL
-   *
    * @return void
    */
   public function select() {
@@ -323,8 +321,6 @@ SELECT label, value
    * Generate the where clause and also the english language
    * equivalent
    *
-   * @param NULL
-   *
    * @return void
    */
   public function where() {
@@ -357,7 +353,7 @@ SELECT label, value
           $wildcard = $isSerialized ? $wildcard : TRUE;
           $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
                 'field' => $name,
-                'context' => 'search'
+                'context' => 'search',
               ), array()));
           $qillValue = '';
           $sqlOP = $wildcard ? ' OR ' : ' AND ';
@@ -554,8 +550,6 @@ SELECT label, value
   /**
    * Function that does the actual query generation
    * basically ties all the above functions together
-   *
-   * @param NULL
    *
    * @return array
    *   array of strings

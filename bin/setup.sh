@@ -151,7 +151,7 @@ if [ -n "$DO_DOWNLOAD" ]; then
     fi
 
     BOWER=$(pickcmd node_modules/bower/bin/bower bower)
-    $BOWER install
+    #$BOWER install
   popd
 fi
 

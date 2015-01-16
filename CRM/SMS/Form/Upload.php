@@ -309,7 +309,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
-
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -336,7 +335,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }
-
 
     $skipTextFile = $self->get('skipTextFile');
 
@@ -382,7 +380,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       /* Do a full token replacement on a dummy verp, the current
              * contact and domain, and the first organization. */
 
-
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace
       // so that we do get an invalid token error
@@ -415,7 +412,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
       if (!empty($dataErrors)) {
         $errors['textFile'] = ts('The following errors were detected in %1:', array(
-            1 => $name
+          1 => $name,
           )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
       }
     }

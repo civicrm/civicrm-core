@@ -110,8 +110,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  ///////////////// civicrm_event_get methods
-
+  /**
+   * civicrm_event_get methods
+   */
   public function testGetEventById() {
     $params = array(
       'id' => $this->_events[1]['id'],
@@ -252,7 +253,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
         'participant_status' => 1,
         'role_id' => 1,
         'contact_id' => $contactID,
-        'event_id' => $this->_eventIds[0]
+        'event_id' => $this->_eventIds[0],
       ));
     $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile, 'getsingle');
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
@@ -261,7 +262,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 
-  /*
+  /**
    * Legacy support for Contribution Type ID. We need to ensure this is supported
    * as an alias for financial_type_id
    */
@@ -295,7 +296,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $check = $this->callAPISuccess($this->_entity, 'get', array(
         'return.custom_' . $ids['custom_field_id'] => 1,
-        'id' => $result['id']
+        'id' => $result['id'],
       ));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
