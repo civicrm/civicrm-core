@@ -67,6 +67,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'js/angular-crmMailing/directives.js',
       ),
       'css' => array('css/angular-crmMailing.css'),
+      'partials' => array(
+        'partials/crmMailing/*.html',
+        'partials/crmMailing/dialog/*.html',
+        'partials/crmMailing/directive/*.html',
+        'partials/crmMailing/field/*.html',
+      ),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
@@ -76,6 +82,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'js/angular-crmMailingAB/directives.js',
       ),
       'css' => array('css/angular-crmMailingAB.css'),
+      'partials' => array(
+        'partials/crmMailingAB/*.html',
+      ),
     );
     $result['crmD3'] = array(
       'ext' => 'civicrm',
