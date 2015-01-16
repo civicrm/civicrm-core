@@ -135,9 +135,9 @@
           <br />
           <span class="description">{ts}First day of current continuous membership period. Start Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
         <tr class="crm-membership-form-block-end_date"><td class="label">{$form.end_date.label}</td>
-          <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
+          <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}
             <br />
-            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
+            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.  If the membership is auto-renew, the expiration date will be overridden upon the next billing cycle.{/ts}</span></td></tr>
         {if !empty($form.auto_renew)}
           <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
             <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
