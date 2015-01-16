@@ -10,12 +10,12 @@ class AntagonistCommand {
     list ($program, $target, $suite) = $argv;
 
     $candidateTests = \Civi\CiUtil\PHPUnitScanner::findTestsByPath(array($suite));
-//    $candidateTests = array(
-//      array('class' => 'CRM_Core_RegionTest', 'method' => 'testBlank'),
-//      array('class' => 'CRM_Core_RegionTest', 'method' => 'testDefault'),
-//      array('class' => 'CRM_Core_RegionTest', 'method' => 'testOverride'),
-//      array('class' => 'CRM_Core_RegionTest', 'method' => 'testAllTypes'),
-//    );
+    //    $candidateTests = array(
+    //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testBlank'),
+    //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testDefault'),
+    //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testOverride'),
+    //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testAllTypes'),
+    //    );
     $antagonist = self::findAntagonist($target, $candidateTests);
     if ($antagonist) {
       print_r(array('found an antagonist' => $antagonist));

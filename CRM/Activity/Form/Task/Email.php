@@ -61,7 +61,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     parent::preProcess();
 

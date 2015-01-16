@@ -48,8 +48,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
-   *
    * @return void
    */
   public function preProcess() {
@@ -74,7 +72,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       array(
         'title' => ts('Price Sets'),
         'url' => $url,
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
@@ -113,8 +111,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -238,8 +234,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -260,8 +254,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
   /**
    * Process the form
-   *
-   * @param null
    *
    * @return void
    */
@@ -302,7 +294,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
           'reset' => 1,
           'action' => $action,
           'sid' => $set->id,
-          'new' => 1
+          'new' => 1,
         ));
       CRM_Core_Session::setStatus(ts("Your Set '%1' has been added. You can add fields to this set now.",
         array(1 => $set->title)

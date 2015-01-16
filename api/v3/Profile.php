@@ -115,7 +115,7 @@ function civicrm_api3_profile_get($params) {
         $ufGroupBAO->setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
       }
     }
-    elseif(!empty($params['contact_id'])) {
+    elseif (!empty($params['contact_id'])) {
       $ufGroupBAO->setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
       foreach ($values[$profileID] as $fieldName => $field) {
         // we should return 'Primary' with & without capitalisation. it is more consistent with api to not
@@ -447,7 +447,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
       $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.1']['values'][0][$fieldname]) ? $result['api.address.get.1']['values'][0][$fieldname] : '';
     }
   }
-  elseif(!empty($result['api.address.get.2']['count'])) {
+  elseif (!empty($result['api.address.get.2']['count'])) {
     foreach ($addressFields as $fieldname) {
       $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.2']['values'][0][$fieldname]) ? $result['api.address.get.2']['values'][0][$fieldname] : '';
     }
@@ -461,7 +461,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
   if (!empty($result['api.email.get.1']['count'])) {
     $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.1']['values'][0]['email'];
   }
-  elseif(!empty($result['api.email.get.2']['count'])) {
+  elseif (!empty($result['api.email.get.2']['count'])) {
     $values['billing-email' . '-' . $locationTypeID] = $result['api.email.get.2']['values'][0]['email'];
   }
   else {
@@ -488,14 +488,14 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *   0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state.
  * @param $is_flush
  *
- * @return array
+ * @return array|void
  */
 function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1, $is_flush) {
   static $profileFields = array();
   if ($is_flush) {
     $profileFields = array();
     if (empty($profileID)) {
-      return;
+      return NULL;
     }
   }
   if (isset($profileFields[$profileID])) {
@@ -644,7 +644,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     }
     $fieldName .= '-' . $field['location_type_id'];
   }
-  elseif(array_key_exists($fieldName, $locationFields)) {
+  elseif (array_key_exists($fieldName, $locationFields)) {
     $fieldName .= '-Primary';
     $entity = 'email';
   }
@@ -683,7 +683,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'soft_credit_type' => 'contribution_soft',
     'group' => 'group_contact',
     'tag' => 'entity_tag',
-   );
+  );
   if (array_key_exists($fieldName, $hardCodedEntityMappings)) {
     $entity = $hardCodedEntityMappings[$fieldName];
   }

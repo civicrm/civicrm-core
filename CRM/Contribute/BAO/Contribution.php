@@ -87,11 +87,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution
+   * @return CRM_Contribute_BAO_Contribution|void
    */
   public static function add(&$params, $ids = array()) {
     if (empty($params)) {
-      return;
+      return NULL;
     }
     //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
     $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
@@ -643,7 +643,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'name' => 'contribution_page',
           'where' => 'civicrm_contribution_page.title',
           'data_type' => CRM_Utils_Type::T_STRING,
-        )
+        ),
       );
 
       $contributionNote = array(
@@ -2461,7 +2461,6 @@ WHERE  contribution_id = %1 ";
       $values['financial_type_id'] = $this->financial_type_id;
     }
 
-
     $template->assign('trxn_id', $this->trxn_id);
     $template->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($this->receive_date)
@@ -2774,7 +2773,6 @@ WHERE  contribution_id = %1 ";
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-
 
         if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
             || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
@@ -3151,10 +3149,8 @@ WHERE  contribution_id = %1 ";
    * @see CRM_Core_DAO::buildOptions
    *
    * @param string $fieldName
-   * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
-   * @param array $props
-   *   whatever is known about this dao object.
+   * @param string $context see CRM_Core_DAO::buildOptionsContext.
+   * @param array $props  whatever is known about this dao object.
    *
    * @return array|bool
    */

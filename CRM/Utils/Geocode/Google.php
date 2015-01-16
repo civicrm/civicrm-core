@@ -60,7 +60,7 @@ class CRM_Utils_Geocode_Google {
    * @param array $values
    * @param bool $stateName
    *
-   * @return boolean
+   * @return bool
    *   true if we modified the address, false otherwise
    */
   public static function format(&$values, $stateName = FALSE) {
