@@ -35,12 +35,7 @@
       <td>&nbsp;</td>
       <td class="description">
         {capture assign=crmURL}{crmURL p='civicrm/admin/setting/component' q='action=add&reset=1'}{/capture}
-        {ts 1=$crmURL}Select the <strong>tabs</strong>
-          that should be displayed when viewing a contact record. EXAMPLE: If your organization does not keep track of
-          'Relationships', then un-check this option to simplify the screen display. Tabs for Contributions, Pledges,
-          Memberships, Events, Grants and Cases are also hidden if the corresponding component is not enabled. Go to
-          <a href="%1">Administer > System Settings > Enable Components</a>
-          to modify the components which are available for your site.{/ts}
+        {ts 1=$crmURL}Select the <strong>tabs</strong> that should be displayed when viewing a contact record. EXAMPLE: If your organization does not keep track of 'Relationships', then un-check this option to simplify the screen display. Tabs for Contributions, Pledges, Memberships, Events, Grants and Cases are also hidden if the corresponding component is not enabled. Go to <a href="%1">Administer > System Settings > Enable Components</a> to modify the components which are available for your site.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_smart_group_display">
@@ -50,8 +45,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab.
-          "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
+        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab. "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_edit_options">
