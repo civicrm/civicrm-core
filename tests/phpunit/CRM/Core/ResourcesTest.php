@@ -281,6 +281,21 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
   }
 
+  public function testGlob() {
+    $this->assertEquals(
+      array('info.xml'),
+      $this->res->glob('com.example.ext', 'info.xml')
+    );
+    $this->assertEquals(
+      array('js/example.js'),
+      $this->res->glob('com.example.ext', 'js/*.js')
+    );
+    $this->assertEquals(
+      array('js/example.js'),
+      $this->res->glob('com.example.ext', array('js/*.js'))
+    );
+  }
+
   /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param string $cacheKey
@@ -291,7 +306,9 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function _createMapper(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/com.example.ext");
+    mkdir("$basedir/com.example.ext/js");
     file_put_contents("$basedir/com.example.ext/info.xml", "<extension key='com.example.ext' type='report'><file>oddball</file></extension>");
+    file_put_contents("$basedir/com.example.ext/js/example.js", "alert('Boo!');");
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir, 'http://ext-dir', $cache, $cacheKey);
     $mapper = new CRM_Extension_Mapper($c, NULL, NULL, '/pathto/civicrm', 'http://core-app');
