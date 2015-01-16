@@ -241,7 +241,7 @@ class CRM_Core_Block {
       if ($value['active']) {
         if (in_array($id, array(
           self::ADD,
-          self::CREATE_NEW
+          self::CREATE_NEW,
         ))) {
           $hasAccess = TRUE;
           if (!CRM_Core_Permission::check('add contacts') &&
@@ -329,7 +329,7 @@ class CRM_Core_Block {
         $urlArray = array(
           'fullTextSearchID' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
             'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name'
-          )
+          ),
         );
         self::setProperty(self::FULLTEXT_SEARCH, 'templateValues', $urlArray);
         break;
@@ -369,7 +369,7 @@ class CRM_Core_Block {
           'query' => 'action=add&reset=1&context=standalone',
           'ref' => 'new-activity',
           'title' => ts('Activity'),
-        )
+        ),
       ));
 
       $components = CRM_Core_Component::getEnabledComponents();
@@ -392,7 +392,7 @@ class CRM_Core_Block {
           'query' => 'atype=3&action=add&reset=1&context=standalone',
           'ref' => 'new-email',
           'title' => ts('Email'),
-        )
+        ),
       ));
 
       if (CRM_Core_Permission::check('edit groups')) {
@@ -402,7 +402,7 @@ class CRM_Core_Block {
             'query' => 'reset=1',
             'ref' => 'new-group',
             'title' => ts('Group'),
-          )
+          ),
         ));
       }
 
@@ -413,7 +413,7 @@ class CRM_Core_Block {
             'query' => 'reset=1&action=add',
             'ref' => 'new-tag',
             'title' => ts('Tag'),
-          )
+          ),
         ));
       }
 
@@ -481,7 +481,7 @@ class CRM_Core_Block {
           'path' => 'civicrm/user',
           'query' => 'reset=1',
           'title' => ts('My Contact Dashboard'),
-        )
+        ),
       );
     }
 
@@ -590,7 +590,7 @@ class CRM_Core_Block {
     // return if upgrade mode
     $config = CRM_Core_Config::singleton();
     if ($config->isUpgradeMode()) {
-      return;
+      return NULL;
     }
 
     if (!self::getProperty($id, 'active')) {

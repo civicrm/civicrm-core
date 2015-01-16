@@ -72,7 +72,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       'contact/log',
       'activitySummary',
       'case/timespent',
-      'case/summary'
+      'case/summary',
     );
 
     $instances = CRM_Core_DAO::executeQuery("SELECT id, form_values, report_id FROM civicrm_report_instance WHERE report_id IN ('" . implode("','", $modifiedReportIds) . "')");
@@ -149,7 +149,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
    */
   public function upgrade_3_4_beta3($rev) {
     // do the regular upgrade
-    $upgrade = new CRM_Upgrade_Form;
+    $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
     if ($upgrade->multilingual) {
@@ -185,7 +185,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       'Contact',
       'Individual',
       'Organization',
-      'Household'
+      'Household',
     );
     while ($ufGroups->fetch()) {
       if (!in_array($ufGroups->group_type, $skipGroupTypes)) {
@@ -219,7 +219,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
       CRM_Core_DAO::executeQuery($query);
     }
 
-    $upgrade = new CRM_Upgrade_Form;
+    $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
   }
 
@@ -299,7 +299,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
             'event_start_date_from',
             'event_start_date_to',
             'event_end_date_from',
-            'event_end_date_to'
+            'event_end_date_to',
           );
           foreach ($eventDates as $date) {
             if (isset($formValues[$date]) && $formValues[$date] == ' ') {
@@ -353,7 +353,8 @@ FROM   civicrm_option_value v,
 WHERE  v.option_group_id = g.id
   AND  g.name      = %1
   AND  g.is_active = 1
-  AND  v.name      = %2", array(
+  AND  v.name      = %2",
+    array(
       1 => array('activity_type', 'String'),
       2 => array('Bulk Email', 'String'),
     ));

@@ -69,7 +69,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
    *
    * @return void
    */
@@ -174,7 +173,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @param null
    *
    * @return void
    * @see valid_date
@@ -186,7 +184,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @param null
    *
    * @return void
    */
@@ -257,13 +254,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         if ($main == 'Relationship') {
           $relName = self::getFormattedList($sel2[$main]);
           $sel2[$main] = array(
-              '' => ts("- Any -")
-            ) + $relName;
+            '' => ts("- Any -"),
+          ) + $relName;
         }
         else {
           $sel2[$main] = array(
-              '' => ts("- Any -")
-            ) + $sel2[$main];
+            '' => ts("- Any -"),
+          ) + $sel2[$main];
         }
       }
     }
@@ -276,8 +273,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $contactSubTypes[$key] = $key;
       }
       $sel2['Contact'] = array(
-          "" => "-- Any --"
-        ) + $contactSubTypes;
+        "" => "-- Any --",
+      ) + $contactSubTypes;
     }
     else {
       if (!isset($this->_id)) {
@@ -405,7 +402,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -457,7 +453,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Process the form
    *
-   * @param null
    *
    * @return void
    */
