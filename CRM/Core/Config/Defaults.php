@@ -78,7 +78,6 @@ class CRM_Core_Config_Defaults {
    * Format size
    *
    */
-
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
     if ($size) {
       $last = strtolower($size{strlen($size) - 1});

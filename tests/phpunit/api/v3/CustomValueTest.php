@@ -63,8 +63,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue() {
     $params = array(
-        'custom_' . $this->ids['single']['custom_field_id'] => 'customString'
-      ) + $this->params;
+      'custom_' . $this->ids['single']['custom_field_id'] => 'customString',
+    ) + $this->params;
 
     $result = $this->callAPIAndDocument('custom_value', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);

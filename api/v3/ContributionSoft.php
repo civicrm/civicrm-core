@@ -46,9 +46,7 @@
  *
  * @example ContributionSoftCreate.php Standard Create Example //FIXME
  *
- * @return array
- *   API result array
- * {@getfields contribution_soft_create}
+ * @return array API result array {@getfields contribution_soft_create}
  */
 function civicrm_api3_contribution_soft_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,9 +71,6 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * @param array $params
  *
  * @example ContributionSoftDelete.php Standard Delete Example
- *
- * @return boolean
- *   | error  true if successfull, error otherwise
  * {@getfields contribution_soft_delete}
  */
 function civicrm_api3_contribution_soft_delete($params) {
@@ -87,17 +82,11 @@ function civicrm_api3_contribution_soft_delete($params) {
 /**
  * Retrieve one or more Soft Credits
  *
- * @param array input parameters
- *
- *
  * @example ContributionSoftGet.php Standard Get Example
  *
- * @param array $params
- *   An associative array of name/value pairs.
+ * @param array $params An associative array of name/value pairs.
  *
- * @return array
- *   api result
- * {@getfields contribution_soft_get}
+ * @return array api result {@getfields contribution_soft_get}
  */
 function civicrm_api3_contribution_soft_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

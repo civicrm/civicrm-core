@@ -380,7 +380,11 @@ class CRM_Event_BAO_Query {
       case 'event_type_id':
 
         $qillName = $name;
-        if (in_array($name, array('event_id',  'event_is_public'))) {
+        if (in_array($name, array(
+              'event_id',
+              'event_is_public',
+            )
+          )) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
@@ -467,7 +471,7 @@ class CRM_Event_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties(
+  public  static function defaultReturnProperties(
     $mode,
     $includeCustomFields = TRUE
   ) {

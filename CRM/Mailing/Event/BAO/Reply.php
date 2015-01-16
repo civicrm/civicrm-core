@@ -142,7 +142,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     if ($fullEmail) {
       // parse the email and set a new destination
-      $parser = new ezcMailParser;
+      $parser = new ezcMailParser();
       $set = new ezcMailVariableSet($fullEmail);
       $parsed = array_shift($parser->parseMail($set));
       $parsed->to = array(new ezcMailAddress($mailing->replyto_email));

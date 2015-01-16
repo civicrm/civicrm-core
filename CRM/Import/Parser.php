@@ -194,33 +194,33 @@ abstract class CRM_Import_Parser {
   /**
    * Abstract function definitions
    */
-  abstract function init();
+  abstract protected function init();
 
   /**
    * @return mixed
    */
-  abstract function fini();
-
-  /**
-   * @param $values
-   *
-   * @return mixed
-   */
-  abstract function mapField(&$values);
+  abstract protected function fini();
 
   /**
    * @param $values
    *
    * @return mixed
    */
-  abstract function preview(&$values);
+  abstract protected function mapField(&$values);
 
   /**
    * @param $values
    *
    * @return mixed
    */
-  abstract function summary(&$values);
+  abstract protected function preview(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
+  abstract protected function summary(&$values);
 
   /**
    * @param $onDuplicate
@@ -228,7 +228,7 @@ abstract class CRM_Import_Parser {
    *
    * @return mixed
    */
-  abstract function import($onDuplicate, &$values);
+  abstract protected function import($onDuplicate, &$values);
 
   /**
    * Set and validate field values

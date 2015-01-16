@@ -89,17 +89,15 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     }
 
     $rows = array(
-      0 =>
-
-        array(
-          'first_name' => $firstName1,
-          'last_name' => 'Anderson',
-          'address_1' => 'Add 1',
-          'address_2' => 'Add 2',
-          'city' => 'Watson',
-          'state' => 'NY',
-          'country' => 'United States',
-        ),
+      0 => array(
+        'first_name' => $firstName1,
+        'last_name' => 'Anderson',
+        'address_1' => 'Add 1',
+        'address_2' => 'Add 2',
+        'city' => 'Watson',
+        'state' => 'NY',
+        'country' => 'United States',
+      ),
     );
     foreach ($customDataParams['rows'][0] as $key => $values) {
       $rows[0][$key] = $values;

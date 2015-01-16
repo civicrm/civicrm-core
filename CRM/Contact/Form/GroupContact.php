@@ -103,7 +103,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
 
       $this->add('select', 'group_id', '', $groupSelect, TRUE, array(
           'class' => 'crm-select2 crm-action-menu action-icon-plus',
-          'placeholder' => $msg
+          'placeholder' => $msg,
         ));
 
       $this->addButtons(array(
