@@ -53,7 +53,7 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('js/angular-crmAttachment.js'),
         'css' => array('css/angular-crmAttachment.css'),
-        'partials' => array('partials/crmAttachment/*.html'),
+        'partials' => array('partials/crmAttachment'),
       );
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
@@ -63,7 +63,7 @@ class Manager {
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
         'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
-        'partials' => array('partials/crmUi/*.html'),
+        'partials' => array('partials/crmUi'),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',

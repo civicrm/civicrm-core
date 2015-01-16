@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmMailingAB/' + relPath;
+    return '~/crmMailingAB/' + relPath;
   };
 
   // example:
