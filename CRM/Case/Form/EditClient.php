@@ -68,7 +68,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     }
     elseif (in_array($context, array(
       'dashlet',
-      'dashletFullscreen'
+      'dashletFullscreen',
     ))) {
       $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
     }

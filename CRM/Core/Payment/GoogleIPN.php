@@ -303,7 +303,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       foreach (array(
                  'membership',
                  'related_contact',
-                 'onbehalf_dupe_alert'
+                 'onbehalf_dupe_alert',
                ) as $fld) {
         if (!is_numeric($ids[$fld])) {
           unset($ids[$fld]);
@@ -491,8 +491,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
         $ids['event'] = $privateData['eventID'];
       }
       else {
-        list($ids['event'], $ids['participant']) =
-          explode(CRM_Core_DAO::VALUE_SEPARATOR, $contribution->trxn_id);
+        list($ids['event'], $ids['participant']) = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contribution->trxn_id);
       }
     }
 
@@ -585,13 +584,12 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
       case "merchant-calculation-callback":
         break;
 
-      case "new-order-notification": {
+      case "new-order-notification":
         $response->SendAck($serial, FALSE);
         $ipn->newOrderNotify($data[$root], $privateData, $module);
         break;
-      }
 
-      case "order-state-change-notification": {
+      case "order-state-change-notification":
         $response->SendAck($serial, FALSE);
         $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
         $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
@@ -615,9 +613,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
             break;
         }
         break;
-      }
 
-      case "authorization-amount-notification": {
+      case "authorization-amount-notification":
         $response->SendAck($serial, FALSE);
         $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
         $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
@@ -644,7 +641,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
             break;
         }
         break;
-      }
 
       case "charge-amount-notification":
       case "chargeback-amount-notification":
