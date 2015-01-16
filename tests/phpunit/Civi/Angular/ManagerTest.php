@@ -86,8 +86,8 @@ class ManagerTest extends \CiviUnitTestCase {
       }
       if (isset($module['partials'])) {
         $this->assertTrue(is_array($module['partials']));
-        foreach ($module['partials'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)));
+        foreach ((array) $module['partials'] as $basedir) {
+          $this->assertTrue(is_dir($this->res->getPath($module['ext']) . '/' . $basedir));
           $counts['partials']++;
         }
       }
@@ -103,7 +103,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['crmMailing/partials/crmMailing/edit.html']);
+    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/edit.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 

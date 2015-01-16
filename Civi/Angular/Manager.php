@@ -55,6 +55,11 @@ class Manager {
         'css' => array('css/angular-crmAttachment.css'),
         'partials' => array('partials/crmAttachment/*.html'),
       );
+      $angularModules['crmResource'] = array(
+        'ext' => 'civicrm',
+        // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
+        'js' => array('js/angular-crmResource/all.js'), // One HTTP request for all modules.
+      );
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
         'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
@@ -148,19 +153,24 @@ class Manager {
    *   Angular module name.
    * @return array
    *   Array(string $extFilePath => string $html)
+   * @throws \Exception
+   *   Invalid partials configuration.
    */
   public function getPartials($name) {
     $module = $this->getModule($name);
     $result = array();
     if (isset($module['partials'])) {
-      foreach ($module['partials'] as $file) {
-        $filename = $name . '/' . $file;
-        $result[$filename] = file_get_contents($this->res->getPath($module['ext'], $file));
+      foreach ($module['partials'] as $partialDir) {
+        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
+        $files = \CRM_Utils_File::findFiles($partialDir, '*.html', TRUE);
+        foreach ($files as $file) {
+          $filename = '~/' . $name . '/' . $file;
+          $result[$filename] = file_get_contents($partialDir . '/' . $file);
+        }
       }
     }
     return $result;
   }
-
 
   /**
    * Get list of translated strings for a module.
@@ -206,13 +216,17 @@ class Manager {
       }
     }
     if (isset($module['partials'])) {
-      foreach ($module['partials'] as $file) {
-        $strings = $this->res->getStrings()->get(
-          $module['ext'],
-          $this->res->getPath($module['ext'], $file),
-          'text/html'
-        );
-        $result = array_unique(array_merge($result, $strings));
+      foreach ($module['partials'] as $partialDir) {
+        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
+        $files = \CRM_Utils_File::findFiles($partialDir, '*.html');
+        foreach ($files as $file) {
+          $strings = $this->res->getStrings()->get(
+            $module['ext'],
+            $file,
+            'text/html'
+          );
+          $result = array_unique(array_merge($result, $strings));
+        }
       }
     }
     return $result;
