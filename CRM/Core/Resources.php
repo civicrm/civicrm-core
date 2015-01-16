@@ -58,9 +58,9 @@ class CRM_Core_Resources {
   private $extMapper = NULL;
 
   /**
-   * @var CRM_Utils_Cache_Interface
+   * @var CRM_Core_Resources_Strings
    */
-  private $cache = NULL;
+  private $strings = NULL;
 
   /**
    * @var array free-form data tree
@@ -135,7 +135,7 @@ class CRM_Core_Resources {
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
-    $this->cache = $cache;
+    $this->strings = new CRM_Core_Resources_Strings($cache);
     $this->cacheCodeKey = $cacheCodeKey;
     if ($cacheCodeKey !== NULL) {
       $this->cacheCode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $cacheCodeKey);
@@ -165,7 +165,9 @@ class CRM_Core_Resources {
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
-      $this->translateScript($ext, $file);
+      // For each extension, maintain one cache record which
+      // includes parsed (translatable) strings for all its files.
+      $this->addString($this->strings->get($ext, $this->getPath($ext, $file), 'text/javascript'));
     }
     // Look for non-minified version if we are in debug mode
     if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
@@ -579,37 +581,15 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function flushStrings() {
-    $this->cache->flush();
+    $this->strings->flush();
     return $this;
   }
 
   /**
-   * Translate strings in a javascript file
-   *
-   * @param string $ext
-   *   extension name.
-   * @param string $file
-   *   file path.
-   * @return void
+   * @return CRM_Core_Resources_Strings
    */
-  private function translateScript($ext, $file) {
-    // For each extension, maintain one cache record which
-    // includes parsed (translatable) strings for all its JS files.
-    $stringsByFile = $this->cache->get($ext); // array($file => array(...strings...))
-    if (!$stringsByFile) {
-      $stringsByFile = array();
-    }
-    if (!isset($stringsByFile[$file])) {
-      $filePath = $this->getPath($ext, $file);
-      if ($filePath && is_readable($filePath)) {
-        $stringsByFile[$file] = CRM_Utils_JS::parseStrings(file_get_contents($filePath));
-      }
-      else {
-        $stringsByFile[$file] = array();
-      }
-      $this->cache->set($ext, $stringsByFile);
-    }
-    $this->addString($stringsByFile[$file]);
+  public function getStrings() {
+    return $this->strings;
   }
 
   /**
