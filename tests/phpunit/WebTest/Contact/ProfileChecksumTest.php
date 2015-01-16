@@ -107,7 +107,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
       'edit-1-profile-edit',
       'edit-1-profile-create',
       'edit-1-access-all-custom-data',
-      'edit-1-edit-all-contacts'
+      'edit-1-edit-all-contacts',
     );
     $this->changePermissions($permission);
 

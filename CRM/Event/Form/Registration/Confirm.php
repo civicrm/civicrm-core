@@ -239,7 +239,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (is_array($v)) {
           foreach (array(
                      'first_name',
-                     'last_name'
+                     'last_name',
                    ) as $name) {
             if (isset($v['billing_' . $name]) &&
               !isset($v[$name])
@@ -640,8 +640,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution =
-            self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount);
+          $contribution = self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount);
           $value['contributionID'] = $contribution->id;
           $value['contributionTypeID'] = $contribution->financial_type_id;
           $value['receive_date'] = $contribution->receive_date;
@@ -958,7 +957,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  static function processContribution(
+  public static function processContribution(
     &$form, $params, $result, $contactID,
     $pending = FALSE, $isAdditionalAmount = FALSE
   ) {

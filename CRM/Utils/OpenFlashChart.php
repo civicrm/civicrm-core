@@ -452,13 +452,12 @@ class CRM_Utils_OpenFlashChart {
       foreach ($rows['multiValue'] as $key => $val) {
         $graph[$key] = array_combine($dateKeys, $rows['multiValue'][$key]);
       }
-      $chartData =
-        array(
-          'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
-          'values' => $graph[0],
-          'multiValues' => $graph,
-          'barKeys' => CRM_Utils_Array::value('barKeys', $rows, array()),
-        );
+      $chartData = array(
+        'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
+        'values' => $graph[0],
+        'multiValues' => $graph,
+        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, array()),
+      );
     }
 
     // rotate the x labels.
@@ -475,7 +474,7 @@ class CRM_Utils_OpenFlashChart {
     foreach (array(
                'xSize',
                'ySize',
-               'divName'
+               'divName',
              ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
@@ -515,7 +514,7 @@ class CRM_Utils_OpenFlashChart {
     foreach (array(
                'xSize',
                'ySize',
-               'divName'
+               'divName',
              ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];

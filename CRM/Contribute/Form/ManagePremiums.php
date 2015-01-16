@@ -106,7 +106,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'name'), TRUE);
     $this->addRule('name', ts('A product with this name already exists. Please select another name.'), 'objectExists', array(
         'CRM_Contribute_DAO_Product',
-        $this->_id
+        $this->_id,
       ));
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
@@ -139,7 +139,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('select', 'period_type', ts('Period Type'), array(
         '' => '- select -',
         'rolling' => 'Rolling',
-        'fixed' => 'Fixed'
+        'fixed' => 'Fixed',
       ));
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
@@ -344,7 +344,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       foreach (array(
                  'cost',
                  'price',
-                 'min_contribution'
+                 'min_contribution',
                ) as $f) {
         $params[$f] = CRM_Utils_Rule::cleanMoney($params[$f]);
       }

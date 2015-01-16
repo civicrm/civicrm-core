@@ -116,7 +116,6 @@ class CRM_Contact_Form_Search_Criteria {
     //added job title
     $form->addElement('text', 'job_title', ts('Job Title'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'job_title'));
 
-
     //added internal ID
     $form->addElement('text', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id'));
     $form->addRule('contact_id', ts('Please enter valid Contact ID'), 'positiveInteger');
@@ -158,7 +157,7 @@ class CRM_Contact_Form_Search_Criteria {
       'uf_group_id',
       ts('Search Views'),
       array(
-        '0' => ts('- default view -')
+        '0' => ts('- default view -'),
       ) + $searchProfiles
     );
 
@@ -487,7 +486,6 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 
     CRM_Core_Form_Date::buildDateRange($form, 'deceased_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
 
     // radio button for is_deceased
     $form->addYesNo('is_deceased', ts('Deceased'), TRUE);

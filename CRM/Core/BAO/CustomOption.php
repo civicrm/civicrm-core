@@ -64,13 +64,13 @@ class CRM_Core_BAO_CustomOption {
    *
    * @param int $fieldID
    *   Field whose options are needed.
-   * @param bool $inactiveNeededDo we need inactive options ?.
+   * @param bool $inactiveNeeded Do we need inactive options ?.
    *   Do we need inactive options ?.
    *
    * @return array
    *   all active options for fieldId
    */
-  static function getCustomOption(
+  public static function getCustomOption(
     $fieldID,
     $inactiveNeeded = FALSE
   ) {
@@ -153,7 +153,7 @@ WHERE  id = %1
       case 'Autocomplete-Select':
         if (!in_array($dataType, array(
           'Boolean',
-          'ContactReference'
+          'ContactReference',
         ))
         ) {
           $options = self::valuesByID($fieldId);

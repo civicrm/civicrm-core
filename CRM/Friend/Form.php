@@ -75,7 +75,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
 
     if (in_array($pcomponent, array(
       'contribute',
-      'event'
+      'event',
     ))) {
       $values = array();
       $params = array('id' => $this->_entityId);
