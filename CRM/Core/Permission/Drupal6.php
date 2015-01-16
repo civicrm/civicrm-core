@@ -69,7 +69,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    *
    * @param int $contactID
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public function check($str, $contactID = NULL) {
@@ -95,10 +95,9 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @param array $array
    *   The roles to check.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
-
   public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load(array('uid' => $GLOBALS['user']->uid));

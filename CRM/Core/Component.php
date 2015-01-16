@@ -230,7 +230,7 @@ class CRM_Core_Component {
       $cfg = $comp->getConfigObject();
       $cfg->add($config, $oldMode);
     }
-    return;
+    return NULL;
   }
 
   /**
@@ -327,7 +327,7 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function &defaultReturnProperties(
+  public static function &defaultReturnProperties(
     $mode,
     $includeCustomFields = TRUE
   ) {
@@ -423,7 +423,6 @@ class CRM_Core_Component {
    * @param array $tables
    *   Array of tables.
    *
-   * @return null
    */
   public static function tableNames(&$tables) {
     $info = self::_info();

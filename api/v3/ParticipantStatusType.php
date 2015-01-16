@@ -46,7 +46,7 @@
  *
  * @return array
  *   participant_status array
- * {@getfields ParticipantStatusType_create}
+ *   {@getfields ParticipantStatusType_create}
  * @example ParticipantStatusTypeCreate.php
  */
 function civicrm_api3_participant_status_type_create($params) {
@@ -63,7 +63,7 @@ function civicrm_api3_participant_status_type_create($params) {
  *
  * @return array
  *   Array of matching participant_statuses
- * {@getfields ParticipantStatusType_get}
+ *   {@getfields ParticipantStatusType_get}
  * @example ParticipantStatusTypeGet.php
  */
 function civicrm_api3_participant_status_type_get($params) {
@@ -82,7 +82,7 @@ function civicrm_api3_participant_status_type_get($params) {
  *
  * @return array
  *   api result array
- * {@getfields ParticipantStatusType_delete}
+ *   {@getfields ParticipantStatusType_delete}
  * @example ParticipantStatusTypeDelete.php
  */
 function civicrm_api3_participant_status_type_delete($params) {

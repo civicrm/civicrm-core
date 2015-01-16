@@ -780,7 +780,7 @@ GROUP BY  currency
     foreach (array(
                'Pending',
                'In Progress',
-               'Overdue'
+               'Overdue',
              ) as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
@@ -839,7 +839,7 @@ GROUP BY  currency
     foreach (array(
                'Completed',
                'Cancelled',
-               'Failed'
+               'Failed',
              ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         unset($allStatus[$key]);
@@ -1125,7 +1125,7 @@ SELECT  pledge.contact_id              as contact_id,
 
     return civicrm_api3('pledge_payment', 'getcount', array(
         'pledge_id' => $pledgeID,
-        'status_id' => array('IN' => self::getTransactionalStatus())
+        'status_id' => array('IN' => self::getTransactionalStatus()),
       ));
   }
 

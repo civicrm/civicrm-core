@@ -46,7 +46,7 @@
  *
  * @return array
  *   Array of newly created membership status property values.
- * {@getfields MembershipStatus_create}
+ *   {@getfields MembershipStatus_create}
  */
 function civicrm_api3_membership_status_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -62,7 +62,7 @@ function civicrm_api3_membership_status_create($params) {
  *
  * @return array
  *   Array of all found membership status property values.
- * {@getfields MembershipStatus_get}
+ *   {@getfields MembershipStatus_get}
  */
 function civicrm_api3_membership_status_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_BAO_MembershipStatus', $params);
@@ -135,7 +135,7 @@ function civicrm_api3_membership_status_delete($params) {
  *
  * @throws API_Exception
  *
- * @return Array
+ * @return array
  *   Array of status id and status name
  * @public
  */

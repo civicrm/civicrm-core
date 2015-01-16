@@ -133,7 +133,7 @@ class CRM_Core_BAO_Block {
    * @param array $params
    *   Associated array of submitted fields.
    *
-   * @return boolean
+   * @return bool
    *   true if the block has data, otherwise false
    */
   public static function dataExists($blockFields, &$params) {
@@ -153,7 +153,7 @@ class CRM_Core_BAO_Block {
    * @param array $params
    *   Associated array of submitted fields.
    *
-   * @return boolean
+   * @return bool
    *   true if the block exits, otherwise false
    */
   public static function blockExists($blockName, &$params) {
@@ -518,7 +518,7 @@ class CRM_Core_BAO_Block {
    * (sort function for sortPrimaryFirst)
    * @param array $location1
    * @param array $location2
-   * @return number
+   * @return int
    */
   public static function primaryComparison($location1, $location2) {
     $l1 = CRM_Utils_Array::value('is_primary', $location1);

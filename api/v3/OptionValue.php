@@ -10,7 +10,7 @@
  *
  * @return array
  *   details of found Option Values
- * {@getfields OptionValue_get}
+ *   {@getfields OptionValue_get}
  */
 function civicrm_api3_option_value_get($params) {
 
@@ -38,7 +38,7 @@ function civicrm_api3_option_value_get($params) {
  * @throws API_Exception
  * @return array
  *   Array of newly created option_value property values.
- * {@getfields OptionValue_create}
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -79,7 +79,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  *
  * @return array
  *   Api result
- * {@getfields OptionValue_create}
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_delete($params) {
   // we will get the option group id before deleting so we can flush pseudoconstants

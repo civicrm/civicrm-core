@@ -95,7 +95,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         'email',
         'external_identifier',
         'membership_start_date',
-        'membership_type_id'
+        'membership_type_id',
       );
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
@@ -362,7 +362,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
                 $errors['_qf_default'] = '';
               }
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                  1 => $threshold
+                1 => $threshold,
                 )) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
             }
           }
@@ -371,7 +371,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
               $errors['_qf_default'] = '';
             }
             $errors['_qf_default'] .= ts('Missing required field: %1', array(
-                1 => $title
+              1 => $title,
               )) . '<br />';
           }
         }

@@ -197,7 +197,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(
               1 => $info->key,
               2 => $method,
-              3 => $file
+              3 => $file,
             )), '', 'error');
         return;
       }
@@ -208,7 +208,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
     catch (CRM_Extension_Exception $e) {
       CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(
             1 => $info->key,
-            2 => $method
+            2 => $method,
           )), '', 'error');
       return;
     }
@@ -288,7 +288,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         // Does PP implement this method, and can we call it?
         if (method_exists($processorInstance, $method) && is_callable(array(
             $processorInstance,
-            $method
+            $method,
           ))
         ) {
           // If so, call it ...
