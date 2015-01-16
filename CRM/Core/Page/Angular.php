@@ -62,6 +62,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
         'resourceUrls' => CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
+          'cacheCode' => $this->res->getCacheCode(),
         ),
         'crmAttachment' => array(
           'token' => CRM_Core_Page_AJAX_Attachment::createToken(),
