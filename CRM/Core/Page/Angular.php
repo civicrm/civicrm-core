@@ -91,7 +91,10 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       'ext' => 'civicrm',
       'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
     );
-    $angularModules['crmApp'] = array('ext' => 'civicrm', 'js' => array('js/angular-crmApp.js'));
+    $angularModules['crmApp'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmApp.js'),
+    );
     $angularModules['crmAttachment'] = array(
       'ext' => 'civicrm',
       'js' => array('js/angular-crmAttachment.js'),
@@ -103,13 +106,19 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
       'partials' => array('partials/crmUi/*.html'),
     );
-    $angularModules['crmUtil'] = array('ext' => 'civicrm', 'js' => array('js/angular-crm-util.js'));
+    $angularModules['crmUtil'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crm-util.js'),
+    );
     // https://github.com/jwstadler/angular-jquery-dialog-service
     $angularModules['dialogService'] = array(
       'ext' => 'civicrm',
       'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
     );
-    $angularModules['ngSanitize'] = array('ext' => 'civicrm', 'js' => array('js/angular-sanitize.js'));
+    $angularModules['ngSanitize'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-sanitize.js'),
+    );
     $angularModules['ui.utils'] = array(
       'ext' => 'civicrm',
       'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
