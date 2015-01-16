@@ -66,6 +66,12 @@ class Container {
     //      }
     //    }
 
+    $container->setDefinition('angular', new Definition(
+      '\Civi\Angular\Manager',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
+
     $container->setDefinition('dispatcher', new Definition(
       '\Symfony\Component\EventDispatcher\EventDispatcher',
       array()
@@ -84,6 +90,13 @@ class Container {
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
     return $container;
+  }
+
+  /**
+   * @return \Civi\Angular\Manager
+   */
+  public function createAngularManager() {
+    return new \Civi\Angular\Manager(\CRM_Core_Resources::singleton());
   }
 
   /**
