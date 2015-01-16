@@ -1,4 +1,5 @@
 <?php
+namespace Civi\Angular\Page;
 
 /**
  * This page is simply a container; any Angular modules defined by CiviCRM (or by CiviCRM extensions)
@@ -6,20 +7,20 @@
  *
  * @link https://issues.civicrm.org/jira/browse/CRM-14479
  */
-class CRM_Core_Page_Angular extends CRM_Core_Page {
+class Main extends \CRM_Core_Page {
   /**
    * The weight to assign to any Angular JS module files
    */
   const DEFAULT_MODULE_WEIGHT = 200;
 
   /**
-   * @var CRM_Core_Resources
+   * @var \CRM_Core_Resources
    */
   protected $res;
 
 
   /**
-   * @var Civi\Angular\Manager
+   * @var \Civi\Angular\Manager
    */
   protected $angular;
 
@@ -28,13 +29,13 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    *   Title of the page.
    * @param int $mode
    *   Mode of the page.
-   * @param CRM_Core_Resources|null $res
+   * @param \CRM_Core_Resources|null $res
    *   Resource manager.
    */
   public function __construct($title = NULL, $mode = NULL, $res = NULL) {
     parent::__construct($title, $mode);
-    $this->res = CRM_Core_Resources::singleton();
-    $this->angular = Civi\Core\Container::singleton()->get('angular');
+    $this->res = \CRM_Core_Resources::singleton();
+    $this->angular = \Civi\Core\Container::singleton()->get('angular');
   }
 
   /**
@@ -59,13 +60,13 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $this->res->addSettingsFactory(function () use (&$modules) {
       // TODO optimization; client-side caching
       return array(
-        'resourceUrls' => CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
+        'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
           'cacheCode' => $this->res->getCacheCode(),
         ),
         'crmAttachment' => array(
-          'token' => CRM_Core_Page_AJAX_Attachment::createToken(),
+          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
         ),
       );
     });
