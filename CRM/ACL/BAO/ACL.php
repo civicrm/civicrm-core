@@ -112,7 +112,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $object_table = NULL, $object_id = NULL,
     $acl_id = NULL, $acl_role = FALSE
   ) {
-    $dao = new CRM_ACL_DAO_ACL;
+    $dao = new CRM_ACL_DAO_ACL();
 
     $t = array(
       'ACL' => self::getTableName(),
@@ -821,11 +821,11 @@ SELECT g.*
         }
 
         if ($staticGroupIDs) {
-          $clauses[] = '( `civicrm_group_contact-ACL`.group_id IN (' . join(', ', $staticGroupIDs) . ') AND `civicrm_group_contact-ACL`.status IN ("Added") )';
+          $clauses[] = '( `civicrm_group_contact-ACL`.group_id IN (' . implode(', ', $staticGroupIDs) . ') AND `civicrm_group_contact-ACL`.status IN ("Added") )';
         }
 
         if ($cachedGroupIDs) {
-          $clauses[] = '`civicrm_group_contact_cache-ACL`.group_id IN (' . join(', ', $cachedGroupIDs) . ')';
+          $clauses[] = '`civicrm_group_contact_cache-ACL`.group_id IN (' . implode(', ', $cachedGroupIDs) . ')';
         }
       }
     }

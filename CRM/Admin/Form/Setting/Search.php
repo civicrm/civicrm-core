@@ -72,8 +72,8 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     // Autocomplete for Contact Search (quick search etc.)
     $options = array(
-        ts('Contact Name') => 1
-      ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
         FALSE, FALSE, TRUE
       ));
     $this->addCheckBox('autocompleteContactSearch', ts('Autocomplete Contact Search'), $options,
@@ -84,8 +84,8 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     // Autocomplete for Contact Reference (custom fields)
     $optionsCR = array(
-        ts('Contact Name') => 1
-      ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
         FALSE, FALSE, TRUE
       ));
     $this->addCheckBox('autocompleteContactReference', ts('Contact Reference Options'), $optionsCR,

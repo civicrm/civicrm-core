@@ -58,7 +58,6 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   /**
    * Basic setup
    */
-
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
     $this->_uploadMaxSize = (int) ini_get('upload_max_filesize');
@@ -78,7 +77,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(FALSE);
 
     // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $attribs = $domain->locales || !$validTriggerPermission ? array('disabled' => 'disabled') : array();
 
@@ -166,7 +165,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     parent::postProcess();
 
     if ($config->logging != $values['logging']) {
-      $logging = new CRM_Logging_Schema;
+      $logging = new CRM_Logging_Schema();
       if ($values['logging']) {
         $logging->enableLogging();
       }

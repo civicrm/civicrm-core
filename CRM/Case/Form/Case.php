@@ -159,8 +159,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    if ($this->_activityTypeFile =
-      CRM_Activity_BAO_Activity::getFileForActivityTypeId($this->_activityTypeId,
+    if ($this->_activityTypeFile = CRM_Activity_BAO_Activity::getFileForActivityTypeId($this->_activityTypeId,
         'Case'
       )
     ) {
@@ -261,7 +260,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
     $this->add('text', 'activity_subject', ts('Subject'),
       array_merge($s, array(
-        'maxlength' => '128'
+        'maxlength' => '128',
       )), TRUE
     );
 

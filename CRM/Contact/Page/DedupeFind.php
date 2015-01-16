@@ -51,7 +51,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   /**
    * Get action Links
    *
-   * @return array
+   * @return void
    *   (reference) of action links
    */
   public function &links() {

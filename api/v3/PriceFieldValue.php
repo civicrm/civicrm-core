@@ -44,7 +44,7 @@
  *
  * @return array
  *   api result array
- * {@getfields price_field_value_create}
+ *   {@getfields price_field_value_create}
  */
 function civicrm_api3_price_field_value_create($params) {
   $ids = array();
@@ -83,7 +83,7 @@ function _civicrm_api3_price_field_value_create_spec(&$params) {
  *
  * @return array
  *   Array of matching price_field_values
- * {@getfields price_field_value_get}
+ *   {@getfields price_field_value_get}
  */
 function civicrm_api3_price_field_value_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -101,7 +101,7 @@ function civicrm_api3_price_field_value_get($params) {
  *
  * @return array
  *   API result array
- * {@getfields price_field_value_delete}
+ *   {@getfields price_field_value_delete}
  */
 function civicrm_api3_price_field_value_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

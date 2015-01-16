@@ -91,7 +91,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact
+   * @return void
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();

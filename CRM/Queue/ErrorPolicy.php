@@ -65,7 +65,7 @@ class CRM_Queue_ErrorPolicy {
     foreach (array(
                'display_errors',
                'html_errors',
-               'xmlrpc_errors'
+               'xmlrpc_errors',
              ) as $key) {
       $this->backup[$key] = ini_get($key);
       ini_set($key, 0);
@@ -84,7 +84,7 @@ class CRM_Queue_ErrorPolicy {
     foreach (array(
                'display_errors',
                'html_errors',
-               'xmlrpc_errors'
+               'xmlrpc_errors',
              ) as $key) {
       ini_set($key, $this->backup[$key]);
     }

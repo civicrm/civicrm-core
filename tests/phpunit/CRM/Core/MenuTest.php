@@ -17,7 +17,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $cases[] = array('mode=256', array('mode' => '256'));
     $cases[] = array(
       'mode=256,addSequence=1,attachUpload=1',
-      array('mode' => '256', 'addSequence' => '1', 'attachUpload' => 1)
+      array('mode' => '256', 'addSequence' => '1', 'attachUpload' => 1),
     );
     $cases[] = array(
       'mode=256,urlToSession=a:b:c:d',
@@ -26,7 +26,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
         'urlToSession' => array(
           array('urlVar' => 'a', 'sessionVar' => 'b', 'type' => 'c', 'default' => 'd'),
         ),
-      )
+      ),
     );
     $cases[] = array(
       'mode=256,urlToSession=a:b:c:d;z:y:x:w',
@@ -36,7 +36,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
           array('urlVar' => 'a', 'sessionVar' => 'b', 'type' => 'c', 'default' => 'd'),
           array('urlVar' => 'z', 'sessionVar' => 'y', 'type' => 'x', 'default' => 'w'),
         ),
-      )
+      ),
     );
     $cases[] = array('url=whiz!;.:#=%/|+bang?', array('url' => 'whiz!;.:#=%/|+bang?'));
     return $cases;

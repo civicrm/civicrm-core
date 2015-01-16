@@ -59,7 +59,7 @@ function civicrm_api3_uf_field_create($params) {
   $location_type_id = CRM_Utils_Array::value('location_type_id', $params);
   $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
 
-  if (! CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+  if (!CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
     throw new API_Exception('The field_name is not valid');
   }
   $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
@@ -110,7 +110,7 @@ function civicrm_api3_uf_field_create($params) {
  *
  * @param array $params
  *
- * @return array
+ * @return void
  *   fields valid for other functions
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
@@ -134,7 +134,7 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
  *
  * @return array
  *   (reference) Array
- * {@getfields UFField_get
+ *   {@getfields UFField_get
  * @example UFFieldGet.php
  */
 function civicrm_api3_uf_field_get($params) {
