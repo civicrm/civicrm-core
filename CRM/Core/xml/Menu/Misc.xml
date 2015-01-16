@@ -181,6 +181,11 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/ajax/angular-modules</path>
+    <page_callback>\Civi\Angular\Page\Modules</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/ajax/recurringentity/update-mode</path>
      <page_callback>CRM_Core_Page_AJAX_RecurringEntity::updateMode</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>

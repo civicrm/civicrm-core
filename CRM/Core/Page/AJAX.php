@@ -200,13 +200,18 @@ class CRM_Core_Page_AJAX {
 
   /**
    * Set headers appropriate for a js file
+   *
+   * @param int|NULL $ttl
+   *   Time-to-live (seconds).
    */
-  public static function setJsHeaders() {
-    // Encourage browsers to cache for a long time - 1 year
-    $year = 60 * 60 * 24 * 364;
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+  public static function setJsHeaders($ttl = NULL) {
+    if ($ttl === NULL) {
+      // Encourage browsers to cache for a long time - 1 year
+      $ttl = 60 * 60 * 24 * 364;
+    }
+    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
     header('Content-Type:	application/javascript');
-    header("Cache-Control: max-age=$year, public");
+    header("Cache-Control: max-age=$ttl, public");
   }
 
   /**
