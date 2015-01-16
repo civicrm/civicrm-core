@@ -161,7 +161,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public function setDefaultValues() {
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
-      return;
+      return NULL;
     }
     $defaults = array();
     if ($this->_mode) {
@@ -333,8 +333,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ),
       )
     );
-
-
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'mailing_backend'
     );
@@ -429,8 +427,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     //get the payment processor id as per mode.
     //@todo unclear relevance of mode - seems like a lot of duplicated params here!
-    $this->_params['payment_processor'] = $params['payment_processor_id'] =
-      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor'] = $params['payment_processor_id']
+      = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
 
     $now = date('YmdHis');
     $fields = array();

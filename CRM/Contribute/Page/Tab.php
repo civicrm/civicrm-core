@@ -104,7 +104,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
    */
   public function browse() {
     // add annual contribution
@@ -252,7 +251,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       if (empty($this->_contactId)) {
         $this->_contactId = civicrm_api3('contribution', 'getvalue', array(
             'id' => $this->_id,
-            'return' => 'contact_id'
+            'return' => 'contact_id',
           ));
       }
       $this->assign('contactId', $this->_contactId);

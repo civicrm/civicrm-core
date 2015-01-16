@@ -68,8 +68,6 @@ class CRM_Contact_Form_Search_Custom_Group
     $this->_groups = FALSE;
     $this->_tags = FALSE;
     $this->_andOr = CRM_Utils_Array::value('andOr', $this->_formValues);
-
-
     //make easy to check conditions for groups and tags are
     //selected or it is empty search
     if (empty($this->_includeGroups) && empty($this->_excludeGroups) &&
@@ -183,7 +181,7 @@ class CRM_Contact_Form_Search_Custom_Group
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -354,8 +352,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
                  SELECT              civicrm_contact.id as contact_id, ''
                  FROM                civicrm_contact";
       }
-
-
       //used only when exclude group is selected
       if ($xGroups != 0) {
         $includeGroup .= " LEFT JOIN        Xg_{$this->_tableName}

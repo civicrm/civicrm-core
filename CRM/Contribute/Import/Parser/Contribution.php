@@ -140,7 +140,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -152,7 +152,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function preview(&$values) {
@@ -165,7 +165,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function summary(&$values) {
@@ -244,7 +244,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function import($onDuplicate, &$values) {

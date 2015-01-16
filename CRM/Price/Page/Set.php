@@ -53,12 +53,10 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
-   *
    * @return array
    *   array of action links that we need to display for the browse screen
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
@@ -118,8 +116,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @param null
    *
    * @return void
    */

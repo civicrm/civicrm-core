@@ -68,9 +68,9 @@ function civicrm_api3_pledge_create($params) {
  * @param array $params
  *   Array included 'pledge_id' of pledge to delete.
  *
- * @return boolean
+ * @return bool
  *   true if success, else false
- * {@getfields pledge_delete}
+ *   {@getfields pledge_delete}
  * @example PledgeDelete.php
  */
 function civicrm_api3_pledge_delete($params) {
@@ -132,7 +132,7 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  *
  * @return array
  *   array of pledges, if error an array with an error id and error message
- * {@getfields pledge_get}
+ *   {@getfields pledge_get}
  * @example PledgeGet.php
  */
 function civicrm_api3_pledge_get($params) {
@@ -165,7 +165,6 @@ function _civicrm_api3_pledge_get_defaults() {
  * @param array $values
  *   The reformatted properties that we can use internally.
  *
- * @return array|CRM_Core_Error
  */
 function _civicrm_api3_pledge_format_params(&$values) {
 

@@ -173,7 +173,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
  * @param array $params
  *   (reference ) input parameters.
  *
- * @return boolean
+ * @return bool
  *   true if success, else false
  */
 function civicrm_api3_contribution_delete($params) {
@@ -341,13 +341,12 @@ function civicrm_api3_contribution_transact($params) {
  *   Input parameters.
  *
  * @throws Exception
- * @return array
- *   Api result array
+ *   Api result array.
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
-  if (! $contribution->find(TRUE)) {
+  if (!$contribution->find(TRUE)) {
     throw new Exception('Contribution does not exist');
   }
   $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
@@ -397,8 +396,7 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * {@getfields Contribution_completetransaction}
  *
  * @throws API_Exception
- * @return array
- *   Api result array
+ *   Api result array.
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 
