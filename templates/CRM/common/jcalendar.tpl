@@ -49,7 +49,8 @@
     {$form.$elementName.html}
 {/if}
 
-{assign var='displayDate' value=$elementId|cat:"_display"}
+{* CRM-15804 - CiviEvent Date Picker broken in modal dialog *}
+{assign var='displayDate' value=$elementId|cat:"_display"|cat:"_$string"|uniqid}
 
 {if $action neq 1028}
     <input type="text" name="{$displayDate}" id="{$displayDate}" class="dateplugin" autocomplete="off"/>
