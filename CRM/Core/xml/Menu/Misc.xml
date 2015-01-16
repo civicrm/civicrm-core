@@ -177,7 +177,7 @@
   </item>
   <item>
     <path>civicrm/a</path>
-    <page_callback>CRM_Core_Page_Angular</page_callback>
+    <page_callback>\Civi\Angular\Page\Main</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
