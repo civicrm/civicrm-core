@@ -181,12 +181,15 @@ class Manager {
    *   Translated strings: array(string $orig => string $translated).
    */
   public function getTranslatedStrings($name) {
+    $module = $this->getModule($name);
     $result = array();
     $strings = $this->getStrings($name);
     foreach ($strings as $string) {
       // TODO: should we pass translation domain based on $module[ext] or $module[tsDomain]?
       // It doesn't look like client side really supports the domain right now...
-      $translated = ts($string);
+      $translated = ts($string, array(
+        'domain' => array($module['ext'], NULL),
+      ));
       if ($translated != $string) {
         $result[$string] = $translated;
       }

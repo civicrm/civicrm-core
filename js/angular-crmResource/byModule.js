@@ -59,7 +59,7 @@
           angular.extend(templates, this.data.partials);
         }
         if (this.data.strings) {
-          angular.extend(CRM.strings, this.data.strings);
+          CRM.addStrings(this.data.domain, this.data.strings);
         }
         angular.forEach(this.deferreds, function(deferred) {
           deferred.resolve(module.data);

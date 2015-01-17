@@ -41,7 +41,7 @@
             angular.extend(templates, module.partials);
           }
           if (module.strings) {
-            angular.extend(CRM.strings, module.strings);
+            CRM.addStrings(module.domain, module.strings);
           }
         });
         notify();
