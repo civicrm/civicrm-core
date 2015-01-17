@@ -37,7 +37,7 @@
       load: function load() {
         var module = this;
         this.status = 'loading';
-        var moduleUrl = CRM.url('civicrm/ajax/angular-modules', {modules: module.name, r: CRM.angular.cacheCode});
+        var moduleUrl = CRM.url('civicrm/ajax/angular-modules', {modules: module.name, l: CRM.config.lcMessages, r: CRM.angular.cacheCode});
         $http.get(moduleUrl)
           .success(function httpSuccess(data) {
             if (data[module.name]) {
