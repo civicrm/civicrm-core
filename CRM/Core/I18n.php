@@ -217,8 +217,9 @@ class CRM_Core_I18n {
    * @param string $text
    *   the original string.
    * @param array $params
-   *   the params of the translation (if any).
-   *
+   *   The params of the translation (if any).
+   *   - domain: string|array a list of translation domains to search (in order)
+   *   - context: string
    * @return string
    *   the translated string
    */
@@ -242,6 +243,7 @@ class CRM_Core_I18n {
       return $text;
     }
 
+    $plural = $count = NULL;
     if (isset($params['plural'])) {
       $plural = $params['plural'];
       unset($params['plural']);
@@ -258,10 +260,66 @@ class CRM_Core_I18n {
       $context = NULL;
     }
 
+    if (isset($params['domain'])) {
+      $domain = $params['domain'];
+      unset($params['domain']);
+    }
+    else {
+      $domain = NULL;
+    }
+
+    if (!empty($domain)) {
+      // It might be prettier to cast to an array, but this is high-traffic stuff.
+      if (is_array($domain)) {
+        foreach ($domain as $d) {
+          $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
+          if ($candidate != $text) {
+            $text = $candidate;
+            break;
+          }
+        }
+      }
+      else {
+        $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
+      }
+    }
+    else {
+      $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
+    }
+
+    // replace the numbered %1, %2, etc. params if present
+    if (count($params)) {
+      $text = $this->strarg($text, $params);
+    }
+
+    // escape SQL if we were asked for it
+    if (isset($escape) and ($escape == 'sql')) {
+      $text = CRM_Core_DAO::escapeString($text);
+    }
+
+    // escape for JavaScript (if requested)
+    if (isset($escape) and ($escape == 'js')) {
+      $text = addcslashes($text, "'");
+    }
+
+    return $text;
+  }
+
+  /**
+   * Lookup the raw translation of a string (without any extra escaping or interpolation).
+   *
+   * @param string $text
+   * @param string|NULL $domain
+   * @param int|NULL $count
+   * @param string $plural
+   * @param string $context
+   * @return mixed|string|translated
+   */
+  protected function crm_translate_raw($text, $domain, $count, $plural, $context) {
     // gettext domain for extensions
     $domain_changed = FALSE;
-    if (!empty($params['domain']) && $this->_phpgettext) {
-      if ($this->setGettextDomain($params['domain'])) {
+    if (!empty($domain) && $this->_phpgettext) {
+      if ($this->setGettextDomain($domain)) {
         $domain_changed = TRUE;
       }
     }
@@ -322,21 +380,6 @@ class CRM_Core_I18n {
           $text = $this->_phpgettext->translate($text);
         }
       }
-    }
-
-    // replace the numbered %1, %2, etc. params if present
-    if (count($params)) {
-      $text = $this->strarg($text, $params);
-    }
-
-    // escape SQL if we were asked for it
-    if (isset($escape) and ($escape == 'sql')) {
-      $text = CRM_Core_DAO::escapeString($text);
-    }
-
-    // escape for JavaScript (if requested)
-    if (isset($escape) and ($escape == 'js')) {
-      $text = addcslashes($text, "'");
     }
 
     if ($domain_changed) {

@@ -159,15 +159,18 @@ class CRM_Core_Resources {
    *   relative weight within a given region.
    * @param string $region
    *   location within the file; 'html-header', 'page-header', 'page-footer'.
-   * @param $translate , whether to parse this file for strings enclosed in ts()
+   * @param bool|string $translate
+   *   Whether to load translated strings for this file. Use one of:
+   *   - FALSE: Do not load translated strings.
+   *   - TRUE: Load translated strings. Use the $ext's default domain.
+   *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
-      // For each extension, maintain one cache record which
-      // includes parsed (translatable) strings for all its files.
-      $this->addString($this->strings->get($ext, $this->getPath($ext, $file), 'text/javascript'));
+      $domain = ($translate === TRUE) ? $ext : $translate;
+      $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
     // Look for non-minified version if we are in debug mode
     if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
@@ -354,15 +357,22 @@ class CRM_Core_Resources {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
+   * @param string|NULL $domain
    * @return CRM_Core_Resources
    */
-  public function addString($text) {
+  public function addString($text, $domain = 'civicrm') {
     foreach ((array) $text as $str) {
-      $translated = ts($str);
+      $translated = ts($str, array(
+        'domain' => ($domain == 'civicrm') ? NULL : array($domain, NULL),
+      ));
+
       // We only need to push this string to client if the translation
       // is actually different from the original
       if ($translated != $str) {
-        $this->addSetting(array('strings' => array($str => $translated)));
+        $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
+        $this->addSetting(array(
+          $bucket => array($str => $translated),
+        ));
       }
     }
     return $this;
