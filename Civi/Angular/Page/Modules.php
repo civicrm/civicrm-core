@@ -36,6 +36,7 @@ class Modules extends \CRM_Core_Page {
     foreach ($moduleNames as $moduleName) {
       if (isset($modules[$moduleName])) {
         $result[$moduleName] = array();
+        $result[$moduleName]['domain'] = $modules[$moduleName]['ext'];
         $result[$moduleName]['js'] = $angular->getScriptUrls($moduleName);
         $result[$moduleName]['css'] = $angular->getStyleUrls($moduleName);
         $result[$moduleName]['partials'] = $angular->getPartials($moduleName);

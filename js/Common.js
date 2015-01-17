@@ -1017,6 +1017,12 @@ CRM.strings = CRM.strings || {};
     };
   };
 
+  CRM.addStrings = function(domain, strings) {
+    var bucket = (domain == 'civicrm' ? 'strings' : 'strings::' + domain);
+    CRM[bucket] = CRM[bucket] || {};
+    _.extend(CRM[bucket], strings);
+  };
+
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
