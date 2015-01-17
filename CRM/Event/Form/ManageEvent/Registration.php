@@ -730,7 +730,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param int $rgId
    * @return bool
    */
-  public function canProfilesDedupe($profileIds, $rgId = 0) {
+  public static function canProfilesDedupe($profileIds, $rgId = 0) {
 
     // find the unsupervised rule
 
