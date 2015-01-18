@@ -55,7 +55,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     if (CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in our online user and administrator guide.</a>', array(
             1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'),
-            2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/"
+            2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/",
           )));
     }
 
@@ -224,8 +224,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     //get the mailing groups.
     $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
     if ($hiddenMailingGroup) {
-      $groups[$hiddenMailingGroup] =
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $hiddenMailingGroup, 'title');
+      $groups[$hiddenMailingGroup]
+        = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $hiddenMailingGroup, 'title');
     }
 
     $mailings = CRM_Mailing_PseudoConstant::completed();
@@ -243,7 +243,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $this->add('select', 'baseGroup',
         ts('Unsubscription Group'),
         array(
-          '' => ts('- select -')
+          '' => ts('- select -'),
         ) + CRM_Contact_BAO_Group::getGroupsHierarchy($staticGroups, NULL, '&nbsp;&nbsp;', TRUE),
         TRUE,
         array('class' => 'crm-select2 huge')
@@ -392,7 +392,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         'campaign_id',
         'dedupe_email',
         'location_type_id',
-        'email_selection_method'
+        'email_selection_method',
       ) as $n
     ) {
       if (!empty($values[$n])) {

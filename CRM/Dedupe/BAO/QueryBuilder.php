@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class CRM_Dedupe_BAO_QueryBuilder
  */
@@ -23,5 +22,3 @@ class CRM_Dedupe_BAO_QueryBuilder {
     }
   }
 }
-
-;

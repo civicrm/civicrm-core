@@ -133,7 +133,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       'CiviPledge' => array('pledge_frequency_interval', 'addPledgeSearchDetail'),
       'relationship' => array(
         "xpath=//div[@id='relationship']/table/tbody/tr//td/label[text()='Relationship Status']/../label[text()='All']",
-        ''
+        '',
       ),
     );
 
@@ -171,7 +171,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
   }
 
-  /*
+  /**
    * Check for CRM-9873
    */
   public function testActivitySearchByTypeTest() {
@@ -229,7 +229,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Advanced']//div[2]/div/div[1]");
   }
 
-  /*
+  /**
    * Check for CRM-14952
    */
   public function testStateSorting() {
@@ -248,7 +248,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
         "Connecticut",
         "Georgia",
         "New Jersey",
-        "Texas"
+        "Texas",
       ));
     $this->clickLink("_qf_Advanced_refresh", "xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
 

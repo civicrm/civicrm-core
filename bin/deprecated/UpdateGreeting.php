@@ -44,7 +44,7 @@
 class CRM_UpdateGreeting {
   /**
    */
-  function __construct() {
+  public function __construct() {
     $this->initialize();
 
     $config = CRM_Core_Config::singleton();
@@ -60,7 +60,7 @@ class CRM_UpdateGreeting {
     CRM_Core_Error::debug_log_message('UpdateGreeting.php');
   }
 
-  function initialize() {
+  public function initialize() {
     require_once '../../civicrm.config.php';
     require_once 'CRM/Core/Config.php';
   }
@@ -85,7 +85,7 @@ class CRM_UpdateGreeting {
 
     if (in_array($greeting, array(
         'email_greeting',
-        'postal_greeting'
+        'postal_greeting',
       )) && $contactType == 'Organization'
     ) {
       CRM_Core_Error::fatal(ts('You cannot use %1 for contact type %2.', array(1 => $greeting, 2 => $contactType)));
@@ -130,7 +130,7 @@ class CRM_UpdateGreeting {
     $processAll = $processOnlyIdSet = FALSE;
     if (in_array($force, array(
       1,
-      'true'
+      'true',
     ))) {
       $processAll = TRUE;
     }
