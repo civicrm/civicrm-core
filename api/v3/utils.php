@@ -1847,7 +1847,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
     // Check our field length
     if (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen($fieldValue) > $fieldInfo['maxlength']
       ) {
-      throw new API_Exception( $fieldValue . " is " . strlen($fieldValue) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
+      throw new API_Exception($fieldValue . " is " . strlen($fieldValue) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
         2100, array('field' => $fieldName, "max_length" => $fieldInfo['maxlength'])
       );
     }

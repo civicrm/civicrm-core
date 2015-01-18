@@ -56,13 +56,13 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
           'CiviMail.ignored',
           date('Y'),
           date('m'),
-          date('d')
+          date('d'),
         )));
     $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
           'CiviMail.processed',
           date('Y'),
           date('m'),
-          date('d')
+          date('d'),
         )));
   }
 
@@ -78,13 +78,13 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    */
   public function fetchNext($count = 0) {
     $mails = array();
-    $parser = new ezcMailParser;
+    $parser = new ezcMailParser();
     //set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
     foreach (array(
                'cur',
-               'new'
+               'new',
              ) as $subdir) {
       $dir = $this->_dir . DIRECTORY_SEPARATOR . $subdir;
       foreach (scandir($dir) as $file) {

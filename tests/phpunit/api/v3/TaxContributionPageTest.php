@@ -361,7 +361,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'pending');
   }
 
-  /*
+  /**
    * Updation of contrbution
    * Function tests that line items, financial records are updated when contribution amount is changed
    */

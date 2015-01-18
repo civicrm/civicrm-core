@@ -133,8 +133,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Retrieve the default payment processor
    *
-   * @param NULL
-   *
    * @return CRM_Financial_DAO_PaymentProcessor|null
    *   The default payment processor object on success,
    *   null otherwise
@@ -239,7 +237,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * (sort function for sortDefaultFirst)
    * @param array $processor1
    * @param array $processor2
-   * @return number
+   *
+   * @return int
    */
   public static function defaultComparison($processor1, $processor2) {
     $p1 = CRM_Utils_Array::value('is_default', $processor1);
@@ -315,7 +314,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $retrievalParameters = array(
       'is_active' => TRUE,
       'options' => array('sort' => 'is_default DESC, name'),
-      'api.payment_processor_type.getsingle' => 1
+      'api.payment_processor_type.getsingle' => 1,
     );
     if ($mode == 'test') {
       $retrievalParameters['is_test'] = 1;
@@ -418,7 +417,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     if (!in_array($component, array(
       'membership',
       'contribute',
-      'recur'
+      'recur',
     ))
     ) {
       return $result;
