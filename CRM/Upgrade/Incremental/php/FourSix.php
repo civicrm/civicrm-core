@@ -72,6 +72,9 @@ class CRM_Upgrade_Incremental_php_FourSix {
     if ($rev == '4.6.alpha1') {
       $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Receipt (off-line)</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
+    if ($rev == '4.6.alpha3') {
+      $postUpgradeMessage .= '<br /><br />' . ts('A new permission has been added for editing message templates. Previously, users needed the "administer CiviCRM" permission. Now, users need the new permission called "edit message templates." Please check your CMS permissions to ensure that users who should be able to edit message templates are assigned this new permission.');
+    }
   }
 
 
