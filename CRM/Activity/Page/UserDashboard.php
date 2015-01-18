@@ -41,12 +41,12 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
   /**
    * List participations for the UF user
    *
-   * @return null
+   * @return bool
    */
   public function listActivities() {
 
-    $controller =
-      new CRM_Core_Controller_Simple(
+    $controller
+      = new CRM_Core_Controller_Simple(
         'CRM_Activity_Form_Search', ts('Activities'),
         NULL,
         FALSE, FALSE, TRUE, FALSE
@@ -61,14 +61,14 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
     $controller->process();
     $controller->run();
 
-    return;
+    return FALSE;
   }
 
   /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    *
-   * @return null
+   * @return void
    */
   public function run() {
     parent::preProcess();

@@ -91,10 +91,12 @@ class CRM_Report_BAO_Hook {
     $contactIdClause = $join = '';
     foreach (self::getSearchQueryObjects() as $obj) {
       list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
-      if ($joinClause)
+      if ($joinClause) {
         $join .= $joinClause;
-      if ($cidClause)
+      }
+      if ($cidClause) {
         $contactIdClause .= $cidClause;
+      }
     }
     return array($contactIdClause, $join);
   }

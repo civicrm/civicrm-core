@@ -69,12 +69,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
-   *
    * @return array
    *   array of action links that we need to display for the browse screen
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
@@ -112,8 +110,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
   /**
    * Browse all price set fields.
-   *
-   * @param null
    *
    * @return void
    */
@@ -240,8 +236,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
-   *
-   * @param null
    *
    * @return void
    */

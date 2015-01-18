@@ -73,9 +73,9 @@ function _civicrm_api3_country_create_spec(&$params) {
  *
  * @example CountryDelete.php Standard Delete Example
  *
- * @return boolean
+ * @return bool
  *   | error  true if successfull, error otherwise
- * {@getfields country_delete}
+ *   {@getfields country_delete}
  */
 function civicrm_api3_country_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
@@ -84,9 +84,6 @@ function civicrm_api3_country_delete($params) {
 /**
  * Retrieve one or more countrys
  *
- * @param array input parameters
- *
- *
  * @example CountryGet.php Standard Get Example
  *
  * @param array $params
@@ -94,7 +91,7 @@ function civicrm_api3_country_delete($params) {
  *
  * @return array
  *   api result array
- * {@getfields country_get}
+ *   {@getfields country_get}
  */
 function civicrm_api3_country_get($params) {
 

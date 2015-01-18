@@ -43,8 +43,6 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -57,8 +55,8 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
       'entity_id' => $this->_surveyId,
     );
 
-    list($defaults['contact_profile_id'], $second) =
-      CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+    list($defaults['contact_profile_id'], $second)
+      = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     $defaults['activity_profile_id'] = $second ? array_shift($second) : '';
 
     return $defaults;
@@ -66,8 +64,6 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -106,8 +102,6 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
   /**
    * Process the form
-   *
-   * @param null
    *
    * @return void
    */

@@ -50,10 +50,10 @@
  * @link http://smarty.php.net/manual/en/language.modifier.truncate.php
  *          truncate (Smarty online manual)
  *
- * @param string
- * @param int
- * @param string
- * @param bool
+ * @param string $string
+ * @param int $length
+ * @param string $etc
+ * @param bool $break_words
  *
  * @return string
  */
