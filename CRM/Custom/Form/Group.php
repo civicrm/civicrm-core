@@ -199,7 +199,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $this->assign('contactTypes', json_encode($contactTypes));
 
-    $sel1 = array("" => "- select -") + CRM_Core_SelectValues::customGroupExtends();
+    $sel1 = array("" => ts("- select -")) + CRM_Core_SelectValues::customGroupExtends();
     $sel2 = array();
     $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
@@ -273,7 +273,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $contactSubTypes[$key] = $key;
       }
       $sel2['Contact'] = array(
-        "" => "-- Any --",
+        "" => ("- Any -"),
       ) + $contactSubTypes;
     }
     else {
@@ -391,7 +391,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
     $this->addButtons($buttons);
 
-    // views are implemented as frozen form
+    // TODO: Is this condition ever true? Can this code be removed?
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"));
