@@ -120,12 +120,12 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       else {
         if ($this->_cc == 'fail') {
           $statusMsg = '<div class="bold">' . ts('Your Credit Card transaction was not successful. No money has yet been charged to your card.') . '</div><div><br />' . ts('Click the "Confirm Registration" button to complete your registration in %1, or click "Cancel Registration" if you are no longer interested in attending this event.', array(
-              1 => $values['title']
+              1 => $values['title'],
             )) . '</div>';
         }
         else {
           $statusMsg = '<div class="bold">' . ts('Confirm your registration for %1.', array(
-              1 => $values['title']
+              1 => $values['title'],
             )) . '</div><div><br />' . ts('Click the "Confirm Registration" button to begin, or click "Cancel Registration" if you are no longer interested in attending this event.') . '</div>';
         }
         $buttons = array_merge($buttons, array(
@@ -134,7 +134,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
             'name' => ts('Confirm Registration'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
-          )
+          ),
         ));
       }
     }
@@ -150,7 +150,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
           'name' => ts('Cancel Registration'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'js' => array('onclick' => 'return confirm(\'' . $cancelConfirm . '\');'),
-        )
+        ),
       ));
       if (!$statusMsg) {
         $statusMsg = ts('You can cancel your registration for %1 by clicking "Cancel Registration".', array(1 => $values['title']));

@@ -32,7 +32,7 @@
 class CiviReportMail {
   /**
    */
-  function __construct() {
+  public function __construct() {
     $this->initialize();
 
     CRM_Utils_System::authenticateScript(TRUE);
@@ -41,14 +41,14 @@ class CiviReportMail {
     CRM_Core_Error::debug_log_message('CiviReportMail.php');
   }
 
-  function initialize() {
+  public function initialize() {
     require_once '../civicrm.config.php';
     require_once 'CRM/Core/Config.php';
 
     $config = CRM_Core_Config::singleton();
   }
 
-  function run() {
+  public function run() {
     require_once 'CRM/Core/Lock.php';
     $lock = new CRM_Core_Lock('CiviReportMail');
 
@@ -72,5 +72,5 @@ class CiviReportMail {
 }
 
 session_start();
-$obj = new CiviReportMail;
+$obj = new CiviReportMail();
 $obj->run();

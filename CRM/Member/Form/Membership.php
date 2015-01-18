@@ -471,7 +471,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), array(
           'create' => TRUE,
-          'api' => array('extra' => array('email'))
+          'api' => array('extra' => array('email')),
         ), TRUE);
     }
 
@@ -576,7 +576,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           }
           $memTypeJs = array(
             'onChange' =>
-              "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
+            "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
           );
         }
       }
@@ -1220,7 +1220,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         if (empty($formValues['source'])) {
           $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(
               1 => $membershipType,
-              2 => $userName
+              2 => $userName,
             ));
         }
         else {
@@ -1722,7 +1722,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @param object $membership
    *   Object.
    *
-   * @return boolean
+   * @return bool
    *   true if mail was sent successfully
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {

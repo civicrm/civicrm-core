@@ -713,7 +713,7 @@ WHERE entity_table = 'civicrm_contribution_page'
    * @param int $contributionPageId
    *   Contribution Page Id.
    *
-   * @return boolean
+   * @return bool
    *   true if payment processor supports recurring
    *   else false
    *
@@ -824,7 +824,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
 
-        break;
+      break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
@@ -925,7 +925,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
 
   /**
    * Helper to determine if the page supports separate membership payments
-   * @param int id form id
+   * @param int $id form id
    *
    * @return bool
    *   isSeparateMembershipPayment
@@ -934,7 +934,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     $membershipBlocks = civicrm_api3('membership_block', 'get', array(
         'entity_table' => 'civicrm_contribution_page',
         'entity_id' => $id,
-        'sequential' => TRUE
+        'sequential' => TRUE,
       ));
     if (!$membershipBlocks['count']) {
       return FALSE;

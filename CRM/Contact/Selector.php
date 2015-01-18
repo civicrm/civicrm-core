@@ -153,7 +153,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @return CRM_Contact_Selector
    */
-  function __construct(
+  public function __construct(
     $customSearchClass,
     $formValues = NULL,
     $params = NULL,
@@ -412,7 +412,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               if (in_array($fieldName, array(
                 'phone',
                 'im',
-                'email'
+                'email',
               ))) {
                 if ($type) {
                   $name = "`$locationTypeName-$fieldName-$type`";
@@ -593,7 +593,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             if (in_array($fieldName, array(
               'phone',
               'im',
-              'email'
+              'email',
             ))) {
               if ($type) {
                 $names[] = "{$locationTypeName}-{$fieldName}-{$type}";
@@ -678,7 +678,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (in_array($property, array(
           'addressee',
           'email_greeting',
-          'postal_greeting'
+          'postal_greeting',
         ))) {
           $greeting = $property . '_display';
           $row[$property] = $result->$greeting;
