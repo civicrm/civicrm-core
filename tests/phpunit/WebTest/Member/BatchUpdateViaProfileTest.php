@@ -206,7 +206,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/uf/group/field/add', array(
         'action' => 'add',
         'reset' => 1,
-        'gid' => $gid
+        'gid' => $gid,
       ), 'field_name[0]');
 
     $this->select('field_name[0]', "value=Membership");

@@ -55,12 +55,10 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
   /**
    * Set up variables to build the form
    *
-   * @param null
-   *
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_fid = $this->get('fid');
 
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField',
@@ -75,8 +73,6 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -98,12 +94,9 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
   /**
    * Process the form when submitted
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
-
     if (CRM_Price_BAO_PriceField::deleteField($this->_fid)) {
       CRM_Core_Session::setStatus(ts('The Price Field \'%1\' has been deleted.', array(1 => $this->_title)), '', 'success');
     }

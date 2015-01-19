@@ -32,7 +32,7 @@ class CRM_Mailing_BAO_QueryTestDataProvider implements Iterator {
       'fv' => array(
         'mailing_name' => 'First%',
         'mailing_delivery_status'
-        => 'N'
+        => 'N',
       ),
       'id' => array(105),
     ),
@@ -41,7 +41,7 @@ class CRM_Mailing_BAO_QueryTestDataProvider implements Iterator {
       'fv' => array(
         'mailing_name' => 'First%',
         'mailing_delivery_status'
-        => 'Y'
+        => 'Y',
       ),
       'id' => array(102, 103, 104, 108, 109, 110, 111, 112),
     ),
@@ -66,7 +66,7 @@ class CRM_Mailing_BAO_QueryTestDataProvider implements Iterator {
       'fv' => array(
         'mailing_name' => 'Second%',
         'mailing_delivery_status'
-        => 'N'
+        => 'N',
       ),
       'id' => array(),
     ),
@@ -75,7 +75,7 @@ class CRM_Mailing_BAO_QueryTestDataProvider implements Iterator {
       'fv' => array(
         'mailing_name' => 'Second%',
         'mailing_delivery_status'
-        => 'Y'
+        => 'Y',
       ),
       'id' => array(102, 103, 104, 108, 109, 110, 111, 112),
     ),

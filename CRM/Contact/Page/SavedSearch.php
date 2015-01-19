@@ -66,7 +66,6 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
     $savedSearch->id = $id;
     $savedSearch->is_active = 0;
     $savedSearch->save();
-    return;
   }
 
   /**

@@ -142,8 +142,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
 
     // add current contact to recently viewed
     if ($ufmatch->contact_id) {
-      list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl) =
-        CRM_Contact_BAO_Contact::getDisplayAndImage($ufmatch->contact_id, TRUE, TRUE);
+      list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl)
+        = CRM_Contact_BAO_Contact::getDisplayAndImage($ufmatch->contact_id, TRUE, TRUE);
 
       $otherRecent = array(
         'imageUrl' => $contactImageUrl,

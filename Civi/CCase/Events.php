@@ -63,6 +63,7 @@ class Events {
 
     if ($caseId) {
       if (!isset(self::$isActive[$caseId])) {
+        $tx = new \CRM_Core_Transaction();
         \CRM_Core_Transaction::addCallback(
           \CRM_Core_Transaction::PHASE_POST_COMMIT,
           array(__CLASS__, 'fireCaseChangeForRealz'),

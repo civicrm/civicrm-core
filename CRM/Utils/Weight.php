@@ -291,7 +291,7 @@ class CRM_Utils_Weight {
    * @return CRM_Core_DAO
    *   objet that holds the results of the query
    */
-  static function &query(
+  public static function &query(
     $queryType,
     $daoName,
     $fieldValues = NULL,
