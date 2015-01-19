@@ -111,7 +111,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $duplicates
    *   (reference ) store ids of duplicate contribs.
    *
-   * @return boolean
+   * @return bool
    *   true if duplicate, false otherwise
    */
   public static function checkDuplicate($params, &$duplicates) {

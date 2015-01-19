@@ -99,7 +99,7 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
  *
  * @return array
  *   API Result
- * {@getfields GroupOrganization_delete}
+ *   {@getfields GroupOrganization_delete}
  * @example GroupOrganizationDelete.php
  */
 function civicrm_api3_group_organization_delete($params) {

@@ -149,7 +149,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     // add participant payment entry
     $this->callAPISuccess('participant_payment', 'create', array(
         'participant_id' => $participant['id'],
-        'contribution_id' => $contributionId
+        'contribution_id' => $contributionId,
       ));
 
     // -- processing priceSet using the BAO

@@ -151,7 +151,7 @@ class CRM_Utils_Token {
    * @param string $str
    *   The string to search.
    *
-   * @return boolean
+   * @return bool
    *   Was there a match
    */
   public static function token_match($type, $var, &$str) {
@@ -332,8 +332,8 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
-    self::$_tokens['org'] =
-      array_merge(
+    self::$_tokens['org']
+      = array_merge(
         array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
         array('address', 'display_name', 'checksum', 'contact_id')
       );
@@ -653,8 +653,8 @@ class CRM_Utils_Token {
     if (self::$_tokens[$key] == NULL) {
       /* This should come from UF */
 
-      self::$_tokens[$key] =
-        array_merge(
+      self::$_tokens[$key]
+        = array_merge(
           array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
           array('checksum', 'contact_id')
         );
@@ -699,8 +699,8 @@ class CRM_Utils_Token {
     if (self::$_tokens['contact'] == NULL) {
       /* This should come from UF */
 
-      self::$_tokens['contact'] =
-        array_merge(
+      self::$_tokens['contact']
+        = array_merge(
           array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
           array('checksum', 'contact_id')
         );
@@ -762,7 +762,9 @@ class CRM_Utils_Token {
 
     if ($escapeSmarty
       && !($returnBlankToken && $noReplace)
-    ) { // $returnBlankToken means the caller wants to do further attempts at processing unreplaced tokens -- so don't escape them yet in this case.
+    ) {
+      // $returnBlankToken means the caller wants to do further attempts at
+      // processing unreplaced tokens -- so don't escape them yet in this case.
       $value = self::tokenEscapeSmarty($value);
     }
 
@@ -879,7 +881,7 @@ class CRM_Utils_Token {
    *   Replace tokens with html or plain text.
    * @param int $contact_id
    *   The contact ID.
-   * @param string hash The security hash of the unsub event
+   * @param string $hash The security hash of the unsub event
    *
    * @return string
    *   The processed string
@@ -925,7 +927,7 @@ class CRM_Utils_Token {
    *   Replace tokens with html or plain text.
    * @param int $contact_id
    *   The contact ID.
-   * @param string hash The security hash of the resub event
+   * @param string $hash The security hash of the resub event
    *
    * @return string
    *   The processed string
@@ -1150,9 +1152,9 @@ class CRM_Utils_Token {
    * @param $contactIDs
    * @param array $returnProperties
    *   Of required properties.
-   * @param bool $skipOnHoldDon 't return on_hold contact info also.
+   * @param bool $skipOnHold Don't return on_hold contact info also.
    *   Don't return on_hold contact info also.
-   * @param bool $skipDeceasedDon 't return deceased contact info.
+   * @param bool $skipDeceased Don't return deceased contact info.
    *   Don't return deceased contact info.
    * @param array $extraParams
    *   Extra params.
@@ -1164,7 +1166,7 @@ class CRM_Utils_Token {
    *
    * @return array
    */
-  static function getTokenDetails(
+  public static function getTokenDetails(
     $contactIDs,
     $returnProperties = NULL,
     $skipOnHold = TRUE,
@@ -1262,7 +1264,7 @@ class CRM_Utils_Token {
         foreach (array(
                    'email_greeting',
                    'postal_greeting',
-                   'addressee'
+                   'addressee',
                  ) as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
@@ -1300,7 +1302,7 @@ class CRM_Utils_Token {
    *   contactDetails with hooks swapped out
    */
   public function getAnonymousTokenDetails($contactIDs = array(
-      0
+      0,
     ),
                                            $returnProperties = NULL,
                                            $skipOnHold = TRUE,
@@ -1335,14 +1337,15 @@ class CRM_Utils_Token {
    *
    * @return array
    */
-  static function getContributionTokenDetails(
+  public static function getContributionTokenDetails(
     $contributionIDs,
     $returnProperties = NULL,
     $extraParams = NULL,
     $tokens = array(),
     $className = NULL
   ) {
-    //@todo - this function basically replications calling civicrm_api3('contribution', 'get', array('id' => array('IN' => array())
+    //@todo - this function basically replicates calling
+    //civicrm_api3('contribution', 'get', array('id' => array('IN' => array())
     if (empty($contributionIDs)) {
       // putting a fatal here so we can track if/when this happens
       CRM_Core_Error::fatal();
@@ -1394,7 +1397,7 @@ class CRM_Utils_Token {
   public static function getMembershipTokenDetails($membershipIDs) {
     $memberships = civicrm_api3('membership', 'get', array(
         'options' => array('limit' => 200000),
-        'membership_id' => array('IN' => (array) $membershipIDs)
+        'membership_id' => array('IN' => (array) $membershipIDs),
       ));
     return $memberships['values'];
   }
@@ -1420,7 +1423,8 @@ class CRM_Utils_Token {
       // check if there are any unevaluated tokens
       $greetingTokens = self::getTokens($tokenString);
 
-      // $greetingTokens not empty, means there are few tokens which are not evaluated, like custom data etc
+      // $greetingTokens not empty, means there are few tokens which are not
+      // evaluated, like custom data etc
       // so retrieve it from database
       if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
         $greetingsReturnProperties = array_flip(CRM_Utils_Array::value('contact', $greetingTokens));
@@ -1485,7 +1489,7 @@ class CRM_Utils_Token {
     foreach (array(
                'html',
                'text',
-               'subject'
+               'subject',
              ) as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
@@ -1713,7 +1717,7 @@ class CRM_Utils_Token {
         try {
           $value = civicrm_api3('membership_type', 'getvalue', array(
               'id' => $membership['membership_type_id'],
-              'return' => 'minimum_fee'
+              'return' => 'minimum_fee',
             ));
         }
         catch (CiviCRM_API3_Exception $e) {
