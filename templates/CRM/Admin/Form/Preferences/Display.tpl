@@ -50,8 +50,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab.
-          "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
+        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab. "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_edit_options">
@@ -101,10 +100,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included when adding or editing a contact record.
-          EXAMPLE: If your organization does not record Gender and Birth Date for individuals, then simplify the form
-          by un-checking this option. Drag interface allows you to change the order of the panes displayed on contact
-          add/edit screen.{/ts}
+        {ts}Select the sections that should be included when adding or editing a contact record. EXAMPLE: If your organization does not record Gender and Birth Date for individuals, then simplify the form by un-checking this option. Drag interface allows you to change the order of the panes displayed on contact add/edit screen.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-advanced_search_options">
@@ -113,10 +109,8 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td
-        class="description">{ts}Select the sections that should be included in the Basic and Advanced Search forms.
-          EXAMPLE: If you don't track Relationships - then you do not need this section included in the advanced search
-          form. Simplify the form by un-checking this option.{/ts}
+      <td class="description">
+        {ts}Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don't track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_ajax_check_similar">
@@ -125,8 +119,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}When enabled, checks for contacts with similar names as the user types values into
-          the contact form name fields.{/ts}
+      <td class="description">{ts}When enabled, checks for contacts with similar names as the user types values into the contact form name fields.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">
@@ -136,8 +129,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}When enabled, contacts who are assigned activities will automatically receive an email notification
-          with a copy of the activity.{/ts}
+        {ts}When enabled, contacts who are assigned activities will automatically receive an email notification with a copy of the activity.{/ts}
       </td>
     </tr>
 
@@ -147,8 +139,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}When enabled, the assignee notification sent out above will also include
-          an ical meeting invite.{/ts}
+      <td class="description">{ts}When enabled, the assignee notification sent out above will also include an ical meeting invite.{/ts}
       </td>
     </tr>
 
@@ -159,8 +150,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want
-          constituents to view their own contribution history, un-check that option.{/ts}
+        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
@@ -182,8 +172,7 @@
           {/literal}
           <br/>
           <span class="description">
-            {ts}You will need to enable and configure several modules if you want to allow users to upload images
-              while using a Drupal Default Editor.{/ts}
+            {ts}You will need to enable and configure several modules if you want to allow users to upload images while using a Drupal Default Editor.{/ts}
             {docURL page="Configuring CiviCRM to Use the Default Drupal Editor" resource="wiki"}
           </span>
         </td>
@@ -192,9 +181,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea'
-          if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text
-          fields).{/ts} {help id="id-editor_id"}
+        {ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea' if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text fields).{/ts} {help id="id-editor_id"}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
