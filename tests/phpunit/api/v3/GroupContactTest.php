@@ -82,7 +82,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
   }
 
-  ///////////////// civicrm_group_contact_get methods
+  /**
+   * civicrm_group_contact_get methods
+   */
   public function testGet() {
     $params = array(
       'contact_id' => $this->_contactId,
@@ -160,7 +162,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals($result['total_count'], 2, "in line " . __LINE__);
   }
 
-  ///////////////// civicrm_group_contact_remove methods
+  /**
+   * civicrm_group_contact_remove methods
+   */
   public function testDelete() {
     $params = array(
       'contact_id' => $this->_contactId,

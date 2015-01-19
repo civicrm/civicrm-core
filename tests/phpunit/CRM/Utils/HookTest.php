@@ -67,8 +67,9 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   }
 }
 
-/* --- Library of test hook implementations ---- */
-
+/**
+ * Library of test hook implementations
+ */
 function hooktesta_civicrm_testRunHooks_outer() {
   $test = CRM_Utils_HookTest::$activeTest;
   $test->log[] = 'a-outer';
@@ -100,8 +101,9 @@ function hooktesta_civicrm_testRunHooks_merge() {
   return array('from-module-a1', 'from-module-a2');
 }
 
-// OMIT: function hooktestb_civicrm_testRunHooks_merge
-
+/**
+ * OMIT: function hooktestb_civicrm_testRunHooks_merge
+ */
 function hooktestc_civicrm_testRunHooks_merge() {
   return array();
 }

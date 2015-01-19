@@ -281,9 +281,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
               if ($fieldName == 'relationship_type_id') {
-                $clause =
-                  "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" .
-                  $this->relationshipId;
+                $clause = "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" . $this->relationshipId;
               }
               else {
                 $clause = $this->whereClause($field,
@@ -452,10 +450,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
               $this->_absoluteUrl
             );
 
-            $rows[$rowNum]['civicrm_contact_household_household_name'] =
-              "<a href='$url' title='" .
-              ts('View contact summary for this househould') . "'>" . $value .
-              '</a>';
+            $rows[$rowNum]['civicrm_contact_household_household_name'] = "<a href='$url' title='" . ts('View contact summary for this househould') . "'>" . $value . '</a>';
           }
           $entryFound = TRUE;
         }

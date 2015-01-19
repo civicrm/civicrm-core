@@ -177,7 +177,7 @@ SELECT  petition.id                         as id,
    */
   public function createSignature(&$params) {
     if (empty($params)) {
-      return;
+      return NULL;
     }
 
     if (!isset($params['sid'])) {
@@ -636,7 +636,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
               $se->hash,
             )
           ) . "@$emailDomain";
-
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
           "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",

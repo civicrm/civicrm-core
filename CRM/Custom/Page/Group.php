@@ -53,7 +53,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
    *
    * @return array
    *   array of action links that we need to display for the browse screen
@@ -107,8 +106,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @param null
    *
    * @return void
    */

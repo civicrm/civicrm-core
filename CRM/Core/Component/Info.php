@@ -229,7 +229,7 @@ abstract class CRM_Core_Component_Info {
    * Provides information whether given component is currently
    * marked as enabled in configuration.
    *
-   * @return boolean
+   * @return bool
    *   true if component is enabled, false if not
    */
   public function isEnabled() {
@@ -322,7 +322,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Provides information whether given component uses system wide search.
    *
-   * @return boolean
+   * @return bool
    *   true if component needs search integration
    */
   public function usesSearch() {

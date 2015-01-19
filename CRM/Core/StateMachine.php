@@ -111,7 +111,7 @@ class CRM_Core_StateMachine {
   /**
    * Setter for name
    *
-   * @param string
+   * @param string $name
    *
    * @return void
    */
@@ -394,7 +394,7 @@ class CRM_Core_StateMachine {
    * beginning from the final state, but retain the same session
    * values
    *
-   * @return boolean
+   * @return bool
    */
   public function shouldReset() {
     return TRUE;

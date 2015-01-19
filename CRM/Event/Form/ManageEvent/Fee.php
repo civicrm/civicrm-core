@@ -147,8 +147,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] =
-            CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
           $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']] = $discountFieldsval['id'];
           if (!empty($discountFieldsval['is_default'])) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
@@ -297,7 +296,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $this->add('select', 'price_set_id', ts('Price Set'),
       array(
-        '' => ts('- none -')
+        '' => ts('- none -'),
       ) + $price,
       NULL, array('onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);")
     );
