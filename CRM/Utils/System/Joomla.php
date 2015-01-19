@@ -194,8 +194,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     $document = JFactory::getDocument();
     $document->setTitle($title);
-
-    return;
   }
 
   /**
@@ -229,7 +227,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       }
     }
     $template->assign_by_ref('breadcrumb', $bc);
-    return;
   }
 
   /**
@@ -240,7 +237,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return void
    */
   public function resetBreadCrumb() {
-    return;
   }
 
   /**
@@ -360,7 +356,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return string
    *   an HTML string containing a link to the given path.
    */
-  function url(
+  public function url(
     $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
@@ -409,7 +405,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         $joomlaVersion = JVERSION;
       }
       else {
-        $jversion = new JVersion;
+        $jversion = new JVersion();
         $joomlaVersion = $jversion->getShortVersion();
       }
 
@@ -424,11 +420,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * Rewrite various system urls to https
    *
    * @return void
-   * access public
+   *   access public
    */
   public function mapConfigToSSL() {
     // dont need to do anything, let CMS handle their own switch to SSL
-    return;
   }
 
   /**
@@ -517,7 +512,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
     if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
-      $jversion = new JVersion;
+      $jversion = new JVersion();
       define('JVERSION', $jversion->getShortVersion());
     }
 
@@ -589,7 +584,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   The message to set.
    */
   public function setMessage($message) {
-    return;
   }
 
   /**
@@ -630,7 +624,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getVersion() {
     if (class_exists('JVersion')) {
-      $version = new JVersion;
+      $version = new JVersion();
       return $version->getShortVersion();
     }
     else {
@@ -675,7 +669,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     // Files may be in different places depending on Joomla version
     if (!defined('JVERSION')) {
       require $joomlaBase . '/libraries/cms/version/version.php';
-      $jversion = new JVersion;
+      $jversion = new JVersion();
       define('JVERSION', $jversion->getShortVersion());
     }
 
@@ -700,7 +694,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Check is user logged in.
    *
-   * @return boolean
+   * @return bool
    */
   public function isUserLoggedIn() {
     $user = JFactory::getUser();
@@ -839,9 +833,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @return array
    *   array
-   * - $url, (Joomla - non admin url)
-   * - $siteName,
-   * - $siteRoot
+   *   - $url, (Joomla - non admin url)
+   *   - $siteName,
+   *   - $siteRoot
    */
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
