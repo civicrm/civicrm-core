@@ -26,9 +26,7 @@
 
 <div class="crm-section no-label paypal_button_info-section">
   <div class="content description">
-    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click
-      <strong>Continue</strong>
-      at the bottom of the page.{/ts}
+    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
   </div>
 </div>
 <div class="crm-section no-label {$form.$expressButtonName.name}-section">

@@ -35,10 +35,5 @@
   {ts}Contributor{/ts}
 {/htxt}
 {htxt id="id-contribution_contact"}
-<p>{ts}Check this box if someone other than the member is paying for this
-membership (i.e. a gift membership or gift subscription), and you want to link
-the payment to the person who is actually paying.  You will be able to select
-an existing contact or enter a new one. The resulting contribution record will
-be linked to the payer, and a soft credit for that contribution will be linked to
-this contact (the member).{/ts}</p>
+  <p>{ts}Check this box if someone other than the member is paying for this membership (i.e. a gift membership or gift subscription), and you want to link the payment to the person who is actually paying.  You will be able to select an existing contact or enter a new one. The resulting contribution record will be linked to the payer, and a soft credit for that contribution will be linked to this contact (the member).{/ts}</p>
 {/htxt}

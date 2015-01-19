@@ -23,86 +23,72 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{capture assign='entityType'}{$params.entityType|lower}{/capture}
 
 {htxt id="id-repeats-title"}
-{ts}Repeats{/ts}
+  {ts}Repeats{/ts}
 {/htxt}
 {htxt id="id-repeats"}
-  {ts}Access the drop-down menu here to select how frequently your {$params.entityType|lower} occurs. You have several options:
-    <ul>
-        <li>Hourly:&nbsp;&nbsp;your {$params.entityType|lower} repeats hourly or after every few hours</li>
-        <li>Daily:&nbsp;&nbsp;your {$params.entityType|lower} repeats daily or after every few days</li>
-        <li>Weekly:&nbsp;&nbsp;your {$params.entityType|lower} repeats on one or more days every week</li>
-        <li>Monthly:&nbsp;&nbsp;your {$params.entityType|lower} repeats on one or more days every month</li>
-        <li>Yearly:&nbsp;&nbsp;your {$params.entityType|lower} repeats yearly or after every few years</li>
-    </ul>
-    Example: You would select option "monthly", if your {$params.entityType|lower} occurs every month.
-  {/ts}
+  {ts 1=$entityType}Access the drop-down menu here to select how frequently your %1 occurs. Options are:{/ts}
+  <ul>
+    <li>{ts}Hourly: repeats hourly or after every few hours{/ts}</li>
+    <li>{ts 1=$entityType}Daily: repeats daily or after every few days{/ts}</li>
+    <li>{ts 1=$entityType}Weekly: repeats on one or more days every week{/ts}</li>
+    <li>{ts 1=$entityType}Monthly: repeats on one or more days every month{/ts}</li>
+    <li>{ts 1=$entityType}Yearly: repeats yearly or after every few years{/ts}</li>
+  </ul>
+  {ts 1=$entityType}Example: You would select option "monthly", if your %1 occurs every month.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-every-title"}
-{ts}Repeats every{/ts}
+  {ts}Repeats every{/ts}
 {/htxt}
 {htxt id="id-repeats-every"}
-  {ts}Option you select here decides the repetition interval.<br/>
-      Example: If your {$params.entityType|lower} repeats every 5 months, then you would select option 5.{/ts}
+  {ts}This option decides the repetition interval.{/ts}<br/>
+  {ts 1=$entityType}Example: If your %1 repeats every 5 months, then you would select option 5.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-on-title"}
-{ts}Repeats on{/ts}
+  {ts}Repeats on{/ts}
 {/htxt}
 {htxt id="id-repeats-on"}
-  {ts}
-    You can choose to select your {$params.entityType|lower} to repeat on weekdays, weekends or any combination of day of the week.<br/>
-    Example: You can select Monday, Wednesday and Friday for your {$params.entityType|lower} to occur on alternate weekdays.
-  {/ts}
+  {ts 1=$entityType}You can choose to select your %1 to repeat on weekdays, weekends or any combination of day of the week.{/ts}<br/>
+  {ts 1=$entityType}Example: You can select Monday, Wednesday and Friday for your %1 to occur on alternate weekdays.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-by-month-title"}
-{ts}Repeats by day of the month{/ts}
+  {ts}Repeats by day of the month{/ts}
 {/htxt}
 {htxt id="id-repeats-by-month"}
-  {ts}
-    Options given here are days of a month from 1 - 31<br/>
-    Example: If your {$params.entityType|lower} repeats 8th of every month then you would select 8.
-  {/ts}
+  {ts}Options given here are days of a month from 1 - 31{/ts}<br/>
+  {ts 1=$entityType}Example: If your %1 repeats 8th of every month then you would select 8.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-by-week-title"}
-{ts}Repeats by day of the week{/ts}
+  {ts}Repeats by day of the week{/ts}
 {/htxt}
 {htxt id="id-repeats-by-week"}
-    {ts}
-        You can choose to select {$params.entityType|lower} occurring every third Friday, last Monday, fourth Wednesday of the month and various other combinations given in the dropdown.
-    {/ts}
+  {ts 1=$entityType}You can choose to select %1 occurring every third Friday, last Monday, fourth Wednesday of the month and various other combinations given in the dropdown.{/ts}
 {/htxt}
 
 {htxt id="id-ends-after-title"}
-{ts}Ends{/ts}
+  {ts}Ends{/ts}
 {/htxt}
 {htxt id="id-ends-after"}
-  {ts}
-    Use this field to limit/end the repetition of the {$params.entityType|lower}.<br/>
-    Example: If you want to repeat an {$params.entityType|lower} for six months (i.e it repeats 6 times), then set 6 as a value for this field.
-  {/ts}
+  {ts 1=$entityType}Use this field to limit/end the repetition of the %1.{/ts}<br/>
+  {ts 1=$entityType}Example: If you want to repeat an %1 for six months (i.e it repeats 6 times), then set 6 as a value for this field.{/ts}
 {/htxt}
 
 {htxt id="id-ends-on-title"}
-{ts}Ends{/ts}
+  {ts}Ends{/ts}
 {/htxt}
 {htxt id="id-ends-on"}
-    {ts}
-        Choose a specific date here to limit/end the repetition<br/>
-        Example: Your {$params.entityType|lower} ends on 26th of September 2014
-    {/ts}
+  {ts}Choose a specific date to limit/end the repetition.{/ts}
 {/htxt}
 
 {htxt id="id-exclude-date-title"}
-{ts}Exclude Date(s){/ts}
+  {ts}Exclude Date(s){/ts}
 {/htxt}
 {htxt id="id-exclude-date"}
-    {ts}
-        Add dates here, if you don't want to repeat your {$params.entityType|lower} on those dates.
-        This field enables you to alter certain sessions, skip holidays, or create gaps in the sequence for other reasons.<br/>
-    {/ts}
+  {ts}This field enables you to alter certain sessions, skip holidays, or create gaps in the sequence for other reasons.{/ts}
 {/htxt}
