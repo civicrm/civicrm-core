@@ -55,7 +55,7 @@ class CRM_Utils_Address {
    *   formatted address string
    *
    */
-  static function format(
+  public static function format(
     $fields,
     $format = NULL,
     $microformat = FALSE,
@@ -66,13 +66,11 @@ class CRM_Utils_Address {
     static $config = NULL;
 
     if (!$format) {
-      $format =
-        CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_format');
+      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_format');
     }
 
     if ($mailing) {
-      $format =
-        CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'mailing_format');
+      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'mailing_format');
     }
 
     $formatted = $format;

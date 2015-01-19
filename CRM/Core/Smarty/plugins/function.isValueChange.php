@@ -57,7 +57,7 @@ function smarty_function_isValueChange($params, &$smarty) {
 
   if (empty($params['key'])) {
     $smarty->trigger_error("Missing required parameter, 'key', in isValueChange plugin.");
-    return;
+    return NULL;
   }
 
   $is_changed = FALSE;
@@ -85,5 +85,5 @@ function smarty_function_isValueChange($params, &$smarty) {
     $smarty->assign($params['assign'], $is_changed);
   }
 
-  return;
+  return NULL;
 }

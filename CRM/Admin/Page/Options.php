@@ -125,7 +125,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
           'url' => CRM_Utils_System::url('civicrm/admin/access',
             'reset=1'
           ),
-        )
+        ),
       );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
@@ -210,7 +210,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
             'url' => 'civicrm/contact/search/custom',
             'qs' => 'reset=1&csid=%%value%%',
             'title' => ts('Run %1', array(1 => self::$_gName)),
-          )
+          ),
         );
         self::$_links = $runLink + self::$_links;
       }

@@ -150,13 +150,13 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'FakeFile',
       'create',
       array(),
-      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/"
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
     );
     $cases[] = array(
       'FakeFile',
       'get',
       array(),
-      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/"
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
     );
 
     $cases[] = array('FakeFile', 'create', array('entity_table' => 'unknown'), '/Unrecognized target entity/');

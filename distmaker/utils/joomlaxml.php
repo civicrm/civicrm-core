@@ -72,7 +72,7 @@ function generateJoomlaConfig($version) {
 
   $output = $targetDir . '/civicrm.xml';
   $fd = fopen($output, "w");
-  fputs($fd, $xml);
+  fwrite($fd, $xml);
   fclose($fd);
 
   require_once 'CRM/Core/Config.php';
@@ -106,6 +106,6 @@ function generateJoomlaConfig($version) {
   $output = $targetDir . '/admin/access.xml';
   $xml    = $smarty->fetch('access.tpl');
   $fd     = fopen($output, "w");
-  fputs($fd, $xml);
+  fwrite($fd, $xml);
   fclose($fd);
 }

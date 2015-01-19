@@ -256,16 +256,16 @@ class CRM_Utils_Address_BatchUpdate {
     }
 
     $this->returnMessages[] = ts("Addresses Evaluated: %1", array(
-        1 => $totalAddresses
+      1 => $totalAddresses,
       )) . "\n";
     if ($processGeocode) {
       $this->returnMessages[] = ts("Addresses Geocoded: %1", array(
-          1 => $totalGeocoded
+          1 => $totalGeocoded,
         )) . "\n";
     }
     if ($parseStreetAddress) {
       $this->returnMessages[] = ts("Street Addresses Parsed: %1", array(
-          1 => $totalAddressParsed
+          1 => $totalAddressParsed,
         )) . "\n";
       if ($unparseableContactAddress) {
         $this->returnMessages[] = "<br />\n" . ts("Following is the list of contacts whose address is not parsed:") . "<br />\n";

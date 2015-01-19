@@ -224,10 +224,10 @@ class CRM_Core_CommunityMessages {
    * @return bool
    */
   public function validateDocument($document) {
-    if (!isset($document['ttl']) || !is_integer($document['ttl'])) {
+    if (!isset($document['ttl']) || !is_int($document['ttl'])) {
       return FALSE;
     }
-    if (!isset($document['retry']) || !is_integer($document['retry'])) {
+    if (!isset($document['retry']) || !is_int($document['retry'])) {
       return FALSE;
     }
     if (!isset($document['messages']) || !is_array($document['messages'])) {

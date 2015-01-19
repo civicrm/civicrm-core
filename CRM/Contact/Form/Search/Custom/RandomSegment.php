@@ -131,7 +131,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -376,6 +376,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     // the temporary tables are dropped automatically
     // so we don't do it here
     // but let mysql clean up
-    return;
+    return NULL;
   }
 }

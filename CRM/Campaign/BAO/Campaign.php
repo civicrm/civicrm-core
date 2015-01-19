@@ -48,7 +48,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    */
   public static function create(&$params) {
     if (empty($params)) {
-      return;
+      return NULL;
     }
 
     if (!(CRM_Utils_Array::value('id', $params))) {
