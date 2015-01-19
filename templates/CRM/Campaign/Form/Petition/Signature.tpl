@@ -41,8 +41,7 @@
 </p>
 {/if}
 {if $duplicate == "unconfirmed"}
-<p>{ts}You have already signed this petition but you still <b>need to verify your email address</b>.</br>
-Please check your email inbox for the confirmation email. If you don't find it, verify if it isn't in your spam folder.{/ts}
+<p>{ts}You have already signed this petition but you still <b>need to verify your email address</b>.</br> Please check your email inbox for the confirmation email. If you don't find it, verify if it isn't in your spam folder.{/ts}
 {/if}
 {if $duplicate}
 <p>{ts}Thank you for your support.{/ts}</p>

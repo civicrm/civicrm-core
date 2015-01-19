@@ -53,8 +53,7 @@
     {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
     </p>
 {/if}
-<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens,
-but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
 {/htxt}
@@ -86,8 +85,7 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
     {/if}
     </p>
 {/if}
-<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens,
-but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
 {/htxt}
