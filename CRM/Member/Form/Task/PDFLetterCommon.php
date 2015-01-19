@@ -21,11 +21,11 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    */
   public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) =
-      self::processMessageTemplate($form);
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties)
+      = self::processMessageTemplate($form);
 
-    $html =
-      self::generateHTML(
+    $html
+      = self::generateHTML(
         $membershipIDs,
         $returnProperties,
         $skipOnHold,

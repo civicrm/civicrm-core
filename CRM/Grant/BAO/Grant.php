@@ -110,19 +110,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Retrieve statistics for grants.
-   *
-   *
-   * @param bool $admin
-   *
-   * @return array
-   *   Array of grant summary statistics
-   */
-  public static function getGrantStatistics($admin = FALSE) {
-    $grantStatuses = array();
-  }
-
-  /**
    * Fetch object based on array of properties
    *
    * @param array $params
@@ -398,7 +385,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
           'title' => ts('Grant Note'),
           'name' => 'grant_note',
           'data_type' => CRM_Utils_Type::T_TEXT,
-        )
+        ),
       );
       $fields = array_merge($fields, $grantFields, $grantNote,
         CRM_Core_BAO_CustomField::getFieldsForImport('Grant')

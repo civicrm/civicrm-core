@@ -198,7 +198,7 @@ class CRM_Core_Region {
 
         case 'jquery':
           $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
-        // no break - continue processing as script
+          // no break - continue processing as script
         case 'script':
           if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
