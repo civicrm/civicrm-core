@@ -97,7 +97,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       'badge_id',
       ts('Name Badge Format'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $label, TRUE
     );
 

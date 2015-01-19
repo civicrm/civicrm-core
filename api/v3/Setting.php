@@ -35,7 +35,6 @@
  * @param array $params
  * @return array
  */
-
 function civicrm_api3_setting_getfields($params) {
   if (!empty($params['action']) && strtolower($params['action']) == 'getvalue') {
     $result = array(
@@ -48,7 +47,7 @@ function civicrm_api3_setting_getfields($params) {
         'title' => 'Setting Group',
         'description' => 'Settings Group. This is required if the setting is not stored in config',
         'type' => CRM_Utils_Type::T_STRING),
-      );
+    );
     return civicrm_api3_create_success($result, $params, 'setting', 'getfields');
   }
   if (!empty($params['name'])) {
@@ -218,7 +217,7 @@ function _civicrm_api3_setting_fill_spec(&$params) {
  *
  * @return array
  *   api result array
- * {@getfields setting_create}
+ *   {@getfields setting_create}
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -238,11 +237,11 @@ function _civicrm_api3_setting_create_spec(&$params) {
     'title' => 'Setting Domain',
     'description' => 'if you do not pass in a domain id this will default to the current domain
       an array or "all" are acceptable values for multiple domains',
-   );
+  );
   $params['group'] = array(
-     'title' => 'Setting Group',
-     'description' => 'if you know the group defining it will make the api more efficient',
-   );
+    'title' => 'Setting Group',
+    'description' => 'if you know the group defining it will make the api more efficient',
+  );
 }
 
 /**
@@ -254,7 +253,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
  *
  * @return array
  *   Array of matching settings
- * {@getfields setting_get}
+ *   {@getfields setting_get}
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -288,7 +287,7 @@ function _civicrm_api3_setting_get_spec(&$params) {
  *
  * @return array
  *   Array of matching settings
- * {@getfields setting_get}
+ *   {@getfields setting_get}
  */
 function civicrm_api3_setting_getvalue($params) {
   $config = CRM_Core_Config::singleton();
@@ -314,21 +313,21 @@ function civicrm_api3_setting_getvalue($params) {
 function _civicrm_api3_setting_getvalue_spec(&$params) {
 
   $params['group'] = array(
-      'title' => 'Settings Group',
-      'api.required' => TRUE,
+    'title' => 'Settings Group',
+    'api.required' => TRUE,
   );
   $params['name'] = array(
-      'title' => 'Setting Name',
-      'api.aliases' => array('return'),
+    'title' => 'Setting Name',
+    'api.aliases' => array('return'),
   );
   $params['default_value'] = array(
-      'title' => 'Default Value',
+    'title' => 'Default Value',
   );
   $params['component_id'] = array(
-      'title' => 'Component Id',
+    'title' => 'Component Id',
   );
   $params['contact_id'] = array(
-      'title' => 'Contact Id',
+    'title' => 'Contact Id',
   );
   $params['domain_id'] = array(
     'title' => 'Setting Domain',

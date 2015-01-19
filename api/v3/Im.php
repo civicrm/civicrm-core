@@ -75,8 +75,6 @@ function civicrm_api3_im_delete($params) {
 /**
  * Retrieve one or more IM
  *
- * @param mixed[] (reference ) input parameters
- * {@getfields im_get}
  * @param array $params
  *   An associative array of name/value pairs.
  *
