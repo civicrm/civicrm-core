@@ -78,8 +78,6 @@
   {ts}Reserved{/ts}
 {/htxt}
 {htxt id="id-is_reserved"}
-{ts}Users with 'administer reserved reports' permission can mark a report instance as reserved, which prevents other users from accessing or modifying Report Criteria and Report Settings.
-This is particularly useful for report instances whose criteria affect the data available on non-report screens. For example, the display columns configured for the 
-Contact Logging Summary affect the columns shown under each contact's Change Log tab.{/ts}
+{ts}Users with 'administer reserved reports' permission can mark a report instance as reserved, which prevents other users from accessing or modifying Report Criteria and Report Settings. This is particularly useful for report instances whose criteria affect the data available on non-report screens. For example, the display columns configured for the  Contact Logging Summary affect the columns shown under each contact's Change Log tab.{/ts}
 {/htxt}
 
