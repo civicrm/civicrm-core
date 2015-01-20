@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -585,4 +585,5 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($groupTitles[$customFieldId]['groupTitle'], 'Test Custom Group', 'Check Group Title.');
     Custom::deleteGroup($customGroup);
   }
+
 }

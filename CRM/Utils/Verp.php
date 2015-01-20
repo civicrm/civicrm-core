@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class to handle encoding and decoding Variable Enveleope Return Path (VERP)
@@ -113,4 +113,5 @@ class CRM_Utils_Verp {
 
     return array("$slocal@$sdomain", "$rlocal@$rdomain");
   }
+
 }

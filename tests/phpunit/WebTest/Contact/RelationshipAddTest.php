@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -427,4 +427,5 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     );
     $this->assertTrue($this->isTextPresent("Employee of"), "Employee of relationship type not visible on View Relationship page.");
   }
+
 }

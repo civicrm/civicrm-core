@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -139,14 +139,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     CRM_Utils_Hook::pre('create', 'GroupContact', $groupId, $contactIds);
 
-    list($numContactsAdded,
-      $numContactsNotAdded
-      ) = self::bulkAddContactsToGroup($contactIds,
-      $groupId,
-      $method,
-      $status,
-      $tracking
-    );
+    list($numContactsAdded, $numContactsNotAdded)
+      = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
 
     // also reset the acl cache
     $config = CRM_Core_Config::singleton();
@@ -813,4 +807,5 @@ AND    contact_id IN ( $contactStr )
 
     return $options;
   }
+
 }

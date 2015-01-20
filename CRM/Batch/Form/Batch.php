@@ -130,4 +130,5 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch/entry', "id={$batch->id}&reset=1"));
     }
   }
+
 }

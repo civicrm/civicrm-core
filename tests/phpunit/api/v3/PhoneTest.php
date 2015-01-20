@@ -153,4 +153,5 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $check);
   }
+
 }

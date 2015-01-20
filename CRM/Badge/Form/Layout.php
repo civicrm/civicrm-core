@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -237,4 +237,5 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     CRM_Badge_BAO_Badge::buildBadges($params, $this);
   }
+
 }

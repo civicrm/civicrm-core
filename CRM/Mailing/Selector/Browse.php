@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -360,7 +360,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         if (in_array($row['status'], array(
           'Scheduled',
           'Running',
-          'Paused'
+          'Paused',
         ))) {
           if ($allAccess ||
             ($showApprovalLinks && $showCreateLinks && $showScheduleLinks)
@@ -608,4 +608,5 @@ ORDER BY LEFT(name, 1)
     $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_parent->_sortByCharacter, TRUE);
     $this->_parent->assign('aToZ', $aToZBar);
   }
+
 }

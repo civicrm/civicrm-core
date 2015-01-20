@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -86,4 +86,5 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->assertEquals('1', $this->getSelectedValue('id=recipient'));
     $this->assertChecked('is_active');
   }
+
 }

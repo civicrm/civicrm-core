@@ -36,4 +36,5 @@ interface CRM_Core_Reference_Interface {
    *   - 'count': int
    */
   public function getReferenceCount($targetDao);
+
 }

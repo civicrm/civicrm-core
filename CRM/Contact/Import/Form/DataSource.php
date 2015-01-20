@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -378,8 +378,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    */
   private function _prepareImportTable($db, $importTableName) {
     /* TODO: Add a check for an existing _status field;
-         *  if it exists, create __status instead and return that
-         */
+     *  if it exists, create __status instead and return that
+     */
 
     $statusFieldName = '_status';
     $primaryKeyName = '_id';
@@ -388,12 +388,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $this->set('statusFieldName', $statusFieldName);
 
     /* Make sure the PK is always last! We rely on this later.
-         * Should probably stop doing that at some point, but it
-         * would require moving to associative arrays rather than
-         * relying on numerical order of the fields. This could in
-         * turn complicate matters for some DataSources, which
-         * would also not be good. Decisions, decisions...
-         */
+     * Should probably stop doing that at some point, but it
+     * would require moving to associative arrays rather than
+     * relying on numerical order of the fields. This could in
+     * turn complicate matters for some DataSources, which
+     * would also not be good. Decisions, decisions...
+     */
 
     $alterQuery = "ALTER TABLE $importTableName
                        ADD COLUMN $statusFieldName VARCHAR(32)
@@ -415,4 +415,5 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   public function getTitle() {
     return ts('Choose Data Source');
   }
+
 }

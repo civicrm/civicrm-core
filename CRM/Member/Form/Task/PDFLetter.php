@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -113,4 +113,5 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public function listTokens() {
     return CRM_Core_SelectValues::membershipTokens();
   }
+
 }

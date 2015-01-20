@@ -292,4 +292,5 @@ class CRM_Core_Region {
    * ));
    * }
    */
+
 }

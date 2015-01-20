@@ -66,4 +66,5 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
       "assert createTruncatedValue($value, ($sigFigs,$decFigs)) == $expectedValue"
     );
   }
+
 }

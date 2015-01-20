@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -117,4 +117,5 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }
+
 }

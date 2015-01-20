@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -362,4 +362,5 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
     $this->assertElementContainsText("xpath=//form[@id='Participant']/div[2]/div/table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/select", "$campaignTitle");
   }
+
 }

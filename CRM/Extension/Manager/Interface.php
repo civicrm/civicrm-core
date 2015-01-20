@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The extension manager handles installing, disabling enabling, and
@@ -128,4 +128,5 @@ interface CRM_Extension_Manager_Interface {
    * @return mixed
    */
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
+
 }

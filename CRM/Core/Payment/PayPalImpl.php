@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -248,8 +248,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     //$args['desc']           = 'Recurring Contribution';
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
-    $args['profilereference'] =
-      "i={$params['invoiceID']}" .
+    $args['profilereference'] = "i={$params['invoiceID']}" .
       "&m=$component" .
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
@@ -335,7 +334,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['billingfrequency'] = $params['frequency_interval'];
       $args['method'] = "CreateRecurringPaymentsProfile";
       $args['profilestartdate'] = $start_date;
-      $args['desc'] =
+      $args['desc'] = "" .
         $params['description'] . ": " .
         $params['amount'] . " Per " .
         $params['frequency_interval'] . " " .
@@ -343,7 +342,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['amt'] = $params['amount'];
       $args['totalbillingcycles'] = $params['installments'];
       $args['version'] = 56.0;
-      $args['PROFILEREFERENCE'] =
+      $args['PROFILEREFERENCE'] = "" .
         "i=" . $params['invoiceID'] . "&m=" . $component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
@@ -426,7 +425,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $method
    *   Method to check for.
    *
-   * @return boolean
+   * @return bool
    */
   public function isSupported($method = 'cancelSubscription') {
     if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal') {
@@ -774,7 +773,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $result;
   }
 
-  /** This function will take NVPString and convert it to an Associative Array and it will decode the response.
+  /**
+   * This function will take NVPString and convert it to an Associative Array and it will decode the response.
    * It is usefull to search for a particular key and displaying arrays.
    * @nvpstr is NVPString.
    * @nvpArray is Associative Array.
@@ -801,4 +801,5 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     return $result;
   }
+
 }

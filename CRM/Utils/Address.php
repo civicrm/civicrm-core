@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Address utilties
@@ -306,4 +306,5 @@ class CRM_Utils_Address {
     $newSequence = array_unique($newSequence);
     return $newSequence;
   }
+
 }

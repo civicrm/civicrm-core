@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -156,30 +156,30 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     $label = ts('Role');
     $role = array(
-        '-1' => ts('- select role -'),
-        '0' => ts('Everyone'),
-      ) + CRM_Core_OptionGroup::values('acl_role');
+      '-1' => ts('- select role -'),
+      '0' => ts('Everyone'),
+    ) + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
     $group = array(
-        '-1' => ts('- select -'),
-        '0' => ts('All Groups'),
-      ) + CRM_Core_PseudoConstant::group();
+      '-1' => ts('- select -'),
+      '0' => ts('All Groups'),
+    ) + CRM_Core_PseudoConstant::group();
 
     $customGroup = array(
-        '-1' => ts('- select -'),
-        '0' => ts('All Custom Groups'),
-      ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+      '-1' => ts('- select -'),
+      '0' => ts('All Custom Groups'),
+    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
     $ufGroup = array(
-        '-1' => ts('- select -'),
-        '0' => ts('All Profiles'),
-      ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+      '-1' => ts('- select -'),
+      '0' => ts('All Profiles'),
+    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     $event = array(
-        '-1' => ts('- select -'),
-        '0' => ts('All Events'),
-      ) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+      '-1' => ts('- select -'),
+      '0' => ts('All Events'),
+    ) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
     $this->add('select', 'group_id', ts('Group'), $group);
     $this->add('select', 'custom_group_id', ts('Custom Data'), $customGroup);

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -131,7 +131,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Default Organization', $result[0]['civicrm_contact_sort_name']);
     $this->assertEquals('Second Domain', $result[1]['civicrm_contact_sort_name']);
     $this->assertEquals('15 Main St', $result[1]['civicrm_address_street_address']);
-    */
+     */
   }
 
   /**
@@ -200,4 +200,5 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     return $reportTemplates;
   }
+
 }

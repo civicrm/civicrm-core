@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -83,6 +83,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     $this->assertEquals('MUNGE! First Last', $result['values'][$result['id']]['display_name_munged']);
   }
+
 }
 
 /**
@@ -113,4 +114,5 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
     }
     return $result;
   }
+
 }

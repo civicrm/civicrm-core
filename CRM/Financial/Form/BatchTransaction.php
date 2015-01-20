@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -194,4 +194,5 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
     return self::$_links;
   }
+
 }

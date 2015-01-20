@@ -308,4 +308,5 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals(empty($relationshipIds), FALSE, 'In line ' . __LINE__);
     $this->relationshipTypeDelete($relType->id);
   }
+
 }

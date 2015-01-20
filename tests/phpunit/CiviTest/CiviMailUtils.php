@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Mail utils for use during unit testing to allow retrieval
@@ -322,4 +322,5 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     $this->_ut->assertNotEmpty($mail, 'Cannot parse mail');
     return $mail[0];
   }
+
 }

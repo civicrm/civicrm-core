@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -73,4 +73,5 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess('campaign', 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
 }

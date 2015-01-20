@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -462,4 +462,5 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   public function getExportFileName($output = 'csv') {
     return ts('Pledge Search');
   }
+
 }

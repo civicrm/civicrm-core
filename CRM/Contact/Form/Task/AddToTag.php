@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -148,7 +148,7 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
       if ($notAdded) {
         $status[] = ts('%count contact already had this tag', array(
             'count' => $notAdded,
-            'plural' => '%count contacts already had this tag'
+            'plural' => '%count contacts already had this tag',
           ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
@@ -156,4 +156,5 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
     }
 
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -399,4 +399,5 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       ->will($this->returnValue($response));
     return $client;
   }
+
 }

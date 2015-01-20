@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1404,4 +1404,5 @@ WHERE   line_item_civireport.id IS NOT NULL
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     return $paymentInstruments[$value];
   }
+
 }

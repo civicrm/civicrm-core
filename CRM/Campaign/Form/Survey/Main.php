@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,9 +40,9 @@
 class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
   /* values
-     *
-     * @var array
-     */
+   *
+   * @var array
+   */
 
   public $_values;
 
@@ -234,4 +234,5 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     parent::endPostProcess();
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -205,7 +205,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     );
 
     /* Add all the members of groups excluded from this mailing to the temp
-         * table */
+     * table */
 
     $excludeSubGroup = "INSERT INTO        X_$job_id (contact_id)
                     SELECT  DISTINCT    $g2contact.contact_id
@@ -219,7 +219,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup->query($excludeSubGroup);
 
     /* Add all unsubscribe members of base group from this mailing to the temp
-         * table */
+     * table */
 
     $unSubscribeBaseGroup = "INSERT INTO        X_$job_id (contact_id)
                     SELECT  DISTINCT    $g2contact.contact_id
@@ -233,7 +233,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup->query($unSubscribeBaseGroup);
 
     /* Add all the (intended) recipients of an excluded prior mailing to
-         * the temp table */
+     * the temp table */
 
     $excludeSubMailing = "INSERT IGNORE INTO X_$job_id (contact_id)
                     SELECT  DISTINCT    $eq.contact_id
@@ -290,7 +290,7 @@ WHERE  c.group_id = {$groupDAO->id}
     );
 
     /* Get the group contacts, but only those which are not in the
-         * exclusion temp table */
+     * exclusion temp table */
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
 
@@ -3056,4 +3056,5 @@ AND        m.id = %1
     $params['version'] = 3;
     return civicrm_api('MailingContact', 'getcount', $params);
   }
+
 }

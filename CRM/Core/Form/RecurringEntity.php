@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -211,7 +211,7 @@ class CRM_Core_Form_RecurringEntity {
     $form->addDate('exclude_date', ts('Exclude Date(s)'), FALSE);
     $select = $form->add('select', 'exclude_date_list', ts(''), self::$_excludeDateInfo, FALSE, array(
         'style' => 'width:150px;',
-        'size' => 4
+        'size' => 4,
       ));
     $select->setMultiple(TRUE);
     $form->addElement('button', 'add_to_exclude_list', '>>', 'onClick="addToExcludeList(document.getElementById(\'exclude_date\').value);"');
@@ -235,8 +235,8 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Global validation rules for the form
    *
-   * @param array $fields
-   *   Posted values of the form .
+   * @param array $values
+   *   Posted values of the form.
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -369,28 +369,26 @@ class CRM_Core_Form_RecurringEntity {
           if ($optionGroupIdExists) {
             CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
           }
-          $optionGroupParams =
-            array(
-              'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
-              'title' => $type . ' recursion',
-              'is_reserved' => 0,
-              'is_active' => 1,
-            );
+          $optionGroupParams = array(
+            'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
+            'title' => $type . ' recursion',
+            'is_reserved' => 0,
+            'is_active' => 1,
+          );
           $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
           if ($opGroup->id) {
             $oldWeight = 0;
             $fieldValues = array('option_group_id' => $opGroup->id);
             foreach ($excludeDates as $val) {
-              $optionGroupValue =
-                array(
-                  'option_group_id' => $opGroup->id,
-                  'label' => CRM_Utils_Date::processDate($val),
-                  'value' => CRM_Utils_Date::processDate($val),
-                  'name' => $opGroup->name,
-                  'description' => 'Used for recurring ' . $type,
-                  'weight' => CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
-                  'is_active' => 1,
-                );
+              $optionGroupValue = array(
+                'option_group_id' => $opGroup->id,
+                'label' => CRM_Utils_Date::processDate($val),
+                'value' => CRM_Utils_Date::processDate($val),
+                'name' => $opGroup->name,
+                'description' => 'Used for recurring ' . $type,
+                'weight' => CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
+                'is_active' => 1,
+              );
               $excludeDateList[] = $optionGroupValue['value'];
               CRM_Core_BAO_OptionValue::add($optionGroupValue);
             }
@@ -411,7 +409,7 @@ class CRM_Core_Form_RecurringEntity {
           ) {
             call_user_func(array(
                 CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'],
-                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id']))
+                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id'])),
               )
             );
           }

@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -493,4 +493,5 @@ class CRM_Badge_BAO_Badge {
     $eventBadgeClass = new CRM_Badge_BAO_Badge();
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
+
 }

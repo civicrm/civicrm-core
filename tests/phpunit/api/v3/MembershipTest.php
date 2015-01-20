@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Test APIv3 civicrm_membership functions
@@ -1032,4 +1032,5 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-12-21', $result['end_date']);
 
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Perform an upgrade without using the web-frontend
@@ -81,4 +81,5 @@ class CRM_Upgrade_Headless {
       'message' => file_get_contents($postUpgradeMessageFile),
     );
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Start of the Error framework. We should check out and inherit from
@@ -64,6 +64,7 @@ class CRM_Exception extends PEAR_Exception {
   public function __construct($message = NULL, $code = 0, Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
   }
+
 }
 
 /**
@@ -967,6 +968,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     return FALSE;
   }
+
 }
 
 $e = new PEAR_ErrorStack('CRM');

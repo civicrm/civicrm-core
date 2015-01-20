@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Contact_Import_Field
@@ -191,4 +191,5 @@ class CRM_Contact_Import_Field {
       return CRM_Utils_Rule::email($this->_value);
     }
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -332,4 +332,5 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
   }
+
 }

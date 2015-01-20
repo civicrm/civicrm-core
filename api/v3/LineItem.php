@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
@@ -44,10 +44,9 @@
  *
  * @return array
  *   api result array
- * {@getfields line_item_create}
  */
 function civicrm_api3_line_item_create($params) {
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params,True);
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -75,7 +74,6 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *
  * @return array
  *   Array of matching line_items
- * {@getfields line_item_get}
  */
 function civicrm_api3_line_item_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -93,7 +91,6 @@ function civicrm_api3_line_item_get($params) {
  *
  * @return array
  *   API result array
- * {@getfields line_item_delete}
  */
 function civicrm_api3_line_item_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

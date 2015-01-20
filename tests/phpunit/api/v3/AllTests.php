@@ -68,6 +68,7 @@ class api_v3_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class api_v3_AllTests
 

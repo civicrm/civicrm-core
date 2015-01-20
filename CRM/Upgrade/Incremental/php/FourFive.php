@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -142,7 +142,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         $endId = $startId + self::BATCH_SIZE - 1;
         $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(
             1 => $startId,
-            2 => $endId
+            2 => $endId,
           ));
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }
@@ -272,7 +272,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     if ($dao->N) {
-      $domain = new CRM_Core_DAO_Domain;
+      $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       while ($dao->fetch()) {
         $honorParams = array('soft_credit' => array('soft_credit_types' => $honorTypes));
@@ -345,4 +345,5 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     );
     $queue->createItem($task, array('weight' => -1));
   }
+
 }

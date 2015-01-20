@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is the base Action class for all actions which we redefine. This is
@@ -86,4 +86,5 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
       CRM_Utils_System::redirect($destination);
     }
   }
+
 }

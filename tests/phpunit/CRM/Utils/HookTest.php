@@ -65,6 +65,7 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
       $result
     );
   }
+
 }
 
 /* --- Library of test hook implementations --- */

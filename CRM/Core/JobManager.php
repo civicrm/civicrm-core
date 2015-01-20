@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This interface defines methods that need to be implemented
@@ -255,6 +255,7 @@ class CRM_Core_JobManager {
     $message = $apiResult['is_error'] ? ', Error message: ' . $msg : " (" . $vals . ")";
     return $status . $message;
   }
+
 }
 
 /**

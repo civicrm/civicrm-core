@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the jump action.
@@ -78,4 +78,5 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
 
     CRM_Utils_System::redirect($url);
   }
+
 }

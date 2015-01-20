@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -195,4 +195,5 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
   }
+
 }

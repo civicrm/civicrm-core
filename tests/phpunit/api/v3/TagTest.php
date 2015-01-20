@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -199,4 +199,5 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0], 'In line ' . __LINE__);
     $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for'], 'In line ' . __LINE__);
   }
+
 }

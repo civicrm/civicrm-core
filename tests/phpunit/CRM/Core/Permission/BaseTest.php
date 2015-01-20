@@ -42,4 +42,5 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     ));
     $this->assertEquals($expected, $actual);
   }
+
 }

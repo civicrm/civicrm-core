@@ -60,7 +60,6 @@ function civicrm_api3_group_nesting_get($params) {
  *
  * @return array
  *   TBD
- * {@getfields GroupNesting_create
  * @todo Work out the return value.
  */
 function civicrm_api3_group_nesting_create($params) {

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -125,4 +125,5 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
       call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
   }
+
 }

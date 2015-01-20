@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -111,4 +111,5 @@ class CRM_Group_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -182,4 +182,5 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     }
     return $providerInfo[$providerID];
   }
+
 }

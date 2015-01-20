@@ -17,4 +17,5 @@ class CRM_Core_CodeGen_Util_Xml {
     $xml = simplexml_import_dom($dom);
     return $xml;
   }
+
 }

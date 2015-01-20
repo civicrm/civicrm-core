@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -521,7 +521,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $pfv2['id']));
     $this->callAPISuccess('PriceField', 'delete', array('id' => $pricefield['id']));
     $this->callAPISuccess('PriceSet', 'delete', array('id' => $priceset['id']));
-    */
+     */
   }
 
   /**
@@ -729,4 +729,5 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
   }
+
 }

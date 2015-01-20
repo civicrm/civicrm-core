@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1163,4 +1163,5 @@ SELECT  pledge.contact_id              as contact_id,
     $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
   }
+
 }

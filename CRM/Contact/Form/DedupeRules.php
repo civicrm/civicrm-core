@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -290,7 +290,7 @@ UPDATE civicrm_dedupe_rule_group
                 'binary',
                 'varbinary',
                 'text',
-                'blob'
+                'blob',
               ))
           ) {
             $length = NULL;
@@ -317,4 +317,5 @@ UPDATE civicrm_dedupe_rule_group
 
     CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
   }
+
 }

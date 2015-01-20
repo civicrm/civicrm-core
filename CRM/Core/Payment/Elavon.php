@@ -7,7 +7,7 @@
  |                                                                            |
  | Written & Contributed by Eileen McNaughton - Nov March 2008                |
  +----------------------------------------------------------------------------+
-*/
+ */
 
 /**
  * -----------------------------------------------------------------------------------------------
@@ -441,4 +441,5 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
     return $processorResponse;
   }
+
 }

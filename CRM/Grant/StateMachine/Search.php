@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -101,4 +101,5 @@ class CRM_Grant_StateMachine_Search extends CRM_Core_StateMachine {
   public function getTaskFormName() {
     return CRM_Utils_String::getClassName($this->_task);
   }
+
 }

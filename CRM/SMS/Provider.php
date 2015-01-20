@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -89,7 +89,7 @@ abstract class CRM_SMS_Provider {
   /**
    * Send an SMS Message via the API Server
    */
-  abstract function send($recipients, $header, $message, $dncID = NULL);
+  abstract public function send($recipients, $header, $message, $dncID = NULL);
 
   /**
    * Return message text. Child class could override this function to have better control over the message being sent.
@@ -120,7 +120,7 @@ abstract class CRM_SMS_Provider {
    * @param int $jobID
    * @param int $userID
    *
-   * @return $this|null|object
+   * @return self|null|object
    * @throws CRM_Core_Exception
    */
   public function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
@@ -186,7 +186,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @param null $to
    * @param int $trackID
    *
-   * @return $this|null|object
+   * @return self|null|object
    * @throws CRM_Core_Exception
    */
   public function processInbound($from, $body, $to = NULL, $trackID = NULL) {
@@ -209,14 +209,14 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
           1 => array(
             'location_type_id' => $phoneloc,
             'email' => $stripFrom . '@mobile.sms',
-          )
+          ),
         ),
         'phone' => array(
           1 => array(
             'phone_type_id' => $phonetype,
             'location_type_id' => $phoneloc,
             'phone' => $stripFrom,
-          )
+          ),
         ),
       );
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
@@ -355,4 +355,5 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
     return $uri;
   }
+
 }

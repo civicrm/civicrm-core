@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
@@ -101,4 +101,5 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
       throw new CRM_Extension_Exception_MissingException("Missing extension: $key");
     }
   }
+
 }

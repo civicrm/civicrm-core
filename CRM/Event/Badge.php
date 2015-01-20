@@ -21,13 +21,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /*
-* Copyright (C) 2010 Tech To The People
-* Licensed to CiviCRM under the Academic Free License version 3.0.
-*
-*/
+ * Copyright (C) 2010 Tech To The People
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ */
 
 /**
  *
@@ -208,4 +208,5 @@ class CRM_Event_Badge {
     }
     $this->pdf->Output($this->event->title . '.pdf', 'D');
   }
+
 }

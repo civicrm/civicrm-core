@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -502,4 +502,5 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('DataTables_Table_0', 'Employee of');
     $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
+
 }

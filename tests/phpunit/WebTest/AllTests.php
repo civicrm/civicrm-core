@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Include parent class definition
@@ -54,4 +54,5 @@ class WebTest_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }

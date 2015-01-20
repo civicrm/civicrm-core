@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -274,4 +274,5 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('mailing_event', "mailino$firstName@mailson.co.in");
     //------end delivery verification---------
   }
+
 }

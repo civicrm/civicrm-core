@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -52,7 +52,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  function &stringActionLinks() {
+  public function &stringActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_stringActionLinks)) {
 
@@ -150,4 +150,5 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     );
     $this->assign('rows', $rows);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1845,12 +1845,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // & we should aim to move this function to the BAO layer in future.
       // however, we can assume that the contact_id passed in by the batch
       // function will be the recipient
-      list(
-        $form->_contributorDisplayName,
-        $form->_contributorEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails(
-        $formValues['contact_id']
-      );
+      list($form->_contributorDisplayName, $form->_contributorEmail)
+        = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
       if (empty($form->_receiptContactId) || $isBatchProcess) {
         $form->_receiptContactId = $formValues['contact_id'];
       }
@@ -1884,4 +1880,5 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     return TRUE;
   }
+
 }

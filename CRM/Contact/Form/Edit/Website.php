@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -74,4 +74,5 @@ class CRM_Contact_Form_Edit_Website {
 
     $form->addRule("website[$blockId][url]", ts('Enter a valid web location beginning with \'http://\' or \'https://\'. EXAMPLE: http://www.mysite.org/'), 'url');
   }
+
 }

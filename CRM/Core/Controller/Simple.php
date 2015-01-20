@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * We use QFC for both single page and multi page wizards. We want to make
@@ -139,4 +139,5 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
     CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
     return $pageTemplateFile;
   }
+
 }

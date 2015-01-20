@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -378,7 +378,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $dataErrors = array();
 
       /* Do a full token replacement on a dummy verp, the current
-             * contact and domain, and the first organization. */
+       * contact and domain, and the first organization. */
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace
@@ -434,4 +434,5 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public function getTitle() {
     return ts('SMS Content');
   }
+
 }

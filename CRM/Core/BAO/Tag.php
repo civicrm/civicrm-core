@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -126,12 +126,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return array
    */
-  public static function getTagsUsedFor($usedFor = array(
-      'civicrm_contact'
-    ),
-                                        $buildSelect = TRUE,
-                                        $all = FALSE,
-                                        $parentId = NULL
+  public static function getTagsUsedFor(
+    $usedFor = array('civicrm_contact'),
+    $buildSelect = TRUE,
+    $all = FALSE,
+    $parentId = NULL
   ) {
     $tags = array();
 
@@ -198,7 +197,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return array
    */
-  static function getTags(
+  public static function getTags(
     $usedFor = 'civicrm_contact',
     &$tags = array(),
     $parentId = NULL,
@@ -320,7 +319,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param int $id
    *   Tag id.
    *
-   * @return boolean
+   * @return bool
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure
@@ -409,7 +408,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // Disallow empty values except for the number zero.
@@ -437,8 +436,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $dao = CRM_Core_DAO::executeQuery($query, array(
         1 => array(
           '%' . $entityTable . '%',
-          'String'
-        )
+          'String',
+        ),
       ), TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;
@@ -476,4 +475,5 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     return $tags;
   }
+
 }

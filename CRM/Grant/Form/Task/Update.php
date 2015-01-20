@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -109,4 +109,5 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
     CRM_Core_Session::setStatus($status, '', 'info');
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/grant/search', 'force=1&qfKey=' . $qfKey));
   }
+
 }

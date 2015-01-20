@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -230,4 +230,5 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
             AND civicrm_option_group.name = 'contribution_status')
         ";
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -75,7 +75,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
    *
    * @return array|bool
    */
-  function invoke(
+  public function invoke(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
@@ -129,4 +129,5 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
       }
     }
   }
+
 }

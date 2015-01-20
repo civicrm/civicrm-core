@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -313,4 +313,5 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
   }
+
 }

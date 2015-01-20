@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A PHP cron script to format all the addresses in the database. Currently
@@ -287,4 +287,5 @@ class CRM_Utils_Address_BatchUpdate {
     $result['messages'] = implode("", $this->returnMessages);
     return $result;
   }
+
 }

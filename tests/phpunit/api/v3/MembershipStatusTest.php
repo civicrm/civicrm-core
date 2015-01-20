@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -133,6 +133,10 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
 
   ///////////////// civicrm_membership_status_delete methods
+
+  /**
+   * Attempt (and fail) to delete membership status without an parameters.
+   */
   public function testDeleteEmptyParams() {
     $result = $this->callAPIFailure('membership_status', 'delete', array());
   }
@@ -181,4 +185,5 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     ));
     $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
+
 }

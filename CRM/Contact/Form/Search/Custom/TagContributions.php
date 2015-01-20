@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
   /**
    * Construct the search query
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $onlyIDs = FALSE
   ) {
@@ -154,9 +154,9 @@ WHERE  $where
   }
 
   /*
-  * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-  *
-  */
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   *
+   */
   /**
    * @param bool $includeContactIDs
    *
@@ -258,4 +258,5 @@ WHERE  $where
   public function summary() {
     return NULL;
   }
+
 }

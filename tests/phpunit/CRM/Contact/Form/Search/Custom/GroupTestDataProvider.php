@@ -355,4 +355,5 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
   public function valid() {
     return isset($this->dataset[$this->i]);
   }
+
 }

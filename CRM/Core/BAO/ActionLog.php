@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -72,4 +72,5 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
 
     return $actionLog;
   }
+
 }

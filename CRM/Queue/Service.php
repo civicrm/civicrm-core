@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The queue service provides an interface for creating or locating
@@ -168,4 +168,5 @@ class CRM_Queue_Service {
     $class = new ReflectionClass($this->getQueueClass($queueSpec['type']));
     return $class->newInstance($queueSpec);
   }
+
 }

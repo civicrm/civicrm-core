@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -84,6 +84,9 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * }
    */
 
+  /**
+   * Ensure that adding a script URL creates expected markup.
+   */
   public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
@@ -122,10 +125,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
             'fruit' => array(
               'yours' => 'orange',
               'mine' => 'new apple',
-              'ours' => 'banana'
-            )
-          )
-        )
+              'ours' => 'banana',
+            ),
+          ),
+        ),
       ),
       $this->res->getSettings()
     );

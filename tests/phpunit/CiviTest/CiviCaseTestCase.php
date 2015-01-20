@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -140,4 +140,5 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    */
   public function hook_caseTypes(&$caseTypes) {
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -506,4 +506,5 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $unitTest = new CiviUnitTestCase();
     $unitTest->quickCleanup($tablesToTruncate);
   }
+
 }

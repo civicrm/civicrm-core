@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -62,8 +62,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * Build and retrieve the list of data types and descriptions
-   *
-   * @param NULL
    *
    * @return array
    *   Data type => Description
@@ -700,8 +698,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   The custom field ID.
    *
    * @return CRM_Core_DAO_CustomField
-   *   $field  the field object
-   * public
+   *   The field object.
    */
   public static function getFieldObject($fieldID) {
     $field = new CRM_Core_DAO_CustomField();
@@ -1083,9 +1080,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param object $field
    *   The field object.
-   *
-   * @return boolean
-   *
    */
   public static function deleteField($field) {
     CRM_Utils_System::flushCache();
@@ -1103,8 +1097,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
-
-    return;
   }
 
   /**
@@ -1153,7 +1145,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array|mixed|null|string
    */
-  static function getDisplayValueCommon(
+  public static function getDisplayValueCommon(
     $value,
     &$option,
     $html_type,
@@ -1366,7 +1358,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *                               just format the given value
    *
    */
-  static function setProfileDefaults(
+  public static function setProfileDefaults(
     $customFieldId,
     $elementName,
     &$defaults,
@@ -1577,10 +1569,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $includeViewOnly
    *   If true, fields marked 'View Only' are included. Required for APIv3.
    *
-   * @return array
+   * @return array|NULL
    *   formatted custom field array
    */
-  static function formatCustomField(
+  public static function formatCustomField(
     $customFieldId, &$customFormatted, $value,
     $customFieldExtend, $customValueId = NULL,
     $entityId = NULL,
@@ -1615,12 +1607,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     );
 
     if (!array_key_exists($customFieldId, $customFields)) {
-      return;
+      return NULL;
     }
 
     // return if field is a 'code' field
     if (!$includeViewOnly && !empty($customFields[$customFieldId]['is_view'])) {
-      return;
+      return NULL;
     }
 
     list($tableName, $columnName, $groupID) = self::getTableColumnGroup($customFieldId);
@@ -1925,8 +1917,8 @@ SELECT $columnName
    * @param int $newGroupID
    *   FK to civicrm_custom_group.
    *
-   * @return array(
-   * string) or TRUE
+   * @return array
+   *   array(string) or TRUE
    */
   public static function _moveFieldValidate($fieldID, $newGroupID) {
     $errors = array();
@@ -2238,7 +2230,7 @@ ORDER BY html_type";
    *
    * @return array
    */
-  static function postProcess(
+  public static function postProcess(
     &$params,
     &$customFields,
     $entityID,
@@ -2536,4 +2528,5 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
   }
+
 }

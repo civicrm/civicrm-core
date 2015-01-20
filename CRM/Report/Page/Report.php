@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -81,4 +81,5 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     }
     return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
   }
+
 }

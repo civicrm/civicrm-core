@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -305,7 +305,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       if ($returnCode == self::DUPLICATE) {
         if ($returnCode == self::MULTIPLE_DUPE) {
           /* TODO: multi-dupes should be counted apart from singles
-                     * on non-skip action */
+           * on non-skip action */
         }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -666,4 +666,5 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
     return $fileName;
   }
+
 }

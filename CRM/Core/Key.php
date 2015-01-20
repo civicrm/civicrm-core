@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -153,4 +153,5 @@ class CRM_Core_Key {
     // ensure that hash is a 32 digit hex number
     return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
   }
+
 }

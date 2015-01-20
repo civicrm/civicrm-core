@@ -79,4 +79,5 @@ class Membership extends PHPUnit_Framework_Testcase {
       $dao->delete();
     }
   }
+
 }

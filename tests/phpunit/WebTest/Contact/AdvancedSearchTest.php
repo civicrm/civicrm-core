@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -516,4 +516,5 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Contact_upload_view", 'css=.crm-summary-display_name');
     $this->assertElementContainsText('css=.crm-summary-display_name', "$firstName adv$firstName");
   }
+
 }

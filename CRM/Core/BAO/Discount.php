@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,7 +47,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param int $entityId
    * @param string $entityTable
    *
-   * @return boolean
+   * @return bool
    */
   public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
@@ -83,7 +83,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * Determine whether the given table/id
    * has discount associated with it
    *
-   * @param int $entityIdEntity id to be searched.
+   * @param int $entityId
    *   Entity id to be searched.
    * @param string $entityTable
    *   Entity table to be searched.

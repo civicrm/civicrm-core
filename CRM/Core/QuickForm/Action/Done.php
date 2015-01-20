@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the back action.
@@ -81,4 +81,5 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
     // use Done when u want to pop back to the same context without a reset
     $this->popUserContext();
   }
+
 }

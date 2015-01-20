@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1063,4 +1063,5 @@ class CRM_Contribute_BAO_Query {
       'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
     );
   }
+
 }

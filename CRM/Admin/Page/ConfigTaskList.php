@@ -55,4 +55,5 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

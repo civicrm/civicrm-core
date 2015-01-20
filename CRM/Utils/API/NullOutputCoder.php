@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Work-around for CRM-13120 - The "create" action incorrectly returns string literal "null"
@@ -103,4 +103,5 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
       return $result;
     }
   }
+
 }

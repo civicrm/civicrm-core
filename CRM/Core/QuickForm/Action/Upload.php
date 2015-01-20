@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the upload action.
@@ -175,4 +175,5 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
       return $state->handleNextState($page);
     }
   }
+
 }

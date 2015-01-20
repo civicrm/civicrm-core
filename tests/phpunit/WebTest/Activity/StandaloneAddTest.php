@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -186,4 +186,5 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
     }
   }
+
 }

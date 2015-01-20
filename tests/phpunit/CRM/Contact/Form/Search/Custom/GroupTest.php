@@ -272,4 +272,5 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
       'In line ' . __LINE__
     );
   }
+
 }

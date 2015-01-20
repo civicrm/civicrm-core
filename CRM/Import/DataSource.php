@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -68,4 +68,5 @@ abstract class CRM_Import_DataSource {
    * Process the form submission
    */
   abstract public function postProcess(&$params, &$db, &$form);
+
 }

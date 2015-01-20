@@ -87,4 +87,5 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * function testGetRelatedCases() {
    * }
    */
+
 }

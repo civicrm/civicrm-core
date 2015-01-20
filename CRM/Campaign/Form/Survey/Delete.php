@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -106,4 +106,5 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));
     }
   }
+
 }

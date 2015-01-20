@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -140,4 +140,5 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     $optionGroup->find(TRUE);
     return $optionGroup->name;
   }
+
 }

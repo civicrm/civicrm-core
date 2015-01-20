@@ -173,7 +173,7 @@ function _civicrm_api3_report_template_getrows_spec(&$params) {
   );
 }
 
-/*
+/* @codingStandardsIgnoreStart
 function civicrm_api3_report_template_getfields($params) {
   return civicrm_api3_create_success(array(
     'id' => array(
@@ -270,4 +270,5 @@ function civicrm_api3_report_template_getfields($params) {
       'default' => 'UL',
     ),
   ));
-}*/
+}
+@codingStandardsIgnoreEnd */

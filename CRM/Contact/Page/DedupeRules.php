@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -155,9 +155,9 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       $action = array_sum(array_keys($this->links()));
       $links = self::links();
       /* if ($dao->is_default) {
-        unset($links[CRM_Core_Action::MAP]);
-        unset($links[CRM_Core_Action::DELETE]);
-        }*/
+      unset($links[CRM_Core_Action::MAP]);
+      unset($links[CRM_Core_Action::DELETE]);
+      }*/
 
       if ($dao->is_reserved) {
         unset($links[CRM_Core_Action::DELETE]);
@@ -223,4 +223,5 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $rgDao->id = $id;
     $rgDao->delete();
   }
+
 }

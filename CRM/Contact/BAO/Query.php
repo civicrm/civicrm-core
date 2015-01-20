@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -5647,4 +5647,5 @@ AND   displayRelType.is_active = 1
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
   }
+
 }

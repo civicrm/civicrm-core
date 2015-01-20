@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -182,11 +182,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
-      list($defaults['trxn_date'],
-        $defaults['trxn_date_time']
-        ) = CRM_Utils_Date::setDateDefaults(
-        CRM_Utils_Array::value('register_date', $defaults), 'activityDateTime'
-      );
+      list($defaults['trxn_date'], $defaults['trxn_date_time'])
+        = CRM_Utils_Date::setDateDefaults(
+          CRM_Utils_Array::value('register_date', $defaults),
+          'activityDateTime'
+        );
     }
 
     if ($this->_refund) {
@@ -709,4 +709,5 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     return $mailSent;
   }
+
 }

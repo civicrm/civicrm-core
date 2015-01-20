@@ -126,4 +126,5 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     CRM_Utils_Array::remove($data, 'one', 'two', array('three', 'four'), 'five');
     $this->assertEquals($data, array('six' => 6));
   }
+
 }

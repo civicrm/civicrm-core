@@ -134,4 +134,5 @@ class CRM_Utils_SQL_Insert {
 
     return $sql;
   }
+
 }

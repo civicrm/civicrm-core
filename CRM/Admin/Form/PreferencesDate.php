@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -137,4 +137,5 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
       array(1 => $params['name'])
     ), ts('Saved'), 'success');
   }
+
 }

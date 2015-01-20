@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -336,7 +336,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton($mode, $processor);
     }
     /*
-     CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
+    CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
      */
     return $processors['values'];
   }
@@ -475,4 +475,5 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
 
     return $result;
   }
+
 }

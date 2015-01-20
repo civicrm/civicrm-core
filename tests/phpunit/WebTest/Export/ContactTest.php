@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
 
@@ -473,4 +473,5 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue", $params);
     return $optionLabel;
   }
+
 }

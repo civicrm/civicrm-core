@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The InnoDB indexer is responsible for creating and destroying
@@ -278,4 +278,5 @@ class CRM_Core_InnoDBIndexer {
   public function getActive() {
     return $this->isActive;
   }
+
 }

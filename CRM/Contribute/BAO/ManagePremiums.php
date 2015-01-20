@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -149,4 +149,5 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     $premium->id = $productID;
     $premium->delete();
   }
+
 }

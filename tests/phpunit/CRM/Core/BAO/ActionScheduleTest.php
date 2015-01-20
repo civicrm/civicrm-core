@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -945,7 +945,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @return array|NULL|object
    */
-  function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
+  public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);

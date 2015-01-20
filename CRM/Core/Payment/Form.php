@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -426,4 +426,5 @@ class CRM_Core_Payment_Form {
   public static function getCreditCardExpirationYear($src) {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
   }
+
 }

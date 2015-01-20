@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -131,4 +131,5 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $bao = new CRM_Campaign_BAO_Petition();
     $bao->confirmSignature($activity_id, $contact_id, $petition_id);
   }
+
 }

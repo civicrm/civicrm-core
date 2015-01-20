@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is our base form. It is part of the Form/Controller/StateMachine
@@ -167,7 +167,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return \CRM_Core_Form
    */
-  function __construct(
+  public function __construct(
     $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
@@ -267,7 +267,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return HTML_QuickForm_Element could be an error object
    */
-  function &add(
+  public function &add(
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
@@ -348,7 +348,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Respond with JSON if in AJAX context (also support legacy value '6')
     if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(
           CRM_Core_Smarty::PRINT_JSON,
-          6
+          6,
         ))
     ) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
@@ -388,10 +388,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * access        public
    *
-   * @return array
+   * @return array|NULL
    *   reference to the array of default values
    */
   public function setDefaultValues() {
+    return NULL;
   }
 
   /**
@@ -408,7 +409,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Performs the server side validation
    * @since     1.0
-   * @return boolean
+   * @return bool
    *   true if no error found
    * @throws    HTML_QuickForm_Error
    */
@@ -501,10 +502,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add default Next / Back buttons
    *
-   * @param array array of associative arrays in the order in which the buttons should be
-   *                displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
-   *                The base form class will define a bunch of static arrays for commonly used
-   *                formats
+   * @param array $params
+   *   Array of associative arrays in the order in which the buttons should be
+   *   displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
+   *   The base form class will define a bunch of static arrays for commonly used
+   *   formats.
    *
    * @return void
    */
@@ -619,7 +621,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for options
    *
-   * @param mixed
+   * @param mixed $options
    *
    * @return void
    */
@@ -642,7 +644,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Boolean function to determine if this is a one form page
    *
-   * @return boolean
+   * @return bool
    */
   public function isSimpleForm() {
     return $this->_state->getType() & (CRM_Core_State::START | CRM_Core_State::FINISH);
@@ -660,7 +662,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for Form Action
    *
-   * @param string
+   * @param string $action
    *
    * @return void
    */
@@ -762,9 +764,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Store the variable with the value in the form scope
    *
-   * @param string name : name of the variable
-   * @param mixed value : value of the variable
-   *
+   * @param string $name
+   *   Name of the variable.
+   * @param mixed $value
+   *   Value of the variable.
    *
    * @return void
    */
@@ -775,8 +778,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the variable from the form scope
    *
-   * @param string name : name of the variable
-   *
+   * @param string $name
+   *   Name of the variable
    *
    * @return mixed
    */
@@ -918,7 +921,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $separator
    * @param bool $flipValues
    */
-  function addCheckBox(
+  public function addCheckBox(
     $id, $title, $values, $other = NULL,
     $attributes = NULL, $required = NULL,
     $javascriptMethod = NULL,
@@ -1173,7 +1176,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addCountry($id, $title, $required = NULL, $extra = NULL) {
     $this->addElement('select', $id, $title,
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + CRM_Core_PseudoConstant::country(), $extra
     );
     if ($required) {
@@ -1276,20 +1279,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add date
-   * @param string $name
-   *   Name of the element.
-   * @param string $label
-   *   Label of the element.
-   * @param array $attributes
-   *   Key / value pair.
    *
+   * @code
    * // if you need time
    * $attributes = array(
    *   'addTime' => true,
    *   'formatType' => 'relative' or 'birth' etc check advanced date settings
    * );
+   * @endcode
+   *
+   * @param string $name
+   *   Name of the element.
+   * @param string $label
+   *   Label of the element.
    * @param bool $required
    *   True if required.
+   * @param array $attributes
+   *   Key / value pair.
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
     if (!empty($attributes['formatType'])) {
@@ -1387,7 +1393,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add a currency and money element to the form
    */
-  function addMoney(
+  public function addMoney(
     $name,
     $label,
     $required = FALSE,
@@ -1410,7 +1416,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add currency element to the form
    */
-  function addCurrency(
+  public function addCurrency(
     $name = 'currency',
     $label = NULL,
     $required = TRUE,
@@ -1566,7 +1572,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - cid from the url if the caller has ACL permission to view
    *   - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
    *
-   * @return NULL|integer
+   * @return NULL|int
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -1655,7 +1661,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array(
           'placeholder' => $autoCompleteField['placeholder'],
-          'api' => $autoCompleteField['api']
+          'api' => $autoCompleteField['api'],
         ));
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
@@ -1780,7 +1786,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'country',
           'Country',
           'state_province',
-          'StateProvince'
+          'StateProvince',
         ), $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
       'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
@@ -1873,4 +1879,5 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
   }
+
 }

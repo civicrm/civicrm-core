@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -104,4 +104,5 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
       ), 'Unable to Delete', 'error');
     }
   }
+
 }

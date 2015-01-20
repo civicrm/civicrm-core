@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -100,4 +100,5 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }
+
 }

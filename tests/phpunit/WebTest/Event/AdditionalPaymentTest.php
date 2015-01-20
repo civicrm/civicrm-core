@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -217,4 +217,5 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
   }
+
 }

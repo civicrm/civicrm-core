@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -459,4 +459,5 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   public function getTitle() {
     return $this->eventToTitle();
   }
+
 }

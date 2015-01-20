@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1264,4 +1264,5 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     }
     return $properties;
   }
+
 }

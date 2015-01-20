@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -405,4 +405,5 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
       }
     }
   }
+
 }

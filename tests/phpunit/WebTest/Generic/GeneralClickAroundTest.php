@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -357,4 +357,5 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Profiles - Admin Notification");
     $this->assertTextPresent("Tell-a-Friend Email");
   }
+
 }

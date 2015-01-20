@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
@@ -51,4 +51,5 @@ class AuthorizeEvent extends Event {
   public function isAuthorized() {
     return $this->authorized;
   }
+
 }

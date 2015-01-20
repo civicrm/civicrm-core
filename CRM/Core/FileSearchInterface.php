@@ -23,4 +23,5 @@ interface CRM_Core_FileSearchInterface {
    *   - xparent_id: int - business-entity to which file is attached (directly or indirectly)
    */
   public function search($query, $limit = self::DEFAULT_SEARCH_LIMIT, $offset = self::DEFAULT_SEARCH_OFFSET);
+
 }

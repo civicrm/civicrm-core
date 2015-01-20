@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -552,4 +552,5 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     }
     CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
   }
+
 }

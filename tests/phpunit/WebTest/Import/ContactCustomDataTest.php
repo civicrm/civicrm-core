@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -190,4 +190,5 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
     return array("custom_{$customFieldId}", $customField, $customGroupTitle);
   }
+
 }

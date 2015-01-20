@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -276,4 +276,5 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       CRM_Core_Session::setStatus(ts("No updates have been saved."), ts('Not Saved'), 'alert');
     }
   }
+
 }

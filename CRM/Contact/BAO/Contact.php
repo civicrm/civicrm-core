@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -113,7 +113,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+   * @return CRM_Contact_BAO_Contact|CRM_Core_Error|NULL
    *   Created or updated contact object or error object.
    *   (error objects are being phased out in favour of exceptions)
    */
@@ -121,7 +121,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $contact = new CRM_Contact_DAO_Contact();
 
     if (empty($params)) {
-      return;
+      return NULL;
     }
 
     // Fix for validate contact sub type CRM-5143.
@@ -536,8 +536,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   public function createDefaultCrudLink($crudLinkSpec) {
     switch ($crudLinkSpec['action']) {
       case CRM_Core_Action::VIEW:
-
-        return array(
+        $result = array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/view',
           'query' => array(
@@ -545,9 +544,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'cid' => $this->id,
           ),
         );
+        return $result;
 
       case CRM_Core_Action::UPDATE:
-        return array(
+        $result = array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/add',
           'query' => array(
@@ -556,6 +556,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'cid' => $this->id,
           ),
         );
+        return $result;
     }
     return NULL;
   }
@@ -1624,10 +1625,10 @@ WHERE id={$id}; ";
 
     // We don't know the contents of return properties, but we need the lower
     // level ids of the contact so add a few fields.
-    $returnProperties['first_name'] =
-    $returnProperties['organization_name'] =
-    $returnProperties['household_name'] =
-    $returnProperties['contact_type'] =
+    $returnProperties['first_name'] = 1;
+    $returnProperties['organization_name'] = 1;
+    $returnProperties['household_name'] = 1;
+    $returnProperties['contact_type'] = 1;
     $returnProperties['contact_sub_type'] = 1;
     return list($query, $options) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, $options);
   }
@@ -2556,11 +2557,11 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Core_BAO_EntityTag::getContactTags($contactId, TRUE);
 
       case 'rel':
-
-        return CRM_Contact_BAO_Relationship::getRelationship($contactId,
+        $result = CRM_Contact_BAO_Relationship::getRelationship($contactId,
           CRM_Contact_BAO_Relationship::CURRENT,
           0, 1
         );
+        return $result;
 
       case 'group':
 
@@ -3133,7 +3134,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param int $contactId
    *
    * @return array
-   *  Dates - ('created_date' => $, 'modified_date' => $)
+   *   Dates - ('created_date' => $, 'modified_date' => $)
    */
   public static function getTimestamps($contactId) {
     $timestamps = CRM_Core_DAO::executeQuery(
@@ -3301,7 +3302,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
@@ -3370,4 +3371,5 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     $obj->free();
     return TRUE;
   }
+
 }

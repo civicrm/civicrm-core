@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -48,4 +48,5 @@ class CRM_Case_Form_ActivityChangeStatus extends CRM_Core_Form {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $this->add('select', 'activity_change_status', ts('New Status'), $activityStatus);
   }
+
 }

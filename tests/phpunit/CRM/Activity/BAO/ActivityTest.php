@@ -544,4 +544,5 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // This contact does not have any activities
     $this->assertEquals(0, count($activities), 'In line ' . __LINE__);
   }
+
 }

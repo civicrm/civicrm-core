@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -168,4 +168,5 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
     $this->assign('rows', $membershipType);
   }
+
 }

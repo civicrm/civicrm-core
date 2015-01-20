@@ -102,4 +102,5 @@ class SequenceListener implements CaseChangeListener {
     $r = civicrm_api3('Activity', 'create', $params);
     $analyzer->flush();
   }
+
 }

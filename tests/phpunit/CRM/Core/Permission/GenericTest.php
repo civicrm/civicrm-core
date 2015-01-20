@@ -39,4 +39,5 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
     $provider = new $providerClass();
     $this->assertEquals(TRUE, $provider->check(CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION));
   }
+
 }

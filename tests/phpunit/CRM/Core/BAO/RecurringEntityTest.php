@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Core/BAO/RecurringEntity.php';
@@ -256,4 +256,5 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $compareActParams = array();
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
   }
+
 }

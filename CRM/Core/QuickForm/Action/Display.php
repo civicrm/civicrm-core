@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the display action.
@@ -225,4 +225,5 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     self::$_requiredTemplate = file_get_contents($templateDir . '/CRM/Form/label.tpl');
     self::$_errorTemplate = file_get_contents($templateDir . '/CRM/Form/error.tpl');
   }
+
 }

@@ -98,9 +98,10 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
    * the $params passed in is not an array.
    */
   public function testParamsNotArray() {
-    /*I have commented this out as the check for is_array has been moved to civicrm_api. But keeping in place as
-    * this test, in contrast to the standards test, tests all existing API rather than just CRUD ones
-    * so want to keep code for re-use
+    /* @codingStandardsIgnoreStart
+     * I have commented this out as the check for is_array has been moved to civicrm_api. But keeping in place as
+     * this test, in contrast to the standards test, tests all existing API rather than just CRUD ones
+     * so want to keep code for re-use
         $files = $this->getAllFilesinAPIDir();
         $this->assertGreaterThan(1, count($files),"something has gone wrong listing the files in line " . __LINE__);
         $this->requireOnceFilesArray($files);
@@ -118,7 +119,8 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
               continue;
             }
 
-        }*/
+        }
+    @codingStandardsIgnoreEnd */
   }
 
   /**
@@ -172,4 +174,5 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
     }
     return $functions;
   }
+
 }

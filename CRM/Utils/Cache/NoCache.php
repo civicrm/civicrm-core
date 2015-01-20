@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -87,4 +87,5 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
   public function flush() {
     return FALSE;
   }
+
 }

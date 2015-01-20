@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -405,4 +405,5 @@ class CRM_Utils_PDF_Utils {
       CRM_Core_Error::statusBounce("PDFlib Error: " . $excp->get_errmsg());
     }
   }
+
 }

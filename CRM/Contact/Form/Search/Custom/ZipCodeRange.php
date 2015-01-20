@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -188,4 +188,5 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

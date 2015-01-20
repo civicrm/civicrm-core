@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -63,11 +63,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     $this->add('select', 'label_name', ts('Select Label'), array('' => ts('- select label -')) + $label, TRUE);
 
-
     // add select for Location Type
     $this->addElement('select', 'location_type_id', ts('Select Location'),
       array(
-        '' => ts('Primary')
+        '' => ts('Primary'),
       ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
     );
 
@@ -92,8 +91,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Set default values for the form.
-   *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -291,7 +288,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
                   'email',
                   'phone',
                   'im',
-                  'openid'
+                  'openid',
                 ))) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];
@@ -391,8 +388,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *   Format in which labels needs to be printed.
    * @param string $fileName
    *   The name of the file to save the label in.
-   *
-   * @return null
    */
   public function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
@@ -411,6 +406,5 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
     $pdf->Output($fileName, 'D');
   }
-
 
 }

@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -87,4 +87,5 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
+
 }

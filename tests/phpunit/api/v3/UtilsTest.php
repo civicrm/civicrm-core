@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Utils/DeprecatedUtils.php';
@@ -312,4 +312,5 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
     $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
+
 }

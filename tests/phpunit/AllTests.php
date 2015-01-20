@@ -59,6 +59,7 @@ class AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class AllTests
 

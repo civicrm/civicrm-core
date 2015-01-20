@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -157,4 +157,5 @@ AND        civicrm_activity_contact.record_type_id = $assigneeID
     }
     return $assigneeNames;
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -272,4 +272,5 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
     }
     return FALSE;
   }
+
 }

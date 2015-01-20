@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -511,8 +511,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     }
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders
-        = array_merge(
+      self::$_columnHeaders = array_merge(
         self::$_columnHeaders,
         array(
           array(
@@ -570,4 +569,5 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   public function getSummary() {
     return $this->_query->summaryContribution($this->_context);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,7 +43,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public function check($str) {
@@ -102,6 +102,6 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
-    return;
   }
+
 }

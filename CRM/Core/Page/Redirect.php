@@ -56,4 +56,5 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
 
     return $url;
   }
+
 }

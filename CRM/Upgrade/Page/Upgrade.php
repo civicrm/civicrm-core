@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -203,4 +203,5 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $content = $template->fetch('CRM/common/success.tpl');
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
   }
+
 }

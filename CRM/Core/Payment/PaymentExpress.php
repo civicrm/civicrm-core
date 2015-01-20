@@ -21,7 +21,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -128,10 +128,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   *   the result in an nice formatted array (or an error object)
-   * @abstract
    */
   public function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
@@ -274,4 +270,5 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       CRM_Utils_System::redirect($request_string);
     }
   }
+
 }

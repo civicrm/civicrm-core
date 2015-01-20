@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -72,8 +72,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @param int $id
    *   Group id.
-   *
-   * @return NULL
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -238,7 +236,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @todo other BAO functions that use returnProperties (e.g. Query Objects) receive the array flipped & filled with 1s and
    * add in essential fields (e.g. id). This should follow a regular pattern like the others
    */
-  static function getGroups(
+  public static function getGroups(
     $params = NULL,
     $returnProperties = NULL,
     $sort = NULL,
@@ -517,8 +515,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $this->where_tables = serialize($whereTables);
       }
     }
-
-    return;
   }
 
   /**
@@ -994,7 +990,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @return array
    */
-  static function getGroupsHierarchy(
+  public static function getGroupsHierarchy(
     $groupIDs,
     $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
@@ -1224,7 +1220,6 @@ WHERE {$whereClause}";
 
     $clauses[] = self::getPermissionClause();
 
-
     return implode(' AND ', $clauses);
   }
 
@@ -1286,4 +1281,5 @@ WHERE {$whereClause}";
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
   }
+
 }

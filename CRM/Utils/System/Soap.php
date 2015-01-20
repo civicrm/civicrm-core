@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -203,4 +203,5 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
   }
+
 }

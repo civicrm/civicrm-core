@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -77,4 +77,5 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
         return parent::load($options, $param1, $param2, $param3, $param4);
     }
   }
+
 }

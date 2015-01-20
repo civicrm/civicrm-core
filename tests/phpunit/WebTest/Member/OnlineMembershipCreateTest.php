@@ -335,4 +335,5 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($expected);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -54,7 +54,7 @@ class CRM_Core_OptionGroup {
    *
    * @return array
    */
-  static function &valuesCommon(
+  public static function &valuesCommon(
     $dao, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $valueColumnName = 'label'
   ) {
@@ -115,7 +115,7 @@ class CRM_Core_OptionGroup {
    *   the values as specified by the above params
    * @void
    */
-  static function &values(
+  public static function &values(
     $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
     $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value'
@@ -374,7 +374,7 @@ WHERE  v.option_group_id = g.id
    *
    * @return null
    */
-  static function getValue(
+  public static function getValue(
     $groupName,
     $label,
     $labelField = 'label',
@@ -594,7 +594,7 @@ SELECT v.label
    *
    * @return array
    */
-  static function getRowValues(
+  public static function getRowValues(
     $groupName, $fieldValue, $field = 'name',
     $fieldType = 'String', $active = TRUE
   ) {
@@ -626,7 +626,7 @@ WHERE  v.option_group_id = g.id
                  'value',
                  'label',
                  'weight',
-                 'description'
+                 'description',
                ) as $fld) {
         $row[$fld] = $dao->$fld;
       }
@@ -683,4 +683,5 @@ WHERE  v.option_group_id = g.id
     self::$_cache = array();
     CRM_Utils_Cache::singleton()->flush();
   }
+
 }

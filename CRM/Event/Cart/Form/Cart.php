@@ -176,4 +176,5 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     $container = $this->controller->container();
     return $container['values'][$page_name];
   }
+
 }

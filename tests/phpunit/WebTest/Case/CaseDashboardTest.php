@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -123,4 +123,5 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.crm-form-submit");
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Drilldown on dashboard summary cells not properly setting search form value to my cases.');
   }
+
 }

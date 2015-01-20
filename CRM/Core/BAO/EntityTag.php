@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class contains functions for managing Tag(tag) for a contact
@@ -413,4 +413,5 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
     return $options;
   }
+
 }

@@ -59,6 +59,7 @@ class CRM_Contacts_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class CRM_Contacts_AllTests
 

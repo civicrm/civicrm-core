@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -299,4 +299,5 @@ WHERE entity_table = '{$tableName}'
       $this->_lookupCache[$dao->slave_id] = $dao->master_id;
     }
   }
+
 }

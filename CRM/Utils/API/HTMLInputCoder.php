@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class captures the encoding practices of CRM-5667 in a reusable
@@ -146,4 +146,5 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
     }
   }
+
 }

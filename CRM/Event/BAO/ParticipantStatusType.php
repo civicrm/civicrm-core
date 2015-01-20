@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -321,4 +321,5 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
 
     return array('is_error' => 0, 'messages' => $returnMessages);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This file contains the various menus of the CiviCRM module
@@ -745,4 +745,5 @@ UNION (
     }
     return $arr;
   }
+
 }

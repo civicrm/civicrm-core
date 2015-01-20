@@ -68,4 +68,5 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       OR label = "CRM_Contact_Form_Search_Custom_Examplez"
       ');
   }
+
 }

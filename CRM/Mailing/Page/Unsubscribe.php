@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -38,4 +38,5 @@ class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
     $this->_type = 'unsubscribe';
     return parent::run();
   }
+
 }

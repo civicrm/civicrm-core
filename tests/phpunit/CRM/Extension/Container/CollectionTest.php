@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -55,7 +55,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
         'test.whiz',
         'test.whizbang',
         'test.foo',
-        'test.foo.bar'
+        'test.foo.bar',
       ), $c->getKeys());
   }
 
@@ -146,4 +146,5 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $c = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
     return $c;
   }
+
 }

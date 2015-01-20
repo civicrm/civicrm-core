@@ -242,4 +242,5 @@ class CRM_Contribute_Form_SoftCredit {
 
     return $errors;
   }
+
 }

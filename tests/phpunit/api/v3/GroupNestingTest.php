@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -241,4 +241,5 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   public function testDeleteWithEmptyParams() {
     $result = $this->callAPIFailure('group_nesting', 'delete', array());
   }
+
 }

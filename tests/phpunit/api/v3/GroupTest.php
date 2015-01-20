@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -145,4 +145,5 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description, 'getfields', 'getfields');
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
+
 }

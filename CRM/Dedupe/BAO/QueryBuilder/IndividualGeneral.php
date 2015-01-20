@@ -68,4 +68,5 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
               AND " . self::internalFilters($rg);
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
+
 }

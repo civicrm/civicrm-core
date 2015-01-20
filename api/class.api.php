@@ -352,4 +352,5 @@ class civicrm_api3 {
   public function result() {
     return $this->lastResult;
   }
+
 }

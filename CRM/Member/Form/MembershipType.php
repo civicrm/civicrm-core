@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -82,7 +82,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $defaults['relationship_type_id'][] = $value . '_' . $relDirections[$key];
       }
     }
-
 
     //setting default fixed_period_start_day & fixed_period_rollover_day
     $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
@@ -235,7 +234,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     if (in_array(CRM_Utils_Array::value('auto_renew', $params), array(
       1,
-      2
+      2,
     ))) {
       if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
         ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')
@@ -438,4 +437,5 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
     }
   }
+
 }

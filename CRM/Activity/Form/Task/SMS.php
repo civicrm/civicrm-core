@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class provides the functionality to sms a group of
@@ -78,4 +78,5 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
   public function postProcess() {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
   }
+
 }

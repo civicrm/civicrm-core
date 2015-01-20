@@ -94,4 +94,5 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('activity_type', 'delete', $params, __FUNCTION__, __FILE__);
   }
+
 }

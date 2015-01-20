@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -267,4 +267,5 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3, '20080510');
     $this->assertEquals('20140510000000', $date);
   }
+
 }

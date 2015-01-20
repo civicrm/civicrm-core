@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -126,4 +126,5 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
   public function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
     return parent::run($args, $pageArgs, "component_type, is_default desc, name");
   }
+
 }

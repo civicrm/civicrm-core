@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -441,4 +441,5 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
         "reset=1&task=billing&result={$result}"));
     }
   }
+
 }

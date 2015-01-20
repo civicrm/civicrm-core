@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -104,4 +104,5 @@ interface CRM_Contact_Form_Search_Interface {
    * Returns an array of column headers and field names and sort options
    */
   public function &columns();
+
 }

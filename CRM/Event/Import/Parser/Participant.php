@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -508,4 +508,5 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    */
   public function fini() {
   }
+
 }

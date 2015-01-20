@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -135,4 +135,5 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   public function getTitle() {
     return ts('Tell a Friend');
   }
+
 }

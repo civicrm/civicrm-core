@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
@@ -302,4 +302,5 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           '', 'error');
     }
   }
+
 }

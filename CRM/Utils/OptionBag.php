@@ -145,5 +145,4 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
     return count($this->data);
   }
 
-
 }

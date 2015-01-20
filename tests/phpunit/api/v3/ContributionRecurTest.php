@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -86,4 +86,5 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
+
 }

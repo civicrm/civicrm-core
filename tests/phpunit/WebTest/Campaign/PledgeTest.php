@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -181,4 +181,5 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     // verify Activity created
     $this->verifyText("xpath=//form[@id='PledgeView']//table/tbody/tr[8]/td[2]", preg_quote($campaignTitle));
   }
+
 }

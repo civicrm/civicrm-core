@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class representing the table relationships
@@ -85,4 +85,5 @@ class CRM_Core_TableHierarchy {
 
     return self::$info;
   }
+
 }

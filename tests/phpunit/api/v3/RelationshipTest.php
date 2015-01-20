@@ -1118,4 +1118,5 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 0));
     $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 1));
   }
+
 }

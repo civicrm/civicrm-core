@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -190,4 +190,5 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
     $this->assertEquals($financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -609,4 +609,5 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    */
   public function fini() {
   }
+
 }

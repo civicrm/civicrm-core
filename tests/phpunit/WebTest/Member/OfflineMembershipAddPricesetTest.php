@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -444,4 +444,5 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr/td/span[text()='{$amount}']"));
     $this->click("_qf_MembershipView_cancel-bottom");
   }
+
 }

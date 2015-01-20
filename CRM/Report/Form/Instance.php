@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -336,4 +336,5 @@ class CRM_Report_Form_Instance {
       CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/report/instance/{$instance->id}", "reset=1"));
     }
   }
+
 }

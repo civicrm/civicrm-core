@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
-* Copyright (C) 2010 Tech To The People
-* Licensed to CiviCRM under the Academic Free License version 3.0.
-*
-*/
+ * Copyright (C) 2010 Tech To The People
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ */
 
 /**
  *
@@ -58,4 +58,5 @@ class CRM_Event_Badge_Simple extends CRM_Event_Badge {
     $this->pdf->Cell($this->pdf->width, $this->pdf->lineHeight, $participant['current_employer'], 0, 2, "C");
     //$this->pdf->MultiCell ($this->pdf->width, $this->pdf->lineHeight, $txt,1,"L");
   }
+
 }

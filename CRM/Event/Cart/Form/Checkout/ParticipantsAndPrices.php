@@ -248,4 +248,5 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
     $this->cart->save();
   }
+
 }

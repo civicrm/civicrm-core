@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This files provides several classes for doing command line work with
@@ -307,6 +307,7 @@ class civicrm_cli {
     // that properly logs
     print "$error\n";
   }
+
 }
 
 /**
@@ -348,6 +349,7 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     fclose($out);
     echo "\n";
   }
+
 }
 
 /**
@@ -422,6 +424,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $params['version'] = 3;
     return $params;
   }
+
 }
 
 /**
@@ -442,6 +445,7 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
       echo "\nline " . $this->row . ": created " . $this->_entity . " id: " . $result['id'] . "\n";
     }
   }
+
 }
 
 /**
@@ -462,4 +466,5 @@ class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
       echo "\nline " . $this->row . ": deleted\n";
     }
   }
+
 }

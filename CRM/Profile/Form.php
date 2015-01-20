@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1379,4 +1379,5 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
+
 }

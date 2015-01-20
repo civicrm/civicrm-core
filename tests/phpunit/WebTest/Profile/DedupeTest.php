@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -87,4 +87,5 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
     $this->waitForTextPresent("A record already exists with the same information.");
   }
+
 }

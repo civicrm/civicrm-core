@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -126,4 +126,5 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
     }
     return FALSE;
   }
+
 }

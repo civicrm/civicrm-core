@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -522,4 +522,5 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-contact-relationship-current']/div/table/tbody/tr/td[2]/a[text()='Organization $org3']"));
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
   }
+
 }

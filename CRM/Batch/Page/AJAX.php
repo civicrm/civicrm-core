@@ -117,4 +117,5 @@ class CRM_Batch_Page_AJAX {
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -56,4 +56,5 @@ class CRM_Upgrade_StateMachine extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -58,9 +58,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
 
     // add select for groups
-    $group = array(
-        '' => ts('- select -')
-      ) + $form->_group;
+    $group = array('' => ts('- select -')) + $form->_group;
     $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group?'), $group);
 
     //add notify field
@@ -101,4 +99,5 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity Search'));
   }
+
 }

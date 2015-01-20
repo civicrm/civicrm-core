@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -125,4 +125,5 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
     $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
   }
+
 }

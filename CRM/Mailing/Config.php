@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -90,4 +90,5 @@ class CRM_Mailing_Config extends CRM_Core_Component_Config {
    * @var int
    */
   public $mailThrottleTime = 0;
+
 }

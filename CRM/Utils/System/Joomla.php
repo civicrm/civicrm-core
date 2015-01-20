@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -904,4 +904,5 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.joomla.js';
   }
+
 }

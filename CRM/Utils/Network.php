@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -85,4 +85,5 @@ class CRM_Utils_Network {
     error_reporting($old_error_reporting);
     return FALSE;
   }
+
 }

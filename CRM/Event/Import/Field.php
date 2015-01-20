@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Event_Import_Field
@@ -114,7 +114,7 @@ class CRM_Event_Import_Field {
       case 'register_date':
         return CRM_Utils_Rule::date($this->_value);
 
-      /*
+      /* @codingStandardsIgnoreStart
         case 'event_id':
             static $events = null;
             if (!$events) {
@@ -127,7 +127,7 @@ class CRM_Event_Import_Field {
                 return false;
             }
             break;
-            */
+      @codingStandardsIgnoreEnd */
 
       default:
         break;
@@ -147,4 +147,5 @@ class CRM_Event_Import_Field {
     }
     return TRUE;
   }
+
 }

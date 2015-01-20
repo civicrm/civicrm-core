@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Core_Report_Excel
@@ -43,9 +43,8 @@ class CRM_Core_Report_Excel {
    * @param string $rows
    *   (reference ) result set rows.
    * @param null $titleHeader
-   * @param bool $printShould the output be printed.
+   * @param bool $print
    *   Should the output be printed.
-   *
    * @param bool $outputHeader
    *
    * @return mixed

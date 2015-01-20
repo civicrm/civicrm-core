@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -147,4 +147,5 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
 
     CRM_Core_Session::setStatus(ts("The contribution page '%1' has been deleted.", array(1 => $this->_title)), ts('Deleted'), 'success');
   }
+
 }

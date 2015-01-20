@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -131,4 +131,5 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The changes have not been saved.'), ts('Saved'), 'success');
     }
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -160,9 +160,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_pcpId;
 
   /* Is event already full.
-     *
-     * @var boolean
-     */
+   *
+   * @var boolean
+   */
 
   public $_isEventFull;
 
@@ -1410,4 +1410,5 @@ WHERE  v.option_group_id = g.id
       CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
     }
   }
+
 }

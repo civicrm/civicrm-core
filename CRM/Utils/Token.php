@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -592,7 +592,7 @@ class CRM_Utils_Token {
     $escapeSmarty = FALSE
   ) {
     /* If the token is an email action, use it.  Otherwise, find the
-         * appropriate URL */
+     * appropriate URL */
 
     if (!in_array($token, self::$_tokens['action'])) {
       $value = "{action.$token}";
@@ -1836,4 +1836,5 @@ class CRM_Utils_Token {
 
     return $output;
   }
+
 }

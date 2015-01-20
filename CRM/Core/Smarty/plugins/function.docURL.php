@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,12 +42,12 @@
  * @param CRM_Core_Smarty $smarty
  *   Reference to the smarty object.
  *
- * @return string
+ * @return string|NULL
  *   HTML code of a link to documentation
  */
 function smarty_function_docURL($params, &$smarty) {
   if (!isset($smarty)) {
-    return;
+    return NULL;
   }
   else {
     return CRM_Utils_System::docURL($params);

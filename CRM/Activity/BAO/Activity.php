@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -1187,8 +1187,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
-    // FIXME a param with no default shouldn't be last
-    $contactIds,
+    $contactIds = NULL,
     $additionalDetails = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email

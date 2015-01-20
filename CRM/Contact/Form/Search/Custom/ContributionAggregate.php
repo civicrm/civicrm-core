@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -304,4 +304,5 @@ civicrm_contact AS contact_a
   public function summary() {
     return NULL;
   }
+
 }

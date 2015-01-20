@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -428,4 +428,5 @@ AND    v.is_active = 1
   public function getTemplateMessage() {
     return "Blah";
   }
+
 }

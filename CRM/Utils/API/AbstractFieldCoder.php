@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Base class for writing API_Wrappers which generically manipulate the content
@@ -144,4 +144,5 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   protected function isApiControlField($key) {
     return (FALSE !== strpos($key, '.'));
   }
+
 }

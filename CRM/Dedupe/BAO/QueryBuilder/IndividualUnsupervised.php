@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised
@@ -107,4 +107,5 @@ AND    " . self::internalFilters($rg);
 
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -391,4 +391,5 @@ AND      c.receive_date < {$this->start_date_1}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

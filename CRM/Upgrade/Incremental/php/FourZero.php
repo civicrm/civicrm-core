@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,4 +47,5 @@ class CRM_Upgrade_Incremental_php_FourZero {
   public function upgrade_4_0_alpha1($rev) {
     // do nothing, db is already upgraded to 3.4.alpha1.
   }
+
 }

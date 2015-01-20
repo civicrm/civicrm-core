@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,12 +49,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param null $entity
    *
-   * @return array
+   * @return array|NULL
    *   array of created address
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     if (!isset($params['address']) || !is_array($params['address'])) {
-      return;
+      return NULL;
     }
     CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
     $addresses = array();
@@ -364,22 +364,21 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Utils_Address_USPS::checkAddress($params);
 
       // do street parsing again if enabled, since street address might have changed
-      $parseStreetAddress =
-        CRM_Utils_Array::value(
-          'street_address_parsing',
-          CRM_Core_BAO_Setting::valueOptions(
-            CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-            'address_options'
-          ),
-          FALSE
-        );
+      $parseStreetAddress = CRM_Utils_Array::value(
+        'street_address_parsing',
+        CRM_Core_BAO_Setting::valueOptions(
+          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+          'address_options'
+        ),
+        FALSE
+      );
 
       if ($parseStreetAddress && !empty($params['street_address'])) {
         foreach (array(
                    'street_number',
                    'street_name',
                    'street_unit',
-                   'street_number_suffix'
+                   'street_number_suffix',
                  ) as $fld) {
           unset($params[$fld]);
         }
@@ -405,8 +404,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
-   *
+   * @return bool
    */
   public static function dataExists(&$params) {
     //check if location type is set if not return false
@@ -423,7 +421,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         'contact_id',
         'is_billing',
         'display',
-        'master_id'
+        'master_id',
       ))) {
         continue;
       }
@@ -508,7 +506,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
                    'state',
                    'state_name',
                    'country',
-                   'world_region'
+                   'world_region',
                  ) as $fld) {
           if (isset($address->$fld)) {
             unset($address->$fld);
@@ -712,8 +710,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * NB: civic street formats for en_CA and fr_CA used by default if those locales are active
    *     otherwise en_US format is default action
    *
-   * @param string Street address including number and apt
-   * @param string Locale - to set locale used to parse address
+   * @param string $streetAddress
+   *   Street address including number and apt.
+   * @param string $locale
+   *   Locale used to parse address.
    *
    * @return array
    *   parsed fields values.
@@ -754,7 +754,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     $matches = array();
     if (in_array($locale, array(
         'en_CA',
-        'fr_CA'
+        'fr_CA',
       )) && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)
     ) {
       $parseFields['street_unit'] = $matches[1];
@@ -848,7 +848,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // overwriting $streetUnitFormats for 'en_CA' and 'fr_CA' locale
     if (in_array($locale, array(
       'en_CA',
-      'fr_CA'
+      'fr_CA',
     ))) {
       $streetUnitFormats = array('APT', 'APP', 'SUITE', 'BUREAU', 'UNIT');
     }
@@ -894,11 +894,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   public static function validateAddressOptions($fields) {
     static $addressOptions = NULL;
     if (!$addressOptions) {
-      $addressOptions =
-        CRM_Core_BAO_Setting::valueOptions(
-          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'address_options'
-        );
+      $addressOptions = CRM_Core_BAO_Setting::valueOptions(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'address_options'
+      );
     }
 
     if (is_array($fields) && !empty($fields)) {
@@ -1034,8 +1033,11 @@ SELECT is_primary,
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
-      $address =
-        trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
+      $address = trim($rows[$rowID]['street_address'])
+        . trim($rows[$rowID]['city'])
+        . trim($rows[$rowID]['state_province'])
+        . trim($rows[$rowID]['postal_code'])
+        . trim($rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }
@@ -1247,11 +1249,11 @@ SELECT is_primary,
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
@@ -1293,9 +1295,8 @@ SELECT is_primary,
       // Not a real field in this entity
       case 'world_region':
         return CRM_Core_PseudoConstant::worldRegion();
-
-        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
 }

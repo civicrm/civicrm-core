@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -142,4 +142,5 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
   }
+
 }

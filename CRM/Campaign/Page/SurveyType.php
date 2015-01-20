@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -214,4 +214,5 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
   public function userContextParams($mode = NULL) {
     return 'reset=1';
   }
+
 }

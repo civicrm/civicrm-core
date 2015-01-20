@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The queue runner is a helper which runs all jobs in a queue.
@@ -360,4 +360,5 @@ class CRM_Queue_Runner {
     }
     return $this->taskCtx;
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
@@ -139,4 +139,5 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
   public function getCustomReportsById() {
     return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
   }
+
 }

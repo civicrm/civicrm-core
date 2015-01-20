@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -371,7 +371,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
                        'id',
                        'auto_renew',
                        'duration_unit',
-                       'duration_interval'
+                       'duration_interval',
                      ) as $fld) {
               $this->_recurMembershipTypes[$recurMembershipTypes->id][$fld] = $recurMembershipTypes->$fld;
             }
@@ -860,4 +860,5 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
+
 }

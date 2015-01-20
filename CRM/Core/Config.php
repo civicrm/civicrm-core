@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Config handles all the run time configuration changes that the system needs to deal with.
@@ -876,4 +876,5 @@ AND
   public static function isEnabledBackOfficeCreditCardPayments() {
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
   }
+
 }

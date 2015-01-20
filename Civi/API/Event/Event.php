@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
@@ -70,4 +70,5 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
   public function getApiRequest() {
     return $this->apiRequest;
   }
+
 }

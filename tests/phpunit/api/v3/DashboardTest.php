@@ -80,4 +80,5 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $this->assertEquals($oldCount, $newCount);
   }
+
 }

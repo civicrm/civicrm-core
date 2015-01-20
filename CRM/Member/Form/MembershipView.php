@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -408,4 +408,5 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       )
     );
   }
+
 }
