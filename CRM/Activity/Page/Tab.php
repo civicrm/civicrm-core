@@ -204,7 +204,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
       if (in_array($activityTypeId, array(
         $emailTypeValue,
-        $letterTypeValue
+        $letterTypeValue,
       ))) {
         return;
       }

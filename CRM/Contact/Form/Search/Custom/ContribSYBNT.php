@@ -144,7 +144,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0,
     $rowcount = 0,
     $sort = NULL,
@@ -190,7 +190,6 @@ GROUP BY   contact_a.id
            $having
 ORDER BY   donation_amount desc
 ";
-
 
     if ($justIDs) {
       CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS CustomSearch_SYBNT_temp");

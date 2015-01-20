@@ -75,7 +75,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @return \CRM_Activity_Selector_Activity
    */
-  function __construct(
+  public function __construct(
     $contactId,
     $permission,
     $admin = FALSE,
@@ -221,7 +221,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => $url,
           'qs' => $qsView,
           'title' => ts('View Activity'),
-        )
+        ),
       );
     }
 
@@ -241,7 +241,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
             'url' => $updateUrl,
             'qs' => $qsUpdate,
             'title' => ts('Update Activity'),
-          )
+          ),
         );
       }
     }
@@ -257,7 +257,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => '#',
           'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
           'title' => ts('File on Case'),
-        )
+        ),
       );
     }
 
@@ -272,7 +272,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => $delUrl,
           'qs' => $qsDelete,
           'title' => ts('Delete Activity'),
-        )
+        ),
       );
     }
 
@@ -284,7 +284,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/mailing/report',
           'qs' => "mid={$sourceRecordId}&reset=1&cid=%%cid%%&context=activitySelector",
           'title' => ts('View Mailing Report'),
-        )
+        ),
       );
     }
 

@@ -79,15 +79,15 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $post_move_values[$cid_to_missing]['source'] = $this->_loadDataFromApi($cid_to_missing, $from_group_id);
     $post_move_values[$cid_to_missing]['destination'] = $this->_loadDataFromApi($cid_to_missing, $to_group_id);
 
-    //Make sure that only the appropriate values have changed
+    // Make sure that only the appropriate values have changed.
     foreach (array(
                $cid_all,
                $cid_from_missing,
-               $cid_to_missing
+               $cid_to_missing,
              ) as $cid) {
       foreach (array(
                  'source',
-                 'destination'
+                 'destination',
                ) as $fieldset) {
         foreach ($pre_move_values[$cid][$fieldset] as $id => $value) {
           if ($id != $field_to_move) {
@@ -280,7 +280,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
           'option_07',
           'option_08',
           'option_09',
-          'option_10'
+          'option_10',
         ),
       ),
       'integer' => array(
@@ -403,7 +403,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     //get the custom id of the custom field that was just created
     $results = $this->webtest_civicrm_api("CustomField", "get", array(
         'label' => $fieldLabel,
-        'custom_group_id' => $group_id
+        'custom_group_id' => $group_id,
       ));
     //While there _technically_ could be two fields with the same name, its highly unlikely
     //so assert that exactly one result is return
@@ -417,7 +417,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
    * @param string $prefix
    * @param array $values
    */
-  function _createFieldOptions($count = 3, $prefix = "option", $values = array()) {
+  public function _createFieldOptions($count = 3, $prefix = "option", $values = array()) {
     // Only support up to 10 options on the creation form
     $count = $count > 10 ? 10 : $count;
 
@@ -450,7 +450,7 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     $field_ids = array_keys($fields);
     $contact = $this->webtest_civicrm_api("Contact", "get", array(
         'contact_id' => $contact_id,
-        'return.custom_' . $field_ids[0] => 1
+        'return.custom_' . $field_ids[0] => 1,
       ));
     $group = $this->webtest_civicrm_api("CustomGroup", "get", array('id' => $group_id, 'return.table_name' => 1));
 

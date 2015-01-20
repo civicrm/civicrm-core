@@ -106,10 +106,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
    *
    * @return string
    */
-  function all(
-    $offset = 0, $rowcount = 0, $sort = NULL,
-    $includeContactIDs = FALSE, $justIDs = FALSE
-  ) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
       $sort = 'contact_a.id';
