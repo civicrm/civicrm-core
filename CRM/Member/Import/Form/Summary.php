@@ -105,7 +105,7 @@ class CRM_Member_Import_Form_Summary extends CRM_Import_Form_Summary {
       'downloadDuplicateRecordsUrl',
       'downloadMismatchRecordsUrl',
       'groupAdditions',
-      'unMatchCount'
+      'unMatchCount',
     );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));

@@ -626,7 +626,7 @@ WHERE  v.option_group_id = g.id
                  'value',
                  'label',
                  'weight',
-                 'description'
+                 'description',
                ) as $fld) {
         $row[$fld] = $dao->$fld;
       }

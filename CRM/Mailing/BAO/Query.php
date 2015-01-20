@@ -308,7 +308,7 @@ class CRM_Mailing_BAO_Query {
           ts('Bounce type(s)'),
           CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', array(
               'keyColumn' => 'id',
-              'labelColumn' => 'name'
+              'labelColumn' => 'name',
             ))
         );
         return;

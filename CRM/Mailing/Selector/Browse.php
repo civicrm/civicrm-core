@@ -360,7 +360,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         if (in_array($row['status'], array(
           'Scheduled',
           'Running',
-          'Paused'
+          'Paused',
         ))) {
           if ($allAccess ||
             ($showApprovalLinks && $showCreateLinks && $showScheduleLinks)

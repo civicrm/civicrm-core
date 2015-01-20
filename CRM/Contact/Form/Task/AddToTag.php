@@ -148,7 +148,7 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
       if ($notAdded) {
         $status[] = ts('%count contact already had this tag', array(
             'count' => $notAdded,
-            'plural' => '%count contacts already had this tag'
+            'plural' => '%count contacts already had this tag',
           ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';

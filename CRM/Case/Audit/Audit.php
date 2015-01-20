@@ -100,7 +100,7 @@ class CRM_Case_Audit_Audit {
               if ($printReport) {
                 if (!in_array($label, array(
                   'Activity Type',
-                  'Status'
+                  'Status',
                 ))
                 ) {
                   $caseActivities[$activityindex][$fieldindex] = array();

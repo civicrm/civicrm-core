@@ -111,7 +111,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         array(
           'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
-        )
+        ),
       );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
@@ -294,8 +294,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaultLocation = $this->_location_types[$defaultLocationType->id];
       unset($this->_location_types[$defaultLocationType->id]);
       $this->_location_types = array(
-          $defaultLocationType->id => $defaultLocation,
-        ) + $this->_location_types;
+        $defaultLocationType->id => $defaultLocation,
+      ) + $this->_location_types;
     }
 
     $this->_location_types = array('Primary') + $this->_location_types;

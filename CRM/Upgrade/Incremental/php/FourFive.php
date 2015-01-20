@@ -142,7 +142,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         $endId = $startId + self::BATCH_SIZE - 1;
         $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(
             1 => $startId,
-            2 => $endId
+            2 => $endId,
           ));
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }

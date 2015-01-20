@@ -280,7 +280,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       array(
         'title' => ts('Price Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&sid=' . $this->_sid),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 

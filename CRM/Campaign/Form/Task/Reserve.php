@@ -94,9 +94,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     //get the survey activities.
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusIds = array();
-    foreach (array(
-               'Scheduled'
-             ) as $name) {
+    foreach (array('Scheduled') as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -179,7 +177,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         'name' => ts('Reserve'),
         'subName' => 'reserve',
         'isDefault' => TRUE,
-      )
+      ),
     );
 
     if (CRM_Core_Permission::check('manage campaign') ||

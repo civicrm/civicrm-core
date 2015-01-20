@@ -290,7 +290,7 @@ UPDATE civicrm_dedupe_rule_group
                 'binary',
                 'varbinary',
                 'text',
-                'blob'
+                'blob',
               ))
           ) {
             $length = NULL;

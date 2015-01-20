@@ -90,7 +90,7 @@ class CRM_Utils_PagerAToZ {
       'W',
       'X',
       'Y',
-      'Z'
+      'Z',
     );
     return $staticAlphabets;
   }

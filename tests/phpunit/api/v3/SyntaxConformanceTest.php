@@ -365,7 +365,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomSearch',
       'Extension',
       'ReportTemplate',
-      'System'
+      'System',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -439,7 +439,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'Setting',
       'MailingContact',
-      'SystemLog'
+      'SystemLog',
       //skip this because it doesn't make sense to update logs,
     );
     if ($sequential === TRUE) {
@@ -550,7 +550,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'installments',
           'original_installment_amount',
           'next_pay_date',
-          'amount' // can't be changed through API,
+          'amount', // can't be changed through API,
         ),
         'break_return' => array(// if these are passed in they are retrieved from the wrong table
           'honor_contact_id',
@@ -1177,11 +1177,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           if (isset($specs['pseudoconstant']['optionGroupName'])) {
             $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(
                 'name' => 'pdf_format',
-                'return' => 'id'
+                'return' => 'id',
               ));
             $optionValue = $this->callAPISuccess('option_value', 'create', array(
                 'option_group_id' => $optionGroupID,
-                'label' => 'new option value'
+                'label' => 'new option value',
               ));
             $options['values'][] = $optionValue['id'];
           }
@@ -1214,7 +1214,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             'update-result' => $update,
             'getsingle-params' => $checkParams,
             'getsingle-result' => $checkEntity,
-            'expected entity' => $entity
+            'expected entity' => $entity,
           ), TRUE));
       if ($resetFKTo) {
         //reset the foreign key fields because otherwise our cleanup routine fails & some other unexpected stuff can kick in

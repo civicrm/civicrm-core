@@ -81,7 +81,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       if (in_array($this->_values['name'], array(
         'encounter_medium',
         'case_type',
-        'case_status'
+        'case_status',
       ))) {
         static $caseCount = NULL;
         if (!isset($caseCount)) {

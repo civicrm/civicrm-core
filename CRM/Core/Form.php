@@ -348,7 +348,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Respond with JSON if in AJAX context (also support legacy value '6')
     if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(
           CRM_Core_Smarty::PRINT_JSON,
-          6
+          6,
         ))
     ) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
@@ -1173,7 +1173,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addCountry($id, $title, $required = NULL, $extra = NULL) {
     $this->addElement('select', $id, $title,
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + CRM_Core_PseudoConstant::country(), $extra
     );
     if ($required) {
@@ -1655,7 +1655,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, array(
           'placeholder' => $autoCompleteField['placeholder'],
-          'api' => $autoCompleteField['api']
+          'api' => $autoCompleteField['api'],
         ));
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
@@ -1780,7 +1780,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'country',
           'Country',
           'state_province',
-          'StateProvince'
+          'StateProvince',
         ), $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
       'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
