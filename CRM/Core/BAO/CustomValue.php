@@ -47,7 +47,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param string $value
    *   The data to be validated.
    *
-   * @return boolean
+   * @return bool
    *   True if the value is of the specified type
    */
   public static function typecheck($type, $value) {

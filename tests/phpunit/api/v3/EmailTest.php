@@ -76,13 +76,11 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $delresult = $this->callAPISuccess('email', 'delete', array('id' => $result['id']));
   }
 
-  /*
+  /**
    * If a new email is set to is_primary the prev should no longer be
    *
    * If is_primary is not set then it should become is_primary is no others exist
    */
-
-
   public function testCreateEmailPrimaryHandlingChangeToPrimary() {
     $params = $this->_params;
     unset($params['is_primary']);

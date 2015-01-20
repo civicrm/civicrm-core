@@ -1,28 +1,28 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.6                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License and the CiviCRM Licensing Exception along                  |
+  | with this program; if not, contact CiviCRM LLC                     |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
 */
 
 /**
@@ -112,9 +112,9 @@ class CRM_Core_Resources {
     if (self::$_singleton === NULL) {
       $sys = CRM_Extension_System::singleton();
       $cache = new CRM_Utils_Cache_SqlGroup(array(
-        'group' => 'js-strings',
-        'prefetch' => FALSE,
-      ));
+                 'group' => 'js-strings',
+                 'prefetch' => FALSE,
+               ));
       self::$_singleton = new CRM_Core_Resources(
         $sys->getMapper(),
         $cache,
@@ -189,12 +189,12 @@ class CRM_Core_Resources {
    */
   public function addScriptUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add(array(
-      'name' => $url,
-      'type' => 'scriptUrl',
-      'scriptUrl' => $url,
-      'weight' => $weight,
-      'region' => $region,
-    ));
+        'name' => $url,
+        'type' => 'scriptUrl',
+        'scriptUrl' => $url,
+        'weight' => $weight,
+        'region' => $region,
+      ));
     return $this;
   }
 
@@ -211,12 +211,12 @@ class CRM_Core_Resources {
    */
   public function addScript($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add(array(
-      // 'name' => automatic
-      'type' => 'script',
-      'script' => $code,
-      'weight' => $weight,
-      'region' => $region,
-    ));
+        // 'name' => automatic
+        'type' => 'script',
+        'script' => $code,
+        'weight' => $weight,
+        'region' => $region,
+      ));
     return $this;
   }
 
@@ -395,12 +395,12 @@ class CRM_Core_Resources {
    */
   public function addStyleUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add(array(
-      'name' => $url,
-      'type' => 'styleUrl',
-      'styleUrl' => $url,
-      'weight' => $weight,
-      'region' => $region,
-    ));
+        'name' => $url,
+        'type' => 'styleUrl',
+        'styleUrl' => $url,
+        'weight' => $weight,
+        'region' => $region,
+      ));
     return $this;
   }
 
@@ -417,12 +417,12 @@ class CRM_Core_Resources {
    */
   public function addStyle($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add(array(
-      // 'name' => automatic
-      'type' => 'style',
-      'style' => $code,
-      'weight' => $weight,
-      'region' => $region,
-    ));
+        // 'name' => automatic
+        'type' => 'style',
+        'style' => $code,
+        'weight' => $weight,
+        'region' => $region,
+      ));
     return $this;
   }
 
@@ -533,7 +533,7 @@ class CRM_Core_Resources {
         'config' => array(
           'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
           'isFrontend' => $config->userFrameworkFrontend,
-        )
+        ),
       );
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
@@ -613,10 +613,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Create dynamic script for localizing js widgets
-   *
-   * @return string
-   *   javascript content
+   * Create dynamic script for localizing js widgets.
    */
   public static function outputLocalizationJS() {
     CRM_Core_Page_AJAX::setJsHeaders();
@@ -715,7 +712,7 @@ class CRM_Core_Resources {
     return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(
         CRM_Core_Smarty::PRINT_SNIPPET,
         CRM_Core_Smarty::PRINT_NOFORM,
-        CRM_Core_Smarty::PRINT_JSON
+        CRM_Core_Smarty::PRINT_JSON,
       ));
   }
 
@@ -738,7 +735,7 @@ class CRM_Core_Resources {
           array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
           array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
           array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
-        )
+        ),
       ),
     );
 

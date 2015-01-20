@@ -306,14 +306,9 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Get Surveys activity types
-   *
-   *
+   * Get Survey activity types.
    */
-  static function getSurveyActivityType(
-    $returnColumn = 'label',
-    $includePetitionActivityType = FALSE
-  ) {
+  public static function getSurveyActivityType($returnColumn = 'label', $includePetitionActivityType = FALSE) {
     static $activityTypes;
     $cacheKey = "{$returnColumn}_{$includePetitionActivityType}";
 
@@ -449,7 +444,7 @@ SELECT  survey.id    as id,
     foreach ($returnProperties as $property => $ignore) {
       $value = (in_array($property, array(
         'city',
-        'street_address'
+        'street_address',
       ))) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
@@ -522,9 +517,7 @@ Group By  contact.id";
    * @return array
    *   array of survey activity.
    */
-  static function voterActivityDetails(
-    $surveyId, $voterIds, $interviewerId = NULL,
-    $statusIds = array()) {
+  public static function voterActivityDetails($surveyId, $voterIds, $interviewerId = NULL, $statusIds = array()) {
     $activityDetails = array();
     if (!$surveyId ||
       !is_array($voterIds) || empty($voterIds)
@@ -585,7 +578,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
    * @return array
    *   An array of survey activity.
    */
-  static function getSurveyActivities(
+  public static function getSurveyActivities(
     $surveyId,
     $interviewerId = NULL,
     $statusIds = NULL,
@@ -742,7 +735,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @param int $activityId
    *   Activity id.
-   * @return boolean
+   * @return bool
    */
   public static function isSurveyActivity($activityId) {
     $isSurveyActivity = FALSE;
@@ -840,13 +833,12 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     if (CRM_Core_Permission::check('access CiviReport')) {
       $reportID = self::getReportID($surveyId);
       if ($reportID) {
-        $voterLinks['report'] =
-          array(
-            'name' => 'report',
-            'url' => "civicrm/report/instance/{$reportID}",
-            'qs' => 'reset=1',
-            'title' => ts('View Survey Report'),
-          );
+        $voterLinks['report'] = array(
+          'name' => 'report',
+          'url' => "civicrm/report/instance/{$reportID}",
+          'qs' => 'reset=1',
+          'title' => ts('View Survey Report'),
+        );
       }
     }
 

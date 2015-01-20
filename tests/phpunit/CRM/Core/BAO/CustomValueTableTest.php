@@ -37,7 +37,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_Country_' . $customField->id,
         'file_id' => '',
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
@@ -72,7 +72,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_File_' . $customField->id,
         'file_id' => 1,
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
@@ -107,7 +107,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_StateProvince_' . $customField->id,
         'file_id' => 1,
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
@@ -141,7 +141,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_Date_' . $customField->id,
         'file_id' => '',
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
@@ -176,7 +176,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_Memo_' . $customField->id,
         'file_id' => '',
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
@@ -212,7 +212,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
         'table_name' => 'civicrm_value_test_group_' . $customGroup->id,
         'column_name' => 'test_Memo_' . $customField->id,
         'file_id' => '',
-      )
+      ),
     );
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);

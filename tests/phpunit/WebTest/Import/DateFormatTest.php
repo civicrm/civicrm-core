@@ -35,7 +35,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for yyyy_mm_dd date format.
    */
   public function testDateFormat_yyyy_mm_dd() {
@@ -50,7 +50,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for mm_dd_yy date format.
    */
   public function testDateFormat_mm_dd_yy() {
@@ -66,7 +66,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for mm_dd_yyyy date format.
    */
   public function testDateFormat_mm_dd_yyyy() {
@@ -87,7 +87,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for Month_dd_yyyy date format.
    */
   public function testDateFormat_Month_dd_yyyy() {
@@ -108,7 +108,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for dd_mon_yy date format.
    */
   public function testDateFormat_dd_mon_yy() {
@@ -129,7 +129,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for dd_mm_yyyy date format.
    */
   public function testDateFormat_dd_mm_yyyy() {
@@ -150,7 +150,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and yyyy-mm-dd OR yyyymmdd dateformat.
    */
   /**
@@ -203,7 +203,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and mm/dd/yy OR mm-dd-yy dateformat.
    */
   /**
@@ -256,7 +256,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and mm/dd/yyyy OR mm-dd-yyyy dateformat.
    */
   /**
@@ -309,7 +309,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and Month dd, yyyy dateformat.
    */
   /**
@@ -362,7 +362,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and dd-mon-yy OR dd/mm/yy dateformat.
    */
   /**
@@ -415,7 +415,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and dd/mm/yyyy dateformat.
    */
   /**
