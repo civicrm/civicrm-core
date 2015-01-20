@@ -393,7 +393,7 @@ class CRM_Extension_Mapper {
     $pathElm = explode(DIRECTORY_SEPARATOR, $path);
     array_pop($pathElm);
     return implode(DIRECTORY_SEPARATOR, $pathElm) . DIRECTORY_SEPARATOR . self::EXT_TEMPLATES_DIRNAME;
-    */
+     */
   }
 
   /**

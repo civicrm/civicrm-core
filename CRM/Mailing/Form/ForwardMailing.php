@@ -61,7 +61,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     }
 
     /* Show the subject instead of the name here, since it's being
-         * displayed to external contacts/users */
+     * displayed to external contacts/users */
 
     CRM_Utils_System::setTitle(ts('Forward Mailing: %1', array(1 => $mailing->subject)));
 

@@ -83,12 +83,12 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     /*
     $container = new CRM_Extension_Container_Static(array(
-      'test.foo.bar' => array(
-        'path' => '/path/to/test.foo.bar',
-        'resUrl' => 'http://resources/test.foo.bar',
-      ),
+    'test.foo.bar' => array(
+    'path' => '/path/to/test.foo.bar',
+    'resUrl' => 'http://resources/test.foo.bar',
+    ),
     ));
-    */
+     */
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");

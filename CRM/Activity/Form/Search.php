@@ -385,7 +385,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       // Activity date time assumes midnight at the beginning of the date
       // This sets it to almost midnight at the end of the date
       /*   if ($dateHigh <= 99999999) {
-        $dateHigh = 1000000 * $dateHigh + 235959;
+      $dateHigh = 1000000 * $dateHigh + 235959;
       } */
       $dateHigh = date('m/d/Y', strtotime($dateHigh));
       $this->_formValues['activity_date_relative'] = 0;

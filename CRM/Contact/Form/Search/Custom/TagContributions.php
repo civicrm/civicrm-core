@@ -154,9 +154,9 @@ WHERE  $where
   }
 
   /*
-  * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-  *
-  */
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   *
+   */
   /**
    * @param bool $includeContactIDs
    *

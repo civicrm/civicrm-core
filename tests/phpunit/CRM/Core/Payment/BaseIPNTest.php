@@ -354,7 +354,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(is_array($result));
   }
 
-  /*
+  /* @codingStandardsIgnoreStart
      * Test calls main functions in sequence per 'main' - I had hoped to test the functions more
      * fully but the calls to the POST happen in more than one function
      * keeping this as good example of data to bring back to life later
@@ -429,6 +429,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
                 return $this->IPN->recur( $input, $ids, $objects, $first );
             }
     }
+   @codingStandardsIgnoreEnd */
 
   /**
    * Prepare for contribution Test - involving only contribution objects

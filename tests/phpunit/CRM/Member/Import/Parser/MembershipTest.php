@@ -138,16 +138,16 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     /*
 
     $params = array(
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => '2006-01-21',
-      'start_date' => '2006-01-21',
-      'end_date' => '2006-12-21',
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_mebershipStatusID,
+    'contact_id' => $contactId,
+    'membership_type_id' => $this->_membershipTypeID,
+    'join_date' => '2006-01-21',
+    'start_date' => '2006-01-21',
+    'end_date' => '2006-12-21',
+    'source' => 'Payment',
+    'is_override' => 1,
+    'status_id' => $this->_mebershipStatusID,
     );
-    */
+     */
     $importObject = new CRM_Member_Import_Parser_Membership($fieldMapper);
     $importObject->init();
     $importObject->_contactType = 'Individual';

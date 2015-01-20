@@ -27,10 +27,10 @@
 
 
 /*
-* Copyright (C) 2010 Tech To The People
-* Licensed to CiviCRM under the Academic Free License version 3.0.
-*
-*/
+ * Copyright (C) 2010 Tech To The People
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ */
 
 /**
  *

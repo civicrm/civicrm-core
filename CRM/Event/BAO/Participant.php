@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 
-*/
+ */
 
 /**
  *
@@ -752,27 +752,27 @@ GROUP BY  participant.event_id
           'type' => CRM_Utils_Type::T_STRING,
         ));
 
-      $participantStatus = array(
+        $participantStatus = array(
         'participant_status' => array(
           'title' => 'Participant Status',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
         ));
 
-      $participantRole = array(
+        $participantRole = array(
         'participant_role' => array(
           'title' => 'Participant Role',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
         ));
 
-      $discountFields = CRM_Core_DAO_Discount::export();
+        $discountFields = CRM_Core_DAO_Discount::export();
 
-      $fields = array_merge($participantFields, $participantStatus, $participantRole,  $eventFields, $noteField, $discountFields);
+        $fields = array_merge($participantFields, $participantStatus, $participantRole,  $eventFields, $noteField, $discountFields);
 
-      // add custom data
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
-      self::$_exportableFields = $fields;
+        // add custom data
+        $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
+        self::$_exportableFields = $fields;
     }
 
     return self::$_exportableFields;

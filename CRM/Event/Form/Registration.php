@@ -160,9 +160,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_pcpId;
 
   /* Is event already full.
-     *
-     * @var boolean
-     */
+   *
+   * @var boolean
+   */
 
   public $_isEventFull;
 

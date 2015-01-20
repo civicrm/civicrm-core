@@ -360,7 +360,7 @@ SET    version = '$version'
 
     // sample test list
     /*         $revList = array(
-      '2.1.0', '2.2.beta2', '2.2.beta1', '2.2.alpha1', */
+    '2.1.0', '2.2.beta2', '2.2.beta1', '2.2.alpha1', */
 
     /*                          '2.2.alpha3', '2.2.0', '2.2.2', '2.1.alpha1', '2.1.3'); */
 

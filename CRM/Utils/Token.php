@@ -592,7 +592,7 @@ class CRM_Utils_Token {
     $escapeSmarty = FALSE
   ) {
     /* If the token is an email action, use it.  Otherwise, find the
-         * appropriate URL */
+     * appropriate URL */
 
     if (!in_array($token, self::$_tokens['action'])) {
       $value = "{action.$token}";

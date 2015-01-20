@@ -62,11 +62,11 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 
   public function __destruct() {
     /*
-        if ( $this->_eventID ) {
-            $sql = "DROP TEMPORARY TABLE {$this->_tableName}";
-            CRM_Core_DAO::executeQuery( $sql );
-        }
-        */
+    if ( $this->_eventID ) {
+    $sql = "DROP TEMPORARY TABLE {$this->_tableName}";
+    CRM_Core_DAO::executeQuery( $sql );
+    }
+     */
   }
 
   public function buildTempTable() {

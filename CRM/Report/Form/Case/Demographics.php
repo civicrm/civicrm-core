@@ -125,7 +125,7 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
                                         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
                                         'options' => CRM_Core_PseudoConstant::stateProvince( ), ),
                                  ),
-    */
+         */
       ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',

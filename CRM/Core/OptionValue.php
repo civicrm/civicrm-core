@@ -214,7 +214,7 @@ class CRM_Core_OptionValue {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
-               field 'value' to decimal->integer                    */
+      field 'value' to decimal->integer                    */
 
       $params['value'] = (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
         $fieldValues,

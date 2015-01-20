@@ -1413,8 +1413,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'contact_type' => 'Individual',
           'contact_id' => $contactId,
         );
-      $contact = CRM_Contact_BAO_Contact::add($params);
-      $test->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
+        $contact = CRM_Contact_BAO_Contact::add($params);
+        $test->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
       },
     ));
   }

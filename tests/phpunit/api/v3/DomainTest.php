@@ -36,7 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_DomainTest extends CiviUnitTestCase {
 
   /* This test case doesn't require DB reset - apart from
-       where cleanDB() is called. */
+  where cleanDB() is called. */
 
 
   public $DBResetRequired = FALSE;
@@ -144,8 +144,8 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   ///////////////// civicrm_domain_create methods
   /*
-    * This test checks for a memory leak observed when doing 2 gets on current domain
-    */
+   * This test checks for a memory leak observed when doing 2 gets on current domain
+   */
 
 
   public function testGetCurrentDomainTwice() {

@@ -827,9 +827,9 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
 
       /* Group (un-limited) report by all aliases and get counts. This might
-      * be done more efficiently when the contents of $sql are known, ie. by
-      * overriding this method in the report class.
-      */
+       * be done more efficiently when the contents of $sql are known, ie. by
+       * overriding this method in the report class.
+       */
 
       $addtotals = '';
 

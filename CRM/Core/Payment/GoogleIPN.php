@@ -224,8 +224,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       /* Since trxn_id hasn't got any use here,
-             * lets make use of it by passing the eventID/membershipTypeID to next level.
-             * And change trxn_id to google-order-number before finishing db update */
+       * lets make use of it by passing the eventID/membershipTypeID to next level.
+       * And change trxn_id to google-order-number before finishing db update */
 
       if (!empty($ids['event'])) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
