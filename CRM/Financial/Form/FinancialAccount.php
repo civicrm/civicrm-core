@@ -97,9 +97,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $this->add('text', 'accounting_code', ts('Accounting Code'), $attributes['accounting_code']);
     $elementAccounting = $this->add('text', 'account_type_code', ts('Account Type Code'), $attributes['account_type_code']);
     $this->addEntityRef('contact_id', ts('Owner'), array(
-        'api' => array('params' => array('contact_type' => 'Organization')),
-        'create' => TRUE
-      ));
+      'api' => array('params' => array('contact_type' => 'Organization')),
+      'create' => TRUE,
+    ));
     $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
     $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));

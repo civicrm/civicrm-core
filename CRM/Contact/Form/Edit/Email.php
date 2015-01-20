@@ -69,7 +69,7 @@ class CRM_Contact_Form_Edit_Email {
       $form->addSelect("email[$blockId][location_type_id]", array(
           'entity' => 'email',
           'class' => 'eight',
-          'placeholder' => NULL
+          'placeholder' => NULL,
         ));
 
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();

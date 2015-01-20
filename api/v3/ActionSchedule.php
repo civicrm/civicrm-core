@@ -53,7 +53,7 @@ function civicrm_api3_action_schedule_get($params) {
  *
  * @return array
  *
- * {@getfields action_schedule_create}
+ *   {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));

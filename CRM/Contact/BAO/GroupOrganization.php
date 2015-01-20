@@ -95,7 +95,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists($params) {
     // return if no data present
@@ -123,7 +123,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *
    * @param int $contactID
    *
-   * @return boolean
+   * @return bool
    */
   public static function hasGroupAssociated($contactID) {
     $orgID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupOrganization',

@@ -342,8 +342,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $tasks = $tasks + CRM_Contact_Task::optionalTaskTitle();
       }
 
-      $search_custom_id =
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'search_custom_id');
+      $search_custom_id
+        = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'search_custom_id');
 
       $savedSearchValues = array(
         'id' => $this->_ssID,
@@ -375,8 +375,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // check if _groupID exists, it might not if
         // we are displaying a hidden group
         if (!isset($this->_group[$this->_groupID])) {
-          $this->_group[$this->_groupID] =
-            CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'title');
+          $this->_group[$this->_groupID]
+            = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'title');
         }
 
         // set the group title
@@ -417,8 +417,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       // we are displaying a hidden group
       if (!isset($this->_group[$this->_amtgID])) {
         $this->assign('permissionedForGroup', FALSE);
-        $this->_group[$this->_amtgID] =
-          CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_amtgID, 'title');
+        $this->_group[$this->_amtgID]
+          = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_amtgID, 'title');
       }
 
       // Set dynamic page title for 'Add Members Group'
@@ -797,7 +797,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $setDynamic = FALSE;
 
       if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
-        $selector = new self::$_selectorName (
+        $selector = new self::$_selectorName(
           $this->_customSearchClass,
           $this->_formValues,
           $this->_params,

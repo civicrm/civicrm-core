@@ -108,7 +108,7 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array
+   * @return void
    *   the result in an nice formatted array (or an error object)
    * @abstract
    */

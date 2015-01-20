@@ -48,7 +48,7 @@ class api_v3_AllTests extends CiviTestSuite {
    * @param string $theClass
    * @param string $name
    */
-  function __construct($theClass = '', $name = '') {
+  public function __construct($theClass = '', $name = '') {
     parent::__construct($theClass, $name);
   }
 
@@ -56,7 +56,7 @@ class api_v3_AllTests extends CiviTestSuite {
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {
-      self::$instance = new self;
+      self::$instance = new self();
     }
     return self::$instance;
   }

@@ -108,8 +108,8 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
     elseif (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
-      $orderByParams =
-        array(
+      $orderByParams
+        = array(
           1 => array(
             'column' => 'civicrm_address.street_name',
             'order' => 'ASC',
@@ -288,8 +288,8 @@ WHERE {$clause}
   public function buildQuickForm() {
     $this->assign('surveyTypeId', $this->_surveyTypeId);
 
-    $options =
-      array(
+    $options
+      = array(
         '' => ' - none - ',
         'civicrm_address.street_name' => 'Street Name',
         'civicrm_address.street_number%2' => 'Odd / Even Street Number',
@@ -408,8 +408,8 @@ WHERE {$clause}
     }
 
     if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
-      $defaults['order_bys'] =
-        array(
+      $defaults['order_bys']
+        = array(
           1 => array(
             'column' => 'civicrm_address.street_name',
             'order' => 'ASC',
@@ -429,8 +429,8 @@ WHERE {$clause}
         );
     }
     else {
-      $defaults['order_bys'] =
-        array(
+      $defaults['order_bys']
+        = array(
           1 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',

@@ -161,7 +161,7 @@ class CRM_Contact_Page_AJAX {
         'id',
         's',
         'q',
-        'action'
+        'action',
       );
       foreach ($_GET as $param => $val) {
         if (empty($val) ||
@@ -1062,11 +1062,10 @@ LIMIT {$offset}, {$rowCount}
       $addressVal["error_message"] = "no contact id found";
     }
     else {
-      $entityBlock =
-        array(
-          'contact_id' => $contactId,
-          'entity_id' => $contactId,
-        );
+      $entityBlock = array(
+        'contact_id' => $contactId,
+        'entity_id' => $contactId,
+      );
       $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
     }
 

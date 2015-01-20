@@ -47,7 +47,7 @@
  *
  * @return array
  *   API Result Array
- * {@getfields relationship_create}
+ *   {@getfields relationship_create}
  */
 function civicrm_api3_relationship_create($params) {
   _civicrm_api3_handle_relationship_type($params);
@@ -74,7 +74,7 @@ function _civicrm_api3_relationship_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
- * {@getfields relationship_delete}
+ *   {@getfields relationship_delete}
  * @example RelationshipDelete.php Delete Example
  *
  */
@@ -104,9 +104,9 @@ function civicrm_api3_relationship_delete($params) {
  * -  if you pass in contact_id - it just returns all relationships for 'contact_id'
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
  *
- * @return Array
+ * @return array
  *   API Result Array
- * {@getfields relationship_get}
+ *   {@getfields relationship_get}
  * @example RelationshipGet.php
  * @access  public
  */

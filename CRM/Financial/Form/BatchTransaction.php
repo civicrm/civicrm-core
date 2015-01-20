@@ -57,18 +57,17 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
       CRM_Utils_System::setTitle(ts('Accounting Batch - %1', array(1 => $batchTitle)));
 
-      $columnHeaders =
-        array(
-          'created_by' => ts('Created By'),
-          'status' => ts('Status'),
-          'description' => ts('Description'),
-          'payment_instrument' => ts('Payment Instrument'),
-          'item_count' => ts('Entered Transactions'),
-          'assigned_item_count' => ts('Assigned Transactions'),
-          'total' => ts('Entered Total'),
-          'assigned_total' => ts('Assigned Total'),
-          'opened_date' => ts('Opened'),
-        );
+      $columnHeaders = array(
+        'created_by' => ts('Created By'),
+        'status' => ts('Status'),
+        'description' => ts('Description'),
+        'payment_instrument' => ts('Payment Instrument'),
+        'item_count' => ts('Entered Transactions'),
+        'assigned_item_count' => ts('Assigned Transactions'),
+        'total' => ts('Entered Total'),
+        'assigned_total' => ts('Assigned Total'),
+        'opened_date' => ts('Opened'),
+      );
       $this->assign('columnHeaders', $columnHeaders);
     }
   }

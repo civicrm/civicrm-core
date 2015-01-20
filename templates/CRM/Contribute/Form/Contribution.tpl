@@ -247,8 +247,7 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
-                 email address.{/ts}</span>
+                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
 
                 <div class="spacer"></div>
                  <div class="crm-contribution-form-block-pcp_details">
@@ -260,8 +259,7 @@
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
                       <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
-                      Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
                       </td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">

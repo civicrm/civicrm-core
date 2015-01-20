@@ -34,16 +34,16 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param null $path
+   *   The class Path of the form being implemented
    * @param bool $title
-   * @param string path the class Path of the form being implemented
+   * @param string $mode
    * @param bool $imageUpload
    * @param bool $addSequence
    *   Should we add a unique sequence number to the end of the key.
@@ -51,10 +51,9 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
    *   Should we not set a qfKey for this controller (for standalone forms).
    * @param bool $attachUpload
    *
-   *
    * @return \CRM_Core_Controller_Simple
    */
-  function __construct(
+  public function __construct(
     $path,
     $title,
     $mode = NULL,
@@ -108,6 +107,8 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   }
 
   /**
+   * Set parent.
+   *
    * @param $parent
    */
   public function setParent($parent) {
@@ -115,7 +116,9 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   }
 
   /**
-   * @return mixed
+   * Get template file name.
+   *
+   * @return string
    */
   public function getTemplateFileName() {
     // there is only one form here, so should be quite easy
@@ -126,8 +129,10 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   }
 
   /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
+   * A wrapper for getTemplateFileName.
+   *
+   * This includes calling the hook to  prevent us from having to copy & paste
+   * the logic of calling the hook
    */
   public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();

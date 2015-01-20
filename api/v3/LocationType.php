@@ -46,7 +46,7 @@
  *
  * @return array
  *   API result array
- * {@getfields email_create}
+ *   {@getfields email_create}
  */
 function civicrm_api3_location_type_create($params) {
   //set display_name equal to name if it's not defined
@@ -78,7 +78,7 @@ function _civicrm_api3_location_type_create_spec(&$params) {
  *
  * @return array
  *   API result array
- * {@getfields LocationType_delete}
+ *   {@getfields LocationType_delete}
  */
 function civicrm_api3_location_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -87,9 +87,6 @@ function civicrm_api3_location_type_delete($params) {
 /**
  * Retrieve one or more Location Types
  *
- * @param array input parameters
- *
- *
  * @example LocationTypeGet.php Standard Get Example
  *
  * @param array $params
@@ -97,7 +94,7 @@ function civicrm_api3_location_type_delete($params) {
  *
  * @return array
  *   api result
- * {@getfields LocationType_get}
+ *   {@getfields LocationType_get}
  */
 function civicrm_api3_location_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

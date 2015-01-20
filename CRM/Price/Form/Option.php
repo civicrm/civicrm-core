@@ -55,8 +55,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @param null
-   *
    * @return void
    */
   public function preProcess() {
@@ -73,14 +71,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array
-   *   array of default values
+   * @return array|void  array of default values
    */
   public function setDefaultValues() {
     if ($this->_action == CRM_Core_Action::DELETE) {
-      return;
+      return NULL;
     }
     $defaults = array();
 
@@ -115,8 +110,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * Build the form object
    *
-   * @param null
-   *
    * @return void
    */
   public function buildQuickForm() {
@@ -132,7 +125,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           ),
         )
       );
-      return;
+      return NULL;
     }
     else {
       $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
@@ -166,7 +159,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $this->add('select', 'membership_type_id', ts('Membership Type'), array(
-            '' => ' '
+            '' => ' ',
           ) + $membershipTypes, FALSE,
           array('onClick' => "calculateRowValues( );")
         );
@@ -294,8 +287,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * Process the form
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
@@ -310,7 +301,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       if (CRM_Price_BAO_PriceFieldValue::del($this->_oid)) {
         CRM_Core_Session::setStatus(ts('%1 option has been deleted.', array(1 => $label)), ts('Record Deleted'), 'success');
       }
-      return;
+      return NULL;
     }
     else {
       $params = $ids = array();

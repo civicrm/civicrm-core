@@ -63,9 +63,9 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param array $entityBlock input parameters to find object
    *
-   * @return boolean
+   * @return bool
    */
   public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('im', $entityBlock);
@@ -137,12 +137,8 @@ ORDER BY
     if (empty($entityElements)) {
       return NULL;
     }
-
-
     $entityId = $entityElements['entity_id'];
     $entityTable = $entityElements['entity_table'];
-
-
     $sql = "SELECT cim.name as im, ltype.name as locationType, cim.is_primary as is_primary, cim.id as im_id, cim.location_type_id as locationTypeId
 FROM civicrm_loc_block loc, civicrm_im cim, civicrm_location_type ltype, {$entityTable} ev
 WHERE ev.id = %1

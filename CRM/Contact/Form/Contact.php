@@ -866,7 +866,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $group = CRM_Utils_Array::value('group', $params);
-    if ($group && is_array($group)) {
+    if (!empty($group) && is_array($group)) {
       unset($params['group']);
       foreach ($group as $key => $value) {
         $params['group'][$value] = 1;
@@ -951,11 +951,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // process shared contact address.
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address']);
 
-    if (!array_key_exists('TagsAndGroups', $this->_editOptions)) {
+    if (!array_key_exists('TagsAndGroups', $this->_editOptions) && !empty($params['group'])) {
       unset($params['group']);
     }
 
-    if (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
+    if (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE) && !empty($params['group'])) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
       if (is_array($contactGroupList)) {

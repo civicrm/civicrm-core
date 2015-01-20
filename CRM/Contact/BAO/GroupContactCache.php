@@ -43,7 +43,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @param $groupIDs
    *   Of group that we are checking against.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if we did not regenerate, FALSE if we did
    */
   public static function check($groupIDs) {
@@ -117,12 +117,12 @@ AND     ( g.cache_date IS NULL OR
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param int /array $groupID groupID of group that we are checking against
+   * @param int /array $groupIDs groupIDs of group that we are checking against
    *                           if empty, all groups are checked
    * @param int $limit
    *   Limits the number of groups we evaluate.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if we did not regenerate, FALSE if we did
    */
   public static function loadAll($groupIDs = NULL, $limit = 0) {
@@ -468,7 +468,6 @@ WHERE  id = %1
         CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
       }
 
-
       $returnProperties = array();
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
         $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
@@ -481,8 +480,7 @@ WHERE  id = %1
         // we split it up and store custom class
         // so temp tables are not destroyed if they are used
         // hence customClass is defined above at top of function
-        $customClass =
-          CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
+        $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
         $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
         $idName = 'contact_id';
@@ -490,8 +488,8 @@ WHERE  id = %1
       else {
         $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
 
-        $query =
-          new CRM_Contact_BAO_Query(
+        $query
+          = new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,
             FALSE, FALSE, 1,
             TRUE, TRUE,
@@ -501,8 +499,8 @@ WHERE  id = %1
           );
         $query->_useDistinct = FALSE;
         $query->_useGroupBy = FALSE;
-        $searchSQL =
-          $query->searchQuery(
+        $searchSQL
+          = $query->searchQuery(
             0, 0, NULL,
             FALSE, FALSE,
             FALSE, TRUE,
@@ -615,7 +613,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
    */
   public static function contactGroup($contactID, $showHidden = FALSE) {
     if (empty($contactID)) {
-      return;
+      return NULL;
     }
 
     if (is_array($contactID)) {
@@ -654,12 +652,12 @@ ORDER BY   gc.contact_id, g.children
       }
       $prevContactID = $dao->contact_id;
       if (!array_key_exists($dao->contact_id, $contactGroup)) {
-        $contactGroup[$dao->contact_id] =
-          array('group' => array(), 'groupTitle' => array());
+        $contactGroup[$dao->contact_id]
+          = array('group' => array(), 'groupTitle' => array());
       }
 
-      $contactGroup[$dao->contact_id]['group'][] =
-        array(
+      $contactGroup[$dao->contact_id]['group'][]
+        = array(
           'id' => $dao->group_id,
           'title' => $dao->title,
           'description' => $dao->description,

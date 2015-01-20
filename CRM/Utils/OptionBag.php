@@ -62,11 +62,11 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    *   <p>.
    * An offset to check for.
    * </p>
-   * @return boolean
+   * @return bool
    *   true on success or false on failure.
-   * </p>
-   * <p>
-   * The return value will be casted to boolean if non-boolean was returned.
+   *   </p>
+   *   <p>
+   *   The return value will be casted to boolean if non-boolean was returned.
    */
   public function offsetExists($offset) {
     return array_key_exists($offset, $this->data);
@@ -125,7 +125,7 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
    * @return Traversable
    *   An instance of an object implementing <b>Iterator</b> or
-   * <b>Traversable</b>
+   *   <b>Traversable</b>
    */
   public function getIterator() {
     return new ArrayIterator($this->data);
@@ -137,9 +137,9 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    * @link http://php.net/manual/en/countable.count.php
    * @return int
    *   The custom count as an integer.
-   * </p>
-   * <p>
-   * The return value is cast to an integer.
+   *   </p>
+   *   <p>
+   *   The return value is cast to an integer.
    */
   public function count() {
     return count($this->data);

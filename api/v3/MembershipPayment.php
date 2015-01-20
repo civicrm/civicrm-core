@@ -43,7 +43,7 @@
  *
  * @return array
  *   (reference )        membership_payment_id of created or updated record
- * {@getfields MembershipPayment_create}
+ *   {@getfields MembershipPayment_create}
  * @example MembershipPaymentCreate.php
  */
 function civicrm_api3_membership_payment_create($params) {

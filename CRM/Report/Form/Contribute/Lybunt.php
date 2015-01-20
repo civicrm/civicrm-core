@@ -119,9 +119,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           ),
         ),
       ),
-    )
-    + $this->addAddressFields()
-    + array(
+    );
+    $this->_columns += $this->addAddressFields();
+    $this->_columns += array(
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -316,8 +316,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy =
-      "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id, " .
+    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id, " .
       self::fiscalYearOffset($this->_aliases['civicrm_contribution'] .
         '.receive_date') . " WITH ROLLUP";
     $this->assign('chartSupported', TRUE);
@@ -380,8 +379,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
       }
       else {
-        $sql =
-          "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
+        $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
           implode(',', $contactIds) .
           ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
       }
@@ -441,8 +439,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     foreach ($rows as $key => $row) {
       $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
         $row['civicrm_life_time_total'];
-      $display[$previous_year] =
-        CRM_Utils_Array::value($previous_year, $display) + $row[$previous_year];
+      $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row[$previous_year];
     }
 
     $config = CRM_Core_Config::Singleton();

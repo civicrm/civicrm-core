@@ -41,7 +41,7 @@ class CRM_Contact_BAO_Contact_Permission {
    *   Contact id.
    * @param int|string $type the type of operation (view|edit)
    *
-   * @return boolean
+   * @return bool
    *   true if the user has permission, false otherwise
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
@@ -143,8 +143,6 @@ ON DUPLICATE KEY UPDATE
 
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)');
     $_processed[$userID] = 1;
-
-    return;
   }
 
   /**
@@ -154,9 +152,9 @@ ON DUPLICATE KEY UPDATE
    * @param int $contactID
    *   Contact id.
    *
-   * @return boolean
+   * @return bool
    */
-  static function hasContactsInCache(
+  public static function hasContactsInCache(
     $type = CRM_Core_Permission::VIEW,
     $contactID = NULL
   ) {

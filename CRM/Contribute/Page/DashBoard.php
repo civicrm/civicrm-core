@@ -57,7 +57,7 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     foreach (array(
                'now',
                'yearDate',
-               'monthDate'
+               'monthDate',
              ) as $date) {
       $$date = $dates[$date];
     }

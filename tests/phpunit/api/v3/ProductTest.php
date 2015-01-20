@@ -44,10 +44,6 @@ class api_v3_ProductTest extends CiviUnitTestCase {
     );
   }
 
-  //  function tearDown() {
-  //    $this->quickCleanup(array('civicrm_product'), TRUE);
-  //  }
-
   public function testGetFields() {
     $fields = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertArrayHasKey('period_type', $fields['values']);

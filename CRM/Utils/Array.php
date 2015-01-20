@@ -440,7 +440,7 @@ class CRM_Utils_Array {
    * @param array $array
    *   (optional) Array to be checked for emptiness.
    *
-   * @return boolean
+   * @return bool
    *   True if the array is empty.
    */
   public static function crmIsEmptyArray($array = array()) {
@@ -744,18 +744,18 @@ class CRM_Utils_Array {
    * @return array
    *   Each item is a distinct combination of values from $dimensions.
    *
-   * For example, the product of
-   * {
+   *   For example, the product of
+   *   {
    *   fg => {red, blue},
    *   bg => {white, black}
-   * }
-   * would be
-   * {
+   *   }
+   *   would be
+   *   {
    *   {fg => red, bg => white},
    *   {fg => red, bg => black},
    *   {fg => blue, bg => white},
    *   {fg => blue, bg => black}
-   * }
+   *   }
    */
   public static function product($dimensions, $template = array()) {
     if (empty($dimensions)) {

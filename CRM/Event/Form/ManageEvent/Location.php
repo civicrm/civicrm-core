@@ -204,9 +204,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
-        $locationEvents = array(
-            '' => ts('- select -')
-          ) + $locationEvents;
+        $locationEvents = array('' => ts('- select -')) + $locationEvents;
       }
       $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents);
     }
@@ -260,7 +258,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     foreach (array(
                'address',
                'phone',
-               'email'
+               'email',
              ) as $block) {
       if (empty($params[$block]) || !is_array($params[$block])) {
         continue;

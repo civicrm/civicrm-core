@@ -196,7 +196,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * @param $files
    * @param $self
    *
-   * @return boolean
+   * @return bool
    *   True if either we deliver immediately, or the
    *                          date is properly set.
    */

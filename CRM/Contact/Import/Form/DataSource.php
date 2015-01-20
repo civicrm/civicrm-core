@@ -56,7 +56,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     //Test database user privilege to create table(Temporary) CRM-4725
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    $daoTestPrivilege = new CRM_Core_DAO;
+    $daoTestPrivilege = new CRM_Core_DAO();
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("DROP TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
@@ -88,7 +88,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     if (!empty($results)) {
       CRM_Core_Error::fatal(ts('<b>%1</b> file(s) in %2 directory are not writable. Listed file(s) might be used during the import to log the errors occurred during Import process. Contact your site administrator for assistance.', array(
             1 => implode(', ', $results),
-            2 => $config->uploadDir
+            2 => $config->uploadDir,
           )));
     }
 
@@ -131,7 +131,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    *
    * @return void
    */
-
   public function buildQuickForm() {
 
     // If there's a dataSource in the query string, we need to load
@@ -139,7 +138,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     if ($this->_dataSourceIsValid) {
       $this->_dataSourceClassFile = str_replace('_', '/', $this->_dataSource) . ".php";
       require_once $this->_dataSourceClassFile;
-      $this->_dataSourceClass = new $this->_dataSource;
+      $this->_dataSourceClass = new $this->_dataSource();
       $this->_dataSourceClass->buildQuickForm($this);
     }
 
@@ -179,7 +178,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->assign('savedMapping', $mappingArray);
     $this->addElement('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
-
 
     $js = array('onClick' => "buildSubTypes();buildDedupeRules();");
     // contact types option
@@ -287,7 +285,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       ) {
         $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
         require_once $dataSourceDir . DIRECTORY_SEPARATOR . $dataSourceFile;
-        $object = new $dataSourceClass;
+        $object = new $dataSourceClass();
         $info = $object->getInfo();
         $dataSources[$dataSourceClass] = $info['title'];
       }

@@ -83,7 +83,7 @@ SELECT  id
       $config = CRM_Core_Config::singleton();
       $preUpgradeMessage .= '<br />' . ts("As per <a href='%1'>the related blog post</a>, we are making contact names, addresses and mailings monolingual; the values entered for the default locale (%2) will be preserved and values for other locales removed.", array(
             1 => 'http://civicrm.org/blogs/shot/multilingual-civicrm-3440-making-some-fields-monolingual',
-            2 => $config->lcMessages
+            2 => $config->lcMessages,
           ));
     }
 
@@ -203,7 +203,7 @@ SELECT  id
 
       $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
             1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
-            2 => $html
+            2 => $html,
           ));
     }
   }
@@ -250,7 +250,7 @@ SELECT  id
           $subTypeTemplates = implode(',', $subTypeTemplates);
           $postUpgradeMessage .= '<br />' . ts('You are using custom template for contact subtypes: %1.', array(1 => $subTypeTemplates)) . '<br />' . ts('You need to move these subtype templates to the SubType directory in %1 and %2 respectively.', array(
                 1 => 'CRM/Contact/Form/Edit',
-                2 => 'CRM/Contact/Page/View'
+                2 => 'CRM/Contact/Page/View',
               ));
         }
       }
@@ -550,7 +550,7 @@ SELECT  count( id ) as statusCount
     $config = CRM_Core_Config::singleton();
     if (is_callable(array(
       $config->userSystem,
-      'replacePermission'
+      'replacePermission',
     ))) {
       $config->userSystem->replacePermission('access CiviEvent', array('access CiviEvent', 'edit all events'));
     }

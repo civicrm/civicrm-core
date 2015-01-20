@@ -183,7 +183,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
         'CRM_Financial_DAO_PaymentProcessor',
-        $this->_id
+        $this->_id,
       ));
 
     $this->add('text', 'description', ts('Description'),
@@ -348,7 +348,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_PaymentProcessor::del($this->_id);
       CRM_Core_Session::setStatus("", ts('Payment Processor Deleted.'), "success");
-      return;
+      return NULL;
     }
 
     $values = $this->controller->exportValues($this->_name);
@@ -371,7 +371,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param int $domainID
    * @param $test
    *
-   * @return Void
+   * @return void
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     $dao = new CRM_Financial_DAO_PaymentProcessor();

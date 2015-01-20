@@ -64,7 +64,6 @@ function _civicrm_api3_im_create_spec(&$params) {
  * Deletes an existing IM
  *
  * @param array $params
- * {@getfields im_delete}
  *
  * @return array
  *   API result Array
@@ -76,8 +75,6 @@ function civicrm_api3_im_delete($params) {
 /**
  * Retrieve one or more IM
  *
- * @param mixed[] (reference ) input parameters
- * {@getfields im_get}
  * @param array $params
  *   An associative array of name/value pairs.
  *

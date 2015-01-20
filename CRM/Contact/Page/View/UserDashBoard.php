@@ -176,7 +176,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         'sectionTitle' => ts('Your Assigned Activities'),
         'weight' => 5,
       );
-      $userDashboard = new CRM_Activity_Page_UserDashboard;
+      $userDashboard = new CRM_Activity_Page_UserDashboard();
       $userDashboard->run();
     }
 
@@ -214,8 +214,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  static
-  public function &links() {
+  public static function &links() {
     if (!(self::$_links)) {
       $disableExtra = ts('Are you sure you want to disable this relationship?');
 

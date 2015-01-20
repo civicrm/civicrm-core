@@ -96,7 +96,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         'end_date',
         'show_payees',
         'event_type_id',
-        'event_id'
+        'event_id',
       ));
   }
 
@@ -110,7 +110,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   /**
    * Construct the search query
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {

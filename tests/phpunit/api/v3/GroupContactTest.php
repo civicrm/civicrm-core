@@ -83,6 +83,10 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_group_contact_get methods
+
+  /**
+   * Test GroupContact.get by ID.
+   */
   public function testGet() {
     $params = array(
       'contact_id' => $this->_contactId,
@@ -161,6 +165,10 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_group_contact_remove methods
+
+  /**
+   * Test GroupContact.delete by contact+group ID.
+   */
   public function testDelete() {
     $params = array(
       'contact_id' => $this->_contactId,

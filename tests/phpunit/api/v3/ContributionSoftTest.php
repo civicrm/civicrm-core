@@ -134,7 +134,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     //test get by contact id works
     $result = $this->callAPISuccess('contribution_soft', 'get', array(
-        'contact_id' => $this->_softIndividual2Id
+        'contact_id' => $this->_softIndividual2Id,
       )
     );
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -155,7 +155,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
 
-  ///////////////// civicrm_contribution_soft
+  /**
+   * civicrm_contribution_soft
+   */
   public function testCreateEmptyParamsContributionSoft() {
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
@@ -169,7 +171,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionSoftInvalidContact() {
-
     $params = array(
       'contact_id' => 999,
       'contribution_id' => $this->_contributionId,
@@ -183,7 +184,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionSoftInvalidContributionId() {
-
     $params = array(
       'contribution_id' => 999999,
       'contact_id' => $this->_softIndividual1Id,
@@ -216,7 +216,10 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['soft_credit_type_id'], 5, 'In line ' . __LINE__);
   }
 
-  //To Update Soft Contribution
+  /**
+   * To Update Soft Contribution
+   *
+   */
   public function testCreateUpdateContributionSoft() {
     //create a soft credit
     $params = array(
@@ -277,7 +280,10 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution_soft', 'delete', $params);
   }
 
-  ///////////////// civicrm_contribution_soft_delete methods
+  /**
+   *  civicrm_contribution_soft_delete methods
+   *
+   */
   public function testDeleteEmptyParamsContributionSoft() {
     $params = array();
     $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);

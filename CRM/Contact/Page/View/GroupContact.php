@@ -37,7 +37,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
    */
   public function browse() {
 
@@ -74,7 +73,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    *
    * @param int $groupId
    *
-   * @return null
    */
   public function edit($groupId = NULL) {
     $controller = new CRM_Core_Controller_Simple(
@@ -176,8 +174,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
         break;
     }
 
-    $groupNum =
-      CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added', NULL, TRUE, TRUE);
+    $groupNum = CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added', NULL, TRUE, TRUE);
     if ($groupNum == 1 &&
       $groupStatus == 'Removed' &&
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,

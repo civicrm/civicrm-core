@@ -47,7 +47,7 @@ class CRM_Mailing_MailStore {
    *   mail store implementation for processing CiviMail-bound emails
    */
   public static function getStore($name = NULL) {
-    $dao = new CRM_Core_DAO_MailSettings;
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $name ? $dao->name = $name : $dao->is_default = 1;
     if (!$dao->find(TRUE)) {
@@ -128,7 +128,7 @@ class CRM_Mailing_MailStore {
       return array();
     }
     $mails = array();
-    $parser = new ezcMailParser;
+    $parser = new ezcMailParser();
     //set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
@@ -158,7 +158,7 @@ class CRM_Mailing_MailStore {
     foreach (array(
                'cur',
                'new',
-               'tmp'
+               'tmp',
              ) as $sub) {
       if (!file_exists($dir . DIRECTORY_SEPARATOR . $sub)) {
         if ($this->_debug) {

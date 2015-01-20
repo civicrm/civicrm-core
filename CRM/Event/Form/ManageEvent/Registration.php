@@ -248,12 +248,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       ts('Allow Online Registration'),
       NULL,
       array(
-        'onclick' => "return showHideByValue('is_online_registration'," . 
-          "''," .
-          "'registration_blocks'," .
-          "'block'," .
-          "'radio'," .
-          "false );",
+        'onclick' => "return showHideByValue('is_online_registration'," .
+        "''," .
+        "'registration_blocks'," .
+        "'block'," .
+        "'radio'," .
+        "false );",
       )
     );
 

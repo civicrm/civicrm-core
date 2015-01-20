@@ -39,7 +39,7 @@ class CRM_Core_SelectValues {
 
   /**
    * Preferred mail format
-   * 
+   *
    * @return array
    */
   public static function pmf() {
@@ -81,7 +81,7 @@ class CRM_Core_SelectValues {
 
   /**
    * Various pre defined unit list
-   * 
+   *
    * @param string $unitType
    * @return array
    */
@@ -762,7 +762,7 @@ class CRM_Core_SelectValues {
 
   /**
    * Get numeric options
-   * 
+   *
    * @param int $start
    * @param int $end
    *
@@ -975,8 +975,8 @@ class CRM_Core_SelectValues {
     static $scheduleReminderFrequencyUnits = NULL;
     if (!$scheduleReminderFrequencyUnits) {
       $scheduleReminderFrequencyUnits = array(
-          'hour' => ts('hour')
-        ) + CRM_Core_OptionGroup::values('recur_frequency_units');
+        'hour' => ts('hour'),
+      ) + CRM_Core_OptionGroup::values('recur_frequency_units');
     }
 
     return $scheduleReminderFrequencyUnits;

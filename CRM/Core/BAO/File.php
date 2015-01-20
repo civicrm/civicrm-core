@@ -85,7 +85,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    *
    * @throws Exception
    */
-  static function filePostProcess(
+  public static function filePostProcess(
     $data,
     $fileTypeID,
     $entityTable,
@@ -495,7 +495,7 @@ AND       CEF.entity_id    = %2";
    * @param $entityTable
    * @param int $entityID
    */
-  static function formatAttachment(
+  public static function formatAttachment(
     &$formValues,
     &$params,
     $entityTable,
@@ -669,7 +669,6 @@ AND       CEF.entity_id    = %2";
     foreach ($currentAttachmentInfo as $fileKey => $fileValue) {
       $fileID = $fileValue['fileID'];
       $fileType = $fileValue['mime_type'];
-      $eid = $entityID;
       if ($fileID) {
         if ($fileType == 'image/jpeg' ||
           $fileType == 'image/pjpeg' ||

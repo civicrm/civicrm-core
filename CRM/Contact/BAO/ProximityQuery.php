@@ -50,7 +50,7 @@ class CRM_Contact_BAO_ProximityQuery {
    * earth_eccentricity_sq = 2*$earth_flattening - pow($earth_flattening, 2);
    * This library is an implementation of UCB CS graduate student, Ka-Ping Yee (http://www.zesty.ca).
    * This version has been taken from Drupal's location module: http://drupal.org/project/location
-   **/
+   */
 
   static protected $_earthFlattening;
   static protected $_earthRadiusSemiMinor;
@@ -206,8 +206,8 @@ class CRM_Contact_BAO_ProximityQuery {
   }
 
   /**
-   * @param float $longitude
    * @param float $latitude
+   * @param float $longitude
    * @param float $distance
    * @param string $tablePrefix
    *
@@ -219,17 +219,8 @@ class CRM_Contact_BAO_ProximityQuery {
     $params = array();
     $clause = array();
 
-    list($minLongitude, $maxLongitude) =
-      self::earthLongitudeRange($longitude,
-        $latitude,
-        $distance
-      );
-    list($minLatitude, $maxLatitude) =
-      self::earthLatitudeRange(
-        $longitude,
-        $latitude,
-        $distance
-      );
+    list($minLongitude, $maxLongitude) = self::earthLongitudeRange($longitude, $latitude, $distance);
+    list($minLatitude, $maxLatitude) = self::earthLatitudeRange($longitude, $latitude, $distance);
 
     // DONT consider NAN values (which is returned by rad2deg php function)
     // for checking BETWEEN geo_code's criteria as it throws obvious 'NAN' field not found DB: Error
@@ -266,6 +257,7 @@ ACOS(
    * @param array $values
    *
    * @throws Exception
+   * @return void
    */
   public static function process(&$query, &$values) {
     list($name, $op, $distance, $grouping, $wildcard) = $values;
@@ -297,7 +289,7 @@ ACOS(
     }
 
     if (empty($proximityAddress)) {
-      return;
+      return NULL;
     }
 
     if (isset($proximityAddress['state_province_id'])) {
@@ -320,7 +312,6 @@ ACOS(
       $proximityAddress['country'] = CRM_Core_PseudoConstant::country($proximityAddress['country_id']);
       $qill[] = $proximityAddress['country'];
     }
-
 
     if (
       isset($proximityAddress['distance_unit']) &&
@@ -358,7 +349,7 @@ ACOS(
       $qill .= ': ' . ts('We could not geocode the destination address.');
       $query->_qill[$grouping][] = $qill;
       $query->_where[$grouping][] = ' (0) ';
-      return;
+      return NULL;
     }
 
     $query->_qill[$grouping][] = $qill;
@@ -368,11 +359,12 @@ ACOS(
       $distance
     );
 
-    return;
+    return NULL;
   }
 
   /**
    * @param array $input
+   * retun void
    */
   public static function fixInputParams(&$input) {
     foreach ($input as $param) {
@@ -395,7 +387,7 @@ ACOS(
             }
           }
         }
-        return;
+        return NULL;
       }
     }
   }

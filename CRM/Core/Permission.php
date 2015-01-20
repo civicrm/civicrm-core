@@ -114,7 +114,7 @@ class CRM_Core_Permission {
    *    array('access CiviEvent', 'access CiviContribute')
    *  ),
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public static function check($permissions) {
@@ -162,7 +162,7 @@ class CRM_Core_Permission {
    * @param array $array
    *   The group/role to check.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public static function checkGroupRole($array) {
@@ -673,8 +673,8 @@ class CRM_Core_Permission {
    * Validate user permission across
    * edit or view or with supportable acls.
    *
-   * @return boolean
-   **/
+   * @return bool
+   */
   public static function giveMeAllACLs() {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')

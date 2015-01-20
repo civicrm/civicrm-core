@@ -48,7 +48,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
    */
   public function run($args = NULL) {
     if ($args[1] !== 'profile') {
-      return;
+      return NULL;
     }
 
     $secondArg = CRM_Utils_Array::value(2, $args, '');
@@ -75,8 +75,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
 
       // make sure that this profile enables mapping
       // CRM-8609
-      $isMap =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileGID, 'is_map');
+      $isMap = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileGID, 'is_map');
       if (!$isMap) {
         CRM_Core_Error::statusBounce(ts('This profile does not have the map feature turned on.'));
       }
@@ -126,7 +125,6 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
     }
 
     CRM_Utils_System::permissionDenied();
-    return;
   }
 
 }

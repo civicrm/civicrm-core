@@ -133,7 +133,6 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *
    * @param int $productID
    */
-
   public static function del($productID) {
     //check dependencies
     $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();

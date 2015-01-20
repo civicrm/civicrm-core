@@ -55,7 +55,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
    * AllIMs() method - get all IMs for our contact, with primary IM first
    */
   public function testAllIMs() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
       $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml')

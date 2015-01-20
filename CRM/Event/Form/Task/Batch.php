@@ -139,7 +139,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_participantIds);
     $fileFieldExists = FALSE;
@@ -350,7 +349,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
     if (!$participantId || !$statusId) {
-      return;
+      return NULL;
     }
 
     $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId,

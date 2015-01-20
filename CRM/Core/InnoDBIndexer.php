@@ -273,7 +273,7 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * @return boolean
+   * @return bool
    */
   public function getActive() {
     return $this->isActive;

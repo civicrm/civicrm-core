@@ -50,6 +50,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_ids = array();
   protected $_pageParams = array();
 
+  /**
+   * Setup function.
+   */
   public function setUp() {
     parent::setUp();
 
@@ -91,10 +94,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Clean up after each test.
+   */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
+  /**
+   * Test Get.
+   */
   public function testGetContribution() {
     $p = array(
       'contact_id' => $this->_individualId,
@@ -122,8 +131,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals(1, $contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
-    // note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
-    // passing back a string rather than an id seems like an error / cruft - & if it is to be introduced we should discuss
+    // Note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
+    // Passing back a string rather than an id seems like an error/cruft.
+    // If it is to be introduced we should discuss.
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
@@ -133,34 +143,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-    //create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id)
+    // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
 
     $contribution2 = $this->callAPISuccess('contribution', 'create', $p);
 
-    // now we have 2 - test getcount
+    // Now we have 2 - test getcount.
     $contribution = $this->callAPISuccess('contribution', 'getcount', array());
     $this->assertEquals(2, $contribution);
-    //test id only format
+    // Test id only format.
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $this->_contribution['id'],
       'format.only_id' => 1,
     ));
-    $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution, TRUE) . " in line " . __LINE__);
-    //test id only format
+    $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution, TRUE));
+    // Test id only format.
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $contribution2['id'],
       'format.only_id' => 1,
     ));
     $this->assertEquals($contribution2['id'], $contribution);
-    //test id as field
+    // Test id as field.
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $this->_contribution['id'],
     ));
     $this->assertEquals(1, $contribution['count']);
 
-    //test get by contact id works
+    // Test get by contact id works.
     $contribution = $this->callAPISuccess('contribution', 'get', array('contact_id' => $this->_individualId));
 
     $this->assertEquals(2, $contribution['count']);
@@ -173,7 +183,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * We need to ensure previous tested behaviour still works as part of the api contract
+   * We need to ensure previous tested behaviour still works as part of the api contract.
    */
   public function testGetContributionLegacyBehaviour() {
     $p = array(
@@ -211,7 +221,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-    //create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id)
+
+    // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
 
@@ -225,7 +236,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $this->_contribution['id'],
       'format.only_id' => 1,
     ));
-    $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution, TRUE) . " in line " . __LINE__);
+    $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution, TRUE));
     //test id only format
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $contribution2['id'],
@@ -261,23 +272,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('contribution', 'create', $params);
   }
-  /*
-   * ensure we continue to support contribution_type_id as part of the api commitment to
-   * stability
-   *///////////////// civicrm_contribution_
-
-  public function testCreateLegacyBehaviour() {
-    $params = array(
-      'contribution_id' => FALSE,
-      'contact_id' => 1,
-      'total_amount' => 1,
-      'check_permissions' => FALSE,
-      'contribution_type_id' => 3,
-    );
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
-    $this->assertEquals(3, $contribution['financial_type_id']);
-  }
 
   /**
    * Check with complete array + custom field
@@ -299,11 +293,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -463,9 +458,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_payment_instrument' => 'Cash',
     ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
-    $this->assertEquals(1,$contribution['count']);
-    $contribution = $this->callAPISuccess('contribution','get',array('sequential' => 1, 'payment_instrument' => 'Cash'));
+    $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
+    $this->assertEquals(1, $contribution['count']);
+    $contribution = $this->callAPISuccess('contribution', 'get',array('sequential' => 1, 'payment_instrument' => 'Cash'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
@@ -532,9 +527,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create test with unique field name on source
+   * Create test with unique field name on source.
    */
-  public function testCreateContributionSourceInvalidContac() {
+  public function testCreateContributionSourceInvalidContact() {
 
     $params = array(
       'contact_id' => 999,
@@ -575,7 +570,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test note created correctly
+   * Test note created correctly.
    */
   public function testCreateContributionWithNote() {
     $description = "Demonstrates creating contribution with Note Entity";
@@ -634,29 +629,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * This is the test for creating soft credits - however a 'get' is not yet possible via API
-   * as the current BAO functions are contact-centric (from what I can find)
+   * This is the test for creating soft credits.
    */
-  public function testCreateContributionWithSoftCredt() {
+  public function testCreateContributionWithSoftCredit() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile = "ContributionCreateWithSoftCredit";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
       'display_name' => 'superman',
       'contact_type' => 'Individual',
     ));
-    $softparams = array(
+    $softParams = array(
       'contact_id' => $contact2['id'],
       'amount' => 50,
       'soft_credit_type_id' => 3,
     );
 
-    $params = $this->_params + array('soft_credit' => array(1 => $softparams));
+    $params = $this->_params + array('soft_credit' => array(1 => $softParams));
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
-    $this->assertEquals($softparams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
-    $this->assertEquals($softparams['amount'], $result['values'][0]['soft_credit'][1]['amount']);
-    $this->assertEquals($softparams['soft_credit_type_id'], $result['values'][0]['soft_credit'][1]['soft_credit_type']);
+    $this->assertEquals($softParams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
+    $this->assertEquals($softParams['amount'], $result['values'][0]['soft_credit'][1]['amount']);
+    $this->assertEquals($softParams['soft_credit_type_id'], $result['values'][0]['soft_credit'][1]['soft_credit_type']);
 
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
@@ -670,8 +664,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ));
     $params = $this->_params + array(
-        'soft_credit_to' => $contact2['id'],
-      );
+      'soft_credit_to' => $contact2['id'],
+    );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
@@ -692,8 +686,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ));
     $params = $this->_params + array(
-        'honor_contact_id' => $contact2['id'],
-      );
+      'honor_contact_id' => $contact2['id'],
+    );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'soft_credit', 'sequential' => 1));
 
@@ -708,7 +702,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code
+   * Test using example code.
    */
   public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
@@ -772,7 +766,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
 
   /**
-   * Function tests that additional financial records are created when online contribution is created
+   * Function tests that additional financial records are created when online contribution is created.
    */
   public function testCreateContributionOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -804,6 +798,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check handling of financial type.
+   *
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
@@ -814,6 +810,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check handling of financial type.
+   *
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
@@ -824,8 +822,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when online contribution with pay later option
-   * is created
+   * Tests that additional financial records are created.
+   *
+   * Checks when online contribution with pay later option is created
    */
   public function testCreateContributionPayLaterOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -889,7 +888,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that BAO defaults work
+   * Test that BAO defaults work.
    */
   public function testCreateBAODefaults() {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
@@ -1154,7 +1153,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00);
-    $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId );
+    $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'], $this->_financialTypeId);
     $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument);
     $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00);
     $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount);
@@ -1168,7 +1167,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     );
     $result = $this->callAPISuccess('contribution', 'delete', $params);
-    $this->assertAPISuccess($result, 'in line' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_contribution_delete methods
@@ -1587,7 +1586,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['contribution_source'] = $params['source'];
     unset($params['source']);
     foreach ($params as $key => $value) {
-      $this->assertEquals($value, $values[$key], $key . " value: $value doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
+      $this->assertEquals($value, $values[$key], $key . " value: $value doesn't match " . print_r($values, TRUE));
     }
   }
 

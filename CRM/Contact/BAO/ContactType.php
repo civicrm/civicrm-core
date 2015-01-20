@@ -373,7 +373,7 @@ WHERE  type.name IS NOT NULL
    *
    * @return mixed
    */
-  static function getSelectElements(
+  public  static function getSelectElements(
     $all = FALSE,
     $isSeparator = TRUE,
     $separator = '__'
@@ -450,7 +450,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *   Contact subType.
    * @param bool $ignoreCache
    *
-   * @return boolean
+   * @return bool
    *   true if subType, false otherwise.
    */
   public static function isaSubType($subType, $ignoreCache = FALSE) {
@@ -521,7 +521,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    * @param bool $ignoreCache
    * @param string $columnName
    *
-   * @return boolean
+   * @return bool
    *   true if contact extends, false otherwise.
    */
   public static function isExtendsContactType($subType, $contactType, $ignoreCache = FALSE, $columnName = 'name') {
@@ -628,18 +628,18 @@ WHERE name = %1";
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return object
+   * @return object|void
    */
   public static function add(&$params) {
 
     // label or name
     if (empty($params['id']) && empty($params['label'])) {
-      return;
+      return NULL;
     }
     if (!empty($params['parent_id']) &&
       !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $params['parent_id'])
     ) {
-      return;
+      return NULL;
     }
 
     $contactType = new CRM_Contact_DAO_ContactType();
@@ -734,7 +734,7 @@ WHERE name = %1";
    * @param string $subType
    *   Subtype.
    *
-   * @return boolean
+   * @return bool
    */
   public static function isAllowEdit($contactId, $subType = NULL) {
 
@@ -867,7 +867,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    *
    * @return bool
    */
-  static function deleteCustomSetForSubtypeMigration(
+  public  static function deleteCustomSetForSubtypeMigration(
     $contactID,
     $contactType,
     $oldSubtypeSet = array(),

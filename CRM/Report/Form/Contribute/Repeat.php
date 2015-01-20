@@ -149,9 +149,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
             'required' => TRUE,
-            'clause' => '
-contribution_civireport1.total_amount_count as contribution1_total_amount_count,
-contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
+            'clause' => 'contribution_civireport1.total_amount_count as contribution1_total_amount_count, contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
           ),
           'total_amount2' => array(
             'name' => 'total_amount',
@@ -160,9 +158,7 @@ contribution_civireport1.total_amount_sum as contribution1_total_amount_sum',
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
             'required' => TRUE,
-            'clause' => '
-contribution_civireport2.total_amount_count as contribution2_total_amount_count,
-contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
+            'clause' => 'contribution_civireport2.total_amount_count as contribution2_total_amount_count, contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
           ),
         ),
         'grouping' => 'contri-fields',
@@ -397,8 +393,8 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
   public function where() {
     if (!$this->_amountClauseWithAND) {
-      $this->_amountClauseWithAND =
-        "!({$this->_aliases['civicrm_contribution']}1.total_amount_count IS NULL AND {$this->_aliases['civicrm_contribution']}2.total_amount_count IS NULL)";
+      $this->_amountClauseWithAND
+        = "!({$this->_aliases['civicrm_contribution']}1.total_amount_count IS NULL AND {$this->_aliases['civicrm_contribution']}2.total_amount_count IS NULL)";
     }
     $clauses = array("atleast_one_amount" => $this->_amountClauseWithAND);
 
@@ -617,19 +613,19 @@ LEFT JOIN civicrm_temp_civireport_repeat2
     //store contributions in array 'contact_sums' for comparison
     $contact_sums = array();
     while ($dao->fetch()) {
-      $contact_sums[$dao->contact_id] =
-        array(
+      $contact_sums[$dao->contact_id]
+        = array(
           'contribution1_total_amount_sum' => $dao->contribution1_total_amount_sum,
           'contribution2_total_amount_sum' => $dao->contribution2_total_amount_sum,
         );
     }
 
     $total_distinct_contacts = count($contact_sums);
-    $number_maintained = 0;
-    $number_upgraded = 0;
-    $number_downgraded = 0;
-    $number_new = 0;
-    $number_lapsed = 0;
+    $maintained = 0;
+    $upgraded = 0;
+    $downgraded = 0;
+    $new = 0;
+    $lapsed = 0;
 
     foreach ($contact_sums as $uid => $row) {
       if ($row['contribution1_total_amount_sum'] &&
@@ -638,49 +634,50 @@ LEFT JOIN civicrm_temp_civireport_repeat2
         $change = ($row['contribution1_total_amount_sum'] -
           $row['contribution2_total_amount_sum']);
         if ($change == 0) {
-          $number_maintained += 1;
+          $maintained += 1;
         }
         elseif ($change > 0) {
-          $number_upgraded += 1;
+          $upgraded += 1;
         }
         elseif ($change < 0) {
-          $number_downgraded += 1;
+          $downgraded += 1;
         }
       }
       elseif ($row['contribution1_total_amount_sum']) {
-        $number_new += 1;
+        $new += 1;
       }
       elseif ($row['contribution2_total_amount_sum']) {
-        $number_lapsed += 1;
+        $lapsed += 1;
       }
     }
 
     //calculate percentages from numbers
-    $percent_maintained = ($number_maintained / $total_distinct_contacts) * 100;
-    $percent_upgraded = ($number_upgraded / $total_distinct_contacts) * 100;
-    $percent_downgraded = ($number_downgraded / $total_distinct_contacts) * 100;
-    $percent_new = ($number_new / $total_distinct_contacts) * 100;
-    $percent_lapsed = ($number_lapsed / $total_distinct_contacts) * 100;
-
+    if (!empty($total_distinct_contacts)) {
+      $maintained = ($maintained / $total_distinct_contacts) * 100;
+      $upgraded = ($upgraded / $total_distinct_contacts) * 100;
+      $downgraded = ($downgraded / $total_distinct_contacts) * 100;
+      $new = ($new / $total_distinct_contacts) * 100;
+      $lapsed = ($lapsed / $total_distinct_contacts) * 100;
+    }
     //display percentages for new, lapsed, upgraded, downgraded, and maintained contributors
     $statistics['counts']['count_new'] = array(
-      'value' => $percent_new,
+      'value' => $new,
       'title' => '% New Donors',
     );
     $statistics['counts']['count_lapsed'] = array(
-      'value' => $percent_lapsed,
+      'value' => $lapsed,
       'title' => '% Lapsed Donors',
     );
     $statistics['counts']['count_upgraded'] = array(
-      'value' => $percent_upgraded,
+      'value' => $upgraded,
       'title' => '% Upgraded Donors',
     );
     $statistics['counts']['count_downgraded'] = array(
-      'value' => $percent_downgraded,
+      'value' => $downgraded,
       'title' => '% Downgraded Donors',
     );
     $statistics['counts']['count_maintained'] = array(
-      'value' => $percent_maintained,
+      'value' => $maintained,
       'title' => '% Maintained Donors',
     );
 
@@ -701,16 +698,16 @@ GROUP BY    currency
     $count = $count2 = 0;
     while ($dao->fetch()) {
       if ($dao->amount) {
-        $amount[] =
-          CRM_Utils_Money::format($dao->amount, $dao->currency) . "(" .
+        $amount[]
+          = CRM_Utils_Money::format($dao->amount, $dao->currency) . "(" .
           $dao->count . ")";
         $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       }
 
       $count += $dao->count;
       if ($dao->amount2) {
-        $amount2[] =
-          CRM_Utils_Money::format($dao->amount2, $dao->currency) . "(" .
+        $amount2[]
+          = CRM_Utils_Money::format($dao->amount2, $dao->currency) . "(" .
           $dao->count . ")";
         $average2[] = CRM_Utils_Money::format($dao->avg2, $dao->currency);
       }
@@ -853,13 +850,13 @@ currency varchar(3)
         $rows[$uid]['change'] = ts('New Donor');
       }
       if ($row['contribution1_total_amount_count']) {
-        $rows[$uid]['contribution1_total_amount_sum'] =
-          $row['contribution1_total_amount_sum'] .
+        $rows[$uid]['contribution1_total_amount_sum']
+          = $row['contribution1_total_amount_sum'] .
           " ({$row['contribution1_total_amount_count']})";
       }
       if ($row['contribution2_total_amount_count']) {
-        $rows[$uid]['contribution2_total_amount_sum'] =
-          $row['contribution2_total_amount_sum'] .
+        $rows[$uid]['contribution2_total_amount_sum']
+          = $row['contribution2_total_amount_sum'] .
           " ({$row['contribution2_total_amount_count']})";
       }
     }

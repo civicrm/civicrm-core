@@ -48,7 +48,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    *
    * @return void
    */
-  function view() {
+  public function view() {
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $this->_id;
     if ($recur->find(TRUE)) {

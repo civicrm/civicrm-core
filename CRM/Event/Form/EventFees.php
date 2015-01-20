@@ -239,7 +239,7 @@ class CRM_Event_Form_EventFees {
                  'payment_instrument_id',
                  'contribution_status_id',
                  'receive_date',
-                 'total_amount'
+                 'total_amount',
                ) as $f) {
         if ($f == 'receive_date') {
           list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
@@ -401,7 +401,7 @@ SELECT  id, html_type
         $element = $form->add('select', 'discount_id',
           ts('Discount Set'),
           array(
-            0 => ts('- select -')
+            0 => ts('- select -'),
           ) + $discounts,
           FALSE,
           array('onchange' => "buildFeeBlock( {$form->_eventId}, this.value );")

@@ -45,7 +45,7 @@ class CRM_Core_ManagedEntities {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function () {
-        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
       },
       array(),
       'ManagedEntities::reconcile'

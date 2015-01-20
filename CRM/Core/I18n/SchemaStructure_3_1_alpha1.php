@@ -36,7 +36,7 @@ class CRM_Core_I18n_SchemaStructure_3_1_alpha1 {
   /**
    * @return array
    */
-  static function &columns() {
+  public static function &columns() {
     static $result = NULL;
     if (!$result) {
       $result = array(

@@ -90,7 +90,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         array('label' => 'my goat', 'value' => 'goat', 'is_active' => TRUE, 'weight' => 2),
         array('label' => 'mohair', 'value' => 'wool', 'is_active' => TRUE, 'weight' => 3),
         array('label' => 'hungry', 'value' => '', 'is_active' => TRUE, 'weight' => 3),
-      )
+      ),
     ));
     $columnName = $result['values'][$result['id']]['column_name'];
     $ids['custom_field_id'] = $result['id'];
@@ -157,14 +157,13 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
-  /*
-  * This is a test to check if setting fields one at a time alters other fields
-  * Issues Hit so far =
-  * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
-  *  - in which case it is valid
-  * 2)
-  */
-
+  /**
+   * This is a test to check if setting fields one at a time alters other fields
+   * Issues Hit so far =
+   * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
+   *  - in which case it is valid
+   * 2)
+   */
   public function testCreateAutoGrant() {
     $entityName = $this->_entity;
     $baoString = 'CRM_Grant_BAO_Grant';

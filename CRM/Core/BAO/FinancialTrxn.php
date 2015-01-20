@@ -67,8 +67,8 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $trxn->save();
 
     // save to entity_financial_trxn table
-    $entityFinancialTrxnParams =
-      array(
+    $entityFinancialTrxnParams
+      = array(
         'entity_table' => "civicrm_contribution",
         'financial_trxn_id' => $trxn->id,
         'amount' => $params['total_amount'],
@@ -384,8 +384,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
-    $params['trxnParams']['fee_amount'] =
-    $params['trxnParams']['net_amount'] = 0;
+    $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
@@ -393,8 +392,8 @@ WHERE ceft.entity_id = %1";
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }
-    $fItemParams =
-      array(
+    $fItemParams
+      = array(
         'financial_account_id' => $financialAccount,
         'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
         'created_date' => date('YmdHis'),
@@ -416,7 +415,7 @@ WHERE ceft.entity_id = %1";
    * @param int $entityId
    * @param string $entityName
    * @param bool $returnType
-   * @param number $lineItemTotal
+   * @param int $lineItemTotal
    *
    * @return array|int|NULL|string
    *   [payment type => amount]

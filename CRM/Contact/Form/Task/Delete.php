@@ -128,14 +128,14 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
           // more than one contact deleted
           $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', array(
               'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
-              'count' => $sharedAddressCount
+              'count' => $sharedAddressCount,
             ));
         }
         else {
           // only one contact deleted
           $message = ts('This contact has an address record which is shared with 1 other contact.', array(
               'plural' => 'This contact has an address record which is shared with %count other contacts.',
-              'count' => $sharedAddressCount
+              'count' => $sharedAddressCount,
             ));
         }
         CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
@@ -258,21 +258,21 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         $status = ts('%1 has been restored from the trash.', array(
             1 => $name,
             'plural' => '%count contacts restored from trash.',
-            'count' => $deleted
+            'count' => $deleted,
           ));
       }
       elseif ($this->_skipUndelete) {
         $status = ts('%1 has been permanently deleted.', array(
             1 => $name,
             'plural' => '%count contacts permanently deleted.',
-            'count' => $deleted
+            'count' => $deleted,
           ));
       }
       else {
         $status = ts('%1 has been moved to the trash.', array(
             1 => $name,
             'plural' => '%count contacts moved to trash.',
-            'count' => $deleted
+            'count' => $deleted,
           ));
       }
       $session->setStatus($status, $title, 'success');

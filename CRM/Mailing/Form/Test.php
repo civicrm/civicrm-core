@@ -177,7 +177,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    * @param array $self
    *   An current this object.
    *
-   * @return boolean
+   * @return bool
    *   true on successful SMTP handoff
    */
   public static function testMail($testParams, $files, $self) {
@@ -266,7 +266,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     ) {
       return array(
         '_qf_default' =>
-          ts("You can not schedule or send this mailing because there are currently no recipients selected. Click 'Previous' to return to the Select Recipients step, OR click 'Save & Continue Later'."),
+        ts("You can not schedule or send this mailing because there are currently no recipients selected. Click 'Previous' to return to the Select Recipients step, OR click 'Save & Continue Later'."),
       );
     }
 
@@ -326,7 +326,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
                 'email' => $email,
                 'is_primary' => 1,
                 'location_type_id' => 1,
-              )
+              ),
             ),
           );
           $contact = CRM_Contact_BAO_Contact::create($params);

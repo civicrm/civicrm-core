@@ -555,8 +555,6 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is ascii
    *
-   * @param array Uploaded file info (from $_FILES)
-   *
    * @return bool
    *   true if file has been uploaded, false otherwise
    */
@@ -571,8 +569,6 @@ class CRM_Utils_Rule {
 
   /**
    * Checks to make sure the uploaded file is in UTF-8, recodes if it's not
-   *
-   * @param array Uploaded file info (from $_FILES)
    *
    * @return bool
    *   whether file has been uploaded properly and is now in UTF-8
@@ -602,8 +598,6 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is html
    *
-   * @param array Uploaded file info (from $_FILES)
-   *
    * @return bool
    *   true if file has been uploaded, false otherwise
    */
@@ -624,7 +618,7 @@ class CRM_Utils_Rule {
    * @param array $options
    *   The daoName and fieldName (optional ).
    *
-   * @return boolean
+   * @return bool
    *   true if object exists
    */
   public static function objectExists($value, $options) {

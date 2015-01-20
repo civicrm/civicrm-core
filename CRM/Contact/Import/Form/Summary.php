@@ -113,7 +113,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
       'groupAdditions',
       'tagAdditions',
       'unMatchCount',
-      'unparsedAddressCount'
+      'unparsedAddressCount',
     );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));

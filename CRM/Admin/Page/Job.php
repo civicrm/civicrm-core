@@ -121,7 +121,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 

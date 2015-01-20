@@ -59,7 +59,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $entities[] = array(
       'entity_name' => 'contribution_1',
       'entity_type' => 'ContributionModel',
-      'entity_sub_type' => '*'
+      'entity_sub_type' => '*',
     );
 
     // If applicable, register 'membership_1'
@@ -69,7 +69,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       $entities[] = array(
         'entity_name' => 'membership_1',
         'entity_type' => 'MembershipModel',
-        'entity_sub_type' => '*'
+        'entity_sub_type' => '*',
       );
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);

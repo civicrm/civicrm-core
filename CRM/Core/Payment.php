@@ -303,7 +303,7 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
             'rule_name' => 'integer',
             'rule_parameters' => NULL,
-          )
+          ),
         ),
       ),
       'credit_card_exp_date' => array(
@@ -318,7 +318,7 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Card expiration date cannot be a past date.'),
             'rule_name' => 'currentDate',
             'rule_parameters' => TRUE,
-          )
+          ),
         ),
       ),
       'credit_card_type' => array(
@@ -357,7 +357,7 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-          )
+          ),
         ),
         'is_required' => TRUE,
       ),
@@ -378,7 +378,7 @@ abstract class CRM_Core_Payment {
             'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
             'rule_name' => 'nopunctuation',
             'rule_parameters' => NULL,
-          )
+          ),
         ),
       ),
       'bank_name' => array(
@@ -408,7 +408,7 @@ abstract class CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    * @abstract
    */
-  abstract function doDirectPayment(&$params);
+  abstract protected function doDirectPayment(&$params);
 
   /**
    * Process payment - this function wraps around both doTransferPayment and doDirectPayment
@@ -442,7 +442,7 @@ abstract class CRM_Core_Payment {
    * @return string
    *   the error message if any
    */
-  abstract function checkConfig();
+  abstract protected function checkConfig();
 
   /**
    * @param $paymentProcessor
@@ -589,7 +589,7 @@ abstract class CRM_Core_Payment {
    * @param string $method
    *   Method to check for.
    *
-   * @return boolean
+   * @return bool
    */
   public function isSupported($method = 'cancelSubscription') {
     return method_exists(CRM_Utils_System::getClassName($this), $method);

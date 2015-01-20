@@ -87,7 +87,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         'first_name',
         'last_name',
         'external_identifier',
-        'participant_status_id'
+        'participant_status_id',
       );
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
@@ -158,8 +158,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
-
-
     /* Initialize all field usages to false */
 
     foreach ($mapperKeys as $key) {
@@ -343,7 +341,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                  1 => $threshold
+                  1 => $threshold,
                 )) . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
             }
           }

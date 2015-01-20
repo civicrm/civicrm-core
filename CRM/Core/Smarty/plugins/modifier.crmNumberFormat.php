@@ -49,8 +49,8 @@
  * @return string
  *   the formatted string
  *
- * For alternate decimal point and thousands separator, delimit values with single quotes in the template.
- * EXAMPLE:   {$number|crmNumberFormat:2:',':' '} for French notation - 1234.56 becomes 1 234,56
+ *   For alternate decimal point and thousands separator, delimit values with single quotes in the template.
+ *   EXAMPLE:   {$number|crmNumberFormat:2:',':' '} for French notation - 1234.56 becomes 1 234,56
  */
 function smarty_modifier_crmNumberFormat($number, $decimals = NULL, $dec_point = NULL, $thousands_sep = NULL) {
   if (is_numeric($number)) {

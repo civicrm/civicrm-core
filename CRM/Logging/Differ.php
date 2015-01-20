@@ -81,7 +81,7 @@ class CRM_Logging_Differ {
       2 => array($this->log_date, 'String'),
     );
 
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $addressCustomTables = $logging->entityCustomDataLogTables('Address');
 
     $contactIdClause = $join = '';
@@ -311,7 +311,7 @@ WHERE lt.log_conn_id = %1 AND
             break;
         }
 
-        $dao = new $daos[$table];
+        $dao = new $daos[$table]();
         foreach ($dao->fields() as $field) {
           $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
 
