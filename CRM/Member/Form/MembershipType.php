@@ -83,7 +83,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
     }
 
-
     //setting default fixed_period_start_day & fixed_period_rollover_day
     $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
     foreach ($periods as $per) {

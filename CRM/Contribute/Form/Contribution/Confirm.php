@@ -1416,7 +1416,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'actual_amount' => $scheduledAmount,
           );
 
-
           CRM_Pledge_BAO_PledgePayment::add($pledgePaymentParams);
         }
 
@@ -1504,7 +1503,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       CRM_Core_BAO_Note::add($noteParams, array());
     }
-
 
     if (isset($params['related_contact'])) {
       $contactID = $params['related_contact'];
