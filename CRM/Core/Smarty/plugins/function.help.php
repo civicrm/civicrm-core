@@ -46,7 +46,7 @@
  */
 function smarty_function_help($params, &$smarty) {
   if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
-    return;
+    return NULL;
   }
 
   if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {

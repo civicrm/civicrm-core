@@ -889,7 +889,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Core_BAO_EntityTag::del($tagParams);
 
       CRM_Core_Session::setStatus(ts("Selected Activity has been deleted successfully."), ts('Record Deleted'), 'success');
-      return;
+      return NULL;
     }
 
     // store the submitted values in an array

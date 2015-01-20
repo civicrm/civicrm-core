@@ -81,8 +81,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
   /**
    * called when action is browse
-   *
-   * @return null
    */
   public function browse() {
     $note = new CRM_Core_DAO_Note();
@@ -160,8 +158,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
   /**
    * called when action is update or new
-   *
-   * @return null
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Note_Form_Note', ts('Contact Notes'), $this->_action);

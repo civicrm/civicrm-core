@@ -83,7 +83,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * Determine whether the given table/id
    * has discount associated with it
    *
-   * @param int $entityIdEntity id to be searched.
+   * @param int $entityId
    *   Entity id to be searched.
    * @param string $entityTable
    *   Entity table to be searched.

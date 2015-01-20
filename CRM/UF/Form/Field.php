@@ -615,18 +615,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for subtype.
    *
-   * @param array $groupType
-   *   Contains all groupTypes.
-   *
    * @param string $fieldType
    *   Type of field.
-   *
+   * @param array $groupType
+   *   Contains all groupTypes.
    * @param array $errors
-   *
-   * @return array
-   *   list of errors to be posted back to the form
+   *   List of errors to be posted back to the form.
    */
-  public static function formRuleSubType($fieldType, $groupType, $errors) {
+  public static function formRuleSubType($fieldType, $groupType, &$errors) {
     if (in_array($fieldType, array(
       'Participant',
       'Contribution',

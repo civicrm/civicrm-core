@@ -378,7 +378,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$name has been created."));
   }
 
-  /*
+  /**
    * Webtest for CRM-12148
    */
   public function testSearchBuilderfinancialType() {
@@ -433,7 +433,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
   }
 
-  /*
+  /**
    * Webtest for CRM-12588
    */
   public function testSearchBuilderMembershipType() {

@@ -49,12 +49,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param null $entity
    *
-   * @return array
+   * @return array|NULL
    *   array of created address
    */
   public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     if (!isset($params['address']) || !is_array($params['address'])) {
-      return;
+      return NULL;
     }
     CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
     $addresses = array();
@@ -1247,7 +1247,7 @@ SELECT is_primary,
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *

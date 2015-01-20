@@ -1083,9 +1083,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param object $field
    *   The field object.
-   *
-   * @return boolean
-   *
    */
   public static function deleteField($field) {
     CRM_Utils_System::flushCache();
@@ -1103,8 +1100,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
-
-    return;
   }
 
   /**
@@ -1577,7 +1572,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $includeViewOnly
    *   If true, fields marked 'View Only' are included. Required for APIv3.
    *
-   * @return array
+   * @return array|NULL
    *   formatted custom field array
    */
   public static function formatCustomField(
@@ -1620,7 +1615,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // return if field is a 'code' field
     if (!$includeViewOnly && !empty($customFields[$customFieldId]['is_view'])) {
-      return;
+      return NULL;
     }
 
     list($tableName, $columnName, $groupID) = self::getTableColumnGroup($customFieldId);

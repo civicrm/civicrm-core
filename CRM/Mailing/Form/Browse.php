@@ -71,7 +71,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    *
    * @return void
    */
-
   public function buildQuickForm() {
     $this->addButtons(array(
         array(
