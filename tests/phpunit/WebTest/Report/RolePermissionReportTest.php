@@ -96,7 +96,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
   }
 
   /**
-   *check for CRM-10148
+   * Check for CRM-10148.
    */
   public function testReservedReportPermission() {
     $this->webtestLogin('admin');

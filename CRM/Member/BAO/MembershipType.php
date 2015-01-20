@@ -752,7 +752,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
   }
 
-  /**                                                                                                                                                                                                         * This function updates all price field value for quick config
+  /**
+   * This function updates all price field value for quick config
    * price set which has membership type
    *
    * @param  int $membershipTypeId membership type id

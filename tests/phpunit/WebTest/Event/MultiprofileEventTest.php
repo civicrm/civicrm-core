@@ -414,7 +414,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * Test profile creation.
    *
-*@param $profileField
+   * @param array $profileField
    * @param int $location
    * @param $type
    *

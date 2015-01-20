@@ -36,5 +36,4 @@ class CRM_Report_Form_Event extends CRM_Report_Form {
   // Nothing here.
   // FIXME: Do these reports really have nothing in common? Really?
 
-
 }
