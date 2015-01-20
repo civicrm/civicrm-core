@@ -387,7 +387,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       ),
     );
     if (!$this->_isGroupEmpty && !empty($this->_subtypes)) {
-      $buttons[0]['js'] = array('onclick' => "return warnDataLoss()");
+      $buttons[0]['class'] = 'crm-warnDataLoss';
     }
     $this->addButtons($buttons);
 
