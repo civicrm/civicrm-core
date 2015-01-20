@@ -58,9 +58,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
 
     // add select for groups
-    $group = array(
-        '' => ts('- select -')
-      ) + $form->_group;
+    $group = array('' => ts('- select -')) + $form->_group;
     $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group?'), $group);
 
     //add notify field

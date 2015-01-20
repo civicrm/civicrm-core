@@ -371,7 +371,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
                        'id',
                        'auto_renew',
                        'duration_unit',
-                       'duration_interval'
+                       'duration_interval',
                      ) as $fld) {
               $this->_recurMembershipTypes[$recurMembershipTypes->id][$fld] = $recurMembershipTypes->$fld;
             }

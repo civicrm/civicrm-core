@@ -642,7 +642,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
               if (!$primaryID &&
                 in_array($name, array(
                   'email',
-                  'openid'
+                  'openid',
                 )) && !empty($blockValues[$name])
               ) {
                 $primaryID = $blockValues[$name];
@@ -733,14 +733,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $deleteExtra = ts('Are you sure you want to delete contact image.');
       $deleteURL = array(
-        CRM_Core_Action::DELETE =>
-          array(
-            'name' => ts('Delete Contact Image'),
-            'url' => 'civicrm/contact/image',
-            'qs' => 'reset=1&cid=%%id%%&action=delete',
-            'extra' =>
-              'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
-          ),
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete Contact Image'),
+          'url' => 'civicrm/contact/image',
+          'qs' => 'reset=1&cid=%%id%%&action=delete',
+          'extra' =>
+          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+        ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
@@ -1083,7 +1082,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       'provider_id',
       'country_id',
       'website_type_id',
-      'master_id'
+      'master_id',
     );
     foreach ($fields as $name => $value) {
       $skipField = FALSE;
@@ -1138,18 +1137,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $duplicateContactsLinks = '<div class="matching-contacts-found">';
         $duplicateContactsLinks .= ts('One matching contact was found. ', array(
             'count' => count($contactLinks['rows']),
-            'plural' => '%count matching contacts were found.<br />'
+            'plural' => '%count matching contacts were found.<br />',
           ));
         if ($contactLinks['msg'] == 'view') {
           $duplicateContactsLinks .= ts('You can View the existing contact', array(
               'count' => count($contactLinks['rows']),
-              'plural' => 'You can View the existing contacts'
+              'plural' => 'You can View the existing contacts',
             ));
         }
         else {
           $duplicateContactsLinks .= ts('You can View or Edit the existing contact', array(
               'count' => count($contactLinks['rows']),
-              'plural' => 'You can View or Edit the existing contacts'
+              'plural' => 'You can View or Edit the existing contacts',
             ));
         }
         if ($contactLinks['msg'] == 'merge') {
@@ -1235,7 +1234,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       foreach (array(
                  'street_number',
                  'street_name',
-                 'street_unit'
+                 'street_unit',
                ) as $fld) {
         if (!empty($address[$fld])) {
           $parseFieldName = 'street_number';
@@ -1268,11 +1267,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
                    'street_number',
                    'street_number_suffix',
                    'street_name',
-                   'street_unit'
+                   'street_unit',
                  ) as $fld) {
           if (in_array($fld, array(
             'street_name',
-            'street_unit'
+            'street_unit',
           ))) {
             $streetAddress .= ' ';
           }

@@ -151,7 +151,7 @@ class CRM_Case_Form_Activity_OpenCase {
     if ($form->_context == 'standalone') {
       $form->addEntityRef('client_id', ts('Client'), array(
           'create' => TRUE,
-          'multiple' => $form->_allowMultiClient
+          'multiple' => $form->_allowMultiClient,
         ), TRUE);
     }
 

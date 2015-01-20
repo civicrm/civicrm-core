@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     // add select for Location Type
     $this->addElement('select', 'location_type_id', ts('Select Location'),
       array(
-        '' => ts('Primary')
+        '' => ts('Primary'),
       ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
     );
 
@@ -291,7 +291,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
                   'email',
                   'phone',
                   'im',
-                  'openid'
+                  'openid',
                 ))) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];

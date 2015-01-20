@@ -55,7 +55,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
         'test.whiz',
         'test.whizbang',
         'test.foo',
-        'test.foo.bar'
+        'test.foo.bar',
       ), $c->getKeys());
   }
 

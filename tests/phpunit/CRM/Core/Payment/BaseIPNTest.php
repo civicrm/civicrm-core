@@ -224,7 +224,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $mut->checkMailLog(array(
         'Thank you for your participation',
         'Annual CiviCRM meet',
-        'Mr. Anthony Anderson II'
+        'Mr. Anthony Anderson II',
       )
     );
     $mut->stop();

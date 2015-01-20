@@ -122,10 +122,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
             'fruit' => array(
               'yours' => 'orange',
               'mine' => 'new apple',
-              'ours' => 'banana'
-            )
-          )
-        )
+              'ours' => 'banana',
+            ),
+          ),
+        ),
       ),
       $this->res->getSettings()
     );

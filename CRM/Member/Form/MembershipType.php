@@ -235,7 +235,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     if (in_array(CRM_Utils_Array::value('auto_renew', $params), array(
       1,
-      2
+      2,
     ))) {
       if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
         ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')

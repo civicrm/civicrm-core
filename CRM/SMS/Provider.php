@@ -209,14 +209,14 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
           1 => array(
             'location_type_id' => $phoneloc,
             'email' => $stripFrom . '@mobile.sms',
-          )
+          ),
         ),
         'phone' => array(
           1 => array(
             'phone_type_id' => $phonetype,
             'location_type_id' => $phoneloc,
             'phone' => $stripFrom,
-          )
+          ),
         ),
       );
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);

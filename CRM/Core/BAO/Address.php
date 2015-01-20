@@ -379,7 +379,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
                    'street_number',
                    'street_name',
                    'street_unit',
-                   'street_number_suffix'
+                   'street_number_suffix',
                  ) as $fld) {
           unset($params[$fld]);
         }
@@ -423,7 +423,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         'contact_id',
         'is_billing',
         'display',
-        'master_id'
+        'master_id',
       ))) {
         continue;
       }
@@ -508,7 +508,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
                    'state',
                    'state_name',
                    'country',
-                   'world_region'
+                   'world_region',
                  ) as $fld) {
           if (isset($address->$fld)) {
             unset($address->$fld);
@@ -754,7 +754,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     $matches = array();
     if (in_array($locale, array(
         'en_CA',
-        'fr_CA'
+        'fr_CA',
       )) && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)
     ) {
       $parseFields['street_unit'] = $matches[1];
@@ -848,7 +848,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // overwriting $streetUnitFormats for 'en_CA' and 'fr_CA' locale
     if (in_array($locale, array(
       'en_CA',
-      'fr_CA'
+      'fr_CA',
     ))) {
       $streetUnitFormats = array('APT', 'APP', 'SUITE', 'BUREAU', 'UNIT');
     }

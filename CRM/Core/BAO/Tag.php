@@ -126,12 +126,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @return array
    */
-  public static function getTagsUsedFor($usedFor = array(
-      'civicrm_contact'
-    ),
-                                        $buildSelect = TRUE,
-                                        $all = FALSE,
-                                        $parentId = NULL
+  public static function getTagsUsedFor(
+    $usedFor = array('civicrm_contact'),
+    $buildSelect = TRUE,
+    $all = FALSE,
+    $parentId = NULL
   ) {
     $tags = array();
 
@@ -437,8 +436,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $dao = CRM_Core_DAO::executeQuery($query, array(
         1 => array(
           '%' . $entityTable . '%',
-          'String'
-        )
+          'String',
+        ),
       ), TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;

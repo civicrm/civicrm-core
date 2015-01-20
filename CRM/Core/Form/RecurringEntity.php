@@ -211,7 +211,7 @@ class CRM_Core_Form_RecurringEntity {
     $form->addDate('exclude_date', ts('Exclude Date(s)'), FALSE);
     $select = $form->add('select', 'exclude_date_list', ts(''), self::$_excludeDateInfo, FALSE, array(
         'style' => 'width:150px;',
-        'size' => 4
+        'size' => 4,
       ));
     $select->setMultiple(TRUE);
     $form->addElement('button', 'add_to_exclude_list', '>>', 'onClick="addToExcludeList(document.getElementById(\'exclude_date\').value);"');
@@ -411,7 +411,7 @@ class CRM_Core_Form_RecurringEntity {
           ) {
             call_user_func(array(
                 CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'],
-                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id']))
+                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id'])),
               )
             );
           }

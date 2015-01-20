@@ -50,7 +50,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
         'civicrm_loc_block',
         'civicrm_email',
         'civicrm_phone',
-        'civicrm_im'
+        'civicrm_im',
       ));
   }
 
