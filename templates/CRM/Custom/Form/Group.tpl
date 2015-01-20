@@ -87,43 +87,31 @@
 <script type="text/Javascript">
 CRM.$(function($) {
 
-  showHideStyle();
-  $('#extends_0').change(function() {
-    showHideStyle();
-  });
+  $('#extends_0').each(showHideStyle).change(showHideStyle);
 
-  var  isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  var isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
   if (isGroupEmpty) {
     showRange(true);
   }
-  $('#is_multiple').click(function() {
-    showRange();
-  });
+  $('#is_multiple').click(showRange);
 
   function showHideStyle() {
-    var isShow  = false;
-    var extend  = $('#extends_0').val();
-
-    var contactTypes    = {/literal}{$contactTypes}{literal};
-    var showStyle       = "{/literal}{$showStyle}{literal}";
-    var showMultiple    = "{/literal}{$showMultiple}{literal}";
-    var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
-
-    if ($.inArray(extend, contactTypes) >= 0) {
-      isShow  = true;
-    }
+    var
+      extend = $(this).val(),
+      contactTypes = {/literal}{$contactTypes}{literal},
+      showStyle = "{/literal}{$showStyle}{literal}",
+      showMultiple = "{/literal}{$showMultiple}{literal}",
+      showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}",
+      isShow = ($.inArray(extend, contactTypes) >= 0);
 
     if (isShow) {
-      $("tr#style").show();
-      $("tr#is_multiple").show();
+      $("tr#style, tr#is_multiple").show();
       if ($('#is_multiple :checked').length) {
         $("tr#multiple").show();
       }
     }
     else {
-      $("tr#style").hide();
-      $("tr#is_multiple").hide();
-      $("tr#multiple").hide();
+      $("tr#style, tr#is_multiple, tr#multiple").hide();
     }
 
     if (showStyle) {
@@ -131,14 +119,13 @@ CRM.$(function($) {
     }
 
     if (showMultiple) {
-      $("tr#style").show();
-      $("tr#is_multiple").show();
+      $("tr#style, tr#is_multiple").show();
     }
 
     if (!showMaxMultiple) {
       $("tr#multiple").hide();
     }
-    else if($( '#is_multiple').prop('checked')) {
+    else if ($('#is_multiple').prop('checked')) {
       $("tr#multiple").show();
     }
   }
@@ -152,7 +139,7 @@ CRM.$(function($) {
     else {
       $('#collapse_display').prop('checked', 'checked');
       $("tr#multiple").hide();
-      if (!onFormLoad) {
+      if (onFormLoad !== true) {
         $("select#style option[value='Inline']").prop("selected", true);
       }
     }
@@ -169,23 +156,24 @@ CRM.$(function($) {
       subtypes.style.display = 'inline';
     }
   }
-});
 
-function warnDataLoss() {
-  var submittedSubtypes = cj('#extends_1').val();
-  var defaultSubtypes   = {/literal}{$defaultSubtypes}{literal};
+  // When removing sub-types
+  $('.crm-warnDataLoss').on('click', function() {
+    var submittedSubtypes = $('#extends_1').val();
+    var defaultSubtypes = {/literal}{$defaultSubtypes}{literal};
 
-  var warning = false;
-  cj.each(defaultSubtypes, function(index, subtype) {
-    if (cj.inArray(subtype, submittedSubtypes) < 0) {
-      warning = true;
+    var warning = false;
+    $.each(defaultSubtypes, function(index, subtype) {
+      if ($.inArray(subtype, submittedSubtypes) < 0) {
+        warning = true;
+      }
+    });
+
+    if (warning) {
+      return confirm({/literal}'{ts escape='js'}Warning: You have chosen to remove one or more subtypes. This will cause any custom data records associated with those subtypes to be removed.{/ts}'{literal});
     }
+    return true;
   });
-
-  if (warning) {
-    return confirm( 'One or more subtypes has been un-selected from the list. Any custom data associated with un-selected subtype would be removed. Click OK to proceed.' );
-  }
-  return true;
-}
+});
 </script>
 {/literal}
