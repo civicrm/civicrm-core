@@ -86,4 +86,5 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
       CRM_Event_BAO_Participant::create($value);
     }
   }
+
 }

@@ -570,4 +570,5 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   public function getSummary() {
     return $this->_query->summaryContribution($this->_context);
   }
+
 }

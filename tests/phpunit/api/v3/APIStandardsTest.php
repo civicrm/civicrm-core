@@ -172,4 +172,5 @@ class api_v3_APIStandardsTest extends CiviUnitTestCase {
     }
     return $functions;
   }
+
 }

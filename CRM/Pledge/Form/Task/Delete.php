@@ -89,4 +89,5 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
       ));
     CRM_Core_Session::setStatus($status, '', 'info');
   }
+
 }

@@ -461,4 +461,5 @@ SELECT v.label
     );
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
+
 }

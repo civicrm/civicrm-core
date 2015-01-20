@@ -59,4 +59,5 @@ class PreEvent extends \Symfony\Component\EventDispatcher\Event {
     $this->id = $id;
     $this->params = $params;
   }
+
 }

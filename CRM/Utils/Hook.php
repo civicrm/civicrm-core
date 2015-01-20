@@ -1914,4 +1914,5 @@ abstract class CRM_Utils_Hook {
       'civicrm_fileSearches'
     );
   }
+
 }

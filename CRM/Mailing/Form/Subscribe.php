@@ -206,4 +206,5 @@ ORDER BY title";
 
     CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($groups, $params);
   }
+
 }

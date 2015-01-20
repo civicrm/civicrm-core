@@ -345,4 +345,5 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

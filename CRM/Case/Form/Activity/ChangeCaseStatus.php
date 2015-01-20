@@ -193,4 +193,5 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     // FIXME: does this do anything ?
     $params['statusMsg'] = ts('Case Status changed successfully.');
   }
+
 }

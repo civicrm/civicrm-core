@@ -75,4 +75,5 @@ class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

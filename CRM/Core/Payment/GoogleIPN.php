@@ -700,4 +700,5 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     }
     return $vars;
   }
+
 }

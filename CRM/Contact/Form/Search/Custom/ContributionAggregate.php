@@ -304,4 +304,5 @@ civicrm_contact AS contact_a
   public function summary() {
     return NULL;
   }
+
 }

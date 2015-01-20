@@ -48,4 +48,5 @@ class CRM_Utils_Constant {
       return $default;
     }
   }
+
 }

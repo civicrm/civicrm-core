@@ -307,4 +307,5 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
 
     return $options;
   }
+
 }

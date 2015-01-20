@@ -435,4 +435,5 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-container', '1 Contact');
   }
+
 }

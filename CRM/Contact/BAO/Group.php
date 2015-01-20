@@ -1286,4 +1286,5 @@ WHERE {$whereClause}";
 
     return CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
   }
+
 }

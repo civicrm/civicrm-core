@@ -72,4 +72,5 @@ class CRM_Core_Module {
     }
     return $result;
   }
+
 }

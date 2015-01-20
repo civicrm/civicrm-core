@@ -320,4 +320,5 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", array(1 => $params['label'])), ts('Value Saved'), 'success');
     }
   }
+
 }

@@ -1163,4 +1163,5 @@ SELECT  pledge.contact_id              as contact_id,
     $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
   }
+
 }

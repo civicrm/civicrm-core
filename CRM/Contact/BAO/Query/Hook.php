@@ -163,4 +163,5 @@ class CRM_Contact_BAO_Query_Hook {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
   }
+
 }

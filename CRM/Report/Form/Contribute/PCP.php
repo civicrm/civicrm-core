@@ -340,4 +340,5 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
       }
     }
   }
+
 }

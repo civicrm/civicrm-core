@@ -471,4 +471,5 @@ class CRM_Contact_Import_ImportJob {
     }
     return $incompleteImportTables;
   }
+
 }

@@ -180,4 +180,5 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
       )
     );
   }
+
 }

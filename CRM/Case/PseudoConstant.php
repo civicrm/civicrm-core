@@ -253,4 +253,5 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
       self::$$name = NULL;
     }
   }
+
 }

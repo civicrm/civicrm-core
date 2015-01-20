@@ -241,4 +241,5 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   public function testDeleteWithEmptyParams() {
     $result = $this->callAPIFailure('group_nesting', 'delete', array());
   }
+
 }

@@ -243,4 +243,5 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
     return array($cid, $firstName, $lastName, $email);
   }
+
 }

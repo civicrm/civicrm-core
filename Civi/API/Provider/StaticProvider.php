@@ -158,4 +158,5 @@ class StaticProvider extends AdhocProvider {
     }
     return civicrm_api3_create_success(array());
   }
+
 }

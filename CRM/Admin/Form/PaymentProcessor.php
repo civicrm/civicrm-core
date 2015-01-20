@@ -414,4 +414,5 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     );
     CRM_Financial_BAO_FinancialTypeAccount::add($params);
   }
+
 }

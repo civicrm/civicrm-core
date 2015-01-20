@@ -190,4 +190,5 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
     $this->assertEquals($financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
   }
+
 }

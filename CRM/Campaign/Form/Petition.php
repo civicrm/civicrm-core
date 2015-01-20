@@ -367,4 +367,5 @@ WHERE  $whereClause
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=petition'));
     }
   }
+
 }

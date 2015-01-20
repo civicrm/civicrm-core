@@ -219,5 +219,4 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
     }
   }
 
-
 }

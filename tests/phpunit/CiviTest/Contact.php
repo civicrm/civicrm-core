@@ -98,4 +98,5 @@ class Contact extends CiviUnitTestCase {
     require_once 'CRM/Contact/BAO/Contact.php';
     return CRM_Contact_BAO_Contact::deleteContact($contactID);
   }
+
 }

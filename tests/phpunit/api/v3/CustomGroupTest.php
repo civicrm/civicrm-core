@@ -374,4 +374,5 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       $this->assertEquals($value, $values[$key], $key . " doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
     }
   }
+
 }

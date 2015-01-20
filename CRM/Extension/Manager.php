@@ -573,4 +573,5 @@ class CRM_Extension_Manager {
       return NULL;
     }
   }
+
 }

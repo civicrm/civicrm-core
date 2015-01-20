@@ -1032,4 +1032,5 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-12-21', $result['end_date']);
 
   }
+
 }

@@ -180,4 +180,5 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       return 'CRM/Campaign/Form/Survey/Tab.tpl';
     }
   }
+
 }

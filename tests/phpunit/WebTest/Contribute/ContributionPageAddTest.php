@@ -441,4 +441,5 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     // contribution page is saved.
     $this->assertTrue($this->isTextPresent($premiumSavedText));
   }
+
 }

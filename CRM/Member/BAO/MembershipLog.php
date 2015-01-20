@@ -80,4 +80,5 @@ UPDATE civicrm_membership_log
     $params = array(1 => array($contactID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
   }
+
 }

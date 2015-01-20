@@ -255,4 +255,5 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Select_next-bottom");
   }
+
 }

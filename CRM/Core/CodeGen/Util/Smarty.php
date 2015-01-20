@@ -54,4 +54,5 @@ class CRM_Core_CodeGen_Util_Smarty {
     }
     return $this->smarty;
   }
+
 }

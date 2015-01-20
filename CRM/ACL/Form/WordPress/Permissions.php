@@ -189,4 +189,5 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     return $perms_array;
   }
+
 }

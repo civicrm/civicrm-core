@@ -142,4 +142,5 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
+
 }

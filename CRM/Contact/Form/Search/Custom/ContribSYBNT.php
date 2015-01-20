@@ -391,4 +391,5 @@ AND      c.receive_date < {$this->start_date_1}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

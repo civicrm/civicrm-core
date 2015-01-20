@@ -199,4 +199,5 @@ class CRM_Core_State {
   public function getType() {
     return $this->_type;
   }
+
 }

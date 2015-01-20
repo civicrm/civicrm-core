@@ -454,4 +454,5 @@ class CRM_Utils_Mail_Incoming {
       CRM_Core_DAO::$_nullArray
     );
   }
+
 }

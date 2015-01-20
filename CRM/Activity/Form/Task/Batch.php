@@ -295,4 +295,5 @@ WHERE  a.id = %1 ";
       CRM_Core_Session::setStatus("", ts("No Updates Saved"), "info");
     }
   }
+
 }

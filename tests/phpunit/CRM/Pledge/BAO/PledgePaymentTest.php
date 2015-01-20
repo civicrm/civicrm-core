@@ -267,4 +267,5 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3, '20080510');
     $this->assertEquals('20140510000000', $date);
   }
+
 }

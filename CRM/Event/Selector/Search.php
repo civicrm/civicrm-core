@@ -524,4 +524,5 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Event Search');
   }
+
 }

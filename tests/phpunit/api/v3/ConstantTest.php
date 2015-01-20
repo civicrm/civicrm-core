@@ -144,4 +144,5 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
     $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
   }
+
 }

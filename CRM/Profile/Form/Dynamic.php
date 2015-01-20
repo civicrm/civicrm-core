@@ -123,4 +123,5 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   public function postProcess() {
     parent::postProcess();
   }
+
 }

@@ -162,4 +162,5 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
     );
     // Note: Post hooks will be called by CRM_Core_Form::mainProcess
   }
+
 }

@@ -168,4 +168,5 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->log();
     $this->response();
   }
+
 }

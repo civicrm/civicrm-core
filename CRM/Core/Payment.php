@@ -671,4 +671,5 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     // Else default
     return $this->_paymentProcessor['url_recur'];
   }
+
 }

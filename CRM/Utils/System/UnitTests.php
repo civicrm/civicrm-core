@@ -335,4 +335,5 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     // UGH. Obscure Drupal-specific implementation. Why does UnitTests extend Drupal?
     // You should delete this function if the base-classes are properly rearranged.
   }
+
 }

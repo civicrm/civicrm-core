@@ -74,4 +74,5 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
 
     return $defaults;
   }
+
 }

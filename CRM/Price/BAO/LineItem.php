@@ -550,4 +550,5 @@ AND li.entity_id = {$entityId}
     }
     return $tax;
   }
+
 }

@@ -122,4 +122,5 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]", "1,200.00");
 
   }
+
 }

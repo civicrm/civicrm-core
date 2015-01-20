@@ -105,4 +105,5 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $this->webtestVerifyTabularData($expected);
   }
+
 }

@@ -1228,4 +1228,5 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $thankStrings = array('Thank You for Registering', 'Event Total', 'Transaction Date');
     $this->assertStringsPresent($thankStrings);
   }
+
 }

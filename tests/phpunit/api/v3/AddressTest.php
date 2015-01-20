@@ -346,4 +346,5 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
     $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
   }
+
 }

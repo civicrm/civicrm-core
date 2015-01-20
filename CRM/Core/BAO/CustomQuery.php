@@ -617,4 +617,5 @@ SELECT label, value
       $this->_qill[$grouping][] = $label . ' - ' . implode(' ' . ts('and') . ' ', $qill);
     }
   }
+
 }

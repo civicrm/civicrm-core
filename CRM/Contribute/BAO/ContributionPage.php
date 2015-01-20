@@ -941,4 +941,5 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
     return $membershipBlocks['values'][0]['is_separate_payment'];
   }
+
 }

@@ -146,4 +146,5 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $c = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
     return $c;
   }
+
 }

@@ -100,4 +100,5 @@ class CRM_Contact_Form_Inline_Lock {
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
     return array('oplock_ts' => $timestamps['modified_date']);
   }
+
 }

@@ -106,4 +106,5 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));
     }
   }
+
 }

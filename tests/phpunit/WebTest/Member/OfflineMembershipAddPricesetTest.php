@@ -444,4 +444,5 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr/td/span[text()='{$amount}']"));
     $this->click("_qf_MembershipView_cancel-bottom");
   }
+
 }

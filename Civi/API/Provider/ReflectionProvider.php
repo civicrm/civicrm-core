@@ -149,4 +149,5 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     $entity = _civicrm_api_get_camel_name($entity, $version);
     return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
   }
+
 }

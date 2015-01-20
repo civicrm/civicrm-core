@@ -140,4 +140,5 @@ class CRM_Case_ManagedEntities {
 
     return $result;
   }
+
 }

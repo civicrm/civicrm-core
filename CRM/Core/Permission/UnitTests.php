@@ -78,4 +78,5 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   public function whereClause($type, &$tables, &$whereTables) {
     return '( 1 )';
   }
+
 }

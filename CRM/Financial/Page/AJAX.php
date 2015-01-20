@@ -521,4 +521,5 @@ class CRM_Financial_Page_AJAX {
 
     CRM_Utils_JSON::output($batchSummary);
   }
+
 }

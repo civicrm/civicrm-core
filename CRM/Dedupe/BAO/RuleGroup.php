@@ -457,4 +457,5 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     }
     return $result;
   }
+
 }

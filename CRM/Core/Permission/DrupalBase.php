@@ -331,4 +331,5 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
       ->condition('permission', array_keys($permissions), 'NOT IN');
     $query->execute();
   }
+
 }

@@ -222,4 +222,5 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->_contributorEmail = $this->_memberEmail;
     }
   }
+
 }

@@ -288,4 +288,5 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   public function getTitle() {
     return ts('Find Contacts');
   }
+
 }

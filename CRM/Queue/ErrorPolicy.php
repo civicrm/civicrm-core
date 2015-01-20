@@ -189,4 +189,5 @@ class CRM_Queue_ErrorPolicy {
     }
     CRM_Utils_JSON::output($response);
   }
+
 }

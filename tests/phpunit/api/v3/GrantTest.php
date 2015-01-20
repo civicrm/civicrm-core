@@ -241,4 +241,5 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
   }
+
 }

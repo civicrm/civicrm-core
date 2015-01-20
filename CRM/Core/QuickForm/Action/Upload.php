@@ -175,4 +175,5 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
       return $state->handleNextState($page);
     }
   }
+
 }

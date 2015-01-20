@@ -121,4 +121,5 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'grant/add', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

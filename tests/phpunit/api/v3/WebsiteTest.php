@@ -105,4 +105,5 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('url', $result['values']);
   }
+
 }

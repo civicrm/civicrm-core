@@ -876,4 +876,5 @@ AND
   public static function isEnabledBackOfficeCreditCardPayments() {
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
   }
+
 }

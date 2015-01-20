@@ -185,4 +185,5 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($participant['participant_status_id'], 14, 'Status record is not proper for participant');
     $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
   }
+
 }

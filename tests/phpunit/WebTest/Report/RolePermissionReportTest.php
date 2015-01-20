@@ -256,4 +256,5 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     return $name;
   }
+
 }

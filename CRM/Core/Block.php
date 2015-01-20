@@ -676,4 +676,5 @@ class CRM_Core_Block {
 
     return $template->fetch('CRM/Block/' . $fileName);
   }
+
 }

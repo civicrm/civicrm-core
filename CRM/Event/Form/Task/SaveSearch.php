@@ -135,4 +135,5 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     }
     $group = CRM_Contact_BAO_Group::create($params);
   }
+
 }

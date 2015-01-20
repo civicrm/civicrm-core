@@ -373,4 +373,5 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     }
     return $results;
   }
+
 }

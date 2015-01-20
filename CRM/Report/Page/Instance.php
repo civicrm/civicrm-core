@@ -106,4 +106,5 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     }
     return CRM_Utils_System::redirect($reportUrl);
   }
+
 }

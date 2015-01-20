@@ -109,4 +109,5 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
       }
     }
   }
+
 }

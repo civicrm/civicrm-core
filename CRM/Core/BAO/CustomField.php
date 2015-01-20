@@ -2536,4 +2536,5 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
   }
+
 }

@@ -596,4 +596,5 @@ SELECT  count( id ) as statusCount
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
   }
+
 }

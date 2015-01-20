@@ -346,4 +346,5 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }

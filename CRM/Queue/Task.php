@@ -92,4 +92,5 @@ class CRM_Queue_Task {
       throw new Exception('Failed to call callback: ' . print_r($this->callback));
     }
   }
+
 }

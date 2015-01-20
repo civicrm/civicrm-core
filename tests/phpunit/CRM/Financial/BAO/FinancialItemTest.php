@@ -267,4 +267,5 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     );
     $this->assertEquals($entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
   }
+
 }

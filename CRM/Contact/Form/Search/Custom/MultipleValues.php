@@ -345,4 +345,5 @@ contact_a.sort_name    as sort_name,
   public function setTitle($title) {
     CRM_Utils_System::setTitle($title);
   }
+
 }

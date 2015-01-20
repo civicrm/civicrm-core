@@ -16,4 +16,5 @@ class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
     $transaction->commit();
     return CRM_Utils_System::redirect($_SERVER['HTTP_REFERER']);
   }
+
 }

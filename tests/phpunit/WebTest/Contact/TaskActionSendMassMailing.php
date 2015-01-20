@@ -132,4 +132,5 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     $this->click("xpath=//table//tbody/tr[td[1]/text()='$mailingName']/descendant::a[text()='Report']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

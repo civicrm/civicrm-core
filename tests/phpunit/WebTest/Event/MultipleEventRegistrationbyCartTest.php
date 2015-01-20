@@ -510,4 +510,5 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("enable_cart");
     $this->click("_qf_Event_next-top");
   }
+
 }

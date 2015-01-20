@@ -628,4 +628,5 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       }
     }
   }
+
 }

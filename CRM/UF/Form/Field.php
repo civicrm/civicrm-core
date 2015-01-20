@@ -1015,4 +1015,5 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     return empty($errors) ? TRUE : $errors;
   }
+
 }

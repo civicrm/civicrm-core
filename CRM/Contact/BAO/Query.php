@@ -5647,4 +5647,5 @@ AND   displayRelType.is_active = 1
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
   }
+
 }

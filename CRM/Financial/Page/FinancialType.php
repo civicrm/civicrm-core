@@ -221,4 +221,5 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/admin/financial/financialType';
   }
+
 }

@@ -133,4 +133,5 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     }
     CRM_Core_Session::setStatus($status);
   }
+
 }

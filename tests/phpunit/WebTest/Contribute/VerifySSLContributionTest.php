@@ -131,4 +131,5 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertFalse($this->isTextPresent("Payment Processor Error message"), "Payment processor returned error message");
   }
+
 }

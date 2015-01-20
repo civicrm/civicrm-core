@@ -69,4 +69,5 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
   public function getTemplateFileName() {
     return 'CRM/Contact/Form/Task/Map.tpl';
   }
+
 }

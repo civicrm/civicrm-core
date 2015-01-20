@@ -617,4 +617,5 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
       preg_quote("$surveyTitle - Respondent Reservation")
     );
   }
+
 }

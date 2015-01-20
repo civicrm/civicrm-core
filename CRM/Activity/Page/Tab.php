@@ -218,4 +218,5 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

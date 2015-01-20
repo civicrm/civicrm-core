@@ -288,4 +288,5 @@ UPDATE  civicrm_membership_status
     $upgrade->assign('addActivityTypeIndex', $addActivityTypeIndex);
     $upgrade->processSQL($rev);
   }
+
 }

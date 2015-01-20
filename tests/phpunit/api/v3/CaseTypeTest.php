@@ -227,4 +227,5 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $getCaseType = $this->callAPISuccess('CaseType', 'get', array('id' => $createCaseType['id']));
     $this->assertEquals(0, $getCaseType['count']);
   }
+
 }

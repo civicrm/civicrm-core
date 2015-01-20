@@ -332,4 +332,5 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
   }
+
 }

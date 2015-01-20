@@ -403,4 +403,5 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     }
     return $params;
   }
+
 }

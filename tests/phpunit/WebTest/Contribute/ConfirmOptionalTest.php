@@ -110,4 +110,5 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->click("_qf_Main_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

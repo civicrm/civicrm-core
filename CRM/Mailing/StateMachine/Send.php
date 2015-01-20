@@ -72,4 +72,5 @@ class CRM_Mailing_StateMachine_Send extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
+
 }

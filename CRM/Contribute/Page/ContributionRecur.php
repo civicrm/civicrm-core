@@ -105,4 +105,5 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

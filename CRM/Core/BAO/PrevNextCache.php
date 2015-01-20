@@ -497,4 +497,5 @@ WHERE  cacheKey LIKE %1
     $params['rowCount1'] = $rowCount;
     return $params;
   }
+
 }

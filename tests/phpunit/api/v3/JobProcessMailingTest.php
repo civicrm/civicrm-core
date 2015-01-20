@@ -123,4 +123,5 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     }
     return $recipients;
   }
+
 }

@@ -113,4 +113,5 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     echo json_encode($result);
     CRM_Utils_System::civiExit();
   }
+
 }

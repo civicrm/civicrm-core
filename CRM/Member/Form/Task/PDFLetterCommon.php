@@ -86,4 +86,5 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
     }
     return $html;
   }
+
 }

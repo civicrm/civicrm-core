@@ -107,4 +107,5 @@ class KernelTest extends \CiviUnitTestCase {
       }, 2 * Events::W_EARLY);
     }
   }
+
 }

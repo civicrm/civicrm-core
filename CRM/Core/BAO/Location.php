@@ -440,4 +440,5 @@ WHERE e.id = %1";
     }
     return $elements;
   }
+
 }

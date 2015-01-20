@@ -221,4 +221,5 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     $current = $current ? $current : 'settings';
     return $current;
   }
+
 }

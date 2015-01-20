@@ -473,4 +473,5 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue", $params);
     return $optionLabel;
   }
+
 }

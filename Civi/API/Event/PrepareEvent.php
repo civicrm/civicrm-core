@@ -41,4 +41,5 @@ class PrepareEvent extends Event {
     $this->apiRequest = $apiRequest;
     return $this;
   }
+
 }

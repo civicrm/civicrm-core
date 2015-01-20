@@ -230,4 +230,5 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
     return $exception->find(TRUE) ? FALSE : TRUE;
   }
+
 }

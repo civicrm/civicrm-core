@@ -201,4 +201,5 @@ AND civicrm_contact.id IN $idString ";
     }
     return $locations;
   }
+
 }

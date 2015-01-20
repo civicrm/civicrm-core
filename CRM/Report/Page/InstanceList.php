@@ -212,4 +212,5 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     }
     return parent::run();
   }
+
 }

@@ -156,4 +156,5 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
       $this->assertTrue(TRUE, 'Validation yielded expected result');
     }
   }
+
 }

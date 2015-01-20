@@ -76,4 +76,5 @@ class System {
     $processor = civicrm_api3('payment_processor', 'get_single', array('name' => $name, 'is_test' => $is_test));
     return self::getByProcessor($processor);
   }
+
 }

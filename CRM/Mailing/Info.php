@@ -258,4 +258,5 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    */
   public function creatNewShortcut(&$shortCuts) {
   }
+
 }

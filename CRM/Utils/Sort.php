@@ -303,4 +303,5 @@ class CRM_Utils_Sort {
     // however, as I understand we don't want equality here:
     return -1;
   }
+
 }

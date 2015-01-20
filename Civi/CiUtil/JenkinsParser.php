@@ -31,4 +31,5 @@ class JenkinsParser {
     }
     return $results;
   }
+
 }

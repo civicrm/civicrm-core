@@ -977,4 +977,5 @@ ORDER BY a.object_id
     $acl->id = $aclId;
     $acl->delete();
   }
+
 }

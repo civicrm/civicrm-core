@@ -67,4 +67,5 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->click('_qf_Participant_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

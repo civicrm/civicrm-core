@@ -131,4 +131,5 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
   }
+
 }

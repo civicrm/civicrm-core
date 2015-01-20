@@ -217,4 +217,5 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('group_organization', 'delete', $paramsDelete);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
   }
+
 }

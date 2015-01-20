@@ -78,4 +78,5 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
 
     CRM_Utils_System::redirect($url);
   }
+
 }

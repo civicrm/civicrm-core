@@ -608,4 +608,5 @@ ORDER BY LEFT(name, 1)
     $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_parent->_sortByCharacter, TRUE);
     $this->_parent->assign('aToZ', $aToZBar);
   }
+
 }

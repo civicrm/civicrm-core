@@ -73,4 +73,5 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess('campaign', 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
 }

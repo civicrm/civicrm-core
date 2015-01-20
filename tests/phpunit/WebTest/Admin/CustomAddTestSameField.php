@@ -166,4 +166,5 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
   }
+
 }

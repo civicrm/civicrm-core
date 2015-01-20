@@ -229,4 +229,5 @@ class CRM_Contact_Form_Search_Custom_Base {
   public function getQueryObj() {
     return NULL;
   }
+
 }

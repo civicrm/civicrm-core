@@ -1561,4 +1561,5 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     Contact::delete($contactId);
   }
+
 }

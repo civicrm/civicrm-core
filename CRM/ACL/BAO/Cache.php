@@ -173,4 +173,5 @@ WHERE  modified_date IS NULL
       CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
     }
   }
+
 }

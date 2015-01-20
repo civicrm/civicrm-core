@@ -324,4 +324,5 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     // Call the parents run method
     return parent::run();
   }
+
 }

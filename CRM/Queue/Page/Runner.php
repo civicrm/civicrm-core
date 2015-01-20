@@ -79,4 +79,5 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
       parent::run();
     }
   }
+
 }

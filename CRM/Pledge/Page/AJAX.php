@@ -101,4 +101,5 @@ WHERE {$whereClause}
     echo json_encode($details);
     CRM_Utils_System::civiExit();
   }
+
 }

@@ -101,4 +101,5 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
       throw new CRM_Extension_Exception_MissingException("Missing extension: $key");
     }
   }
+
 }

@@ -276,4 +276,5 @@ class CRM_Core_Page_AJAX_Location {
 
     CRM_Utils_JSON::output($result);
   }
+
 }

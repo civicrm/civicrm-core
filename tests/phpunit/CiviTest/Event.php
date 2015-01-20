@@ -43,4 +43,5 @@ class Event extends PHPUnit_Framework_Testcase {
   public static function delete($eventId) {
     return CRM_Event_BAO_Event::del($eventId);
   }
+
 }

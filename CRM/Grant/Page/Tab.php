@@ -206,4 +206,5 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
       CRM_Utils_System::redirect($url);
     }
   }
+
 }

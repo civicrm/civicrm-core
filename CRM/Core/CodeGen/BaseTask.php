@@ -21,4 +21,5 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
     $this->config = $config;
     $this->tables = $this->config->tables;
   }
+
 }

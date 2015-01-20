@@ -140,4 +140,5 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
     //Delete Financial Account
     $this->_testDeleteFinancialAccount($financialAccountTitle);
   }
+
 }

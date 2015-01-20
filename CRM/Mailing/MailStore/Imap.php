@@ -131,4 +131,5 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
     $this->_transport->copyMessages($nr, $this->_processed);
     $this->_transport->delete($nr);
   }
+
 }

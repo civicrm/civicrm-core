@@ -96,4 +96,5 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
   }
+
 }

@@ -59,4 +59,5 @@ class CRM_Core_Page_Inline_Help {
       exit($smarty->fetch($file) . $extraoutput);
     }
   }
+
 }

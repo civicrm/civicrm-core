@@ -86,4 +86,5 @@ class PermissionCheck implements EventSubscriberInterface {
       $event->stopPropagation();
     }
   }
+
 }

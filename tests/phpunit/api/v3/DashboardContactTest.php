@@ -75,4 +75,5 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     $newCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
     $this->assertEquals($oldCount + 1, $newCount);
   }
+
 }

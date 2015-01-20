@@ -411,4 +411,5 @@ VALUES
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
   }
+
 }

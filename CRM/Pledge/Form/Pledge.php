@@ -662,4 +662,5 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ));
     }
   }
+
 }

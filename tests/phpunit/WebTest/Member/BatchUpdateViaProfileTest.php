@@ -274,4 +274,5 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     return array($textFieldLabel, $customGroupTitle);
   }
+
 }

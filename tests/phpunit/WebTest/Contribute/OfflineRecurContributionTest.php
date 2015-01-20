@@ -109,4 +109,5 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       );
     }
   }
+
 }

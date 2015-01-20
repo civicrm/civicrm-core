@@ -259,4 +259,5 @@ class CRM_Core_Permission_Base {
     CRM_Utils_Hook::permission($permissions);
     return $permissions;
   }
+
 }

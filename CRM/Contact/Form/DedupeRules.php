@@ -317,4 +317,5 @@ UPDATE civicrm_dedupe_rule_group
 
     CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
   }
+
 }

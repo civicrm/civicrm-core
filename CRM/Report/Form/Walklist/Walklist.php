@@ -284,4 +284,5 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
       }
     }
   }
+
 }

@@ -376,4 +376,5 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals(1, $get['values'][$emailID]['on_hold'], 'In line ' . __LINE__);
     $this->assertEquals('1-2@example.com', $get['values'][$emailID]['email'], 'In line ' . __LINE__);
   }
+
 }

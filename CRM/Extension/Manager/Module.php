@@ -108,4 +108,5 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
   public function onPreEnable(CRM_Extension_Info $info) {
     $this->callHook($info, 'enable');
   }
+
 }

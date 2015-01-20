@@ -47,4 +47,5 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $log = $this->callAPISuccess('SystemLog', 'get', array());
     $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log['id']]['message']);
   }
+
 }

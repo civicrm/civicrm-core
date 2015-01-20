@@ -168,4 +168,5 @@ class CRM_Queue_Service {
     $class = new ReflectionClass($this->getQueueClass($queueSpec['type']));
     return $class->newInstance($queueSpec);
   }
+
 }

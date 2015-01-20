@@ -385,4 +385,5 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertTrue(NULL === $fooNew);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
   }
+
 }

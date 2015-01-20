@@ -166,4 +166,5 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   public function getTitle() {
     return ts('Premiums');
   }
+
 }

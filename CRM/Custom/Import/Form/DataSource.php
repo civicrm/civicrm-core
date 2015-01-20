@@ -211,4 +211,5 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   public function getTitle() {
     return ts('Upload Data');
   }
+
 }

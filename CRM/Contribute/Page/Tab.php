@@ -464,4 +464,5 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
+
 }

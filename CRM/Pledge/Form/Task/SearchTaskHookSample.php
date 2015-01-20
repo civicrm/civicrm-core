@@ -83,4 +83,5 @@ INNER JOIN civicrm_contact ct ON ( plg.contact_id = ct.id )
       )
     );
   }
+
 }

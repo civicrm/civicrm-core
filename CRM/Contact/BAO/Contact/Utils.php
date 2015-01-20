@@ -1128,4 +1128,5 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $smarty = CRM_Core_Smarty::singleton();
     $templateString = $smarty->fetch("string:$templateString");
   }
+
 }

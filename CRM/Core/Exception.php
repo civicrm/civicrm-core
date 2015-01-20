@@ -80,4 +80,5 @@ class CRM_Core_Exception extends PEAR_Exception {
   public function getErrorData() {
     return $this->errorData;
   }
+
 }

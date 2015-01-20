@@ -323,4 +323,5 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
         "reset=1&task=update&result=1"));
     }
   }
+
 }

@@ -903,4 +903,5 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
   }
+
 }

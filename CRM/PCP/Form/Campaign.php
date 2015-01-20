@@ -352,4 +352,5 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/pcp', 'reset=1'));
     }
   }
+
 }

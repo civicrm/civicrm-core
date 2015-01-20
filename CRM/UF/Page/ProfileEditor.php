@@ -270,4 +270,5 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     }
     return $result;
   }
+
 }

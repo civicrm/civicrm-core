@@ -160,4 +160,5 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($resultChildContactIds), 'Check the count of returned values');
     $this->assertEquals(array(), array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
   }
+
 }

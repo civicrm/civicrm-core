@@ -283,4 +283,5 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->contact_sub_type, 'null', 'In line ' . __LINE__);
     CRM_Contact_BAO_Contact::deleteContact($contact->id);
   }
+
 }

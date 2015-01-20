@@ -117,4 +117,5 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }
+
 }

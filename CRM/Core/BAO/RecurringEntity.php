@@ -1135,4 +1135,5 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
     return $result;
   }
+
 }

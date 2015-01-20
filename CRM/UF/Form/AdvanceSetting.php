@@ -101,4 +101,5 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity Search'));
   }
+
 }

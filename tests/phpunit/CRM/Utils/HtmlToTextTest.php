@@ -62,4 +62,5 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
       "Text Output did not match for $html"
     );
   }
+
 }

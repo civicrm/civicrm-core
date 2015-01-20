@@ -177,4 +177,5 @@ class CRM_Core_Page_AJAX_Attachment {
       'ts' => $ts,
     ));
   }
+
 }

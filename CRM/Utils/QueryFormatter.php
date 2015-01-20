@@ -354,4 +354,5 @@ class CRM_Utils_QueryFormatter {
 
     echo $buf;
   }
+
 }

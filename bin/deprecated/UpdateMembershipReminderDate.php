@@ -106,6 +106,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
     CRM_Core_DAO::executeQuery($query);
   }
+
 }
 
 $reminderDate = new CRM_UpdateMembershipReminderDate();

@@ -160,4 +160,5 @@ AND        civicrm_contact.is_deleted = 0
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;
   }
+
 }

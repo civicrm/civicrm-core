@@ -49,4 +49,5 @@ class CRM_UF_Page_AJAX {
     $isMultiple = array('is_multi' => $isMultiple);
     CRM_Utils_JSON::output($isMultiple);
   }
+
 }

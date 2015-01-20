@@ -138,4 +138,5 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
     $this->assertEquals(empty($result), FALSE, 'Verify membership status records is_current_member.');
   }
+
 }

@@ -313,4 +313,5 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       }
     }
   }
+
 }

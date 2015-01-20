@@ -192,4 +192,5 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/admin/sms/provider';
   }
+
 }

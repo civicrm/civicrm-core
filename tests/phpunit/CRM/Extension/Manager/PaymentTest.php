@@ -136,4 +136,5 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, test_extension_manager_paymenttest::$counts['uninstall']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
   }
+
 }

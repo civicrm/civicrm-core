@@ -291,4 +291,5 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     );
   }
+
 }

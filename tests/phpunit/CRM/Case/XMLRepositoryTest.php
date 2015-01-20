@@ -195,4 +195,5 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals(2, $repo->getRelationshipReferenceCount('Second Role'));
     $this->assertEquals(1, $repo->getRelationshipReferenceCount('Third Role'));
   }
+
 }

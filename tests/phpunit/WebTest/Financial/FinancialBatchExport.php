@@ -138,4 +138,5 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
       )
     );
   }
+
 }

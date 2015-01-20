@@ -62,4 +62,5 @@ class CRM_Grant_Controller_Search extends CRM_Core_Controller {
     $config = CRM_Core_Config::singleton();
     $this->addActions();
   }
+
 }

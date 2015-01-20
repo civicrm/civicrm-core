@@ -87,4 +87,5 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
     $this->assertEquals($fooValue, $c->get('foo')); // should work b/c value is fetched on demand
     $this->assertEquals($fooValue, $c->getFromFrontCache('foo')); // should work b/c value was fetched on demand
   }
+
 }

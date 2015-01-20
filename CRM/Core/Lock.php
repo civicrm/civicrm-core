@@ -160,4 +160,5 @@ class CRM_Core_Lock {
     $this->_hasLock = TRUE;
     return TRUE;
   }
+
 }

@@ -170,4 +170,5 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
     $this->assertDBRowNotExist('CRM_Contact_DAO_Contact', $contactId);
   }
+
 }

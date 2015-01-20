@@ -205,4 +205,5 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       $this->assertEquals($expectValue, $customField[$expectKey]);
     }
   }
+
 }

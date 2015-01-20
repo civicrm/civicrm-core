@@ -104,4 +104,5 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
 
     return $bounce;
   }
+
 }

@@ -91,4 +91,5 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       CRM_ACL_BAO_EntityRole::create($params);
     }
   }
+
 }

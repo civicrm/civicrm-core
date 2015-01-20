@@ -169,4 +169,5 @@ class CRM_Pledge_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

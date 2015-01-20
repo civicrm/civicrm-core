@@ -86,4 +86,5 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
       CRM_Utils_System::redirect($destination);
     }
   }
+
 }

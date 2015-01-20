@@ -68,4 +68,5 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       return array(NULL, NULL);
     }
   }
+
 }

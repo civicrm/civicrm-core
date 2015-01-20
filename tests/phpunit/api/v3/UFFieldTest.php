@@ -216,4 +216,5 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

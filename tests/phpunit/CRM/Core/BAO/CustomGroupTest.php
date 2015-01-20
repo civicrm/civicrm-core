@@ -585,4 +585,5 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($groupTitles[$customFieldId]['groupTitle'], 'Test Custom Group', 'Check Group Title.');
     Custom::deleteGroup($customGroup);
   }
+
 }

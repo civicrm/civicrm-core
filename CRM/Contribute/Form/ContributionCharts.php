@@ -242,4 +242,5 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $this->assign('hasOpenFlashChart', empty($chartData) ? FALSE : TRUE);
     $this->assign('openFlashChartData', json_encode($chartData));
   }
+
 }

@@ -92,4 +92,5 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

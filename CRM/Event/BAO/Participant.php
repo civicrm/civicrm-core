@@ -2179,4 +2179,5 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
 }

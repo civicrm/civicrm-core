@@ -408,4 +408,5 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $query = "SELECT count(*) FROM civicrm_grant WHERE civicrm_grant.contact_id = {$contactID} ";
     return CRM_Core_DAO::singleValueQuery($query);
   }
+
 }

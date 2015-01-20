@@ -300,4 +300,5 @@ class CRM_Utils_Check_Security {
     list ($ignore, $heuristicSuffix) = explode($filePathMarker, str_replace('\\', '/', $targetDir));
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
+
 }

@@ -716,4 +716,5 @@ AND       CEF.entity_id    = %2";
     }
     return NULL;
   }
+
 }

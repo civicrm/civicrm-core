@@ -64,4 +64,5 @@ class RespondEvent extends Event {
   public function setResponse($response) {
     $this->response = $response;
   }
+
 }

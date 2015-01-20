@@ -3056,4 +3056,5 @@ AND        m.id = %1
     $params['version'] = 3;
     return civicrm_api('MailingContact', 'getcount', $params);
   }
+
 }

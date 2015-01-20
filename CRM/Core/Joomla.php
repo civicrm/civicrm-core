@@ -71,4 +71,5 @@ class CRM_Core_Joomla {
     $sidebarLeft = $template->fetch('CRM/Block/blocks.tpl');
     $template->assign_by_ref('sidebarLeft', $sidebarLeft);
   }
+
 }

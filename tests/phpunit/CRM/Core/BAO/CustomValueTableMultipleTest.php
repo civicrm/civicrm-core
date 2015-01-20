@@ -149,4 +149,5 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
     Contact::delete($contactID);
   }
+
 }

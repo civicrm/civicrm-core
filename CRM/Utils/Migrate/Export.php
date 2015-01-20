@@ -579,4 +579,5 @@ class CRM_Utils_Migrate_Export {
     }
     return $prefix . "<$name>" . htmlentities($value) . "</$name>";
   }
+
 }

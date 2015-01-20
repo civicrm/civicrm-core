@@ -142,4 +142,5 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
   public function postProcess() {
     // redirect to the main search page after printing is over
   }
+
 }

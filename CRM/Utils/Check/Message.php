@@ -90,4 +90,5 @@ class CRM_Utils_Check_Message {
       'title' => $this->title,
     );
   }
+
 }

@@ -182,4 +182,5 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     }
     return $providerInfo[$providerID];
   }
+
 }

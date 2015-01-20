@@ -345,4 +345,5 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   public function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
   }
+
 }

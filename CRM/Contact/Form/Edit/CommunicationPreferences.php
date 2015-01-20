@@ -244,4 +244,5 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     return self::$greetings[$contactType];
   }
+
 }

@@ -146,4 +146,5 @@ class CRM_Utils_XML {
     }
     return $arr;
   }
+
 }

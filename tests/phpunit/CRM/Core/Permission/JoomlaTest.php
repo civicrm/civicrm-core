@@ -41,4 +41,5 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
     $actual = $perm->translateJoomlaPermission($input);
     $this->assertEquals($expected, $actual);
   }
+
 }

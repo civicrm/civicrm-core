@@ -541,4 +541,5 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
       }
     }
   }
+
 }

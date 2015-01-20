@@ -1131,4 +1131,5 @@ LIMIT {$offset}, {$rowCount}
     echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
+
 }

@@ -59,6 +59,7 @@ class CRM_Utils_Cache_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class CRM_Utils_Cache_AllTests
 

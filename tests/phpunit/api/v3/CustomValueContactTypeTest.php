@@ -285,4 +285,5 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $this->assertEquals($getContact['values'][$this->individualStudent]["custom_{$this->IndiStudentField['id']}"], 'Test String', 'In line ' . __LINE__);
   }
+
 }

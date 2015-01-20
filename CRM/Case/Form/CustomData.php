@@ -175,4 +175,5 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
 
     $transaction->commit();
   }
+
 }

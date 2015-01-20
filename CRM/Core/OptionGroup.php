@@ -683,4 +683,5 @@ WHERE  v.option_group_id = g.id
     self::$_cache = array();
     CRM_Utils_Cache::singleton()->flush();
   }
+
 }

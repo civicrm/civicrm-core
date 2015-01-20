@@ -180,4 +180,5 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
+
 }

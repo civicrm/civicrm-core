@@ -230,4 +230,5 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
             AND civicrm_option_group.name = 'contribution_status')
         ";
   }
+
 }

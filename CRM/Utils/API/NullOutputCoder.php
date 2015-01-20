@@ -103,4 +103,5 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
       return $result;
     }
   }
+
 }

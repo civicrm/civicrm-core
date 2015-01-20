@@ -247,4 +247,5 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
+
 }

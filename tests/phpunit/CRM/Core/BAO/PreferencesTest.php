@@ -63,4 +63,5 @@ class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
 
     $this->assertEquals($addressOptions['county'], 1, 'County was set but did not stick in db');
   }
+
 }

@@ -303,4 +303,5 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       $this->assign('accessContribution', FALSE);
     }
   }
+
 }

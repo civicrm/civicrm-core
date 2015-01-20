@@ -1410,4 +1410,5 @@ WHERE  v.option_group_id = g.id
       CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
     }
   }
+
 }

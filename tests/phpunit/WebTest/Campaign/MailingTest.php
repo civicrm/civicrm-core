@@ -274,4 +274,5 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('mailing_event', "mailino$firstName@mailson.co.in");
     //------end delivery verification---------
   }
+
 }

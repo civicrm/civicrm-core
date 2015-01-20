@@ -506,4 +506,5 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $unitTest = new CiviUnitTestCase();
     $unitTest->quickCleanup($tablesToTruncate);
   }
+
 }

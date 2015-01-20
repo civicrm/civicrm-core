@@ -58,4 +58,5 @@ class CRM_Group_StateMachine extends CRM_Core_StateMachine {
   public function getTaskFormName() {
     return CRM_Utils_String::getClassName('CRM_Contact_Form_Task_AddToGroup');
   }
+
 }

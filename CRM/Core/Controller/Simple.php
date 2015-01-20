@@ -139,4 +139,5 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
     CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
     return $pageTemplateFile;
   }
+
 }

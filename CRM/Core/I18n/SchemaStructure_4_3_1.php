@@ -237,4 +237,5 @@ class CRM_Core_I18n_SchemaStructure_4_3_1 {
     }
     return $result;
   }
+
 }

@@ -171,4 +171,5 @@ class CRM_Mailing_MailStore {
     }
     return $dir . DIRECTORY_SEPARATOR . 'cur';
   }
+
 }

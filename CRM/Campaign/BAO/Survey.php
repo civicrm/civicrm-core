@@ -1145,4 +1145,5 @@ UPDATE  civicrm_activity
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
 }

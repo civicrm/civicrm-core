@@ -76,4 +76,5 @@ class CRM_Contact_Form_Edit_Demographics {
    */
   public static function setDefaultValues(&$form, &$defaults) {
   }
+
 }

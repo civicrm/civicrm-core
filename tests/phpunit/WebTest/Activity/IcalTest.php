@@ -119,4 +119,5 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

@@ -217,4 +217,5 @@ class CRM_Contribute_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

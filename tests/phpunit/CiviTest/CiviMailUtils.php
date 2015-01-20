@@ -322,4 +322,5 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     $this->_ut->assertNotEmpty($mail, 'Cannot parse mail');
     return $mail[0];
   }
+
 }

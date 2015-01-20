@@ -413,4 +413,5 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
     return $options;
   }
+
 }

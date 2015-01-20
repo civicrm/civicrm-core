@@ -321,4 +321,5 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
 
     return array('is_error' => 0, 'messages' => $returnMessages);
   }
+
 }

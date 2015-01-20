@@ -627,4 +627,5 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     );
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
+
 }

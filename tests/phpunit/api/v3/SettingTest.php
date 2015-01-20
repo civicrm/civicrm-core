@@ -549,4 +549,5 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
+
 }

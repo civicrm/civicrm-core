@@ -218,4 +218,5 @@ ORDER BY entity_id
   public function userContext($mode = NULL) {
     return 'civicrm/acl/basic';
   }
+
 }

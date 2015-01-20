@@ -258,4 +258,5 @@ WHERE  $where
   public function summary() {
     return NULL;
   }
+
 }

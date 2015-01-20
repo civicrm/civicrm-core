@@ -143,4 +143,5 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     $this->verifyText("xpath=//table/tbody//tr/td[contains(text(),'$editCaseTypeLabel')]", $editCaseTypeLabel);
   }
+
 }

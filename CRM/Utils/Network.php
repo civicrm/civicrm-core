@@ -85,4 +85,5 @@ class CRM_Utils_Network {
     error_reporting($old_error_reporting);
     return FALSE;
   }
+
 }

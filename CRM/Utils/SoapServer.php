@@ -332,4 +332,5 @@ class CRM_Utils_SoapServer {
     $params['version'] = 3;
     return civicrm_api('contact', 'get', $params);
   }
+
 }

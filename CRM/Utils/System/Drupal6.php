@@ -973,4 +973,5 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   public function flush() {
     drupal_flush_all_caches();
   }
+
 }

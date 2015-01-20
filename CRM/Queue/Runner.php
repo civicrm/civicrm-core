@@ -360,4 +360,5 @@ class CRM_Queue_Runner {
     }
     return $this->taskCtx;
   }
+
 }

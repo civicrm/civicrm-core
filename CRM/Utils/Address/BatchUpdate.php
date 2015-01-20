@@ -287,4 +287,5 @@ class CRM_Utils_Address_BatchUpdate {
     $result['messages'] = implode("", $this->returnMessages);
     return $result;
   }
+
 }

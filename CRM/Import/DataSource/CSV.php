@@ -250,6 +250,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     return $result;
   }
+
 }
 
 /**

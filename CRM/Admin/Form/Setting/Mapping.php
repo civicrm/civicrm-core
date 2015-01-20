@@ -93,4 +93,5 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
   public function addRules() {
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mapping', 'formRule'));
   }
+
 }

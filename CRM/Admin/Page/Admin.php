@@ -120,4 +120,5 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     $this->_showHide->addToTemplate();
     return parent::run();
   }
+
 }

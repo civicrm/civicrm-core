@@ -493,4 +493,5 @@ class CRM_Badge_BAO_Badge {
     $eventBadgeClass = new CRM_Badge_BAO_Badge();
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
+
 }

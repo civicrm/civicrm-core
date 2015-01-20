@@ -658,4 +658,5 @@ SELECT end_event_adjust_interval
       )
     );
   }
+
 }

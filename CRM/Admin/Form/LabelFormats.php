@@ -250,4 +250,5 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     }
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
+
 }

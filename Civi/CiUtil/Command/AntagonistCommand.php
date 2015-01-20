@@ -67,4 +67,5 @@ class AntagonistCommand {
     }
     return NULL;
   }
+
 }

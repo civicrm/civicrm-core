@@ -59,4 +59,5 @@ interface ProviderInterface {
    * @return array<string>
    */
   public function getActionNames($version, $entity);
+
 }

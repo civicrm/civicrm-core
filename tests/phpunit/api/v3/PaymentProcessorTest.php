@@ -125,4 +125,5 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
     $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
   }
+
 }

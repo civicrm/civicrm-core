@@ -193,4 +193,5 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function releaseItem($item) {
     unset($this->releaseTimes[$item->id]);
   }
+
 }

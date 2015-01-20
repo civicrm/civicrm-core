@@ -64,4 +64,5 @@ class CRM_Utils_JS {
     }
     return array_values($strings);
   }
+
 }

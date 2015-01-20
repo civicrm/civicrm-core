@@ -546,4 +546,5 @@ FROM   {$this->_tableName} contact_a
     }
     return $result;
   }
+
 }

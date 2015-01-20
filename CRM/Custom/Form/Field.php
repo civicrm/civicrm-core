@@ -1019,4 +1019,5 @@ SELECT id
     // Add data when in ajax contect
     $this->ajaxResponse['customField'] = $customField->toArray();
   }
+
 }

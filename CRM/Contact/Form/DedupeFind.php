@@ -104,4 +104,5 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
     CRM_Utils_System::redirect($url);
   }
+
 }

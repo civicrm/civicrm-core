@@ -107,4 +107,5 @@ interface CRM_Report_Interface {
    * Returns an array of column headers and field names and sort options
    */
   public function &columns();
+
 }

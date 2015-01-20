@@ -523,4 +523,5 @@ MODIFY      {$columnName} varchar( $length )
       ));
     }
   }
+
 }

@@ -170,4 +170,5 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'id', $isActive, 'Check DB for is_Active value'
     );
   }
+
 }

@@ -47,4 +47,5 @@ class UnhandledExceptionEvent extends \Symfony\Component\EventDispatcher\Event {
     $this->request = $request;
     $this->exception = $e;
   }
+
 }

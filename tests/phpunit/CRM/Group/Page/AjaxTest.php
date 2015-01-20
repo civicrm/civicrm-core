@@ -452,4 +452,5 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       $currentGroups = $groups;
     }
   }
+
 }

@@ -736,4 +736,5 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
 
     return $containingGroups;
   }
+
 }

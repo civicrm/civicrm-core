@@ -634,4 +634,5 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       }
     }
   }
+
 }

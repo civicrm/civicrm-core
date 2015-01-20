@@ -26,4 +26,5 @@ class CRM_Event_Cart_Controller_Checkout extends CRM_Core_Controller {
       $this->addActions();
     }
   }
+
 }

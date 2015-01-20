@@ -1909,4 +1909,5 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
     }
   }
+
 }

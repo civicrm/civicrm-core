@@ -436,4 +436,5 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     file_put_contents("$basedir/$file.php", "<?php\n");
     return $basedir;
   }
+
 }

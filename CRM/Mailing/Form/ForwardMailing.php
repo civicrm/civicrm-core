@@ -163,4 +163,5 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     $session->pushUserContext($config->userFrameworkBaseURL);
   }
+
 }

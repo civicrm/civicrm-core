@@ -221,4 +221,5 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
     $fieldValueDAO->id = $id;
     return $fieldValueDAO->delete();
   }
+
 }

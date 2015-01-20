@@ -85,4 +85,5 @@ class CRM_Core_TableHierarchy {
 
     return self::$info;
   }
+
 }

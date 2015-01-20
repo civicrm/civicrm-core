@@ -194,4 +194,5 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
+
 }

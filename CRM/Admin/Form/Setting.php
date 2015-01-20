@@ -277,4 +277,5 @@ AND    time_format <> ''
     $configFile = $config->uploadDir . 'Config.IDS.ini';
     @unlink($configFile);
   }
+
 }

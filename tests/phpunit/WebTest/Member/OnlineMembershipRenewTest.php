@@ -657,4 +657,5 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
       );
     }
   }
+
 }

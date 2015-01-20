@@ -705,4 +705,5 @@ ORDER BY LEFT(title, 1)
 
     return $formattedConfLinks;
   }
+
 }

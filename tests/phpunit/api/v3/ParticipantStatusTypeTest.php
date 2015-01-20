@@ -78,4 +78,5 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array());
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
 }

@@ -340,4 +340,5 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->_checkResult($value, $type);
     }
   }
+
 }

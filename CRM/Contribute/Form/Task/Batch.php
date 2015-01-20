@@ -261,4 +261,5 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       CRM_Core_Session::setStatus(ts("No updates have been saved."), ts('Not Saved'), 'alert');
     }
   }
+
 }

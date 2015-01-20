@@ -151,4 +151,5 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $result = CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
+
 }

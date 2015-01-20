@@ -136,4 +136,5 @@ class CRM_Utils_Signer {
     // many times on certain admin pages; so instead we'll re-use the hash.
     return $this->defaultSalt;
   }
+
 }

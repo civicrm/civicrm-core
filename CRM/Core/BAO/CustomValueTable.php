@@ -715,4 +715,5 @@ AND    cf.id IN ( $fieldIDList )
       return $result;
     }
   }
+
 }

@@ -147,4 +147,5 @@ class CRM_Event_Import_Field {
     }
     return TRUE;
   }
+
 }

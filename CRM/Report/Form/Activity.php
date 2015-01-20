@@ -985,4 +985,5 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       $this->assign('sectionTotals', $totals);
     }
   }
+
 }

@@ -200,4 +200,5 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     return $reportTemplates;
   }
+
 }

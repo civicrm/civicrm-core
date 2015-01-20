@@ -573,4 +573,5 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

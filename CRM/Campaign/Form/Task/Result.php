@@ -63,4 +63,5 @@ class CRM_Campaign_Form_Task_Result extends CRM_Campaign_Form_Task {
       )
     );
   }
+
 }

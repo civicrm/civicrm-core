@@ -89,4 +89,5 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
     CRM_Core_Session::setStatus(ts('Deleted Grant(s): %1', array(1 => $deletedGrants)), '', 'info');
     CRM_Core_Session::setStatus(ts('Total Selected Grant(s): %1', array(1 => count($this->_grantIds))), '', 'info');
   }
+
 }

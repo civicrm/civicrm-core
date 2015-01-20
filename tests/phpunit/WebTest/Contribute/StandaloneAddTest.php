@@ -287,4 +287,5 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'contribute/add', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

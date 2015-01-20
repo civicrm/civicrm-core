@@ -243,4 +243,5 @@ class CRM_Case_Audit_Audit {
     }
     return $contents;
   }
+
 }

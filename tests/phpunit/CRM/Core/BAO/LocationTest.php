@@ -556,4 +556,5 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //cleanup DB by deleting the contact
     Contact::delete($contactId);
   }
+
 }

@@ -81,4 +81,5 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   public function selectorName() {
     return $this->get('selectorName');
   }
+
 }

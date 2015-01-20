@@ -187,4 +187,5 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     }
     CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
   }
+
 }

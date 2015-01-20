@@ -159,4 +159,5 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
       )
     );
   }
+
 }

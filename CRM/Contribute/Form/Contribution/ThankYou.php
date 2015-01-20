@@ -292,4 +292,5 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     // CRM-9491
     $this->controller->reset();
   }
+
 }

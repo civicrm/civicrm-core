@@ -45,4 +45,5 @@ class CRM_Core_JobManagerTest extends CiviUnitTestCase {
     $jobManager = new CRM_Core_JobManager();
     $jobManager->execute(FALSE);
   }
+
 }

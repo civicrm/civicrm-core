@@ -28,4 +28,5 @@ namespace Civi\CCase;
 
 interface CaseChangeListener {
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event);
+
 }

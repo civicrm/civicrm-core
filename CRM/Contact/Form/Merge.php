@@ -378,4 +378,5 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     CRM_Utils_System::redirect($url);
   }
+
 }

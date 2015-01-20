@@ -51,4 +51,5 @@ class CRM_Contact_Page_Task extends CRM_Core_Page {
   public function getTitle() {
     return "Task Results";
   }
+
 }

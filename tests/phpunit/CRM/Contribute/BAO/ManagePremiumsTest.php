@@ -134,4 +134,5 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
 
     $this->assertEquals(empty($result), TRUE, 'Verify product record deletion.');
   }
+
 }

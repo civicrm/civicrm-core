@@ -136,4 +136,5 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
     );
     $this->set('report', $contents);
   }
+
 }

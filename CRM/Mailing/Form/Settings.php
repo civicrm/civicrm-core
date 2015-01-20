@@ -257,4 +257,5 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   public function getTitle() {
     return ts('Track and Respond');
   }
+
 }

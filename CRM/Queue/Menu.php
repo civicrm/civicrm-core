@@ -87,4 +87,5 @@ class CRM_Queue_Menu {
         // unrecognized
     }
   }
+
 }

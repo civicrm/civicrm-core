@@ -671,4 +671,5 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
     }
   }
+
 }

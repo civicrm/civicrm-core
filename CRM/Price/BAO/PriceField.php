@@ -803,4 +803,5 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
 
     return $label;
   }
+
 }

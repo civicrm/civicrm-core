@@ -386,4 +386,5 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     return $mailSent;
   }
+
 }

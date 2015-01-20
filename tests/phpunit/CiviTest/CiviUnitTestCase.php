@@ -3269,4 +3269,5 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       ob_end_clean();
     }
   }
+
 }

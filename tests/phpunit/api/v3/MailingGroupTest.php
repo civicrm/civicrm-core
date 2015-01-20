@@ -184,4 +184,5 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
   }
+
 }

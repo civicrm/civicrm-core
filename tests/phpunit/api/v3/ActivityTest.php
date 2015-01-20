@@ -1177,4 +1177,5 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       $this->assertTrue(is_array($value), $key . " is not an array in line " . __LINE__);
     }
   }
+
 }

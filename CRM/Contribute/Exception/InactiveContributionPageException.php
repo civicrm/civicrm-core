@@ -18,4 +18,5 @@ class CRM_Contribute_Exception_InactiveContributionPageException extends Excepti
   public function getID() {
     return $this->id;
   }
+
 }

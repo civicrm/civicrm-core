@@ -175,4 +175,5 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
     return $data;
   }
+
 }

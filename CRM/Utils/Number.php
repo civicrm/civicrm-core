@@ -45,4 +45,5 @@ class CRM_Utils_Number {
       return $sign * $val;
     }
   }
+
 }

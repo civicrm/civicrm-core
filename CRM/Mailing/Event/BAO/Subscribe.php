@@ -421,4 +421,5 @@ SELECT     civicrm_email.id as email_id
       CRM_Utils_System::setUFMessage(ts('We had a problem processing your subscription request for %1. You have tried to subscribe to a private group and/or we encountered a database error. Please contact the site administrator.', array(1 => $groupTitle)));
     }
   }
+
 }

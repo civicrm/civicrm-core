@@ -142,4 +142,5 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
   }
+
 }

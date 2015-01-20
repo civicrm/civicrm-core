@@ -813,4 +813,5 @@ AND    contact_id IN ( $contactStr )
 
     return $options;
   }
+
 }

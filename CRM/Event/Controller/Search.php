@@ -75,4 +75,5 @@ class CRM_Event_Controller_Search extends CRM_Core_Controller {
     // add all the actions
     $this->addActions($uploadDir, $uploadNames);
   }
+
 }

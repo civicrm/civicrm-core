@@ -719,4 +719,5 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
     }
   }
+
 }

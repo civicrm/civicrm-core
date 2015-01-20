@@ -96,4 +96,5 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
 
     }
   }
+
 }

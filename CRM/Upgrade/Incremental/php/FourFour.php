@@ -832,4 +832,5 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     }
     return $result;
   }
+
 }

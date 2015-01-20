@@ -574,4 +574,5 @@ class CRM_Core_Session {
     // helps proxies like varnish
     return empty($_SESSION);
   }
+
 }

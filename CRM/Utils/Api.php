@@ -80,4 +80,5 @@ class CRM_Utils_Api {
     }
     return _civicrm_api_get_entity_name_from_camel($shortName);
   }
+
 }

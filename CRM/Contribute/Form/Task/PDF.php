@@ -295,4 +295,5 @@ AND    {$this->_componentClause}";
 
     return $pdfElements;
   }
+
 }

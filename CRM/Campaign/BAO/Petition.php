@@ -673,4 +673,5 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         break;
     }
   }
+
 }

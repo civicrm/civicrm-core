@@ -1063,4 +1063,5 @@ class CRM_Contribute_BAO_Query {
       'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
     );
   }
+
 }

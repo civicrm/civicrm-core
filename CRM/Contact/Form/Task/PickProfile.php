@@ -166,4 +166,5 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
+
 }

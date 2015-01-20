@@ -144,4 +144,5 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   protected function isApiControlField($key) {
     return (FALSE !== strpos($key, '.'));
   }
+
 }

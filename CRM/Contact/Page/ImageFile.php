@@ -62,4 +62,5 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
       CRM_Core_Error::fatal('Photo does not exist');
     }
   }
+
 }

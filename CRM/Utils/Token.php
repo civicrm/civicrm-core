@@ -1836,4 +1836,5 @@ class CRM_Utils_Token {
 
     return $output;
   }
+
 }

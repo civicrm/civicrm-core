@@ -580,4 +580,5 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
       self::del($contactNoteId->id, FALSE);
     }
   }
+
 }

@@ -413,4 +413,5 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
     $this->assign('aToZ', $aToZBar);
   }
+
 }

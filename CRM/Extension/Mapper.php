@@ -419,4 +419,5 @@ class CRM_Extension_Mapper {
       $this->cache->delete($this->cacheKey . '/moduleFiles');
     }
   }
+
 }

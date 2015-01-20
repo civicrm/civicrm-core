@@ -361,4 +361,5 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/contact/dedupefind';
   }
+
 }

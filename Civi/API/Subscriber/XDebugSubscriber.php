@@ -62,4 +62,5 @@ class XDebugSubscriber implements EventSubscriberInterface {
       $event->setResponse($result);
     }
   }
+
 }

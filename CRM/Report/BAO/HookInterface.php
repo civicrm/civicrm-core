@@ -57,4 +57,5 @@ class CRM_Report_BAO_HookInterface {
   public function logDiffClause(&$reportObj, $table) {
     return array();
   }
+
 }

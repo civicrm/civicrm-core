@@ -374,4 +374,5 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     parent::endPostProcess();
   }
+
 }

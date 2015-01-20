@@ -199,4 +199,5 @@ class CRM_Logging_Reverter {
       }
     }
   }
+
 }

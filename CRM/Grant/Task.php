@@ -160,4 +160,5 @@ class CRM_Grant_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

@@ -145,4 +145,5 @@ abstract class CRM_Queue_Queue {
    *   The item returned by claimItem.
    */
   public abstract function releaseItem($item);
+
 }

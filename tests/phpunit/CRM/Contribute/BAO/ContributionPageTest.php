@@ -169,4 +169,5 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($checkRecurring, FALSE, 'Check for false return.');
     ContributionPage::delete($contributionpage->id);
   }
+
 }

@@ -981,4 +981,5 @@ class CRM_Core_SelectValues {
 
     return $scheduleReminderFrequencyUnits;
   }
+
 }

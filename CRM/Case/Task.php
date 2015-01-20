@@ -175,4 +175,5 @@ class CRM_Case_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

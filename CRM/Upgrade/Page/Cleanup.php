@@ -60,4 +60,5 @@ class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
     $content = $template->fetch('CRM/common/upgradeCleanup.tpl');
     echo CRM_Utils_System::theme($content, FALSE, TRUE);
   }
+
 }

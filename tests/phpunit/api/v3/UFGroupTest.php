@@ -207,4 +207,5 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
   }
+
 }

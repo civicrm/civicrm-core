@@ -69,4 +69,5 @@ WHERE   id = %1";
     $details['auto_renew'] = CRM_Utils_Array::value('auto_renew', $options[$details]);
     CRM_Utils_JSON::output($details);
   }
+
 }

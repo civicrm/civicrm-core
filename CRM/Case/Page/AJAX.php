@@ -213,4 +213,5 @@ class CRM_Case_Page_AJAX {
 
     CRM_Utils_System::civiExit();
   }
+
 }

@@ -146,4 +146,5 @@ class CRM_Utils_Cache_Memcache {
   public function flush() {
     return $this->_cache->flush();
   }
+
 }

@@ -168,4 +168,5 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
     $_cache[$permissionName] = self::getContactEmails($uids);
     return $_cache[$permissionName];
   }
+
 }

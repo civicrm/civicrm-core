@@ -43,4 +43,5 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
     $this->assertTrue(empty($schema['ActivityModel']['schema']['street_address']));
 
   }
+
 }

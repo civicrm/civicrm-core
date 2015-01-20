@@ -85,4 +85,5 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
       )
     );
   }
+
 }

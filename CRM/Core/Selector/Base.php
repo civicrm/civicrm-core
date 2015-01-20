@@ -189,4 +189,5 @@ class CRM_Core_Selector_Base {
   public function getKey() {
     return $this->_key;
   }
+
 }

@@ -14,4 +14,5 @@ class CRM_Core_CodeGen_Reflection extends CRM_Core_CodeGen_BaseTask {
 
     $template->run('listAll.tpl', $this->config->CoreDAOCodePath . "AllCoreTables.php");
   }
+
 }

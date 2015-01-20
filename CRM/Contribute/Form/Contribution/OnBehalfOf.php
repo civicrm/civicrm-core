@@ -178,4 +178,5 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->assign('onBehalfOfFields', $profileFields);
     $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
   }
+
 }

@@ -122,4 +122,5 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
   }
+
 }

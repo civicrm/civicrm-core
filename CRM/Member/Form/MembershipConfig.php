@@ -151,4 +151,5 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
       );
     }
   }
+
 }

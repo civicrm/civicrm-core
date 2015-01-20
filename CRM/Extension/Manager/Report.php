@@ -139,4 +139,5 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
   public function getCustomReportsById() {
     return CRM_Core_OptionGroup::values(self::REPORT_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
   }
+
 }

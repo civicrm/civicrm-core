@@ -329,4 +329,5 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // delete created profile
     $this->_testdeleteProfile($profileTitle);
   }
+
 }

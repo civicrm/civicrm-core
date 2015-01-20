@@ -95,4 +95,5 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->writeOneSide($participant);
     $this->pdf->StopTransform();
   }
+
 }

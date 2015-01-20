@@ -1188,6 +1188,7 @@ class InstallRequirements {
   public function hasWarnings() {
     return count($this->warnings);
   }
+
 }
 
 /**
@@ -1399,6 +1400,7 @@ class Installer extends InstallRequirements {
 
     return $this->errors;
   }
+
 }
 
 function civicrm_install_set_drupal_perms() {

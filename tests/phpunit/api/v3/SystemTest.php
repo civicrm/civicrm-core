@@ -100,4 +100,5 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }
+
 }

@@ -186,4 +186,5 @@ class CRM_Contact_BAO_Contact_Optimizer {
     // we can skip saving new and return
     unset($newValues['email']);
   }
+
 }

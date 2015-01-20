@@ -68,4 +68,5 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
 
     parent::preProcess();
   }
+
 }

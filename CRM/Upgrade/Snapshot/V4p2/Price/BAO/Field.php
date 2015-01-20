@@ -635,4 +635,5 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
       $error['_qf_default'] = ts("Please select at least one option from price set.");
     }
   }
+
 }

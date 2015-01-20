@@ -475,4 +475,5 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       }
     }
   }
+
 }

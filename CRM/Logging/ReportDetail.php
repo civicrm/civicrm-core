@@ -241,4 +241,5 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->assign('revertURL', CRM_Report_Utils_Report::getNextUrl($this->detail, "$q&revert=1", FALSE, TRUE));
     $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
   }
+
 }

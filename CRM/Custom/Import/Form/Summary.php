@@ -14,4 +14,5 @@ class CRM_Custom_Import_Form_Summary extends CRM_Contact_Import_Form_Summary {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/custom', 'reset=1'));
   }
+
 }

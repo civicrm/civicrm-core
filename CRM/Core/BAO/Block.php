@@ -528,4 +528,5 @@ class CRM_Core_BAO_Block {
     }
     return ($l1 < $l2) ? -1 : 1;
   }
+
 }

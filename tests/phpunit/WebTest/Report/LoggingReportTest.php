@@ -379,4 +379,5 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
   }
+
 }

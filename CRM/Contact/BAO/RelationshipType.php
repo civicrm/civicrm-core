@@ -180,4 +180,5 @@ UPDATE civicrm_membership_type
     $relationshipType->id = $relationshipTypeId;
     return $relationshipType->delete();
   }
+
 }

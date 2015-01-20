@@ -92,4 +92,5 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   public static function del($id) {
     CRM_Core_Error::fatal();
   }
+
 }

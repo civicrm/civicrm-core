@@ -71,4 +71,5 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

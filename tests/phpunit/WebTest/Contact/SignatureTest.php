@@ -194,4 +194,5 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     // Is signature correct? in Activity
     $this->assertTextPresent($signature);
   }
+
 }

@@ -369,5 +369,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return NULL;
     }
   }
+
 }
 // end class CRM_Core_Payment_FirstData

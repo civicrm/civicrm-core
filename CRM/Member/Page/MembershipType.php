@@ -168,4 +168,5 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
     $this->assign('rows', $membershipType);
   }
+
 }

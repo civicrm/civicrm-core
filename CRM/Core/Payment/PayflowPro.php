@@ -684,4 +684,5 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     //RESPMSG=Invalid Profile ID: Invalid recurring profile ID
     //RT0000000001
   }
+
 }

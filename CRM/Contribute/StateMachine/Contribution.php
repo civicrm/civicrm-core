@@ -58,4 +58,5 @@ class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
+
 }

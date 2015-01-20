@@ -555,4 +555,5 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       $lastKey = $rowNum;
     }
   }
+
 }

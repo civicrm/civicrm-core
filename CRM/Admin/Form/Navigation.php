@@ -165,4 +165,5 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       array(1 => $navigation->label)
     ), ts('Saved'), 'success');
   }
+
 }

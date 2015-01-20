@@ -386,4 +386,5 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
     }
   }
+
 }

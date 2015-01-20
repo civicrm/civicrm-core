@@ -433,4 +433,5 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
     }
   }
+
 }

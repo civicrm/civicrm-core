@@ -831,4 +831,5 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

@@ -93,4 +93,5 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
       $this->assertRegexp($pattern, file_get_contents($logFile));
     }
   }
+
 }

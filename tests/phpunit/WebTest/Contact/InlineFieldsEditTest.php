@@ -350,4 +350,5 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

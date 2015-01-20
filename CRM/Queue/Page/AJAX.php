@@ -124,4 +124,5 @@ class CRM_Queue_Page_AJAX {
     }
     CRM_Utils_JSON::output($result);
   }
+
 }

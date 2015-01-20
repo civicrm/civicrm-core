@@ -85,4 +85,5 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
     CRM_Core_Session::setStatus($deletedActivities, ts('Deleted Activities'), "success");
     CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', array(1 => count($this->_activityHolderIds))), "info");
   }
+
 }

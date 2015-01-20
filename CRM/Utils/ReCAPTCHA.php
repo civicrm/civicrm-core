@@ -125,4 +125,5 @@ class CRM_Utils_ReCAPTCHA {
     );
     return $resp->is_valid;
   }
+
 }

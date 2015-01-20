@@ -278,4 +278,5 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
   }
+
 }

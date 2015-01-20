@@ -104,4 +104,5 @@ class CRM_Utils_Time {
     $diff = strtotime($b) - strtotime($a);
     return (abs($diff) <= $threshold);
   }
+
 }

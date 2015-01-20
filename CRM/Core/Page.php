@@ -425,4 +425,5 @@ class CRM_Core_Page {
   public function setVar($name, $value) {
     $this->$name = $value;
   }
+
 }

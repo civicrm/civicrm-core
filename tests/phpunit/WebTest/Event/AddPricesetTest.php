@@ -757,4 +757,5 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

@@ -360,4 +360,5 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       }
     }
   }
+
 }

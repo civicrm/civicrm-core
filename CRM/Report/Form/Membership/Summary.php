@@ -448,4 +448,5 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       }
     }
   }
+
 }

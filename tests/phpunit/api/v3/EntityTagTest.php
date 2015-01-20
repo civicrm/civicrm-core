@@ -323,4 +323,5 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->assertEquals($result['removed'], 1);
     $this->assertEquals($result['not_removed'], 1);
   }
+
 }

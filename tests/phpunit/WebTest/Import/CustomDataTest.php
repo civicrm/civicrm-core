@@ -352,4 +352,5 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     return array($customDataParams, $customDataVerify);
   }
+
 }
