@@ -344,7 +344,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     parent::__construct();
   }
 
-  /** adding address fields with dbAlias for order clause
+  /**
+   * Adding address fields with dbAlias for order clause.
    * @return array
    *   address fields
    */

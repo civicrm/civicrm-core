@@ -47,12 +47,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /** This test case doesn't require DB reset */
+  /**
+   * This test case doesn't require DB reset.
+   */
   public $DBResetRequired = FALSE;
 
   protected $_entity;
 
-  /** Map custom group entities to civicrm components */
+  /**
+   * Map custom group entities to civicrm components.
+   */
   static $componentMap = array(
     'Contribution' => 'CiviContribute',
     'Membership' => 'CiviMember',
@@ -597,11 +601,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $knownFailures[$entity][$key];
   }
 
-  /** testing the _get **/
+  /* ----- testing the _get  ----- */
 
   /**
    * @dataProvider toBeSkipped_get
-  entities that don't need a get action
+   *   Entities that don't need a get action
    * @param $Entity
    */
   public function testNotImplemented_get($Entity) {
@@ -1230,9 +1234,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoObj->free();
   }
 
-  /** testing the _getFields **/
+  /* ---- testing the _getFields ---- */
 
-  /** testing the _delete **/
+  /* ---- testing the _delete ---- */
 
   /**
    * @dataProvider toBeSkipped_delete
