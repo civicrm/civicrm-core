@@ -157,7 +157,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    *
    * @return \CRM_Event_Selector_Search
    */
-  function __construct(
+  public function __construct(
     &$queryParams,
     $action = CRM_Core_Action::NONE,
     $eventClause = NULL,

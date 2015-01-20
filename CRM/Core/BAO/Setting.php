@@ -82,7 +82,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return boolean
    *   true if item is already in cache
    */
-  static function inCache(
+  public static function inCache(
     $group,
     $name,
     $componentID = NULL,
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return string
    */
-  static function setCache(
+  public static function setCache(
     $values,
     $group,
     $componentID = NULL,
@@ -163,7 +163,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
    */
-  static function dao(
+  public static function dao(
     $group,
     $name = NULL,
     $componentID = NULL,
@@ -219,7 +219,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return mixed
    *   The data if present in the setting table, else null
    */
-  static function getItem(
+  public static function getItem(
     $group,
     $name = NULL,
     $componentID = NULL,
@@ -346,7 +346,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return void
    */
-  static function setItem(
+  public static function setItem(
     $value,
     $group,
     $name,
@@ -380,7 +380,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $createdID
    * @param int $domainID
    */
-  static function _setItem(
+  public static function _setItem(
     $metadata,
     $value,
     $group,
@@ -646,7 +646,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * - description
    * - help_text
    */
-  static function getSettingSpecification(
+  public static function getSettingSpecification(
     $componentID = NULL,
     $filters = array(),
     $domainID = NULL,
@@ -832,7 +832,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return array
    */
-  static function valueOptions(
+  public static function valueOptions(
     $group,
     $name,
     $system = TRUE,
@@ -891,7 +891,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $userID
    * @param string $keyField
    */
-  static function setValueOption(
+  public static function setValueOption(
     $group,
     $name,
     $value,

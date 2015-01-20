@@ -642,7 +642,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $email1
    * @param $email2
    */
-  function _testEventRegistration(
+  public function _testEventRegistration(
     $eventPageId, $customId, $firstName, $lastName,
     $participantfname, $participantlname, $email1, $email2
   ) {

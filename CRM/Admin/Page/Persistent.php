@@ -52,7 +52,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  function &stringActionLinks() {
+  public function &stringActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_stringActionLinks)) {
 

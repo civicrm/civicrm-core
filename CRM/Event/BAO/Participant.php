@@ -352,7 +352,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @return bool|int|null|string
    *   1. false                 => If event having some empty spaces.
    */
-  static function eventFull(
+  public static function eventFull(
     $eventId,
     $returnEmptySeats = FALSE,
     $includeWaitingList = TRUE,
@@ -496,7 +496,7 @@ SELECT  event.event_full_text,
    * @return array
    *   an array of each option id and total count
    */
-  static function priceSetOptionsCount(
+  public static function priceSetOptionsCount(
     $eventId,
     $skipParticipantIds = array(),
     $considerCounted = TRUE,
@@ -1225,7 +1225,7 @@ UPDATE  civicrm_participant
    *
    * @return array
    */
-  static function transitionParticipants(
+  public static function transitionParticipants(
     $participantIds, $toStatusId,
     $fromStatusId = NULL, $returnResult = FALSE, $skipCascadeRule = FALSE
   ) {
@@ -1461,7 +1461,7 @@ UPDATE  civicrm_participant
    *
    * @return bool
    */
-  static function sendTransitionParticipantMail(
+  public static function sendTransitionParticipantMail(
     $participantId,
     $participantValues,
     $eventDetails,

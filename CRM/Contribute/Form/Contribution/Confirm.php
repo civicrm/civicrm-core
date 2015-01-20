@@ -1229,7 +1229,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws Exception
    * @return CRM_Contribute_DAO_Contribution
    */
-  static function processContribution(
+  public static function processContribution(
     &$form,
     $params,
     $result,

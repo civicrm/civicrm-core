@@ -93,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
   /**
    * Construct the search query
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $onlyIDs = FALSE
   ) {

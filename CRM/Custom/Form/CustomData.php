@@ -49,7 +49,7 @@ class CRM_Custom_Form_CustomData {
    *
    * @return void
    */
-  static function preProcess(
+  public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {

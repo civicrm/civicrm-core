@@ -167,7 +167,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return \CRM_Core_Form
    */
-  function __construct(
+  public function __construct(
     $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
@@ -267,7 +267,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return HTML_QuickForm_Element could be an error object
    */
-  function &add(
+  public function &add(
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
@@ -918,7 +918,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $separator
    * @param bool $flipValues
    */
-  function addCheckBox(
+  public function addCheckBox(
     $id, $title, $values, $other = NULL,
     $attributes = NULL, $required = NULL,
     $javascriptMethod = NULL,
@@ -1387,7 +1387,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add a currency and money element to the form
    */
-  function addMoney(
+  public function addMoney(
     $name,
     $label,
     $required = FALSE,
@@ -1410,7 +1410,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add currency element to the form
    */
-  function addCurrency(
+  public function addCurrency(
     $name = 'currency',
     $label = NULL,
     $required = TRUE,
