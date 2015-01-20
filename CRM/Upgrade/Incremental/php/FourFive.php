@@ -272,7 +272,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     if ($dao->N) {
-      $domain = new CRM_Core_DAO_Domain;
+      $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       while ($dao->fetch()) {
         $honorParams = array('soft_credit' => array('soft_credit_types' => $honorTypes));

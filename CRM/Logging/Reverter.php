@@ -189,7 +189,7 @@ class CRM_Logging_Reverter {
         return;
       }
 
-      $dao = new CRM_Contact_DAO_Contact;
+      $dao = new CRM_Contact_DAO_Contact();
       $dao->id = $cid;
       if ($dao->find(TRUE)) {
         // CRM-8102: MySQL can’t parse its own dates
