@@ -433,7 +433,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //set address block defaults
     CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
 
-
     if (!empty($defaults['image_URL'])) {
       list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($defaults['image_URL']));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
@@ -1180,7 +1179,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $errors['_qf_default'] = $duplicateContactsLinks;
 
-
         // let smarty know that there are duplicates
         $template = CRM_Core_Smarty::singleton();
         $template->assign('isDuplicate', 1);
@@ -1401,7 +1399,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $userId = $contactId;
       }
 
-
       // get deceased status id
       $allStatus = CRM_Member_PseudoConstant::membershipStatus();
       $deceasedStatusId = array_search('Deceased', $allStatus);
@@ -1439,7 +1436,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'membership_type_id' => $dao->membership_type_id,
           'max_related' => $dao->max_related,
         );
-
 
         CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
 

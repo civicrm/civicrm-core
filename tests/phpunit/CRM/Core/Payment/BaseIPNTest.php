@@ -291,7 +291,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('pledge_payment', $this->objects);
     $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
 
-
     $this->ids['pledge_payment'][0] = 999;
     $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, $this->_processorId, array('return_error' => 1));
     $this->assertArrayHasKey('error_message', $result);
@@ -437,7 +436,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * @param bool $contributionPage
    */
   public function _setUpContributionObjects($contributionPage = FALSE) {
-
 
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;

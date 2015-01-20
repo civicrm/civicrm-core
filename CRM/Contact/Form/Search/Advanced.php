@@ -271,7 +271,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $this->_formValues['group'] = array($this->_groupID => 1);
     }
 
-
     //search for civicase
     if (is_array($this->_formValues)) {
       $allCases = FALSE;

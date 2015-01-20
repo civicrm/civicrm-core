@@ -1224,7 +1224,6 @@ WHERE {$whereClause}";
 
     $clauses[] = self::getPermissionClause();
 
-
     return implode(' AND ', $clauses);
   }
 

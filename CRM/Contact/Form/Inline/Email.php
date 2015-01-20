@@ -119,7 +119,6 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
         }
       }
 
-
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');
       }
