@@ -1153,7 +1153,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array|mixed|null|string
    */
-  static function getDisplayValueCommon(
+  public static function getDisplayValueCommon(
     $value,
     &$option,
     $html_type,
@@ -1366,7 +1366,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *                               just format the given value
    *
    */
-  static function setProfileDefaults(
+  public static function setProfileDefaults(
     $customFieldId,
     $elementName,
     &$defaults,
@@ -1580,7 +1580,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return array
    *   formatted custom field array
    */
-  static function formatCustomField(
+  public static function formatCustomField(
     $customFieldId, &$customFormatted, $value,
     $customFieldExtend, $customValueId = NULL,
     $entityId = NULL,
@@ -2238,7 +2238,7 @@ ORDER BY html_type";
    *
    * @return array
    */
-  static function postProcess(
+  public static function postProcess(
     &$params,
     &$customFields,
     $entityID,

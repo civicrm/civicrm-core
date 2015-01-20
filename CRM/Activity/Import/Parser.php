@@ -73,7 +73,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run(
+  public function run(
     $fileName,
     $seperator = ',',
     &$mapper,
