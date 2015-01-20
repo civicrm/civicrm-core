@@ -189,7 +189,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'note' => 'note',
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
-      'subject' => NULL
+      'subject' => NULL,
     );
 
     try {
@@ -255,7 +255,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'end_date' => '',
       'membership_end_date' => '0',
       'join_date' => '2010-12-20',
-      'membership_start_date' => '2010-12-20'
+      'membership_start_date' => '2010-12-20',
     );
     $fields = civicrm_api3('Membership', 'getfields', array('action' => 'get'));
     _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);

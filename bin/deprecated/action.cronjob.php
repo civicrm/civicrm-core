@@ -35,7 +35,7 @@
 class CRM_Cron_Action {
   /**
    */
-  function __construct() {
+  public function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
       require_once "cli.php";
@@ -56,7 +56,7 @@ class CRM_Cron_Action {
     }
   }
 
-  function initialize() {
+  public function initialize() {
     require_once '../civicrm.config.php';
     require_once 'CRM/Core/Config.php';
 

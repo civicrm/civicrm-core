@@ -54,7 +54,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       ->addSetting(array(
         'tabSettings' => array(
           'active' => self::getCurrentTab($tabs),
-        )
+        ),
       ));
     return $tabs;
   }
@@ -171,8 +171,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
           $tabs[$key]['qfKey'] = NULL;
         }
 
-        $tabs[$key]['link'] =
-          CRM_Utils_System::url(
+        $tabs[$key]['link'] = CRM_Utils_System::url(
             "civicrm/admin/contribute/{$key}",
             "{$reset}action=update&id={$contribPageId}{$tabs[$key]['qfKey']}"
           );

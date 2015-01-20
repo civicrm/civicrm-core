@@ -80,7 +80,7 @@ class CRM_Admin_Page_ParticipantStatusType extends CRM_Core_Page_Basic {
   public function browse() {
     $statusTypes = array();
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->orderBy('weight');
     $dao->find();
 
@@ -92,7 +92,7 @@ class CRM_Admin_Page_ParticipantStatusType extends CRM_Core_Page_Basic {
       'Awaiting approval',
       'Pending from waitlist',
       'Pending from approval',
-      'Rejected'
+      'Rejected',
     );
 
     while ($dao->fetch()) {

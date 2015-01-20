@@ -30,10 +30,14 @@
  */
 class CRM_Queue_Task {
 
-  /** Task was performed successfully */
+  /**
+   * Task was performed successfully
+   */
   const TASK_SUCCESS = 1;
 
-  /** Task failed and should not be retried */
+  /**
+   * Task failed and should not be retried
+   */
   const TASK_FAIL = 2;
 
   /**

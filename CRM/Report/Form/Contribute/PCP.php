@@ -264,11 +264,11 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select =
-      "SELECT SUM({$this->_aliases['civicrm_pcp']}.goal_amount) as goal_total, " .
-      "SUM({$this->_aliases['civicrm_contribution_soft']}.amount) as committed_total, " .
-      "COUNT({$this->_aliases['civicrm_contribution_soft']}.id) as donors_total, " .
-      "SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount)) AS received_total ";
+    $select
+      = "SELECT SUM({$this->_aliases['civicrm_pcp']}.goal_amount) as goal_total, " .
+        "SUM({$this->_aliases['civicrm_contribution_soft']}.amount) as committed_total, " .
+        "COUNT({$this->_aliases['civicrm_contribution_soft']}.id) as donors_total, " .
+        "SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount)) AS received_total ";
     $sql = "{$select} {$this->_from} {$this->_where}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();

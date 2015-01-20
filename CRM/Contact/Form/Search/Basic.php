@@ -86,7 +86,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
           'entity' => 'group_contact',
           'label' => ts('in'),
           'context' => 'search',
-          'placeholder' => ts('- any group -')
+          'placeholder' => ts('- any group -'),
         ));
     }
 
@@ -97,7 +97,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
             'entity' => 'entity_tag',
             'label' => ts('with'),
             'context' => 'search',
-            'placeholder' => ts('- any tag -')
+            'placeholder' => ts('- any tag -'),
           ));
       }
     }
@@ -243,7 +243,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       $this->_formValues['tag'][$tag] = 1;
     }
 
-    return;
+    return NULL;
   }
 
   /**

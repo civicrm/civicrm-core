@@ -475,7 +475,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       ->addSetting(array(
         'tabSettings' => array(
           'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-        )
+        ),
       ));
   }
 

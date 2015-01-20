@@ -738,7 +738,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               'last_name',
               'suffix_id',
               'organization_name',
-              'household_name'
+              'household_name',
             );
             if ($profileContactType == 'honor' && in_array($field['name'], $honoreeNamefields)) {
               unset($fields[$field['name']]);
@@ -887,7 +887,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * When we get the control back from payment gate way
    * lets delete the recurring and related contribution.
    *
-   **/
+   */
   public function cancelRecurring() {
     $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject);
     if ($isCancel) {

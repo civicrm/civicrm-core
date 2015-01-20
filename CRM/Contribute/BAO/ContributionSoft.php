@@ -113,7 +113,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
     $params = array(
       1 => array($contact_id, 'Integer'),
-      2 => array($isTest, 'Integer')
+      2 => array($isTest, 'Integer'),
     );
 
     $cs = CRM_Core_DAO::executeQuery($query, $params);
@@ -237,8 +237,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @param int $contact_id
    *   Contact id.
-   * @param int $isTest
    * @param string $filter
+   * @param int $isTest
    *   Additional filter criteria, later used in where clause.
    *
    * @return array

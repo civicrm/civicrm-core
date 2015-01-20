@@ -112,7 +112,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
       'dst_html_type',
       ts('New HTML Type'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $this->_htmlTypeTransitions,
       TRUE
     );
@@ -168,7 +168,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     if ($dstHtmlType == 'Text' && in_array($srcHtmlType, array(
         'Select',
         'Radio',
-        'Autocomplete-Select'
+        'Autocomplete-Select',
       ))
     ) {
       $customField->option_group_id = "NULL";

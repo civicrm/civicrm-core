@@ -47,7 +47,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
       'edit-2-access-all-cases-and-activities',
       'edit-2-access-my-cases-and-activities',
       'edit-2-administer-civicase',
-      'edit-2-delete-in-civicase'
+      'edit-2-delete-in-civicase',
     );
     $this->changePermissions($permission);
 
@@ -155,7 +155,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
       'edit-2-access-all-cases-and-activities',
       'edit-2-access-my-cases-and-activities',
       'edit-2-administer-civicase',
-      'edit-2-delete-in-civicase'
+      'edit-2-delete-in-civicase',
     );
     $this->changePermissions($permission);
 

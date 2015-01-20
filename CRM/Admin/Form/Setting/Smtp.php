@@ -120,7 +120,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $from = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
         $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(
             1 => $domainEmailAddress,
-            2 => $toEmail
+            2 => $toEmail,
           ));
 
         $params = array();

@@ -156,7 +156,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
                  'pcp_display_in_roll',
                  'pcp_is_anonymous',
                  'pcp_roll_nickname',
-                 'pcp_personal_note'
+                 'pcp_personal_note',
                ) as $val) {
         if (!empty($this->_params[$val])) {
           $this->assign($val, $this->_params[$val]);
@@ -242,7 +242,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         elseif (in_array($name, array(
               'addressee',
               'email_greeting',
-              'postal_greeting'
+              'postal_greeting',
             )) && !empty($contact[$name . '_custom'])
         ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];

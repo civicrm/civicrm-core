@@ -122,8 +122,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -199,7 +197,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // custom group id
     $this->add('select', 'contact_profile_id', ts('Contact Profile'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) + $customContactProfiles, TRUE
     );
 
