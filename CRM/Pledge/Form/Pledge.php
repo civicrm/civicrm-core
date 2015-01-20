@@ -353,7 +353,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->add('text', 'eachPaymentAmount', ts('each'), array(
         'size' => 10,
         'style' => "background-color:#EBECE4",
-        'READONLY',
+        0 => 'READONLY', // WTF, preserved because its inexplicable
       ));
 
     //add various dates
