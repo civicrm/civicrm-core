@@ -76,7 +76,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   static function buildQuickForm(&$form) {
-    if ($form->_mode == 'live' && !empty($form->_honor_block_is_active)) {
+    if (!empty($form->_honor_block_is_active)) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
