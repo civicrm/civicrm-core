@@ -651,7 +651,7 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param bool $getCount
    *
-   * @return boolean
+   * @return bool
    *   does this entity have data in this custom table
    */
   static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE) {
@@ -1242,9 +1242,8 @@ ORDER BY civicrm_custom_group.weight,
    * @param bool $force
    *   whether to force the deletion, even if there are custom fields.
    *
-   * @return boolean
+   * @return bool
    *   false if field exists for this group, true if group gets deleted.
-   *
    */
   public static function deleteGroup($group, $force = FALSE) {
 
@@ -1695,8 +1694,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param array $removeCustomFieldTypes
    *   Remove custom fields of a type eg: array("Individual") ;.
    *
-   *
-   * @return boolean
+   * @return bool
    *   false if it matches else true
    */
   public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {

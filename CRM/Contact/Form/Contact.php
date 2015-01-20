@@ -1066,7 +1066,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $fields
    *   The hierarchical value representation of this location.
    *
-   * @return boolean
+   * @return bool
    *   true if data exists, false otherwise
    */
   public static function blockDataExists(&$fields) {

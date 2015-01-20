@@ -89,7 +89,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *
  * @param $result
  *
- * @return boolean
+ * @return bool
  *   true if error, false otherwise
  */
 function civicrm_error($result) {

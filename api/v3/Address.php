@@ -142,13 +142,11 @@ function civicrm_api3_address_delete($params) {
  *
  * @param mixed[] (reference ) input parameters
  *
- * {@example AddressGet.php 0}
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
  *   details of found addresses else error
- * {@getfields address_get}
  */
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');

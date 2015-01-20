@@ -700,8 +700,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   The custom field ID.
    *
    * @return CRM_Core_DAO_CustomField
-   *   $field  the field object
-   * public
+   *   The field object.
    */
   public static function getFieldObject($fieldID) {
     $field = new CRM_Core_DAO_CustomField();
@@ -1920,8 +1919,8 @@ SELECT $columnName
    * @param int $newGroupID
    *   FK to civicrm_custom_group.
    *
-   * @return array(
-   * string) or TRUE
+   * @return array
+   *   array(string) or TRUE
    */
   public static function _moveFieldValidate($fieldID, $newGroupID) {
     $errors = array();

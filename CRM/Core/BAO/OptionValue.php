@@ -231,7 +231,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @param int $optionValueId
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function del($optionValueId) {

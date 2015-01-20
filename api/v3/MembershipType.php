@@ -100,7 +100,7 @@ function civicrm_api3_membership_type_get($params) {
  *
  * @param array $params
  *
- * @return boolean
+ * @return bool
  *   true if success, else false
  */
 function civicrm_api3_membership_type_delete($params) {
