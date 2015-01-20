@@ -47,7 +47,7 @@
  * {@getfields line_item_create}
  */
 function civicrm_api3_line_item_create($params) {
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params,True);
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, True);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
