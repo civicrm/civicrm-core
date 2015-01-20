@@ -40,16 +40,15 @@
         <td class="label">{$form.weight.label}</td>
         <td>{$form.weight.html} {help id="id-weight"}</td>
     </tr>
-    <tr id="is_multiple" class="hiddenElement"> {* This section shown only when Used For = Contact, Individ, Org or Household. *}
+    <tr id="is_multiple_row" class="hiddenElement"> {* This section shown only when Used For = Contact, Individ, Org or Household. *}
         <td></td>
         <td class="html-adjust">{$form.is_multiple.html}&nbsp;{$form.is_multiple.label} {help id="id-is_multiple"}</td>
     </tr>
-    <tr id="multiple" class="hiddenElement">
-        {*<dt>{$form.min_multiple.label}</dt><dd>{$form.min_multiple.html}</dd>*}
+    <tr id="multiple_row" class="hiddenElement">
         <td class="label">{$form.max_multiple.label}</td>
         <td>{$form.max_multiple.html} {help id="id-max_multiple"}</td>
     </tr>
-    <tr id="style" class="hiddenElement">
+    <tr id="style_row" class="hiddenElement">
         <td class="label">{$form.style.label}</td>
         <td>{$form.style.html} {help id="id-display_style"}</td>
     </tr>
@@ -86,6 +85,7 @@
 {literal}
 <script type="text/Javascript">
 CRM.$(function($) {
+  var tabWithTableOption;
 
   $('#extends_0').each(showHideStyle).change(showHideStyle);
 
@@ -93,7 +93,7 @@ CRM.$(function($) {
   if (isGroupEmpty) {
     showRange(true);
   }
-  $('#is_multiple').click(showRange);
+  $('input#is_multiple').change(showRange);
 
   function showHideStyle() {
     var
@@ -102,46 +102,49 @@ CRM.$(function($) {
       showStyle = "{/literal}{$showStyle}{literal}",
       showMultiple = "{/literal}{$showMultiple}{literal}",
       showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}",
-      isShow = ($.inArray(extend, contactTypes) >= 0);
+      isContact = ($.inArray(extend, contactTypes) >= 0);
 
-    if (isShow) {
-      $("tr#style, tr#is_multiple").show();
+    if (isContact) {
+      $("tr#style_row, tr#is_multiple_row").show();
       if ($('#is_multiple :checked').length) {
-        $("tr#multiple").show();
+        $("tr#multiple_row").show();
       }
     }
     else {
-      $("tr#style, tr#is_multiple, tr#multiple").hide();
+      $("tr#style_row, tr#is_multiple_row, tr#multiple_row").hide();
     }
 
     if (showStyle) {
-      $("tr#style").show();
+      $("tr#style_row").show();
     }
 
     if (showMultiple) {
-      $("tr#style, tr#is_multiple").show();
+      $("tr#style_row, tr#is_multiple_row").show();
     }
 
     if (!showMaxMultiple) {
-      $("tr#multiple").hide();
+      $("tr#multiple_row").hide();
     }
     else if ($('#is_multiple').prop('checked')) {
-      $("tr#multiple").show();
+      $("tr#multiple_row").show();
     }
   }
 
   function showRange(onFormLoad) {
-    if($("#is_multiple :checked").length) {
-      $("tr#multiple").show();
-      $('#collapse_display').prop('checked', '');
-      $("select#style option[value='Tab with table']").prop("selected", true);
+    if($("#is_multiple").is(':checked')) {
+      $("tr#multiple_row").show();
+      if (onFormLoad !== true) {
+        $('#collapse_display').prop('checked', false);
+        $("select#style").append(tabWithTableOption);
+        $("select#style").val('Tab with table');
+      }
     }
     else {
-      $('#collapse_display').prop('checked', 'checked');
-      $("tr#multiple").hide();
-      if (onFormLoad !== true) {
-        $("select#style option[value='Inline']").prop("selected", true);
+      $("tr#multiple_row").hide();
+      if ($("select#style").val() === 'Tab with table') {
+        $("select#style").val('Inline');
       }
+      tabWithTableOption = $("select#style option[value='Tab with table']").detach();
     }
   }
 
