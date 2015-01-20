@@ -109,4 +109,5 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     sort($actualStrings);
     $this->assertEquals($expectedStrings, $actualStrings);
   }
+
 }

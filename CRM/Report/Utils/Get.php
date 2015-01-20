@@ -305,4 +305,5 @@ class CRM_Report_Utils_Get {
       }
     }
   }
+
 }

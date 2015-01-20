@@ -67,4 +67,5 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
       ),
     ));
   }
+
 }

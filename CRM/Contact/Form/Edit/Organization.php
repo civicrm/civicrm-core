@@ -109,4 +109,5 @@ class CRM_Contact_Form_Edit_Organization {
     // add code to make sure that the uniqueness criteria is satisfied
     return empty($errors) ? TRUE : $errors;
   }
+
 }

@@ -63,4 +63,5 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
     $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id'));
     $this->assertTrue($values['count'] == 1, 'check that cached value is not retained for custom_group_id');
   }
+
 }

@@ -173,4 +173,5 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The Survey type \'%1\' has been saved.', array(1 => $optionValue->label)), ts('Saved'), 'success');
     }
   }
+
 }

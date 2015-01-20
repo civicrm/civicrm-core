@@ -67,4 +67,5 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
     parent::preProcess();
     $this->listParticipations();
   }
+
 }

@@ -108,4 +108,5 @@ class CRM_Upgrade_Incremental_php_FourSix {
     );
     $queue->createItem($task, array('weight' => -1));
   }
+
 }

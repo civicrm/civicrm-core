@@ -577,4 +577,5 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       }
     }
   }
+
 }

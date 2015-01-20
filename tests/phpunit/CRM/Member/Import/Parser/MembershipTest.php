@@ -157,4 +157,5 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', array());
     $this->assertEquals(2, $result['count']);
   }
+
 }

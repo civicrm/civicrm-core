@@ -72,4 +72,5 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
     // finally call parent
     parent::run();
   }
+
 }

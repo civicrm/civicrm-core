@@ -270,4 +270,5 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[$column]/", preg_quote($value));
     }
   }
+
 }

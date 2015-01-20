@@ -103,4 +103,5 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
     }
   }
+
 }

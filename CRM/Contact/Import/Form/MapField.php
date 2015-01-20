@@ -1013,4 +1013,5 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     return $formattedFieldNames;
   }
+
 }

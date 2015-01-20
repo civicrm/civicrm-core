@@ -198,4 +198,5 @@ class CRM_Utils_PagerAToZ {
     $aToZBar[] = array('item' => $url);
     return $aToZBar;
   }
+
 }

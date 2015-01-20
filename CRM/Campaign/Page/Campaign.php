@@ -139,4 +139,5 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

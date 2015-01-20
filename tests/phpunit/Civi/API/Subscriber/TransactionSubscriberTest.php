@@ -115,4 +115,5 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       1 => array($result['id'], 'Integer'),
     ));
   }
+
 }

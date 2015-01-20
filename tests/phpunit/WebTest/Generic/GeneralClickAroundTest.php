@@ -357,4 +357,5 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Profiles - Admin Notification");
     $this->assertTextPresent("Tell-a-Friend Email");
   }
+
 }

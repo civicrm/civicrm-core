@@ -97,4 +97,5 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
   }
+
 }

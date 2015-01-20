@@ -362,4 +362,5 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     return $params;
   }
+
 }

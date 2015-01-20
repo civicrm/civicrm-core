@@ -167,4 +167,5 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // cleanup by removing the widget
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
+
 }

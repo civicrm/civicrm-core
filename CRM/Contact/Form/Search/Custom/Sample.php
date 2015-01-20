@@ -218,4 +218,5 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

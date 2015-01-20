@@ -558,4 +558,5 @@ WHERE  report_id = %1";
     }
     return $instanceDetails[$reportUrl];
   }
+
 }

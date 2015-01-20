@@ -40,4 +40,5 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('-10foo', 'Positive', NULL),
     );
   }
+
 }

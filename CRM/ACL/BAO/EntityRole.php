@@ -100,4 +100,5 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
     $entityDAO->find(TRUE);
     $entityDAO->delete();
   }
+
 }

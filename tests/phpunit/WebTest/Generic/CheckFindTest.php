@@ -43,4 +43,5 @@ class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("search-status"));
   }
+
 }

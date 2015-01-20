@@ -63,4 +63,5 @@ class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
     $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
     return ($foundName == 'civicrm_queue_item');
   }
+
 }

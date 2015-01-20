@@ -1350,4 +1350,5 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
     );
     $queue->createItem($task, array('weight' => -1));
   }
+
 }

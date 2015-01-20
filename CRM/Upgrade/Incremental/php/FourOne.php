@@ -428,4 +428,5 @@ AND    v.is_active = 1
   public function getTemplateMessage() {
     return "Blah";
   }
+
 }

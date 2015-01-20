@@ -670,4 +670,5 @@ class CRM_Core_CodeGen_Specification {
     }
     return 'CRM_Utils_Type::HUGE';
   }
+
 }

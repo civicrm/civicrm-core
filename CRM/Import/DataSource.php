@@ -68,4 +68,5 @@ abstract class CRM_Import_DataSource {
    * Process the form submission
    */
   abstract public function postProcess(&$params, &$db, &$form);
+
 }

@@ -416,4 +416,5 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->assign('alterContactDashboard', $alterContactDashboard);
     $upgrade->processSQL($rev);
   }
+
 }

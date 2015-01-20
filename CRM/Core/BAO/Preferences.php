@@ -148,4 +148,5 @@ AND    v.is_active = 1
       }
     }
   }
+
 }

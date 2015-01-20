@@ -120,4 +120,5 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
+
 }

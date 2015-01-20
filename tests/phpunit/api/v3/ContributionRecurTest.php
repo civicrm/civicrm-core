@@ -86,4 +86,5 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
+
 }

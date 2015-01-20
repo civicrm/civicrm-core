@@ -798,4 +798,5 @@ class CRM_Utils_Rule {
   public static function qfKey($key) {
     return ($key) ? CRM_Core_Key::valid($key) : FALSE;
   }
+
 }

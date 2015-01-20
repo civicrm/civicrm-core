@@ -535,4 +535,5 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, array('id' => 'activity_deleted_' . $form->_caseID));
     }
   }
+
 }

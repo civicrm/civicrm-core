@@ -283,4 +283,5 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   public function getTitle() {
     return ts('Widget Settings');
   }
+
 }

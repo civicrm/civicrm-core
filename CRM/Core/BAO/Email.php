@@ -331,4 +331,5 @@ AND    reset_date IS NULL
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
+
 }

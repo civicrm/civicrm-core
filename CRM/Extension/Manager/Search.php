@@ -132,4 +132,5 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
   protected function getCustomSearchesById() {
     return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
   }
+
 }

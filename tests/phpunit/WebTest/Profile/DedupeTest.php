@@ -87,4 +87,5 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
     $this->waitForTextPresent("A record already exists with the same information.");
   }
+
 }

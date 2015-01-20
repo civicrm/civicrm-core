@@ -288,4 +288,5 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertEquals('a', $item->data['test-key']);
     $queue2->releaseItem($item);
   }
+
 }

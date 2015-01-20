@@ -120,4 +120,5 @@ class CRM_Bridge_OG_CiviCRM {
       }
     }
   }
+
 }

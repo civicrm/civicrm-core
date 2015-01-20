@@ -60,4 +60,5 @@ class CRM_Core_QuickForm_Action_Next extends CRM_Core_QuickForm_Action {
   public function perform(&$page, $actionName) {
     $this->_stateMachine->perform($page, $actionName, 'Next');
   }
+
 }

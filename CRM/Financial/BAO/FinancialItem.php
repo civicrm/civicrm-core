@@ -272,4 +272,5 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
     }
     return FALSE;
   }
+
 }

@@ -153,4 +153,5 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
 
     return $results;
   }
+
 }

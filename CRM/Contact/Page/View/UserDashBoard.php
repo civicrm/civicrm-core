@@ -257,4 +257,5 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     );
     return self::$_links;
   }
+
 }

@@ -217,4 +217,5 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $expectedResult = UF_join_create_expectedresult();
     $this->assertEquals($result, $expectedResult);
   }
+
 }

@@ -291,4 +291,5 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   public function getTitle() {
     return ts('Add Premium to Contribution Page');
   }
+
 }

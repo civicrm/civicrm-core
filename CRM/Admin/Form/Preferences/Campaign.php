@@ -59,4 +59,5 @@ class CRM_Admin_Form_Preferences_Campaign extends CRM_Admin_Form_Preferences {
 
     parent::preProcess();
   }
+
 }

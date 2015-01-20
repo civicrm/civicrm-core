@@ -400,4 +400,5 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     }
     return TRUE;
   }
+
 }

@@ -70,4 +70,5 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
   public function getApiRequest() {
     return $this->apiRequest;
   }
+
 }

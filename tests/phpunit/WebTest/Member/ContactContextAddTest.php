@@ -234,4 +234,5 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_MembershipView_cancel-bottom");
     $this->waitForElementPresent("mainTabContainer");
   }
+
 }

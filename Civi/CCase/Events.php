@@ -98,4 +98,5 @@ class Events {
       $listener->onCaseChange($event);
     }
   }
+
 }

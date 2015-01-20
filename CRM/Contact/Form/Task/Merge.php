@@ -90,4 +90,5 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
     // redirect to merge page.
     CRM_Utils_System::redirect($url);
   }
+
 }

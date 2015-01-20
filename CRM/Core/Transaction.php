@@ -250,4 +250,5 @@ class CRM_Core_Transaction {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     $frame->addCallback($phase, $callback, $params, $id);
   }
+
 }

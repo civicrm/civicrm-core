@@ -98,4 +98,5 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
+
 }

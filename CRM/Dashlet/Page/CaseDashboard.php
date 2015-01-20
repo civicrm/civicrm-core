@@ -61,4 +61,5 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

@@ -432,4 +432,5 @@ class Kernel {
     $this->dispatcher = $dispatcher;
     return $this;
   }
+
 }

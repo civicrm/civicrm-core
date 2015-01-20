@@ -228,4 +228,5 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//tr/td[5]/a[text()='$contact']"));
     }
   }
+
 }

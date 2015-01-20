@@ -410,4 +410,5 @@ ORDER BY contact_a.sort_name';
   public function summary() {
     return NULL;
   }
+
 }

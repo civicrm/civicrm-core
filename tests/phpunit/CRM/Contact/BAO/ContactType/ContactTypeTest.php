@@ -227,4 +227,5 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $del = CRM_Contact_BAO_ContactType::del(NULL);
     $this->assertEquals($del, FALSE, 'In line ' . __LINE__);
   }
+
 }

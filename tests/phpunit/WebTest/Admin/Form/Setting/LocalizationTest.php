@@ -58,4 +58,5 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
       array_push($this->verificationErrors, $e->toString());
     }
   }
+
 }

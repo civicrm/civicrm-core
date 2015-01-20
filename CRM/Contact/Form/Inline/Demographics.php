@@ -73,4 +73,5 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

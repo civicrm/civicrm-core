@@ -544,4 +544,5 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Member Search');
   }
+
 }

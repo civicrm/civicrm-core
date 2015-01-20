@@ -234,4 +234,5 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     parent::endPostProcess();
   }
+
 }

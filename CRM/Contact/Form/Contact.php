@@ -1474,4 +1474,5 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     return $updateMembershipMsg;
   }
+
 }

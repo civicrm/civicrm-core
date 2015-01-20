@@ -345,4 +345,5 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     );
     $queue->createItem($task, array('weight' => -1));
   }
+
 }

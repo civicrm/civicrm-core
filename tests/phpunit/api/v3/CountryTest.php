@@ -115,4 +115,5 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $check);
   }
+
 }

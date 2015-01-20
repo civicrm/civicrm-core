@@ -299,4 +299,5 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table[@class='caseSelector']/tbody//tr/td[3]/a", $firstName);
     $this->verifyText("xpath=//table[@class='caseSelector']/tbody//tr/td[6]", $caseTypeLabel);
   }
+
 }

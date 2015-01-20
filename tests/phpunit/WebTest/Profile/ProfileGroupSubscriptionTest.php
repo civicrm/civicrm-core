@@ -142,4 +142,5 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
+
 }

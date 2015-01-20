@@ -192,4 +192,5 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
     return TRUE;
   }
+
 }

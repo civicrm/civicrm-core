@@ -93,4 +93,5 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
   public function getTemplateFileName() {
     return 'CRM/Admin/Page/ScheduleReminders.tpl';
   }
+
 }

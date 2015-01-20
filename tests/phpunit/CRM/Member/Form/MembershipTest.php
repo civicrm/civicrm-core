@@ -519,5 +519,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     //  Should have found Current membership status
     $this->assertTrue($rc, 'In line ' . __LINE__);
   }
+
 }
 // class CRM_Member_Form_MembershipTest

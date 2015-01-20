@@ -156,4 +156,5 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

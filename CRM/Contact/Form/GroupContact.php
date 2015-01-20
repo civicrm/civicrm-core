@@ -139,4 +139,5 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts("Contact has been added to '%1'.", array(1 => $groups[$groupId])), ts('Added to Group'), 'success');
     }
   }
+
 }

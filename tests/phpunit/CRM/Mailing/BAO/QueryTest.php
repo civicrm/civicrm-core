@@ -69,4 +69,5 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
     $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
   }
+
 }

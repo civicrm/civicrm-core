@@ -183,4 +183,5 @@ class CRM_Utils_Sunlight {
 
     return $result;
   }
+
 }

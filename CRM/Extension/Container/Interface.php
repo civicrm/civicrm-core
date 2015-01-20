@@ -79,4 +79,5 @@ interface CRM_Extension_Container_Interface {
    * Scan the container for available extensions.
    */
   public function refresh();
+
 }

@@ -1027,4 +1027,5 @@ AND    record_type_id = $targetRecordID
 
     return $result;
   }
+
 }

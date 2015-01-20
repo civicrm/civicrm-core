@@ -729,4 +729,5 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
   }
+
 }

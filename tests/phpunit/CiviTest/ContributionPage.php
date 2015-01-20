@@ -57,4 +57,5 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
     }
     return $result;
   }
+
 }

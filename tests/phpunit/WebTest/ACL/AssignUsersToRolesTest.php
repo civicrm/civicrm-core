@@ -176,4 +176,5 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
     $this->verifyText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
   }
+
 }

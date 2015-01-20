@@ -118,4 +118,5 @@ class Custom extends CiviUnitTestCase {
     $deleteCustomGroup = CRM_Core_BAO_CustomGroup::deleteGroup($params, TRUE);
     return $deleteCustomGroup;
   }
+
 }

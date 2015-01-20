@@ -779,4 +779,5 @@ class CRM_Core_Permission {
       'is_enabled'
     ) ? TRUE : FALSE;
   }
+
 }

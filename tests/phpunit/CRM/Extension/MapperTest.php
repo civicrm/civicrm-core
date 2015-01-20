@@ -97,4 +97,5 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
     return array($basedir, $c);
   }
+
 }

@@ -225,4 +225,5 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
 
     return array($headers, $rows, $fieldMapper);
   }
+
 }

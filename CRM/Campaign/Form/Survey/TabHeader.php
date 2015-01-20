@@ -184,4 +184,5 @@ class CRM_Campaign_Form_Survey_TabHeader {
     $next = $next ? $next : 'main';
     return $next;
   }
+
 }

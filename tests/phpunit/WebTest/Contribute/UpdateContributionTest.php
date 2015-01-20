@@ -498,4 +498,5 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     return $contact;
   }
+
 }

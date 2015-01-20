@@ -111,4 +111,5 @@ class CRM_Utils_GlobalStack {
       }
     }
   }
+
 }

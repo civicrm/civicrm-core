@@ -98,4 +98,5 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     //delete financialtype
     $this->addeditFinancialType($financialType, 'Delete');
   }
+
 }

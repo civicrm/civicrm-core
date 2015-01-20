@@ -254,4 +254,5 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
       }
     );
   }
+
 }

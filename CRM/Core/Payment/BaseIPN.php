@@ -1080,4 +1080,5 @@ LIMIT 1;";
       $soft_contribution->save();
     }
   }
+
 }

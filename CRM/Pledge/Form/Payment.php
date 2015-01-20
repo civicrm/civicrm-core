@@ -188,4 +188,5 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     $statusMsg = ts('Pledge Payment Schedule has been updated.');
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
+
 }

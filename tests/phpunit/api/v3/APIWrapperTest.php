@@ -83,6 +83,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     $this->assertEquals('MUNGE! First Last', $result['values'][$result['id']]['display_name_munged']);
   }
+
 }
 
 /**
@@ -113,4 +114,5 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
     }
     return $result;
   }
+
 }

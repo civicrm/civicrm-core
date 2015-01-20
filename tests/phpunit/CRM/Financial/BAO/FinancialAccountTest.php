@@ -139,4 +139,5 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
     $this->assertEquals($accountingCode, 4800, 'Verify accounting code.');
   }
+
 }

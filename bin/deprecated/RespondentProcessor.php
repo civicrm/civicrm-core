@@ -101,6 +101,7 @@ UPDATE  civicrm_activity
 
     echo "<br /><br />Number of respondents released = {$releasedCount}";
   }
+
 }
 
 $obj = new CRM_RespondentProcessor();

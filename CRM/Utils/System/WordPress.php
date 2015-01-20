@@ -795,4 +795,5 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
     }
   }
+
 }

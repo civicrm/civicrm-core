@@ -791,4 +791,5 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     return $returnArray;
   }
+
 }

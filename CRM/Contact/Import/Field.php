@@ -191,4 +191,5 @@ class CRM_Contact_Import_Field {
       return CRM_Utils_Rule::email($this->_value);
     }
   }
+
 }

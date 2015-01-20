@@ -355,4 +355,5 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
       }
     }
   }
+
 }

@@ -603,4 +603,5 @@ class CRM_Event_BAO_Query {
       $tables = array_merge(array('civicrm_participant' => 1), $tables);
     }
   }
+
 }

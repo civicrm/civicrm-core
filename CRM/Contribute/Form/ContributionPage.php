@@ -449,4 +449,5 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       return 'CRM/Contribute/Form/ContributionPage/Tab.tpl';
     }
   }
+
 }

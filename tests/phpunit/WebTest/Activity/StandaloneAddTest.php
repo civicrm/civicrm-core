@@ -186,4 +186,5 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
       $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
     }
   }
+
 }

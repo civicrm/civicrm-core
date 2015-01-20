@@ -1404,4 +1404,5 @@ WHERE   line_item_civireport.id IS NOT NULL
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     return $paymentInstruments[$value];
   }
+
 }

@@ -70,4 +70,5 @@ class CRM_Activity_Controller_Search extends CRM_Core_Controller {
   public function selectorName() {
     return $this->get('selectorName');
   }
+
 }

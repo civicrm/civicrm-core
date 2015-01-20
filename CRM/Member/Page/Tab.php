@@ -604,4 +604,5 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public function getBAOName() {
     return 'CRM_Member_BAO_Membership';
   }
+
 }

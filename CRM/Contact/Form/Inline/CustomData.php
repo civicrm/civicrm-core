@@ -107,4 +107,5 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

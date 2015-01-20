@@ -504,4 +504,5 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     sort($r);
     return $r;
   }
+
 }

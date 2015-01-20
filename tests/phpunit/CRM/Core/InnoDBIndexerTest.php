@@ -81,4 +81,5 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   public function supportsFts() {
     return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.6.0', '>=');
   }
+
 }

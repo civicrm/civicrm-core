@@ -397,4 +397,5 @@ class CRM_Core_Invoke {
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
+
 }

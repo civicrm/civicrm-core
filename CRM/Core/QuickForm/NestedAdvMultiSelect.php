@@ -77,4 +77,5 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
         return parent::load($options, $param1, $param2, $param3, $param4);
     }
   }
+
 }

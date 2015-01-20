@@ -188,4 +188,5 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $this->ajaxResponse['addressId'] = $address[0]->id;
     $this->response();
   }
+
 }

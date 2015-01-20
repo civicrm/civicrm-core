@@ -63,4 +63,5 @@ class CRM_Core_QuickForm_Action_Cancel extends CRM_Core_QuickForm_Action {
 
     $this->popUserContext();
   }
+
 }

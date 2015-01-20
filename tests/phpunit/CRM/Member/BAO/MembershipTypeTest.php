@@ -368,4 +368,5 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
 
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
+
 }

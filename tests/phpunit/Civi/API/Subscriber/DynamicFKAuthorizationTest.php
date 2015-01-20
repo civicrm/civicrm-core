@@ -204,4 +204,5 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     ), TRUE));
     $this->assertRegExp($expectedError, $result['error_message']);
   }
+
 }

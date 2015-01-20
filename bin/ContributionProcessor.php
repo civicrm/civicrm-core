@@ -398,6 +398,7 @@ class CiviContributeProcessor {
         return self::csv();
     }
   }
+
 }
 
 // bootstrap the environment and run the processor

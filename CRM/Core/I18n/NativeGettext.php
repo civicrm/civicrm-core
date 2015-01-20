@@ -68,4 +68,5 @@ class CRM_Core_I18n_NativeGettext {
   public function ngettext($text, $plural, $count) {
     return ngettext($text, $plural, $count);
   }
+
 }

@@ -344,4 +344,5 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     return parent::getTemplateFileName();
   }
+
 }

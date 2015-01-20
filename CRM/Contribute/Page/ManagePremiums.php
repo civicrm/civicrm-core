@@ -208,4 +208,5 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/admin/contribute/managePremiums';
   }
+
 }

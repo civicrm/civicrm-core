@@ -227,4 +227,5 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
   public function exportTRANS() {
   }
+
 }

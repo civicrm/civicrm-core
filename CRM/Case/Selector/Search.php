@@ -505,4 +505,5 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   public function getExportFileName($output = 'csv') {
     return ts('Case Search');
   }
+
 }

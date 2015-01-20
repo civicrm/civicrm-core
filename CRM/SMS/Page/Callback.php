@@ -44,4 +44,5 @@ class CRM_SMS_Page_Callback {
       $provider->inbound();
     }
   }
+
 }

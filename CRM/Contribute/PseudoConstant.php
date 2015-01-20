@@ -440,4 +440,5 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     return self::$batch;
   }
+
 }

@@ -974,4 +974,5 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
       $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
     }
   }
+
 }

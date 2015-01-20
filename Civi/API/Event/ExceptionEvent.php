@@ -57,4 +57,5 @@ class ExceptionEvent extends Event {
   public function getException() {
     return $this->exception;
   }
+
 }

@@ -100,4 +100,5 @@ class CRM_Report_BAO_Hook {
     }
     return array($contactIdClause, $join);
   }
+
 }

@@ -123,4 +123,5 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $actualRelUrls = CRM_Extension_Container_Basic::convertPathsToUrls('\\', $relPaths);
     $this->assertEquals($expectedRelUrls, $actualRelUrls);
   }
+
 }

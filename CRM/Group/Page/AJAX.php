@@ -111,4 +111,5 @@ class CRM_Group_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
   }
+
 }

@@ -180,4 +180,5 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[2]");
     $this->assertElementContainsText('help', "Bulk Email Sent.", "Status message didn't show up after saving!");
   }
+
 }

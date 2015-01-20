@@ -197,4 +197,5 @@ UPDATE civicrm_log
 
     return FALSE;
   }
+
 }

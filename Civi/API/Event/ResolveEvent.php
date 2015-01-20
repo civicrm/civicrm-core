@@ -55,4 +55,5 @@ class ResolveEvent extends Event {
   public function setApiRequest($apiRequest) {
     $this->apiRequest = $apiRequest;
   }
+
 }

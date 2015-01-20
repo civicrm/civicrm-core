@@ -43,4 +43,5 @@ class ComparisonPrinter {
     }
     print "\n";
   }
+
 }

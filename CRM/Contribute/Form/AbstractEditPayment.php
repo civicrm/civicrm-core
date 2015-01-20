@@ -617,4 +617,5 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       CRM_Core_Error::fatal($e->getMessage());
     }
   }
+
 }

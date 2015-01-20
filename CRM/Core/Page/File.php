@@ -69,4 +69,5 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       );
     }
   }
+
 }

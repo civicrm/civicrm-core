@@ -4102,4 +4102,5 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'placeholder' => ts('- select -'),
     );
   }
+
 }

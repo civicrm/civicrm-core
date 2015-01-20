@@ -15,4 +15,5 @@ class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
     );
     $this->assertEquals($expectedTypes, $caseTypes);
   }
+
 }

@@ -497,4 +497,5 @@ class CRM_Member_BAO_Query {
       $tables = array_merge(array('civicrm_membership' => 1), $tables);
     }
   }
+
 }

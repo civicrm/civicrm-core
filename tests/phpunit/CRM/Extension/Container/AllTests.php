@@ -60,6 +60,7 @@ class CRM_Extension_Container_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // -- set Emacs parameters --
 // Local variables:

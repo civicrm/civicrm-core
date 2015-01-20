@@ -131,4 +131,5 @@ interface CRM_Core_Selector_API {
    *                special characters to avoid various browser issues
    */
   public function getExportFileName($type = 'csv');
+
 }

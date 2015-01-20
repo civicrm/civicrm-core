@@ -85,4 +85,5 @@ class CRM_Contact_Form_Edit_Phone {
     // TODO: set this up as a group, we need a valid phone_type_id if we have a  phone number
     // $form->addRule( "location[$locationId][phone][$locationId][phone]", ts('Phone number is not valid.'), 'phone' );
   }
+
 }

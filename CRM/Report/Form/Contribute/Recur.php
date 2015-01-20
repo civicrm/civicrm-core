@@ -325,4 +325,5 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
     }
   }
+
 }

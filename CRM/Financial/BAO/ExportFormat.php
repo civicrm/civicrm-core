@@ -263,4 +263,5 @@ class CRM_Financial_BAO_ExportFormat {
       return FALSE;
     }
   }
+
 }

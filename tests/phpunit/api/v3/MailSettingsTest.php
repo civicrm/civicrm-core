@@ -110,4 +110,5 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('MailSettings', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', array()));
   }
+
 }

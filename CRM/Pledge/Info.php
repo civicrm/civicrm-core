@@ -184,4 +184,5 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
       ));
     }
   }
+
 }

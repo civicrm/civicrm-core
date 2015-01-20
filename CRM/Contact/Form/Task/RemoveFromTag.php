@@ -150,4 +150,5 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
       CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
     }
   }
+
 }

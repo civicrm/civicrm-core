@@ -936,4 +936,5 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'contact_type' => 'Contact',
       ));
   }
+
 }

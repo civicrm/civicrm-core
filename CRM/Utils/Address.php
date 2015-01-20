@@ -306,4 +306,5 @@ class CRM_Utils_Address {
     $newSequence = array_unique($newSequence);
     return $newSequence;
   }
+
 }

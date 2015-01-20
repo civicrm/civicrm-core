@@ -81,4 +81,5 @@ class CRM_Upgrade_Headless {
       'message' => file_get_contents($postUpgradeMessageFile),
     );
   }
+
 }

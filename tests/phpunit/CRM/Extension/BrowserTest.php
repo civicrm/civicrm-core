@@ -67,4 +67,5 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $info = $browser->getExtension('test.crm.extension.browsertest.nonexistent');
     $this->assertEquals(NULL, $info);
   }
+
 }

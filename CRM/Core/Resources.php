@@ -756,4 +756,5 @@ class CRM_Core_Resources {
 
     return $filters;
   }
+
 }

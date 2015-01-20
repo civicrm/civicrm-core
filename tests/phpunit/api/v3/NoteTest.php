@@ -259,6 +259,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('note', 'delete', $params, __FUNCTION__, __FILE__);
   }
+
 }
 
 /**

@@ -106,4 +106,5 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     $this->browse();
     return parent::run();
   }
+
 }

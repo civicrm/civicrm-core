@@ -158,4 +158,5 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/batchtransaction';
   }
+
 }

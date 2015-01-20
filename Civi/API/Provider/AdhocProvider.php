@@ -164,4 +164,5 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   public function matchesRequest($apiRequest) {
     return $apiRequest['entity'] == $this->entity && $apiRequest['version'] == $this->version && isset($this->actions[strtolower($apiRequest['action'])]);
   }
+
 }

@@ -51,4 +51,5 @@ class AuthorizeEvent extends Event {
   public function isAuthorized() {
     return $this->authorized;
   }
+
 }

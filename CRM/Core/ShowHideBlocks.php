@@ -268,4 +268,5 @@ class CRM_Core_ShowHideBlocks {
       );
     }
   }
+
 }

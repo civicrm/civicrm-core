@@ -178,4 +178,5 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
         3 => $srcUrl,
       )), '', 'success');
   }
+
 }

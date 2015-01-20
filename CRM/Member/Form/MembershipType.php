@@ -438,4 +438,5 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
     }
   }
+
 }

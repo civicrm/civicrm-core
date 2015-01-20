@@ -516,4 +516,5 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Contact_upload_view", 'css=.crm-summary-display_name');
     $this->assertElementContainsText('css=.crm-summary-display_name', "$firstName adv$firstName");
   }
+
 }

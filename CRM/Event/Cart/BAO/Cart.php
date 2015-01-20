@@ -340,4 +340,5 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
 
     CRM_Core_DAO::executeQuery($sql, $params);
   }
+
 }

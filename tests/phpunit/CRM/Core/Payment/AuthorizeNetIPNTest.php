@@ -146,4 +146,5 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',
     ));
   }
+
 }

@@ -269,4 +269,5 @@ class CRM_Utils_SQL_Select {
     }
     return $sql;
   }
+
 }

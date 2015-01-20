@@ -50,4 +50,5 @@ class CRM_Core_Permission_Soap extends CRM_Core_Permission_Base {
   public function check($str) {
     return TRUE;
   }
+
 }

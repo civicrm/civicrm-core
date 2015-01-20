@@ -568,4 +568,5 @@ class CRM_Utils_OpenFlashChart {
 
     return $openFlashChart;
   }
+
 }

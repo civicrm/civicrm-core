@@ -58,4 +58,5 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
     $rec->context = json_encode($context);
     $rec->save();
   }
+
 }

@@ -116,4 +116,5 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     // Re-enable pop-ups to leave things in the same state
     $this->enableDisablePopups(TRUE);
   }
+
 }

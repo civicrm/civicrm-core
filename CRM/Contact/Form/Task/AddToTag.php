@@ -156,4 +156,5 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
     }
 
   }
+
 }

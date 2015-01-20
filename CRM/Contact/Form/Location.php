@@ -122,4 +122,5 @@ class CRM_Contact_Form_Location {
     $form->assign('generateAjaxRequest', $generateAjaxRequest);
     $form->assign('ajaxRequestBlocks', $ajaxRequestBlocks);
   }
+
 }

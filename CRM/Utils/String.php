@@ -778,4 +778,5 @@ class CRM_Utils_String {
   public static function unstupifyUrl($htmlUrl) {
     return str_replace('&amp;', '&', $htmlUrl);
   }
+
 }

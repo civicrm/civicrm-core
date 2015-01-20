@@ -340,4 +340,5 @@ WHERE     c.id IN ( $contributionIDs )";
     }
     return $rows;
   }
+
 }

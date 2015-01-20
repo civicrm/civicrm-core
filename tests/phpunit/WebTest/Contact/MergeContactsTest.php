@@ -1003,4 +1003,5 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("address-block-2", "Birmingham");
     $this->assertElementNotContainsText("address-block-2", "3456");
   }
+
 }

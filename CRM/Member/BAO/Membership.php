@@ -3077,4 +3077,5 @@ WHERE      civicrm_membership.is_test = 0";
     }
     return $cancelledMembershipIds;
   }
+
 }

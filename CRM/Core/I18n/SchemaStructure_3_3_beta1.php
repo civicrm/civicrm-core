@@ -292,4 +292,5 @@ class CRM_Core_I18n_SchemaStructure_3_3_beta1 {
     }
     return $result;
   }
+
 }

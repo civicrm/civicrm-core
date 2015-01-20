@@ -1017,4 +1017,5 @@ AND    u.status = 1
   public function flush() {
     drupal_flush_all_caches();
   }
+
 }

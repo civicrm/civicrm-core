@@ -436,4 +436,5 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
+
 }

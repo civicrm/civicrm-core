@@ -166,4 +166,5 @@ class CRM_Utils_PseudoConstant {
     }
     CRM_Core_PseudoConstant::flush();
   }
+
 }

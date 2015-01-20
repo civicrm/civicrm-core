@@ -197,4 +197,5 @@ WHERE  activity_id IN ( $IDs ) AND
       )
     );
   }
+
 }

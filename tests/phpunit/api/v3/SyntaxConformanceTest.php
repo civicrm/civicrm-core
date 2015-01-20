@@ -1557,4 +1557,5 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       1 => array($eventId, 'Integer'),
     ));
   }
+
 }

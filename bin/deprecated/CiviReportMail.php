@@ -69,6 +69,7 @@ class CiviReportMail {
 
     $lock->release();
   }
+
 }
 
 session_start();

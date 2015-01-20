@@ -60,4 +60,5 @@ class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
   }
+
 }

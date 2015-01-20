@@ -116,4 +116,5 @@ EOS;
       'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     );
   }
+
 }

@@ -217,4 +217,5 @@ class Analyzer {
     $this->activities = NULL;
     $this->indices = array();
   }
+
 }

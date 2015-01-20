@@ -128,4 +128,5 @@ interface CRM_Extension_Manager_Interface {
    * @return mixed
    */
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
+
 }

@@ -135,4 +135,5 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@class='view-content' and contains(., 'view pledge payments')]/table[@class='selector row-highlight']//tbody/tr[1]/td[4]", "1,930.00");
 
   }
+
 }

@@ -175,4 +175,5 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     $this->assertTrue($zip->open($this->file));
     $this->assertEquals($expectedResult, CRM_Utils_Zip::guessBaseDir($zip, $expectedKey));
   }
+
 }

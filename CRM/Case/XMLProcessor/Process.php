@@ -669,4 +669,5 @@ AND        a.is_deleted = 0
     $xml = $this->retrieve("Settings");
     return ( string ) $xml->NaturalActivityTypeSort ? 1 : 0;
   }
+
 }

@@ -71,4 +71,5 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
     return $this->targetOptionGroupId;
   }
+
 }

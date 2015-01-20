@@ -56,4 +56,5 @@ class CRM_Upgrade_Controller extends CRM_Core_Controller {
     $config = CRM_Core_Config::singleton();
     $this->addActions();
   }
+
 }

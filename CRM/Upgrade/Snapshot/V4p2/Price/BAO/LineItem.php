@@ -311,4 +311,5 @@ WHERE  $where
 
     CRM_Core_DAO::executeQuery($query, $params);
   }
+
 }

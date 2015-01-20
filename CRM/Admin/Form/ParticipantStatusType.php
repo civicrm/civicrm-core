@@ -131,4 +131,5 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The changes have not been saved.'), ts('Saved'), 'success');
     }
   }
+
 }

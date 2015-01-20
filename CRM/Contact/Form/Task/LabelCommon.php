@@ -336,4 +336,5 @@ class CRM_Contact_Form_Task_LabelCommon {
     $rows = array_merge($individuals, $households);
     return $rows;
   }
+
 }

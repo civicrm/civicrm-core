@@ -228,4 +228,5 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     CRM_Core_DAO::executeQuery($sql, $params);
     $dao->free();
   }
+
 }

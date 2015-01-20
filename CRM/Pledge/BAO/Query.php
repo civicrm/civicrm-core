@@ -638,4 +638,5 @@ class CRM_Pledge_BAO_Query {
       $tables = array_merge(array('civicrm_pledge' => 1), $tables);
     }
   }
+
 }

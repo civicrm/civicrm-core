@@ -163,4 +163,5 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     ));
 
   }
+
 }

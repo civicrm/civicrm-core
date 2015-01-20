@@ -32,9 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_Group
-  extends CRM_Contact_Form_Search_Custom_Base
-  implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
 
@@ -651,4 +649,5 @@ WHERE  gcc.group_id = {$ssGroup->id}
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }

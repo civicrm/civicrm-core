@@ -203,4 +203,5 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
   }
+
 }

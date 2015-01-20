@@ -468,4 +468,5 @@ class CRM_Contact_Form_Edit_Address {
       $form->_addressRequireOmission = rtrim($requireOmission, ',');
     }
   }
+
 }

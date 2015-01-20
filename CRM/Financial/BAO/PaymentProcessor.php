@@ -475,4 +475,5 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
 
     return $result;
   }
+
 }

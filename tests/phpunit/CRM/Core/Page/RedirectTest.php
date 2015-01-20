@@ -51,4 +51,5 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
     $actualUrl = CRM_Core_Page_Redirect::createUrl($parsedRequestPath, $parsedRequestArgs, $parsedPageArgs, FALSE);
     $this->assertEquals($expectedUrl, $actualUrl);
   }
+
 }

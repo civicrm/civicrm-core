@@ -114,4 +114,5 @@ class CRM_Utils_Check_Case {
 
     return $messages;
   }
+
 }

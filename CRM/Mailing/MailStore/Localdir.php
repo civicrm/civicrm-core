@@ -161,4 +161,5 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
       throw new Exception("Could not rename $file to $target");
     }
   }
+
 }

@@ -146,4 +146,5 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
     }
   }
+
 }

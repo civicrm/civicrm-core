@@ -126,4 +126,5 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
     }
     return $blog;
   }
+
 }

@@ -248,4 +248,5 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->_checkStrings($stringsToCheck);
   }
+
 }

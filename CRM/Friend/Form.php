@@ -323,4 +323,5 @@ class CRM_Friend_Form extends CRM_Core_Form {
     CRM_Utils_System::setTitle($defaults['thankyou_title']);
     $this->assign('thankYouText', $defaults['thankyou_text']);
   }
+
 }

@@ -268,4 +268,5 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     );
     $this->webtestVerifyTabularData($expected);
   }
+
 }

@@ -399,4 +399,5 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       ->will($this->returnValue($response));
     return $client;
   }
+
 }

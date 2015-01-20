@@ -299,4 +299,5 @@ WHERE entity_table = '{$tableName}'
       $this->_lookupCache[$dao->slave_id] = $dao->master_id;
     }
   }
+
 }

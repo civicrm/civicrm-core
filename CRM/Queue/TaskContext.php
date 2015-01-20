@@ -39,4 +39,5 @@ class CRM_Queue_TaskContext {
    * @var Log
    */
   public $log;
+
 }

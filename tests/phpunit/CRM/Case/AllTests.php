@@ -29,4 +29,5 @@ class CRM_Case_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }

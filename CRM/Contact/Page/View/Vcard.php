@@ -168,4 +168,5 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     $vcard->send($filename . '.vcf', 'attachment', 'utf-8');
     CRM_Utils_System::civiExit();
   }
+
 }

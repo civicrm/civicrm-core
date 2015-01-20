@@ -481,4 +481,5 @@ class CRM_Mailing_BAO_Query {
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
+
 }

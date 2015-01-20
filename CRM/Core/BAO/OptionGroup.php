@@ -140,4 +140,5 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     $optionGroup->find(TRUE);
     return $optionGroup->name;
   }
+
 }

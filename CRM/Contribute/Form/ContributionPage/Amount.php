@@ -772,4 +772,5 @@ SELECT id
   public function getTitle() {
     return ts('Amounts');
   }
+
 }

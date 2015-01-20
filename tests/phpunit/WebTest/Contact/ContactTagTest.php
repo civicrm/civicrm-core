@@ -149,4 +149,5 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('tags', "tagset1, tagset2");
   }
+
 }

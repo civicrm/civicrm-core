@@ -126,4 +126,5 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact1} AAA");
     $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
   }
+
 }

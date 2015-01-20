@@ -66,4 +66,5 @@ class CRM_Event_Form_Task_Result extends CRM_Event_Form_Task {
     $session->replaceUserContext($url);
     CRM_Utils_System::redirect($url);
   }
+
 }

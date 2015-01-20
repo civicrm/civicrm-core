@@ -257,6 +257,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       }
     }
   }
+
 }
 
 $obj = new CRM_ParticipantProcessor();

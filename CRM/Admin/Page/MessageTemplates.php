@@ -293,4 +293,5 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
     $this->assign('rows', $rows);
   }
+
 }

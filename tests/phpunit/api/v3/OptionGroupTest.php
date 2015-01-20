@@ -169,4 +169,5 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->callAPIAndDocument('OptionGroup', 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
   }
+
 }

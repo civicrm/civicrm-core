@@ -167,4 +167,5 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
     $this->assign('rows', $labelFormatList);
   }
+
 }

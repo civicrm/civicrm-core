@@ -252,4 +252,5 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
           'plural' => 'Added Contacts to %1',
         )), 'success', array('expires' => 0));
   }
+
 }

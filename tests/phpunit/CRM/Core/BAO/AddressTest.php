@@ -325,4 +325,5 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('street_unit', $parsedStreetAddress);
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
   }
+
 }

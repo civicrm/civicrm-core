@@ -812,4 +812,5 @@ WHERE  {$where}
     }
     return $batches;
   }
+
 }

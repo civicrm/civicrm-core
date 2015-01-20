@@ -181,4 +181,5 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     ));
     $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
+
 }

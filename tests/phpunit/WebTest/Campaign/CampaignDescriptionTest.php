@@ -93,4 +93,5 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'campaign/add', 'args' => 'reset=1');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

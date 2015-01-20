@@ -238,6 +238,7 @@ UPDATE civicrm_contact
       CRM_Core_DAO::executeQuery($cacheFieldQuery);
     }
   }
+
 }
 
 $obj = new CRM_UpdateGreeting();

@@ -457,4 +457,5 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestAddBillingDetails();
     return $contact;
   }
+
 }

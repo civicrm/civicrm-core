@@ -272,4 +272,5 @@ class CRM_Core_IDS {
     }
     CRM_Core_Error::fatal($msg);
   }
+
 }

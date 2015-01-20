@@ -169,4 +169,5 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   public function postProcess() {
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
   }
+
 }

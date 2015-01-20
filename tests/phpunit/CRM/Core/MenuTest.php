@@ -51,4 +51,5 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $actual = CRM_Core_Menu::getArrayForPathArgs($inputString);
     $this->assertEquals($expectedArray, $actual);
   }
+
 }

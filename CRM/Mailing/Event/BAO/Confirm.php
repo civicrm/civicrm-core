@@ -158,4 +158,5 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     return $group->title;
   }
+
 }

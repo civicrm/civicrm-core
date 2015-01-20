@@ -255,6 +255,7 @@ class CRM_Core_JobManager {
     $message = $apiResult['is_error'] ? ', Error message: ' . $msg : " (" . $vals . ")";
     return $status . $message;
   }
+
 }
 
 /**

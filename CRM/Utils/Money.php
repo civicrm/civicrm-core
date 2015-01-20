@@ -126,4 +126,5 @@ class CRM_Utils_Money {
     );
     return strtr($format, $replacements);
   }
+
 }

@@ -292,4 +292,5 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   public function getTitle() {
     return ts('Event Location');
   }
+
 }

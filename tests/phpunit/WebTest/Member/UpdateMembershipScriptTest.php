@@ -128,4 +128,5 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     return $memTypeParams;
   }
+
 }

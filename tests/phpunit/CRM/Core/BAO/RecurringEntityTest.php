@@ -256,4 +256,5 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $compareActParams = array();
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
   }
+
 }

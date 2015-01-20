@@ -118,4 +118,5 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->select('group_id', "{$groupName}");
     $this->click('_qf_GroupContact_next');
   }
+
 }

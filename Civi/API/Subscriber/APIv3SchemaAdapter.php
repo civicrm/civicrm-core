@@ -121,4 +121,5 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
     }
     return $required;
   }
+
 }

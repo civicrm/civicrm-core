@@ -2038,4 +2038,5 @@ WHERE  {$whereClause}";
     }
     return $componentPaymentFields;
   }
+
 }

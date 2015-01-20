@@ -122,4 +122,5 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
       $this->onPostInstall($oldInfo);
     }
   }
+
 }

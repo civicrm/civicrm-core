@@ -72,4 +72,5 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
 
     return $actionLog;
   }
+
 }

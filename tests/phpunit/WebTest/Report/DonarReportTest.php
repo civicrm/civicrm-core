@@ -114,4 +114,5 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     // check if criteria still exits
     $this->assertElementContainsText('css=table.statistics-table', "Is greater than or equal to 10", "Criteria is not selected");
   }
+
 }

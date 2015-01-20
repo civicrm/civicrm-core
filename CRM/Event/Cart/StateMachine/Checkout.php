@@ -40,4 +40,5 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
     $pages["CRM_Event_Cart_Form_Checkout_ThankYou"] = NULL;
     $this->addSequentialPages($pages, $action);
   }
+
 }

@@ -1379,4 +1379,5 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
+
 }

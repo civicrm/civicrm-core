@@ -478,4 +478,5 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     // add all the necessary variables to the form
     $parser->set($this);
   }
+
 }

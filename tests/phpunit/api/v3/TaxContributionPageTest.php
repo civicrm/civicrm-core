@@ -529,4 +529,5 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('contribution', 'delete', $params, __FUNCTION__, __FILE__);
   }
+
 }

@@ -98,4 +98,5 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
     $form->set('importTableName', $importJob->getTableName());
   }
+
 }

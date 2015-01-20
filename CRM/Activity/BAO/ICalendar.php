@@ -137,4 +137,5 @@ class CRM_Activity_BAO_ICalendar {
     }
     return $primary;
   }
+
 }

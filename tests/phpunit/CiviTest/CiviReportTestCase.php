@@ -164,4 +164,5 @@ class CiviReportTestCase extends CiviUnitTestCase {
     }
     return $result;
   }
+
 }

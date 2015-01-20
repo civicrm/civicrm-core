@@ -86,4 +86,5 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->assertEquals('1', $this->getSelectedValue('id=recipient'));
     $this->assertChecked('is_active');
   }
+
 }

@@ -405,4 +405,5 @@ class CRM_Utils_PDF_Utils {
       CRM_Core_Error::statusBounce("PDFlib Error: " . $excp->get_errmsg());
     }
   }
+
 }

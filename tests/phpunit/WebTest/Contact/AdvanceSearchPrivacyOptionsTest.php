@@ -228,4 +228,5 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
   }
+
 }

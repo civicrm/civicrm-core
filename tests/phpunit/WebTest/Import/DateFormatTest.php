@@ -467,4 +467,5 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
+
 }

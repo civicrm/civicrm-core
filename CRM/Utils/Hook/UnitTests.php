@@ -125,4 +125,5 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
       call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
   }
+
 }

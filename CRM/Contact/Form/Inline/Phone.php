@@ -170,4 +170,5 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     $this->log();
     $this->response();
   }
+
 }

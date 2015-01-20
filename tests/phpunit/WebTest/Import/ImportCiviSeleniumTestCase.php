@@ -595,4 +595,5 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

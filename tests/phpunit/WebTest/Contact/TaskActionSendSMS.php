@@ -117,4 +117,5 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent('Your message has been sent.'), "Test SMS could not be sent!");
   }
+
 }

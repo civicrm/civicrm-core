@@ -268,4 +268,5 @@ FROM `{$this->loggingDB}`.$tableName entity_log_civireport
 LEFT  JOIN civicrm_contact altered_by_contact_civireport
         ON (entity_log_civireport.log_user_id = altered_by_contact_civireport.id)";
   }
+
 }

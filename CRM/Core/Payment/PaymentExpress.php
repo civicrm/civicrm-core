@@ -274,4 +274,5 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       CRM_Utils_System::redirect($request_string);
     }
   }
+
 }

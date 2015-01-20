@@ -467,4 +467,5 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

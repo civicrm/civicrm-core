@@ -147,4 +147,5 @@ ORDER BY
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
   }
+
 }

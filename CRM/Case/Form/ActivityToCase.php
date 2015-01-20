@@ -98,4 +98,5 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     $this->addEntityRef('file_on_case_target_contact_id', ts('With Contact(s)'), array('multiple' => TRUE));
     $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
   }
+
 }

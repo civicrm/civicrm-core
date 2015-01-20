@@ -75,4 +75,5 @@ class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
     // suppress all hok calls during soap
     return NULL;
   }
+
 }

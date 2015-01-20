@@ -557,4 +557,5 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('hidden', 'hidden_CiviCase', 1);
     CRM_Case_BAO_Query::buildSearchForm($form);
   }
+
 }

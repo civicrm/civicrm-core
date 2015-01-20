@@ -507,4 +507,5 @@ SELECT  id, html_type
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
   }
+
 }

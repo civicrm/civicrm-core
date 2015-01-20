@@ -103,4 +103,5 @@ class WrapperAdapter implements EventSubscriberInterface {
     }
     return $apiRequest['wrappers'];
   }
+
 }

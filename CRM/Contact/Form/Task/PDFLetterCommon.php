@@ -459,4 +459,5 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
   }
+
 }

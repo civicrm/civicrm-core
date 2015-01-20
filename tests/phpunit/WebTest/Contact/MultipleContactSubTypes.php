@@ -251,4 +251,5 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
     return array($customGroupTitle, $gid);
   }
+
 }

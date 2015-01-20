@@ -127,4 +127,5 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Your update(s) have been saved.'), ts('Saved'), 'success');
   }
+
 }

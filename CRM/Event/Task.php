@@ -229,4 +229,5 @@ class CRM_Event_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

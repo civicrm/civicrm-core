@@ -185,4 +185,5 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
     CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat);
   }
+
 }

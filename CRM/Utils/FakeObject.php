@@ -33,4 +33,5 @@ class CRM_Utils_FakeObject {
       throw new Exception("Call to unimplemented method: $name");
     }
   }
+
 }

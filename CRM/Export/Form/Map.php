@@ -249,4 +249,5 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   public function getTitle() {
     return ts('Select Fields to Export');
   }
+
 }

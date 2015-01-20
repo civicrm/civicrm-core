@@ -433,4 +433,5 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($verifyMembershipRenewData);
   }
+
 }

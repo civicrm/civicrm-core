@@ -122,4 +122,5 @@ class CRM_Core_ScheduledJob {
 
   public function __destruct() {
   }
+
 }

@@ -94,4 +94,5 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
     return $controller->run();
   }
+
 }

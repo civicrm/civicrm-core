@@ -156,4 +156,5 @@ class CRM_Campaign_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

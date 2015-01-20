@@ -172,4 +172,5 @@ class TransactionSubscriber implements EventSubscriberInterface {
       unset($this->transactions[$apiRequest['id']]);
     }
   }
+
 }

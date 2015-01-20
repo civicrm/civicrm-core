@@ -383,4 +383,5 @@ FROM {$from}
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Respondent Search');
   }
+
 }

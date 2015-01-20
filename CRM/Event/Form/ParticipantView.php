@@ -234,4 +234,5 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       )
     );
   }
+
 }

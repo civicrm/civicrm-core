@@ -118,4 +118,5 @@ class SequenceListenerTest extends \CiviCaseTestCase {
   public static function ag($array, $key) {
     return $array[$key];
   }
+
 }

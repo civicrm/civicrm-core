@@ -168,4 +168,5 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       CRM_Core_Session::setStatus(implode('&nbsp;', $status), '', 'info');
     }
   }
+
 }

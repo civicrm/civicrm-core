@@ -144,4 +144,5 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   public function getTitle() {
     return ts('Tell a Friend');
   }
+
 }

@@ -104,4 +104,5 @@ interface CRM_Contact_Form_Search_Interface {
    * Returns an array of column headers and field names and sort options
    */
   public function &columns();
+
 }

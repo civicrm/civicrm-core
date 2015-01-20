@@ -59,4 +59,5 @@ class PostEvent extends \Symfony\Component\EventDispatcher\Event {
     $this->id = $id;
     $this->object = $object;
   }
+
 }

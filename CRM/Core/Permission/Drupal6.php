@@ -214,4 +214,5 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
     }
     return $return_permissions;
   }
+
 }

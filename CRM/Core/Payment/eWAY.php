@@ -555,5 +555,6 @@ The CiviCRM eWAY Payment Processor Module
 
     CRM_Utils_Mail::send($params);
   }
+
 }
 // end class CRM_Core_Payment_eWAY

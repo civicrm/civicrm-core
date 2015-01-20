@@ -465,4 +465,5 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       unset($rValue['action']);
     }
   }
+
 }

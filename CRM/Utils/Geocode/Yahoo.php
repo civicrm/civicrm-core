@@ -208,4 +208,5 @@ class CRM_Utils_Geocode_Yahoo {
     $values['geo_code_1'] = $values['geo_code_2'] = 'null';
     return FALSE;
   }
+
 }

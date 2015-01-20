@@ -191,4 +191,5 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count'], "in line " . __LINE__);
     $this->assertArrayNotHasKey('id', $result, "in line " . __LINE__);
   }
+
 }

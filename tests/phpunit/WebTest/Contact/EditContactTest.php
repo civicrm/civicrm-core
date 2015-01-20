@@ -112,4 +112,5 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("2342322222  ext. 198");
 
   }
+
 }

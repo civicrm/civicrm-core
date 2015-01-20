@@ -140,4 +140,5 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    */
   public function hook_caseTypes(&$caseTypes) {
   }
+
 }

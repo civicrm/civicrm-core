@@ -66,4 +66,5 @@ GROUP BY cv.label";
     }
     CRM_Utils_JSON::output($results);
   }
+
 }

@@ -665,4 +665,5 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
   }
+
 }

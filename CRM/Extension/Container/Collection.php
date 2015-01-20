@@ -170,4 +170,5 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     }
     return $k2c;
   }
+
 }

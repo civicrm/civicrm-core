@@ -198,4 +198,5 @@ class CRM_Utils_Recent {
     $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
   }
+
 }

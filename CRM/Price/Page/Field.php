@@ -343,4 +343,5 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $controller->process();
     $controller->run();
   }
+
 }

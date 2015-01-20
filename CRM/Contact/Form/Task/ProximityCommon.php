@@ -158,4 +158,5 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     $form->setDefaults($defaults);
     return $defaults;
   }
+
 }

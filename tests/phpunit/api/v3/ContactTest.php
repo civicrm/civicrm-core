@@ -1996,4 +1996,5 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->assertArrayKeyExists($action, $result['deprecated']);
     }
   }
+
 }

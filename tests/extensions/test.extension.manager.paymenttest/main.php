@@ -59,4 +59,5 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
 
   public function checkConfig() {
   }
+
 }

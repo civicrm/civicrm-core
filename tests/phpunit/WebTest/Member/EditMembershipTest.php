@@ -102,4 +102,5 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[3][text()='Type changed from {$membershipTypes['membership_type']} to General']"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[5]/a[text()='{$contactName}']"));
   }
+
 }

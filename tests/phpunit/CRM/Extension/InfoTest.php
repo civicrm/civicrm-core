@@ -65,4 +65,5 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc));
   }
+
 }

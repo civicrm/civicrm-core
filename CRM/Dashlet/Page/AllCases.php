@@ -62,4 +62,5 @@ class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
     }
     return parent::run();
   }
+
 }

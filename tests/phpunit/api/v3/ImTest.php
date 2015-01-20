@@ -86,4 +86,5 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
 }

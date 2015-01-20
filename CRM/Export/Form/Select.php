@@ -526,4 +526,5 @@ FROM   {$this->_componentTable}
 
     return $options;
   }
+
 }

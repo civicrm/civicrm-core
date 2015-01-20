@@ -1094,4 +1094,5 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(array_flip($byId), $result);
   }
+
 }

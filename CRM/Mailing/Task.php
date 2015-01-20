@@ -122,4 +122,5 @@ class CRM_Mailing_Task {
       self::$_tasks[$value]['result'],
     );
   }
+
 }

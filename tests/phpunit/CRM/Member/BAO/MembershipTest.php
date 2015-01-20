@@ -614,4 +614,5 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipDelete($membershipId);
     Contact::delete($contactId);
   }
+
 }

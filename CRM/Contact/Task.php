@@ -383,4 +383,5 @@ class CRM_Contact_Task {
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     );
   }
+
 }

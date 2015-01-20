@@ -111,4 +111,5 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $this->set('searchParams', $this->_searchParams);
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
+
 }

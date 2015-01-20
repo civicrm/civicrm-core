@@ -21,4 +21,5 @@ interface API_Wrapper {
    *   modified $result
    */
   public function toApiOutput($apiRequest, $result);
+
 }

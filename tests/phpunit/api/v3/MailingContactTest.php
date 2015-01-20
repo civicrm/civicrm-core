@@ -191,4 +191,5 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][2]['creator_id'], 3, "In line " . __LINE__);
     $this->assertEquals($result['values'][2]['creator_name'], "xyz1, abc1", "In line " . __LINE__);
   }
+
 }

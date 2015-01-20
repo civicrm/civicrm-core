@@ -355,4 +355,5 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
       CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
     }
   }
+
 }

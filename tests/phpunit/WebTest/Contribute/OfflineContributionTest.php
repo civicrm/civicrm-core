@@ -431,4 +431,5 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($expected);
   }
+
 }

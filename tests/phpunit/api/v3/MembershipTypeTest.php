@@ -278,4 +278,5 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
   }
+
 }

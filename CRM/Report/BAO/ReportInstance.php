@@ -254,4 +254,5 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
     return NULL;
   }
+
 }

@@ -302,4 +302,5 @@ AND cgc.group_id = {$this->_group}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

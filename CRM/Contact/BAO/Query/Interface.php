@@ -122,4 +122,5 @@ abstract class CRM_Contact_BAO_Query_Interface {
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
   }
+
 }

@@ -224,4 +224,5 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
+
 }

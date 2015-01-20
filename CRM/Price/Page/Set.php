@@ -326,4 +326,5 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
 
     CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
+
 }

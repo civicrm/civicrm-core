@@ -175,4 +175,5 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
       )
     );
   }
+
 }

@@ -131,4 +131,5 @@ class CRM_Case_XMLProcessor {
     self::$activityTypes = NULL;
     self::$relationshipTypes = NULL;
   }
+
 }

@@ -136,4 +136,5 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
+
 }

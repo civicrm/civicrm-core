@@ -92,4 +92,5 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     return $contact;
   }
+
 }

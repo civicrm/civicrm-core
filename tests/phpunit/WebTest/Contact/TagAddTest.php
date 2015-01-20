@@ -110,4 +110,5 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Contacts'), 'Missing text: ' . 'Contacts');
     $this->assertTrue($this->isTextPresent('Edit'), 'Missing text: ' . 'Edit');
   }
+
 }

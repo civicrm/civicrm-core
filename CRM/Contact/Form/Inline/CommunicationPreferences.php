@@ -102,4 +102,5 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
 
     $this->response();
   }
+
 }
