@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -600,7 +600,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue(
       (bool) preg_match("/^This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation./",
         $this->getConfirmation()
-      ));
+      )
+    );
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('civicrm-footer');
@@ -1003,4 +1004,5 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("address-block-2", "Birmingham");
     $this->assertElementNotContainsText("address-block-2", "3456");
   }
+
 }

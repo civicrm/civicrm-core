@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -251,4 +251,5 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     // 3.status msg
     $params['statusMsg'] = ts('Case Start Date changed successfully.');
   }
+
 }

@@ -22,8 +22,9 @@ function civicrm_api3_generic_setValue($apiRequest) {
 
   $fields = civicrm_api($entity, 'getFields', array('version' => 3, 'action' => 'create', "sequential"));
   // getfields error, shouldn't happen.
-  if ($fields['is_error'])
-  return $fields;
+  if ($fields['is_error']) {
+    return $fields;
+  }
   $fields = $fields['values'];
 
   $isCustom = strpos($field, 'custom_') === 0;
@@ -67,9 +68,10 @@ function civicrm_api3_generic_setValue($apiRequest) {
       break;
 
     case CRM_Utils_Type::T_DATE:
-      $value = CRM_Utils_Type::escape($value,"Date",false);
-      if (!$value)
+      $value = CRM_Utils_Type::escape($value, "Date", FALSE);
+      if (!$value) {
         return civicrm_api3_create_error("Param '$field' is not a date. format YYYYMMDD or YYYYMMDDHHMMSS");
+      }
       break;
 
     case CRM_Utils_Type::T_BOOLEAN:

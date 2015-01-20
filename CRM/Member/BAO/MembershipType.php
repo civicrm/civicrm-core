@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -752,7 +752,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
   }
 
-  /**                                                                                                                                                                                                         * This function updates all price field value for quick config
+  /**
+   * This function updates all price field value for quick config
    * price set which has membership type
    *
    * @param  int $membershipTypeId membership type id
@@ -795,4 +796,5 @@ SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1
 AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
     CRM_Core_DAO::executeQuery($query, $queryParams);
   }
+
 }

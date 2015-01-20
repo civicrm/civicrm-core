@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A queue implementation which stores items in the CiviCRM SQL database
@@ -193,4 +193,5 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   public function releaseItem($item) {
     unset($this->releaseTimes[$item->id]);
   }
+
 }

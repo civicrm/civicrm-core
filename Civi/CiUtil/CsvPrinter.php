@@ -29,4 +29,5 @@ class CsvPrinter {
     array_unshift($row, $test);
     fputcsv($this->file, $row);
   }
+
 }

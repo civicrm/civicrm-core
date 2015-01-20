@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -228,7 +228,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
                         AND     {$t['GroupContact']}.status     = 'Added')";
 
     /* Query for permissions granted through an ACL group to a Contact
-         * group */
+     * group */
 
     $query[] = "SELECT      {$t['ACL']}.*, 0 as override
                     FROM        {$t['ACL']}
@@ -262,10 +262,10 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     while ($dao->fetch()) {
       /* Instant bypass for the following cases:
-             * 1) the rule governs all tables
-             * 2) the rule governs all objects in the table in question
-             * 3) the rule governs the specific object we want
-             */
+       * 1) the rule governs all tables
+       * 2) the rule governs all objects in the table in question
+       * 3) the rule governs the specific object we want
+       */
 
       if (empty($dao->object_table) ||
         ($dao->object_table == $object_table
@@ -284,8 +284,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
         );
 
         /* If the clause returned is null, then the rule is a blanket
-                 * (id is null) on a table other than the one we're interested
-                 * in.  So skip it. */
+         * (id is null) on a table other than the one we're interested
+         * in.  So skip it. */
 
         if (empty($clause)) {
           continue;
@@ -293,7 +293,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
       }
 
       /* Now we figure out if this is an allow or deny rule, and possibly
-             * a contact-level override */
+       * a contact-level override */
 
       if ($dao->deny) {
         $deny[] = $clause;
@@ -977,4 +977,5 @@ ORDER BY a.object_id
     $acl->id = $aclId;
     $acl->delete();
   }
+
 }

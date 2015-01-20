@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -90,7 +90,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param array $entityBlock
    *
    * @return array
    *   array of phone objects
@@ -141,7 +141,6 @@ LEFT JOIN civicrm_phone ON ( civicrm_contact.id = civicrm_phone.contact_id )
 LEFT JOIN civicrm_location_type ON ( civicrm_phone.location_type_id = civicrm_location_type.id )
 WHERE     civicrm_contact.id = %1 $cond
 ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
-
 
     $params = array(
       1 => array(
@@ -271,4 +270,5 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     CRM_Core_DAO::checkSqlFunctionsExist();
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
   }
+
 }

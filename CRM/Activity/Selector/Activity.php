@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -545,4 +545,5 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
     return self::$_columnHeaders;
   }
+
 }

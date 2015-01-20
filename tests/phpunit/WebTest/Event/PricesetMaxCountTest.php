@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -1228,4 +1228,5 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $thankStrings = array('Thank You for Registering', 'Event Total', 'Transaction Date');
     $this->assertStringsPresent($thankStrings);
   }
+
 }

@@ -284,4 +284,5 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($groups['A']);
     Custom::deleteGroup($groups['B']);
   }
+
 }

@@ -141,4 +141,5 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     }
   }
+
 }

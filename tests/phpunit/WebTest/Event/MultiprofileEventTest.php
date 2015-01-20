@@ -414,7 +414,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * Test profile creation.
    *
-*@param $profileField
+   * @param array $profileField
    * @param int $location
    * @param $type
    *
@@ -642,7 +642,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $email1
    * @param $email2
    */
-  function _testEventRegistration(
+  public function _testEventRegistration(
     $eventPageId, $customId, $firstName, $lastName,
     $participantfname, $participantlname, $email1, $email2
   ) {
@@ -831,4 +831,5 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

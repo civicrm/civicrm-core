@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -225,4 +225,5 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
   }
+
 }

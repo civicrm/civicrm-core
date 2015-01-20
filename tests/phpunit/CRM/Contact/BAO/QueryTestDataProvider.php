@@ -200,5 +200,6 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
   public function valid() {
     return isset($this->dataset[$this->i]);
   }
+
 }
 // class CRM_Contact_BAO_QueryTestDataProvider

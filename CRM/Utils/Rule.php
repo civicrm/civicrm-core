@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -429,7 +429,8 @@ class CRM_Utils_Rule {
       'currency', array(
         'keyColumn' => 'name',
         'labelColumn' => 'symbol',
-      ));
+      )
+    );
     $value = str_replace($currencySymbols, '', $value);
 
     if ($config->monetaryThousandSeparator) {
@@ -798,4 +799,5 @@ class CRM_Utils_Rule {
   public static function qfKey($key) {
     return ($key) ? CRM_Core_Key::valid($key) : FALSE;
   }
+
 }

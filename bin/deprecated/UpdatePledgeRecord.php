@@ -301,6 +301,7 @@ SELECT  pledge.contact_id              as contact_id,
     // end if ( $sendReminders )
     echo "<br />{$updateCnt} records updated.";
   }
+
 }
 
 $obj = new CRM_UpdatePledgeRecord();

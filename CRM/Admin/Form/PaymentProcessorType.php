@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -244,4 +244,5 @@ UPDATE civicrm_payment_processor SET is_default = 0";
     }
     $dao->save();
   }
+
 }

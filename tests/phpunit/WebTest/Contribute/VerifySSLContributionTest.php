@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -45,8 +45,8 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
 
     // todo: write code to check other payment processors
     /*$this->_tryPaymentProcessor($this->names['Google_Checkout']);
-        $this->_tryPaymentProcessor($this->names['PayPal']);
-        $this->_tryPaymentProcessor($this->names['PayPal_Standard']);*/
+    $this->_tryPaymentProcessor($this->names['PayPal']);
+    $this->_tryPaymentProcessor($this->names['PayPal_Standard']);*/
   }
 
   public function _initialize() {
@@ -131,4 +131,5 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertFalse($this->isTextPresent("Payment Processor Error message"), "Payment processor returned error message");
   }
+
 }

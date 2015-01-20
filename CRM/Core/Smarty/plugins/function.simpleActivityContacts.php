@@ -52,7 +52,7 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
 
   foreach (array(
              'target',
-             'assignee'
+             'assignee',
            ) as $role) {
     $contact = array();
     if (!empty($activity[$role . '_contact_id'])) {

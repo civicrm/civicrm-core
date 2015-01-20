@@ -105,7 +105,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       $this->callAPISuccess('group_contact', 'create', array(
           'contact_id' => $contactID,
           'group_id' => $groupID,
-          'status' => 'Added'
+          'status' => 'Added',
         ));
     }
   }
@@ -123,4 +123,5 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     }
     return $recipients;
   }
+
 }

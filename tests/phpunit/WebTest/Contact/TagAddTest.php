@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -110,4 +110,5 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Contacts'), 'Missing text: ' . 'Contacts');
     $this->assertTrue($this->isTextPresent('Edit'), 'Missing text: ' . 'Edit');
   }
+
 }

@@ -54,4 +54,5 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
             WHERE log_action = 'Update' AND log_conn_id = %1 AND log_date = %2 ORDER BY log_date DESC LIMIT 1
         ";
   }
+
 }

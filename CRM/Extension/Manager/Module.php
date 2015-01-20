@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
@@ -108,4 +108,5 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
   public function onPreEnable(CRM_Extension_Info $info) {
     $this->callHook($info, 'enable');
   }
+
 }

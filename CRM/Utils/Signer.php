@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -136,4 +136,5 @@ class CRM_Utils_Signer {
     // many times on certain admin pages; so instead we'll re-use the hash.
     return $this->defaultSalt;
   }
+
 }

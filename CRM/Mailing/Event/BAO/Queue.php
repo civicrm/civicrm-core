@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -329,4 +329,5 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
       CRM_Core_DAO::executeQuery($sql);
     }
   }
+
 }

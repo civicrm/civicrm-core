@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -112,7 +112,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
 
-    /*
+    /* @codingStandardsIgnoreStart
     // adapted from CRM_Core_Extensions_Payment::install
     foreach (array(
       'class_name',
@@ -134,12 +134,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
       'billing_mode',
       'is_recur',
       'payment_type'
-    ) as $trimmable) {
+      ) as $trimmable) {
       if (isset($paymentProcessorType->{$trimmable})) {
         $paymentProcessorType->{$trimmable} = trim($paymentProcessorType->{$trimmable});
       }
     }
-    */
+    @codingStandardsIgnoreEnd */
 
     if (isset($paymentProcessorType->billing_mode)) {
       // ugh unidirectional manipulation

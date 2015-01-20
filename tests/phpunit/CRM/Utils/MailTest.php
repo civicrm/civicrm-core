@@ -58,4 +58,5 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
       $this->assertEquals($result, $value['result'], 'Expected encoding does not match');
     }
   }
+
 }

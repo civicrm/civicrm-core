@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -241,7 +241,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'option_group', 'get', array(
         'name' => 'gender',
         'sequential' => 1,
-      ));
+      )
+    );
     $this->assertAPISuccess($optionGroup);
     $params = array(
       'option_group_id' => $optionGroup['id'],
@@ -347,4 +348,5 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ));
     $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
   }
+
 }

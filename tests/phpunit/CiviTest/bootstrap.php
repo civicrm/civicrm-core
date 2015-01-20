@@ -27,7 +27,7 @@ require_once $GLOBALS['base_dir'] . '/vendor/autoload.php';
 
 /*
 require $GLOBALS['base_dir'] . DIRECTORY_SEPARATOR .
-        'packages' . DIRECTORY_SEPARATOR .
-        'PHPUnit' . DIRECTORY_SEPARATOR .
-        'Autoload.php';
-*/
+'packages' . DIRECTORY_SEPARATOR .
+'PHPUnit' . DIRECTORY_SEPARATOR .
+'Autoload.php';
+ */

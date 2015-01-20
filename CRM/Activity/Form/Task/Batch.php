@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -295,4 +295,5 @@ WHERE  a.id = %1 ";
       CRM_Core_Session::setStatus("", ts("No Updates Saved"), "info");
     }
   }
+
 }

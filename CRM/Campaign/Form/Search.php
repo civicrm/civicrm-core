@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -479,4 +479,5 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   public function getTitle() {
     return ts('Find Respondents');
   }
+
 }

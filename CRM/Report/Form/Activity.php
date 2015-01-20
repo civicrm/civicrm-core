@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -62,246 +62,246 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     asort($this->activityTypes);
 
     $this->_columns = array(
-        'civicrm_contact' => array(
-          'dao' => 'CRM_Contact_DAO_Contact',
-          'fields' => array(
-            'contact_source' => array(
-              'name' => 'sort_name',
-              'title' => ts('Source Contact Name'),
-              'alias' => 'civicrm_contact_source',
-              'no_repeat' => TRUE,
-            ),
-            'contact_assignee' => array(
-              'name' => 'sort_name',
-              'title' => ts('Assignee Contact Name'),
-              'alias' => 'civicrm_contact_assignee',
-              'dbAlias' => "civicrm_contact_assignee.sort_name",
-              'default' => TRUE,
-            ),
-            'contact_target' => array(
-              'name' => 'sort_name',
-              'title' => ts('Target Contact Name'),
-              'alias' => 'civicrm_contact_target',
-              'dbAlias' => "civicrm_contact_target.sort_name",
-              'default' => TRUE,
-            ),
-            'contact_source_id' => array(
-              'name' => 'id',
-              'alias' => 'civicrm_contact_source',
-              'dbAlias' => "civicrm_contact_source.id",
-              'no_display' => TRUE,
-              'default' => TRUE,
-              'required' => TRUE,
-            ),
-            'contact_assignee_id' => array(
-              'name' => 'id',
-              'alias' => 'civicrm_contact_assignee',
-              'dbAlias' => "civicrm_contact_assignee.id",
-              'no_display' => TRUE,
-              'default' => TRUE,
-              'required' => TRUE,
-            ),
-            'contact_target_id' => array(
-              'name' => 'id',
-              'alias' => 'civicrm_contact_target',
-              'dbAlias' => "civicrm_contact_target.id",
-              'no_display' => TRUE,
-              'default' => TRUE,
-              'required' => TRUE,
-            ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'contact_source' => array(
+            'name' => 'sort_name',
+            'title' => ts('Source Contact Name'),
+            'alias' => 'civicrm_contact_source',
+            'no_repeat' => TRUE,
           ),
-          'filters' => array(
-            'contact_source' => array(
-              'name' => 'sort_name',
-              'alias' => 'civicrm_contact_source',
-              'title' => ts('Source Contact Name'),
-              'operator' => 'like',
-              'type' => CRM_Report_Form::OP_STRING,
-            ),
-            'contact_assignee' => array(
-              'name' => 'sort_name',
-              'alias' => 'civicrm_contact_assignee',
-              'title' => ts('Assignee Contact Name'),
-              'operator' => 'like',
-              'type' => CRM_Report_Form::OP_STRING,
-            ),
-            'contact_target' => array(
-              'name' => 'sort_name',
-              'alias' => 'civicrm_contact_target',
-              'title' => ts('Target Contact Name'),
-              'operator' => 'like',
-              'type' => CRM_Report_Form::OP_STRING,
-            ),
-            'current_user' => array(
-              'name' => 'current_user',
-              'title' => ts('Limit To Current User'),
-              'type' => CRM_Utils_Type::T_INT,
-              'operatorType' => CRM_Report_Form::OP_SELECT,
-              'options' => array('0' => ts('No'), '1' => ts('Yes')),
-            ),
+          'contact_assignee' => array(
+            'name' => 'sort_name',
+            'title' => ts('Assignee Contact Name'),
+            'alias' => 'civicrm_contact_assignee',
+            'dbAlias' => "civicrm_contact_assignee.sort_name",
+            'default' => TRUE,
           ),
-          'grouping' => 'contact-fields',
-        ),
-        'civicrm_email' => array(
-          'dao' => 'CRM_Core_DAO_Email',
-          'fields' => array(
-            'contact_source_email' => array(
-              'name' => 'email',
-              'title' => ts('Source Contact Email'),
-              'alias' => 'civicrm_email_source',
-            ),
-            'contact_assignee_email' => array(
-              'name' => 'email',
-              'title' => ts('Assignee Contact Email'),
-              'alias' => 'civicrm_email_assignee',
-            ),
-            'contact_target_email' => array(
-              'name' => 'email',
-              'title' => ts('Target Contact Email'),
-              'alias' => 'civicrm_email_target',
-            ),
+          'contact_target' => array(
+            'name' => 'sort_name',
+            'title' => ts('Target Contact Name'),
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.sort_name",
+            'default' => TRUE,
           ),
-          'order_bys' => array(
-            'source_contact_email' => array(
-              'name' => 'email',
-              'title' => ts('Source Contact Email'),
-              'dbAlias' => 'civicrm_email_contact_source_email',
-            ),
+          'contact_source_id' => array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_source',
+            'dbAlias' => "civicrm_contact_source.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_assignee_id' => array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_assignee',
+            'dbAlias' => "civicrm_contact_assignee.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_target_id' => array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
           ),
         ),
-        'civicrm_activity' => array(
-          'dao' => 'CRM_Activity_DAO_Activity',
-          'fields' => array(
-            'id' => array(
-              'no_display' => TRUE,
-              'title' => ts('Activity ID'),
-              'required' => TRUE,
-            ),
-            'source_record_id' => array(
-              'no_display' => TRUE,
-              'required' => TRUE,
-            ),
-            'activity_type_id' => array(
-              'title' => ts('Activity Type'),
-              'required' => TRUE,
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
-            'activity_subject' => array(
-              'title' => ts('Subject'),
-              'default' => TRUE,
-            ),
-            'activity_date_time' => array(
-              'title' => ts('Activity Date'),
-              'required' => TRUE,
-            ),
-            'status_id' => array(
-              'title' => ts('Activity Status'),
-              'default' => TRUE,
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
-            'duration' => array(
-              'title' => ts('Duration'),
-              'type' => CRM_Utils_Type::T_INT,
-            ),
-            'details' => array(
-              'title' => ts('Activity Details'),
-            ),
+        'filters' => array(
+          'contact_source' => array(
+            'name' => 'sort_name',
+            'alias' => 'civicrm_contact_source',
+            'title' => ts('Source Contact Name'),
+            'operator' => 'like',
+            'type' => CRM_Report_Form::OP_STRING,
           ),
-          'filters' => array(
-            'activity_date_time' => array(
-              'default' => 'this.month',
-              'operatorType' => CRM_Report_Form::OP_DATE,
-            ),
-            'activity_subject' => array('title' => ts('Activity Subject')),
-            'activity_type_id' => array(
-              'title' => ts('Activity Type'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => $this->activityTypes,
-            ),
-            'status_id' => array(
-              'title' => ts('Activity Status'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Core_PseudoConstant::activityStatus(),
-            ),
-            'details' => array(
-              'title' => ts('Activity Details'),
-              'type' => CRM_Utils_Type::T_TEXT,
-            ),
+          'contact_assignee' => array(
+            'name' => 'sort_name',
+            'alias' => 'civicrm_contact_assignee',
+            'title' => ts('Assignee Contact Name'),
+            'operator' => 'like',
+            'type' => CRM_Report_Form::OP_STRING,
           ),
-          'order_bys' => array(
-            'activity_date_time' => array(
-              'title' => ts('Activity Date'),
-              'default_weight' => '1',
-              'dbAlias' => 'civicrm_activity_activity_date_time',
-            ),
-            'activity_type_id' => array(
-              'title' => ts('Activity Type'),
-              'default_weight' => '2',
-              'dbAlias' => "option_value_civireport",
-            ),
+          'contact_target' => array(
+            'name' => 'sort_name',
+            'alias' => 'civicrm_contact_target',
+            'title' => ts('Target Contact Name'),
+            'operator' => 'like',
+            'type' => CRM_Report_Form::OP_STRING,
           ),
-          'grouping' => 'activity-fields',
-          'alias' => 'activity',
-        ),
-        'civicrm_activity_contact' => array(
-          'dao' => 'CRM_Activity_DAO_ActivityContact',
-          'fields' => array(// so we have $this->_alias populated
+          'current_user' => array(
+            'name' => 'current_user',
+            'title' => ts('Limit To Current User'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array('0' => ts('No'), '1' => ts('Yes')),
           ),
         ),
-        'civicrm_option_value' => array(
-          'dao' => 'CRM_Core_DAO_OptionValue',
-          'fields' => array(// so we have $this->_alias populated
+        'grouping' => 'contact-fields',
+      ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'contact_source_email' => array(
+            'name' => 'email',
+            'title' => ts('Source Contact Email'),
+            'alias' => 'civicrm_email_source',
           ),
-          'status_id' =>
-            array(
-              'title' => ts('Activity Status'),
-              'default' => TRUE,
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
-          'duration' =>
-            array(
-              'title' => ts('Duration'),
-              'type' => CRM_Utils_Type::T_INT,
-            ),
-          'location' =>
-            array(
-              'title' => ts('Location'),
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
+          'contact_assignee_email' => array(
+            'name' => 'email',
+            'title' => ts('Assignee Contact Email'),
+            'alias' => 'civicrm_email_assignee',
+          ),
+          'contact_target_email' => array(
+            'name' => 'email',
+            'title' => ts('Target Contact Email'),
+            'alias' => 'civicrm_email_target',
+          ),
+        ),
+        'order_bys' => array(
+          'source_contact_email' => array(
+            'name' => 'email',
+            'title' => ts('Source Contact Email'),
+            'dbAlias' => 'civicrm_email_contact_source_email',
+          ),
+        ),
+      ),
+      'civicrm_activity' => array(
+        'dao' => 'CRM_Activity_DAO_Activity',
+        'fields' => array(
+          'id' => array(
+            'no_display' => TRUE,
+            'title' => ts('Activity ID'),
+            'required' => TRUE,
+          ),
+          'source_record_id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'activity_type_id' => array(
+            'title' => ts('Activity Type'),
+            'required' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'activity_subject' => array(
+            'title' => ts('Subject'),
+            'default' => TRUE,
+          ),
+          'activity_date_time' => array(
+            'title' => ts('Activity Date'),
+            'required' => TRUE,
+          ),
+          'status_id' => array(
+            'title' => ts('Activity Status'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'duration' => array(
+            'title' => ts('Duration'),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
           'details' => array(
             'title' => ts('Activity Details'),
-          )
+          ),
         ),
         'filters' => array(
           'activity_date_time' => array(
             'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-          'activity_subject' =>
-            array('title' => ts('Activity Subject')),
-          'location' =>
-            array(
-              'title' => ts('Location'),
-              'type' => CRM_Utils_Type::T_TEXT,
-            ),
-          'activity_type_id' =>
-            array(
-              'title' => ts('Activity Type'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => $this->activityTypes,
-            ),
-          'status_id' =>
-            array(
-              'title' => ts('Activity Status'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Core_PseudoConstant::activityStatus(),
-            ),
+          'activity_subject' => array('title' => ts('Activity Subject')),
+          'activity_type_id' => array(
+            'title' => ts('Activity Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->activityTypes,
+          ),
+          'status_id' => array(
+            'title' => ts('Activity Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::activityStatus(),
+          ),
           'details' => array(
             'title' => ts('Activity Details'),
             'type' => CRM_Utils_Type::T_TEXT,
-          )
+          ),
         ),
-      ) + $this->addressFields(TRUE);
+        'order_bys' => array(
+          'activity_date_time' => array(
+            'title' => ts('Activity Date'),
+            'default_weight' => '1',
+            'dbAlias' => 'civicrm_activity_activity_date_time',
+          ),
+          'activity_type_id' => array(
+            'title' => ts('Activity Type'),
+            'default_weight' => '2',
+            'dbAlias' => "option_value_civireport",
+          ),
+        ),
+        'grouping' => 'activity-fields',
+        'alias' => 'activity',
+      ),
+      'civicrm_activity_contact' => array(
+        'dao' => 'CRM_Activity_DAO_ActivityContact',
+        'fields' => array(// so we have $this->_alias populated
+        ),
+      ),
+      'civicrm_option_value' => array(
+        'dao' => 'CRM_Core_DAO_OptionValue',
+        'fields' => array(// so we have $this->_alias populated
+        ),
+        'status_id' =>
+        array(
+          'title' => ts('Activity Status'),
+          'default' => TRUE,
+          'type' => CRM_Utils_Type::T_STRING,
+        ),
+        'duration' =>
+        array(
+          'title' => ts('Duration'),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'location' =>
+        array(
+          'title' => ts('Location'),
+          'type' => CRM_Utils_Type::T_STRING,
+        ),
+        'details' => array(
+          'title' => ts('Activity Details'),
+        ),
+      ),
+      'filters' => array(
+        'activity_date_time' => array(
+          'default' => 'this.month',
+          'operatorType' => CRM_Report_Form::OP_DATE,
+        ),
+        'activity_subject' =>
+        array('title' => ts('Activity Subject')),
+        'location' =>
+        array(
+          'title' => ts('Location'),
+          'type' => CRM_Utils_Type::T_TEXT,
+        ),
+        'activity_type_id' =>
+        array(
+          'title' => ts('Activity Type'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => $this->activityTypes,
+        ),
+        'status_id' =>
+        array(
+          'title' => ts('Activity Status'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Core_PseudoConstant::activityStatus(),
+        ),
+        'details' => array(
+          'title' => ts('Activity Details'),
+          'type' => CRM_Utils_Type::T_TEXT,
+        ),
+      ),
+    ) + $this->addressFields(TRUE);
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
@@ -344,7 +344,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     parent::__construct();
   }
 
-  /** adding address fields with dbAlias for order clause
+  /**
+   * Adding address fields with dbAlias for order clause.
    * @return array
    *   address fields
    */
@@ -563,8 +564,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                 empty($this->_params['activity_type_id_value'])
               ) {
                 $actTypes = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE));
-                $clause =
-                  "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
+                $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
                   implode(',', $actTypes) . ") )";
               }
             }
@@ -985,4 +985,5 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       $this->assign('sectionTotals', $totals);
     }
   }
+
 }

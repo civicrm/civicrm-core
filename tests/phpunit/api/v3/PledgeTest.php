@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -515,4 +515,5 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeID = array('id' => $result['id']);
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
+
 }

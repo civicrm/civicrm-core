@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'ReleaseTestCase.php';
 
@@ -63,4 +63,5 @@ class WebTest_Release_InstallScript extends WebTest_Release_ReleaseTestCase {
     $this->openCiviPage("dashboard", "reset=1");
     $this->assertTrue($this->isTextPresent("CiviCRM Home"));
   }
+
 }

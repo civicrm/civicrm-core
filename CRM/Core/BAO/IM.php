@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -169,4 +169,5 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);
   }
+
 }

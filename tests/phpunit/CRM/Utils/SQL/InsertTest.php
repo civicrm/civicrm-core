@@ -45,4 +45,5 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
     $this->assertEquals($expected, $actual, $message);
   }
+
 }

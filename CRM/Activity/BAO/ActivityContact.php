@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -160,4 +160,5 @@ AND        civicrm_contact.is_deleted = 0
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;
   }
+
 }

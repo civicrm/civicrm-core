@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -145,24 +145,17 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     if (isset($defaults['start_date'])) {
-      list($defaults['start_date'],
-        $defaults['start_date_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['start_date'],
-        'activityDateTime'
-      );
+      list($defaults['start_date'], $defaults['start_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['start_date'], 'activityDateTime');
     }
     else {
-      list($defaults['start_date'],
-        $defaults['start_date_time']
-        ) = CRM_Utils_Date::setDateDefaults();
+      list($defaults['start_date'], $defaults['start_date_time'])
+        = CRM_Utils_Date::setDateDefaults();
     }
 
     if (isset($defaults['end_date'])) {
-      list($defaults['end_date'],
-        $defaults['end_date_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['end_date'],
-        'activityDateTime'
-      );
+      list($defaults['end_date'], $defaults['end_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDateTime');
     }
 
     if (!isset($defaults['is_active'])) {
@@ -386,4 +379,5 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
     }
   }
+
 }

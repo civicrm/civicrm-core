@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -62,4 +62,5 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
       CRM_Core_Error::fatal('Photo does not exist');
     }
   }
+
 }

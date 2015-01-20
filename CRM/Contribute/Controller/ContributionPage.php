@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -59,4 +59,5 @@ class CRM_Contribute_Controller_ContributionPage extends CRM_Core_Controller {
     $this->addPages($this->_stateMachine, $action);
     $this->addActions();
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -218,4 +218,5 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
+
 }

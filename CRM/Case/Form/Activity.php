@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -281,9 +281,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $openCaseID = CRM_Core_OptionGroup::getValue('activity_type', 'Open Case', 'name');
       unset($aTypes[$openCaseID]);
       asort($aTypes);
-      $this->_fields['followup_activity_type_id']['attributes'] = array(
-          '' => '- select activity type -',
-        ) + $aTypes;
+      $this->_fields['followup_activity_type_id']['attributes'] = array('' => '- select activity type -') + $aTypes;
     }
 
     $result = parent::buildQuickForm();
@@ -711,4 +709,5 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       ), 'info');
     }
   }
+
 }

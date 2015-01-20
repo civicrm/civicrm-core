@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -353,7 +353,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->add('text', 'eachPaymentAmount', ts('each'), array(
         'size' => 10,
         'style' => "background-color:#EBECE4",
-        'READONLY'
+        0 => 'READONLY', // WTF, preserved because its inexplicable
       ));
 
     //add various dates
@@ -662,4 +662,5 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ));
     }
   }
+
 }

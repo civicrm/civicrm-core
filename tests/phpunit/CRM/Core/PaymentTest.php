@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -47,4 +47,5 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $log = $this->callAPISuccess('SystemLog', 'get', array());
     $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log['id']]['message']);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -114,4 +114,5 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $query = CRM_Core_DAO::composeQuery($query, $params, TRUE);
     $dao->query($query, FALSE);
   }
+
 }

@@ -41,4 +41,5 @@ class CRM_Extension_Container_Default extends CRM_Extension_Container_Basic {
 
     return $errors;
   }
+
 }

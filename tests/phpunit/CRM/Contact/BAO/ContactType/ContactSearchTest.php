@@ -299,4 +299,5 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
     $result = civicrm_api('contact', 'get', $params, $defaults);
     $this->assertEquals(empty($result['values']), TRUE, 'In line ' . __LINE__);
   }
+
 }

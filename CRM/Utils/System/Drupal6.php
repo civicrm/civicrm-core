@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -878,12 +878,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $perms = $perms + drupal_map_assoc($newPerms);
       $permList = implode(', ', $perms);
       db_query('UPDATE {permission} SET perm = "%s" WHERE rid = %d', $permList, $rid);
-      /*
+      /* @codingStandardsIgnoreStart
         if ( ! empty( $roles ) ) {
             $rids = implode(',', array_keys($roles));
             db_query( 'UPDATE {permission} SET perm = CONCAT( perm, \', edit all events\') WHERE rid IN (' . implode(',', array_keys($roles)) . ')' );
             db_query( "UPDATE {permission} SET perm = REPLACE( perm, '%s', '%s' ) WHERE rid IN ($rids)",
-                $oldPerm, implode(', ', $newPerms) );*/
+                $oldPerm, implode(', ', $newPerms) );
+      @codingStandardsIgnoreEnd */
     }
   }
 
@@ -973,4 +974,5 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   public function flush() {
     drupal_flush_all_caches();
   }
+
 }

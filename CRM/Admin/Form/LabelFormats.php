@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -90,16 +90,16 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     // currently we support only mailing label creation, hence comment below code
     /*
     $options = array(
-      'label_format' => ts('Mailing Label'),
-      'name_badge'   => ts('Name Badge'),
+    'label_format' => ts('Mailing Label'),
+    'name_badge'   => ts('Name Badge'),
     );
 
     $labelType = $this->addRadio('label_type', ts('Used For'), $options, null, '&nbsp;&nbsp;');
 
     if ($this->_action != CRM_Core_Action::ADD) {
-      $labelType->freeze();
+    $labelType->freeze();
     }
-    */
+     */
 
     $this->add('select', 'paper_size', ts('Sheet Size'),
       array(
@@ -250,4 +250,5 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     }
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
+
 }

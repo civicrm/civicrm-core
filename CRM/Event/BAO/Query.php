@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -603,4 +603,5 @@ class CRM_Event_BAO_Query {
       $tables = array_merge(array('civicrm_participant' => 1), $tables);
     }
   }
+
 }

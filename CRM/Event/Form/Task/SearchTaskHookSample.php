@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -85,4 +85,5 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
       )
     );
   }
+
 }

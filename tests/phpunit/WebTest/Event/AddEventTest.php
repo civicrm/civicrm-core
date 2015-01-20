@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -974,4 +974,5 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
       $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
     }
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -90,4 +90,5 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
     // redirect to merge page.
     CRM_Utils_System::redirect($url);
   }
+
 }

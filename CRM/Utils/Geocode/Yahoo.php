@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -185,11 +185,11 @@ class CRM_Utils_Geocode_Yahoo {
           $values['postal_code'] = $ret['postal'];
 
           /* the following logic to split the string was borrowed from
-             CRM/Core/BAO/Address.php -- CRM_Core_BAO_Address::fixAddress.
-             This is actually the function that calls the geocoding
-             script to begin with, but the postal code business takes
-             place before geocoding gets called.
-          */
+          CRM/Core/BAO/Address.php -- CRM_Core_BAO_Address::fixAddress.
+          This is actually the function that calls the geocoding
+          script to begin with, but the postal code business takes
+          place before geocoding gets called.
+           */
 
           if (preg_match('/^(\d{4,5})[+-](\d{4})$/',
             $ret['postal'],
@@ -208,4 +208,5 @@ class CRM_Utils_Geocode_Yahoo {
     $values['geo_code_1'] = $values['geo_code_2'] = 'null';
     return FALSE;
   }
+
 }

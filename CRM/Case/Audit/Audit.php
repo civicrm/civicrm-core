@@ -100,7 +100,7 @@ class CRM_Case_Audit_Audit {
               if ($printReport) {
                 if (!in_array($label, array(
                   'Activity Type',
-                  'Status'
+                  'Status',
                 ))
                 ) {
                   $caseActivities[$activityindex][$fieldindex] = array();
@@ -212,20 +212,19 @@ class CRM_Case_Audit_Audit {
   }
 
   /**
-   * @param $xmlString
+   * @param string $xmlString
    * @param int $clientID
    * @param int $caseID
    * @param bool $printReport
    *
    * @return mixed
    */
-  static
-  public function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
+  public static function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*
     $fh = fopen('C:/temp/audit2.xml', 'w');
     fwrite($fh, $xmlString);
     fclose($fh);
-    */
+     */
 
     $audit = new CRM_Case_Audit_Audit($xmlString, 'audit.conf.xml');
     $activities = $audit->getActivities($printReport);
@@ -243,4 +242,5 @@ class CRM_Case_Audit_Audit {
     }
     return $contents;
   }
+
 }

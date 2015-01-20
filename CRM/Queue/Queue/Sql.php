@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A queue implementation which stores items in the CiviCRM SQL database
@@ -228,4 +228,5 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     CRM_Core_DAO::executeQuery($sql, $params);
     $dao->free();
   }
+
 }

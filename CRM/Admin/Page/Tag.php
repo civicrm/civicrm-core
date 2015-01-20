@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -216,4 +216,5 @@ WHERE t2.id IS NULL {$reservedClause}";
 
     $this->assign('rows', $values);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -175,13 +175,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /*
   public function testGetIdOfEventByEventTitle() {
-    $params = array(      'title' => 'Annual CiviCRM meet',
-      'return' => 'id'
-    );
+  $params = array(      'title' => 'Annual CiviCRM meet',
+  'return' => 'id'
+  );
 
-    $result = $this->callAPISuccess('Event', 'Get', $params);
+  $result = $this->callAPISuccess('Event', 'Get', $params);
   }
-  */
+   */
 
 
   /**
@@ -550,4 +550,5 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);
   }
+
 }

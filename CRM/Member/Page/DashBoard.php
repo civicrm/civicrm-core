@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -181,7 +181,8 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
     $status = implode(',', $status);
 
-    /* Disabled for lack of appropriate search
+    /*@codingStandardsIgnoreStart
+     Disabled for lack of appropriate search
 
        The Membership search isn't able to properly filter by join or renewal events.
        Until that works properly, the subtotals shouldn't get links.
@@ -254,7 +255,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         }
       }
     }
-    */
+    @codingStandardsIgnoreEnd */
 
     // Temporary replacement for current totals column
 
@@ -456,4 +457,5 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

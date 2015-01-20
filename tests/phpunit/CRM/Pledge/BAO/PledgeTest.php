@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -131,4 +131,5 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
   }
+
 }

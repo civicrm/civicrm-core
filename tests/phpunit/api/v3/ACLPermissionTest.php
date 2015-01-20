@@ -370,4 +370,5 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id > 1";
   }
+
 }

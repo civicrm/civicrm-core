@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -627,4 +627,5 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     );
     $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
   }
+
 }

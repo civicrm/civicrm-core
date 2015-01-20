@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -96,4 +96,5 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $participantListingClass->preProcess();
     $participantListingClass->run();
   }
+
 }

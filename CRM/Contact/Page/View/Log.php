@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,7 +47,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
       $this->assign('instanceUrl',
         CRM_Utils_System::url("civicrm/report/instance/{$loggingReport}",
           "reset=1&force=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={$this->_contactId}&cid={$this->_contactId}", FALSE, NULL, FALSE));
-      return;
+      return NULL;
     }
 
     $log = new CRM_Core_DAO_Log();
@@ -98,4 +98,5 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }

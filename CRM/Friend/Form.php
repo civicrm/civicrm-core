@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -323,4 +323,5 @@ class CRM_Friend_Form extends CRM_Core_Form {
     CRM_Utils_System::setTitle($defaults['thankyou_title']);
     $this->assign('thankYouText', $defaults['thankyou_text']);
   }
+
 }

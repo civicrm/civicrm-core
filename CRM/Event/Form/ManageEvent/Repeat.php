@@ -211,4 +211,5 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted = $eventIdsWithNoRegistration;
     return CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted;
   }
+
 }

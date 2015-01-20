@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -228,4 +228,5 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//tr/td[5]/a[text()='$contact']"));
     }
   }
+
 }

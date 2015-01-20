@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -93,7 +93,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
       'options' => array(
         'metadata' => array('fields'),
-      )
+      ),
     ), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }
@@ -105,4 +105,5 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('url', $result['values']);
   }
+
 }

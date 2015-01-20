@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -98,11 +98,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
       return self::error('Invalid currency selection, must be $CAD');
     }
     /* unused params: cvv not yet implemented, payment action ingored (should test for 'Sale' value?)
-        [cvv2] => 000
-        [ip_address] => 192.168.0.103
-        [payment_action] => Sale
-        [contact_type] => Individual
-        [geo_coord_id] => 1 */
+    [cvv2] => 000
+    [ip_address] => 192.168.0.103
+    [payment_action] => Sale
+    [contact_type] => Individual
+    [geo_coord_id] => 1 */
 
     //this code based on Moneris example code #
     //create an mpgCustInfo object
@@ -333,4 +333,5 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
       return NULL;
     }
   }
+
 }

@@ -76,4 +76,5 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
     civicrm_api('OptionValue', 'Get', array('version' => 3, 'label' => 'OG', 'api.option_value.delete'));
     civicrm_api('OptionValue', 'Get', array('version' => 3, 'label' => 'OG2', 'api.option_value.delete'));
   }
+
 }

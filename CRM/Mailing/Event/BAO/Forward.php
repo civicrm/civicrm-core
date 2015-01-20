@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -92,7 +92,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       (isset($dao->do_not_email) && $dao->do_not_email == 1)
     ) {
       /* We already sent this mailing to $forward_email, or we should
-             * never email this contact.  Give up. */
+       * never email this contact.  Give up. */
 
       return $successfulForward;
     }
@@ -373,4 +373,5 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     }
     return $results;
   }
+
 }

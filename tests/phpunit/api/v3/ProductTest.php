@@ -53,4 +53,5 @@ class api_v3_ProductTest extends CiviUnitTestCase {
     $options = $this->callAPISuccess($this->_entity, 'getoptions', array('field' => 'period_type'));
     $this->assertArrayHasKey('rolling', $options['values']);
   }
+
 }

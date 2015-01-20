@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -96,9 +96,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->defaults = array();
 
     /*
-         * we allow the controller to set force/reset externally, useful when we are being
-         * driven by the wizard framework
-         */
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
+     */
 
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
@@ -440,4 +440,5 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   public function getTitle() {
     return ts('Find Cases');
   }
+
 }

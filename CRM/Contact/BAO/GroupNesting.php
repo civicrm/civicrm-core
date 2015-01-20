@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -262,10 +262,10 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     }
     else {
       /* if we get here, it could be because we're out of siblings
-             * (in which case we return null) or because we're at the
-             * top level groups which do not have parents but may still
-             * have siblings, so check for that first.
-             */
+       * (in which case we return null) or because we're at the
+       * top level groups which do not have parents but may still
+       * have siblings, so check for that first.
+       */
 
       $nextGroup = $this->_getNextParentlessGroup($group);
       if ($nextGroup) {
@@ -415,8 +415,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
       $parentGroupId = $dao->parent_group_id;
       if ($parentGroupId == $checkGroupId) {
         /* print "One of these: <pre>";
-                print_r($groupIds);
-                print "</pre> has groupId $checkGroupId as an ancestor.<br/>"; */
+        print_r($groupIds);
+        print "</pre> has groupId $checkGroupId as an ancestor.<br/>"; */
 
         return TRUE;
       }
@@ -449,8 +449,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
       $childGroupId = $dao->child_group_id;
       if ($childGroupId == $checkGroupId) {
         /* print "One of these: <pre>";
-                 print_r($groupIds);
-                 print "</pre> has groupId $checkGroupId as a descendent.<br/><br/>"; */
+        print_r($groupIds);
+        print "</pre> has groupId $checkGroupId as a descendent.<br/><br/>"; */
 
         return TRUE;
       }
@@ -484,8 +484,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
       $parentGroupId = $dao->parent_group_id;
       if ($parentGroupId == $checkGroupId) {
         /* print "One of these: <pre>";
-                print_r($groupIds);
-                print "</pre> has groupId $checkGroupId as an ancestor.<br/>"; */
+        print_r($groupIds);
+        print "</pre> has groupId $checkGroupId as an ancestor.<br/>"; */
 
         return TRUE;
       }
@@ -525,8 +525,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
       $childGroupId = $dao->child_group_id;
       if ($childGroupId == $checkGroupId) {
         /* print "One of these: <pre>";
-                print_r($groupIds);
-                print "</pre> has groupId $checkGroupId as a descendent.<br/><br/>"; */
+        print_r($groupIds);
+        print "</pre> has groupId $checkGroupId as a descendent.<br/><br/>"; */
 
         return TRUE;
       }
@@ -736,4 +736,5 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
 
     return $containingGroups;
   }
+
 }

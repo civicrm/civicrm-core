@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -153,7 +153,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @return \CRM_Activity_Selector_Search
    */
-  function __construct(
+  public function __construct(
     &$queryParams,
     $action = CRM_Core_Action::NONE,
     $activityClause = NULL,
@@ -439,4 +439,5 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Activity Search');
   }
+
 }

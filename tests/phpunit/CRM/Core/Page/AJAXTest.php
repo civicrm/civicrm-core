@@ -61,4 +61,5 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

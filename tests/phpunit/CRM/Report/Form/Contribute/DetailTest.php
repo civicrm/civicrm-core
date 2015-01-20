@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviReportTestCase.php';
 
@@ -98,4 +98,5 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
+
 }

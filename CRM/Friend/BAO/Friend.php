@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -352,4 +352,5 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     return $friendDAO;
   }
+
 }

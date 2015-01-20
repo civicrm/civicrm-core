@@ -53,4 +53,5 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
 
     $template->run('schema_structure.tpl', $this->config->phpCodePath . "/CRM/Core/I18n/SchemaStructure.php");
   }
+
 }

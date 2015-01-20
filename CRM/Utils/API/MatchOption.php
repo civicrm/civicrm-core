@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Implement the "match" and "match-mandatory" options. If the submitted record doesn't have an ID
@@ -187,4 +187,5 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
     }
     return $params;
   }
+
 }

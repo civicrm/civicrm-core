@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 /**
  *
  * APIv3 functions for registering/processing mailing group events.
@@ -34,17 +34,16 @@
  * $Id$
  *
  */
+
 /**
  * Handle a confirm event
  *
  * @param array $params
  *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
  * @return array
  *   api result array
- * {@getfields mailing_event_confirm_create}
  */
 function civicrm_api3_mailing_event_queue_create($params) {
   if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
@@ -52,7 +51,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('job_id','contact_id'),
+    array('job_id', 'contact_id'),
     FALSE
   );
   return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);

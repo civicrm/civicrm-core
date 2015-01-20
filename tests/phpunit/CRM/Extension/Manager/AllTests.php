@@ -47,7 +47,7 @@ class CRM_Extension_Manager_AllTests extends CiviTestSuite {
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {
-      self::$instance = new self;
+      self::$instance = new self();
     }
     return self::$instance;
   }
@@ -59,6 +59,7 @@ class CRM_Extension_Manager_AllTests extends CiviTestSuite {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class CRM_Core_AllTests
 

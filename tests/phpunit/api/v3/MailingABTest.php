@@ -195,4 +195,5 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
       ),
     ));
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Variables class contains definitions of all the core config settings that are allowed on
@@ -609,5 +609,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     }
     return $cachedProvinceLimit;
   }
+
 }
 // end CRM_Core_Config

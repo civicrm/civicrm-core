@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -110,4 +110,5 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   public function shouldReset() {
     return FALSE;
   }
+
 }

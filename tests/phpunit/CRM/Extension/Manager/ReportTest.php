@@ -57,4 +57,5 @@ class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest" AND is_active = 1');
   }
+
 }

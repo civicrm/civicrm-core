@@ -224,4 +224,5 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     // add all the necessary variables to the form
     $parser->set($this);
   }
+
 }

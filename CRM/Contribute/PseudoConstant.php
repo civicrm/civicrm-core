@@ -22,8 +22,8 @@
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +------- -------------------------------------------------------------+
-*/
+ +--------------------------------------------------------------------+
+ */
 
 /**
  *
@@ -440,4 +440,5 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     return self::$batch;
   }
+
 }

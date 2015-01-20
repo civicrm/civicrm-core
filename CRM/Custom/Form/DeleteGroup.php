@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -116,4 +116,5 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::deleteGroup($group);
     CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", array(1 => $group->title)), '', 'success');
   }
+
 }

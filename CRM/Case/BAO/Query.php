@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -772,4 +772,5 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    */
   public static function searchAction(&$row, $id) {
   }
+
 }

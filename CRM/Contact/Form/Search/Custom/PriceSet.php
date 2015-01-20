@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -62,11 +62,11 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 
   public function __destruct() {
     /*
-        if ( $this->_eventID ) {
-            $sql = "DROP TEMPORARY TABLE {$this->_tableName}";
-            CRM_Core_DAO::executeQuery( $sql );
-        }
-        */
+    if ( $this->_eventID ) {
+    $sql = "DROP TEMPORARY TABLE {$this->_tableName}";
+    CRM_Core_DAO::executeQuery( $sql );
+    }
+     */
   }
 
   public function buildTempTable() {
@@ -355,4 +355,5 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
       CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
     }
   }
+
 }

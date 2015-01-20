@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the next action.
@@ -60,4 +60,5 @@ class CRM_Core_QuickForm_Action_Next extends CRM_Core_QuickForm_Action {
   public function perform(&$page, $actionName) {
     $this->_stateMachine->perform($page, $actionName, 'Next');
   }
+
 }

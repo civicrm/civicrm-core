@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -218,4 +218,5 @@ ORDER BY entity_id
   public function userContext($mode = NULL) {
     return 'civicrm/acl/basic';
   }
+
 }

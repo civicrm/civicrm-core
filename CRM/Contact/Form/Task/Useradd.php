@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class generates form components generic to useradd
@@ -144,4 +144,5 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }

@@ -23,7 +23,7 @@ s | under the terms of the GNU Affero General Public License           |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -247,7 +247,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       if (array_key_exists('contribution_amount_low', $this->_formValues)) {
         foreach (array(
                    'contribution_amount_low',
-                   'contribution_amount_high'
+                   'contribution_amount_high',
                  ) as $f) {
           $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
         }
@@ -271,7 +271,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $this->_formValues['group'] = array($this->_groupID => 1);
     }
 
-
     //search for civicase
     if (is_array($this->_formValues)) {
       $allCases = FALSE;
@@ -283,7 +282,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
                    'case_type_id',
                    'case_status_id',
                    'case_deleted',
-                   'case_tags'
+                   'case_tags',
                  ) as $caseCriteria) {
           if (!empty($this->_formValues[$caseCriteria])) {
             $allCases = TRUE;
@@ -374,7 +373,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'status_id',
       'activity_subject',
       'participant_status_id',
-      'participant_role_id'
+      'participant_role_id',
     );
     foreach ($specialParams as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
@@ -407,8 +406,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         }
       }
     }
-
-    return;
   }
 
   /**
@@ -434,4 +431,5 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
     return $defaults;
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -160,4 +160,5 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
       $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
+
 }

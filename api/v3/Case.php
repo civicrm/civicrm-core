@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 Case functions
@@ -39,7 +39,7 @@
 /**
  * Open a new case, add client and manager roles, and add standard timeline
  *
- * @param array (
+ * @param array $params
  * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -182,14 +182,13 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * Please provide one (and only one) of the four get/search parameters:
  *
- * @param array (
- * 'id' => if set, will get all available info about a case, including contacts and activities
+ * @param array $params
+ *   'id' => if set, will get all available info about a case, including contacts and activities
  *
- * // if no case_id provided, this function will use one of the following search parameters:
- * 'client_id' => finds all cases with a specific client
- * 'activity_id' => returns the case containing a specific activity
- * 'contact_id' => finds all cases associated with a contact (in any role, not just client)
- *
+ *   // if no case_id provided, this function will use one of the following search parameters:
+ *   'client_id' => finds all cases with a specific client
+ *   'activity_id' => returns the case containing a specific activity
+ *   'contact_id' => finds all cases associated with a contact (in any role, not just client)
  *
  * @throws API_Exception
  * @return array
@@ -292,14 +291,14 @@ function _civicrm_api3_case_deprecation() {
 /**
  * Update a specified case.
  *
- * @param array (
- * //REQUIRED:
- * 'case_id' => int
+ * @param array $params
+ *   //REQUIRED:
+ *   'case_id' => int
  *
- * //OPTIONAL
- * 'status_id' => int
- * 'start_date' => str datestamp
- * 'contact_id' => int // case client
+ *   //OPTIONAL
+ *   'status_id' => int
+ *   'start_date' => str datestamp
+ *   'contact_id' => int // case client
  *
  * @throws API_Exception
  * @return array
@@ -360,15 +359,15 @@ function civicrm_api3_case_update($params) {
 /**
  * Delete a specified case.
  *
- * @param array (
- * //REQUIRED:
- * 'id' => int
+ * @param array $params
+ *   //REQUIRED:
+ *   'id' => int
  *
- * //OPTIONAL
- * 'move_to_trash' => bool (defaults to false)
+ *   //OPTIONAL
+ *   'move_to_trash' => bool (defaults to false)
  *
  * @throws API_Exception
- * @return boolean
+ * @return bool
  *   true if success, else false
  */
 function civicrm_api3_case_delete($params) {

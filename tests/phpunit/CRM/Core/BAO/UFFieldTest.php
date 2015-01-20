@@ -211,4 +211,5 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
     return $ufGroup->id;
   }
+
 }

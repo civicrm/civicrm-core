@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
@@ -96,4 +96,5 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
 
     }
   }
+
 }

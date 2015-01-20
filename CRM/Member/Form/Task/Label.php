@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -63,8 +63,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
   /**
    * Set default values for the form.
-   *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -132,7 +130,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $labelRows = array();
       $memberships = civicrm_api3('membership', 'get', array(
           'id' => array('IN' => $this->_memberIds),
-          'return' => 'contact_id'
+          'return' => 'contact_id',
         ));
       foreach ($memberships['values'] as $id => $membership) {
         $labelRows[$id] = $rows[$membership['contact_id']];
@@ -145,4 +143,5 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     CRM_Contact_Form_Task_LabelCommon::createLabel($labelRows, $labelName);
     CRM_Utils_System::civiExit(1);
   }
+
 }

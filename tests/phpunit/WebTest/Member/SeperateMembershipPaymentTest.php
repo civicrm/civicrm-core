@@ -162,4 +162,5 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
   }
+
 }

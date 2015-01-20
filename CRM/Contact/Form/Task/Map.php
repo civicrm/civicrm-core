@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -242,4 +242,5 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
     $page->assign_by_ref('center', $center);
     $page->assign_by_ref('span', $span);
   }
+
 }

@@ -74,6 +74,7 @@ class API_Exception extends Exception {
       self::NOT_IMPLEMENTED => 'Entity or method is not implemented',
     );
   }
+
 }
 
 /**
@@ -122,4 +123,5 @@ class CiviCRM_API3_Exception extends Exception {
   public function getExtraParams() {
     return $this->extraParams;
   }
+
 }

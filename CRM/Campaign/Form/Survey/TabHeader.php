@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -164,8 +164,9 @@ class CRM_Campaign_Form_Survey_TabHeader {
    */
   public static function getNextTab(&$form) {
     static $next = FALSE;
-    if ($next)
+    if ($next) {
       return $next;
+    }
 
     $tabs = $form->get('tabHeader');
     if (is_array($tabs)) {
@@ -184,4 +185,5 @@ class CRM_Campaign_Form_Survey_TabHeader {
     $next = $next ? $next : 'main';
     return $next;
   }
+
 }

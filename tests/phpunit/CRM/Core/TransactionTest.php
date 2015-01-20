@@ -438,4 +438,5 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function _postRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_postRollback', $arg1, $arg2);
   }
+
 }

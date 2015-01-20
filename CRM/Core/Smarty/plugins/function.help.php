@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -46,7 +46,7 @@
  */
 function smarty_function_help($params, &$smarty) {
   if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
-    return;
+    return NULL;
   }
 
   if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {

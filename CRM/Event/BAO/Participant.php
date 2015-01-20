@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 
-*/
+ */
 
 /**
  *
@@ -113,7 +113,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
       $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
     }
 
-    $participantBAO = new CRM_Event_BAO_Participant;
+    $participantBAO = new CRM_Event_BAO_Participant();
     if (!empty($params['id'])) {
       $participantBAO->id = CRM_Utils_Array::value('id', $params);
       $participantBAO->find(TRUE);
@@ -352,7 +352,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @return bool|int|null|string
    *   1. false                 => If event having some empty spaces.
    */
-  static function eventFull(
+  public static function eventFull(
     $eventId,
     $returnEmptySeats = FALSE,
     $includeWaitingList = TRUE,
@@ -496,7 +496,7 @@ SELECT  event.event_full_text,
    * @return array
    *   an array of each option id and total count
    */
-  static function priceSetOptionsCount(
+  public static function priceSetOptionsCount(
     $eventId,
     $skipParticipantIds = array(),
     $considerCounted = TRUE,
@@ -712,11 +712,9 @@ GROUP BY  participant.event_id
       $extIdentifier = CRM_Utils_Array::value('external_identifier', $contactFields);
       if ($extIdentifier) {
         $tmpContactField['external_identifier'] = $extIdentifier;
-        $tmpContactField['external_identifier']['title'] =
-          CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
+        $tmpContactField['external_identifier']['title'] = CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
       }
-      $tmpFields['participant_contact_id']['title'] =
-        $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
+      $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
 
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
@@ -750,25 +748,28 @@ GROUP BY  participant.event_id
           'title' => 'Participant Note',
           'name' => 'participant_note',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
       $participantStatus = array(
         'participant_status' => array(
           'title' => 'Participant Status',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
       $participantRole = array(
         'participant_role' => array(
           'title' => 'Participant Role',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
       $discountFields = CRM_Core_DAO_Discount::export();
 
-      $fields = array_merge($participantFields, $participantStatus, $participantRole,  $eventFields, $noteField, $discountFields);
+      $fields = array_merge($participantFields, $participantStatus, $participantRole, $eventFields, $noteField, $discountFields);
 
       // add custom data
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
@@ -915,11 +916,11 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * Checks duplicate participants
    *
-   * @param array $duplicates
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $input
    *   An assosiative array of name /value pairs.
    *   from other function
+   * @param array $duplicates
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_BAO_Contribution
    */
@@ -1148,11 +1149,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param int $newStatusID
    * @param bool $updatePrimaryStatus
    *
-   * @return bool|void
+   * @return bool|NULL
    */
   public static function updateParticipantStatus($participantID, $oldStatusID, $newStatusID = NULL, $updatePrimaryStatus = FALSE) {
     if (!$participantID || !$oldStatusID) {
-      return;
+      return NULL;
     }
 
     if (!$newStatusID) {
@@ -1223,14 +1224,14 @@ UPDATE  civicrm_participant
    * @param bool $returnResult
    * @param bool $skipCascadeRule
    *
-   * @return array
+   * @return array|NULL
    */
-  static function transitionParticipants(
+  public static function transitionParticipants(
     $participantIds, $toStatusId,
     $fromStatusId = NULL, $returnResult = FALSE, $skipCascadeRule = FALSE
   ) {
     if (!is_array($participantIds) || empty($participantIds) || !$toStatusId) {
-      return;
+      return NULL;
     }
 
     //thumb rule is if we triggering  primary participant need to triggered additional
@@ -1461,7 +1462,7 @@ UPDATE  civicrm_participant
    *
    * @return bool
    */
-  static function sendTransitionParticipantMail(
+  public static function sendTransitionParticipantMail(
     $participantId,
     $participantValues,
     $eventDetails,
@@ -1808,14 +1809,16 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         $contributionParams['contribution']->financial_type_id, $relationTypeId);
       if (!empty($contributionParams['trxnParams']['from_financial_account_id'])) {
         $contributionParams['trxnParams']['total_amount'] = $mainAmount - $contributionParams['total_amount'];
-        $contributionParams['trxnParams']['payment_processor_id'] = $contributionParams['trxnParams']['payment_instrument_id'] =
-        $contributionParams['trxnParams']['check_number'] = $contributionParams['trxnParams']['trxn_id'] =
-        $contributionParams['trxnParams']['net_amount'] = $contributionParams['trxnParams']['fee_amount'] = NULL;
+        $contributionParams['trxnParams']['payment_processor_id'] = NULL;
+        $contributionParams['trxnParams']['payment_instrument_id'] = NULL;
+        $contributionParams['trxnParams']['check_number'] = NULL;
+        $contributionParams['trxnParams']['trxn_id'] = NULL;
+        $contributionParams['trxnParams']['net_amount'] = NULL;
+        $contributionParams['trxnParams']['fee_amount'] = NULL;
 
         CRM_Core_BAO_FinancialTrxn::create($contributionParams['trxnParams']);
       }
     }
-    return;
   }
 
   /**
@@ -2084,8 +2087,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $ftDetail = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
       // adjusted amount financial_trxn creation
       if (empty($ftDetail['trxn_id'])) {
-        $updatedContribution =
-          CRM_Contribute_BAO_Contribution::getValues(array('id' => $contributionId), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+        $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
+          array('id' => $contributionId),
+          CRM_Core_DAO::$_nullArray,
+          CRM_Core_DAO::$_nullArray
+        );
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
 
@@ -2160,11 +2166,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array('condition' => array());
@@ -2179,4 +2185,5 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
 }

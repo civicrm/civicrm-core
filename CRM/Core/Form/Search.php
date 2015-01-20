@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Base class for most search forms
@@ -122,4 +122,5 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
   }
+
 }

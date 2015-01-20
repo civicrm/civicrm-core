@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -175,4 +175,5 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     $this->assertTrue($zip->open($this->file));
     $this->assertEquals($expectedResult, CRM_Utils_Zip::guessBaseDir($zip, $expectedKey));
   }
+
 }

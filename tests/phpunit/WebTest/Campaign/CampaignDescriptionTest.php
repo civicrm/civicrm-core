@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -93,4 +93,5 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'campaign/add', 'args' => 'reset=1');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

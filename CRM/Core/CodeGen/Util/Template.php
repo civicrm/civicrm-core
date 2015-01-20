@@ -90,4 +90,5 @@ class CRM_Core_CodeGen_Util_Template {
     $this->smarty->clear_all_assign();
     $this->smarty->clear_all_cache();
   }
+
 }

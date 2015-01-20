@@ -63,4 +63,5 @@ class CRM_Batch_Form_Search extends CRM_Core_Form {
     parent::buildQuickForm();
     $this->assign('suppressForm', TRUE);
   }
+
 }

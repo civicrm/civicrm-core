@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -651,4 +651,5 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $params = array('output' => 'pdf_invoice');
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
   }
+
 }

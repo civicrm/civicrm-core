@@ -214,4 +214,5 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
     // print_r(array($prefix, 'addTests' => $addTests, 'addAllTests' => $addAllTests, 'addTestSuites' => $addTestSuites));
   }
+
 }

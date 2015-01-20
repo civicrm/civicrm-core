@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -70,6 +70,7 @@ class CRM_Cron_Action {
     require_once 'CRM/Core/BAO/ActionSchedule.php';
     CRM_Core_BAO_ActionSchedule::processQueue($now);
   }
+
 }
 
 $cron = new CRM_Cron_Action();

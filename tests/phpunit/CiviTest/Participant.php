@@ -42,4 +42,5 @@ class Participant extends PHPUnit_Framework_Testcase {
     require_once 'CRM/Event/BAO/Participant.php';
     return CRM_Event_BAO_Participant::deleteParticipant($participantId);
   }
+
 }

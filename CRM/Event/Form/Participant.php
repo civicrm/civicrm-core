@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -530,11 +530,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    list($defaults[$this->_id]['register_date'],
-      $defaults[$this->_id]['register_date_time']
-      ) = CRM_Utils_Date::setDateDefaults(
-      CRM_Utils_Array::value('register_date', $defaults[$this->_id]), 'activityDateTime'
-    );
+    list($defaults[$this->_id]['register_date'], $defaults[$this->_id]['register_date_time'])
+      = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value('register_date', $defaults[$this->_id]), 'activityDateTime');
 
     //assign event and role id, this is needed for Custom data building
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -1775,4 +1772,5 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ));
     }
   }
+
 }

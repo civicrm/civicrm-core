@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,7 +49,7 @@ class CRM_Custom_Form_CustomData {
    *
    * @return void
    */
-  static function preProcess(
+  public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
@@ -167,4 +167,5 @@ class CRM_Custom_Form_CustomData {
     $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
     CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
   }
+
 }

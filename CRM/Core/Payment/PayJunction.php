@@ -283,5 +283,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       return NULL;
     }
   }
+
 }
 // end class CRM_Core_Payment_PayJunction

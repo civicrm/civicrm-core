@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -122,4 +122,5 @@ class CRM_Badge_Page_Layout extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/admin/badgelayout';
   }
+
 }

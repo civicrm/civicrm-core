@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -66,4 +66,5 @@ interface CRM_Utils_Cache_Interface {
    * @return void
    */
   public function flush();
+
 }

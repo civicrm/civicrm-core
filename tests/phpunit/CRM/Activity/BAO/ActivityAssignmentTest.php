@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -118,4 +118,5 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(array($activity['id']));
     $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');
   }
+
 }

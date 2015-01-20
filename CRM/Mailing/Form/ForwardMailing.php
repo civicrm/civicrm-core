@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -61,7 +61,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     }
 
     /* Show the subject instead of the name here, since it's being
-         * displayed to external contacts/users */
+     * displayed to external contacts/users */
 
     CRM_Utils_System::setTitle(ts('Forward Mailing: %1', array(1 => $mailing->subject)));
 
@@ -163,4 +163,5 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     $session->pushUserContext($config->userFrameworkBaseURL);
   }
+
 }

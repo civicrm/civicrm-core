@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class proivdes various helper functions for locating extensions
@@ -393,7 +393,7 @@ class CRM_Extension_Mapper {
     $pathElm = explode(DIRECTORY_SEPARATOR, $path);
     array_pop($pathElm);
     return implode(DIRECTORY_SEPARATOR, $pathElm) . DIRECTORY_SEPARATOR . self::EXT_TEMPLATES_DIRNAME;
-    */
+     */
   }
 
   /**
@@ -419,4 +419,5 @@ class CRM_Extension_Mapper {
       $this->cache->delete($this->cacheKey . '/moduleFiles');
     }
   }
+
 }

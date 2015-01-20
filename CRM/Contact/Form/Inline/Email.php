@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -119,7 +119,6 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
         }
       }
 
-
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');
       }
@@ -168,4 +167,5 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->log();
     $this->response();
   }
+
 }

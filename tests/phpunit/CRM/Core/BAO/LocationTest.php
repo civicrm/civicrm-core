@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -50,7 +50,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
         'civicrm_loc_block',
         'civicrm_email',
         'civicrm_phone',
-        'civicrm_im'
+        'civicrm_im',
       ));
   }
 
@@ -556,4 +556,5 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //cleanup DB by deleting the contact
     Contact::delete($contactId);
   }
+
 }

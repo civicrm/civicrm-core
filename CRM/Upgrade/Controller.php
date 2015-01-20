@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -56,4 +56,5 @@ class CRM_Upgrade_Controller extends CRM_Core_Controller {
     $config = CRM_Core_Config::singleton();
     $this->addActions();
   }
+
 }

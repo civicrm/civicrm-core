@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the refresh action.
@@ -76,4 +76,5 @@ class CRM_Core_QuickForm_Action_Refresh extends CRM_Core_QuickForm_Action {
 
     return $page->handle('jump');
   }
+
 }

@@ -29,4 +29,5 @@ class CRM_Utils_TimeTest extends CiviUnitTestCase {
     $actual = CRM_Utils_Time::isEqual($timeB, $timeA, $threshold);
     $this->assertEquals($expectedResult, $actual);
   }
+
 }

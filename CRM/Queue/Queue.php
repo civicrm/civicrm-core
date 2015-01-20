@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A queue is an object (usually backed by some persistent data store)
@@ -145,4 +145,5 @@ abstract class CRM_Queue_Queue {
    *   The item returned by claimItem.
    */
   public abstract function releaseItem($item);
+
 }

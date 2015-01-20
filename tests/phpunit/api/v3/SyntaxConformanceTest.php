@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -47,12 +47,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /** This test case doesn't require DB reset */
+  /**
+   * This test case doesn't require DB reset.
+   */
   public $DBResetRequired = FALSE;
 
   protected $_entity;
 
-  /** Map custom group entities to civicrm components */
+  /**
+   * Map custom group entities to civicrm components.
+   */
   static $componentMap = array(
     'Contribution' => 'CiviContribute',
     'Membership' => 'CiviMember',
@@ -365,7 +369,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomSearch',
       'Extension',
       'ReportTemplate',
-      'System'
+      'System',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -439,7 +443,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'Setting',
       'MailingContact',
-      'SystemLog'
+      'SystemLog',
       //skip this because it doesn't make sense to update logs,
     );
     if ($sequential === TRUE) {
@@ -550,7 +554,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'installments',
           'original_installment_amount',
           'next_pay_date',
-          'amount' // can't be changed through API,
+          'amount', // can't be changed through API,
         ),
         'break_return' => array(// if these are passed in they are retrieved from the wrong table
           'honor_contact_id',
@@ -597,11 +601,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $knownFailures[$entity][$key];
   }
 
-  /** testing the _get **/
+  /* ----- testing the _get  ----- */
 
   /**
    * @dataProvider toBeSkipped_get
-  entities that don't need a get action
+   *   Entities that don't need a get action
    * @param $Entity
    */
   public function testNotImplemented_get($Entity) {
@@ -928,10 +932,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     // create entities
     $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj1->id), 'check first id');
+    $this->assertTrue(is_int($baoObj1->id), 'check first id');
     $this->deletableTestObjects[$baoString][] = $baoObj1->id;
     $baoObj2 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj2->id), 'check second id');
+    $this->assertTrue(is_int($baoObj2->id), 'check second id');
     $this->deletableTestObjects[$baoString][] = $baoObj2->id;
 
     // fetch first by ID
@@ -980,7 +984,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
   }
 
-  /** testing the _create **/
+  /* ---- testing the _create ---- */
 
   /**
    * @dataProvider toBeSkipped_create
@@ -1177,11 +1181,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           if (isset($specs['pseudoconstant']['optionGroupName'])) {
             $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(
                 'name' => 'pdf_format',
-                'return' => 'id'
+                'return' => 'id',
               ));
             $optionValue = $this->callAPISuccess('option_value', 'create', array(
                 'option_group_id' => $optionGroupID,
-                'label' => 'new option value'
+                'label' => 'new option value',
               ));
             $options['values'][] = $optionValue['id'];
           }
@@ -1214,7 +1218,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             'update-result' => $update,
             'getsingle-params' => $checkParams,
             'getsingle-result' => $checkEntity,
-            'expected entity' => $entity
+            'expected entity' => $entity,
           ), TRUE));
       if ($resetFKTo) {
         //reset the foreign key fields because otherwise our cleanup routine fails & some other unexpected stuff can kick in
@@ -1230,9 +1234,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoObj->free();
   }
 
-  /** testing the _getFields **/
+  /* ---- testing the _getFields ---- */
 
-  /** testing the _delete **/
+  /* ---- testing the _delete ---- */
 
   /**
    * @dataProvider toBeSkipped_delete
@@ -1403,7 +1407,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     while ($i < $count) {
       // create entities
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-      $this->assertTrue(is_integer($baoObj->id), 'check first id');
+      $this->assertTrue(is_int($baoObj->id), 'check first id');
       $this->deletableTestObjects[$baoString][] = $baoObj->id;
       $baos[] = $baoObj;
       $i++;
@@ -1557,4 +1561,5 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       1 => array($eventId, 'Integer'),
     ));
   }
+
 }

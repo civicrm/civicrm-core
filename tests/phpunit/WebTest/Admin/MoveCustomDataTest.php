@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -491,4 +491,5 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
     //assert success
     $this->waitForText('crm-notification-container', "has been updated");
   }
+
 }

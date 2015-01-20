@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -111,4 +111,5 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $this->set('searchParams', $this->_searchParams);
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
+
 }

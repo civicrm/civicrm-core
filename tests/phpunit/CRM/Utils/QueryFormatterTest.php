@@ -210,4 +210,5 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     $actualText = $formatter->format($text, $language);
     $this->assertEquals($expectedText, $actualText);
   }
+
 }

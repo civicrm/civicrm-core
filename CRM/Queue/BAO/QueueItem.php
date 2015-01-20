@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -63,4 +63,5 @@ class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
     $foundName = CRM_Core_DAO::singleValueQuery($checkTableSql);
     return ($foundName == 'civicrm_queue_item');
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -196,11 +196,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       //CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id' );
       // FIX ME: duplicate rule?
       /*
-            $this->addRule( 'label',
-                            ts('Duplicate option label.'),
-                            'optionExists',
-                            array( 'CRM_Core_DAO_OptionValue', $this->_oid, $this->_ogId, 'label' ) );
-            */
+      $this->addRule( 'label',
+      ts('Duplicate option label.'),
+      'optionExists',
+      array( 'CRM_Core_DAO_OptionValue', $this->_oid, $this->_ogId, 'label' ) );
+       */
 
       // value
       $this->add('text', 'amount', ts('Option Amount'), NULL, TRUE);
@@ -320,4 +320,5 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", array(1 => $params['label'])), ts('Value Saved'), 'success');
     }
   }
+
 }

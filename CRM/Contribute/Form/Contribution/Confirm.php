@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -89,22 +89,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'source' =>
-        (!$online || !empty($params['source'])) ?
-          CRM_Utils_Array::value('source', $params) :
-          CRM_Utils_Array::value('description', $params),
+      'source' => (!$online || !empty($params['source'])) ? CRM_Utils_Array::value('source', $params) : CRM_Utils_Array::value('description', $params),
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
       'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
-      'cancel_date' =>
-        isset($params['cancel_date']) ?
-          CRM_Utils_Date::format($params['cancel_date']) :
-          NULL,
-      'thankyou_date' =>
-        isset($params['thankyou_date']) ?
-          CRM_Utils_Date::format($params['thankyou_date']) :
-          NULL,
+      'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
+      'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
       'campaign_id' => $campaignId,
       'is_test' => $isTest,
       'address_id' => $addressID,
@@ -1229,7 +1220,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws Exception
    * @return CRM_Contribute_DAO_Contribution
    */
-  static function processContribution(
+  public static function processContribution(
     &$form,
     $params,
     $result,
@@ -1416,7 +1407,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'actual_amount' => $scheduledAmount,
           );
 
-
           CRM_Pledge_BAO_PledgePayment::add($pledgePaymentParams);
         }
 
@@ -1504,7 +1494,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       CRM_Core_BAO_Note::add($noteParams, array());
     }
-
 
     if (isset($params['related_contact'])) {
       $contactID = $params['related_contact'];
@@ -2001,4 +1990,5 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     return $params;
   }
+
 }

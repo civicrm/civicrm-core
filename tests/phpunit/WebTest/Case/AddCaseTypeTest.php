@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -143,4 +143,5 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     $this->verifyText("xpath=//table/tbody//tr/td[contains(text(),'$editCaseTypeLabel')]", $editCaseTypeLabel);
   }
+
 }

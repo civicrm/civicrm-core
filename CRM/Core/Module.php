@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A module is any software package that participates in the hook
@@ -72,4 +72,5 @@ class CRM_Core_Module {
     }
     return $result;
   }
+
 }

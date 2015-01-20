@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -58,10 +58,11 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
   /**
    * Get action Links
    *
-   * @return array
+   * @return array|NULL
    *   (reference) of action links
    */
   public function &links() {
+    return NULL;
   }
 
   /**
@@ -109,4 +110,5 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
   }
+
 }

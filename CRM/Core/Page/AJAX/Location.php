@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -229,13 +229,13 @@ class CRM_Core_Page_AJAX_Location {
     foreach ($addressOptions as $element => $isSet) {
       if ($isSet && (!in_array($element, array(
           'im',
-          'openid'
+          'openid',
         )))
       ) {
         if (in_array($element, array(
           'country',
           'state_province',
-          'county'
+          'county',
         ))) {
           $element .= '_id';
         }
@@ -248,7 +248,7 @@ class CRM_Core_Page_AJAX_Location {
         $result[str_replace(array(
           '][',
           '[',
-          "]"
+          "]",
         ), array('_', '_', ''), $fld)] = $value;
       }
     }
@@ -256,7 +256,7 @@ class CRM_Core_Page_AJAX_Location {
     foreach (array(
                'email',
                'phone_type_id',
-               'phone'
+               'phone',
              ) as $element) {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
@@ -266,7 +266,7 @@ class CRM_Core_Page_AJAX_Location {
         $result[str_replace(array(
           '][',
           '[',
-          "]"
+          "]",
         ), array('_', '_', ''), $fld)] = $value;
       }
     }
@@ -276,4 +276,5 @@ class CRM_Core_Page_AJAX_Location {
 
     CRM_Utils_JSON::output($result);
   }
+
 }

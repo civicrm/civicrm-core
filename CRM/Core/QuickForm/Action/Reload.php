@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Define the reload action. Reload the page but do not do any validation.
@@ -70,4 +70,5 @@ class CRM_Core_QuickForm_Action_Reload extends CRM_Core_QuickForm_Action {
 
     return $page->handle('display');
   }
+
 }

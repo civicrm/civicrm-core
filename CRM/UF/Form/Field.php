@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -111,7 +111,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         array(
           'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
-        )
+        ),
       );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
@@ -294,8 +294,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaultLocation = $this->_location_types[$defaultLocationType->id];
       unset($this->_location_types[$defaultLocationType->id]);
       $this->_location_types = array(
-          $defaultLocationType->id => $defaultLocation,
-        ) + $this->_location_types;
+        $defaultLocationType->id => $defaultLocation,
+      ) + $this->_location_types;
     }
 
     $this->_location_types = array('Primary') + $this->_location_types;
@@ -615,18 +615,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule for subtype.
    *
-   * @param array $groupType
-   *   Contains all groupTypes.
-   *
    * @param string $fieldType
    *   Type of field.
-   *
+   * @param array $groupType
+   *   Contains all groupTypes.
    * @param array $errors
-   *
-   * @return array
-   *   list of errors to be posted back to the form
+   *   List of errors to be posted back to the form.
    */
-  public static function formRuleSubType($fieldType, $groupType, $errors) {
+  public static function formRuleSubType($fieldType, $groupType, &$errors) {
     if (in_array($fieldType, array(
       'Participant',
       'Contribution',
@@ -1015,4 +1011,5 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     return empty($errors) ? TRUE : $errors;
   }
+
 }

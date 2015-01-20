@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -272,14 +272,14 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   }
 
   /* Retrieve the session values from the cache and populate the $_SESSION array
-     *
-     * @param array $names
-     *   Array of session values that should be persisted.
-     *                     This is either a form name + qfKey or just a form name
-     *                     (in the case of profile)
-     *
-     * @return void
-     */
+   *
+   * @param array $names
+   *   Array of session values that should be persisted.
+   *                     This is either a form name + qfKey or just a form name
+   *                     (in the case of profile)
+   *
+   * @return void
+   */
 
   /**
    * @param string $names
@@ -394,4 +394,5 @@ AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
       CRM_Core_DAO::executeQuery($sql);
     }
   }
+
 }

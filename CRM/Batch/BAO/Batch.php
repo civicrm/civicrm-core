@@ -299,8 +299,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $newLinks = array();
       }
       elseif ($params['context'] == 'financialBatch') {
-        $values['check'] =
-          "<input type='checkbox' id='check_" .
+        $values['check'] = "<input type='checkbox' id='check_" .
           $object->id .
           "' name='check_" .
           $object->id .
@@ -673,34 +672,33 @@ LEFT JOIN civicrm_contact contact_a ON contact_a.id = civicrm_contribution.conta
 LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id
 ";
 
-    $searchFields =
-      array(
-        'sort_name',
-        'financial_type_id',
-        'contribution_page_id',
-        'contribution_payment_instrument_id',
-        'contribution_transaction_id',
-        'contribution_source',
-        'contribution_currency_type',
-        'contribution_pay_later',
-        'contribution_recurring',
-        'contribution_test',
-        'contribution_thankyou_date_is_not_null',
-        'contribution_receipt_date_is_not_null',
-        'contribution_pcp_made_through_id',
-        'contribution_pcp_display_in_roll',
-        'contribution_date_relative',
-        'contribution_amount_low',
-        'contribution_amount_high',
-        'contribution_in_honor_of',
-        'contact_tags',
-        'group',
-        'contribution_date_relative',
-        'contribution_date_high',
-        'contribution_date_low',
-        'contribution_check_number',
-        'contribution_status_id',
-      );
+    $searchFields = array(
+      'sort_name',
+      'financial_type_id',
+      'contribution_page_id',
+      'contribution_payment_instrument_id',
+      'contribution_transaction_id',
+      'contribution_source',
+      'contribution_currency_type',
+      'contribution_pay_later',
+      'contribution_recurring',
+      'contribution_test',
+      'contribution_thankyou_date_is_not_null',
+      'contribution_receipt_date_is_not_null',
+      'contribution_pcp_made_through_id',
+      'contribution_pcp_display_in_roll',
+      'contribution_date_relative',
+      'contribution_amount_low',
+      'contribution_amount_high',
+      'contribution_in_honor_of',
+      'contact_tags',
+      'group',
+      'contribution_date_relative',
+      'contribution_date_high',
+      'contribution_date_low',
+      'contribution_check_number',
+      'contribution_status_id',
+    );
     $values = array();
     foreach ($searchFields as $field) {
       if (isset($params[$field])) {
@@ -812,4 +810,5 @@ WHERE  {$where}
     }
     return $batches;
   }
+
 }

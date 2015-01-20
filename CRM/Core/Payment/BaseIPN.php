@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -86,7 +86,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Boolean Return FALSE if the relevant objects don't exist.
    * @param int $paymentProcessorID
    *   Id of the payment processor ID in use.
-   * @return boolean
+   * @return bool
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
@@ -135,7 +135,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param int $paymentProcessorID
    * @param array $error_handling
    *
-   * @return boolean
+   * @return bool
    */
   public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
@@ -167,7 +167,7 @@ class CRM_Core_Payment_BaseIPN {
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
       if (!empty($error_handling['echo_error'])) {
-        echo($e->getMessage());
+        echo $e->getMessage();
       }
       if (!empty($error_handling['return_error'])) {
         return array(
@@ -185,7 +185,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    * @param object $transaction
    * @param array $input
-   * @return boolean
+   * @return bool
    */
   public function failed(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
@@ -206,7 +206,7 @@ class CRM_Core_Payment_BaseIPN {
     //CRM-15546
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
-        'flip' => 1
+        'flip' => 1,
       ));
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
@@ -231,7 +231,7 @@ class CRM_Core_Payment_BaseIPN {
         // if transaction is failed then set "Cancelled" as membership status
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
             'labelColumn' => 'name',
-            'flip' => 1
+            'flip' => 1,
           ));
         foreach ($memberships as $membership) {
           if ($membership) {
@@ -248,7 +248,7 @@ class CRM_Core_Payment_BaseIPN {
       if ($participant) {
         $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
             'labelColumn' => 'name',
-            'flip' => 1
+            'flip' => 1,
           ));
         $participant->status_id = $participantStatuses['Cancelled'];
         $participant->save();
@@ -265,7 +265,7 @@ class CRM_Core_Payment_BaseIPN {
    * Handled pending contribution status
    * @param array $objects
    * @param object $transaction
-   * @return boolean
+   * @return bool
    */
   public function pending(&$objects, &$transaction) {
     $transaction->commit();
@@ -295,7 +295,7 @@ class CRM_Core_Payment_BaseIPN {
     }
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
-        'flip' => 1
+        'flip' => 1,
       ));
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
     $contribution->cancel_date = self::$_now;
@@ -321,7 +321,7 @@ class CRM_Core_Payment_BaseIPN {
       if (!empty($memberships)) {
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
             'labelColumn' => 'name',
-            'flip' => 1
+            'flip' => 1,
           ));
         foreach ($memberships as $membership) {
           if ($membership) {
@@ -338,7 +338,7 @@ class CRM_Core_Payment_BaseIPN {
       if ($participant) {
         $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
             'labelColumn' => 'name',
-            'flip' => 1
+            'flip' => 1,
           ));
         $participant->status_id = $participantStatuses['Cancelled'];
         $participant->save();
@@ -429,7 +429,7 @@ FROM      civicrm_membership_log
 WHERE     membership_id=$membership->id
 ORDER BY  id DESC
 LIMIT 1;";
-            $dao = new CRM_Core_DAO;
+            $dao = new CRM_Core_DAO();
             $dao->query($sql);
             if ($dao->fetch()) {
               if (!empty($dao->membership_type_id)) {
@@ -558,7 +558,7 @@ LIMIT 1;";
       if (empty($input['skipComponentSync'])) {
         $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
             'labelColumn' => 'name',
-            'flip' => 1
+            'flip' => 1,
           ));
         $participant->status_id = $participantStatuses['Registered'];
       }
@@ -576,7 +576,7 @@ LIMIT 1;";
     }
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
-        'flip' => 1
+        'flip' => 1,
       ));
     $contribution->contribution_status_id = $contributionStatuses['Completed'];
     $contribution->is_test = $input['is_test'];
@@ -642,7 +642,7 @@ LIMIT 1;";
     if ($contribution->id) {
       $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
           'labelColumn' => 'name',
-          'flip' => 1
+          'flip' => 1,
         ));
       if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later && $input['prevContribution']->contribution_status_id == $contributionStatuses['Pending'])) {
         $input['payment_processor'] = $paymentProcessorId;
@@ -792,7 +792,7 @@ LIMIT 1;";
    * it is unclear whether it is a function on the way in or on the way out
    *
    * @param array $params
-   * @return void|int
+   * @return void|NULL|int
    */
   public function updateContributionStatus(&$params) {
     // get minimum required values.
@@ -802,7 +802,7 @@ LIMIT 1;";
     $contributionId = CRM_Utils_Array::value('contribution_id', $params);
 
     if (!$contributionId || !$componentId || !$componentName || !$statusId) {
-      return;
+      return NULL;
     }
 
     $input = $ids = $objects = array();
@@ -852,7 +852,7 @@ LIMIT 1;";
 
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
-        'flip' => 1
+        'flip' => 1,
       ));
     $input['skipComponentSync'] = CRM_Utils_Array::value('skipComponentSync', $params);
     if ($statusId == $contributionStatuses['Cancelled']) {
@@ -876,7 +876,7 @@ LIMIT 1;";
     foreach (array(
                'fee_amount',
                'check_number',
-               'payment_instrument_id'
+               'payment_instrument_id',
              ) as $field) {
       if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
         $input[$field] = $contribution->$field;
@@ -1000,7 +1000,7 @@ LIMIT 1;";
           try {
             civicrm_api3('membership_payment', 'create', array(
                 'membership_id' => $value['entity_id'],
-                'contribution_id' => $contribution->id
+                'contribution_id' => $contribution->id,
               ));
           }
           catch (CiviCRM_API3_Exception $e) {
@@ -1080,4 +1080,5 @@ LIMIT 1;";
       $soft_contribution->save();
     }
   }
+
 }

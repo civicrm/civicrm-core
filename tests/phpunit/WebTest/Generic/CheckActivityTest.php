@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -82,4 +82,5 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     // ...again, waiting for the box with contact name to show up...
     $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$contactFirstName2");
   }
+
 }

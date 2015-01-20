@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -490,4 +490,5 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     }
     return $returnGroupTypes;
   }
+
 }

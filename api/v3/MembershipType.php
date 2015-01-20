@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 membership type functions
@@ -100,7 +100,7 @@ function civicrm_api3_membership_type_get($params) {
  *
  * @param array $params
  *
- * @return boolean
+ * @return bool
  *   true if success, else false
  */
 function civicrm_api3_membership_type_delete($params) {

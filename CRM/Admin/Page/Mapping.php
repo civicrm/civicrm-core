@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -146,4 +146,5 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
     $sort = 'mapping_type asc';
     return parent::run($sort);
   }
+
 }

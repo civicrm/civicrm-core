@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -377,4 +377,5 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
     return parent::getTemplateFileName();
   }
+
 }

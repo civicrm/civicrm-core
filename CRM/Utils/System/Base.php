@@ -401,4 +401,5 @@ abstract class CRM_Utils_System_Base {
    */
   public function appendCoreResources(&$list) {
   }
+
 }

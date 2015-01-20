@@ -132,4 +132,5 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       CRM_Batch_BAO_Batch::closeReOpen($batchIds, $_POST['batch_update']);
     }
   }
+
 }

@@ -720,4 +720,5 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     return $defaults;
   }
+
 }

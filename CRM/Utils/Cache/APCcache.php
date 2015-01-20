@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -110,9 +110,11 @@ class CRM_Utils_Cache_APCcache {
 
     foreach ($keys as $key) {
       $name = $key['info'];
-      if ($prefix == substr($name, 0, $lp)) {  // Ours?
+      if ($prefix == substr($name, 0, $lp)) {
+        // Ours?
         apc_delete($this->_prefix . $name);
       }
     }
   }
+
 }

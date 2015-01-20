@@ -85,4 +85,5 @@ class CRM_Core_TemporaryErrorScope {
     $GLOBALS['_PEAR_default_error_options'] = $frame['_PEAR_default_error_options'];
     CRM_Core_Error::$modeException = $frame['modeException'];
   }
+
 }

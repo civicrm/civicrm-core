@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CRM/Core/Page.php';
@@ -79,4 +79,5 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
       parent::run();
     }
   }
+
 }

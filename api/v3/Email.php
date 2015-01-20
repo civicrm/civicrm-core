@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 email functions
@@ -46,7 +46,6 @@
  *
  * @return array
  *   API result array
- * {@getfields email_create}
  */
 function civicrm_api3_email_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,9 +72,8 @@ function _civicrm_api3_email_create_spec(&$params) {
  *
  * @example EmailDelete.php Standard Delete Example
  *
- * @return boolean
+ * @return bool
  *   | error  true if successfull, error otherwise
- * {@getfields email_delete}
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -84,17 +82,11 @@ function civicrm_api3_email_delete($params) {
 /**
  * Retrieve one or more emails
  *
- * @param array input parameters
- *
- *
- * @example EmailGet.php Standard Get Example
- *
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
  *   api result array
- * {@getfields email_get}
  */
 function civicrm_api3_email_get($params) {
 

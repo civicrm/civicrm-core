@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -81,7 +81,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       if (in_array($this->_values['name'], array(
         'encounter_medium',
         'case_type',
-        'case_status'
+        'case_status',
       ))) {
         static $caseCount = NULL;
         if (!isset($caseCount)) {
@@ -128,4 +128,5 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', array(1 => $optionGroup->name)), ts('Saved'), 'success');
     }
   }
+
 }

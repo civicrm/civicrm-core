@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
@@ -262,6 +262,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_
+
+  /**
+   * Create an contribution_id=FALSE and financial_type_id=Donation.
+   */
   public function testCreateEmptyContributionIDUseDonation() {
     $params = array(
       'contribution_id' => FALSE,
@@ -342,11 +346,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(0, $lineItems['count']);
   }
 
-  /*
+  /**
    * Test checks that passing in line items suppresses the create mechanism
    */
   public function testCreateContributionChainedLineItems() {
-
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -460,9 +463,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
-    $contribution = $this->callAPISuccess('contribution', 'get',array('sequential' => 1, 'payment_instrument' => 'Cash'));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('sequential' => 1, 'payment_instrument' => 'Cash'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
+    $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'sequential' => 1,
@@ -717,7 +720,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contributionId);
   }
 
-  /*
+  /**
    * Function tests that additional financial records are created when fee amount is recorded
    */
   public function testCreateContributionWithFee() {
@@ -856,7 +859,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
-  /*
+  /**
    * Function tests that additional financial records are created when online contribution with pending option
    * is created
    */
@@ -901,7 +904,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('Check', $contribution['payment_instrument']);
   }
 
-  /*
+  /**
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
   public function testCreateUpdateContributionChangeTotal() {
@@ -940,7 +943,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('125.00', $fitemAmount);
   }
 
-  /*
+  /**
    * Function tests that line items, financial records are updated when pay later contribution is received
    */
   public function testCreateUpdateContributionPayLater() {
@@ -968,7 +971,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialTrxn($contribution, 'payLater');
   }
 
-  /*
+  /**
    * Function tests that financial records are updated when Payment Instrument is changed
    */
   public function testCreateUpdateContributionPaymentInstrument() {
@@ -993,7 +996,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
   }
 
-  /*
+  /**
    * Function tests that financial records are added when Contribution is Refunded
    */
   public function testCreateUpdateContributionRefund() {
@@ -1018,7 +1021,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialItem($contribution['id'], 'refund');
   }
 
-  /*
+  /**
    * Function tests invalid contribution status change
    */
   public function testCreateUpdateContributionInValidStatusChange() {
@@ -1040,7 +1043,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   }
 
-  /*
+  /**
    * Function tests that financial records are added when Pending Contribution is Canceled
    */
   public function testCreateUpdateContributionCancelPending() {
@@ -1065,7 +1068,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
   }
 
-  /*
+  /**
    * Function tests that financial records are added when Financial Type is Changed
    */
   public function testCreateUpdateContributionChangeFinancialType() {
@@ -1101,8 +1104,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $contribution['contribution_status_id']);
   }
-  //To Update Contribution
-  //CHANGE: we require the API to do an incremental update
+
+  /**
+   * To Update Contribution
+   * CHANGE: we require the API to do an incremental update
+   */
   public function testCreateUpdateContribution() {
 
     $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
@@ -1171,6 +1177,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_contribution_delete methods
+
+  /**
+   * Attempt (but fail) to delete a contribution without parameters.
+   */
   public function testDeleteEmptyParamsContribution() {
     $params = array();
     $this->callAPIFailure('contribution', 'delete', $params);
@@ -1620,7 +1630,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return null|string
    */
-  function _getFinancialTrxnAmount($contId) {
+  public function _getFinancialTrxnAmount($contId) {
     $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -1637,7 +1647,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return null|string
    */
-  function _getFinancialItemAmount($contId) {
+  public function _getFinancialItemAmount($contId) {
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $query = "SELECT
      SUM(amount)
@@ -1909,4 +1919,5 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
     }
   }
+
 }

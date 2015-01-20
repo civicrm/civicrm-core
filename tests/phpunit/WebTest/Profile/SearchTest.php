@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -247,4 +247,5 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
+
 }

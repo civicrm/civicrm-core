@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -71,7 +71,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    *
    * @return void
    */
-
   public function buildQuickForm() {
     $this->addButtons(array(
         array(
@@ -103,4 +102,5 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
     }
   }
+
 }

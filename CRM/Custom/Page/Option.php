@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -323,4 +323,5 @@ ORDER BY weight, label
     // Call the parents run method
     return parent::run();
   }
+
 }

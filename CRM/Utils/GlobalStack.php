@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Temporarily change a global variable.
@@ -111,4 +111,5 @@ class CRM_Utils_GlobalStack {
       }
     }
   }
+
 }

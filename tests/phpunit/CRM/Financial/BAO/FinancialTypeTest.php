@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -120,4 +120,5 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
+
 }

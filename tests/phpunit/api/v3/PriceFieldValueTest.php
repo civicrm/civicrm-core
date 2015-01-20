@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -203,4 +203,5 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));
   }
+
 }

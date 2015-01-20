@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -63,4 +63,5 @@ class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
 
     $this->assertEquals($addressOptions['county'], 1, 'County was set but did not stick in db');
   }
+
 }

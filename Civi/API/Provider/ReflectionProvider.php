@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Provider;
 
@@ -149,4 +149,5 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     $entity = _civicrm_api_get_camel_name($entity, $version);
     return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -300,4 +300,5 @@ class CRM_Utils_Check_Security {
     list ($ignore, $heuristicSuffix) = explode($filePathMarker, str_replace('\\', '/', $targetDir));
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
+
 }

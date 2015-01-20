@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Parse Javascript content and extract translatable strings.
@@ -64,4 +64,5 @@ class CRM_Utils_JS {
     }
     return array_values($strings);
   }
+
 }

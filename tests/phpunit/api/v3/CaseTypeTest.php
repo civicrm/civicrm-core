@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviCaseTestCase.php';
 
@@ -227,4 +227,5 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $getCaseType = $this->callAPISuccess('CaseType', 'get', array('id' => $createCaseType['id']));
     $this->assertEquals(0, $getCaseType['count']);
   }
+
 }

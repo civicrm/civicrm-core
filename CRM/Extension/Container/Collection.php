@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
@@ -170,4 +170,5 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     }
     return $k2c;
   }
+
 }

@@ -173,4 +173,5 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals('second multi value 3', $result['values'][$firstCustomField][4]);
     $this->assertEquals('second multi value 3', $result['values'][$firstCustomField]['latest']);
   }
+
 }

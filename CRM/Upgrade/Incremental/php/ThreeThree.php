@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -416,4 +416,5 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->assign('alterContactDashboard', $alterContactDashboard);
     $upgrade->processSQL($rev);
   }
+
 }

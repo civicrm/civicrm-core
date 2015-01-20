@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -113,4 +113,5 @@ class CRM_Core_Payment_ProcessorForm {
     }
     CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater));
   }
+
 }

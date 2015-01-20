@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -608,4 +608,5 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }

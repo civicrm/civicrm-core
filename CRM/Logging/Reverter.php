@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -116,7 +116,7 @@ class CRM_Logging_Reverter {
         // DAO-based tables
 
         case in_array($table, array_keys($daos)):
-          $dao = new $daos[$table];
+          $dao = new $daos[$table]();
           foreach ($row as $id => $changes) {
             $dao->id = $id;
             foreach ($changes as $field => $value) {
@@ -189,7 +189,7 @@ class CRM_Logging_Reverter {
         return;
       }
 
-      $dao = new CRM_Contact_DAO_Contact;
+      $dao = new CRM_Contact_DAO_Contact();
       $dao->id = $cid;
       if ($dao->find(TRUE)) {
         // CRM-8102: MySQL can’t parse its own dates
@@ -199,4 +199,5 @@ class CRM_Logging_Reverter {
       }
     }
   }
+
 }

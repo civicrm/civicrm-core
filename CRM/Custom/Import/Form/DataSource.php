@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -211,4 +211,5 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   public function getTitle() {
     return ts('Upload Data');
   }
+
 }

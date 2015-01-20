@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -178,7 +178,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'attributes' => array(
           'multiple' => TRUE,
           'create' => TRUE,
-          'api' => array('params' => array('is_deceased' => 0))
+          'api' => array('params' => array('is_deceased' => 0)),
         ),
       ),
       'followup_assignee_contact_id' => array(
@@ -187,7 +187,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'attributes' => array(
           'multiple' => TRUE,
           'create' => TRUE,
-          'api' => array('params' => array('is_deceased' => 0))
+          'api' => array('params' => array('is_deceased' => 0)),
         ),
       ),
       'followup_activity_type_id' => array(
@@ -484,8 +484,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // figure out the file name for activity type, if any
     if ($this->_activityTypeId &&
-      $this->_activityTypeFile =
-        CRM_Activity_BAO_Activity::getFileForActivityTypeId($this->_activityTypeId, $this->_crmDir)
+      $this->_activityTypeFile = CRM_Activity_BAO_Activity::getFileForActivityTypeId($this->_activityTypeId, $this->_crmDir)
     ) {
       $this->assign('activityTypeFile', $this->_activityTypeFile);
       $this->assign('crmDir', $this->_crmDir);
@@ -566,8 +565,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $defaults['source_contact_id'] = $this->_sourceContactId;
       $defaults['target_contact_id'] = $this->_targetContactId;
 
-      list($defaults['activity_date_time'], $defaults['activity_date_time_time']) =
-        CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      list($defaults['activity_date_time'], $defaults['activity_date_time_time'])
+        = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
     }
 
     if ($this->_activityTypeId) {
@@ -889,7 +888,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Core_BAO_EntityTag::del($tagParams);
 
       CRM_Core_Session::setStatus(ts("Selected Activity has been deleted successfully."), ts('Record Deleted'), 'success');
-      return;
+      return NULL;
     }
 
     // store the submitted values in an array
@@ -1008,7 +1007,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param array $params
    *   Associated array of submitted values.
    *
-   * @return $this|null|object
+   * @return self|null|object
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
@@ -1197,4 +1196,5 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $className::endPostProcess($this, $params, $activity);
     }
   }
+
 }

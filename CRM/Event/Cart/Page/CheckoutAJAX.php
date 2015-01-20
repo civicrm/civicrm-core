@@ -52,4 +52,5 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
 
     CRM_Utils_System::civiExit();
   }
+
 }

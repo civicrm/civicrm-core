@@ -39,4 +39,5 @@ EOS;
     }
     return $smarty_sessions;
   }
+
 }

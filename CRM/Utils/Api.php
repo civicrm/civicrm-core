@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Utils_Api
@@ -80,4 +80,5 @@ class CRM_Utils_Api {
     }
     return _civicrm_api_get_entity_name_from_camel($shortName);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,4 +49,5 @@ class CRM_UF_Page_AJAX {
     $isMultiple = array('is_multi' => $isMultiple);
     CRM_Utils_JSON::output($isMultiple);
   }
+
 }

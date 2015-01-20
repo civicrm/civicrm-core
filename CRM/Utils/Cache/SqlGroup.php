@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -135,4 +135,5 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function prefetch() {
     $this->frontCache = CRM_Core_BAO_Cache::getItems($this->group, $this->componentID);
   }
+
 }

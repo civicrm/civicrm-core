@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -170,4 +170,5 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'id', $isActive, 'Check DB for is_Active value'
     );
   }
+
 }

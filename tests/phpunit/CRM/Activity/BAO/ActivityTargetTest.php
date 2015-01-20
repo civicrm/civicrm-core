@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -67,4 +67,5 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
     $this->assertEquals(count($targetIDs), 1, 'One target ID match for activity');
     $this->assertEquals($targetIDs[0], $activity['target_contact_id'], 'The returned target contacts ids match');
   }
+
 }

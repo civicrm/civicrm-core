@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Describe the runtime environment in which a queue task executes
@@ -39,4 +39,5 @@ class CRM_Queue_TaskContext {
    * @var Log
    */
   public $log;
+
 }

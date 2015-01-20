@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -78,4 +78,5 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent($postalCode), 'In line ' . __LINE__);
     $this->assertTrue($this->isElementPresent("//div[@id='profilewrap1']/div[@id='crm-container']/div/div[7]/div[2][contains(text(), 'AR')]"));
   }
+
 }

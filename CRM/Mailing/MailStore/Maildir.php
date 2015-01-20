@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -144,4 +144,5 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
       throw new Exception("Could not rename $file to $target");
     }
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -345,4 +345,5 @@ contact_a.sort_name    as sort_name,
   public function setTitle($title) {
     CRM_Utils_System::setTitle($title);
   }
+
 }

@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -68,7 +68,7 @@ class CRM_Member_Import_Form_DataSource extends CRM_Core_Form {
     $this->setMaxFileSize($uploadFileSize);
     $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
           1 => $uploadSize,
-          2 => $uploadFileSize
+          2 => $uploadFileSize,
         )), 'maxfilesize', $uploadFileSize);
     $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
@@ -195,4 +195,5 @@ class CRM_Member_Import_Form_DataSource extends CRM_Core_Form {
   public function getTitle() {
     return ts('Upload Data');
   }
+
 }

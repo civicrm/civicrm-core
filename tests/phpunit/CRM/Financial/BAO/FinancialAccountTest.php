@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -139,4 +139,5 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
     $this->assertEquals($accountingCode, 4800, 'Verify accounting code.');
   }
+
 }

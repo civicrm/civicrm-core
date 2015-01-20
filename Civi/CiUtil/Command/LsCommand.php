@@ -9,4 +9,5 @@ class LsCommand {
       printf("%s %s %s\n", $test['file'], $test['class'], $test['method']);
     }
   }
+
 }

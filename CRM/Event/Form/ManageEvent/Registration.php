@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -183,19 +183,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $defaults['approval_req_text'] = CRM_Utils_Array::value('approval_req_text', $defaults, ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.'));
 
     if (!empty($defaults['registration_start_date'])) {
-      list($defaults['registration_start_date'],
-        $defaults['registration_start_date_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['registration_start_date'],
-        'activityDateTime'
-      );
+      list($defaults['registration_start_date'], $defaults['registration_start_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['registration_start_date'], 'activityDateTime');
     }
 
     if (!empty($defaults['registration_end_date'])) {
-      list($defaults['registration_end_date'],
-        $defaults['registration_end_date_time']
-        ) = CRM_Utils_Date::setDateDefaults($defaults['registration_end_date'],
-        'activityDateTime'
-      );
+      list($defaults['registration_end_date'], $defaults['registration_end_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['registration_end_date'], 'activityDateTime');
     }
 
     return $defaults;
@@ -1024,4 +1018,5 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   public function getTitle() {
     return ts('Online Registration');
   }
+
 }
