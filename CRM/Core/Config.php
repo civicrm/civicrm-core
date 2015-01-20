@@ -211,7 +211,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       self::$_singleton = $cache->get('CRM_Core_Config' . CRM_Core_Config::domainID());
       // if not in cache, fire off config construction
       if (!self::$_singleton) {
-        self::$_singleton = new CRM_Core_Config;
+        self::$_singleton = new CRM_Core_Config();
         self::$_singleton->_initialize($loadFromDB);
 
         //initialize variables. for gencode we cannot load from the
@@ -358,8 +358,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // also make sure we create the config directory within this directory
       // the below statement will create both the templates directory and the config and log directory
-      $this->configAndLogDir =
-        CRM_Utils_File::baseFilePath($this->templateCompileDir) .
+      $this->configAndLogDir
+        = CRM_Utils_File::baseFilePath($this->templateCompileDir) .
         'ConfigAndLog' . DIRECTORY_SEPARATOR;
       CRM_Utils_File::createDir($this->configAndLogDir);
       CRM_Utils_File::restrictAccess($this->configAndLogDir);
@@ -658,7 +658,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
                $this->templateCompileDir,
                $this->uploadDir,
                $this->configAndLogDir,
-               $this->customFileUploadDir
+               $this->customFileUploadDir,
              ) as $dir) {
       if ($dir && is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
@@ -669,10 +669,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * Verify that the needed parameters are not null in the config
    *
-   * @param CRM_Core_Config (reference ) the system config object
-   * @param array (reference ) the parameters that need a value
+   * @param CRM_Core_Config $config (reference) the system config object
+   * @param array $required (reference) the parameters that need a value
    *
-   * @return boolean
+   * @return bool
    */
   public static function check(&$config, &$required) {
     foreach ($required as $name) {

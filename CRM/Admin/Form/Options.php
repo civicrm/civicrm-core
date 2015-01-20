@@ -95,7 +95,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         $scriptURL = "<a href='" . CRM_Utils_System::docURL2('Update Greetings and Address Data for Contacts', TRUE, NULL, NULL, NULL, "wiki") . "'>" . ts('Learn more about a script that can automatically update contact addressee and greeting options.') . "</a>";
         CRM_Core_Session::setStatus(ts('The selected %1 option has <strong>not been deleted</strong> because it is currently in use. Please update these contacts to use a different format before deleting this option. %2', array(
               1 => $this->_gLabel,
-              2 => $scriptURL
+              2 => $scriptURL,
             )), ts('Sorry'), 'error');
         $redirect = CRM_Utils_System::url($url, $params);
         CRM_Utils_System::redirect($redirect);
@@ -132,7 +132,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if (in_array($this->_gName, array(
       'email_greeting',
       'postal_greeting',
-      'addressee'
+      'addressee',
     ))) {
       $defaults['contactOptions'] = (CRM_Utils_Array::value('filter', $defaults)) ? $defaults['filter'] : NULL;
     }
@@ -173,7 +173,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if (!in_array($this->_gName, array(
         'email_greeting',
         'postal_greeting',
-        'addressee'
+        'addressee',
       )) && !$isReserved
     ) {
       $this->addRule('label',
@@ -304,7 +304,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if (in_array($this->_gName, array(
         'email_greeting',
         'postal_greeting',
-        'addressee'
+        'addressee',
       )) && !$isReserved
     ) {
       $values = array(
@@ -352,7 +352,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if (in_array($self->_gName, array(
           'email_greeting',
           'postal_greeting',
-          'addressee'
+          'addressee',
         )) && empty($self->_defaultValues['is_reserved'])
     ) {
       $label = $fields['label'];
@@ -455,7 +455,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(
             1 => $this->_gLabel,
-            2 => $optionValue->label
+            2 => $optionValue->label,
           )), ts('Saved'), 'success');
     }
   }

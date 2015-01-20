@@ -144,7 +144,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
           'action=browse&reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
@@ -188,7 +188,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
       array(
-        'null' => ts('- default -')
+        'null' => ts('- default -'),
       ) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 

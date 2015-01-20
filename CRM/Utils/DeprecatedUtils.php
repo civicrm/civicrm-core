@@ -989,7 +989,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
              'Email',
              'IM',
              'OpenID',
-             'Phone_Ext'
+             'Phone_Ext',
            ) as $block) {
     $name = strtolower($block);
     if (!array_key_exists($name, $values)) {

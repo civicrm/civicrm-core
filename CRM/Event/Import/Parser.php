@@ -74,7 +74,7 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run(
+  public function run(
     $fileName,
     $seperator = ',',
     &$mapper,
@@ -293,7 +293,7 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
    *
-   * @param array mapped array of values
+   * @param $fieldKeys array mapped array of values
    *
    * @return void
    */

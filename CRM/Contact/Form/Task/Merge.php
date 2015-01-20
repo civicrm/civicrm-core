@@ -62,8 +62,9 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
       $contact = CRM_Core_DAO::executeQuery($sql);
       while ($contact->fetch()) {
         $contactTypes[$contact->contact_type] = TRUE;
-        if (count($contactTypes) > 1)
+        if (count($contactTypes) > 1) {
           break;
+        }
       }
       if (count($contactTypes) > 1) {
         $statusMsg = ts('Selected records must all be the same contact type (i.e. all Individuals).');

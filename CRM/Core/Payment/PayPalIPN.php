@@ -226,7 +226,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param bool $recur
    * @param bool $first
    */
-  function single(
+  public function single(
     &$input, &$ids, &$objects,
     $recur = FALSE,
     $first = FALSE

@@ -60,10 +60,10 @@ class CRM_Core_OptionValue {
    *
    * @param array $groupParams
    *   Array containing group fields whose option-values is to retrieved.
-   * @param string $orderBy
-   *   For orderBy clause.
    * @param array $links
    *   Has links like edit, delete, disable ..etc.
+   * @param string $orderBy
+   *   For orderBy clause.
    *
    * @return array
    *   Array of option-values
@@ -176,7 +176,7 @@ class CRM_Core_OptionValue {
    * @param array $groupParams
    *   Array containing group fields whose option-values is to retrieved/saved.
    * @param $action
-   * @param int $optionValueIDHas the id of the optionValue being edited, disabled ..etc.
+   * @param int $optionValueID Has the id of the optionValue being edited, disabled ..etc.
    *   Has the id of the optionValue being edited, disabled ..etc.
    *
    * @return CRM_Core_DAO_OptionValue
@@ -250,7 +250,7 @@ class CRM_Core_OptionValue {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
-   * @return boolean
+   * @return bool
    *   true if object exists
    */
   public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
@@ -272,7 +272,7 @@ class CRM_Core_OptionValue {
    * @param string $mode
    * @param string $contactType
    *
-   * @return boolean
+   * @return bool
    *   true if object exists
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
@@ -303,7 +303,7 @@ class CRM_Core_OptionValue {
           'Individual',
           'Household',
           'Organization',
-          'All'
+          'All',
         ))) {
           $nameTitle = array(
             'addressee' => array(
@@ -381,8 +381,7 @@ class CRM_Core_OptionValue {
    * @param string $orderBy
    *   For orderBy clause.
    *
-   * @param bool $isActiveDo you want only active option values?.
-   *   Do you want only active option values?.
+   * @param bool $isActive Do you want only active option values?
    *
    * @return array
    *   Array of option-values

@@ -108,7 +108,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
         'id' => 1,
         'child_group_id' => 2,
         'parent_group_id' => 1,
-      )
+      ),
     );
 
     $this->assertEquals($expected, $result['values']);

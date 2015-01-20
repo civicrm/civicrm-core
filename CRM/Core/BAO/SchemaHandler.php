@@ -79,7 +79,7 @@ class CRM_Core_BAO_SchemaHandler {
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
       // logging support
-      $logging = new CRM_Logging_Schema;
+      $logging = new CRM_Logging_Schema();
       $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
     }
 
@@ -348,7 +348,7 @@ ALTER TABLE {$tableName}
     if ($config->logging) {
       // logging support: if we’re adding a column (but only then!) make sure the potential relevant log table gets a column as well
       if ($params['operation'] == 'add') {
-        $logging = new CRM_Logging_Schema;
+        $logging = new CRM_Logging_Schema();
         $logging->fixSchemaDifferencesFor($params['table_name'], array('ADD' => array($params['name'])), FALSE);
       }
     }
@@ -361,14 +361,10 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * Delete a civiCRM-table
+   * Delete a CiviCRM-table
    *
    * @param string $tableName
    *   Name of the table to be created.
-   *
-   * @return bool
-   *   TRUE if successfully deleted, FALSE otherwise.
-   *
    */
   public static function dropTable($tableName) {
     $sql = "DROP TABLE $tableName";
@@ -410,7 +406,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   public static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
     $queries = array();
     require_once 'CRM/Core/DAO/Domain.php';
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -440,7 +436,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
           "index_{$field}{$lengthName}",
           "FK_{$table}_{$field}{$lengthName}",
           "UI_{$field}{$lengthName}",
-          "{$createIndexPrefix}_{$field}{$lengthName}"
+          "{$createIndexPrefix}_{$field}{$lengthName}",
         );
 
         // skip to the next $field if one of the above $names exists; handle multilingual for CRM-4126
@@ -465,7 +461,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     }
 
     // run the queries without i18n-rewriting
-    $dao = new CRM_Core_DAO;
+    $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }

@@ -221,7 +221,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       CRM_Core_Error::fatal('The contact profile needs to contain the primary email address field');
     }
 
-
     $ufJoinParams['weight'] = 1;
     $this->_activityProfileId = CRM_Core_BAO_UFJoin::findUFGroupId($ufJoinParams);
 
@@ -326,7 +325,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @return void
    * @see valid_date
    */
-
   public static function formRule($fields, $files, $errors) {
     $errors = array();
 
@@ -343,7 +341,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
       'tag_unconfirmed'
     );
-
 
     if ($tag_name) {
       // Check if contact 'email confirmed' tag exists, else create one
@@ -496,7 +493,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
         break;
     }
 
-
     $transaction = new CRM_Core_Transaction();
 
     $addToGroupID = isset($this->_addToGroupID) ? $this->_addToGroupID : NULL;
@@ -570,11 +566,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       $this->postProcessHook();
 
       // set the template to thank you
-      $url =
-        CRM_Utils_System::url(
-          'civicrm/petition/thankyou',
-          'pid=' . $this->_surveyId . '&id=' . $this->_sendEmailMode . '&reset=1'
-        );
+      $url = CRM_Utils_System::url(
+        'civicrm/petition/thankyou',
+        'pid=' . $this->_surveyId . '&id=' . $this->_sendEmailMode . '&reset=1'
+      );
       CRM_Utils_System::redirect($url);
     }
   }
@@ -608,16 +603,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       }
 
       if ($fields) {
-        /*
-                // unset any email-* fields since we already collect it, CRM-2888
-                foreach ( array_keys( $fields ) as $fieldName ) {
-                    if ( substr( $fieldName, 0, 6 ) == 'email-' ) {
-                        unset( $fields[$fieldName] );
-                    }
-                }
-                */
-
-
         $this->assign($name, $fields);
 
         $addCaptcha = FALSE;
