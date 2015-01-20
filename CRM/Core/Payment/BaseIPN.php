@@ -429,7 +429,7 @@ FROM      civicrm_membership_log
 WHERE     membership_id=$membership->id
 ORDER BY  id DESC
 LIMIT 1;";
-            $dao = new CRM_Core_DAO;
+            $dao = new CRM_Core_DAO();
             $dao->query($sql);
             if ($dao->fetch()) {
               if (!empty($dao->membership_type_id)) {
