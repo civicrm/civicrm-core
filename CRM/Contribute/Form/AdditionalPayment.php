@@ -182,11 +182,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
-      list($defaults['trxn_date'],
-        $defaults['trxn_date_time']
-        ) = CRM_Utils_Date::setDateDefaults(
-        CRM_Utils_Array::value('register_date', $defaults), 'activityDateTime'
-      );
+      list($defaults['trxn_date'], $defaults['trxn_date_time'])
+        = CRM_Utils_Date::setDateDefaults(
+          CRM_Utils_Array::value('register_date', $defaults),
+          'activityDateTime'
+        );
     }
 
     if ($this->_refund) {

@@ -92,7 +92,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       (isset($dao->do_not_email) && $dao->do_not_email == 1)
     ) {
       /* We already sent this mailing to $forward_email, or we should
-             * never email this contact.  Give up. */
+       * never email this contact.  Give up. */
 
       return $successfulForward;
     }

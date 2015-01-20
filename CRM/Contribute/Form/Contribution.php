@@ -448,11 +448,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $dates = array('receive_date', 'receipt_date', 'cancel_date', 'thankyou_date');
     foreach ($dates as $key) {
       if (!empty($defaults[$key])) {
-        list($defaults[$key],
-          $defaults[$key . '_time']
-          ) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults),
-          'activityDateTime'
-        );
+        list($defaults[$key], $defaults[$key . '_time'])
+          = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults), 'activityDateTime');
       }
     }
 

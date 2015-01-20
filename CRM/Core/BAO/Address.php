@@ -1292,8 +1292,6 @@ SELECT is_primary,
       // Not a real field in this entity
       case 'world_region':
         return CRM_Core_PseudoConstant::worldRegion();
-
-        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

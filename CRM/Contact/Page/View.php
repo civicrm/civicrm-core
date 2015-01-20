@@ -180,9 +180,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // check logged in user permission
     self::checkUserPermission($this);
 
-    list($displayName, $contactImage,
-      $contactType, $contactSubtype, $contactImageUrl
-      ) = self::getContactDetails($this->_contactId);
+    list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl) = self::getContactDetails($this->_contactId);
     $this->assign('displayName', $displayName);
 
     $this->set('contactType', $contactType);
@@ -268,7 +266,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       ) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId,
       TRUE,
       TRUE
-    );
+      );
   }
 
   /**

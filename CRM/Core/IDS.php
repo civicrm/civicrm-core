@@ -215,7 +215,7 @@ class CRM_Core_IDS {
     $ip = (isset($_SERVER['SERVER_ADDR']) &&
       $_SERVER['SERVER_ADDR'] != '127.0.0.1') ? $_SERVER['SERVER_ADDR'] : (
       isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
-    );
+      );
 
     $data = array();
     $session = CRM_Core_Session::singleton();
