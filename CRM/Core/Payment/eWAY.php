@@ -54,7 +54,7 @@
  |       different CustomerID is used per currency.                   |
  |                                                                    |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * -----------------------------------------------------------------------------------------------
@@ -160,13 +160,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     }
 
     /*
-        //-------------------------------------------------------------
-        // NOTE: eWAY Doesn't use the following at the moment:
-        //-------------------------------------------------------------
-       $creditCardType = $params['credit_card_type'];
-       $currentcyID    = $params['currencyID'];
-       $country        = $params['country'];
-       */
+    //-------------------------------------------------------------
+    // NOTE: eWAY Doesn't use the following at the moment:
+    //-------------------------------------------------------------
+    $creditCardType = $params['credit_card_type'];
+    $currentcyID    = $params['currencyID'];
+    $country        = $params['country'];
+     */
 
     //-------------------------------------------------------------
     // Prepare some composite data from _paymentProcessor fields
@@ -374,24 +374,24 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     }
 
     /*
-        //----------------------------------------------------------------------------------------------------
-        // Test mode always returns trxn_id = 0 - so we fix that here
-        //
-        // NOTE: This code was taken from the AuthorizeNet payment processor, however it now appears
-        //       unecessary for the eWAY gateway - Left here in case it proves useful
-        //----------------------------------------------------------------------------------------------------
-       if ( $this->_mode == 'test' ) {
-           $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
-           $p                 = array( );
-           $trxn_id           = strval( CRM_Core_Dao::singleValueQuery( $query, $p ) );
-           $trxn_id           = str_replace( 'test', '', $trxn_id );
-           $trxn_id           = intval($trxn_id) + 1;
-           $params['trxn_id'] = sprintf('test%08d', $trxn_id);
-       }
-       else {
-           $params['trxn_id'] = $eWAYResponse->TransactionNumber();
-       }
-       */
+    //----------------------------------------------------------------------------------------------------
+    // Test mode always returns trxn_id = 0 - so we fix that here
+    //
+    // NOTE: This code was taken from the AuthorizeNet payment processor, however it now appears
+    //       unecessary for the eWAY gateway - Left here in case it proves useful
+    //----------------------------------------------------------------------------------------------------
+    if ( $this->_mode == 'test' ) {
+    $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
+    $p                 = array( );
+    $trxn_id           = strval( CRM_Core_Dao::singleValueQuery( $query, $p ) );
+    $trxn_id           = str_replace( 'test', '', $trxn_id );
+    $trxn_id           = intval($trxn_id) + 1;
+    $params['trxn_id'] = sprintf('test%08d', $trxn_id);
+    }
+    else {
+    $params['trxn_id'] = $eWAYResponse->TransactionNumber();
+    }
+     */
 
     //=============
     // Success !

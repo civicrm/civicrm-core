@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Include class definitions
@@ -149,8 +149,8 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     }
   }
   /*
-  * Can't figure out the point of this?
-  */
+   * Can't figure out the point of this?
+   */
   /**
    * @param array $params
    */
@@ -170,14 +170,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   public function _buildParams($gid, $htype, $dtype) {
     $params = $this->_buildBasicParams($gid, $htype, $dtype);
     /* //Not Working for any type. Maybe redundant with testCustomFieldCreateWithOptionValues()
-        if ($htype == 'Multi-Select')
-            $params = array_merge($params, array(
-                         'option_label'    => array( 'Label1','Label2'),
-                         'option_value'    => array( 'val1', 'val2' ),
-                         'option_weight'   => array( 1, 2),
-                         'option_status'   => array( 1, 1),
-                         ));
-    */
+    if ($htype == 'Multi-Select')
+    $params = array_merge($params, array(
+    'option_label'    => array( 'Label1','Label2'),
+    'option_value'    => array( 'val1', 'val2' ),
+    'option_weight'   => array( 1, 2),
+    'option_status'   => array( 1, 1),
+    ));
+     */
 
     return $params;
   }
@@ -207,15 +207,15 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *  Test  using example code
    */
   /*function testCustomFieldCreateExample( )
-    {
+  {
 
 
-        $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
-        require_once 'api/v3/examples/CustomField/Create.php';
-        $result = custom_field_create_example();
-        $expectedResult = custom_field_create_expectedresult();
-        $this->assertEquals($result,$expectedResult);
-    }*/
+  $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
+  require_once 'api/v3/examples/CustomField/Create.php';
+  $result = custom_field_create_example();
+  $expectedResult = custom_field_create_expectedresult();
+  $this->assertEquals($result,$expectedResult);
+  }*/
 
   /**
    * Check with data type - Options with option_values

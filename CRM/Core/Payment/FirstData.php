@@ -12,7 +12,7 @@
  |                                                                    |
  |                                                                    |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
@@ -87,7 +87,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    */
   public function mapProcessorFieldstoParams($params) {
     /*concatenate full customer name first  - code from EWAY gateway
-         */
+     */
 
     $credit_card_name = $params['first_name'] . " ";
     if (strlen($params['middle_name']) > 0) {
@@ -187,9 +187,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestxml = lphp::buildXML($requestFields);
 
     /*----------------------------------------------------------------------------------------------------
-         // Send to the payment information using cURL
-         /----------------------------------------------------------------------------------------------------
-        */
+    // Send to the payment information using cURL
+    /----------------------------------------------------------------------------------------------------
+     */
 
     $ch = curl_init($host);
     if (!$ch) {

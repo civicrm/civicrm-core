@@ -750,16 +750,16 @@ FROM   civicrm_relationship
 WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
 
     /*
-    * CRM-11792 - date fields from API are in ISO format, but this function
-    * supports date arrays BAO has increasingly standardised to ISO format
-    * so I believe this function should support ISO rather than make API
-    * format it - however, need to support array format for now to avoid breakage
-    * @ time of writing this function is called from Relationship::createMultiple (twice)
-    * CRM_BAO_Contact_Utils::clearCurrentEmployer (seemingly without dates)
-    * CRM_Contact_Form_Task_AddToOrganization::postProcess &
-    * CRM_Contact_Form_Task_AddToHousehold::postProcess
-    * (I don't think the last 2 support dates but not sure
-    */
+     * CRM-11792 - date fields from API are in ISO format, but this function
+     * supports date arrays BAO has increasingly standardised to ISO format
+     * so I believe this function should support ISO rather than make API
+     * format it - however, need to support array format for now to avoid breakage
+     * @ time of writing this function is called from Relationship::createMultiple (twice)
+     * CRM_BAO_Contact_Utils::clearCurrentEmployer (seemingly without dates)
+     * CRM_Contact_Form_Task_AddToOrganization::postProcess &
+     * CRM_Contact_Form_Task_AddToHousehold::postProcess
+     * (I don't think the last 2 support dates but not sure
+     */
 
     $dateFields = array('end_date', 'start_date');
     foreach ($dateFields as $dateField) {

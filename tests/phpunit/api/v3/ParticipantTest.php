@@ -521,7 +521,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $pfv2['id']));
     $this->callAPISuccess('PriceField', 'delete', array('id' => $pricefield['id']));
     $this->callAPISuccess('PriceSet', 'delete', array('id' => $priceset['id']));
-    */
+     */
   }
 
   /**

@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /*
  * These functions have been deprecated out of API v3 Utils folder as they are not part of the
@@ -764,18 +764,18 @@ function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $
  */
 function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   /* Crawl through the possible classes:
-     * Contact
-     *      Individual
-     *      Household
-     *      Organization
-     *          Location
-     *              Address
-     *              Email
-     *              Phone
-     *              IM
-     *      Note
-     *      Custom
-     */
+   * Contact
+   *      Individual
+   *      Household
+   *      Organization
+   *          Location
+   *              Address
+   *              Email
+   *              Phone
+   *              IM
+   *      Note
+   *      Custom
+   */
 
   /* Cache the various object fields */
   static $fields = NULL;

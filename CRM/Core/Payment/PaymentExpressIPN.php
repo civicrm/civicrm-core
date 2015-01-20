@@ -172,8 +172,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       /* Since trxn_id hasn't got any use here,
-             * lets make use of it by passing the eventID/membershipTypeID to next level.
-             * And change trxn_id to the payment processor reference before finishing db update */
+       * lets make use of it by passing the eventID/membershipTypeID to next level.
+       * And change trxn_id to the payment processor reference before finishing db update */
 
       if ($ids['event']) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];

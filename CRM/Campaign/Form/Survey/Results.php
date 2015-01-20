@@ -44,9 +44,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   protected $_reportTitle;
 
   /* values
-     *
-     * @var array
-     */
+   *
+   * @var array
+   */
   public $_values;
 
   const NUM_OPTION = 11;

@@ -72,10 +72,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $form_state['method'] = 'post';
     $form_state['build_info']['args'] = array();
     /*
-    * if we want to submit this form more than once in a process (e.g. create more than one user)
-    * we must force it to validate each time for this form. Otherwise it will not validate
-    * subsequent submissions and the manner in which the password is passed in will be invalid
-    */
+     * if we want to submit this form more than once in a process (e.g. create more than one user)
+     * we must force it to validate each time for this form. Otherwise it will not validate
+     * subsequent submissions and the manner in which the password is passed in will be invalid
+     */
     $form_state['must_validate'] = TRUE;
     $config = CRM_Core_Config::singleton();
 

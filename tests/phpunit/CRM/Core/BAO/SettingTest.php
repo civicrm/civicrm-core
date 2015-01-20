@@ -113,9 +113,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    *  2) for current domain setting max_attachments is set to the value that $config->maxAttachments
    *    had (6)
    *  3) for other domain (2) max_attachments is set to the configured default (3)
-   *
-   *
-   **/
+   */
   public function testConvertAndFillSettings() {
     $settings = array('maxAttachments' => 6);
     CRM_Core_BAO_ConfigSetting::add($settings);
@@ -179,10 +177,10 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertEmpty($maxAttachments);
   }
 
-  /*
+  /* @codingStandardsIgnoreStart
    * Check that setting is converted without config value being removed
    *
-  public function testConvertConfigToSettingPrefetch() {
+    public function testConvertConfigToSettingPrefetch() {
     $settings = array('debug' => 1);
     CRM_Core_BAO_ConfigSetting::add($settings);
     $config = CRM_Core_Config::singleton(true, true);
@@ -194,7 +192,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton(true, true);
     $this->assertEmpty($config->debug);
   }
-   */
+  @codingStandardsIgnoreEnd */
 
   /**
    * Ensure that on_change callbacks fire.

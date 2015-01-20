@@ -429,7 +429,8 @@ class CRM_Utils_Rule {
       'currency', array(
         'keyColumn' => 'name',
         'labelColumn' => 'symbol',
-      ));
+      )
+    );
     $value = str_replace($currencySymbols, '', $value);
 
     if ($config->monetaryThousandSeparator) {

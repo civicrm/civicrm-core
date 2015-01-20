@@ -175,13 +175,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /*
   public function testGetIdOfEventByEventTitle() {
-    $params = array(      'title' => 'Annual CiviCRM meet',
-      'return' => 'id'
-    );
+  $params = array(      'title' => 'Annual CiviCRM meet',
+  'return' => 'id'
+  );
 
-    $result = $this->callAPISuccess('Event', 'Get', $params);
+  $result = $this->callAPISuccess('Event', 'Get', $params);
   }
-  */
+   */
 
 
   /**

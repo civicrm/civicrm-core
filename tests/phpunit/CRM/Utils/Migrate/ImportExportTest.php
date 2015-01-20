@@ -82,7 +82,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       __DIR__ . '/fixtures/Contact-text.xml',
     );
 
-    /*
+    /* @codingStandardsIgnoreStart
     $cases[] = array(
       // CustomGroup params
       array(
@@ -94,7 +94,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       // expectedXmlFilePath
       __DIR__ . '/fixtures/Contact-select.xml',
     );
-    */
+    @codingStandardsIgnoreEnd */
 
     $cases[] = array(
       // CustomGroup params

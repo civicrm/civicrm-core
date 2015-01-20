@@ -707,16 +707,16 @@ class CRM_Core_SelectValues {
     );
 
     /*
-       Year greater than 2000 get wrong result for following format
-       echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
-       echo date( 'Y-m-d', strtotime( '7 November, 2001') );
-       Return current year
-       expected :: 2001-11-07
-       output   :: 2009-11-07
-       However
-       echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
-       echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
-       gives proper result
+    Year greater than 2000 get wrong result for following format
+    echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
+    echo date( 'Y-m-d', strtotime( '7 November, 2001') );
+    Return current year
+    expected :: 2001-11-07
+    output   :: 2009-11-07
+    However
+    echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
+    echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
+    gives proper result
      */
 
     return $dateInputFormats;

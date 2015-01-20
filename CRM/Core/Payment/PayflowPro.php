@@ -288,16 +288,16 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // get the result code to validate.
     $result_code = $nvpArray['RESULT'];
     /*debug
-      echo "<p>Params array</p><br>";
-      print_r($params);
-      echo "<p></p><br>";
-      echo "<p>Values to Payment Processor</p><br>";
-      print_r($payflow_query_array);
-      echo "<p></p><br>";
-      echo "<p>Results from Payment Processor</p><br>";
-      print_r($nvpArray);
-      echo "<p></p><br>";
-    */
+    echo "<p>Params array</p><br>";
+    print_r($params);
+    echo "<p></p><br>";
+    echo "<p>Values to Payment Processor</p><br>";
+    print_r($payflow_query_array);
+    echo "<p></p><br>";
+    echo "<p>Results from Payment Processor</p><br>";
+    print_r($nvpArray);
+    echo "<p></p><br>";
+     */
 
     switch ($result_code) {
       case 0:

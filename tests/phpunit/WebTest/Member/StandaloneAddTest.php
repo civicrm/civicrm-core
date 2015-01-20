@@ -250,7 +250,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $test = $this;
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl,
       function () use ($test) {
-      $test->select('membership_type_id_0', 'value=1');
+        $test->select('membership_type_id_0', 'value=1');
       }
     );
   }

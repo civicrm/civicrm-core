@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -427,14 +427,14 @@ class CRM_Report_Form extends CRM_Core_Form {
       'force',
       'Boolean',
       CRM_Core_DAO::$_nullObject
-    );
+      );
 
     $this->_dashBoardRowCount
       = CRM_Utils_Request::retrieve(
       'rowCount',
       'Integer',
       CRM_Core_DAO::$_nullObject
-    );
+      );
 
     $this->_section = CRM_Utils_Request::retrieve('section', 'Integer', CRM_Core_DAO::$_nullObject);
 

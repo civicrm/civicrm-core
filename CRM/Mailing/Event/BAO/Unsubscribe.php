@@ -174,7 +174,7 @@ WHERE  email = %2
     );
 
     /* Make a list of groups and a list of prior mailings that received
-         * this mailing */
+     * this mailing */
 
     $groups = array();
     $base_groups = array();
@@ -195,7 +195,7 @@ WHERE  email = %2
     }
 
     /* As long as we have prior mailings, find their groups and add to the
-         * list */
+     * list */
 
     while (!empty($mailings)) {
       $do->query("
@@ -223,8 +223,8 @@ WHERE  email = %2
     CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $group_ids, $base_group_ids);
 
     /* Now we have a complete list of recipient groups.  Filter out all
-         * those except smart groups, those that the contact belongs to and
-         * base groups from search based mailings */
+     * those except smart groups, those that the contact belongs to and
+     * base groups from search based mailings */
 
     $baseGroupClause = '';
     if (!empty($base_group_ids)) {

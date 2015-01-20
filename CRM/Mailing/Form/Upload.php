@@ -637,7 +637,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
 
       /* Do a full token replacement on a dummy verp, the current
-             * contact and domain, and the first organization. */
+       * contact and domain, and the first organization. */
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace

@@ -45,8 +45,8 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
 
     // todo: write code to check other payment processors
     /*$this->_tryPaymentProcessor($this->names['Google_Checkout']);
-        $this->_tryPaymentProcessor($this->names['PayPal']);
-        $this->_tryPaymentProcessor($this->names['PayPal_Standard']);*/
+    $this->_tryPaymentProcessor($this->names['PayPal']);
+    $this->_tryPaymentProcessor($this->names['PayPal_Standard']);*/
   }
 
   public function _initialize() {
