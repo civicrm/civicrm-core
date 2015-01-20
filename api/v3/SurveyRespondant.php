@@ -48,7 +48,6 @@ function _civicrm_api3_survey_respondant_deprecation() {
  *   (reference ) input parameters.
  *
  * @return array
- *  contribution_id of created or updated record
  */
 function civicrm_api3_survey_respondant_get(&$params) {
 

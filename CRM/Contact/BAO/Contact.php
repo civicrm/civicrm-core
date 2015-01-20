@@ -3133,7 +3133,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param int $contactId
    *
    * @return array
-   *  Dates - ('created_date' => $, 'modified_date' => $)
+   *   Dates - ('created_date' => $, 'modified_date' => $)
    */
   public static function getTimestamps($contactId) {
     $timestamps = CRM_Core_DAO::executeQuery(
@@ -3301,7 +3301,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();

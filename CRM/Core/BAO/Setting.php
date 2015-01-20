@@ -79,7 +79,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $domainID
    * @param bool $force
    *
-   * @return boolean
+   * @return bool
    *   true if item is already in cache
    */
   public static function inCache(
@@ -637,14 +637,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return array
    *   the following information as appropriate for each setting
-   * - name
-   * - type
-   * - default
-   * - add (CiviCRM version added)
-   * - is_domain
-   * - is_contact
-   * - description
-   * - help_text
+   *   - name
+   *   - type
+   *   - default
+   *   - add (CiviCRM version added)
+   *   - is_domain
+   *   - is_contact
+   *   - description
+   *   - help_text
    */
   public static function getSettingSpecification(
     $componentID = NULL,
@@ -1111,7 +1111,7 @@ AND domain_id = %3
   /**
    * Civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
    *
-   * @return boolean
+   * @return bool
    */
   public static function isUpgradeFromPreFourOneAlpha1() {
     if (CRM_Core_Config::isUpgradeMode()) {

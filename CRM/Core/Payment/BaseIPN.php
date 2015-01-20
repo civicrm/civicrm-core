@@ -86,7 +86,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Boolean Return FALSE if the relevant objects don't exist.
    * @param int $paymentProcessorID
    *   Id of the payment processor ID in use.
-   * @return boolean
+   * @return bool
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
@@ -135,7 +135,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param int $paymentProcessorID
    * @param array $error_handling
    *
-   * @return boolean
+   * @return bool
    */
   public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
@@ -185,7 +185,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    * @param object $transaction
    * @param array $input
-   * @return boolean
+   * @return bool
    */
   public function failed(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
@@ -265,7 +265,7 @@ class CRM_Core_Payment_BaseIPN {
    * Handled pending contribution status
    * @param array $objects
    * @param object $transaction
-   * @return boolean
+   * @return bool
    */
   public function pending(&$objects, &$transaction) {
     $transaction->commit();

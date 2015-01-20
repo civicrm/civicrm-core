@@ -368,7 +368,7 @@ function civicrm_api3_case_update($params) {
  * 'move_to_trash' => bool (defaults to false)
  *
  * @throws API_Exception
- * @return boolean
+ * @return bool
  *   true if success, else false
  */
 function civicrm_api3_case_delete($params) {

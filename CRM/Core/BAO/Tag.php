@@ -319,7 +319,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param int $id
    *   Tag id.
    *
-   * @return boolean
+   * @return bool
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure
@@ -408,7 +408,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // Disallow empty values except for the number zero.

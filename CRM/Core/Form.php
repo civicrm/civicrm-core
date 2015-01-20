@@ -409,7 +409,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Performs the server side validation
    * @since     1.0
-   * @return boolean
+   * @return bool
    *   true if no error found
    * @throws    HTML_QuickForm_Error
    */
@@ -643,7 +643,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Boolean function to determine if this is a one form page
    *
-   * @return boolean
+   * @return bool
    */
   public function isSimpleForm() {
     return $this->_state->getType() & (CRM_Core_State::START | CRM_Core_State::FINISH);
@@ -1570,7 +1570,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - cid from the url if the caller has ACL permission to view
    *   - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
    *
-   * @return NULL|integer
+   * @return NULL|int
    */
   public function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);

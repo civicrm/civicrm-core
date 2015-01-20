@@ -46,7 +46,6 @@
  *
  * @return array
  *   API result array
- * {@getfields email_create}
  */
 function civicrm_api3_email_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,9 +72,8 @@ function _civicrm_api3_email_create_spec(&$params) {
  *
  * @example EmailDelete.php Standard Delete Example
  *
- * @return boolean
+ * @return bool
  *   | error  true if successfull, error otherwise
- * {@getfields email_delete}
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -94,7 +92,6 @@ function civicrm_api3_email_delete($params) {
  *
  * @return array
  *   api result array
- * {@getfields email_get}
  */
 function civicrm_api3_email_get($params) {
 

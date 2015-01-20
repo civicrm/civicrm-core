@@ -405,8 +405,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
-   *
+   * @return bool
    */
   public static function dataExists(&$params) {
     //check if location type is set if not return false
@@ -1251,7 +1250,7 @@ SELECT is_primary,
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();

@@ -34,17 +34,16 @@
  * $Id$
  *
  */
+
 /**
  * Handle a confirm event
  *
  * @param array $params
  *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
  * @return array
  *   api result array
- * {@getfields mailing_event_confirm_create}
  */
 function civicrm_api3_mailing_event_queue_create($params) {
   if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
