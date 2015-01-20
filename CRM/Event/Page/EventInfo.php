@@ -195,7 +195,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('mapKey', $config->mapAPIKey);
       $sumLat = $sumLng = 0;
       $maxLat = $maxLng = -400;
-      $minLat = $minLng = +400;
+      $minLat = $minLng = 400;
       foreach ($locations as $location) {
         $sumLat += $location['lat'];
         $sumLng += $location['lng'];

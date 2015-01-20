@@ -141,7 +141,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return \CRM_Case_Selector_Search
    */
-  function __construct(
+  public function __construct(
     &$queryParams,
     $action = CRM_Core_Action::NONE,
     $additionalClause = NULL,
@@ -185,8 +185,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return array
    */
-  static
-  public function &links($isDeleted = FALSE, $key = NULL) {
+  static public function &links($isDeleted = FALSE, $key = NULL) {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if ($isDeleted) {

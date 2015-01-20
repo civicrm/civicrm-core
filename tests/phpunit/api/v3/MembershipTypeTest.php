@@ -1,29 +1,29 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
- */
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.6                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License and the CiviCRM Licensing Exception along                  |
+  | with this program; if not, contact CiviCRM LLC                     |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
+*/
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -74,12 +74,14 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete($params);
   }
 
-  ///////////////// civicrm_membership_type_create methods
+  /**
+   * Civicrm_membership_type_create methods.
+   */
   public function testCreateWithEmptyParams() {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', array());
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
-    );
+                       );
   }
 
   public function testCreateWithoutMemberOfContactId() {
@@ -96,8 +98,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     );
 
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params,
-      'Mandatory key(s) missing from params array: member_of_contact_id'
-    );
+                      'Mandatory key(s) missing from params array: member_of_contact_id'
+                                           );
   }
 
   public function testCreateWithoutContributionTypeId() {
@@ -115,7 +117,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id'
-    );
+                       );
   }
 
   public function testCreateWithoutDurationUnit() {
@@ -133,7 +135,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: duration_unit'
-    );
+                       );
   }
 
   public function testCreateWithoutDurationInterval() {
@@ -150,7 +152,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: financial_type_id, duration_interval'
-    );
+                       );
   }
 
   public function testCreateWithoutNameandDomainIDandDurationUnit() {
@@ -167,7 +169,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: domain_id, duration_unit, name'
-    );
+                       );
   }
 
   public function testCreateWithoutName() {
@@ -212,7 +214,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
     $this->assertEquals($membershiptype['error_message'],
       'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
-    );
+                       );
   }
 
   public function testUpdateWithoutId() {
@@ -263,8 +265,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'id' => 'doesNotExist',
     );
     $membershiptype = $this->callAPIFailure('membership_type', 'delete', $params,
-      'Error while deleting membership type. id : ' . $params['id']
-    );
+                      'Error while deleting membership type. id : ' . $params['id']
+                                           );
   }
 
   public function testDelete() {

@@ -208,7 +208,7 @@ class CRM_Core_PseudoConstant {
    * - fresh      boolean ignore cache entries and go back to DB
    * @param string $context : Context string
    *
-   * @return Array|bool
+   * @return array|bool
    *   array on success, FALSE on error.
    *
    */
@@ -261,7 +261,7 @@ class CRM_Core_PseudoConstant {
     }
 
     // Core field: load schema
-    $dao = new $daoName;
+    $dao = new $daoName();
     $fieldSpec = $dao->getFieldSpec($fieldName);
     $dao->free();
     // If neither worked then this field doesn't exist. Return false.
@@ -323,7 +323,7 @@ class CRM_Core_PseudoConstant {
             return FALSE;
           }
           // Get list of fields for the option table
-          $dao = new $daoName;
+          $dao = new $daoName();
           $availableFields = array_keys($dao->fieldKeys());
           $dao->free();
 
@@ -467,7 +467,7 @@ class CRM_Core_PseudoConstant {
    * @param string $fieldName
    * @param string|Int $value
    *
-   * @return bool|null|string|number
+   * @return bool|null|string|int
    *   FALSE if the given field has no associated option list
    *   NULL if the given key has no corresponding option
    *   String|Number if key is found
@@ -553,7 +553,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    $object = new $name ();
+    $object = new $name();
 
     $object->selectAdd();
     $object->selectAdd("$key, $retrieve");
@@ -1735,7 +1735,7 @@ WHERE  id = %1
       $defaultGreetings = array();
       $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array(
           'keyColumn' => 'id',
-          'labelColumn' => 'name'
+          'labelColumn' => 'name',
         ));
 
       foreach ($contactTypes as $filter => $contactType) {

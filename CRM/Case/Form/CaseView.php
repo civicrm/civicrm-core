@@ -170,7 +170,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($relatedCases) {
       $this->assign('relatedCaseLabel', ts('%1 Related Case', array(
             'count' => count($relatedCases),
-            'plural' => '%1 Related Cases'
+            'plural' => '%1 Related Cases',
           )));
       $this->assign('relatedCaseUrl', CRM_Utils_System::url('civicrm/contact/view/case', array(
         'id' => $this->_caseID,
@@ -312,7 +312,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         $this->add('select', 'merge_case_id',
           ts('Select Case for Merge'),
           array(
-            '' => ts('- select case -')
+            '' => ts('- select case -'),
           ) + $otherCases,
           FALSE,
           array('class' => 'crm-select2 huge')

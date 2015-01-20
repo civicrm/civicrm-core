@@ -45,8 +45,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param string $entityTable
    *   Name of the entity table usually 'civicrm_contact'.
    *
-   * @return array(
-   * ) reference $tag array of category id's the contact belongs to.
+   * @return array
+   *   reference $tag array of category id's the contact belongs to.
    *
    */
   public static function &getTag($entityID, $entityTable = 'civicrm_contact') {
@@ -103,7 +103,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists($params) {
     return !($params['tag_id'] == 0);
@@ -114,8 +114,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return CRM_Core_BAO_EntityTag
    */
   public static function del(&$params) {
     $entityTag = new CRM_Core_BAO_EntityTag();
@@ -390,15 +388,17 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
    * Get options for a given field.
+   *
    * @see CRM_Core_DAO::buildOptions
+   * @see CRM_Core_DAO::buildOptionsContext
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   *   As per CRM_Core_DAO::buildOptionsContext.
    * @param array $props
    *   whatever is known about this dao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
