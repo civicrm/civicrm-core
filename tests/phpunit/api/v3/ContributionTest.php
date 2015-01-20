@@ -460,9 +460,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
-    $contribution = $this->callAPISuccess('contribution', 'get',array('sequential' => 1, 'payment_instrument' => 'Cash'));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('sequential' => 1, 'payment_instrument' => 'Cash'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
+    $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'sequential' => 1,
