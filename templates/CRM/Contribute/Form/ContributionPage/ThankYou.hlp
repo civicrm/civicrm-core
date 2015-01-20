@@ -27,10 +27,7 @@
   {ts}Thank-you and Receipting{/ts}
 {/htxt}
 {htxt id="id_thank"}
-  <p>{ts}Use this form to configure the thank-you message and receipting options for this online contribution page. Contributors will
-see a thank-you page whenever an online contribution is successfully processed. You provide the content and layout of the
-thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add
-a custom message to that receipt.{/ts}</p>
+  <p>{ts}Use this form to configure the thank-you message and receipting options for this online contribution page. Contributors will see a thank-you page whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add a custom message to that receipt.{/ts}</p>
 {/htxt}
 
 {htxt id="id_thankyou-title-title"}
@@ -51,8 +48,7 @@ a custom message to that receipt.{/ts}</p>
   {ts}Thank-you Page Footer{/ts}
 {/htxt}
 {htxt id="id_footer-text"}
-  <p>{ts}Enter link(s) and/or text that you want to appear at the bottom of the thank-you page. You can use this content area to encourage contributors to visit a tell-a-friend
-  page or take some other action.{/ts}<p>
+  <p>{ts}Enter link(s) and/or text that you want to appear at the bottom of the thank-you page. You can use this content area to encourage contributors to visit a tell-a-friend page or take some other action.{/ts}<p>
   <p>{ts}NOTE: Social media links will be automatically included if you have enabled 'Social media sharing' for this page (see the 'Title' tab).{/ts}</p>
 {/htxt}
 
@@ -85,8 +81,7 @@ a custom message to that receipt.{/ts}</p>
   {ts}Additional Receipt Message{/ts}
 {/htxt}
 {htxt id="id_receipt-text"}
-  <p>{ts}Enter a message you want included at the beginning of emailed receipts. This message will be inserted at the top of the "Contributions - Receipt (on-line)"
-  System Workflow Message.{/ts}</p>
+  <p>{ts}Enter a message you want included at the beginning of emailed receipts. This message will be inserted at the top of the "Contributions - Receipt (on-line)" System Workflow Message.{/ts}</p>
   <p>{ts}IMPORTANT: Keep in mind that this message will be included in ALL of the following types of receipts related to this online contribution page{/ts}:
     <ul>
       <li>{ts}One-time online contributions{/ts}</li>
@@ -101,14 +96,12 @@ a custom message to that receipt.{/ts}</p>
   {ts}CC Receipts{/ts}
 {/htxt}
 {htxt id="id_receipt-cc"}
-  <p>{ts}If you want member(s) of your organization to receive a carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email
-addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
+  <p>{ts}If you want member(s) of your organization to receive a carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
 {/htxt}
 
 {htxt id="id_receipt-bcc-title"}
   {ts}BCC Receipts{/ts}
 {/htxt}
 {htxt id="id_receipt-bcc"}
-  <p>{ts}If you want member(s) of your organization to receive a BLIND carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email
-  addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
+  <p>{ts}If you want member(s) of your organization to receive a BLIND carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
 {/htxt}

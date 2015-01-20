@@ -29,9 +29,7 @@
 </div>
 {if $selectedOutput ne 'email'}
   <div id="help">
-    {ts}You may choose to email invoice to contributors OR download a PDF file containing one invoice per page to your local computer by clicking
-      <strong>Process Invoice(s)</strong>
-      . Your browser may display the file for you automatically, or you may need to open it for printing using any PDF reader (such as Adobe&reg; Reader).{/ts}
+    {ts}You may choose to email invoice to contributors OR download a PDF file containing one invoice per page to your local computer by clicking <strong>Process Invoice(s)</strong> . Your browser may display the file for you automatically, or you may need to open it for printing using any PDF reader (such as Adobe&reg; Reader).{/ts}
   </div>
 {/if}
 
