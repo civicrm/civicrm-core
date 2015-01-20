@@ -304,15 +304,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
           }
         }
         else {
-          $setting =
-            CRM_Core_BAO_Setting::getItem(
-              $fields['values'][$name]['group_name'],
-              $name,
-              CRM_Utils_Array::value('component_id', $params),
-              NULL,
-              CRM_Utils_Array::value('contact_id', $params),
-              $domainID
-            );
+          $setting = CRM_Core_BAO_Setting::getItem(
+            $fields['values'][$name]['group_name'],
+            $name,
+            CRM_Utils_Array::value('component_id', $params),
+            NULL,
+            CRM_Utils_Array::value('contact_id', $params),
+            $domainID
+          );
         }
         if (!is_null($setting)) {
           // we won't return if not set - helps in return all scenario - otherwise we can't indentify the missing ones

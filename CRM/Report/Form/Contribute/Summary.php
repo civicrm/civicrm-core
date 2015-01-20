@@ -314,8 +314,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
               $this->_interval = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] =
-                $field['title'] . ' Beginning';
+              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
@@ -544,15 +543,15 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     $totalAmount = $average = $softTotalAmount = $softAverage = array();
     $count = $softCount = 0;
     while ($dao->fetch()) {
-      $totalAmount[] =
-        CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_sum, $dao->currency) .
+      $totalAmount[]
+        = CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_sum, $dao->currency) .
         " (" . $dao->civicrm_contribution_total_amount_count . ")";
       $average[] = CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_avg, $dao->currency);
       $count += $dao->civicrm_contribution_total_amount_count;
 
       if ($softCredit) {
-        $softTotalAmount[] =
-          CRM_Utils_Money::format($dao->civicrm_contribution_soft_soft_amount_sum, $dao->currency) .
+        $softTotalAmount[]
+          = CRM_Utils_Money::format($dao->civicrm_contribution_soft_soft_amount_sum, $dao->currency) .
           " (" . $dao->civicrm_contribution_soft_soft_amount_count . ")";
         $softAverage[] = CRM_Utils_Money::format($dao->civicrm_contribution_soft_soft_amount_avg, $dao->currency);
         $softCount += $dao->civicrm_contribution_soft_soft_amount_count;

@@ -51,8 +51,10 @@ interface CRM_Core_Selector_API {
    *  csvString - The html string to display for export as csv
    *  rowCount  - the number of rows to be included
    *
-   * @param string action the action being performed
-   * @param array params the array that the pagerParams will be inserted into
+   * @param string $action
+   *   The action being performed.
+   * @param array $params
+   *   The array that the pagerParams will be inserted into.
    *
    * @return void
    */
@@ -61,7 +63,8 @@ interface CRM_Core_Selector_API {
   /**
    * Returns the sort order array for the given action
    *
-   * @param string action the action being performed
+   * @param string $action
+   *   The action being performed.
    *
    * @return array
    *   the elements that can be sorted along with their properties
@@ -85,7 +88,8 @@ interface CRM_Core_Selector_API {
   /**
    * Returns the number of rows for this action
    *
-   * @param string action the action being performed
+   * @param string $action
+   *   The action being performed.
    *
    * @return int
    *   the total number of rows for this action
@@ -124,7 +128,8 @@ interface CRM_Core_Selector_API {
   /**
    * Return the filename for the exported CSV
    *
-   * @param string type the type of export required: csv/xml/foaf etc
+   * @param string $type
+   *   The type of export required: csv/xml/foaf etc.
    *
    * @return string
    *   the fileName which we will munge to skip spaces and

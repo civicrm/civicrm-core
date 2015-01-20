@@ -140,8 +140,6 @@ function civicrm_api3_address_delete($params) {
  * Retrieve one or more addresses on address_id, contact_id, street_name, city
  * or a combination of those
  *
- * @param mixed[] (reference ) input parameters
- *
  * @param array $params
  *   An associative array of name/value pairs.
  *

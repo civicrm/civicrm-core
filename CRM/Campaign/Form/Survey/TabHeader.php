@@ -164,8 +164,9 @@ class CRM_Campaign_Form_Survey_TabHeader {
    */
   public static function getNextTab(&$form) {
     static $next = FALSE;
-    if ($next)
+    if ($next) {
       return $next;
+    }
 
     $tabs = $form->get('tabHeader');
     if (is_array($tabs)) {

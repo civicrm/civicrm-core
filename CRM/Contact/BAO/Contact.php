@@ -536,8 +536,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   public function createDefaultCrudLink($crudLinkSpec) {
     switch ($crudLinkSpec['action']) {
       case CRM_Core_Action::VIEW:
-
-        return array(
+        $result = array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/view',
           'query' => array(
@@ -545,9 +544,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'cid' => $this->id,
           ),
         );
+        return $result;
 
       case CRM_Core_Action::UPDATE:
-        return array(
+        $result = array(
           'title' => $this->display_name,
           'path' => 'civicrm/contact/add',
           'query' => array(
@@ -556,6 +556,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'cid' => $this->id,
           ),
         );
+        return $result;
     }
     return NULL;
   }
@@ -1624,10 +1625,10 @@ WHERE id={$id}; ";
 
     // We don't know the contents of return properties, but we need the lower
     // level ids of the contact so add a few fields.
-    $returnProperties['first_name'] =
-    $returnProperties['organization_name'] =
-    $returnProperties['household_name'] =
-    $returnProperties['contact_type'] =
+    $returnProperties['first_name'] = 1;
+    $returnProperties['organization_name'] = 1;
+    $returnProperties['household_name'] = 1;
+    $returnProperties['contact_type'] = 1;
     $returnProperties['contact_sub_type'] = 1;
     return list($query, $options) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, $options);
   }
@@ -2556,11 +2557,11 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Core_BAO_EntityTag::getContactTags($contactId, TRUE);
 
       case 'rel':
-
-        return CRM_Contact_BAO_Relationship::getRelationship($contactId,
+        $result = CRM_Contact_BAO_Relationship::getRelationship($contactId,
           CRM_Contact_BAO_Relationship::CURRENT,
           0, 1
         );
+        return $result;
 
       case 'group':
 

@@ -76,8 +76,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
-   *
    * @return array
    *   array of action links that we need to display for the browse screen
    */
@@ -119,8 +117,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
 
   /**
    * Browse all price fields.
-   *
-   * @param null
    *
    * @return void
    */
@@ -255,12 +251,9 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    *
-   * @param null
-   *
    * @return void
    */
   public function run() {
-
     // get the field id
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this, FALSE, 0

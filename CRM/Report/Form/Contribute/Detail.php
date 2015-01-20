@@ -468,8 +468,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
-      $totalAmount[] =
-        CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
         $dao->count . ")";
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
@@ -507,8 +506,7 @@ SELECT COUNT(contribution_soft_civireport.amount ) as count,
 GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
-        $totalAmount[] =
-          CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
+        $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
           $dao->count . ")";
         $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
         $count += $dao->count;
@@ -550,8 +548,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
-    $tempQuery =
-      'CREATE TEMPORARY TABLE civireport_contribution_detail_temp1 AS ' . $sql;
+    $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp1 AS ' . $sql;
     CRM_Core_DAO::executeQuery($tempQuery);
     $this->setPager();
 
@@ -565,8 +562,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
-    $tempQuery =
-      'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
+    $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
     CRM_Core_DAO::executeQuery($tempQuery);
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'

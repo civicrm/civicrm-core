@@ -1333,7 +1333,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case CRM_Report_Form::OP_INT:
       case CRM_Report_Form::OP_FLOAT:
 
-        return array(
+        $result = array(
           'lte' => ts('Is less than or equal to'),
           'gte' => ts('Is greater than or equal to'),
           'bw' => ts('Is between'),
@@ -1345,39 +1345,44 @@ class CRM_Report_Form extends CRM_Core_Form {
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
+        return $result;
 
       case CRM_Report_Form::OP_SELECT:
-        return array(
+        $result = array(
           'eq' => ts('Is equal to'),
         );
+        return $result;
 
       case CRM_Report_Form::OP_MONTH:
       case CRM_Report_Form::OP_MULTISELECT:
       case CRM_Report_Form::OP_ENTITYREF:
 
-        return array(
+        $result = array(
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
         );
+        return $result;
 
       case CRM_Report_Form::OP_DATE:
 
-        return array(
+        $result = array(
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
+        return $result;
 
       case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
         // use this operator for the values, concatenated with separator. For e.g if
         // multiple options for a column is stored as ^A{val1}^A{val2}^A
-        return array(
+        $result = array(
           'mhas' => ts('Is one of'),
           'mnot' => ts('Is not one of'),
         );
+        return $result;
 
       default:
         // type is string
-        return array(
+        $result = array(
           'has' => ts('Contains'),
           'sw' => ts('Starts with'),
           'ew' => ts('Ends with'),
@@ -1387,6 +1392,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
+        return $result;
     }
   }
 

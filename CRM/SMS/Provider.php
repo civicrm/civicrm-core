@@ -120,7 +120,7 @@ abstract class CRM_SMS_Provider {
    * @param int $jobID
    * @param int $userID
    *
-   * @return $this|null|object
+   * @return self|null|object
    * @throws CRM_Core_Exception
    */
   public function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
@@ -186,7 +186,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @param null $to
    * @param int $trackID
    *
-   * @return $this|null|object
+   * @return self|null|object
    * @throws CRM_Core_Exception
    */
   public function processInbound($from, $body, $to = NULL, $trackID = NULL) {

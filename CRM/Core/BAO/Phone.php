@@ -90,7 +90,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param array $entityBlock
    *
    * @return array
    *   array of phone objects

@@ -102,7 +102,6 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
-    return;
   }
 
 }

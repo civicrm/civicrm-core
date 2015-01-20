@@ -64,8 +64,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
