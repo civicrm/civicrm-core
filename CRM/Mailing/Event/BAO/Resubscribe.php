@@ -102,7 +102,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     );
 
     /* Make a list of groups and a list of prior mailings that received
-         * this mailing */
+     * this mailing */
 
     $groups = array();
     $mailings = array();
@@ -117,7 +117,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     }
 
     /* As long as we have prior mailings, find their groups and add to the
-         * list */
+     * list */
 
     while (!empty($mailings)) {
       $do->query("
@@ -144,7 +144,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     CRM_Utils_Hook::unsubscribeGroups('resubscribe', $mailing_id, $contact_id, $group_ids, $base_groups);
 
     /* Now we have a complete list of recipient groups.  Filter out all
-         * those except smart groups and those that the contact belongs to */
+     * those except smart groups and those that the contact belongs to */
 
     $do->query("
             SELECT      $group.id as group_id,

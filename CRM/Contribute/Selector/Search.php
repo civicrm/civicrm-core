@@ -511,8 +511,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     }
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders
-        = array_merge(
+      self::$_columnHeaders = array_merge(
         self::$_columnHeaders,
         array(
           array(

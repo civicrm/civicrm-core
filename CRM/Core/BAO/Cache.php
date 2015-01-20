@@ -272,14 +272,14 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   }
 
   /* Retrieve the session values from the cache and populate the $_SESSION array
-     *
-     * @param array $names
-     *   Array of session values that should be persisted.
-     *                     This is either a form name + qfKey or just a form name
-     *                     (in the case of profile)
-     *
-     * @return void
-     */
+   *
+   * @param array $names
+   *   Array of session values that should be persisted.
+   *                     This is either a form name + qfKey or just a form name
+   *                     (in the case of profile)
+   *
+   * @return void
+   */
 
   /**
    * @param string $names
