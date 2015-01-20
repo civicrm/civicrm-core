@@ -113,7 +113,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Contact_BAO_Contact|CRM_Core_Error
+   * @return CRM_Contact_BAO_Contact|CRM_Core_Error|NULL
    *   Created or updated contact object or error object.
    *   (error objects are being phased out in favour of exceptions)
    */
@@ -121,7 +121,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $contact = new CRM_Contact_DAO_Contact();
 
     if (empty($params)) {
-      return;
+      return NULL;
     }
 
     // Fix for validate contact sub type CRM-5143.

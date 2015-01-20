@@ -116,7 +116,7 @@ class CRM_Logging_Reverter {
         // DAO-based tables
 
         case in_array($table, array_keys($daos)):
-          $dao = new $daos[$table];
+          $dao = new $daos[$table]();
           foreach ($row as $id => $changes) {
             $dao->id = $id;
             foreach ($changes as $field => $value) {

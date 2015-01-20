@@ -750,29 +750,32 @@ GROUP BY  participant.event_id
           'title' => 'Participant Note',
           'name' => 'participant_note',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
-        $participantStatus = array(
+      $participantStatus = array(
         'participant_status' => array(
           'title' => 'Participant Status',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
-        $participantRole = array(
+      $participantRole = array(
         'participant_role' => array(
           'title' => 'Participant Role',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
-        ));
+        ),
+      );
 
-        $discountFields = CRM_Core_DAO_Discount::export();
+      $discountFields = CRM_Core_DAO_Discount::export();
 
-        $fields = array_merge($participantFields, $participantStatus, $participantRole,  $eventFields, $noteField, $discountFields);
+      $fields = array_merge($participantFields, $participantStatus, $participantRole, $eventFields, $noteField, $discountFields);
 
-        // add custom data
-        $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
-        self::$_exportableFields = $fields;
+      // add custom data
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
+      self::$_exportableFields = $fields;
     }
 
     return self::$_exportableFields;
@@ -915,11 +918,11 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * Checks duplicate participants
    *
-   * @param array $duplicates
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $input
    *   An assosiative array of name /value pairs.
    *   from other function
+   * @param array $duplicates
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_BAO_Contribution
    */
@@ -1148,11 +1151,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param int $newStatusID
    * @param bool $updatePrimaryStatus
    *
-   * @return bool|void
+   * @return bool|NULL
    */
   public static function updateParticipantStatus($participantID, $oldStatusID, $newStatusID = NULL, $updatePrimaryStatus = FALSE) {
     if (!$participantID || !$oldStatusID) {
-      return;
+      return NULL;
     }
 
     if (!$newStatusID) {
@@ -1223,14 +1226,14 @@ UPDATE  civicrm_participant
    * @param bool $returnResult
    * @param bool $skipCascadeRule
    *
-   * @return array
+   * @return array|NULL
    */
   public static function transitionParticipants(
     $participantIds, $toStatusId,
     $fromStatusId = NULL, $returnResult = FALSE, $skipCascadeRule = FALSE
   ) {
     if (!is_array($participantIds) || empty($participantIds) || !$toStatusId) {
-      return;
+      return NULL;
     }
 
     //thumb rule is if we triggering  primary participant need to triggered additional
@@ -2160,7 +2163,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
    *
    * @param string $fieldName
    * @param string $context
-   *   @see CRM_Core_DAO::buildOptionsContext.
+   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
    *   whatever is known about this dao object.
    *

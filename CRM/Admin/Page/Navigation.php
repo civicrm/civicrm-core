@@ -58,10 +58,11 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
   /**
    * Get action Links
    *
-   * @return array
+   * @return array|NULL
    *   (reference) of action links
    */
   public function &links() {
+    return NULL;
   }
 
   /**

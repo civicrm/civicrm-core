@@ -84,6 +84,9 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * }
    */
 
+  /**
+   * Ensure that adding a script URL creates expected markup.
+   */
   public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')

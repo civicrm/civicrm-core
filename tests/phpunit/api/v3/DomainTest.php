@@ -143,11 +143,10 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_domain_create methods
-  /*
+
+  /**
    * This test checks for a memory leak observed when doing 2 gets on current domain
    */
-
-
   public function testGetCurrentDomainTwice() {
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
       'current_domain' => 1,

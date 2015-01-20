@@ -89,22 +89,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'source' =>
-        (!$online || !empty($params['source'])) ?
-          CRM_Utils_Array::value('source', $params) :
-          CRM_Utils_Array::value('description', $params),
+      'source' => (!$online || !empty($params['source'])) ? CRM_Utils_Array::value('source', $params) : CRM_Utils_Array::value('description', $params),
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
       'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
-      'cancel_date' =>
-        isset($params['cancel_date']) ?
-          CRM_Utils_Date::format($params['cancel_date']) :
-          NULL,
-      'thankyou_date' =>
-        isset($params['thankyou_date']) ?
-          CRM_Utils_Date::format($params['thankyou_date']) :
-          NULL,
+      'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
+      'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
       'campaign_id' => $campaignId,
       'is_test' => $isTest,
       'address_id' => $addressID,

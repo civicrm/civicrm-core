@@ -241,7 +241,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param int $id
    *   Id of the database record.
-   * @param bool $is_activeValue we want to set the is_active field.
+   * @param bool $is_active
    *   Value we want to set the is_active field.
    *
    * @return Object
@@ -796,8 +796,8 @@ ORDER BY civicrm_custom_group.weight,
               'name' => ts('Delete Attached File'),
               'url' => 'civicrm/file',
               'qs' => 'reset=1&id=%%id%%&eid=%%eid%%&fid=%%fid%%&action=delete',
-              'extra' => 'onclick = "if (confirm( \'' . $deleteExtra .
-                '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+              'extra' => 'onclick = "if (confirm( \'' . $deleteExtra
+              . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
             ),
           );
           $customValue['deleteURL'] = CRM_Core_Action::formLink($deleteURL,
@@ -1977,7 +1977,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
     //changed isset CRM-4601
     if (CRM_Utils_System::isNull($value)) {
-      return;
+      return NULL;
     }
 
     $htmlType = CRM_Utils_Array::value('html_type', $field);
@@ -2203,12 +2203,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param array $fieldIds
    *   Array of custom field ids.
    *
-   * @return array
+   * @return array|NULL
    *   array consisting of groups and fields labels with ids.
    */
   public static function getGroupTitles($fieldIds) {
     if (!is_array($fieldIds) && empty($fieldIds)) {
-      return;
+      return NULL;
     }
 
     $groupLabels = array();
@@ -2250,12 +2250,12 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @param int $gID
    *   Custom group id.
    *
-   * @return boolean
+   * @return bool|NULL
    *   true if empty otherwise false.
    */
   public static function isGroupEmpty($gID) {
     if (!$gID) {
-      return;
+      return NULL;
     }
 
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',

@@ -792,7 +792,7 @@ LIMIT 1;";
    * it is unclear whether it is a function on the way in or on the way out
    *
    * @param array $params
-   * @return void|int
+   * @return void|NULL|int
    */
   public function updateContributionStatus(&$params) {
     // get minimum required values.
@@ -802,7 +802,7 @@ LIMIT 1;";
     $contributionId = CRM_Utils_Array::value('contribution_id', $params);
 
     if (!$contributionId || !$componentId || !$componentName || !$statusId) {
-      return;
+      return NULL;
     }
 
     $input = $ids = $objects = array();

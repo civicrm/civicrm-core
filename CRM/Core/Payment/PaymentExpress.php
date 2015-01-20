@@ -129,7 +129,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @return array
+   * @return array|NULL
    *   the result in an nice formatted array (or an error object)
    * @abstract
    */

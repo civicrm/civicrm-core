@@ -133,6 +133,10 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
 
   ///////////////// civicrm_membership_status_delete methods
+
+  /**
+   * Attempt (and fail) to delete membership status without an parameters.
+   */
   public function testDeleteEmptyParams() {
     $result = $this->callAPIFailure('membership_status', 'delete', array());
   }

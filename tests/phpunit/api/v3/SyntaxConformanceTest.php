@@ -932,10 +932,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     // create entities
     $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj1->id), 'check first id');
+    $this->assertTrue(is_int($baoObj1->id), 'check first id');
     $this->deletableTestObjects[$baoString][] = $baoObj1->id;
     $baoObj2 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj2->id), 'check second id');
+    $this->assertTrue(is_int($baoObj2->id), 'check second id');
     $this->deletableTestObjects[$baoString][] = $baoObj2->id;
 
     // fetch first by ID
@@ -984,7 +984,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
   }
 
-  /** testing the _create **/
+  /* ---- testing the _create ---- */
 
   /**
    * @dataProvider toBeSkipped_create
@@ -1407,7 +1407,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     while ($i < $count) {
       // create entities
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-      $this->assertTrue(is_integer($baoObj->id), 'check first id');
+      $this->assertTrue(is_int($baoObj->id), 'check first id');
       $this->deletableTestObjects[$baoString][] = $baoObj->id;
       $baos[] = $baoObj;
       $i++;

@@ -212,15 +212,14 @@ class CRM_Case_Audit_Audit {
   }
 
   /**
-   * @param $xmlString
+   * @param string $xmlString
    * @param int $clientID
    * @param int $caseID
    * @param bool $printReport
    *
    * @return mixed
    */
-  static
-  public function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
+  public static function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*
     $fh = fopen('C:/temp/audit2.xml', 'w');
     fwrite($fh, $xmlString);

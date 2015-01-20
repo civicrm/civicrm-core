@@ -388,10 +388,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * access        public
    *
-   * @return array
+   * @return array|NULL
    *   reference to the array of default values
    */
   public function setDefaultValues() {
+    return NULL;
   }
 
   /**
@@ -1276,20 +1277,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add date
-   * @param string $name
-   *   Name of the element.
-   * @param string $label
-   *   Label of the element.
-   * @param array $attributes
-   *   Key / value pair.
    *
+   * @code
    * // if you need time
    * $attributes = array(
    *   'addTime' => true,
    *   'formatType' => 'relative' or 'birth' etc check advanced date settings
    * );
+   * @endcode
+   *
+   * @param string $name
+   *   Name of the element.
+   * @param string $label
+   *   Label of the element.
    * @param bool $required
    *   True if required.
+   * @param array $attributes
+   *   Key / value pair.
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
     if (!empty($attributes['formatType'])) {
