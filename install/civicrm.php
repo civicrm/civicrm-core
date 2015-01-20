@@ -71,7 +71,7 @@ function civicrm_write_file($name, &$buffer) {
   if (!$fd) {
     die("Cannot open $name");
   }
-  fputs($fd, $buffer);
+  fwrite($fd, $buffer);
   fclose($fd);
 }
 

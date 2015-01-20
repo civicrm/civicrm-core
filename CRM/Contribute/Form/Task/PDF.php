@@ -53,7 +53,7 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -94,7 +94,7 @@ AND    {$this->_componentClause}";
       array(
         'url' => $url,
         'title' => ts('Search Results'),
-      )
+      ),
     );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);

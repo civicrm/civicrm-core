@@ -51,7 +51,7 @@ class CRM_Event_Badge {
       'cap' => 'round',
       'join' => 'round',
       'dash' => '2,2',
-      'color' => array(0, 0, 200)
+      'color' => array(0, 0, 200),
     );
     $this->format = '5160';
     $this->imgExtension = 'png';
@@ -80,7 +80,7 @@ class CRM_Event_Badge {
    *
    * @param array $participants
    *
-   * @return null
+   * @return;
    */
   public function run(&$participants) {
     // fetch the 1st participant, and take her event to retrieve its attributes
@@ -154,8 +154,8 @@ class CRM_Event_Badge {
             'cap' => 'round',
             'join' => 'round',
             'dash' => '2,10',
-            'color' => array(255, 0, 0)
-          )
+            'color' => array(255, 0, 0),
+          ),
         ));
     }
     $img = $this->getImageFileName($this->event->id, $img);
@@ -172,7 +172,7 @@ class CRM_Event_Badge {
 
   /**
    * This is supposed to be overrided
-   **/
+   */
   public function generateLabel($participant) {
     $txt = "{$this->event['title']}
 {$participant['display_name']}
@@ -189,7 +189,7 @@ class CRM_Event_Badge {
    *
    * @param array $participants
    *
-   * @return null
+   * @return;
    */
   public function createLabels(&$participants) {
 

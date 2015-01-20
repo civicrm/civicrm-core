@@ -139,7 +139,7 @@ class CRM_Extension_Downloader {
    *   URL of a .zip file.
    * @param string $localFile
    *   Path at which to store the .zip file.
-   * @return boolean
+   * @return bool
    *   Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {

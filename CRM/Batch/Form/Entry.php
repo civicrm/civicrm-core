@@ -202,7 +202,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array(
           'create' => TRUE,
-          'placeholder' => ts('- select -')
+          'placeholder' => ts('- select -'),
         ));
 
       // special field specific to membership batch udpate
@@ -253,7 +253,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'contact' => array(
           'return' => implode(',', $contactReturnProperties),
           'fieldmap' => array_flip($contactReturnProperties),
-        )
+        ),
       ));
 
     // don't set the status message when form is submitted.

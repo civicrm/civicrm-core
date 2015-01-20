@@ -178,7 +178,7 @@ class CRM_Utils_SQL_Select {
   /**
    * Given a string like "field_name = @value", replace "@value" with an escaped SQL string
    *
-   * @param string SQL expression
+   * @param $expr SQL expression
    * @param null|array $args a list of values to insert into the SQL expression; keys are prefix-coded:
    *   prefix '@' => escape SQL
    *   prefix '#' => literal number, skip escaping but do validation

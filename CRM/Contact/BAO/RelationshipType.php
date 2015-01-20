@@ -147,7 +147,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
       throw new CRM_Core_Exception(ts('Invalid relationship type'));
     }
 
-
     //check dependencies
 
     // delete all relationships
@@ -164,8 +163,8 @@ UPDATE civicrm_membership_type
     $params = array(
       1 => array(
         CRM_Core_DAO::VALUE_SEPARATOR . $relationshipTypeId . CRM_Core_DAO::VALUE_SEPARATOR,
-        'String'
-      )
+        'String',
+      ),
     );
     CRM_Core_DAO::executeQuery($query, $params);
 

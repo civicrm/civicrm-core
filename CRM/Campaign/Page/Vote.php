@@ -98,7 +98,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       ->addSetting(array(
         'tabSettings' => array(
           'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
-        )
+        ),
       ));
   }
 
@@ -119,8 +119,8 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
           array(
             'manage campaign',
             'administer CiviCampaign',
-            "{$name} campaign contacts"
-          )
+            "{$name} campaign contacts",
+          ),
         ))
       ) {
         continue;

@@ -109,7 +109,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
                'phone',
                'email',
                'im',
-               'address'
+               'address',
              ) as $loc) {
       $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
       $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
@@ -216,7 +216,7 @@ WHERE e.id = %1";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
+   * @return bool
    */
   public static function dataExists(&$params) {
     // return if no data present
@@ -368,7 +368,7 @@ WHERE e.id = %1";
                'IM',
                'Phone',
                'Address',
-               'OpenID'
+               'OpenID',
              ) as $block) {
       $name = strtolower($block);
       if (array_key_exists($name, $primaryLocBlockIds) &&

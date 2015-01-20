@@ -199,7 +199,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return array
    *   the fields that are listings related
    */
-  static function getListingFields(
+  public static function getListingFields(
     $action,
     $visibility,
     $considerSelector = FALSE,
@@ -278,7 +278,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return array
    *   the fields that belong to this ufgroup(s)
    */
-  static function getFields(
+  public static function getFields(
     $id,
     $register = FALSE,
     $action = NULL,
@@ -422,9 +422,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @param CRM_Core_DAO_UFGroup|CRM_Core_DAO $group
    * @param CRM_Core_DAO_UFField|CRM_Core_DAO $field
+   * @param array $customFields
    * @param array $addressCustomFields
    * @param array $importableFields
-   * @param array $customFields
    * @param int $permissionType
    *   Eg CRM_Core_Permission::CREATE.
    * @return array
@@ -711,7 +711,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   The action of the form.
    *
    * @pram  boolean $register is this the registrtion form
-   * @return boolean
+   * @return bool
    *   true if form is valid
    */
   public static function isValid($userID, $title, $register = FALSE, $action = NULL) {
@@ -765,7 +765,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return string
    *   the html for the form on success, otherwise empty string
    */
-  static function getEditHTML(
+  public static function getEditHTML(
     $userID,
     $title,
     $action = NULL,
@@ -1376,7 +1376,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $id
    *   Profile Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function usedByModule($id) {
@@ -1401,7 +1401,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param int $id
    *   Profile Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function del($id) {
@@ -1739,7 +1739,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   Uf group id (profile id).
    * @param int $contactID
    *
-   * @return boolean
+   * @return bool
    *   true or false
    */
   public static function filterUFGroups($ufGroupId, $contactID = NULL) {
@@ -1791,7 +1791,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return null
    */
-  static function buildProfile(
+  public static function buildProfile(
     &$form,
     &$field,
     $mode,
@@ -1814,7 +1814,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     // do not display view fields in drupal registration form
     // CRM-4632
     if ($view && $mode == CRM_Profile_Form::MODE_REGISTER) {
-      return;
+      return NULL;
     }
 
     if ($usedFor == 'onbehalf') {
@@ -1841,14 +1841,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     if ($fieldName == 'image_URL' && $mode == CRM_Profile_Form::MODE_EDIT) {
       $deleteExtra = ts('Are you sure you want to delete contact image.');
       $deleteURL = array(
-        CRM_Core_Action::DELETE =>
-          array(
-            'name' => ts('Delete Contact Image'),
-            'url' => 'civicrm/contact/image',
-            'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
-            'extra' =>
-              'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
-          ),
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete Contact Image'),
+          'url' => 'civicrm/contact/image',
+          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
+          'extra' =>
+          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+        ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
@@ -2141,8 +2140,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
       $products = array(
-          '0' => ts('- select -'),
-        ) + $products;
+        '0' => ts('- select -'),
+      ) + $products;
       $sel->setOptions(array($products, $options));
     }
     elseif ($fieldName == 'payment_instrument') {
@@ -2329,10 +2328,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $componentId
    *   Id for specific components like contribute, event etc.
    * @param null $component
-   *
-   * @return null
    */
-  static function setProfileDefaults(
+  public static function setProfileDefaults(
     $contactId, &$fields, &$defaults,
     $singleProfile = TRUE, $componentId = NULL, $component = NULL
   ) {
@@ -2617,7 +2614,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getValidProfiles($required, $optional = NULL) {
     if (!is_array($required) || empty($required)) {
-      return;
+      return NULL;
     }
 
     $profiles = array();
@@ -2773,7 +2770,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return void
    */
-
   public static function commonSendMail($contactID, &$values) {
     if (!$contactID || !$values) {
       return;
@@ -3106,7 +3102,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $groupTypes
    *   With key having group type names.
    *
-   * @return Boolean
+   * @return bool
    */
   public static function updateGroupTypes($gId, $groupTypes = array()) {
     if (!is_array($groupTypes) || !$gId) {
@@ -3294,8 +3290,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       elseif ($name == 'membership_type') {
         // since membership_type field is a hierselect -
-        $defaults[$fldName][0] =
-          CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'member_of_contact_id', 'id');
+        $defaults[$fldName][0]
+          = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'member_of_contact_id', 'id');
         $defaults[$fldName][1] = $values['membership_type_id'];
       }
       elseif ($name == 'membership_status') {
@@ -3500,7 +3496,7 @@ SELECT  group_id
    * @param array $profileIds
    *   Associated array of profile ids.
    *
-   * @return boolean
+   * @return bool
    *   true if profile is mixed
    */
   public static function checkForMixProfiles($profileIds) {
@@ -3550,7 +3546,7 @@ SELECT  group_id
   /**
    * Determine of we show overlay profile or not
    *
-   * @return boolean
+   * @return bool
    *   true if profile should be shown else false
    */
   public static function showOverlayProfile() {
@@ -3577,7 +3573,7 @@ SELECT  group_id
    * @param int $profileId
    * @param string $groupType
    *
-   * @return Array
+   * @return array
    *   group type values
    */
   public static function groupTypeValues($profileId, $groupType = NULL) {

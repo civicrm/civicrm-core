@@ -80,7 +80,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
   public static function create(&$params, $ids) {
 
     if (!is_array($params) || empty($params)) {
-      return;
+      return NULL;
     }
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
@@ -190,7 +190,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param int $fieldId
    *   Price field id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function deleteValues($fieldId) {
@@ -209,7 +209,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param int $id
    *   Id.
    *
-   * @return boolean
+   * @return bool
    *
    */
   public static function del($id) {

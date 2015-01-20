@@ -34,7 +34,7 @@
  */
 class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
-  protected $_summary = NULL;
+  public $_summary = NULL;
 
   protected $_emailField = FALSE;
 
@@ -54,108 +54,108 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
-        'civicrm_contact' => array(
-          'dao' => 'CRM_Contact_DAO_Contact',
-          'fields' => array(
-            'sort_name' => array(
-              'title' => ts('Contact Name'),
-              'required' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-            'first_name' => array(
-              'title' => ts('First Name'),
-            ),
-            'middle_name' => array(
-              'title' => ts('Middle Name'),
-            ),
-            'last_name' => array(
-              'title' => ts('Last Name'),
-            ),
-            'id' => array(
-              'no_display' => TRUE,
-              'required' => TRUE,
-            ),
-            'contact_type' => array(
-              'title' => ts('Contact Type'),
-            ),
-            'contact_sub_type' => array(
-              'title' => ts('Contact Subtype'),
-            ),
-            'gender_id' => array(
-              'title' => ts('Gender'),
-            ),
-            'birth_date' => array(
-              'title' => ts('Birth Date'),
-            ),
-            'age' => array(
-              'title' => ts('Age'),
-              'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-            ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'required' => TRUE,
+            'no_repeat' => TRUE,
           ),
-          'filters' => array(
-            'sort_name' => array('title' => ts('Contact Name')),
-            'source' => array(
-              'title' => ts('Contact Source'),
-              'type' => CRM_Utils_Type::T_STRING,
-            ),
-            'id' => array(
-              'title' => ts('Contact ID'),
-              'no_display' => TRUE,
-            ),
-            'gender_id' => array(
-              'title' => ts('Gender'),
-              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-              'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-            ),
-            'birth_date' => array(
-              'title' => ts('Birth Date'),
-              'operatorType' => CRM_Report_Form::OP_DATE,
-            ),
+          'first_name' => array(
+            'title' => ts('First Name'),
           ),
-          'grouping' => 'contact-fields',
-          'order_bys' => array(
-            'sort_name' => array(
-              'title' => ts('Last Name, First Name'),
-              'default' => '1',
-              'default_weight' => '0',
-              'default_order' => 'ASC',
-            ),
-            'gender_id' => array(
-              'name' => 'gender_id',
-              'title' => ts('Gender'),
-            ),
-            'birth_date' => array(
-              'name' => 'birth_date',
-              'title' => ts('Birth Date'),
-            ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
           ),
         ),
-        'civicrm_email' => array(
-          'dao' => 'CRM_Core_DAO_Email',
-          'fields' => array(
-            'email' => array(
-              'title' => ts('Email'),
-              'no_repeat' => TRUE,
-            ),
+        'filters' => array(
+          'sort_name' => array('title' => ts('Contact Name')),
+          'source' => array(
+            'title' => ts('Contact Source'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
-          'grouping' => 'contact-fields',
-          'order_bys' => array(
-            'email' => array(
-              'title' => ts('Email'),
-            ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
-        'civicrm_phone' => array(
-          'dao' => 'CRM_Core_DAO_Phone',
-          'fields' => array(
-            'phone' => NULL,
-            'phone_ext' => array(
-              'title' => ts('Phone Extension'),
-            ),
+        'grouping' => 'contact-fields',
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC',
           ),
-          'grouping' => 'contact-fields',
+          'gender_id' => array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
+          ),
         ),
-      ) + $this->getAddressColumns(array('group_by' => FALSE));
+      ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Email'),
+            'no_repeat' => TRUE,
+          ),
+        ),
+        'grouping' => 'contact-fields',
+        'order_bys' => array(
+          'email' => array(
+            'title' => ts('Email'),
+          ),
+        ),
+      ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' => array(
+          'phone' => NULL,
+          'phone_ext' => array(
+            'title' => ts('Phone Extension'),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
+    ) + $this->getAddressColumns(array('group_by' => FALSE));
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;

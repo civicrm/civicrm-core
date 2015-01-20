@@ -89,7 +89,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       array(/* deceased[0], */
         $deceased[1]->id,
         $deceased[2]->id,
-        $living[0]->id
+        $living[0]->id,
       ),
       $group->id
     );
@@ -152,7 +152,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertCacheMatches(
       array(/* deceased[0], */
         $deceased[1]->id,
-        $deceased[2]->id
+        $deceased[2]->id,
       ),
       $parent->id
     );
@@ -224,7 +224,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * @param int $numObjects
    * @param bool $createOnly
    */
-  function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
+  public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);

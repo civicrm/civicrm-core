@@ -106,7 +106,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $this->add('select', 'target_entity_id',
       ts('Online Contribution Page'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) +
       CRM_Contribute_PseudoConstant::contributionPage()
     );
@@ -122,7 +122,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     if (!empty($pcpBlock->id) && CRM_PCP_BAO_PCP::getPcpBlockInUse($pcpBlock->id)) {
       foreach (array(
                  'target_entity_type',
-                 'target_entity_id'
+                 'target_entity_id',
                ) as $element_name) {
         $element = $this->getElement($element_name);
         $element->freeze();

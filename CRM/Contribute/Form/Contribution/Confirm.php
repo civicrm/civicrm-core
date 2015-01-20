@@ -840,6 +840,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($dupeParams['onbehalf'])) {
         unset($dupeParams['onbehalf']);
       }
+      if (!empty($dupeParams['honor'])) {
+        unset($dupeParams['honor']);
+      }
 
       $dedupeParams = CRM_Dedupe_Finder::formatParams($dupeParams, 'Individual');
       $dedupeParams['check_permission'] = FALSE;

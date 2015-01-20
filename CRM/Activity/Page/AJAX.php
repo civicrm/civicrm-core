@@ -77,7 +77,7 @@ class CRM_Activity_Page_AJAX {
       'reporter',
       'status',
       'links',
-      'class'
+      'class',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
@@ -293,8 +293,8 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            $row['actions'] =
-              '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions']
+              = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
               '</a>' .
               '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
@@ -303,8 +303,8 @@ class CRM_Activity_Page_AJAX {
             break;
 
           case 'caseRoles':
-            $row['actions'] =
-              '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions']
+              = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<span class="icon ui-icon-pencil"></span>' .
               '</a>';
             break;
@@ -375,7 +375,7 @@ class CRM_Activity_Page_AJAX {
 
     if (in_array($params['mode'], array(
       'move',
-      'file'
+      'file',
     ))) {
       $caseActivity = new CRM_Case_DAO_CaseActivity();
       $caseActivity->case_id = $params['caseID'];

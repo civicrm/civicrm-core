@@ -121,7 +121,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 
@@ -170,7 +169,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
-      return;
+      return NULL;
     }
 
     $defaults = $sortName = array();
@@ -258,7 +257,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     if ($inValidSubtypeCnt) {
       CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array(
             'plural' => 'Contact Subtype field of %count contacts has not been updated.',
-            'count' => $inValidSubtypeCnt
+            'count' => $inValidSubtypeCnt,
           )), ts('Invalid Subtype'));
     }
   }

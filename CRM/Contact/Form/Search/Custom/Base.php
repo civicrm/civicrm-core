@@ -95,7 +95,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @return string
    */
-  function sql(
+  public function sql(
     $selectClause,
     $offset = 0,
     $rowcount = 0,

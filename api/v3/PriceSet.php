@@ -44,7 +44,7 @@
  *
  * @return array
  *   api result array
- * {@getfields price_set_create}
+ *   {@getfields price_set_create}
  */
 function civicrm_api3_price_set_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -84,7 +84,7 @@ function _civicrm_api3_price_set_create_spec(&$params) {
  *
  * @return array
  *   Array of matching price_sets
- * {@getfields price_set_get}
+ *   {@getfields price_set_get}
  */
 function civicrm_api3_price_set_get($params) {
   // hack to make getcount work. - not sure the best approach here
@@ -112,7 +112,7 @@ function civicrm_api3_price_set_get($params) {
  *
  * @return array
  *   API result array
- * {@getfields price_set_delete}
+ *   {@getfields price_set_delete}
  */
 function civicrm_api3_price_set_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

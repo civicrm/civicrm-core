@@ -162,14 +162,14 @@ class CRM_Contact_Form_Task_SMSCommon {
         if ($extendTargetContacts) {
           $errorMess = ts('One selected activity consists of more than one target contact.', array(
             'count' => $extendTargetContacts,
-            'plural' => '%count selected activities consist of more than one target contact.'
+            'plural' => '%count selected activities consist of more than one target contact.',
           ));
         }
         if ($invalidActivity) {
           $errorMess = ($errorMess ? ' ' : '');
           $errorMess .= ts('The selected activity is invalid.', array(
             'count' => $invalidActivity,
-            'plural' => '%count selected activities are invalid.'
+            'plural' => '%count selected activities are invalid.',
           ));
         }
         CRM_Core_Error::statusBounce(ts("%1: SMS Reply will not be sent.", array(1 => $errorMess)));
@@ -269,7 +269,6 @@ class CRM_Contact_Form_Task_SMSCommon {
     if (isset($extendTargetContacts)) {
       $form->assign('extendTargetContacts', $extendTargetContacts);
     }
-
 
     $form->assign('toContact', json_encode($toArray));
     $form->assign('suppressedSms', $suppressedSms);
@@ -408,7 +407,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', array(
             'plural' => '%count messages were sent successfully.',
-            'count' => $countSuccess
+            'count' => $countSuccess,
           )), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
     }
 
@@ -422,7 +421,7 @@ class CRM_Contact_Form_Task_SMSCommon {
       $status .= '</ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
             'count' => count($sent),
-            'plural' => '%count Messages Not Sent'
+            'plural' => '%count Messages Not Sent',
           )), 'info');
     }
     else {
@@ -444,7 +443,7 @@ class CRM_Contact_Form_Task_SMSCommon {
         $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
         CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
               'count' => count($smsNotSent),
-              'plural' => '%count Messages Not Sent'
+              'plural' => '%count Messages Not Sent',
             )), 'info');
       }
     }

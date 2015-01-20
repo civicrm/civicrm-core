@@ -98,12 +98,9 @@ function civicrm_api3_website_delete($params) {
 /**
  * Retrieve one or more websites
  *
- * @param mixed[] (reference ) input parameters
- * {@getfields website_get}
+ * @param array $params
  * {@example WebsiteGet.php 0}
  * @example WebsiteGet.php
- * @param array $params
- *   An associative array of name/value pairs.
  *
  * @return array
  *   details of found websites

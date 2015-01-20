@@ -64,7 +64,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'js' => array(
         'js/angular-crmMailing.js',
         'js/angular-crmMailing/services.js',
-        'js/angular-crmMailing/directives.js'
+        'js/angular-crmMailing/directives.js',
       ),
       'css' => array('css/angular-crmMailing.css'),
     );
@@ -73,7 +73,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'js' => array(
         'js/angular-crmMailingAB.js',
         'js/angular-crmMailingAB/services.js',
-        'js/angular-crmMailingAB/directives.js'
+        'js/angular-crmMailingAB/directives.js',
       ),
       'css' => array('css/angular-crmMailingAB.css'),
     );
@@ -139,7 +139,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
         'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
             'id' => 'user_contact_id',
-            'return' => 'email'
+            'return' => 'email',
           )),
         'visibility' => array(
           array('value' => 'Public Pages', 'label' => ts('Public Pages')),

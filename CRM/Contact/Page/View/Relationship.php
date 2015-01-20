@@ -135,7 +135,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
    */
   public function browse() {
     // do nothing :) we are using datatable for rendering relationship selectors
@@ -144,7 +143,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   /**
    * called when action is update or new
    *
-   * @return null
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Relationship', ts('Contact Relationships'), $this->_action);
@@ -260,7 +258,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   /**
    * called to delete the relationship of a contact
    *
-   * @return null
    */
   public function delete() {
     // calls a function to delete relationship

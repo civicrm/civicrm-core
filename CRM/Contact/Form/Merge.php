@@ -131,7 +131,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->prev = $this->next = NULL;
     foreach (array(
                'prev',
-               'next'
+               'next',
              ) as $position) {
       if (!empty($pos[$position])) {
         if ($pos[$position]['id1'] && $pos[$position]['id2']) {
@@ -282,7 +282,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $buttons[] = array(
         'type' => 'done',
         'name' => ts('Merge and View Result'),
-        'icon' => 'circle-check'
+        'icon' => 'circle-check',
       );
     }
 

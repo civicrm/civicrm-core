@@ -231,7 +231,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
     $this->add('select', 'from_email_address',
       ts('From Email Address'), array(
-        '' => '- select -'
+        '' => '- select -',
       ) + $fromEmailAddress, TRUE
     );
 
@@ -558,7 +558,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     // set $header and $footer
     foreach (array(
                'header',
-               'footer'
+               'footer',
              ) as $part) {
       $$part = array();
       if ($params["{$part}_id"]) {
@@ -598,7 +598,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
     foreach (array(
                'text',
-               'html'
+               'html',
              ) as $file) {
       if (!$params['upload_type'] && !file_exists(CRM_Utils_Array::value('tmp_name', $files[$file . 'File']))) {
         continue;
@@ -667,7 +667,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
       if (!empty($dataErrors)) {
         $errors[$file . 'File'] = ts('The following errors were detected in %1:', array(
-            1 => $name
+            1 => $name,
           )) . ' <ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Sample CiviMail Messages', TRUE, NULL, NULL, NULL, "wiki") . '" target="_blank">' . ts('More information on required tokens...') . '</a>';
       }
     }

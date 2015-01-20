@@ -39,7 +39,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is browse
    *
-   * @return null
+   * @return void
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);

@@ -381,20 +381,18 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
     // If we have active campaigns add those elements to both the fields and filters
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_participant']['fields']['campaign_id'] =
-        array(
-          'title' => ts('Campaign'),
-          'default' => 'false',
-        );
-      $this->_columns['civicrm_participant']['filters']['campaign_id'] =
-        array(
-          'title' => ts('Campaign'),
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => $this->activeCampaigns,
-        );
-      $this->_columns['civicrm_participant']['order_bys']['campaign_id'] =
-        array('title' => ts('Campaign'));
-
+      $this->_columns['civicrm_participant']['fields']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'default' => 'false',
+      );
+      $this->_columns['civicrm_participant']['filters']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'options' => $this->activeCampaigns,
+      );
+      $this->_columns['civicrm_participant']['order_bys']['campaign_id'] = array(
+        'title' => ts('Campaign'),
+      );
     }
 
     $this->_currencyColumn = 'civicrm_participant_fee_currency';
@@ -402,6 +400,8 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   }
 
   /**
+   * Searches database for priceset values.
+   *
    * @return array
    */
   public function getPriceLevels() {
@@ -424,8 +424,7 @@ ORDER BY  cv.label
     }
 
     return $elements;
-  } //searches database for priceset values
-
+  }
 
   public function preProcess() {
     parent::preProcess();
@@ -573,8 +572,7 @@ ORDER BY  cv.label
       $this->_where = "WHERE {$this->_aliases['civicrm_participant']}.is_test = 0 ";
     }
     else {
-      $this->_where =
-        "WHERE {$this->_aliases['civicrm_participant']}.is_test = 0 AND " .
+      $this->_where = "WHERE {$this->_aliases['civicrm_participant']}.is_test = 0 AND " .
         implode(' AND ', $clauses);
     }
     if ($this->_aclWhere) {

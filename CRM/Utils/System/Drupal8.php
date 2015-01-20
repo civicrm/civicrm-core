@@ -422,8 +422,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * This function does nothing in Drupal 8. Changes to the base_url should be made
    * in settings.php directly.
    *
-   * @param null
-   *
    * @return void
    */
   public function mapConfigToSSL() {
@@ -482,7 +480,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return array|bool
    *   [contactID, ufID, uniqueString] if success else false if no auth
    *
-   * This always bootstraps Drupal
+   *   This always bootstraps Drupal
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     (new CRM_Utils_System_Drupal8())->loadBootStrap(array(), FALSE);

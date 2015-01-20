@@ -71,10 +71,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built
-   *
-   * @param null
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -97,8 +93,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   * @param null
    *
    * @return array
    *   array of default values
@@ -166,10 +160,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // lets trim all the whitespace
@@ -291,9 +281,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $js = array('onchange' => "calculateRowValues( $i );");
 
         $this->add('select', 'membership_type_id[' . $i . ']', ts('Membership Type'),
-          array(
-            '' => ' '
-          ) + $membershipTypes, FALSE, $js
+          array('' => ' ') + $membershipTypes, FALSE, $js
         );
         $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), CRM_Utils_Array::value('membership_num_terms', $attributes));
       }
@@ -604,10 +592,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
   /**
    * Process the form
-   *
-   * @param null
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

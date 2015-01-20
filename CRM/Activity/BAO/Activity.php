@@ -30,12 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * This class is for activity functions
- *
+ * This class is for activity functions.s
  */
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
@@ -54,7 +52,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   static $_importableFields = NULL;
 
   /**
-   * Check if there is absolute minimum of data to add the object
+   * Check if there is absolute minimum of data to add the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -69,7 +67,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -139,12 +137,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Delete the activity
+   * Delete the activity.
    *
    * @param array $params
    * @param bool $moveToTrash
    *
-   * @return void
+   * @return mixed
    */
   public static function deleteActivity(&$params, $moveToTrash = FALSE) {
     // CRM-9137
@@ -245,7 +243,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Delete activity assignment record
+   * Delete activity assignment record.
    *
    * @param int $activityId
    * @param int $recordTypeID
@@ -260,7 +258,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Process the activities
+   * Process the activities.
    *
    * @param array $params
    *   Associated array of the submitted values.
@@ -613,8 +611,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * @param $activity
-   * @param null $logMessage
+   * Create an activity.
+   *
+   * @todo elaborate on what this does.
+   *
+   * @param CRM_Core_DAO_Activity $activity
+   * @param string $logMessage
    *
    * @return bool
    */
@@ -638,7 +640,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Get the list Activities
+   * Get the list Activities.
    *
    * @param array $input
    *   Array of parameters.
@@ -653,8 +655,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - activity_type_id int|string the activitiy types we want to restrict by
    *
    * @return array
-   *   (reference)      $values the relevant data object values of open activities
-   *
+   *   Relevant data object values of open activities
    */
   public static function &getActivities($input) {
     //step 1: Get the basic activity data
@@ -897,9 +898,12 @@ ORDER BY    fixed_sort_order
   }
 
   /**
-   * Get the component id and name those are enabled and logged in
-   * user has permission. To decide whether we are going to include
-   * component related activities w/ core activity retrieve process.
+   * Get the component id and name if those are enabled and allowed.
+   *
+   * Checks whether logged in user has permission.
+   * To decide whether we are going to include
+   * component related activities with core activity retrieve process.
+   * (what did that just mean?)
    *
    * @return array
    *   Array of component id and name.
@@ -930,7 +934,7 @@ ORDER BY    fixed_sort_order
   }
 
   /**
-   * Get the activity Count
+   * Get the activity Count.
    *
    * @param array $input
    *   Array of parameters.
@@ -943,7 +947,6 @@ ORDER BY    fixed_sort_order
    *
    * @return int
    *   count of activities
-   *
    */
   public static function &getActivitiesCount($input) {
     $input['count'] = TRUE;
@@ -966,7 +969,7 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
   }
 
   /**
-   * Get the activity sql clause to pick activities
+   * Get the activity sql clause to pick activities.
    *
    * @param array $input
    *   Array of parameters.
@@ -980,7 +983,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
    *
    * @return int
    *   count of activities
-   *
    */
   public static function getActivitySQLClause($input) {
     $params = array();
@@ -1145,8 +1147,9 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the message to all the contacts and also insert a
-   * contact activity in each contacts record
+   * Send the message to all the contacts.
+   *
+   * Also insert a contact activity in each contacts record.
    *
    * @param array $contactDetails
    *   The array of contact details to send the email.
@@ -1184,7 +1187,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
-    $contactIds, // FIXME a param with no default shouldn't be last
+    // FIXME a param with no default shouldn't be last
+    $contactIds,
     $additionalDetails = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
@@ -1357,6 +1361,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
+   * Send SMS.
+   *
    * @param array $contactDetails
    * @param array $activityParams
    * @param array $smsParams
@@ -1489,12 +1495,11 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the sms message to a specific contact
+   * Send the sms message to a specific contact.
    *
    * @param int $toID
    *   The contact id of the recipient.
    * @param $tokenText
-   * @param $tokenHtml
    * @param array $smsParams
    *   The params used for sending sms.
    * @param int $activityID
@@ -1564,7 +1569,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Send the message to a specific contact
+   * Send the message to a specific contact.
    *
    * @param string $from
    *   The name and email of the sender.
@@ -1647,7 +1652,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important and should be done in the
@@ -1704,7 +1709,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
-   * get the Activities of a target contact
+   * Get the Activities of a target contact.
    *
    * @param int $contactId
    *   Id of the contact whose activities need to find.
@@ -1777,7 +1782,7 @@ WHERE      activity.id IN ($activityIds)";
   }
 
   /**
-   * Add activity for Membership/Event/Contribution
+   * Add activity for Membership/Event/Contribution.
    *
    * @param object $activity
    *   (reference) particular component object.
@@ -1896,13 +1901,13 @@ SELECT  display_name
   }
 
   /**
-   * Get Parent activity for currently viewed activity
+   * Get Parent activity for currently viewed activity.
    *
    * @param int $activityId
    *   Current activity id.
    *
    * @return int
-   *   $parentId  Id of parent activity otherwise false.
+   *   Id of parent activity otherwise false.
    */
   public static function getParentActivity($activityId) {
     static $parentActivities = array();
@@ -1924,7 +1929,7 @@ SELECT  display_name
   }
 
   /**
-   * Get total count of prior revision of currently viewd activity
+   * Get total count of prior revision of currently viewed activity.
    *
    * @param $activityID
    *   Current activity id.
@@ -1962,7 +1967,7 @@ AND id < {$activityID}
   }
 
   /**
-   * Get all prior activities of currently viewed activity
+   * Get all prior activities of currently viewed activity.
    *
    * @param $activityID
    *   Current activity id.
@@ -2013,7 +2018,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Find the latest revision of a given activity
+   * Find the latest revision of a given activity.
    *
    * @param int $activityID
    *   Prior activity id.
@@ -2046,7 +2051,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Create a follow up a given activity
+   * Create a follow up a given activity.
    *
    * @param int $activityId
    *   activity id of parent activity.
@@ -2093,7 +2098,6 @@ AND cl.modified_id  = c.id
    *
    * @return string|bool
    *   if file exists returns $activityTypeFile activity filename otherwise false.
-   *
    */
   public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
@@ -2120,11 +2124,11 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Restore the activity
+   * Restore the activity.
    *
    * @param array $params
    *
-   * @return void
+   * @return CRM_Activity_DAO_Activity
    */
   public static function restoreActivity(&$params) {
     $activity = new CRM_Activity_DAO_Activity();
@@ -2137,7 +2141,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Get the exportable fields for Activities
+   * Get the exportable fields for Activities.
    *
    * @param string $name
    *   If it is called by case $name = Case else $name = Activity.
@@ -2160,8 +2164,16 @@ AND cl.modified_id  = c.id
         );
 
         $Activityfields = array(
-          'activity_type' => array('title' => ts('Activity Type'), 'name' => 'activity_type', 'type' => CRM_Utils_Type::T_STRING),
-          'activity_status' => array('title' => ts('Activity Status'), 'name' => 'activity_status', 'type' => CRM_Utils_Type::T_STRING),
+          'activity_type' => array(
+            'title' => ts('Activity Type'),
+            'name' => 'activity_type',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'activity_status' => array(
+            'title' => ts('Activity Status'),
+            'name' => 'activity_status',
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         );
         $fields = array_merge($Activityfields, $exportableFields);
       }
@@ -2199,7 +2211,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Get the allowed profile fields for Activities
+   * Get the allowed profile fields for Activities.
    *
    * @return array
    *   array of activity profile Fields
@@ -2235,8 +2247,10 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * This function deletes the activity record related to contact record,
-   * when there are no target and assignee record w/ other contact.
+   * This function deletes the activity record related to contact record.
+   *
+   * This is conditional on there being no target and assignee record
+   * with other contacts.
    *
    * @param int $contactId
    *   ContactId.
@@ -2283,7 +2297,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Does user has sufficient permission for view/edit activity record?
+   * Does user has sufficient permission for view/edit activity record.
    *
    * @param int $activityId
    *   Activity record id.
@@ -2435,13 +2449,13 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * wrapper for ajax activity selector
+   * Wrapper for ajax activity selector.
    *
    * @param array $params
    *   Associated array for params record id.
    *
    * @return array
-   *   associated array of contact activities
+   *   Associated array of contact activities
    */
   public static function getContactActivitySelector(&$params) {
     // format the params
@@ -2585,7 +2599,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
-   * copy custom fields and attachments from an existing activity to another.
+   * Copy custom fields and attachments from an existing activity to another.
+   *
    * @see CRM_Case_Page_AJAX::_convertToCaseActivity()
    *
    * @param array $params
@@ -2629,6 +2644,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get activity contact.
+   *
    * @param int $activityId
    * @param int $recordTypeID
    * @param string $column
@@ -2648,6 +2665,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Get source contact id.
+   *
    * @param int $activityId
    *
    * @return null
@@ -2663,6 +2682,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Set api filter.
+   *
+   * @todo Document what this is for.
+   *
    * @param array $params
    */
   public function setApiFilter(&$params) {

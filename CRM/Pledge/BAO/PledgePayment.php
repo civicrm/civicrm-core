@@ -213,7 +213,7 @@ WHERE     pledge_id = %1
    * @return CRM_Pledge_BAO_PledgePayment
    */
   public static function retrieve(&$params, &$defaults) {
-    $payment = new CRM_Pledge_BAO_PledgePayment;
+    $payment = new CRM_Pledge_BAO_PledgePayment();
     $payment->copyValues($params);
     if ($payment->find(TRUE)) {
       CRM_Core_DAO::storeValues($payment, $defaults);
@@ -339,7 +339,7 @@ WHERE     pledge_id = %1
    * @return int
    *   $newStatus, updated status id (or 0)
    */
-  static function updatePledgePaymentStatus(
+  public static function updatePledgePaymentStatus(
     $pledgeID,
     $paymentIDs = NULL,
     $paymentStatusID = NULL,
@@ -631,7 +631,7 @@ WHERE  civicrm_pledge.id = %2
    *   , is function being called from bin script?.
    *
    */
-  static function updatePledgePayments(
+  public static function updatePledgePayments(
     $pledgeId,
     $paymentStatusId,
     $paymentIds = NULL,

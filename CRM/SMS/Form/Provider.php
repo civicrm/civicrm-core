@@ -30,11 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
- *
+ * SMS Form.
  */
 class CRM_SMS_Form_Provider extends CRM_Core_Form {
   protected $_id = NULL;
@@ -62,9 +61,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -99,7 +96,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
 
     $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array(
         'CRM_SMS_DAO_Provider',
-        $this->_id
+        $this->_id,
       ));
 
     $this->add('text', 'username', ts('Username'),
@@ -124,15 +121,8 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
+   * Set the default values of various form elements.
    *
-   * access        public
-   *
-   * @return array
-   *   reference to the array of default values
-   */
-  /**
    * @return array
    */
   public function setDefaultValues() {
@@ -153,8 +143,9 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $this->_id;
 
-    if ($name)
+    if ($name) {
       $dao->name = $name;
+    }
 
     if (!$dao->find(TRUE)) {
       return $defaults;
@@ -166,10 +157,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
-   *
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
 

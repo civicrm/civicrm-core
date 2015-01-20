@@ -67,7 +67,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   /**
    * Constructor
    */
-  function __construct() {
+  public function __construct() {
     $template = CRM_Core_Smarty::singleton();
     parent::__construct($template);
   }
@@ -147,7 +147,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param string $error
    *   Error associated with the element.
    *
-   * @return array
    */
   public static function updateAttributes(&$element, $required, $error) {
     // lets create an id for all input elements, so we can generate nice label tags
@@ -289,7 +288,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         }
         $field->setAttribute('data-entity-value', json_encode(array(
               'id' => $contact['id'],
-              'text' => implode(' :: ', $view)
+              'text' => implode(' :: ', $view),
             )));
       }
     }

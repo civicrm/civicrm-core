@@ -156,7 +156,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     foreach ($fields as $f) {
       if (in_array($f, array(
         'is_default',
-        'is_ssl'
+        'is_ssl',
       ))) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
       }

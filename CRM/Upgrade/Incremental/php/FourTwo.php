@@ -188,7 +188,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
       }
     }
     // Drop index UI_title for civicrm_price_set
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
@@ -285,7 +285,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
       $dao = CRM_Core_DAO::executeQuery($query);
 
       if (!$dao->N) {
-        $domain = new CRM_Core_DAO_Domain;
+        $domain = new CRM_Core_DAO_Domain();
         $domain->find(TRUE);
 
         if ($domain->locales) {
@@ -433,7 +433,7 @@ WHERE     cpse.price_set_id IS NULL";
       $addTo[2] = $dao->contribution_page_id;
       $options = array(
         'otherAmount' => $dao->is_allow_other_amount,
-        'membership' => $dao->membership_block_id
+        'membership' => $dao->membership_block_id,
       );
       self::createPriceSet($daoName, $addTo, $options);
     }
@@ -655,7 +655,7 @@ WHERE     cpf.price_set_id = %1
           '2' => array('membership_amount', 'String'),
           '3' => array(
             CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $result->membership_id, 'membership_type_id'),
-            'Integer'
+            'Integer',
           ),
         );
         $res = CRM_Core_DAO::executeQuery($sql, $params);
@@ -721,12 +721,12 @@ WHERE     cpf.price_set_id = %1
           if (!empty($defaults)) {
             $lineParams['price_field_id'] = $defaults['id'];
             $lineParams['label'] = $defaults['label'];
-            $lineParams['price_field_value_id'] =
-              CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $defaults['id'], 'id', 'price_field_id');
+            $lineParams['price_field_value_id']
+              = CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $defaults['id'], 'id', 'price_field_id');
           }
           else {
-            $lineParams['price_field_id'] =
-              CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $priceSetId, 'id', 'price_set_id');
+            $lineParams['price_field_id']
+              = CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $priceSetId, 'id', 'price_set_id');
             $lineParams['label'] = 'Contribution Amount';
           }
           $lineParams['qty'] = 1;
@@ -967,7 +967,7 @@ VALUES
           $dao->start_date,
           $dao->end_date,
           $memStatus,
-          $status
+          $status,
         );
       }
     }

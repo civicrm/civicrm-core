@@ -142,8 +142,7 @@ class CiviContributeProcessor {
    * @param $start
    * @param $end
    */
-  static
-  function paypal($paymentProcessor, $paymentMode, $start, $end) {
+  public static function paypal($paymentProcessor, $paymentMode, $start, $end) {
     $url = "{$paymentProcessor['url_api']}nvp";
 
     $keyArgs = array(
@@ -186,7 +185,7 @@ class CiviContributeProcessor {
           // details about a transaction, let's make sure that it doesn't
           // already exist in the database.
           require_once 'CRM/Contribute/DAO/Contribution.php';
-          $dao = new CRM_Contribute_DAO_Contribution;
+          $dao = new CRM_Contribute_DAO_Contribution();
           $dao->trxn_id = $value;
           if ($dao->find(TRUE)) {
             preg_match('/(\d+)$/', $name, $matches);
@@ -248,8 +247,7 @@ class CiviContributeProcessor {
    * @param $start
    * @param $end
    */
-  static
-  function google($paymentProcessor, $paymentMode, $start, $end) {
+  public static function google($paymentProcessor, $paymentMode, $start, $end) {
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
     require_once 'CRM/Core/Payment/Google.php';
     $nextPageToken = TRUE;
@@ -282,9 +280,7 @@ class CiviContributeProcessor {
           $response[1][$response[0]]['notifications']['charge-amount-notification'][] = $chrgAmt;
         }
 
-        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification']
-                 as $amtData
-        ) {
+        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification'] as $amtData) {
           $searchParams = array(
             'order-numbers' => array($amtData['google-order-number']['VALUE']),
             'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
@@ -321,8 +317,7 @@ class CiviContributeProcessor {
     }
   }
 
-  static
-  function csv() {
+  public static function csv() {
     $csvFile = '/home/deepak/Desktop/crm-4247.csv';
     $delimiter = ";";
     $row = 1;
@@ -364,8 +359,7 @@ class CiviContributeProcessor {
     fclose($handle);
   }
 
-  static
-  function process() {
+  public static function process() {
     require_once 'CRM/Utils/Request.php';
 
     $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'csv', 'REQUEST');

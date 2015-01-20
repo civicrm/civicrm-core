@@ -41,7 +41,7 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
       'edit-1-profile-create',
       'edit-1-profile-edit',
       'edit-1-profile-listings',
-      'edit-1-profile-view'
+      'edit-1-profile-view',
     );
     $this->changePermissions($permission);
 

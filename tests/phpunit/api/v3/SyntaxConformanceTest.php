@@ -65,13 +65,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     'Survey' => 'CiviCampaign',
   );
 
-  /* they are two types of missing APIs:
-       - Those that are to be implemented
-         (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
-       Those that don't exist
-         and that will never exist (eg an obsoleted Entity
-         they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
-    */
+  /**
+   * Set up function.
+   *
+   * There are two types of missing APIs:
+   * Those that are to be implemented
+   * (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
+   * Those that don't exist
+   * and that will never exist (eg an obsoleted Entity
+   * they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
+   */
   public function setUp() {
     parent::setUp();
     $this->enableCiviCampaign();
@@ -83,7 +86,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'ReportTemplate',
       'System',
-      'Setting'
+      'Setting',
     );
     $this->toBeImplemented['create'] = array(
       'SurveyRespondant',
@@ -94,7 +97,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomSearch',
       'Extension',
       'ReportTemplate',
-      'System'
+      'System',
     );
     $this->toBeImplemented['delete'] = array(
       'MembershipPayment',
@@ -104,9 +107,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFMatch',
       'Extension',
       'LocationType',
-      'System'
+      'System',
     );
-    $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain', 'Setting');
+    $this->onlyIDNonZeroCount['get'] = array(
+      'ActivityType',
+      'Entity',
+      'Domain',
+      'Setting',
+    );
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
     $this->deletableTestObjects = array();
   }
@@ -120,11 +128,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param null $skip
+   * Generate list of all entities.
+   *
+   * @param array $skip
+   *   Entities to skip.
    *
    * @return array
    */
-  public static function entities($skip = NULL) {
+  public static function entities($skip = array()) {
     // The order of operations in here is screwy. In the case where SYNTAX_CONFORMANCE_ENTITIES is
     // defined, we should be able to parse+return it immediately. However, some weird dependency
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
@@ -149,6 +160,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get list of entities for get test.
+   *
    * @return array
    */
   public static function entities_get() {
@@ -157,6 +170,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities for create tests.
+   *
    * @return array
    */
   public static function entities_create() {
@@ -225,6 +240,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities to be skipped on get tests.
+   *
    * @param bool $sequential
    *
    * @return array
@@ -235,7 +252,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventConfirm',
       'MailingEventResubscribe',
       'MailingEventUnsubscribe',
-      'Location'
+      'Location',
     );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -248,6 +265,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities to be skipped for get call.
+   *
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
    * support id in API but in this case the underlying tables are crying out for a restructure
    * & it just doesn't make sense, on the otherhand Event need id to be existant as pseudo property
@@ -298,7 +317,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Domain',
       'Profile',
       'CustomValue',
-      'Setting'
+      'Setting',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;

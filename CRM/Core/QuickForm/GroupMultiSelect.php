@@ -118,7 +118,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       // set name of Select From Box
       $this->_attributesUnselected = array(
         'name' => '__' . $selectName,
-        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')"
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')",
       );
       $this->_attributesUnselected = array_merge($this->_attributes, $this->_attributesUnselected);
       $attrUnselected = $this->_getAttrString($this->_attributesUnselected);
@@ -126,7 +126,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       // set name of Select To Box
       $this->_attributesSelected = array(
         'name' => '_' . $selectName,
-        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')"
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')",
       );
       $this->_attributesSelected = array_merge($this->_attributes, $this->_attributesSelected);
       $attrSelected = $this->_getAttrString($this->_attributesSelected);
@@ -134,7 +134,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       // set name of Select hidden Box
       $this->_attributesHidden = array(
         'name' => $selectName,
-        'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;'
+        'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;',
       );
       $this->_attributesHidden = array_merge($this->_attributes, $this->_attributesHidden);
       $attrHidden = $this->_getAttrString($this->_attributesHidden);

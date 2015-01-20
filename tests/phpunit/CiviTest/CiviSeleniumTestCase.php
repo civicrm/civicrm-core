@@ -708,7 +708,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param int $row
    * @param string $prefix
    */
-  function webtestNewDialogContact(
+  public function webtestNewDialogContact(
     $fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
     $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
     // 4 - Individual profile
@@ -809,7 +809,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @throws PHPUnit_Framework_AssertionFailedError
    * @return int
    */
-
   public function webtestAddPaymentProcessor($processorName = 'Test Processor', $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
     if (!$processorName) {
       $this->fail("webTestAddPaymentProcessor requires $processorName.");
@@ -936,7 +935,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if (!$filePath) {
       $filePath = '/tmp/testfile_' . substr(sha1(rand()), 0, 7) . '.txt';
       $fp = @fopen($filePath, 'w');
-      fputs($fp, 'Test file created by selenium test.');
+      fwrite($fp, 'Test file created by selenium test.');
       @fclose($fp);
     }
 
@@ -1067,7 +1066,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @return null
    *   of newly created online contribution page.
    */
-  function webtestAddContributionPage(
+  public function webtestAddContributionPage(
     $hash = NULL,
     $rand = NULL,
     $pageTitle = NULL,
@@ -1627,8 +1626,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * @return bool
    */
-  static
-  public function checkDoLocalDBTest() {
+  public static function checkDoLocalDBTest() {
     if (defined('CIVICRM_WEBTEST_LOCAL_DB') &&
       CIVICRM_WEBTEST_LOCAL_DB
     ) {
@@ -1649,7 +1647,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param array $match
    *   Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
-   * @param boolean $delete
+   * @param bool $delete
    *   are we checking that a DELETE action occurred?
    */
   public function assertDBState($daoName, $id, $match, $delete = FALSE) {
@@ -1732,7 +1730,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $taxRate
    * @param bool $isDefault
    */
-  function _testAddFinancialAccount(
+  public function _testAddFinancialAccount(
     $financialAccountTitle,
     $financialAccountDescription = FALSE,
     $accountingCode = FALSE,
@@ -1823,7 +1821,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $taxRate
    * @param bool $isDefault
    */
-  function _testEditFinancialAccount(
+  public function _testEditFinancialAccount(
     $editfinancialAccount,
     $financialAccountTitle = FALSE,
     $financialAccountDescription = FALSE,

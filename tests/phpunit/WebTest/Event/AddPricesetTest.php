@@ -264,7 +264,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Fee_upload_done-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->click("xpath=//tbale[@id='paymentProcessor']/tbody/tr[1]/td[2]/label[text()='$processorName']");
-    $this->select('financial_type_id','label=Event Fee');
+    $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
     // intro text for registration page

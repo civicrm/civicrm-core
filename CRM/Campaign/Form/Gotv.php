@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -50,11 +49,9 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   protected $_searchVoterFor;
 
   /**
-   * Processing needed for buildForm and later
-   *
-   * @return void
+   * Processing needed for buildForm and later.
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
@@ -96,10 +93,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     if ($this->_search) {

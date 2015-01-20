@@ -47,8 +47,8 @@ class CRM_Core_CodeGen_Specification {
           foreach ($table['foreignKey'] as $fkName => $fkValue) {
             if ($this->tables[$fkValue['table']]['archive'] == 'true') {
               $table['foreignKey'][$fkName]['table'] = 'archive_' . $table['foreignKey'][$fkName]['table'];
-              $table['foreignKey'][$fkName]['uniqName'] =
-                str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
+              $table['foreignKey'][$fkName]['uniqName']
+                = str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
             }
           }
           $archiveTables[$name] = $table;
@@ -274,7 +274,6 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $tables[$name] = &$table;
-    return;
   }
 
   /**
@@ -303,7 +302,7 @@ class CRM_Core_CodeGen_Specification {
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
 
-        break;
+      break;
 
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = $type;

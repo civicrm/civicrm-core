@@ -70,7 +70,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'value' => 'foo',
           'is_active' => 1,
           'weight' => 0,
-        )
+        ),
       ),
     );
     $result = civicrm_api3('custom_field', 'create', $api_params);
@@ -1083,14 +1083,14 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     // But we can also fetch by ID
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
         'keyColumn' => 'id',
-        'labelColumn' => 'name'
+        'labelColumn' => 'name',
       ));
     $this->assertEquals($byId, $result);
     // Make sure flip param works
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
         'keyColumn' => 'id',
         'labelColumn' => 'name',
-        'flip' => TRUE
+        'flip' => TRUE,
       ));
     $this->assertEquals(array_flip($byId), $result);
   }

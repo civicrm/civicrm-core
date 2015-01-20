@@ -34,7 +34,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       array('is_transactional' => TRUE, 'options' => array('force_rollback' => TRUE)),
       TRUE,
       TRUE,
-      TRUE
+      TRUE,
     );
     $r[] = array(
       3,
@@ -43,7 +43,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       array('is_transactional' => TRUE, 'options' => array('force_rollback' => FALSE)),
       TRUE,
       FALSE,
-      FALSE
+      FALSE,
     );
     $r[] = array(
       3,
@@ -52,7 +52,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       array('is_transactional' => FALSE, 'options' => array('force_rollback' => TRUE)),
       TRUE,
       TRUE,
-      TRUE
+      TRUE,
     );
     $r[] = array(
       3,
@@ -61,7 +61,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       array('is_transactional' => FALSE, 'options' => array('force_rollback' => FALSE)),
       FALSE,
       FALSE,
-      FALSE
+      FALSE,
     );
 
     $r[] = array(4, 'Widget', 'get', array(), FALSE, FALSE, FALSE);

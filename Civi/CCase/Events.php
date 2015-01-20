@@ -63,6 +63,7 @@ class Events {
 
     if ($caseId) {
       if (!isset(self::$isActive[$caseId])) {
+        $tx = new \CRM_Core_Transaction();
         \CRM_Core_Transaction::addCallback(
           \CRM_Core_Transaction::PHASE_POST_COMMIT,
           array(__CLASS__, 'fireCaseChangeForRealz'),
@@ -87,7 +88,7 @@ class Events {
   /**
    * Find any extra listeners declared in XML and pass the event along to them
    *
-   * @param Event\CaseChangeEvent $event
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
    */
   public static function delegateToXmlListeners(\Civi\CCase\Event\CaseChangeEvent $event) {
     $p = new \CRM_Case_XMLProcessor_Process();

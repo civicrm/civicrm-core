@@ -140,7 +140,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
@@ -299,7 +299,7 @@ SELECT end_event_adjust_interval
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
@@ -451,7 +451,7 @@ SELECT end_event_adjust_interval
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }
@@ -605,7 +605,7 @@ SELECT end_event_adjust_interval
     foreach (array(
                'joinDate',
                'startDate',
-               'endDate'
+               'endDate',
              ) as $date) {
       $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
     }

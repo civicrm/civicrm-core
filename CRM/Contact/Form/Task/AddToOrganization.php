@@ -63,7 +63,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
       'relationship_type_id',
       ts('Relationship Type'),
       array(
-        '' => ts('- select -')
+        '' => ts('- select -'),
       ) +
       CRM_Contact_BAO_Relationship::getRelationType("Organization"), TRUE
     );
@@ -88,13 +88,11 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
       $this->assign('searchRows', $searchRows);
     }
 
-
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', ts('Organization'));
     $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
     $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
-
 
     $this->addButtons(array(
         array(
@@ -166,27 +164,27 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
             'count' => $valid,
             'plural' => '%count %2 %3 relationships created',
             2 => $relationship,
-            3 => $org
-          ))
+            3 => $org,
+          )),
       );
       if ($duplicate) {
         $status[] = ts('%count was skipped because the contact is already %2 %3', array(
             'count' => $duplicate,
             'plural' => '%count were skipped because the contacts are already %2 %3',
             2 => $relationship,
-            3 => $org
+            3 => $org,
           ));
       }
       if ($invalid) {
         $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array(
             'count' => $invalid,
-            'plural' => '%count relationships were not created because the contact is not of the right type for this relationship'
+            'plural' => '%count relationships were not created because the contact is not of the right type for this relationship',
           ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts('Relationship created.', array(
             'count' => $valid,
-            'plural' => 'Relationships created.'
+            'plural' => 'Relationships created.',
           )), 'success', array('expires' => 0));
     }
   }

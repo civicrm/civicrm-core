@@ -70,8 +70,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Option Group ID for Paper Sizes
    *
-   * @param void
-   *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
    */
@@ -92,8 +90,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param string $returnURL
    *   URL of page calling this function.
    *
-   * @return array
-   *   (reference)   List of Paper Sizes
    */
   public static function &addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
@@ -132,8 +128,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
   /**
    * Retrieve the default Paper Size values
-   *
-   * @param NULL
    *
    * @return array
    *   Name/value pairs containing the default Paper Size values.

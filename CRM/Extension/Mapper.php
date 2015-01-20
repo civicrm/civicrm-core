@@ -147,7 +147,7 @@ class CRM_Extension_Mapper {
    * @param string $key
    *   A string which might be an extension key.
    *
-   * @return boolean
+   * @return bool
    *   true if given string is an extension name
    */
   public function isExtensionKey($key) {
@@ -162,7 +162,7 @@ class CRM_Extension_Mapper {
    * @param string $clazz
    *   A string which might be an extension class name.
    *
-   * @return boolean
+   * @return bool
    *   true if given string is an extension class name
    */
   public function isExtensionClass($clazz) {

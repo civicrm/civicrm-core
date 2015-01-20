@@ -30,14 +30,12 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
@@ -130,7 +128,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.
@@ -146,7 +144,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return \CRM_Pledge_Selector_Search
    */
-  function __construct(
+  public function __construct(
     &$queryParams,
     $action = CRM_Core_Action::NONE,
     $additionalClause = NULL,
@@ -176,8 +174,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
    *
+   * Currently the links added for each row are:
    * - View
    * - Edit
    *
@@ -249,7 +247,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param int $action
    *
    * @return int
    *   Total number of rows
@@ -264,7 +262,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -362,6 +360,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
+   * Get qill (display what was searched on).
+   *
    * @inheritDoc
    */
   public function getQILL() {
@@ -369,8 +369,9 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * Returns the column headers as an array of tuples:
-   * (name, sortName (key to the sort array))
+   * Returns the column headers as an array of tuples.
+   *
+   * Keys are name, sortName, key to the sort array
    *
    * @param string $action
    *   The action being performed.
@@ -441,6 +442,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
+   * Get sql query string.
+   *
    * @return string
    */
   public function &getQuery() {

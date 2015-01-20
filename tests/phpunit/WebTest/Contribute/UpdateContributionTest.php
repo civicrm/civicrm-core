@@ -174,10 +174,10 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount,null,"Verify actual cost for changed premium");
+    $this->assertEquals($actualAmount, NULL, "Verify actual cost for changed premium");
 
     $deletedAmount = $this->_getPremiumActualCost($contId, $from, $to, $cost, "'civicrm_contribution'");
-    $this->assertEquals($deletedAmount, null, "Verify actual cost for deleted premium");
+    $this->assertEquals($deletedAmount, NULL, "Verify actual cost for deleted premium");
   }
 
   public function testDeletePremium() {
@@ -239,7 +239,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount, null, "Verify actual cost for deleted premium");
+    $this->assertEquals($actualAmount, NULL, "Verify actual cost for deleted premium");
   }
 
   public function testChangePaymentInstrument() {
@@ -375,7 +375,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    *
    * @return null|string
    */
-  function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
+  public function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
     $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
     $query = "SELECT
      {$select}
@@ -405,7 +405,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    *
    * @return null|string
    */
-  function _getFinancialTrxnAmount($contId) {
+  public function _getFinancialTrxnAmount($contId) {
     $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -421,7 +421,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    *
    * @return null|string
    */
-  function _getFinancialItemAmount($contId) {
+  public function _getFinancialItemAmount($contId) {
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $query = "SELECT
      SUM(amount)
@@ -437,7 +437,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    *
    * @return null|string
    */
-  function _getTotalContributedAmount($contId) {
+  public function _getTotalContributedAmount($contId) {
     $query = "SELECT
      SUM(amount)
      FROM civicrm_entity_financial_trxn

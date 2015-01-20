@@ -156,10 +156,7 @@ class CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean
-   *   true if yes, else false
    */
-
   public function check($str) {
     //no default behaviour
   }
@@ -170,10 +167,9 @@ class CRM_Core_Permission_Base {
    * @param array $array
    *   The roles to check.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
-
   public function checkGroupRole($array) {
     return FALSE;
   }
@@ -184,8 +180,6 @@ class CRM_Core_Permission_Base {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
-   * @return string
-   *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
     CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");
@@ -197,8 +191,6 @@ class CRM_Core_Permission_Base {
    * @param string $roleName
    *   Name of the role we are interested in.
    *
-   * @return string
-   *   a comma separated list of email addresses
    */
   public function roleEmails($roleName) {
     CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");

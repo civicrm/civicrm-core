@@ -535,13 +535,12 @@ AND li.entity_id = {$entityId}
    * @param array $lineItemId
    *   An assoc array of lineItem.
    *
-   * @return number|void
+   * @return int|void
    *   tax rate
-   *
    */
   public static function calculateTaxRate($lineItemId) {
     if ($lineItemId['unit_price'] == 0) {
-      return;
+      return FALSE;
     }
     if ($lineItemId['html_type'] == 'Text') {
       $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;

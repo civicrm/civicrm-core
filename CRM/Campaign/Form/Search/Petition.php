@@ -50,7 +50,7 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'petition');

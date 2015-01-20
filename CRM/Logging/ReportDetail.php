@@ -70,25 +70,24 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
-    $breadcrumb =
+    $breadcrumb = array(
       array(
-        array(
-          'title' => ts('Home'),
-          'url' => CRM_Utils_System::url()
-        ),
-        array(
-          'title' => ts('CiviCRM'),
-          'url' => CRM_Utils_System::url('civicrm', 'reset=1')
-        ),
-        array(
-          'title' => ts('View Contact'),
-          'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")
-        ),
-        array(
-          'title' => ts('Search Results'),
-          'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")
-        ),
-      );
+        'title' => ts('Home'),
+        'url' => CRM_Utils_System::url(),
+      ),
+      array(
+        'title' => ts('CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
+      ),
+      array(
+        'title' => ts('View Contact'),
+        'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"),
+      ),
+      array(
+        'title' => ts('Search Results'),
+        'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1"),
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if (CRM_Utils_Request::retrieve('revert', 'Boolean', CRM_Core_DAO::$_nullObject)) {
@@ -105,7 +104,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
 
     // make sure the report works even without the params
     if (!$this->log_conn_id or !$this->log_date) {
-      $dao = new CRM_Core_DAO;
+      $dao = new CRM_Core_DAO();
       $dao->query("SELECT log_conn_id, log_date FROM `{$this->db}`.log_{$this->tables[0]} WHERE log_action = 'Update' ORDER BY log_date DESC LIMIT 1");
       $dao->fetch();
       $this->log_conn_id = $dao->log_conn_id;

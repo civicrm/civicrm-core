@@ -55,8 +55,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    *
    * gets session variables for group or field id
    *
-   * @param null
-   *
    * @return void
    */
   public function preProcess() {
@@ -94,8 +92,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   /**
    * Set the default form values
    *
-   * @param null
-   *
    * @return array
    *   the default array reference
    */
@@ -109,8 +105,6 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */

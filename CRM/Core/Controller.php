@@ -172,10 +172,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Should we add a unique sequence number to the end of the key.
    * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
-   *
-   * @internal param bool $whether controller is modal
    */
-  function __construct(
+  public function __construct(
     $title = NULL,
     $modal = TRUE,
     $mode = NULL,
@@ -195,8 +193,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // lets try to get it from the session and/or the request vars
     // we do this early on in case there is a fatal error in retrieving the
     // key and/or session
-    $this->_entryURL =
-      CRM_Utils_Request::retrieve('entryURL', 'String', $this);
+    $this->_entryURL
+      = CRM_Utils_Request::retrieve('entryURL', 'String', $this);
 
     // add a unique validable key to the name
     $name = CRM_Utils_System::getClassName($this);
@@ -381,8 +379,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Helper function to add all the needed default actions. Note that the framework
    * redefines all of the default QFC actions
    *
-   * @param string directory to store all the uploaded files
-   * @param array names for the various upload buttons (note u can have more than 1 upload)
+   * @param string $uploadDirectory to store all the uploaded files
+   * @param array $uploadNames for the various upload buttons (note u can have more than 1 upload)
    *
    *
    * @return void
@@ -663,7 +661,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for embedded
    *
-   * @return boolean
+   * @return bool
    *   return the embedded value
    */
   public function getEmbedded() {
@@ -684,7 +682,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for skipRedirection
    *
-   * @return boolean
+   * @return bool
    *   return the skipRedirection value
    */
   public function getSkipRedirection() {
@@ -740,7 +738,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Getter for print
    *
-   * @return boolean
+   * @return bool
    *   return the print value
    */
   public function getPrint() {

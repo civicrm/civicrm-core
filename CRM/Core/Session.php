@@ -95,7 +95,7 @@ class CRM_Core_Session {
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
-      self::$_singleton = new CRM_Core_Session;
+      self::$_singleton = new CRM_Core_Session();
     }
     return self::$_singleton;
   }
@@ -144,7 +144,7 @@ class CRM_Core_Session {
     ) {
       $this->_session[$this->_key] = array();
     }
-    return;
+    return NULL;
   }
 
   /**
@@ -167,7 +167,7 @@ class CRM_Core_Session {
       $this->_session = array();
     }
 
-    return;
+    return NULL;
   }
 
   /**

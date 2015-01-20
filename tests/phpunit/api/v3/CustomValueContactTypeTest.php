@@ -112,7 +112,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  /*
+  /**
    * Test that custom fields is returned for correct contact type only
    */
   public function testGetFields() {
@@ -120,12 +120,12 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Contact', 'getfields', array(
         'action' => 'create',
-        'contact_type' => 'Individual'
+        'contact_type' => 'Individual',
       ), 'in line' . __LINE__);
     $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values']);
     $result = $this->callAPISuccess('Contact', 'getfields', array(
         'action' => 'create',
-        'contact_type' => 'Organization'
+        'contact_type' => 'Organization',
       ));
     $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Relationship', 'getfields', array('action' => 'create'), 'in line' . __LINE__);
@@ -232,8 +232,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
     $this->assertTrue(in_array("custom_{$this->IndiStudentField['id']}", $contact['undefined_fields']), __LINE__);
   }
-
-
 
   // Retrieve Methods
 

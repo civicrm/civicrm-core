@@ -45,7 +45,6 @@ class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
    * @param object $controller
    * @param \const|int $action
    *
-   * @internal param \CRM_SMS_Controller $object
    * @return \CRM_SMS_StateMachine_Send CRM_SMS_StateMachine
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {

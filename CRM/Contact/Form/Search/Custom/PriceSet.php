@@ -276,7 +276,7 @@ AND    p.entity_id    = e.id
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {

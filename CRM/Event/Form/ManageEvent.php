@@ -210,7 +210,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           array(
             'title' => ts('Manage Events'),
             'url' => $this->_doneUrl,
-          )
+          ),
         );
       }
     }
@@ -220,7 +220,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         array(
           'title' => ts('Manage Event Templates'),
           'url' => $this->_doneUrl,
-        )
+        ),
       );
     }
     CRM_Utils_System::appendBreadCrumb($breadCrumb);

@@ -11,7 +11,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @return CRM_Contact_BAO_QueryTestDataProvider
    */
   public function dataProvider() {
-    return new CRM_Contact_BAO_QueryTestDataProvider;
+    return new CRM_Contact_BAO_QueryTestDataProvider();
   }
 
   public function setUp() {
@@ -75,7 +75,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array(
         'contact_id' => $contactID,
         'city' => 'Cool City',
-        'location_type_id' => 1
+        'location_type_id' => 1,
       ));
     $params = array(
       0 => array(
@@ -117,7 +117,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array(
         'contact_id' => $contactID,
         'city' => 'Cool City',
-        'location_type_id' => 1
+        'location_type_id' => 1,
       ));
     $params = array(
       0 => array(
@@ -160,7 +160,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', array(
         'contact_id' => $contactID,
         'city' => 'Cool City',
-        'location_type_id' => 1
+        'location_type_id' => 1,
       ));
     $params = array(
       0 => array(

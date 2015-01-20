@@ -40,8 +40,7 @@
  */
 
 /**
- * {@getfields EntityTag_get}
- * @example EntityTagGet.php
+ * Get entity tags.
  *
  * @param array $params
  *
@@ -64,9 +63,10 @@ function civicrm_api3_entity_tag_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -76,20 +76,18 @@ function _civicrm_api3_entity_tag_get_spec(&$params) {
 }
 
 /**
+ * Create an entity tag.
  *
  * @param array $params
  *
  * @return array
- * {@getfields EntityTag_create}
- * @example EntityTagCreate.php
  */
 function civicrm_api3_entity_tag_create($params) {
   return _civicrm_api3_entity_tag_common($params, 'add');
 }
 
 /**
- * {@getfields EntityTag_delete}
- * @example EntityTagGet.php
+ * Mark entity tag as removed.
  *
  * @param array $params
  *
@@ -101,7 +99,8 @@ function civicrm_api3_entity_tag_delete($params) {
 }
 
 /**
- * modify metadata
+ * Modify metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_entity_tag_delete_spec(&$params) {
@@ -110,12 +109,12 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
 }
 
 /**
+ * Helper function for formatting tags (part of api v2 legacy).
  *
  * @param array $params
  * @param string $op
  *
  * @return array
- *   <type>
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 

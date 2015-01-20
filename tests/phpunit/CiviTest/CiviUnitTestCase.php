@@ -1810,7 +1810,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Delete a Location Type
    *
-   * @param int locationTypeId
+   * @param int $locationTypeId
    */
   public function locationTypeDelete($locationTypeId) {
     $locationType = new CRM_Core_DAO_LocationType();
@@ -2025,7 +2025,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function activityTypeCreate($params) {
     return $this->callAPISuccess('ActivityType', 'create', $params);
-   }
+  }
 
   /**
    * Delete activity type
@@ -2037,7 +2037,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
     return $this->callAPISuccess('ActivityType', 'delete', $params);
-   }
+  }
 
   /**
    * Create custom group
@@ -3100,7 +3100,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
    * & the best protection agains that is the functions this class affords
    * @param array $params
-   * @return
+   * @return int $result['id'] payment processor id
    */
   public function paymentProcessorCreate($params = array()) {
     $params = array_merge(array(

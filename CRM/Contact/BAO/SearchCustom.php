@@ -161,7 +161,6 @@ class CRM_Contact_BAO_SearchCustom {
     $from = $customClass->from();
     $where = $customClass->where();
 
-
     return array($from, $where);
   }
 }

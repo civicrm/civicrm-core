@@ -104,8 +104,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
    * @return array
    *   array of default values
    */
@@ -142,8 +140,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */
@@ -190,8 +186,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   /**
    * Process the form
    *
-   * @param null
-   *
    * @return void
    */
   public function postProcess() {
@@ -229,7 +223,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
           1 => array(
             $this->_values['result_id'],
             'Positive',
-          )
+          ),
         )
       );
       // delete option group if no any survey is using it.

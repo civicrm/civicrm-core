@@ -212,7 +212,7 @@ class CRM_Grant_BAO_Query {
 
         $query->_qill[$grouping][] = ts('Grant Type %2 %1', array(
             1 => implode(' ' . ts('or') . ' ', $names),
-            2 => $op
+            2 => $op,
           ));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
@@ -248,7 +248,7 @@ class CRM_Grant_BAO_Query {
 
         $query->_qill[$grouping][] = ts('Grant Status %2 %1', array(
             1 => implode(' ' . ts('or') . ' ', $names),
-            2 => $op
+            2 => $op,
           ));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
@@ -331,7 +331,7 @@ class CRM_Grant_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties(
+  public static function defaultReturnProperties(
     $mode,
     $includeCustomFields = TRUE
   ) {

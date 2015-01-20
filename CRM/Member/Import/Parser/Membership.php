@@ -112,7 +112,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    */
   public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
@@ -124,7 +124,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function preview(&$values) {
@@ -137,7 +137,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function summary(&$values) {
@@ -254,7 +254,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @param array $values
    *   The array of values belonging to this line.
    *
-   * @return boolean
+   * @return bool
    *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
@@ -594,7 +594,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    * @param $formatted
    *
-   * @return Array
+   * @return;
    *   formatted containing date values
    */
   public function formattedDates($calcDates, &$formatted) {

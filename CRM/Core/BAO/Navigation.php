@@ -84,7 +84,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   /**
    * Add/update navigation record
    *
-   * @param array associated array of submitted values
+   * @param $params associated array of submitted values
    *
    * @return object
    *   navigation object
@@ -312,7 +312,7 @@ ORDER BY parent_id, weight";
           'parentID' => $navigation->parent_id,
           'navID' => $navigation->id,
           'active' => $navigation->is_active,
-        )
+        ),
       );
       self::buildNavigationTree($navigationTree[$navigation->id]['child'], $navigation->id, $navigationMenu);
     }
@@ -493,7 +493,7 @@ ORDER BY parent_id, weight";
     //we need to check core view/edit or supported acls.
     if (in_array($menuName, array(
       'Search...',
-      'Contacts'
+      'Contacts',
     ))) {
       if (!CRM_Core_Permission::giveMeAllACLs()) {
         $skipMenuItems[] = $navID;

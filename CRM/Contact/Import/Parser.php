@@ -101,7 +101,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @return mixed
    */
-  function run(
+  public function run(
     $tableName,
     &$mapper,
     $mode = self::MODE_PREVIEW,
@@ -405,9 +405,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
    *
-   * @param array mapped array of values
-   *
-   * @return void
+   * @param array $fieldKeys
+   *   Mapped array of values.
    */
   public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
@@ -554,10 +553,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
           }
 
           $value = array(
-            $this->_activeFields[$i]->_name =>
-              $this->_activeFields[$i]->_value,
-            'location_type_id' =>
-              $this->_activeFields[$i]->_hasLocationType,
+            $this->_activeFields[$i]->_name => $this->_activeFields[$i]->_value,
+            'location_type_id' => $this->_activeFields[$i]->_hasLocationType,
           );
 
           if (isset($this->_activeFields[$i]->_phoneType)) {
@@ -653,7 +650,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $dataPattern
    * @param bool $hasLocationType
    */
-  function addField(
+  public function addField(
     $name, $title, $type = CRM_Utils_Type::T_INT,
     $headerPattern = '//', $dataPattern = '//',
     $hasLocationType = FALSE

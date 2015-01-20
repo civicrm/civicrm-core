@@ -132,7 +132,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
   /**
    * Check for Each data type: loop through available form input types
-   **/
+   */
   public function testCustomFieldCreateAllAvailableFormInputs() {
     $gid = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'testAllFormInputs'));
 
@@ -242,11 +242,11 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     $this->assertTrue(is_numeric($optionGroupID) && ($optionGroupID > 0));
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', array(
-      'id' => $optionGroupID
+      'id' => $optionGroupID,
     ));
     $this->assertEquals($optionGroup['title'], 'Country');
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', array(
-      'option_group_id' => $optionGroupID
+      'option_group_id' => $optionGroupID,
     ));
     $this->assertEquals(0, $optionValueCount);
   }
@@ -451,14 +451,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group_c'));
     $contactField = $this->customFieldCreate(array(
         'custom_group_id' => $contactGroup['id'],
-        'label' => 'For Contacts'
+        'label' => 'For Contacts',
       ));
     $indivGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group_i'));
     $indivField = $this->customFieldCreate(array('custom_group_id' => $indivGroup['id'], 'label' => 'For Individuals'));
     $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group_a'));
     $activityField = $this->customFieldCreate(array(
         'custom_group_id' => $activityGroup['id'],
-        'label' => 'For Activities'
+        'label' => 'For Activities',
       ));
 
     // Check getfields

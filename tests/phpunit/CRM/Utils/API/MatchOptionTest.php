@@ -189,7 +189,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
           array(
             'location_type_id' => 2,
             'email' => 'j2@example.com',
-            'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'
+            'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
           ),
         ),
       ),
@@ -269,12 +269,12 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
           array(
             'location_type_id' => 1,
             'street_address' => 'j1-a Example Ave',
-            'supplemental_address_1' => 'The Dude abides.'
+            'supplemental_address_1' => 'The Dude abides.',
           ),
           array(
             'location_type_id' => 2,
             'street_address' => 'j2 Example Ave',
-            'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'
+            'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
           ),
         ),
       ),

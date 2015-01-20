@@ -74,7 +74,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_done = FALSE;
     $this->_defaults = array();
 
@@ -96,7 +96,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     if (!in_array($this->_operation, array(
       'reserve',
       'release',
-      'interview'
+      'interview',
     ))
     ) {
       $this->_operation = 'reserve';
@@ -232,7 +232,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $taskValue = array(
           $currentTaskValue => ts('Record %1 Responses',
             array(1 => $activityTypes[$surveyTypeId])
-          )
+          ),
         );
       }
 
@@ -356,7 +356,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $contactType = CRM_Campaign_BAO_Survey::getSurveyContactType(CRM_Utils_Array::value('campaign_survey_id', $this->_formValues));
     if ($contactType && in_array($this->_operation, array(
         'reserve',
-        'interview'
+        'interview',
       ))
     ) {
       $this->_formValues['contact_type'][$contactType] = 1;

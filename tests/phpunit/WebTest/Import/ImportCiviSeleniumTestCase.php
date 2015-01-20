@@ -55,7 +55,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    *                             saveMapping        : save current mapping?
    *                             saveMappingName    : to override mapping name
    */
-  function importCSVComponent(
+  public function importCSVComponent(
     $component,
     $headers,
     $rows,
@@ -417,7 +417,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
     if (!empty($other['callbackImportSummary']) && is_callable(array(
         $this,
-        $other['callbackImportSummary']
+        $other['callbackImportSummary'],
       ))
     ) {
       $callbackImportSummary = $other['callbackImportSummary'];

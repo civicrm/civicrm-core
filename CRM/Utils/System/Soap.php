@@ -56,7 +56,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    */
   public function setTitle($title, $pageTitle) {
-    return;
+    return NULL;
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @param string $str
    *   The permission to check.
    *
-   * @return boolean
+   * @return bool
    *   true if yes, else false
    */
   public function checkPermission($str) {
@@ -81,7 +81,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    */
   public function appendBreadCrumb($title, $url) {
-    return;
+    return NULL;
   }
 
   /**
@@ -93,7 +93,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @return void
    */
   public function addHTMLHead($head) {
-    return;
+    return NULL;
   }
 
   /**
@@ -126,8 +126,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
   /**
    * Figure out the post url for the form
-   *
-   * @param the default action if one is pre-specified
    *
    * @return string
    *   the url to post the form
@@ -199,7 +197,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
-   * @return string
+   * @return;
    *   loginURL for the current CMS
    */
   public function getLoginURL($destination = '') {
