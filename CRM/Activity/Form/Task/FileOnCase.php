@@ -94,7 +94,6 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    *
    * @return void
    */
-
   public function postProcess() {
     $formparams = $this->exportValues();
     $caseId = $formparams['unclosed_case_id'];
@@ -131,7 +130,7 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
       else {
         CRM_Core_Session::setStatus(ts('Not permitted to file activity %1 %2.', array(
             1 => empty($defaults['subject']) ? '' : $defaults['subject'],
-            2 => $defaults['activity_date_time']
+            2 => $defaults['activity_date_time'],
           )),
           ts("Error"), "error");
       }

@@ -430,11 +430,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $session->setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {
-      if ($status)
+      if ($status) {
         CRM_Utils_System::setUFMessage($status);
+      }
       $result = (int) ($updateSubscription && isset($ctype));
-      if (isset($tplParams))
+      if (isset($tplParams)) {
         $session->set('resultParams', $tplParams);
+      }
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=billing&result={$result}"));
     }

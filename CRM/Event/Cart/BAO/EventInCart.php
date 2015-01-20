@@ -26,7 +26,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   /**
    * @param array $params
    *
-   * @return $this|CRM_Event_Cart_BAO_EventInCart
+   * @return object $this|CRM_Event_Cart_BAO_EventInCart
    * @throws Exception
    */
   public static function create(&$params) {

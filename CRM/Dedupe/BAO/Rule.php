@@ -188,7 +188,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
   /**
    * find fields related to a rule group.
    *
-   * @param array contains the rule group property to identify rule group
+   * @param array $params contains the rule group property to identify rule group
    *
    * @return array
    *   rule fields array associated to rule group
@@ -217,7 +217,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    */
   public static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
-      return;
+      return NULL;
     }
     $exception = new CRM_Dedupe_DAO_Exception();
     $exception->contact_id1 = $cid;

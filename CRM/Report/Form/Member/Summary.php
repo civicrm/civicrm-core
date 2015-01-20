@@ -241,8 +241,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             }
             if (!empty($this->_params['group_bys_freq'][$fieldName])) {
               $this->_interval = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] =
-                $field['title'] . ' Beginning';
+              $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
@@ -339,8 +338,6 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                          ON payment.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
   }
 
-  // end of from
-
   public function where() {
     $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0 AND
                               {$this->_aliases['civicrm_contact']}.is_deleted = 0";
@@ -413,9 +410,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     $totalAmount = $average = array();
     $count = $memberCount = 0;
     while ($dao->fetch()) {
-      $totalAmount[] =
-        CRM_Utils_Money::format($dao->amount, $dao->currency) . "(" .
-        $dao->count . ")";
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . "(" . $dao->count . ")";
       $average[] = CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
       $memberCount += $dao->memberCount;

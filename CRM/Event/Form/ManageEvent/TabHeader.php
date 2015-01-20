@@ -55,7 +55,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       ->addSetting(array(
         'tabSettings' => array(
           'active' => self::getCurrentTab($tabs),
-        )
+        ),
       ));
     CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;

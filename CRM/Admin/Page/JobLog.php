@@ -83,7 +83,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
@@ -104,8 +104,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 
     $jobName = NULL;
     if ($jid) {
-      $jobName =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
+      $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
     }
 
     $this->assign('jobName', $jobName);

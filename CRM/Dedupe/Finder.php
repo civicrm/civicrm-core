@@ -95,7 +95,7 @@ class CRM_Dedupe_Finder {
    * @return array
    *   matching contact ids
    */
-  static function dupesByParams(
+  public static function dupesByParams(
     $params,
     $ctype,
     $used = 'Unsupervised',
@@ -236,7 +236,7 @@ class CRM_Dedupe_Finder {
     // handle {birth,deceased}_date
     foreach (array(
                'birth_date',
-               'deceased_date'
+               'deceased_date',
              ) as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];

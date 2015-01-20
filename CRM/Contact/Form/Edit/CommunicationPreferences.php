@@ -56,7 +56,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     // since the pcm - preferred comminication method is logically
     // grouped hence we'll use groups of HTML_QuickForm
 
-
     // checkboxes for DO NOT phone, email, mail
     // we take labels from SelectValues
     $privacy = $commPreff = $commPreference = array();
@@ -118,7 +117,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
           array(
-            '' => ts('- select -')
+            '' => ts('- select -'),
           ) + $greetingTokens
         );
         //custom addressee
@@ -187,8 +186,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     if ($form->_action & CRM_Core_Action::ADD) {
       foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
         if (empty($defaults[$greeting . '_id'])) {
-          if ($defaultGreetingTypeId =
-            CRM_Contact_BAO_Contact_Utils::defaultGreeting($form->_contactType, $greeting)
+          if ($defaultGreetingTypeId = CRM_Contact_BAO_Contact_Utils::defaultGreeting($form->_contactType, $greeting)
           ) {
             $defaults[$greeting . '_id'] = $defaultGreetingTypeId;
           }

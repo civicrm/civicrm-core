@@ -42,7 +42,7 @@ require_once 'CRM/Core/Config.php';
 class CRM_UpdatePledgeRecord {
   /**
    */
-  function __construct() {
+  public function __construct() {
     $config = CRM_Core_Config::singleton();
     // this does not return on failure
     require_once 'CRM/Utils/System.php';
@@ -72,7 +72,7 @@ class CRM_UpdatePledgeRecord {
     foreach (array(
                'Completed',
                'Cancelled',
-               'Failed'
+               'Failed',
              ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         unset($allStatus[$key]);

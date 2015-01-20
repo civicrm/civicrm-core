@@ -78,10 +78,9 @@ function civicrm_api3_payment_processor_delete($params) {
 /**
  * Retrieve one or more PaymentProcessor
  *
- * @param mixed[] (reference) input parameters
- * {@getfields payment_processor_get}
  * @param array $params
  *   An associative array of name/value pairs.
+ * {@getfields payment_processor_get}
  *
  * @return array
  *   details of found PaymentProcessor

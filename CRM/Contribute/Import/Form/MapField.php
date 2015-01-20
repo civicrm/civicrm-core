@@ -79,7 +79,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       foreach (array(
                  'contribution_id',
                  'invoice_id',
-                 'trxn_id'
+                 'trxn_id',
                ) as $key) {
         $this->_mapperFields[$key] .= ' (match to contribution record)';
         $highlightedFields[] = $key;
@@ -92,7 +92,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         'email',
         'first_name',
         'last_name',
-        'external_identifier'
+        'external_identifier',
       );
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;

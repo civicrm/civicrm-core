@@ -72,7 +72,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
           'city',
           'state_province',
           'postal_code',
-          'country'
+          'country',
         )) && empty($addressOptions[$field])
       ) {
         unset($this->_columns[$name]);
@@ -112,7 +112,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
       $this->_formValues['tag'][$tag] = 1;
     }
 
-    return;
+    return NULL;
   }
 
   /**
@@ -155,7 +155,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    *
    * @return CRM_Contact_DAO_Contact
    */
-  function all(
+  public function all(
     $offset = 0,
     $rowCount = 0,
     $sort = NULL,

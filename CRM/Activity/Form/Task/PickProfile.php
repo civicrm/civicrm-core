@@ -76,7 +76,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
       CRM_Core_Session::setStatus(ts("The maximum number of Activities you can select for Batch Update is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
             1 => $this->_maxActivities,
-            2 => count($this->_activityHolderIds)
+            2 => count($this->_activityHolderIds),
           )), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
@@ -129,7 +129,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
       array(
-        '' => ts('- select profile -')
+        '' => ts('- select profile -'),
       ) + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));

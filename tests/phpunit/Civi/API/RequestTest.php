@@ -36,7 +36,7 @@ class RequestTest extends \CiviUnitTestCase {
         'option.limit' => 15,
         'option.foo' => array('bar'),
         'options' => array('whiz' => 'bang'),
-        'optionnotreally' => 'data'
+        'optionnotreally' => 'data',
       ), // requestParams
       array('limit' => 15, 'foo' => array('bar'), 'whiz' => 'bang'), // expectedOptions
       array('optionnotreally' => 'data'), // expectedData
@@ -48,7 +48,7 @@ class RequestTest extends \CiviUnitTestCase {
         'return' => array('field1', 'field2'),
         'return.field3' => 1,
         'return.field4' => 0,
-        'returnontreally' => 'data'
+        'returnontreally' => 'data',
       ), // requestParams
       array('return' => array('field1', 'field2', 'field3')), // expectedOptions
       array('returnontreally' => 'data'), // expectedData

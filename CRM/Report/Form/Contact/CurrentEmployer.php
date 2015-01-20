@@ -277,9 +277,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       $this->_where = "WHERE {$this->_aliases['civicrm_contact']}.employer_id!='null' ";
     }
     else {
-      $this->_where =
-        "WHERE ({$this->_aliases['civicrm_contact']}.employer_id!='null') AND " .
-        implode(' AND ', $clauses);
+      $this->_where = "WHERE ({$this->_aliases['civicrm_contact']}.employer_id!='null') AND " . implode(' AND ', $clauses);
     }
 
     if ($this->_aclWhere) {
