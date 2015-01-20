@@ -167,7 +167,7 @@ class CRM_Core_Payment_BaseIPN {
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
       if (!empty($error_handling['echo_error'])) {
-        echo($e->getMessage());
+        echo $e->getMessage();
       }
       if (!empty($error_handling['return_error'])) {
         return array(

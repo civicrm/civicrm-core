@@ -82,11 +82,6 @@ function civicrm_api3_email_delete($params) {
 /**
  * Retrieve one or more emails
  *
- * @param array input parameters
- *
- *
- * @example EmailGet.php Standard Get Example
- *
  * @param array $params
  *   An associative array of name/value pairs.
  *

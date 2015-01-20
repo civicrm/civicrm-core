@@ -329,8 +329,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       //handle the Financial Type Ids
       if (array_key_exists('civicrm_pledge_financial_type_id', $row)) {
         if ($value = $row['civicrm_pledge_financial_type_id']) {
-          $rows[$rowNum]['civicrm_pledge_financial_type_id'] =
-            CRM_Contribute_PseudoConstant::financialType($value, FALSE);
+          $rows[$rowNum]['civicrm_pledge_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($value, FALSE);
         }
         $entryFound = TRUE;
       }

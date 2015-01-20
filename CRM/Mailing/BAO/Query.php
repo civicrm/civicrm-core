@@ -64,8 +64,8 @@ class CRM_Mailing_BAO_Query {
       $query->_element['mailing_id'] = 1;
 
       // base table is contact, so join recipients to it
-      $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] =
-        " INNER JOIN civicrm_mailing_recipients ON civicrm_mailing_recipients.contact_id = contact_a.id ";
+      $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients']
+        = " INNER JOIN civicrm_mailing_recipients ON civicrm_mailing_recipients.contact_id = contact_a.id ";
 
       $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
 
@@ -83,8 +83,8 @@ class CRM_Mailing_BAO_Query {
 
       // get mailing status
       if (!empty($query->_returnProperties['mailing_job_status'])) {
-        $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
-          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
+        $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job']
+          = " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_status'] = "civicrm_mailing_job.status as mailing_job_status";
         $query->_element['mailing_job_status'] = 1;
       }
@@ -111,8 +111,8 @@ class CRM_Mailing_BAO_Query {
 
       // mailing job end date / completed date
       if (!empty($query->_returnProperties['mailing_job_end_date'])) {
-        $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
-          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
+        $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job']
+          = " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_end_date'] = "civicrm_mailing_job.end_date as mailing_job_end_date";
         $query->_element['mailing_job_end_date'] = 1;
       }

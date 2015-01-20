@@ -498,11 +498,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         // make we require one primary block, CRM-5505
         if ($updateMode) {
           if (!$hasPrimary) {
-            $hasPrimary =
-              CRM_Utils_Array::value(
-                'is_primary',
-                CRM_Utils_Array::value($instance, $defaults[$name])
-              );
+            $hasPrimary = CRM_Utils_Array::value(
+              'is_primary',
+              CRM_Utils_Array::value($instance, $defaults[$name])
+            );
           }
           continue;
         }

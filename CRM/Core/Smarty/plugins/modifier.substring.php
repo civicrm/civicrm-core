@@ -48,12 +48,12 @@
  *   {$my_string|substring:2:4}
  *   returns substring from character 2 until character 6
  * @link based on substr(): http://www.zend.com/manual/function.substr.php
- * @param string
- * @param position: startposition of the substring, beginning with 0
- * @param length: length of substring
+ * @param string $string
+ * @param int $position
+ *   startposition of the substring, beginning with 0
+ * @param int $length
+ *   length of substring
  * @return string
- *
- * -------------------------------------------------------------
  */
 function smarty_modifier_substring($string, $position, $length) {
   return substr($string, $position, $length);

@@ -101,7 +101,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @return $this|bool|CRM_Event_Cart_BAO_Cart
+   * @return self|bool|CRM_Event_Cart_BAO_Cart
    */
   public static function find_or_create_for_current_session() {
     $session = CRM_Core_Session::singleton();

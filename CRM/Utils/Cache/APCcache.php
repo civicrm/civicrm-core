@@ -110,7 +110,7 @@ class CRM_Utils_Cache_APCcache {
 
     foreach ($keys as $key) {
       $name = $key['info'];
-      if ($prefix == substr($name, 0, $lp)) { 
+      if ($prefix == substr($name, 0, $lp)) {
         // Ours?
         apc_delete($this->_prefix . $name);
       }

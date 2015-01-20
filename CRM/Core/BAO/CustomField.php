@@ -63,8 +63,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Build and retrieve the list of data types and descriptions
    *
-   * @param NULL
-   *
    * @return array
    *   Data type => Description
    */
@@ -1609,7 +1607,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     );
 
     if (!array_key_exists($customFieldId, $customFields)) {
-      return;
+      return NULL;
     }
 
     // return if field is a 'code' field

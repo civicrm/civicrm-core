@@ -248,8 +248,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     //$args['desc']           = 'Recurring Contribution';
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
-    $args['profilereference'] =
-      "i={$params['invoiceID']}" .
+    $args['profilereference'] = "i={$params['invoiceID']}" .
       "&m=$component" .
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
@@ -335,7 +334,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['billingfrequency'] = $params['frequency_interval'];
       $args['method'] = "CreateRecurringPaymentsProfile";
       $args['profilestartdate'] = $start_date;
-      $args['desc'] =
+      $args['desc'] = "" .
         $params['description'] . ": " .
         $params['amount'] . " Per " .
         $params['frequency_interval'] . " " .
@@ -343,7 +342,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['amt'] = $params['amount'];
       $args['totalbillingcycles'] = $params['installments'];
       $args['version'] = 56.0;
-      $args['PROFILEREFERENCE'] =
+      $args['PROFILEREFERENCE'] = "" .
         "i=" . $params['invoiceID'] . "&m=" . $component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];

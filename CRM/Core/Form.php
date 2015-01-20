@@ -502,10 +502,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Add default Next / Back buttons
    *
-   * @param array array of associative arrays in the order in which the buttons should be
-   *                displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
-   *                The base form class will define a bunch of static arrays for commonly used
-   *                formats
+   * @param array $params
+   *   Array of associative arrays in the order in which the buttons should be
+   *   displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
+   *   The base form class will define a bunch of static arrays for commonly used
+   *   formats.
    *
    * @return void
    */
@@ -620,7 +621,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for options
    *
-   * @param mixed
+   * @param mixed $options
    *
    * @return void
    */
@@ -661,7 +662,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for Form Action
    *
-   * @param string
+   * @param string $action
    *
    * @return void
    */
@@ -763,9 +764,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Store the variable with the value in the form scope
    *
-   * @param string name : name of the variable
-   * @param mixed value : value of the variable
-   *
+   * @param string $name
+   *   Name of the variable.
+   * @param mixed $value
+   *   Value of the variable.
    *
    * @return void
    */
@@ -776,8 +778,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the variable from the form scope
    *
-   * @param string name : name of the variable
-   *
+   * @param string $name
+   *   Name of the variable
    *
    * @return mixed
    */

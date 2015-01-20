@@ -364,15 +364,14 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Utils_Address_USPS::checkAddress($params);
 
       // do street parsing again if enabled, since street address might have changed
-      $parseStreetAddress =
-        CRM_Utils_Array::value(
-          'street_address_parsing',
-          CRM_Core_BAO_Setting::valueOptions(
-            CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-            'address_options'
-          ),
-          FALSE
-        );
+      $parseStreetAddress = CRM_Utils_Array::value(
+        'street_address_parsing',
+        CRM_Core_BAO_Setting::valueOptions(
+          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+          'address_options'
+        ),
+        FALSE
+      );
 
       if ($parseStreetAddress && !empty($params['street_address'])) {
         foreach (array(
@@ -711,8 +710,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * NB: civic street formats for en_CA and fr_CA used by default if those locales are active
    *     otherwise en_US format is default action
    *
-   * @param string Street address including number and apt
-   * @param string Locale - to set locale used to parse address
+   * @param string $streetAddress
+   *   Street address including number and apt.
+   * @param string $locale
+   *   Locale used to parse address.
    *
    * @return array
    *   parsed fields values.
@@ -893,11 +894,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   public static function validateAddressOptions($fields) {
     static $addressOptions = NULL;
     if (!$addressOptions) {
-      $addressOptions =
-        CRM_Core_BAO_Setting::valueOptions(
-          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'address_options'
-        );
+      $addressOptions = CRM_Core_BAO_Setting::valueOptions(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'address_options'
+      );
     }
 
     if (is_array($fields) && !empty($fields)) {
@@ -1033,8 +1033,11 @@ SELECT is_primary,
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
-      $address =
-        trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
+      $address = trim($rows[$rowID]['street_address'])
+        . trim($rows[$rowID]['city'])
+        . trim($rows[$rowID]['state_province'])
+        . trim($rows[$rowID]['postal_code'])
+        . trim($rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }

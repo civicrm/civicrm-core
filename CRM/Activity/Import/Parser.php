@@ -278,7 +278,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * Given a list of the importable field keys that the user has selected
    * set the active fields array to this list
    *
-   * @param array mapped array of values
+   * @param array $fieldKeys
    *
    * @return void
    */

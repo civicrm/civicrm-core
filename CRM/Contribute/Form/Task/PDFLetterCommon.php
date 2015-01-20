@@ -144,7 +144,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
         foreach ($tokens[$entity] as $token) {
           if (!self::isHtmlTokenInTableCell($token, $entity, $html)) {
-            ;
             return FALSE;
           }
         }

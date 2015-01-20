@@ -712,11 +712,9 @@ GROUP BY  participant.event_id
       $extIdentifier = CRM_Utils_Array::value('external_identifier', $contactFields);
       if ($extIdentifier) {
         $tmpContactField['external_identifier'] = $extIdentifier;
-        $tmpContactField['external_identifier']['title'] =
-          CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
+        $tmpContactField['external_identifier']['title'] = CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
       }
-      $tmpFields['participant_contact_id']['title'] =
-        $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
+      $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
 
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
@@ -1811,14 +1809,16 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         $contributionParams['contribution']->financial_type_id, $relationTypeId);
       if (!empty($contributionParams['trxnParams']['from_financial_account_id'])) {
         $contributionParams['trxnParams']['total_amount'] = $mainAmount - $contributionParams['total_amount'];
-        $contributionParams['trxnParams']['payment_processor_id'] = $contributionParams['trxnParams']['payment_instrument_id'] =
-        $contributionParams['trxnParams']['check_number'] = $contributionParams['trxnParams']['trxn_id'] =
-        $contributionParams['trxnParams']['net_amount'] = $contributionParams['trxnParams']['fee_amount'] = NULL;
+        $contributionParams['trxnParams']['payment_processor_id'] = NULL;
+        $contributionParams['trxnParams']['payment_instrument_id'] = NULL;
+        $contributionParams['trxnParams']['check_number'] = NULL;
+        $contributionParams['trxnParams']['trxn_id'] = NULL;
+        $contributionParams['trxnParams']['net_amount'] = NULL;
+        $contributionParams['trxnParams']['fee_amount'] = NULL;
 
         CRM_Core_BAO_FinancialTrxn::create($contributionParams['trxnParams']);
       }
     }
-    return;
   }
 
   /**
@@ -2087,8 +2087,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $ftDetail = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
       // adjusted amount financial_trxn creation
       if (empty($ftDetail['trxn_id'])) {
-        $updatedContribution =
-          CRM_Contribute_BAO_Contribution::getValues(array('id' => $contributionId), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+        $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
+          array('id' => $contributionId),
+          CRM_Core_DAO::$_nullArray,
+          CRM_Core_DAO::$_nullArray
+        );
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
 
