@@ -30,8 +30,7 @@
 <div class="crm-content-block">
 {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{crmURL p="civicrm/event/add" q="action=add&is_template=1&reset=1"}" id="newEventTemplate" class="button">
-        <span><div class="icon ui-icon-circle-plus"></div>{ts}Add Event Template{/ts}</span></a>
+        {crmButton p="civicrm/event/add" q="action=add&is_template=1&reset=1" id="newEventTemplate"  icon="circle-plus"}{ts}Add Event Template{/ts}{/crmButton}
         <div class="clear"></div>
       </div>
 {/if}

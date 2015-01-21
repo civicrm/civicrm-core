@@ -73,7 +73,7 @@
 
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      <a href="{crmURL p='civicrm/admin/member/membershipType/add' q="action=add&reset=1"}" id="newMembershipType" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Membership Type{/ts}</span></a>
+      {crmButton p='civicrm/admin/member/membershipType/add' q="action=add&reset=1" id="newMembershipType"  icon="circle-plus"}{ts}Add Membership Type{/ts}{/crmButton}
     </div>
   {/if}
 </div>

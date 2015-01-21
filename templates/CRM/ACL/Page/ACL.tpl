@@ -74,7 +74,7 @@
 
         {if $action ne 1 and $action ne 2}
           <div class="action-link">
-            <a href="{crmURL q="action=add&reset=1"}" id="newACL" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add ACL{/ts}</span></a>
+            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add ACL{/ts}{/crmButton}
           </div>
         {/if}
       </div>
