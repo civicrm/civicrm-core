@@ -36,7 +36,7 @@
 {if $rows}
 {if !($action eq 1 and $action eq 2)}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Relationship Type{/ts}</span></a>
+      {crmButton q="action=add&reset=1" class="newRelationshipType" icon="circle-plus"}{ts}Add Relationship Type{/ts}{/crmButton}
     </div>
 {/if}
 
@@ -82,7 +82,7 @@
     </div>
 {/if}
   <div class="action-link">
-    <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Relationship Type{/ts}</span></a>
-    <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+    {crmButton q="action=add&reset=1" class="newRelationshipType" icon="circle-plus"}{ts}Add Relationship Type{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

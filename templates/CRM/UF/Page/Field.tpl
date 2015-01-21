@@ -37,7 +37,7 @@
         <div id="field_page">
         {if not ($action eq 2 or $action eq 1)}
             <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Field{/ts}</span></a>{if !$isGroupReserved}<a href="{crmURL p="civicrm/admin/uf/group/update" q="action=update&id=`$gid`&reset=1&context=field"}" class="button"><span><div class="icon ui-icon-pencil"></div>{ts}Edit Settings{/ts}</span></a>{/if}<a href="{crmURL p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field"}" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}Preview (all fields){/ts}</span></a>{if !$skipCreate }<a href="{crmURL p="civicrm/profile/create" q="gid=$gid&reset=1"}" class="button"><span><div class="icon ui-icon-play"></div>{ts}Use (create mode){/ts}</span></a>{/if}
+                {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}{if !$isGroupReserved}{crmButton p="civicrm/admin/uf/group/update" q="action=update&id=`$gid`&reset=1&context=field" icon="pencil"}{ts}Edit Settings{/ts}{/crmButton}{/if}{crmButton p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}{if !$skipCreate }{crmButton p="civicrm/profile/create" q="gid=$gid&reset=1" icon="play"}{ts}Use (create mode){/ts}{/crmButton}{/if}
                 <div class="clear"></div>
             </div>
         {/if}
@@ -79,7 +79,7 @@
         {/strip}
         {if not ($action eq 2 or $action eq 1)}
             <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Field{/ts}</span></a>{if !$isGroupReserved}<a href="{crmURL p="civicrm/admin/uf/group" q="action=update&id=`$gid`&reset=1&context=field"}" class="button"><span><div class="icon ui-icon-pencil"></div>{ts}Edit Settings{/ts}</span></a>{/if}<a href="{crmURL p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field"}" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}Preview (all fields){/ts}</span></a>{if !$skipCreate }<a href="{crmURL p="civicrm/profile/create" q="gid=$gid&reset=1"}" class="button"><span><div class="icon ui-icon-play"></div>{ts}Use (create mode){/ts}</span></a>{/if}
+                {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}{if !$isGroupReserved}{crmButton p="civicrm/admin/uf/group" q="action=update&id=`$gid`&reset=1&context=field" icon="pencil"}{ts}Edit Settings{/ts}{/crmButton}{/if}{crmButton p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}{if !$skipCreate }{crmButton p="civicrm/profile/create" q="gid=$gid&reset=1" icon="play"}{ts}Use (create mode){/ts}{/crmButton}{/if}
                 <div class="clear"></div>
             </div>
         {/if}
@@ -93,7 +93,7 @@
           {ts}None found.{/ts}
         </div>
         <div class="action-link">
-          <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Field{/ts}</span></a>
+          {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}
         </div>
         {/if}
     {/if}
