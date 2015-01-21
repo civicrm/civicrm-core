@@ -777,4 +777,19 @@ class CRM_Utils_String {
     return str_replace('&amp;', '&', $htmlUrl);
   }
 
+  /**
+   * Formats a string of attributes for insertion in an html tag
+   *
+   * @param array $attributes
+   *
+   * @return string
+   */
+  public static function htmlAttributes($attributes) {
+    $output = '';
+    foreach ($attributes as $name => $vals) {
+      $output .= " $name=\"" . htmlspecialchars(implode(' ', (array) $vals)) . '"';
+    }
+    return ltrim($output);
+  }
+
 }

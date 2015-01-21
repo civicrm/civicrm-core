@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -41,13 +41,8 @@
  * @param CRM_Core_Smarty $smarty
  *
  * @return string
- * @throws Exception
  */
 function smarty_function_crmAttributes($params, &$smarty) {
-  $output = '';
   $attributes = isset($params['a']) ? $params['a'] : array();
-  foreach ($attributes as $name => $vals) {
-    $output .= " $name=\"" . htmlspecialchars(implode(' ', (array) $vals)) . '"';
-  }
-  return $output;
+  return CRM_Utils_String::htmlAttributes($attributes);
 }
