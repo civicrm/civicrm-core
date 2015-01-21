@@ -23,7 +23,7 @@
           scope.abtest = model(scope.$parent);
           scope.crmMailingConst = CRM.crmMailing;
           scope.crmMailingABCriteria = crmMailingABCriteria;
-          scope.ts = CRM.ts('CiviMail');
+          scope.ts = CRM.ts(null);
 
           var fieldsModel = $parse(attr[directiveName]);
           scope.fields = fieldsModel(scope.$parent);
@@ -44,7 +44,7 @@
         var sliderTests = $('.slider-test', element);
         var sliderWin = $('.slider-win', element);
 
-        scope.ts = CRM.ts('CiviMail');
+        scope.ts = CRM.ts(null);
         scope.testValue = 0;
         scope.winValue = 100;
 
