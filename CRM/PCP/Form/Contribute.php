@@ -74,6 +74,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       $defaults['is_tellfriend_enabled'] = 1;
       $defaults['tellfriend_limit'] = 5;
       $defaults['link_text'] = ts('Create your own fundraising page');
+      $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
 
       if ($ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')) {
         $defaults['notify_email'] = $ccReceipt;

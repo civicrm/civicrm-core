@@ -80,6 +80,20 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
+    <name>owner_notify_id</name>
+    <title>Owner Notification</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>FK to civicrm_option_group with name = PCP owner notifications</comment>
+    <add>4.6</add>
+    <pseudoconstant>
+      <optionGroupName>pcp_owner_notify</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Radio</type>
+    </html>
+  </field>
+  <field>
     <name>is_approval_needed</name>
     <type>boolean</type>
     <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>

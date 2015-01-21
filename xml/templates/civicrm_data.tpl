@@ -144,6 +144,7 @@ VALUES
    ('payment_instrument'            , '{ts escape="sql"}Payment Instruments{/ts}'                , 1, 1, 0),
    ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , 1, 1, 1),
    ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , 1, 1, 1),
+   ('pcp_owner_notify'              , '{ts escape="sql"}PCP owner notifications{/ts}'            , 1, 1, 1),
    ('participant_role'              , '{ts escape="sql"}Participant Role{/ts}'                   , 1, 1, 0),
    ('event_type'                    , '{ts escape="sql"}Event Type{/ts}'                         , 1, 1, 0),
    ('contact_view_options'          , '{ts escape="sql"}Contact View Options{/ts}'               , 1, 1, 1),
@@ -224,6 +225,7 @@ SELECT @option_group_id_acc            := max(id) from civicrm_option_group wher
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 SELECT @option_group_id_cs             := max(id) from civicrm_option_group where name = 'contribution_status';
 SELECT @option_group_id_pcp            := max(id) from civicrm_option_group where name = 'pcp_status';
+SELECT @option_group_id_pcpOwnerNotify := max(id) from civicrm_option_group where name = 'pcp_owner_notify';
 SELECT @option_group_id_pRole          := max(id) from civicrm_option_group where name = 'participant_role';
 SELECT @option_group_id_etype          := max(id) from civicrm_option_group where name = 'event_type';
 SELECT @option_group_id_cvOpt          := max(id) from civicrm_option_group where name = 'contact_view_options';
@@ -437,6 +439,10 @@ VALUES
   (@option_group_id_pcp, '{ts escape="sql"}Waiting Review{/ts}', 1, 'Waiting Review', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_pcp, '{ts escape="sql"}Approved{/ts}'      , 2, 'Approved'      , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_pcp, '{ts escape="sql"}Not Approved{/ts}'  , 3, 'Not Approved'  , NULL, 0, NULL, 3, NULL, 0, 1, 1, NULL, NULL),
+
+  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Owner chooses whether to receive notifications{/ts}', 1, 'owner_chooses', NULL, 0, 1, 1, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Notifications are sent to ALL owners{/ts}'      , 2, 'all_owners'      , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Notifications are NOT available{/ts}'  , 3, 'no_notifications'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL),
 
   (@option_group_id_pRole, '{ts escape="sql"}Attendee{/ts}',  1, 'Attendee',  NULL, 1, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_pRole, '{ts escape="sql"}Volunteer{/ts}', 2, 'Volunteer', NULL, 1, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
