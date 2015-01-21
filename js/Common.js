@@ -13,7 +13,13 @@ CRM._ = _;
  */
 function ts(text, params) {
   "use strict";
-  text = CRM.strings[text] || text;
+  var d = (params && params.domain) ? ('strings::' + params.domain) : null;
+  if (d && CRM[d] && CRM[d][text]) {
+    text = CRM[d][text];
+  }
+  else if (CRM['strings'][text]) {
+    text = CRM['strings'][text];
+  }
   if (typeof(params) === 'object') {
     for (var i in params) {
       if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
@@ -1009,6 +1015,12 @@ CRM.strings = CRM.strings || {};
       }
       return ts(message, options);
     };
+  };
+
+  CRM.addStrings = function(domain, strings) {
+    var bucket = (domain == 'civicrm' ? 'strings' : 'strings::' + domain);
+    CRM[bucket] = CRM[bucket] || {};
+    _.extend(CRM[bucket], strings);
   };
 
   /**

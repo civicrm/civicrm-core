@@ -1,7 +1,7 @@
 /// crmFile: Manage file attachments
 (function (angular, $, _) {
   var partialUrl = function (relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmAttachment/' + relPath;
+    return '~/crmAttachment/' + relPath;
   };
 
   angular.module('crmAttachment', ['angularFileUpload']);

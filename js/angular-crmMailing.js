@@ -1,6 +1,6 @@
 (function (angular, $, _) {
   var partialUrl = function partialUrl(relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmMailing/' + relPath;
+    return '~/crmMailing/' + relPath;
   };
 
   angular.module('crmMailing', [
@@ -73,7 +73,7 @@
     $scope.crmMailingConst = CRM.crmMailing;
 
     $scope.partialUrl = partialUrl;
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size($scope.mailing.jobs) > 0;
@@ -181,7 +181,7 @@
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
   angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
@@ -276,7 +276,7 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - recipients: array of contacts
   angular.module('crmMailing').controller('PreviewRecipCtrl', function ($scope) {
-    $scope.ts = CRM.ts('CiviMail');
+    $scope.ts = CRM.ts(null);
   });
 
   // Controller for the "Preview Mailing" dialog
@@ -285,13 +285,13 @@
   //   - "body_html"
   //   - "body_text"
   angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope) {
-    $scope.ts = CRM.ts('CiviMail');
+    $scope.ts = CRM.ts(null);
   });
 
   // Controller for the "Preview Mailing Component" segment
   // which displays header/footer/auto-responder
   angular.module('crmMailing').controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
 
     $scope.previewComponent = function previewComponent(title, componentId) {
       var component = _.where(CRM.crmMailing.headerfooterList, {id: "" + componentId});
@@ -317,12 +317,12 @@
   //   - "body_html"
   //   - "body_text"
   angular.module('crmMailing').controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
-    $scope.ts = CRM.ts('CiviMail');
+    $scope.ts = CRM.ts(null);
   });
 
   // Controller for the in-place msg-template management
   angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     $scope.crmMsgTemplates = crmMsgTemplates;
 
     // @return Promise MessageTemplate (per APIv3)
@@ -368,7 +368,7 @@
   //       - "msg_text": string
   //       - "msg_html": string
   angular.module('crmMailing').controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     $scope.saveOpt = {mode: '', newTitle: ''};
     $scope.selected = null;
 

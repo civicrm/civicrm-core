@@ -268,7 +268,10 @@ class CRM_Core_Invoke {
 
       $result = NULL;
       if (is_array($item['page_callback'])) {
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php';
+        if ($item['page_callback']{0} !== '\\') {
+          // Legacy class-loading for PHP 5.2 namespaces; not sure it's needed, but counter-productive for PHP 5.3 namespaces
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php';
+        }
         $result = call_user_func($item['page_callback']);
       }
       elseif (strstr($item['page_callback'], '_Form')) {
@@ -281,18 +284,21 @@ class CRM_Core_Invoke {
       }
       else {
         $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php';
+        if ($item['page_callback']{0} !== '\\') {
+          // Legacy class-loading for PHP 5.2 namespaces; not sure it's needed, but counter-productive for PHP 5.3 namespaces
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php';
+        }
         $mode = 'null';
         if (isset($pageArgs['mode'])) {
           $mode = $pageArgs['mode'];
           unset($pageArgs['mode']);
         }
         $title = CRM_Utils_Array::value('title', $item);
-        if (strstr($item['page_callback'], '_Page')) {
+        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller')) {
+        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];
