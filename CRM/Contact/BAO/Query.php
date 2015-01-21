@@ -3291,7 +3291,7 @@ WHERE  id IN ( $groupIDs )
   /*
    * Where/qill clause for greeting fields
    *
-   * @params $values
+   * @param array $values
    *
    * @return void
    */
@@ -3299,7 +3299,7 @@ WHERE  id IN ( $groupIDs )
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $name .= '_display';
 
-    $this->_qill[$grouping][] = "Greeting $op $value";
+    $this->_qill[$grouping][] = ts('Greeting %1 %2', array(1 => $op, 2 => $value));
     $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", 'LIKE', "$value", 'String');
   }
 
