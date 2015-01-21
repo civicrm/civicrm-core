@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -39,6 +39,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
   protected $_defaults = NULL;
 
+  public $unsavedChangesWarn = TRUE;
+
   public function preProcess() {
     // This controller was originally written to CRUD $config->locale_custom_strings,
     // but that's no longer the canonical store. Re-sync from canonical store to ensure
@@ -48,16 +50,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
     $this->assign('soInstance', $this->_soInstance);
-    $breadCrumbUrl = CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
-      "reset=1"
-    );
-    $breadCrumb = array(
-      array(
-        'title' => ts('Word Replacements'),
-        'url' => $breadCrumbUrl,
-      ),
-    );
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**
@@ -281,5 +273,4 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
       ));
     }
   }
-
 }

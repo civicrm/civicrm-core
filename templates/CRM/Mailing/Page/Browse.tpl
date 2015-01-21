@@ -37,7 +37,7 @@
 
 {if $showLinks}
     <div class="action-link">
-      <a accesskey="N" href="{crmURL p=$newMassUrl q='reset=1'}" class="button"><span><div class="icon ui-icon-mail-closed"></div>{ts}{$linkTitle}{/ts}</span></a><br/><br/>
+      {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="mail-closed"}{ts}{$linkTitle}{/ts}{/crmButton}<br/><br/>
     </div>
 {/if}
 {include file="CRM/Mailing/Form/Search.tpl"}
@@ -84,7 +84,7 @@
     {include file="CRM/common/pager.tpl" location="bottom"}
     {if $showLinks}
       <div class="action-link">
-            <a accesskey="N" href="{crmURL p=$newMassUrl q='reset=1'}" class="button"><span><div class="icon ui-icon-mail-closed"></div>{ts}{$linkTitle}{/ts}</span></a><br/>
+            {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="mail-closed"}{ts}{$linkTitle}{/ts}{/crmButton}<br/>
       </div>
     {/if}
 

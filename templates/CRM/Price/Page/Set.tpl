@@ -76,7 +76,7 @@
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-            <a href="{crmURL p='civicrm/admin/price' q="action=add&reset=1"}" id="newPriceSet" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Set of Price Fields{/ts}</span></a>
+            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="circle-plus"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>
         {/if}
 

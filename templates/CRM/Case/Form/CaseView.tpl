@@ -250,12 +250,10 @@
       {ts}Other Relationships{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
-      {capture assign=relUrl}{crmURL p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`"}{/capture}
+      <div class="crm-submit-buttons">
+        {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="circle-plus"}{ts}Add client relationship{/ts}{/crmButton}
+      </div>
       {if $clientRelationships}
-        <div class="crm-submit-buttons">
-          <a class="button" href="{$relUrl}">
-          <div class="icon ui-icon-circle-plus"></div>{ts}Add client relationship{/ts}</a>
-        </div>
         <table id="clientRelationships-selector-{$caseID}"  class="report-layout">
           <thead><tr>
             <th>{ts}Client Relationship{/ts}</th>
@@ -267,8 +265,7 @@
         {else}
         <div class="messages status no-popup">
           <div class="icon inform-icon"></div>
-          {capture assign=link}class="action-item" href="{$relUrl}"{/capture}
-          {ts 1=$link}There are no Relationships entered for this client. You can <a %1>add one</a>.{/ts}
+          {ts}None found.{/ts}
         </div>
       {/if}
  {literal}

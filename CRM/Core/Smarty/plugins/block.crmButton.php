@@ -23,26 +23,38 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
- * Formats an array of attributes as html
+ * Generate the html for a button-style link
  *
  * @param array $params
- *   ['a'] array of attributes.
+ *   Params of the {crmButton} call.
+ * @param string $text
+ *   Contents of block.
  * @param CRM_Core_Smarty $smarty
+ *   The Smarty object.
  *
  * @return string
+ *   The generated html.
  */
-function smarty_function_crmAttributes($params, &$smarty) {
-  $attributes = isset($params['a']) ? $params['a'] : array();
-  return CRM_Utils_String::htmlAttributes($attributes);
+function smarty_block_crmButton($params, $text, &$smarty) {
+  // Generate url (pass 'html' param as false to avoid double-encode by htmlAttributes)
+  $params['href'] = CRM_Utils_System::crmURL($params + array('h' => FALSE));
+  // Always add class 'button' - fixme probably should be crm-button
+  $params['class'] = 'button ' . CRM_Utils_Array::value('class', $params, '');
+  // Any jQuery-UI icon works
+  $icon = CRM_Utils_Array::value('icon', $params, 'pencil');
+  // All other params are treated as html attributes
+  CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
+  $attributes = CRM_Utils_String::htmlAttributes($params);
+  return "<a $attributes><span><span class='icon ui-icon-$icon'></span> $text</span></a>";
 }

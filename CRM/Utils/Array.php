@@ -531,9 +531,9 @@ class CRM_Utils_Array {
    * @param array $items
    *   The array from which to remove items.
    *
-   * @internal param string|\string[] $key When passed a string, unsets $items[$key].*   When passed a string, unsets $items[$key].
-   *   When passed an array of strings, unsets $items[$k] for each string $k
-   *   in the array.
+   * Additional params:
+   *   When passed a string, unsets $items[$key].
+   *   When passed an array of strings, unsets $items[$k] for each string $k in the array.
    */
   public static function remove(&$items) {
     foreach (func_get_args() as $n => $key) {

@@ -38,9 +38,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
               <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -81,9 +81,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
                 <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
