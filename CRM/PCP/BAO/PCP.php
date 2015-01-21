@@ -401,6 +401,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $form->add('select', 'supporter_profile_id', ts('Supporter Profile'), array('' => ts('- select -')) + $profile, TRUE);
 
+    //CRM-15821 - To add new option for PCP "Owner" notification
+    $ownerNotifications = CRM_Core_OptionGroup::values('pcp_owner_notify');
+    $form->addRadio('owner_notify_id', ts('Owner Notification'), $ownerNotifications, NULL, NULL, TRUE);
+
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
     $form->add('text',
@@ -913,4 +917,22 @@ INNER JOIN civicrm_uf_group ufgroup
     }
   }
 
+  /**
+   * Get owner notification id
+   *
+   * @param int $pcpId
+   * @param $component
+   *
+   *
+   * @return int
+   */
+  public static function getOwnerNotificationId($pcpId) {
+    $query = "
+         SELECT pb.owner_notify_id
+         FROM civicrm_pcp_block pb
+         LEFT JOIN civicrm_pcp pcp ON ( pb.id = pcp.pcp_block_id )
+         WHERE pcp.id = %1";
+    $params = array(1 => array($pcpId, 'Integer'));
+    return CRM_Core_DAO::singleValueQuery($query, $params);
+  }
 }

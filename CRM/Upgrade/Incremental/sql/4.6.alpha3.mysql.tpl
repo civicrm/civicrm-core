@@ -1,5 +1,4 @@
 {* file to handle db changes in 4.6.alpha3 during upgrade *}
-
 -- update permission for editing message templates (CRM-15819)
 
 SELECT @messages_menu_id := id FROM civicrm_navigation WHERE name = 'Mailings';

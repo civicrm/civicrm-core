@@ -78,6 +78,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $defaults['is_tellfriend_enabled'] = 1;
       $defaults['tellfriend_limit'] = 5;
       $defaults['link_text'] = ts('Promote this event with a personal campaign page');
+      $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
 
       if ($this->_id &&
         $ccReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'cc_receipt')
