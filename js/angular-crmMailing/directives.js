@@ -28,7 +28,7 @@
           var model = $parse(attr.crmMailing);
           scope.mailing = model(scope.$parent);
           scope.crmMailingConst = CRM.crmMailing;
-          scope.ts = CRM.ts('CiviMail');
+          scope.ts = CRM.ts(null);
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
         }
       };
@@ -44,7 +44,7 @@
         var mailingModel = $parse(attr.crmMailing);
         scope.mailing = mailingModel(scope);
         scope.crmMailingConst = CRM.crmMailing;
-        scope.ts = CRM.ts('CiviMail');
+        scope.ts = CRM.ts(null);
         scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
         scope.testGroup = {gid: null};
 
@@ -72,7 +72,7 @@
         var mailingModel = $parse(attr.crmMailing);
         scope.mailing = mailingModel(scope.$parent);
         scope.crmMailingConst = CRM.crmMailing;
-        scope.ts = CRM.ts('CiviMail');
+        scope.ts = CRM.ts(null);
         scope.previewMailing = function previewMailing(mailing, mode) {
           return crmMailingPreviewMgr.preview(mailing, mode);
         };
@@ -243,7 +243,7 @@
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
         scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
 
-        scope.ts = CRM.ts('CiviMail');
+        scope.ts = CRM.ts(null);
 
         /// Convert MySQL date ("yyyy-mm-dd hh:mm:ss") to JS date object
         scope.parseDate = function (date) {

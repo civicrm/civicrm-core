@@ -44,7 +44,7 @@
   ]);
 
   angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     $scope.mailingABList = mailingABList.values;
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingABStatus = crmMailingABStatus;
@@ -52,7 +52,7 @@
 
   angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location) {
     $scope.abtest = abtest;
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.partialUrl = partialUrl;
@@ -175,7 +175,7 @@
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmApi, crmMailingPreviewMgr, dialogService) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
 
     $scope.abtest = abtest;
 
@@ -211,7 +211,7 @@
 
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
-    var ts = $scope.ts = CRM.ts('CiviMail');
+    var ts = $scope.ts = CRM.ts(null);
     var abtest = $scope.abtest = $scope.model.abtest;
     var mailingName = $scope.model.mailingName;
 
