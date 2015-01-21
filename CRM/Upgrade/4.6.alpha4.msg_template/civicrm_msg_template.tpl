@@ -41,9 +41,9 @@ INSERT INTO civicrm_msg_template
   (msg_title,      msg_subject,                  msg_text,                  msg_html,                  workflow_id,        is_default, is_reserved) VALUES
 {foreach from=$ovNames key=gName item=ovs name=for_groups}
 {foreach from=$ovs key=vName item=title name=for_values}
-      {fetch assign=subject file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha3.msg_template/message_templates/`$vName`_subject.tpl"}
-      {fetch assign=text    file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha3.msg_template/message_templates/`$vName`_text.tpl"}
-      {fetch assign=html    file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha3.msg_template/message_templates/`$vName`_html.tpl"}
+      {fetch assign=subject file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha4.msg_template/message_templates/`$vName`_subject.tpl"}
+      {fetch assign=text    file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha4.msg_template/message_templates/`$vName`_text.tpl"}
+      {fetch assign=html    file="`$smarty.const.SMARTY_DIR`/../../CRM/Upgrade/4.6.alpha4.msg_template/message_templates/`$vName`_html.tpl"}
       ('{$title}', '{$subject|escape:"quotes"}', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', @tpl_ovid_{$vName}, 1,          0),
       ('{$title}', '{$subject|escape:"quotes"}', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', @tpl_ovid_{$vName}, 0,          1) {if $smarty.foreach.for_groups.last and $smarty.foreach.for_values.last};{else},{/if}
 {/foreach}
