@@ -31,8 +31,8 @@
   <div class="form-item">
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Assign Account{/ts}</span></a>
-  <a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon ui-icon-pencil"></div>{ts}Edit Financial Type{/ts}</span></a>
+      {crmButton q="action=add&reset=1&aid=$aid" id="newfinancialTypeAccount"  icon="circle-plus"}{ts}Assign Account{/ts}{/crmButton}
+  {crmButton p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
       </div>
     {/if}
     {strip}
@@ -64,8 +64,8 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1&aid=$aid"}" id="newfinancialTypeAccount" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Assign Account{/ts}</span></a>
-  <a href="{crmURL p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1"}" class="button"><span><div class="icon ui-icon-pencil"></div>{ts}Edit Financial Type{/ts}</span></a>
+      {crmButton q="action=add&reset=1&aid=$aid" id="newfinancialTypeAccount"  icon="circle-plus"}{ts}Assign Account{/ts}{/crmButton}
+  {crmButton p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
       </div>
     {/if}
     </div>
