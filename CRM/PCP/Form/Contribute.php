@@ -65,9 +65,6 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
       $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
-      if (!CRM_Utils_Array::value('owner_notify_id', $defaults)) {
-        $defaults['owner_notify_id'] = CRM_Core_OptionGroup::getDefaultValue('pcp_owner_notify');
-      }
       $this->assign('pageId', $this->_id);
     }
 

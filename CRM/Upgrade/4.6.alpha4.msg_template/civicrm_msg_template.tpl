@@ -1,5 +1,5 @@
 {php}
-  $dir = SMARTY_DIR . '/../../CRM/Upgrade/4.6.alpha1.msg_template/message_templates';
+  $dir = SMARTY_DIR . '/../../CRM/Upgrade/4.6.alpha4.msg_template/message_templates';
   $templates = array();
   foreach (preg_grep('/\.tpl$/', scandir($dir)) as $filename) {
     $parts = explode('_', basename($filename, '.tpl'));

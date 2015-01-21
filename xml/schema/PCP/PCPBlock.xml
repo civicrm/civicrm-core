@@ -83,7 +83,7 @@
     <name>owner_notify_id</name>
     <title>Owner Notification</title>
     <type>int unsigned</type>
-    <default>1</default>
+    <default>0</default>
     <comment>FK to civicrm_option_group with name = PCP owner notifications</comment>
     <add>4.6</add>
     <pseudoconstant>
