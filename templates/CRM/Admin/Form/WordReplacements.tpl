@@ -39,6 +39,9 @@
 <div id="help">
     {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
 </div>
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location='top'}
+  </div>
 <table class="form-layout-compressed">
   <tr>
       <td>
@@ -62,44 +65,19 @@
 
           {/section}
           </table>
+        &nbsp;&nbsp;&nbsp;<a class="action-item crm-hover-button buildStringOverrideRow" href="#"><span class="icon ui-icon-circle-plus"></span> {ts}Add row{/ts}</a>
          </td>
   </tr>
 </table>
- <div class="crm-submit-buttons" ><a class="button" onClick="Javascript:buildStringOverrideRow( false );return false;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add row{/ts}</span></a>{include file="CRM/common/formButtons.tpl"} </div>
+ <div class="crm-submit-buttons">
+   {include file="CRM/common/formButtons.tpl" location='bottom'}
+ </div>
 
 </div>
 {/if}
 
 {literal}
 <script type="text/javascript">
-function buildStringOverrideRow( curInstance )
-{
-   var rowId = 'string_override_row_';
-
-   if ( curInstance ) {
-      if ( curInstance <= 10 ) return;
-      currentInstance  = curInstance;
-      previousInstance = currentInstance - 1;
-   } else {
-      var previousInstance = cj( '[id^="'+ rowId +'"]:last' ).attr('id').slice( rowId.length );
-      var currentInstance = parseInt( previousInstance ) + 1;
-   }
-
-   var dataUrl  = {/literal}"{crmURL q='snippet=4' h=0}"{literal} ;
-   dataUrl     += "&instance="+currentInstance;
-
-   var prevInstRowId = '#string_override_row_' + previousInstance;
-
-   cj.ajax({ url     : dataUrl,
-             async   : false,
-             success : function( html ) {
-       cj( prevInstRowId ).after( html );
-       cj('#old_'+currentInstance).TextAreaResizer();
-       cj('#new_'+currentInstance).TextAreaResizer();
-       }
-   });
-}
-
 CRM.$(function($) {
   {/literal}
   {if $stringOverrideInstances}
@@ -108,6 +86,38 @@ CRM.$(function($) {
      {/foreach}
   {/if}
   {literal}
+
+  function buildStringOverrideRow( curInstance ) {
+    var rowId = 'string_override_row_';
+
+    if (curInstance) {
+      if (curInstance <= 10) return;
+      currentInstance = curInstance;
+      previousInstance = currentInstance - 1;
+    } else {
+      var previousInstance = $('[id^="'+ rowId +'"]:last').attr('id').slice(rowId.length);
+      var currentInstance = parseInt(previousInstance) + 1;
+    }
+
+    var dataUrl = {/literal}"{crmURL q='snippet=4' h=0}"{literal};
+    dataUrl += "&instance="+currentInstance;
+
+    var prevInstRowId = '#string_override_row_' + previousInstance;
+
+    $.ajax({
+      url: dataUrl,
+      async: false,
+      success: function(html) {
+        $(prevInstRowId).after(html);
+        $('#old_'+currentInstance).TextAreaResizer();
+        $('#new_'+currentInstance).TextAreaResizer();
+      }
+    });
+  }
+  
+  $('.buildStringOverrideRow').click(function() {
+    buildStringOverrideRow(false);
+  });
 });
 </script>
 {/literal}
