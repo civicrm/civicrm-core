@@ -26,7 +26,8 @@
 
 {* template for a single row *}
 {if $soInstance}
-  <tr class="string-override-row row-{$soInstance} {if $soInstance % 2}odd{else}even{/if}-row">
+  <tr class="string-override-row {if $soInstance % 2}odd{else}even{/if}-row" data-row="{$soInstance}"
+      xmlns="http://www.w3.org/1999/html">
     <td>{$form.enabled.$soInstance.html}</td>
     <td>{$form.old.$soInstance.html}</td>
     <td>{$form.new.$soInstance.html}</td>
@@ -45,17 +46,20 @@
     <table class="form-layout-compressed">
       <tr>
         <td>
-          <table>
-            <tr class="columnheader">
-              <td>{ts}Enabled{/ts}</td>
-              <td>{ts}Original{/ts}</td>
-              <td>{ts}Replacement{/ts}</td>
-              <td>{ts}Exact Match{/ts}</td>
-            </tr>
-
-            {section name="numStrings" start=1 step=1 loop=$numStrings+1}
-              {include file="CRM/Admin/Form/WordReplacements.tpl" soInstance=$smarty.section.numStrings.index}
-            {/section}
+          <table class="string-override-table row-highlight">
+            <thead>
+              <tr class="columnheader">
+                <th>{ts}Enabled{/ts}</th>
+                <th>{ts}Original{/ts}</th>
+                <th>{ts}Replacement{/ts}</th>
+                <th>{ts}Exact Match{/ts}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section name="numStrings" start=1 step=1 loop=$numStrings+1}
+                {include file="CRM/Admin/Form/WordReplacements.tpl" soInstance=$smarty.section.numStrings.index}
+              {/section}
+            </tbody>
           </table>
           &nbsp;&nbsp;&nbsp;<a class="action-item crm-hover-button buildStringOverrideRow" href="#"><span class="icon ui-icon-circle-plus"></span> {ts}Add row{/ts}</a>
         </td>
@@ -71,36 +75,35 @@
     CRM.$(function($) {
       {/literal}
       {if $stringOverrideInstances}
-      {foreach from=$stringOverrideInstances key="index" item="instance"}
-      buildStringOverrideRow( {$instance} );
-      {/foreach}
+        {* Rebuild necessary rows in case of form error *}
+        {foreach from=$stringOverrideInstances key="index" item="instance"}
+          buildStringOverrideRow( {$instance} );
+        {/foreach}
       {/if}
       {literal}
 
       function buildStringOverrideRow( curInstance ) {
-        var rowId = 'string_override_row_';
+        var newRowNum;
 
         if (curInstance) {
-          if (curInstance <= 10) return;
-          currentInstance = curInstance;
-          previousInstance = currentInstance - 1;
+          // Don't fetch if already present
+          if ($('tr.string-override-row[data-row=' + curInstance + ']').length) {
+            return;
+          }
+          newRowNum = curInstance;
         } else {
-          var previousInstance = $('[id^="'+ rowId +'"]:last').attr('id').slice(rowId.length);
-          var currentInstance = parseInt(previousInstance) + 1;
+          newRowNum = 1 + $('tr.string-override-row:last').data('row');
         }
 
         var dataUrl = {/literal}"{crmURL q='snippet=4' h=0}"{literal};
-        dataUrl += "&instance="+currentInstance;
-
-        var prevInstRowId = '#string_override_row_' + previousInstance;
+        dataUrl += "&instance="+newRowNum;
 
         $.ajax({
           url: dataUrl,
           async: false,
           success: function(html) {
-            $(prevInstRowId).after(html);
-            $('#old_'+currentInstance).TextAreaResizer();
-            $('#new_'+currentInstance).TextAreaResizer();
+            $('.string-override-table tbody').append(html);
+            $('tr.string-override-row:last').trigger('crmLoad');
           }
         });
       }
@@ -109,6 +112,17 @@
         buildStringOverrideRow(false);
         e.preventDefault();
       });
+
+      // Auto-check new items
+      $('.string-override-table').on('keyup', 'textarea', function() {
+        if (!$(this).data('crm-initial-value')) {
+          var otherValue = $(this).closest('tr').find('textarea').not(this).val();
+          if ($(this).val() && otherValue) {
+            $(this).closest('tr').find('input[type=checkbox]').first().prop('checked', true);
+          }
+        }
+      });
+
     });
   </script>
 {/literal}
