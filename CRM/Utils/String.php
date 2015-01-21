@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -101,12 +101,11 @@ class CRM_Utils_String {
 
   /**
    * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g
-   * membership_payment returns MembershipPayment
+   * e.g membership_payment returns MembershipPayment
+   *
    * @param string $string
    *
    * @return string
-   *   string
    */
   public static function convertStringToCamel($string) {
     $fragments = explode('_', $string);
@@ -121,7 +120,6 @@ class CRM_Utils_String {
   }
 
   /**
-   *
    * Takes a variable name and munges it randomly into another variable name
    *
    * @param string $name
@@ -143,11 +141,11 @@ class CRM_Utils_String {
    *
    * @param string $string
    *   The input string.
-   * @param \char|string $char $char the character used to demarcate the componets
-   *
+   * @param string $char
+   *   Character used to demarcate the components
    *
    * @return string
-   *   the last component
+   *   The last component
    */
   public static function getClassName($string, $char = '_') {
     $names = array();
@@ -160,7 +158,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Appends a name to a string and seperated by delimiter.
+   * Appends a name to a string and separated by delimiter.
    * does the right thing for an empty string
    *
    * @param string $str
@@ -360,13 +358,13 @@ class CRM_Utils_String {
   }
 
   /**
-   * Extract variable values
+   * Extract the civicrm path from the url
    *
-   * @param mix $query
-   *   This is basically url.
+   * @param string $query
+   *   A url string.
    *
-   * @return mix
-   *   $v  returns civicrm url (eg: civicrm/contact/search/...)
+   * @return string|null
+   *   civicrm url (eg: civicrm/contact/search)
    */
   public static function extractURLVarValue($query) {
     $config = CRM_Core_Config::singleton();
