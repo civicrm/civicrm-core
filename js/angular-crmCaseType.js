@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   var partialUrl = function(relPath) {
-    return CRM.resourceUrls.civicrm + '/partials/crmCaseType/' + relPath;
+    return '~/crmCaseType/' + relPath;
   };
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
@@ -128,7 +128,7 @@
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
     $scope.partialUrl = partialUrl;
-    var ts = $scope.ts = CRM.ts('CiviCase');
+    var ts = $scope.ts = CRM.ts(null);
 
     $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
     $scope.activityTypes = apiCalls.actTypes.values;

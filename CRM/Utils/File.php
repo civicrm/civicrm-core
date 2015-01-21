@@ -610,9 +610,12 @@ HTACCESS;
    *   base dir.
    * @param string $pattern
    *   glob pattern, eg "*.txt".
+   * @param bool $relative
+   *   TRUE if paths should be made relative to $dir
    * @return array(string)
    */
-  public static function findFiles($dir, $pattern) {
+  public static function findFiles($dir, $pattern, $relative = FALSE) {
+    $dir = rtrim($dir, '/');
     $todos = array($dir);
     $result = array();
     while (!empty($todos)) {
@@ -621,7 +624,7 @@ HTACCESS;
       if (is_array($matches)) {
         foreach ($matches as $match) {
           if (!is_dir($match)) {
-            $result[] = $match;
+            $result[] = $relative ? CRM_Utils_File::relativize($match, "$dir/") : $match;
           }
         }
       }

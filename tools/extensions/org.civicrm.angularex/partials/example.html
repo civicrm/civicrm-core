@@ -1,6 +1,6 @@
 <div>
-  Your Name: <input ng-model="name" type="text"/>
+  {{ts('Name')}}: <input ng-model="name" type="text"/>
 </div>
 <div>
-  Hello, {{ name }}!
+  {{ts('Hello, %1!', {1: name})}}
 </div>

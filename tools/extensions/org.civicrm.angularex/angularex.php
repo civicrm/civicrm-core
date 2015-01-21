@@ -115,5 +115,9 @@ function angularex_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @param $angularModule
  */
 function angularex_civicrm_angularModules(&$angularModule) {
-  $angularModule['example'] = array('ext' => 'org.civicrm.angularex', 'js' => array('js/example.js'));
+  $angularModule['example'] = array(
+    'ext' => 'org.civicrm.angularex',
+    'js' => array('js/*.js'),
+    'partials' => array('partials'),
+  );
 }

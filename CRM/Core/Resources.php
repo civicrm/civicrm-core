@@ -58,9 +58,9 @@ class CRM_Core_Resources {
   private $extMapper = NULL;
 
   /**
-   * @var CRM_Utils_Cache_Interface
+   * @var CRM_Core_Resources_Strings
    */
-  private $cache = NULL;
+  private $strings = NULL;
 
   /**
    * @var array free-form data tree
@@ -135,7 +135,7 @@ class CRM_Core_Resources {
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
-    $this->cache = $cache;
+    $this->strings = new CRM_Core_Resources_Strings($cache);
     $this->cacheCodeKey = $cacheCodeKey;
     if ($cacheCodeKey !== NULL) {
       $this->cacheCode = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, $cacheCodeKey);
@@ -159,13 +159,18 @@ class CRM_Core_Resources {
    *   relative weight within a given region.
    * @param string $region
    *   location within the file; 'html-header', 'page-header', 'page-footer'.
-   * @param $translate , whether to parse this file for strings enclosed in ts()
+   * @param bool|string $translate
+   *   Whether to load translated strings for this file. Use one of:
+   *   - FALSE: Do not load translated strings.
+   *   - TRUE: Load translated strings. Use the $ext's default domain.
+   *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
-      $this->translateScript($ext, $file);
+      $domain = ($translate === TRUE) ? $ext : $translate;
+      $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
     // Look for non-minified version if we are in debug mode
     if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
@@ -352,15 +357,22 @@ class CRM_Core_Resources {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
+   * @param string|NULL $domain
    * @return CRM_Core_Resources
    */
-  public function addString($text) {
+  public function addString($text, $domain = 'civicrm') {
     foreach ((array) $text as $str) {
-      $translated = ts($str);
+      $translated = ts($str, array(
+        'domain' => ($domain == 'civicrm') ? NULL : array($domain, NULL),
+      ));
+
       // We only need to push this string to client if the translation
       // is actually different from the original
       if ($translated != $str) {
-        $this->addSetting(array('strings' => array($str => $translated)));
+        $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
+        $this->addSetting(array(
+          $bucket => array($str => $translated),
+        ));
       }
     }
     return $this;
@@ -431,14 +443,17 @@ class CRM_Core_Resources {
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
-   * @param string $file
+   * @param string|NULL $file
    *   file path -- relative to the extension base dir.
    *
    * @return bool|string
    *   full file path or FALSE if not found
    */
-  public function getPath($ext, $file) {
+  public function getPath($ext, $file = NULL) {
     // TODO consider caching results
+    if ($file === NULL) {
+      return $this->extMapper->keyToBasePath($ext);
+    }
     $path = $this->extMapper->keyToBasePath($ext) . '/' . $file;
     if (is_file($path)) {
       return $path;
@@ -466,6 +481,40 @@ class CRM_Core_Resources {
     }
     // TODO consider caching results
     return $this->extMapper->keyToUrl($ext) . '/' . $file;
+  }
+
+  /**
+   * Evaluate a glob pattern in the context of a particular extension.
+   *
+   * @param string $ext
+   *   Extension name; use 'civicrm' for core.
+   * @param string|array $patterns
+   *   Glob pattern; e.g. "*.html".
+   * @param null|int $flags
+   *   See glob().
+   * @return array
+   *   List of matching files, relative to the extension base dir.
+   * @see glob()
+   */
+  public function glob($ext, $patterns, $flags = NULL) {
+    $path = $this->getPath($ext);
+    $patterns = (array) $patterns;
+    $files = array();
+    foreach ($patterns as $pattern) {
+      if ($pattern{0} === '/') {
+        // Absolute path.
+        $files = array_merge($files, (array) glob($pattern, $flags));
+      }
+      else {
+        // Relative path.
+        $files = array_merge($files, (array) glob("$path/$pattern", $flags));
+      }
+    }
+    sort($files); // Deterministic order.
+    $files = array_unique($files);
+    return array_map(function ($file) use ($path) {
+      return CRM_Utils_File::relativize($file, "$path/");
+    }, $files);
   }
 
   /**
@@ -579,37 +628,15 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function flushStrings() {
-    $this->cache->flush();
+    $this->strings->flush();
     return $this;
   }
 
   /**
-   * Translate strings in a javascript file
-   *
-   * @param string $ext
-   *   extension name.
-   * @param string $file
-   *   file path.
-   * @return void
+   * @return CRM_Core_Resources_Strings
    */
-  private function translateScript($ext, $file) {
-    // For each extension, maintain one cache record which
-    // includes parsed (translatable) strings for all its JS files.
-    $stringsByFile = $this->cache->get($ext); // array($file => array(...strings...))
-    if (!$stringsByFile) {
-      $stringsByFile = array();
-    }
-    if (!isset($stringsByFile[$file])) {
-      $filePath = $this->getPath($ext, $file);
-      if ($filePath && is_readable($filePath)) {
-        $stringsByFile[$file] = CRM_Utils_JS::parseStrings(file_get_contents($filePath));
-      }
-      else {
-        $stringsByFile[$file] = array();
-      }
-      $this->cache->set($ext, $stringsByFile);
-    }
-    $this->addString($stringsByFile[$file]);
+  public function getStrings() {
+    return $this->strings;
   }
 
   /**
