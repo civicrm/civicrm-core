@@ -482,7 +482,7 @@ SELECT label, value
             $toValue = CRM_Utils_Array::value('to', $value);
 
             if (!$fromValue && !$toValue) {
-              if (!CRM_Utils_Date::processDate($value) && $op != 'IS NULL' && $op != 'IS NOT NULL') {
+              if (!CRM_Utils_Date::processDate($value) && !in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
                 continue;
               }
 
