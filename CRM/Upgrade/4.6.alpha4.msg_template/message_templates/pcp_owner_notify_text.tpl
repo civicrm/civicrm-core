@@ -3,6 +3,7 @@
 
 ===========================================================
 {ts}You have received a donation at your personal page{/ts}: {$page_title}
+>> {$pcpInfoURL}
 
 {ts}Your fundraising total has been updated.{/ts}
 {ts}The donor's information is listed below.  You can choose to contact them and convey your thanks if you wish.{/ts}

@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 {capture assign=pcpURL     }{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcpId`" h=0 a=1}{/capture}
 
-  <p>{ts}You have received a donation at your personal page{/ts}: {$page_title}</p>
+  <p>{ts}You have received a donation at your personal page{/ts}: <a href="{$pcpInfoURL}">{$page_title}</a></p>
   <p>{ts}Your fundraising total has been updated.{/ts}<br/>
     {ts}The donor's information is listed below.  You can choose to contact them and convey your thanks if you wish.{/ts} <br/>
     {if $is_honor_roll_enabled}
