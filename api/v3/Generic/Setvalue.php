@@ -92,7 +92,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   $params = array('id' => $id, $field => $value);
 
   if ((!empty($def['pseudoconstant']) || !empty($def['option_group_id'])) && $value !== '' && $value !== 'null') {
-    _civicrm_api3_api_match_pseudoconstant($params, $entity, $field, $def);
+    _civicrm_api3_api_match_pseudoconstant($params[$field], $entity, $field, $def);
   }
 
   CRM_Utils_Hook::pre('edit', $entity, $id, $params);
@@ -106,16 +106,21 @@ function civicrm_api3_generic_setValue($apiRequest) {
     }
     CRM_Core_BAO_CustomValueTable::setValues($params);
     CRM_Utils_Hook::post('edit', $entity, $id, CRM_Core_DAO::$_nullObject);
-    return civicrm_api3_create_success($params);
   }
   // Core fields
   elseif (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $params[$field])) {
     $entityDAO = new $dao_name();
     $entityDAO->copyValues($params);
     CRM_Utils_Hook::post('edit', $entity, $entityDAO->id, $entityDAO);
-    return civicrm_api3_create_success($params);
   }
   else {
     return civicrm_api3_create_error("error assigning $field=$value for $entity (id=$id)");
   }
+
+  // Add changelog entry - TODO: Should we do this for other entities as well?
+  if (strtolower($entity) === 'contact') {
+    CRM_Core_BAO_Log::register($id, 'civicrm_contact', $id);
+  }
+
+  return civicrm_api3_create_success($params);
 }
