@@ -29,6 +29,23 @@ INSERT INTO `civicrm_navigation`
 VALUES
   ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
 
+CREATE TABLE IF NOT EXISTS `civicrm_mailing_abtest` (
+     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
+     `name` varchar(128)    COMMENT 'Name of the A/B test',
+     `status` varchar(32)    COMMENT 'Status',
+     `mailing_id_a` int unsigned    COMMENT 'The first experimental mailing (\"A\" condition)',
+     `mailing_id_b` int unsigned    COMMENT 'The second experimental mailing (\"B\" condition)',
+     `mailing_id_c` int unsigned    COMMENT 'The final, general mailing (derived from A or B)',
+     `domain_id` int unsigned    COMMENT 'Which site is this mailing for',
+     `testing_criteria_id` int unsigned    ,
+     `winner_criteria_id` int unsigned    ,
+     `specific_url` varchar(255)    COMMENT 'What specific url to track',
+     `declare_winning_time` datetime    COMMENT 'In how much time to declare winner',
+     `group_percentage` int unsigned
+,
+    PRIMARY KEY ( `id` )
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
 -- Insert menu items under "Mailings" for A/B Tests
 SELECT @parent_id := id from `civicrm_navigation` where name = 'Mailings' AND domain_id = {$domainID};
 SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Find Mass SMS' and `parent_id` = @parent_id;
