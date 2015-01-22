@@ -67,7 +67,7 @@
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-owner_notify_id">
         <td class="label">{$form.owner_notify_id.label}</td>
-        <td>{$form.owner_notify_id.html} {help id="id-owner_notify"}</td>
+        <td>{$form.owner_notify_id.html}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-is_tellfriend_enabled">
         <td class="label">{$form.is_tellfriend_enabled.label}</td>

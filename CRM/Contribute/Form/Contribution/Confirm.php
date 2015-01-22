@@ -1777,20 +1777,38 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
 
   public static function pcpNotifyOwner($contribution, $contributionSoft) {
-    $component = $contribution->_component ? $contribution->_component : 'contribute';
-    $ownerNotifyID = CRM_PCP_BAO_PCP::getOwnerNotificationId($contributionSoft->pcp_id);
-    if ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'no_notifications', 'name') ||
-        ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name') &&
-         CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify'))) {
-      $pcpPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($contributionSoft->pcp_id, $component);
+    $params = array('id' => $contributionSoft->pcp_id);
+    CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
+    $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+
+    if ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'no_notifications', 'name') &&
+        (($ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name') &&
+        CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify')) ||
+        $ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'all_owners', 'name'))) {
+      $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
+        "reset=1&id={$contributionSoft->pcp_id}",
+        TRUE, NULL, FALSE, TRUE
+      );
       // set email in the template here
-      $donorName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contribution->contact_id, 'display_name');
+      // get the billing location type
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      $billingLocationTypeId = array_search('Billing', $locationTypes);
+
+      if ($billingLocationTypeId) {
+        list($donorName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id, FALSE, $billingLocationTypeId);
+      }
+      // get primary location email if no email exist( for billing location).
+      if (!$email) {
+        list($donorName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id);
+      }
+      list($ownerName, $ownerEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contributionSoft->contact_id);
       $tplParams = array(
-        'page_title' => $pcpPageTitle,
+        'page_title' => $pcpInfo['title'],
         'receive_date' => $contribution->receive_date,
         'total_amount' => $contributionSoft->amount,
         'donors_display_name' => $donorName,
-        'donors_email' => CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id),
+        'donors_email' => $email,
+        'pcpInfoURL' => $pcpInfoURL,
         'is_honor_roll_enabled' => $contributionSoft->pcp_display_in_roll,
       );
       $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
@@ -1798,8 +1816,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'pcp_owner_notify',
         'contactId' => $contributionSoft->contact_id,
-        'toEmail' => CRM_Contact_BAO_Contact::getPrimaryEmail($contributionSoft->contact_id),
-        'toName' => $donorName,
+        'toEmail' => $ownerEmail,
+        'toName' => $ownerName,
         'from' => "$domainValues[0] <$domainValues[1]>",
         'tplParams' => $tplParams,
         'PDFFilename' => 'receipt.pdf',

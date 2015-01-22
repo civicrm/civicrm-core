@@ -403,7 +403,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     //CRM-15821 - To add new option for PCP "Owner" notification
     $ownerNotifications = CRM_Core_OptionGroup::values('pcp_owner_notify');
-    $form->addRadio('owner_notify_id', ts('Owner Notification'), $ownerNotifications, NULL, NULL, TRUE);
+    $form->addRadio('owner_notify_id', ts('Owner Notification'), $ownerNotifications, NULL, '<br/>', TRUE);
 
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
@@ -431,20 +431,20 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @param CRM_Core_Page $page
    * @param null $elements
    */
-  public function buildPcp($pcpId, &$page, &$elements = NULL) {
+  public static function buildPcp($pcpId, &$page, &$elements = NULL) {
 
     $prms = array('id' => $pcpId);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $prms, $pcpInfo);
     if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpId)) {
       if ($pcpInfo['page_type'] == 'event') {
-        $pcp_supporter_text = ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $pcp_supporter_text = ts('This event registration is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'event');
         if (!empty($text)) {
           $pcp_supporter_text .= "You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!";
         }
       }
       else {
-        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $pcp_supporter_text = ts('This contribution is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'contribute');
         if (!empty($text)) {
           $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
@@ -920,19 +920,23 @@ INNER JOIN civicrm_uf_group ufgroup
   /**
    * Get owner notification id
    *
-   * @param int $pcpId
+   * @param int $component_id
    * @param $component
-   *
    *
    * @return int
    */
-  public static function getOwnerNotificationId($pcpId) {
+  public static function getOwnerNotificationId($component_id, $component = 'contribute') {
+    $entity_table = self::getPcpEntityTable($component);
     $query = "
          SELECT pb.owner_notify_id
          FROM civicrm_pcp_block pb
-         LEFT JOIN civicrm_pcp pcp ON ( pb.id = pcp.pcp_block_id )
-         WHERE pcp.id = %1";
-    $params = array(1 => array($pcpId, 'Integer'));
-    return CRM_Core_DAO::singleValueQuery($query, $params);
+         WHERE pb.entity_id = %1 AND pb.entity_table = %2";
+    $params = array(1 => array($component_id, 'Integer'), 2 => array($entity_table, 'String'));
+    if (!$ownerNotificationId = CRM_Core_DAO::singleValueQuery($query, $params)) {
+      CRM_Core_Error::fatal(ts('Owner Notification is not set for this Personal Campaign Page. Please contact the site administrator if you need assistance.'));
+    }
+    else {
+      return $ownerNotificationId;
+    }
   }
 }

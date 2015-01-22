@@ -67,6 +67,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_first = FALSE;
 
   /**
+   * Is this the last page?
+   *
+   * @var boolean
+   */
+  protected $_last = FALSE;
+
+  /**
    * Store price set id.
    *
    * @var int
@@ -155,31 +162,33 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     if ($this->_single) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Save'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'upload',
-            'name' => ts('Save and Done'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'subName' => 'done',
-          ),
-          array(
-            'type' => 'submit',
-            'name' => ts('Save and Next'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'subName' => 'savenext',
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
+      $buttons = array(
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'upload',
+          'name' => ts('Save and Done'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'subName' => 'done',
+        ),
       );
+      if (!$this->_last) {
+        $buttons[] = array(
+          'type' => 'submit',
+          'name' => ts('Save and Next'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'subName' => 'savenext',
+        );
+      }
+      $buttons[] = array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      );
+      $this->addButtons($buttons);
     }
     else {
       $buttons = array();
