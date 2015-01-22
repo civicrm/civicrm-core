@@ -44,7 +44,7 @@
      {else}
      <div class="messages status no-popup">
       <div class="icon inform-icon"></div> &nbsp;
-      {ts}No modifications have been logged for this contact.{/ts}
+      {ts}None found.{/ts}
      </div>
      {/if}
     </div>

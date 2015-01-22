@@ -310,6 +310,17 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       CRM_Core_Session::singleton()
         ->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
     }
+
+    // Add entry in the log table
+    CRM_Core_BAO_Log::register($this->_tableID,
+      'civicrm_contact',
+      $this->_tableID
+    );
+
+    if (CRM_Core_Resources::isAjaxMode()) {
+      $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_tableID);
+    }
+
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
   }
