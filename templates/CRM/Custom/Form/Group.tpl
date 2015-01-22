@@ -95,6 +95,16 @@ CRM.$(function($) {
   }
   $('input#is_multiple').change(showRange);
 
+  // "Collapse" is a bad default for "Tab" display
+  $("select#style").change(function() {
+    if ($(this).val() == 'Tab') {
+      $('#collapse_display').prop('checked', false);
+    }
+  });
+
+  /**
+   * Check if this is a contact-related set and show/hide other options accordingly
+   */
   function showHideStyle() {
     var
       extend = $(this).val(),
@@ -130,6 +140,11 @@ CRM.$(function($) {
     }
   }
 
+  /**
+   * Check if this set supports multiple records and adjust other options accordingly
+   *
+   * @param onFormLoad
+   */
   function showRange(onFormLoad) {
     if($("#is_multiple").is(':checked')) {
       $("tr#multiple_row").show();
@@ -149,7 +164,7 @@ CRM.$(function($) {
   }
 
   // In update mode, when 'extends' is set to an option which doesn't have
-  // any options in 2nd selector (for subtypes)  -
+  // any options in 2nd selector (for subtypes)
   var subtypes = document.getElementById('extends_1');
   if (subtypes) {
     if (subtypes.options.length <= 0) {
