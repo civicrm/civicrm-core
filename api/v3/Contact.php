@@ -946,8 +946,7 @@ WHERE     $whereClause
 /**
  * @see _civicrm_api3_generic_getlist_params
  *
- * @param $request
- *   Array.
+ * @param array $request
  */
 function _civicrm_api3_contact_getlist_params(&$request) {
   // get the autocomplete options from settings
@@ -990,10 +989,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result
- *   Array.
- * @param $request
- *   Array.
+ * @param array $result
+ * @param array $request
  *
  * @return array
  */
