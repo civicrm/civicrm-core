@@ -91,15 +91,6 @@
         _.each(update, reloadBlock);
         CRM.status(ts('Saved'));
       }
-      // Update changelog tab and contact footer
-      if (response.changeLog && response.changeLog.count) {
-        CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
-      }
-      $("#crm-record-log").replaceWith(response.changeLog.markup);
-      // Refresh tab contents - Simple logging
-      if (!CRM.reloadChangeLogTab && $('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
-        $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
-      }
     }
     else {
       // Handle formRule error
@@ -320,9 +311,27 @@
         }
         $('#crm-contact-actions-list').hide();
       })
+      .on('crmFormSuccess crmLoad', function(e, data) {
+        // Update changelog tab and contact footer
+        if (data && data.changeLog) {
+          if (data.changeLog.count) {
+            CRM.tabHeader.updateCount('#tab_log', data.changeLog.count);
+          }
+          if (data.changeLog.markup) {
+            $("#crm-record-log").replaceWith(data.changeLog.markup);
+          }
+        }
+      })
       .on('crmFormSuccess', function(e, data) {
-        // Reload changelog whenever an inline or popup form submits
-        CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
+        // Refresh changeLog - advanced logging
+        if (CRM.reloadChangeLogTab) {
+          CRM.reloadChangeLogTab();
+        }
+        // Refresh changeLog - simple logging
+        // If we didn't get a changelog count in the response, force refresh the changelog tab to populate it
+        else {
+          CRM.tabHeader.resetTab('#tab_log', !(data && data.changeLog && data.changeLog.count));
+        }
         // Refresh dependent blocks
         if (data && data.reloadBlocks) {
           _.each(data.reloadBlocks, reloadBlock);

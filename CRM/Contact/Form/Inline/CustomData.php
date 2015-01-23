@@ -102,6 +102,8 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $this->_entityType
     );
 
+    $this->log();
+
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
 

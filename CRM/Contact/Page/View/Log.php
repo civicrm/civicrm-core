@@ -69,6 +69,8 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     }
 
     $this->assign('logCount', count($logEntries));
+    $this->ajaxResponse['tabCount'] = count($logEntries);
+    $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_contactId, FALSE);
     $this->assign_by_ref('log', $logEntries);
   }
 
