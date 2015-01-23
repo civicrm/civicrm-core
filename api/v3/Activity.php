@@ -470,10 +470,8 @@ function _civicrm_api3_activity_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result
- *   Array.
- * @param $request
- *   Array.
+ * @param array $result
+ * @param array $request
  *
  * @return array
  */

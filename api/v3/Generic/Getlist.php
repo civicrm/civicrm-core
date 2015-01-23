@@ -28,7 +28,6 @@
  * Generic api wrapper used for quicksearch and autocomplete
  *
  * @param array $apiRequest
- *   Array.
  * @return mixed
  */
 function civicrm_api3_generic_getList($apiRequest) {
@@ -66,10 +65,8 @@ function civicrm_api3_generic_getList($apiRequest) {
 /**
  * Set defaults for api.getlist
  *
- * @param $entity
- *   String.
- * @param $request
- *   Array.
+ * @param string $entity
+ * @param array $request
  */
 function _civicrm_api3_generic_getList_defaults($entity, &$request) {
   $config = CRM_Core_Config::singleton();
@@ -129,8 +126,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
 /**
  * Fallback implementation of getlist_params. May be overridden by individual apis
  *
- * @param $request
- *   Array.
+ * @param array $request
  */
 function _civicrm_api3_generic_getlist_params(&$request) {
   $fieldsToReturn = array($request['id_field'], $request['label_field']);
@@ -146,10 +142,8 @@ function _civicrm_api3_generic_getlist_params(&$request) {
 /**
  * Fallback implementation of getlist_output. May be overridden by individual apis
  *
- * @param $result
- *   Array.
- * @param $request
- *   Array.
+ * @param array $result
+ * @param array $request
  *
  * @return array
  */

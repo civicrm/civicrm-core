@@ -220,8 +220,7 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 /**
  * @see _civicrm_api3_generic_getlist_params
  *
- * @param $request
- *   Array.
+ * @param array $request
  */
 function _civicrm_api3_event_getlist_params(&$request) {
   $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
@@ -236,10 +235,8 @@ function _civicrm_api3_event_getlist_params(&$request) {
 /**
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result
- *   Array.
- * @param $request
- *   Array.
+ * @param array $result
+ * @param array $request
  *
  * @return array
  */
