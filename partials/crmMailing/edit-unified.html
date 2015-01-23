@@ -6,7 +6,7 @@
   {{ts('This mailing has been submitted.')}}
 </div>
 
-<form name="crmMailing" ng-hide="isSubmitted()">
+<form name="crmMailing" ng-hide="isSubmitted()" crm-autosave="save()" crm-autosave-model="mailing">
   <div class="crm-block crm-form-block crmMailing">
 
     <div crm-mailing-block-summary crm-mailing="mailing"/>

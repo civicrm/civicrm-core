@@ -6,7 +6,8 @@
   {{ts('This mailing has been submitted.')}}
 </div>
 
-<form name="crmMailing" novalidate ng-hide="isSubmitted()">
+<form name="crmMailing" novalidate ng-hide="isSubmitted()" crm-autosave="save()" crm-autosave-model="mailing">
+
   <div class="crm-block crm-form-block crmMailing">
     <div crm-ui-wizard>
       <div crm-ui-wizard-step crm-title="ts('Define Mailing')">
