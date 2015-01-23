@@ -69,6 +69,10 @@ class Manager {
         'css' => array('css/angular-crmAttachment.css'),
         'partials' => array('partials/crmAttachment'),
       );
+      $angularModules['crmAutosave'] = array(
+        'ext' => 'civicrm',
+        'js' => array('js/angular-crmAutosave.js'),
+      );
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
         // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
