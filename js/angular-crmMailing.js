@@ -1,7 +1,7 @@
 (function (angular, $, _) {
 
   angular.module('crmMailing', [
-    'crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
+    'crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
   ]); // TODO ngSanitize, unsavedChanges
 
   // Time to wait before triggering AJAX update to recipients list
