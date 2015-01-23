@@ -120,10 +120,15 @@ class CRM_Upgrade_Incremental_php_FourSix {
   // CRM-15728, Add new column reference_date to civicrm_action_log in order to track
   // actual action_start_date for membership entity for only those schedule reminders which are not repeatable
   static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
-    //Add column civicrm_action_log.reference_date
-    $query = "ALTER TABLE `civicrm_action_log`
-    ADD COLUMN `reference_date` date COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'";
-    CRM_Core_DAO::executeQuery($query);
+    //Add column civicrm_action_log.reference_date if not exists
+    $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_action_log' AND COLUMN_NAME = 'reference_date' ";
+    $res = CRM_Core_DAO::singleValueQuery($sql);
+
+    if ($res <= 0) {
+      $query = "ALTER TABLE `civicrm_action_log`
+ ADD COLUMN `reference_date` date COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'";
+      CRM_Core_DAO::executeQuery($query);
+    }
 
     //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen
     $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
