@@ -128,8 +128,14 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $this->addElement('checkbox', 'is_thermometer', ts('Progress Bar'));
     $this->addElement('checkbox', 'is_honor_roll', ts('Honor Roll'), NULL);
-
-    $owner_notification_option = $this->_pageId ? CRM_PCP_BAO_PCP::getOwnerNotificationId($this->_pageId) : CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock',  $this->controller->get('component_page_id'), 'owner_notify_id');
+    if ($this->_pageId) {
+      $params = array('id' => $this->_pageId);
+      CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
+      $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+    }
+    else {
+      $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ? $this->_component : 'contribute');
+    }
     if ($owner_notification_option == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name')) {
       $this->assign('owner_notification_option', TRUE);
       $this->addElement('checkbox', 'is_notify', ts('Notify me via email when someone donates to my page'), NULL);
