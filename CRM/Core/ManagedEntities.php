@@ -16,12 +16,15 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @var array($status => array($name => CRM_Core_Module))
+   * @var array
+   *   Array($status => array($name => CRM_Core_Module)).
    */
   protected $moduleIndex;
 
   /**
-   * @var array per hook_civicrm_managed
+   * @var array
+   *   List of all entity declarations.
+   * @see CRM_Utils_Hook::managed()
    */
   protected $declarations;
 
@@ -70,8 +73,12 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Read the managed entity
+   * Read a managed entity using APIv3.
    *
+   * @param string $moduleName
+   *   The name of the module which declared entity.
+   * @param string $name
+   *   The symbolic name of the entity.
    * @return array|NULL
    *   API representation, or NULL if the entity does not exist
    */
@@ -97,6 +104,12 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * Identify any enabled/disabled modules. Add new entities, update
+   * existing entities, and remove orphaned (stale) entities.
+   *
+   * @throws Exception
+   */
   public function reconcile() {
     if ($error = $this->validate($this->getDeclarations())) {
       throw new Exception($error);
@@ -106,7 +119,12 @@ class CRM_Core_ManagedEntities {
     $this->reconcileUnknownModules();
   }
 
-
+  /**
+   * For all enabled modules, add new entities, update
+   * existing entities, and remove orphaned (stale) entities.
+   *
+   * @throws Exception
+   */
   public function reconcileEnabledModules() {
     // Note: any thing currently declared is necessarily from
     // an active module -- because we got it from a hook!
@@ -127,11 +145,13 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Create, update, and delete entities declared by an active module
+   * For one enabled module, add new entities, update existing entities,
+   * and remove orphaned (stale) entities.
    *
-   * @param \CRM_Core_Module|string $module string
+   * @param \CRM_Core_Module $module
    * @param array $todos
-   *   $name => array().
+   *   List of entities currently declared by this module.
+   *   array(string $name => array $entityDef).
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
     $dao = new CRM_Core_DAO_Managed();
@@ -155,6 +175,9 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * For all disabled modules, disable any managed entities.
+   */
   public function reconcileDisabledModules() {
     if (empty($this->moduleIndex[FALSE])) {
       return;
@@ -170,6 +193,10 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * Remove any orphaned (stale) entities that are linked to
+   * unknown modules.
+   */
   public function reconcileUnknownModules() {
     $knownModules = array();
     if (array_key_exists(0, $this->moduleIndex) && is_array($this->moduleIndex[0])) {
@@ -177,7 +204,6 @@ class CRM_Core_ManagedEntities {
     }
     if (array_key_exists(1, $this->moduleIndex) && is_array($this->moduleIndex[1])) {
       $knownModules = array_merge($knownModules, array_keys($this->moduleIndex[1]));
-
     }
 
     $dao = new CRM_Core_DAO_Managed();
@@ -192,7 +218,7 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Create a new entity
+   * Create a new entity.
    *
    * @param array $todo
    *   Entity specification (per hook_civicrm_managedEntities).
@@ -264,9 +290,10 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Remove a stale entity (if policy allows)
+   * Remove a stale entity (if policy allows).
    *
    * @param CRM_Core_DAO_Managed $dao
+   * @throws Exception
    */
   public function removeStaleEntity($dao) {
     $policy = empty($dao->cleanup) ? 'always' : $dao->cleanup;
@@ -327,7 +354,8 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $modules
+   * @param array $modules
+   *   Array<CRM_Core_Module>.
    *
    * @return array
    *   indexed by is_active,name
@@ -341,8 +369,8 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $moduleIndex
-   * @param $declarations
+   * @param array $moduleIndex
+   * @param array $declarations
    *
    * @return array
    *   indexed by module,name
