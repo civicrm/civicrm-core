@@ -112,3 +112,16 @@ function civicrm_api3_relationship_type_get($params) {
 function civicrm_api3_relationship_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ * @return array
+ */
+function _civicrm_api3_relationship_type_getlist_defaults($request) {
+  return array(
+    'label_field' => 'label_a_b',
+    'search_field' => 'label_a_b',
+  );
+}
