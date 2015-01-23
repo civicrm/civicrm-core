@@ -961,6 +961,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       // $limitWhere - this filtering applies only for
       // 'limit to' option
       $select = $join = $where = $limitWhere = array();
+      $selectColumns = "contact_id, entity_id, entity_table, action_schedule_id";
       $limitTo = $actionSchedule->limit_to;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
@@ -1097,6 +1098,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode(',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
+
+        // We are not tracking the reference date for 'repeated' schedule reminders,
+        // for further details please check CRM-15376
+        if ($actionSchedule->start_action_date && $actionSchedule->is_repeat == FALSE) {
+          $select[] = $dateField;
+          $selectColumns = "reference_date, " . $selectColumns;
+        }
       }
 
       if ($mapping->entity == 'civicrm_contact') {
@@ -1250,14 +1258,55 @@ reminder.action_schedule_id = %1";
       }
 
       $query = "
-INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
+INSERT INTO civicrm_action_log ({$selectColumns})
 {$selectClause}
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
+
+      // In some cases reference_date got outdated due to many reason e.g. In Membership renewal end_date got extended
+      // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
+      // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
+      // value via UNION operation
+      if (strpos($selectColumns, 'reference_date') !== FALSE) {
+        $dateClause = str_replace('reminder.id IS NULL', 'reminder.id IS NOT NULL', $dateClause);
+        $referenceQuery = "
+INSERT INTO civicrm_action_log ({$selectColumns})
+{$selectClause}
+{$fromClause}
+{$joinClause}
+ LEFT JOIN {$reminderJoinClause}
+{$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
+ reminder.action_date_time IS NOT NULL AND
+ (reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField})
+LIMIT 0,1
+";
+
+        // As per the usage of UNION clause above we always INSERT a new reminder if reference_date (RD)
+        // got outdated or mismatches to start_action_date criteria so we need to update RD with actual
+        // start_action_date of already sent reminder, so to prevent redeundancy in sending new reminder
+        // due to above INSERT-UNION query
+        $updateQuery = "UPDATE civicrm_action_log reminder
+ INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id AND
+ reminder.reference_date IS NOT NULL AND reminder.action_date_time IS NOT NULL
+ INNER JOIN civicrm_action_log new_reminder ON
+   new_reminder.action_schedule_id = reminder.action_schedule_id AND
+   new_reminder.reference_date = {$dateField} AND
+   new_reminder.action_date_time IS NULL
+ SET reminder.reference_date = {$dateField}
+ WHERE reminder.action_schedule_id = %1 AND reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField}
+";
+        }
+
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
+
+      if (!empty($updateQuery)) {
+        CRM_Core_DAO::executeQuery($referenceQuery, array(1 => array($actionSchedule->id, 'Integer')));
+        CRM_Core_DAO::executeQuery($updateQuery, array(1 => array($actionSchedule->id, 'Integer')));
+      }
+
       $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
       if ($isSendToAdditionalContacts) {
         $contactTable = "civicrm_contact c";

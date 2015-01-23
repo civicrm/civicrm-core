@@ -112,4 +112,62 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $queue->createItem($task, array('weight' => -1));
   }
 
+  function upgrade_4_6_alpha3($rev) {
+    // task to process sql
+    $this->addTask(ts('Add and update reference_date column for Schedule Reminders'), 'updateReferenceDate');
+  }
+
+  // CRM-15728, Add new column reference_date to civicrm_action_log in order to track
+  // actual action_start_date for membership entity for only those schedule reminders which are not repeatable
+  static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
+    //Add column civicrm_action_log.reference_date if not exists
+    $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_action_log' AND COLUMN_NAME = 'reference_date' ";
+    $res = CRM_Core_DAO::singleValueQuery($sql);
+
+    if ($res <= 0) {
+      $query = "ALTER TABLE `civicrm_action_log`
+ ADD COLUMN `reference_date` date COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'";
+      CRM_Core_DAO::executeQuery($query);
+    }
+
+    //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen
+    $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
+ LEFT JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
+   mapper.entity = 'civicrm_membership' AND
+   schedule.is_repeat = 0 AND
+   schedule.start_action_date IS NOT NULL";
+
+    // construct basic where clauses
+    $where = array(
+      'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)'
+    ); //choose reminder older then 9 months
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while($dao->fetch()) {
+
+      $referenceColumn = str_replace('membership_', "m.", $dao->start_action_date);
+      $value = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($dao->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)));
+      if (!empty($value)) {
+        $where[] = "m.membership_type_id IN ({$value})";
+      }
+      else {
+        $where[] = "m.membership_type_id IS NULL";
+      }
+
+      //Create new action_log records where action_start_date changes and exclude reminders for additional contacts
+      //and select contacts are active
+      $sql = "UPDATE civicrm_action_log reminder
+ LEFT JOIN civicrm_membership m
+   ON reminder.entity_id = m.id AND
+   reminder.entity_table = 'civicrm_membership' AND
+   ( m.is_override IS NULL OR m.is_override = 0 )
+ INNER JOIN civicrm_contact c
+   ON c.id = e.contact_id AND
+   c.is_deleted = 0 AND c.is_deceased = 0
+ SET reminder.reference_date = {$referenceColumn}
+ WHERE " . implode(" AND ", $where);
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    return TRUE;
+  }
 }
