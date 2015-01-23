@@ -16,11 +16,11 @@ Required vars: caseType
     </span>
   </div>
 
-  <div ng-include="partialUrl('caseTypeDetails.html')"></div>
+  <div ng-include="'~/crmCaseType/caseTypeDetails.html'"></div>
 
   <h2 ng-show="isForkable()">Roles</h2>
 
-  <div ng-show="isForkable()" ng-include="partialUrl('rolesTable.html')"></div>
+  <div ng-show="isForkable()" ng-include="'~/crmCaseType/rolesTable.html'"></div>
 
   <h2 ng-show="isForkable()">Activities</h2>
 
@@ -46,7 +46,7 @@ Required vars: caseType
     </ul>
 
     <div id="acttab-actType">
-      <div ng-include="partialUrl('activityTypesTable.html')"></div>
+      <div ng-include="'~/crmCaseType/activityTypesTable.html'"></div>
     </div>
 
     <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
@@ -54,7 +54,7 @@ Required vars: caseType
 
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">Advanced</div>
-        <div class="crm-accordion-body" ng-include="partialUrl('activitySetDetails.html')"></div>
+        <div class="crm-accordion-body" ng-include="'~/crmCaseType/activitySetDetails.html'"></div>
       </div>
     </div>
   </div>

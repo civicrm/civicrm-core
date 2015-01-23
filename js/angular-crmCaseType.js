@@ -1,9 +1,5 @@
 (function(angular, $, _) {
 
-  var partialUrl = function(relPath) {
-    return '~/crmCaseType/' + relPath;
-  };
-
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
 
   // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
@@ -39,7 +35,7 @@
   crmCaseType.config(['$routeProvider',
     function($routeProvider) {
       $routeProvider.when('/caseType', {
-        templateUrl: partialUrl('list.html'),
+        templateUrl: '~/crmCaseType/list.html',
         controller: 'CaseTypeListCtrl',
         resolve: {
           caseTypes: function($route, crmApi) {
@@ -48,7 +44,7 @@
         }
       });
       $routeProvider.when('/caseType/:id', {
-        templateUrl: partialUrl('edit.html'),
+        templateUrl: '~/crmCaseType/edit.html',
         controller: 'CaseTypeCtrl',
         resolve: {
           apiCalls: function($route, crmApi) {
@@ -127,7 +123,6 @@
   });
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
-    $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
@@ -264,9 +259,9 @@
      */
     $scope.activityTableTemplate = function(activitySet) {
       if (activitySet.timeline) {
-        return partialUrl('timelineTable.html');
+        return '~/crmCaseType/timelineTable.html';
       } else if (activitySet.sequence) {
-        return partialUrl('sequenceTable.html');
+        return '~/crmCaseType/sequenceTable.html';
       } else {
         return '';
       }

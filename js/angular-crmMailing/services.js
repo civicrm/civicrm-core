@@ -1,7 +1,4 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmMailing/' + relPath;
-  };
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
   // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
@@ -356,9 +353,9 @@
       // @return Promise
       preview: function preview(mailing, mode) {
         var templates = {
-          html: partialUrl('dialog/previewHtml.html'),
-          text: partialUrl('dialog/previewText.html'),
-          full: partialUrl('dialog/previewFull.html')
+          html: '~/crmMailing/dialog/previewHtml.html',
+          text: '~/crmMailing/dialog/previewText.html',
+          full: '~/crmMailing/dialog/previewFull.html'
         };
         var result = null;
         var p = crmMailingMgr

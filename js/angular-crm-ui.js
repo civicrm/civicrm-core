@@ -3,10 +3,6 @@
 
   var uidCount = 0;
 
-  var partialUrl = function (relPath) {
-    return '~/crmUi/' + relPath;
-  };
-
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
@@ -105,8 +101,8 @@
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
-        default: partialUrl('field.html'),
-        checkbox: partialUrl('field-cb.html')
+        default: '~/crmUi/field.html',
+        checkbox: '~/crmUi/field-cb.html'
       };
 
       return {
@@ -417,7 +413,7 @@
         scope: {
           crmUiTabSet: '@'
         },
-        templateUrl: partialUrl('tabset.html'),
+        templateUrl: '~/crmUi/tabset.html',
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
         controller: function($scope, $parse) {
@@ -491,7 +487,7 @@
         scope: {
           crmUiWizard: '@'
         },
-        templateUrl: partialUrl('wizard.html'),
+        templateUrl: '~/crmUi/wizard.html',
         transclude: true,
         controllerAs: 'crmUiWizardCtrl',
         controller: function($scope, $parse) {
