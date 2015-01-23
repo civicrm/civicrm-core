@@ -156,12 +156,12 @@
       create: function create() {
         return {
           jobs: {}, // {jobId: JobRecord}
-          name: "",
+          name: "New Mailing",
           campaign_id: null,
           from_name: crmFromAddresses.getDefault().author,
           from_email: crmFromAddresses.getDefault().email,
           replyto_email: "",
-          subject: "",
+          subject: "New Mailing",
           groups: {include: [], exclude: []},
           mailings: {include: [], exclude: []},
           body_html: "",
