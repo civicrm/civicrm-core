@@ -287,7 +287,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-    if (!empty($fields['is_active']) && $fields['mode'] != 'SMS' &&
+    if (!empty($fields['is_active']) &&
+      CRM_Utils_Array::value('mode', $fields) == 'SMS' &&
       CRM_Utils_System::isNull($fields['subject'])
     ) {
       $errors['subject'] = ts('Subject is a required field.');
@@ -313,7 +314,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         'target_id' => 'recipient_manual_id',
       ),
     );
-    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+    if ($fields['limit_to'] != '' && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
