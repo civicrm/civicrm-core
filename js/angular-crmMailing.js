@@ -18,41 +18,33 @@
         template: '<div></div>',
         controller: 'ListMailingsCtrl'
       });
-      $routeProvider.when('/mailing/:id', {
-        templateUrl: partialUrl('edit.html'),
-        controller: 'EditMailingCtrl',
-        resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) {
-            return crmMailingMgr.getOrCreate($route.current.params.id);
+
+      var editorPaths = {
+        '': partialUrl('edit.html'),
+        '/unified': partialUrl('edit-unified.html'),
+        '/unified2': partialUrl('edit-unified2.html'),
+        '/wizard': partialUrl('edit-wizard.html')
+      };
+      angular.forEach(editorPaths, function(editTemplate, pathSuffix) {
+        $routeProvider.when('/mailing/new' + pathSuffix, {
+          template: '<p>' + ts('Initializing...') + '</p>',
+          controller: 'CreateMailingCtrl',
+          resolve: {
+            selectedMail: function(crmMailingMgr) {
+              var m = crmMailingMgr.create();
+              return crmMailingMgr.save(m);
+            }
           }
-        }
-      });
-      $routeProvider.when('/mailing/:id/unified', {
-        templateUrl: partialUrl('edit-unified.html'),
-        controller: 'EditMailingCtrl',
-        resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) {
-            return crmMailingMgr.getOrCreate($route.current.params.id);
+        });
+        $routeProvider.when('/mailing/:id' + pathSuffix, {
+          templateUrl: editTemplate,
+          controller: 'EditMailingCtrl',
+          resolve: {
+            selectedMail: function($route, crmMailingMgr) {
+              return crmMailingMgr.get($route.current.params.id);
+            }
           }
-        }
-      });
-      $routeProvider.when('/mailing/:id/unified2', {
-        templateUrl: partialUrl('edit-unified2.html'),
-        controller: 'EditMailingCtrl',
-        resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) {
-            return crmMailingMgr.getOrCreate($route.current.params.id);
-          }
-        }
-      });
-      $routeProvider.when('/mailing/:id/wizard', {
-        templateUrl: partialUrl('edit-wizard.html'),
-        controller: 'EditMailingCtrl',
-        resolve: {
-          selectedMail: function selectedMail($route, crmMailingMgr) {
-            return crmMailingMgr.getOrCreate($route.current.params.id);
-          }
-        }
+        });
       });
     }
   ]);
@@ -63,6 +55,14 @@
     var new_url = crmLegacy.url('civicrm/mailing/browse/unscheduled', {reset: 1, scheduled: 'false'});
     crmNavigator.redirect(new_url);
   }]);
+
+  angular.module('crmMailing').controller('CreateMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location) {
+    // Transition URL "/mailing/new/foo" => "/mailing/123/foo"
+    var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
+    parts[2] = selectedMail.id;
+    $location.path(parts.join('/'));
+    $location.replace();
+  });
 
   angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr) {
     $scope.mailing = selectedMail;
@@ -89,8 +89,7 @@
       var savePromise = crmMailingMgr.save(mailing)
         .then(function () {
           return attachments.save();
-        })
-        .then(updateUrl);
+        });
       return crmStatus({start: ts('Saving...'), success: ''}, savePromise)
         .then(function () {
           crmMailingPreviewMgr.sendTest(mailing, recipient);
@@ -123,7 +122,6 @@
             // pre-condition: the mailing exists *before* saving attachments to it
             return $scope.attachments.save();
           })
-          .then(updateUrl)
       );
     };
 
@@ -158,19 +156,6 @@
             reset: 1,
             scheduled: 'false'
           });
-      }
-    }
-
-    // Transition URL "/mailing/new" => "/mailing/123"
-    function updateUrl() {
-      var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
-      if (parts[2] != $scope.mailing.id) {
-        parts[2] = $scope.mailing.id;
-        $location.path(parts.join('/'));
-        $location.replace();
-        // FIXME: Angular unnecessarily refreshes UI
-        // WARNING: Changing the URL triggers a full reload. Any pending AJAX operations
-        // could be inconsistently applied. Run updateUrl() after other changes complete.
       }
     }
   });
