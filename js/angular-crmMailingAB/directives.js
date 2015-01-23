@@ -1,14 +1,11 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmMailingAB/' + relPath;
-  };
 
   // example:
   //   scope.myAbtest = new CrmMailingAB();
   //   <crm-mailing-ab-block-mailing="{fromAddressA: 1, fromAddressB: 1}" crm-abtest="myAbtest" />
   var simpleDirectives = {
-    crmMailingAbBlockMailing: partialUrl('joint-mailing.html'),
-    crmMailingAbBlockSetup: partialUrl('setup.html')
+    crmMailingAbBlockMailing: '~/crmMailingAB/joint-mailing.html',
+    crmMailingAbBlockSetup: '~/crmMailingAB/setup.html'
   };
   _.each(simpleDirectives, function (templateUrl, directiveName) {
     angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria) {
@@ -37,7 +34,7 @@
     return {
       require: '?ngModel',
       scope: {},
-      templateUrl: partialUrl('slider.html'),
+      templateUrl: '~/crmMailingAB/slider.html',
       link: function (scope, element, attrs, ngModel) {
         var TEST_MIN = 1, TEST_MAX = 50;
         var sliders = $('.slider-test,.slider-win', element);

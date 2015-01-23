@@ -1,8 +1,5 @@
 /// crmFile: Manage file attachments
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmAttachment/' + relPath;
-  };
 
   angular.module('crmAttachment', ['angularFileUpload']);
 
@@ -131,7 +128,7 @@
         var model = $parse(attr.crmAttachments);
         scope.att = model(scope.$parent);
         scope.ts = CRM.ts(null);
-        scope.inclUrl = partialUrl('attachments.html');
+        scope.inclUrl = '~/crmAttachment/attachments.html';
 
         // delay rendering of child tree until after model has been populated
         scope.ready = true;

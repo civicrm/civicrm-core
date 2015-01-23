@@ -1,21 +1,18 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmMailing/' + relPath;
-  };
 
   // The following directives have the same simple implementation -- load
   // a template and export a "mailing" object into scope.
   var simpleBlocks = {
-    crmMailingBlockHeaderFooter: partialUrl('headerFooter.html'),
-    crmMailingBlockMailing: partialUrl('mailing.html'),
-    crmMailingBlockPublication: partialUrl('publication.html'),
-    crmMailingBlockResponses: partialUrl('responses.html'),
-    crmMailingBlockRecipients: partialUrl('recipients.html'),
-    crmMailingBlockSchedule: partialUrl('schedule.html'),
-    crmMailingBlockSummary: partialUrl('summary.html'),
-    crmMailingBlockTracking: partialUrl('tracking.html'),
-    crmMailingBodyHtml: partialUrl('body_html.html'),
-    crmMailingBodyText: partialUrl('body_text.html')
+    crmMailingBlockHeaderFooter: '~/crmMailing/headerFooter.html',
+    crmMailingBlockMailing: '~/crmMailing/mailing.html',
+    crmMailingBlockPublication: '~/crmMailing/publication.html',
+    crmMailingBlockResponses: '~/crmMailing/responses.html',
+    crmMailingBlockRecipients: '~/crmMailing/recipients.html',
+    crmMailingBlockSchedule: '~/crmMailing/schedule.html',
+    crmMailingBlockSummary: '~/crmMailing/summary.html',
+    crmMailingBlockTracking: '~/crmMailing/tracking.html',
+    crmMailingBodyHtml: '~/crmMailing/body_html.html',
+    crmMailingBodyText: '~/crmMailing/body_text.html'
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
     angular.module('crmMailing').directive(directiveName, function ($parse) {
@@ -39,7 +36,7 @@
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
   angular.module('crmMailing').directive('crmMailingBlockPreview', function ($parse) {
     return {
-      templateUrl: partialUrl('preview.html'),
+      templateUrl: '~/crmMailing/preview.html',
       link: function (scope, elm, attr) {
         var mailingModel = $parse(attr.crmMailing);
         scope.mailing = mailingModel(scope);
@@ -67,7 +64,7 @@
       scope: {
         crmMailing: '@'
       },
-      templateUrl: partialUrl('review.html'),
+      templateUrl: '~/crmMailing/review.html',
       link: function (scope, elm, attr) {
         var mailingModel = $parse(attr.crmMailing);
         scope.mailing = mailingModel(scope.$parent);
@@ -237,7 +234,7 @@
         crmAvailMailings: '@', // available mailings
         crmMailing: '@' // the mailing for which we are choosing recipients
       },
-      templateUrl: partialUrl('directive/recipients.html'),
+      templateUrl: '~/crmMailing/directive/recipients.html',
       link: function (scope, element, attrs) {
         scope.mailing = scope.$parent.$eval(attrs.crmMailing);
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);

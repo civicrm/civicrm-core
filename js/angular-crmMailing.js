@@ -1,7 +1,4 @@
 (function (angular, $, _) {
-  var partialUrl = function partialUrl(relPath) {
-    return '~/crmMailing/' + relPath;
-  };
 
   angular.module('crmMailing', [
     'crmUtil', 'crmAttachment', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
@@ -20,10 +17,10 @@
       });
 
       var editorPaths = {
-        '': partialUrl('edit.html'),
-        '/unified': partialUrl('edit-unified.html'),
-        '/unified2': partialUrl('edit-unified2.html'),
-        '/wizard': partialUrl('edit-wizard.html')
+        '': '~/crmMailing/edit.html',
+        '/unified': '~/crmMailing/edit-unified.html',
+        '/unified2': '~/crmMailing/edit-unified2.html',
+        '/wizard': '~/crmMailing/edit-wizard.html'
       };
       angular.forEach(editorPaths, function(editTemplate, pathSuffix) {
         $routeProvider.when('/mailing/new' + pathSuffix, {
@@ -72,7 +69,6 @@
     $scope.attachments.load();
     $scope.crmMailingConst = CRM.crmMailing;
 
-    $scope.partialUrl = partialUrl;
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.isSubmitted = function isSubmitted() {
@@ -253,7 +249,7 @@
           1: $scope.getRecipientsEstimate()
         })
       };
-      dialogService.open('recipDialog', partialUrl('dialog/recipients.html'), model, options);
+      dialogService.open('recipDialog', '~/crmMailing/dialog/recipients.html', model, options);
     };
   });
 
@@ -291,7 +287,7 @@
         modal: true,
         title: title // component[0].name
       };
-      dialogService.open('previewComponentDialog', partialUrl('dialog/previewComponent.html'), component[0], options);
+      dialogService.open('previewComponentDialog', '~/crmMailing/dialog/previewComponent.html', component[0], options);
     };
   });
 
@@ -326,7 +322,7 @@
         modal: true,
         title: ts('Save Template')
       };
-      return dialogService.open('saveTemplateDialog', partialUrl('dialog/saveTemplate.html'), model, options)
+      return dialogService.open('saveTemplateDialog', '~/crmMailing/dialog/saveTemplate.html', model, options)
         .then(function (item) {
           mailing.msg_template_id = item.id;
           return item;
