@@ -1718,10 +1718,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if ($field == 'id') {
           continue;
         }
-        elseif ($field == 'name') {
-          $ufGroups[$dao->id][$field] = $dao->title;
-          continue;
-        }
         $ufGroups[$dao->id][$field] = $dao->$field;
       }
     }
