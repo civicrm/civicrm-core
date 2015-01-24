@@ -5,16 +5,14 @@
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param $params
- *
- * @internal param $array $ params input parameters
+ * @param array $params
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
  *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
- * @access public
+ * @return array
+ *   details of found Option Values
+ *   {@getfields OptionValue_get}
  */
 function civicrm_api3_custom_search_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -31,11 +29,11 @@ function civicrm_api3_custom_search_get($params) {
  *
  * {@example OptionValueCreate.php}
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
+ *   Array of newly created option_value property values.
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_custom_search_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -53,7 +51,8 @@ function civicrm_api3_custom_search_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_search_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
@@ -67,13 +66,13 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
 /**
  * Deletes an existing ReportTemplate
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@example ReportTemplateDelete.php 0}
  *
- * @return array Api result
- * {@getfields ReportTemplate_create}
- * @access public
+ * @return array
+ *   Api result
+ *   {@getfields ReportTemplate_create}
  */
 function civicrm_api3_custom_search_delete($params) {
   require_once 'api/v3/OptionValue.php';

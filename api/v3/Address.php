@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 address functions
@@ -43,14 +42,14 @@
  * {@getfields address_create}
  * {@example AddressCreate.php}
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created tag property values.
- * @access public
+ * @return array
+ *   Array of newly created tag property values.
  */
 function civicrm_api3_address_create(&$params) {
   /**
-   * if street_parsing, street_address has to be parsed into
+   * If street_parsing, street_address has to be parsed into
    * separate parts
    */
   if (array_key_exists('street_parsing', $params)) {
@@ -78,15 +77,14 @@ function civicrm_api3_address_create(&$params) {
   }
 
   /**
-    * create array for BAO (expects address params in as an
-    * element in array 'address'
-    */
+   * Create array for BAO (expects address params in as an
+   * element in array 'address'
+   */
   $addressBAO = CRM_Core_BAO_Address::add($params, TRUE);
   if (empty($addressBAO)) {
     return civicrm_api3_create_error("Address is not created or updated ");
   }
   else {
-    $values = array();
     $values = _civicrm_api3_dao_to_array($addressBAO, $params);
     return civicrm_api3_create_success($values, $params, 'address', $addressBAO);
   }
@@ -95,7 +93,8 @@ function civicrm_api3_address_create(&$params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_address_create_spec(&$params) {
   $params['location_type_id']['api.required'] = 1;
@@ -105,30 +104,33 @@ function _civicrm_api3_address_create_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 /**
  * Adjust Metadata for Get action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_address_get_spec(&$params) {
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
   );
 }
 
 /**
  * Deletes an existing Address
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@getfields address_delete}
  * {@example AddressDelete.php 0}
  *
- * @return array api result array
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -138,16 +140,12 @@ function civicrm_api3_address_delete($params) {
  * Retrieve one or more addresses on address_id, contact_id, street_name, city
  * or a combination of those
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
- * {@example AddressGet.php 0}
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array details of found addresses else error
- * {@getfields address_get}
- * @access public
+ * @return array
+ *   details of found addresses else error
  */
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');
 }
-

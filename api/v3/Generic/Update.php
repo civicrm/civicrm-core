@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Update function is basically a hack to get around issues listed in
@@ -35,12 +34,13 @@
  * To do this, perform a 'get' action to load the existing values, then merge in the updates
  * and call 'create' to save the revised entity.
  *
- * @param array $apiRequest array with keys:
- *  - entity: string
- *  - action: string
- *  - version: string
- *  - function: callback (mixed)
- *  - params: array, varies
+ * @param array $apiRequest
+ *   Array with keys:
+ *   - entity: string
+ *   - action: string
+ *   - version: string
+ *   - function: callback (mixed)
+ *   - params: array, varies
  *
  * @return array|int|mixed
  */
@@ -53,7 +53,7 @@ function civicrm_api3_generic_update($apiRequest) {
   // @fixme
   // tests show that contribution works better with create
   // this is horrible but to make it work we'll just handle it separately
-  if(strtolower($apiRequest['entity']) == 'contribution'){
+  if (strtolower($apiRequest['entity']) == 'contribution') {
     return civicrm_api($apiRequest['entity'], 'create', $apiRequest['params']);
   }
   $seek = array($key_id => $apiRequest['params'][$key_id], 'version' => $apiRequest['version']);

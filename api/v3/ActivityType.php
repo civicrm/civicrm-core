@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @deprecated
@@ -38,21 +38,20 @@
 
 /**
  * @deprecated api notice
- * @return string to indicate this entire api entity is deprecated
+ * @return string
+ *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_activity_type_deprecation() {
   return 'The activity_type api is deprecated. Please use the option_value api instead.';
 }
 
 /**
- * Function to retrieve activity types
+ * retrieve activity types
  *
- * @param $params
+ * @param array $params
  *
- * @return array $activityTypes activity types keyed by id
- * @access public
- *
- * @example ActivityTypeGet.php
+ * @return array
+ *   activity types keyed by id
  * @deprecated - use getoptions
  */
 function civicrm_api3_activity_type_get($params) {
@@ -62,14 +61,12 @@ function civicrm_api3_activity_type_get($params) {
 }
 
 /**
- * Function to create activity type (
+ * create activity type (
  *
- * @param array   $params  associated array of fields
- *                 $params['option_value_id'] is required for updation of activity type
+ * @param array $params
  *
- * @return array $activityType created / updated activity type
- *
- * @access public
+ * @return array
+ *   created / updated activity type
  *
  * @deprecated - use option_value create
  */
@@ -92,7 +89,8 @@ function civicrm_api3_activity_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
   $params['label']['api.required'] = 1;
@@ -102,17 +100,16 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 }
 
 /**
- * Function to delete activity type
+ * delete activity type
  *
- * @param array $params array including id of activity_type to delete
+ * @param array $params
+ *   Array including id of activity_type to delete.
 
- * @return array API result array
- *
- * @access public
+ * @return array
+ *   API result array
  *
  * @deprecated - we will introduce OptionValue Delete- plse consider helping with this if not done
  */
 function civicrm_api3_activity_type_delete($params) {
   return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
 }
-

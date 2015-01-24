@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 location type functions
@@ -43,11 +42,11 @@
  *
  * @example LocationTypeCreate.php Standard Create Example
  *
- * @param $params
+ * @param array $params
  *
- * @return array API result array
- * {@getfields email_create}
- * @access public
+ * @return array
+ *   API result array
+ *   {@getfields email_create}
  */
 function civicrm_api3_location_type_create($params) {
   //set display_name equal to name if it's not defined
@@ -62,7 +61,8 @@ function civicrm_api3_location_type_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_location_type_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -72,13 +72,13 @@ function _civicrm_api3_location_type_create_spec(&$params) {
 /**
  * Deletes an existing Location Type
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example LocationTypeDelete.php Standard Delete Example
  *
- * @return array API result array
- * {@getfields LocationType_delete}
- * @access public
+ * @return array
+ *   API result array
+ *   {@getfields LocationType_delete}
  */
 function civicrm_api3_location_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -87,18 +87,15 @@ function civicrm_api3_location_type_delete($params) {
 /**
  * Retrieve one or more Location Types
  *
- * @param  array input parameters
- *
- *
  * @example LocationTypeGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
- * @return  array api result
- * {@getfields LocationType_get}
- * @access public
+ * @return array
+ *   api result
+ *   {@getfields LocationType_get}
  */
 function civicrm_api3_location_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

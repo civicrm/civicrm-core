@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 product functions
@@ -41,11 +40,11 @@
  * {@getfields product_create}
  * @example productCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of newly created product property values.
- * @access public
+ * @return array
+ *   Array of newly created product property values.
  */
 function civicrm_api3_product_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -58,10 +57,10 @@ function civicrm_api3_product_create($params) {
  * {@getfields product_get}
  * @example productCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of retrieved product property values.
- * @access public
+ * @return array
+ *   Array of retrieved product property values.
  */
 function civicrm_api3_product_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -74,11 +73,11 @@ function civicrm_api3_product_get($params) {
  * {@getfields product_delete}
  * @example productCreate.php
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_product_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

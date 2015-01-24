@@ -75,6 +75,8 @@ function contribution_create_expectedresult(){
           'address_id' => '',
           'check_number' => '',
           'campaign_id' => '',
+          'creditnote_id' => '',
+          'tax_amount' => '',
           'contribution_type_id' => '1',
         ),
     ),

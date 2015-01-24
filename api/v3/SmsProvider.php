@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 sms_provider functions
@@ -41,10 +40,10 @@
  * {@getfields sms_provider_create}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created sms_provider property values.
- * @access public
+ * @return array
+ *   Array of newly created sms_provider property values.
  */
 function civicrm_api3_sms_provider_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,10 +56,10 @@ function civicrm_api3_sms_provider_create($params) {
  * {@getfields sms_provider_get}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of retrieved sms_provider property values.
- * @access public
+ * @return array
+ *   Array of retrieved sms_provider property values.
  */
 function civicrm_api3_sms_provider_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -73,10 +72,10 @@ function civicrm_api3_sms_provider_get($params) {
  * {@getfields sms_provider_delete}
  * @example sms_providerCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_sms_provider_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

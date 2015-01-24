@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -40,15 +39,12 @@
 /**
  * Flush all system caches
  *
- * @param  array       $params input parameters
+ * @param array $params
+ *   Input parameters.
  *                          - triggers: bool, whether to drop/create SQL triggers; default: FALSE
  *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
  *
- * @return boolean        true if success, else false
- * @static void
- * @access public
- * @example SystemFlush.php
- *
+ * @return array
  */
 function civicrm_api3_system_flush($params) {
   CRM_Core_Invoke::rebuildMenuAndCaches(
@@ -62,9 +58,10 @@ function civicrm_api3_system_flush($params) {
  * Adjust Metadata for Flush action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
-function _civicrm_api3_system_flush_spec(&$params){
+function _civicrm_api3_system_flush_spec(&$params) {
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
   $params['session'] = array('title' => 'refresh sessions (boolean)');
 }
@@ -73,7 +70,8 @@ function _civicrm_api3_system_flush_spec(&$params){
  * System.Check API specification (optional)
  * This is used for documentation and validation.
  *
- * @param array $spec description of fields supported by this API call
+ * @param array $spec
+ *   Description of fields supported by this API call.
  * @return void
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */
@@ -85,7 +83,8 @@ function _civicrm_api3_system_check_spec(&$spec) {
  * System.Check API
  *
  * @param array $params
- * @return array API result descriptor; return items are alert codes/messages
+ * @return array
+ *   API result descriptor; return items are alert codes/messages
  * @see civicrm_api3_create_success
  * @see civicrm_api3_create_error
  * @throws API_Exception
@@ -101,7 +100,7 @@ function civicrm_api3_system_check($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -109,12 +108,12 @@ function civicrm_api3_system_log($params) {
   $log = new CRM_Utils_SystemLogger();
   // this part means fields with separate db storage are accepted as params which kind of seems more intuitive to me
   // because I felt like not doing this required a bunch of explanation in the spec function - but perhaps other won't see it as helpful?
-  if(!isset($params['context'])) {
+  if (!isset($params['context'])) {
     $params['context'] = array();
   }
   $specialFields = array('contact_id', 'hostname');
-  foreach($specialFields as $specialField) {
-    if(isset($params[$specialField]) && !isset($params['context'])) {
+  foreach ($specialFields as $specialField) {
+    if (isset($params[$specialField]) && !isset($params['context'])) {
       $params['context'][$specialField] = $params[$specialField];
     }
   }
@@ -124,7 +123,7 @@ function civicrm_api3_system_log($params) {
 
 /**
  * Metadata for log function
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_system_log_spec(&$params) {
   $params['level'] = array(
@@ -160,7 +159,8 @@ function _civicrm_api3_system_log_spec(&$params) {
 /**
  * System.Get API
  *
- * @param arary $params
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_system_get($params) {
   $returnValues = array(
@@ -171,4 +171,3 @@ function civicrm_api3_system_get($params) {
   );
   return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
 }
-

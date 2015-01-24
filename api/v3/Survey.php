@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -38,23 +37,25 @@
 /**
  * Create or update a survey
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  * @example SurveyCreate.php Std Create example
  *
- * @return array api result array
- * {@getfields survey_create}
- * @access public
+ * @return array
+ *   api result array
+ *   {@getfields survey_create}
  */
 function civicrm_api3_survey_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Survey');
 }
 
 /**
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_survey_create_spec(&$params) {
   $params['title']['api.required'] = 1;
@@ -63,16 +64,17 @@ function _civicrm_api3_survey_create_spec(&$params) {
 /**
  * Returns array of surveys  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params
+ *   Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array  API result Array of matching surveys
- * {@getfields survey_get}
- * @access public
+ * @return array
+ *   API result Array of matching surveys
+ *   {@getfields survey_get}
  */
 function civicrm_api3_survey_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Survey');
 }
 
 /**
@@ -81,14 +83,14 @@ function civicrm_api3_survey_get($params) {
  * This method is used to delete any existing survey. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params
+ *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array api result array
- * {@getfields survey_delete}
- * @access public
+ * @return array
+ *   api result array
+ *   {@getfields survey_delete}
  */
 function civicrm_api3_survey_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

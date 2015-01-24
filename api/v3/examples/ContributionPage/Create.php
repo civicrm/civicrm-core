@@ -84,6 +84,7 @@ function contribution_page_create_expectedresult(){
           'currency' => 'NZD',
           'campaign_id' => '',
           'is_share' => '',
+          'is_billing_required' => '',
         ),
     ),
 );

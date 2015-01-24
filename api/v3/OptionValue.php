@@ -3,16 +3,14 @@
 /**
  * Retrieve one or more OptionValues
  *
- * @param $params
- *
- * @internal param $array $ params input parameters
+ * @param array $params
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
  *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
- * @access public
+ * @return array
+ *   details of found Option Values
+ *   {@getfields OptionValue_get}
  */
 function civicrm_api3_option_value_get($params) {
 
@@ -35,12 +33,12 @@ function civicrm_api3_option_value_get($params) {
  *
  * {@example OptionValueCreate.php}
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
+ *   Array of newly created option_value property values.
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -61,7 +59,8 @@ function civicrm_api3_option_value_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -74,23 +73,22 @@ function _civicrm_api3_option_value_create_spec(&$params) {
 /**
  * Deletes an existing OptionValue
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@example OptionValueDelete.php 0}
  *
- * @return array Api result
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
+ *   Api result
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_delete($params) {
   // we will get the option group id before deleting so we can flush pseudoconstants
   $optionGroupID = civicrm_api('option_value', 'getvalue', array('version' => 3, 'id' => $params['id'], 'return' => 'option_group_id'));
-  if(CRM_Core_BAO_OptionValue::del((int) $params['id'])){
+  if (CRM_Core_BAO_OptionValue::del((int) $params['id'])) {
     civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID));
     return civicrm_api3_create_success();
   }
-  else{
+  else {
     civicrm_api3_create_error('Could not delete OptionValue ' . $params['id']);
   }
 }
-

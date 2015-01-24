@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 domain functions
@@ -40,12 +39,14 @@
 /**
  * Get CiviCRM Word Replacement details
  * {@getfields word_replacement_create}
- *
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'WordReplacement');
-  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, true,'WordReplacement');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'WordReplacement');
+  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'WordReplacement');
 
   return civicrm_api3_create_success($wordReplacements, $params, 'word_replacement', 'get', $bao);
 }
@@ -58,7 +59,7 @@ function civicrm_api3_word_replacement_get($params) {
  *
  * @return array
  *
- * {@getfields word_replacement_create}
+ *   {@getfields word_replacement_create}
  */
 function civicrm_api3_word_replacement_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -68,7 +69,8 @@ function civicrm_api3_word_replacement_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_word_replacement_create_spec(&$params) {
   unset($params['version']);
@@ -78,12 +80,13 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  * delete an existing word_replacement
  *
  *
- * @param array $params array containing id of the word_replacement
- *  to be deleted
+ * @param array $params
+ *   Array containing id of the word_replacement.
+ *   to be deleted
  *
- * @return array api result array
+ * @return array
+ *   api result array
  *
- * @access public
  */
 function civicrm_api3_word_replacement_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

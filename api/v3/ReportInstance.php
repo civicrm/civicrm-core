@@ -3,10 +3,11 @@
 /**
  * Retrieve a report instance
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
- * @return  array details of found instances
- * @access public
+ * @return array
+ *   details of found instances
  */
 function civicrm_api3_report_instance_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -15,10 +16,10 @@ function civicrm_api3_report_instance_get($params) {
 /**
  *  Add or update a report instance.
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created report instance property values.
- * @access public
+ * @return array
+ *   Array of newly created report instance property values.
  */
 function civicrm_api3_report_instance_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -28,7 +29,8 @@ function civicrm_api3_report_instance_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_report_instance_create_spec(&$params) {
   $params['report_id']['api.required'] = 1;
@@ -38,10 +40,10 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
 /**
  * Deletes an existing ReportInstance
  *
- * @param  array  $params
+ * @param array $params
  *
- * @return array Api result
- * @access public
+ * @return array
+ *   Api result
  */
 function civicrm_api3_report_instance_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

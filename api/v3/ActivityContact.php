@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 activity contact functions
@@ -43,10 +42,10 @@
  *
  * @example ActivityContact.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created activity contact records.
- * @access public
+ * @return array
+ *   Array of newly created activity contact records.
  */
 function civicrm_api3_activity_contact_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -56,7 +55,8 @@ function civicrm_api3_activity_contact_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_activity_contact_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -66,12 +66,12 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
 /**
  * Deletes an existing ActivityContact record
  *
- * @param  array  $params
+ * @param array $params
  *
- * @return array Api Result
+ * @return array
+ *   Api Result
  *
  * @example ActivityContact.php
- * @access public
  */
 function civicrm_api3_activity_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -82,11 +82,12 @@ function civicrm_api3_activity_contact_delete($params) {
  *
  * @example ActivityContact.php
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
- * @return  array details of found tags else error
+ * @return array
+ *   details of found tags else error
  *
- * @access public
  */
 function civicrm_api3_activity_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 batch functions
@@ -41,10 +40,10 @@
  * {@getfields batch_create}
  * @example BatchCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created batch property values.
- * @access public
+ * @return array
+ *   Array of newly created batch property values.
  */
 function civicrm_api3_batch_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -54,7 +53,8 @@ function civicrm_api3_batch_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_batch_create_spec(&$params) {
   //@todo - the entity table field looks like it is not actually required & should probably be removed (or a description added if
@@ -76,10 +76,10 @@ function _civicrm_api3_batch_create_spec(&$params) {
  * {@getfields batch_get}
  * @example BatchCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of retrieved batch property values.
- * @access public
+ * @return array
+ *   Array of retrieved batch property values.
  */
 function civicrm_api3_batch_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -92,10 +92,10 @@ function civicrm_api3_batch_get($params) {
  * {@getfields batch_delete}
  * @example BatchCreate.php
  *
- * @param $params
+ * @param array $params
  *
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_batch_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

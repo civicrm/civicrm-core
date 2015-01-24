@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,13 +39,14 @@
 /**
  * Subscribe from mailing group
  *
- * @param array $params Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  *
  * @throws API_Exception
- * @return array api result array
- * {@getfields mailing_event_subscribe_create}
- * @access public
+ * @return array
+ *   api result array
+ *   {@getfields mailing_event_subscribe_create}
  */
 function civicrm_api3_mailing_event_subscribe_create($params) {
   $email      = $params['email'];
@@ -55,7 +55,7 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
 
   $group            = new CRM_Contact_DAO_Group();
   $group->is_active = 1;
-  $group->id        = (int)$group_id;
+  $group->id        = (int) $group_id;
   if (!$group->find(TRUE)) {
     throw new API_Exception('Invalid Group id');
   }
@@ -64,7 +64,6 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
 
   if ($subscribe !== NULL) {
     /* Ask the contact for confirmation */
-
 
     $subscribe->send_confirm_request($email);
 
@@ -82,7 +81,8 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['email']['api.required'] = 1;
@@ -90,4 +90,3 @@ function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['group_id']['api.required'] = 1;
   $params['group_id']['title'] = 'Unsubscribe From Group';
 }
-

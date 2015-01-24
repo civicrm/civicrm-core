@@ -5,16 +5,14 @@
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param $params
- *
- * @internal param $array $ params input parameters
+ * @param array $params
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
  *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
- * @access public
+ * @return array
+ *   details of found Option Values
+ *   {@getfields OptionValue_get}
  */
 function civicrm_api3_report_template_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -31,11 +29,11 @@ function civicrm_api3_report_template_get($params) {
  *
  * {@example OptionValueCreate.php}
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
+ *   Array of newly created option_value property values.
+ *   {@getfields OptionValue_create}
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -53,7 +51,8 @@ function civicrm_api3_report_template_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
@@ -69,13 +68,13 @@ function _civicrm_api3_report_template_create_spec(&$params) {
 /**
  * Deletes an existing ReportTemplate
  *
- * @param  array  $params
+ * @param array $params
  *
  * {@example ReportTemplateDelete.php 0}
  *
- * @return array Api result
- * {@getfields ReportTemplate_create}
- * @access public
+ * @return array
+ *   Api result
+ *   {@getfields ReportTemplate_create}
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -85,10 +84,11 @@ function civicrm_api3_report_template_delete($params) {
 /**
  * Retrieve rows from a report template
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
- * @return  array details of found instances
- * @access public
+ * @return array
+ *   details of found instances
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
@@ -97,26 +97,26 @@ function civicrm_api3_report_template_getrows($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_report_template_getrows($params) {
-  if(empty($params['report_id'])) {
+  if (empty($params['report_id'])) {
     $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
   }
 
   $class = civicrm_api3('option_value', 'getvalue', array(
-    'option_group_id' => 'report_template',
+    'option_group_name' => 'report_template',
     'return' => 'name',
     'value' => $params['report_id'],
     )
   );
 
   $reportInstance = new $class();
-  if(!empty($params['instance_id'])) {
+  if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);
   }
   $reportInstance->setParams($params);
@@ -124,7 +124,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'report_template','get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'report_template', 'get');
   $reportInstance->setLimitValue($options['limit']);
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
@@ -132,12 +132,12 @@ function _civicrm_api3_report_template_getrows($params) {
   $rows = $metadata = $requiredMetadata  = array();
   $reportInstance->buildRows($sql, $rows);
   $requiredMetadata = array();
-  if(isset($params['options']) && !empty($params['options']['metadata'])) {
+  if (isset($params['options']) && !empty($params['options']['metadata'])) {
     $requiredMetadata = $params['options']['metadata'];
-    if(in_array('title', $requiredMetadata)) {
+    if (in_array('title', $requiredMetadata)) {
       $metadata['metadata']['title'] = $reportInstance->getTitle();
     }
-    if(in_array('labels', $requiredMetadata)) {
+    if (in_array('labels', $requiredMetadata)) {
       foreach ($reportInstance->_columnHeaders as $key => $header) {
         //would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
         //NB I think these are already translated
@@ -149,7 +149,7 @@ function _civicrm_api3_report_template_getrows($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  *
  * @return array
  */
@@ -161,10 +161,11 @@ function civicrm_api3_report_template_getstatistics($params) {
 /**
  * Retrieve rows from a report template
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
- * @return  array details of found instances
- * @access public
+ * @return void
+ *   details of found instances
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(
@@ -172,7 +173,7 @@ function _civicrm_api3_report_template_getrows_spec(&$params) {
   );
 }
 
-/*
+/* @codingStandardsIgnoreStart
 function civicrm_api3_report_template_getfields($params) {
   return civicrm_api3_create_success(array(
     'id' => array(
@@ -269,4 +270,5 @@ function civicrm_api3_report_template_getfields($params) {
       'default' => 'UL',
     ),
   ));
-}*/
+}
+@codingStandardsIgnoreEnd */

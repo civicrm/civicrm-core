@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 custom group functions
@@ -41,8 +40,9 @@
  * as parameters. Some of the most commonly used parameters are
  * described below
  *
- * @param array $params           an associative array used in construction
- * retrieval of the object
+ * @param array $params
+ *   An associative array used in construction.
+ *   retrieval of the object
  * @todo missing get function
  *
  *
@@ -55,12 +55,12 @@
  * See the CRM Data Model for custom_group property definitions
  * $params['class_name'] is a required field, class being extended.
  *
- * @param $params     array   Associative array of property name/value pairs to insert in group.
+ * @param array $params
+ *   Array Associative array of property name/value pairs to insert in group.
  * {@getfields CustomGroup_create}
  *
- * @return   Newly create custom_group object
+ * @return array
  * @todo $params['extends'] is array format - is that std compatible
- * @access public
  */
 function civicrm_api3_custom_group_create($params) {
   if (isset($params['extends']) && is_string($params['extends'])) {
@@ -82,7 +82,8 @@ function civicrm_api3_custom_group_create($params) {
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_custom_group_create_spec(&$params) {
   $params['extends']['api.required'] = 1;
@@ -94,15 +95,11 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
 /**
  * Use this API to delete an existing group.
  *
- * @param array id of the group to be deleted
+ * @param array $params
  *
- * @return Null if success
- * @access public
- * {@getfields CustomGroup_delete}
- * @example CustomGroupDelete.php
- **/
+ * @return array
+ */
 function civicrm_api3_custom_group_delete($params) {
-
   $values = new CRM_Core_DAO_CustomGroup();
   $values->id = $params['id'];
   $values->find(TRUE);
@@ -114,19 +111,19 @@ function civicrm_api3_custom_group_delete($params) {
 /**
  * Use this API to get existing custom fields.
  *
- * @param array $params Array to search on
+ * @param array $params
+ *   Array to search on.
  *
  * @return array
- * @access public
- * {@getfields CustomGroup_get}
- * @example CustomGroupGet.php
- **/
+ */
 function civicrm_api3_custom_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_custom_group_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';

@@ -9,18 +9,14 @@
  */
 
 /**
- * This api exception returns more information than the default one. The aim it let the api consumer know better what is exactly the error without having to parse the error message.
- * If you consume an api that doesn't return an error_code or the extra data you need, consider improving the api and contribute
- * @param string $message
- *   the human friendly error message
- * @param string $error_code
- *   a computer friendly error code. By convention, no space (but underscore allowed)
- *  ex: mandatory_missing, duplicate, invalid_format
- * @param array $data
- *   extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data
+ * This api exception returns more information than the default one. The aim
+ * it let the api consumer know better what is exactly the error without
+ * having to parse the error message.
+ *
+ * If you consume an api that doesn't return an error_code or the extra data
+ * you need, consider improving the api and contribute.
  */
-class API_Exception extends Exception
-{
+class API_Exception extends Exception {
   const UNAUTHORIZED = 'unauthorized';
   const NOT_IMPLEMENTED = 'not-found';
 
@@ -28,21 +24,31 @@ class API_Exception extends Exception
 
   /**
    * @param string $message
-   * @param int $error_code
+   *   The human friendly error message.
+   * @param mixed $error_code
+   *   A computer friendly error code. By convention, no space (but underscore
+   *   allowed) (ex: mandatory_missing, duplicate, invalid_format).
    * @param array $extraParams
-   * @param Exception $previous
+   *   Extra params to return. eg an extra array of ids. It is not mandatory,
+   *   but can help the computer using the api. Keep in mind the api consumer
+   *   isn't to be trusted. eg. the database password is NOT a good extra data.
+   * @param Exception|NULL $previous
+   *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $error_code = 0, $extraParams = array(),Exception $previous = null) {
-    if (is_numeric ($error_code)) // using int for error code "old way")
+  public function __construct($message, $error_code = 0, $extraParams = array(), Exception $previous = NULL) {
+    // Using int for error code "old way") ?
+    if (is_numeric($error_code)) {
       $code = $error_code;
-    else
-      $code=0;
+    }
+    else {
+      $code = 0;
+    }
     parent::__construct(ts($message), $code, $previous);
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
 
-  // custom string representation of object
   /**
+   * custom string representation of object
    * @return string
    */
   public function __toString() {
@@ -59,47 +65,54 @@ class API_Exception extends Exception
   /**
    * @return array
    */
-  public function getErrorCodes(){
+  public function getErrorCodes() {
     return array(
-        2000 => '$params was not an array',
-        2001 => 'Invalid Value for Date field',
-        2100 => 'String value is longer than permitted length',
-        self::UNAUTHORIZED => 'Unauthorized',
-        self::NOT_IMPLEMENTED => 'Entity or method is not implemented',
-        );
+      2000 => '$params was not an array',
+      2001 => 'Invalid Value for Date field',
+      2100 => 'String value is longer than permitted length',
+      self::UNAUTHORIZED => 'Unauthorized',
+      self::NOT_IMPLEMENTED => 'Entity or method is not implemented',
+    );
   }
+
 }
+
 /**
  * This api exception returns more information than the default one. We are using it rather than
  * API_Exception from the api wrapper as the namespace is more generic
- * @param string $message the human friendly error message
- * @param string $error_code a computer friendly error code. By convention, no space (but underscore allowed)
- *  ex: mandatory_missing, duplicate, invalid_format
- * @param array $data extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data
  */
-class CiviCRM_API3_Exception extends Exception
-{
+class CiviCRM_API3_Exception extends Exception {
   private $extraParams = array();
 
   /**
    * @param string $message
-   * @param int $error_code
+   *   The human friendly error message.
+   * @param mixed $error_code
+   *   A computer friendly error code. By convention, no space (but underscore
+   *   allowed) (ex: mandatory_missing, duplicate, invalid_format).
    * @param array $extraParams
-   * @param Exception $previous
+   *   Extra params to return. eg an extra array of ids. It is not mandatory,
+   *   but can help the computer using the api. Keep in mind the api consumer
+   *   isn't to be trusted. eg. the database password is NOT a good extra data.
+   * @param Exception|NULL $previous
+   *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $error_code, $extraParams = array(),Exception $previous = null) {
+  public function __construct($message, $error_code, $extraParams = array(), Exception $previous = NULL) {
     parent::__construct(ts($message));
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
 
-  // custom string representation of object
   /**
+   * custom string representation of object
    * @return string
    */
   public function __toString() {
     return __CLASS__ . ": [{$this->extraParams['error_code']}: {$this->message}\n";
   }
 
+  /**
+   * @return mixed
+   */
   public function getErrorCode() {
     return $this->extraParams['error_code'];
   }
@@ -110,4 +123,5 @@ class CiviCRM_API3_Exception extends Exception
   public function getExtraParams() {
     return $this->extraParams;
   }
+
 }

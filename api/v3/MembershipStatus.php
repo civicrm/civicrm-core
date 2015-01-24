@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -42,24 +41,15 @@
  *
  * This API is used for creating a Membership Status
  *
- * @param   array  $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  *
- * @return array of newly created membership status property values.
- * {@getfields MembershipStatus_create}
- * @access public
+ * @return array
+ *   Array of newly created membership status property values.
+ *   {@getfields MembershipStatus_create}
  */
 function civicrm_api3_membership_status_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * Adjust Metadata for Create action
- *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
- */
-function _civicrm_api3_membership_status_create_spec(&$params) {
-  $params['name']['api.aliases'] = array('label');
 }
 
 /**
@@ -67,11 +57,12 @@ function _civicrm_api3_membership_status_create_spec(&$params) {
  *
  * This api is used for finding an existing membership status.
  *
- * @param  array $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  *
- * @return  Array of all found membership status property values.
- * {@getfields MembershipStatus_get}
- * @access public
+ * @return array
+ *   Array of all found membership status property values.
+ *   {@getfields MembershipStatus_get}
  */
 function civicrm_api3_membership_status_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_BAO_MembershipStatus', $params);
@@ -83,11 +74,12 @@ function civicrm_api3_membership_status_get($params) {
  * This api is used for updating an existing membership status.
  * Required parameters : id of a membership status
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_membership_status
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_status.
  * @deprecated - should just use create
  *
- * @return array of updated membership status property values
- * @access public
+ * @return array
+ *   Array of updated membership status property values
  */
 function &civicrm_api3_membership_status_update($params) {
 
@@ -124,11 +116,8 @@ function &civicrm_api3_membership_status_update($params) {
  *
  * This API is used for deleting a membership status
  *
- * @param  array  Params array containing 'id' -    Id of the membership status to be deleted
- * {@getfields MembershipStatus_delete}
- *
- * @return array i
- * @access public
+ * @param array $params
+ * @return array
  */
 function civicrm_api3_membership_status_delete($params) {
 
@@ -142,13 +131,12 @@ function civicrm_api3_membership_status_delete($params) {
  * This API is used for deriving Membership Status of a given Membership
  * record using the rules encoded in the membership_status table.
  *
- * @param $membershipParams
+ * @param array $membershipParams
  *
  * @throws API_Exception
- * @internal param Int $membershipID Id of a membership
- * @internal param String $statusDate
  *
- * @return Array  Array of status id and status name
+ * @return array
+ *   Array of status id and status name
  * @public
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
@@ -156,7 +144,7 @@ function civicrm_api3_membership_status_calc($membershipParams) {
     throw new API_Exception('membershipParams do not contain membership_id');
   }
 
-  if(empty($membershipParams['id'])) {
+  if (empty($membershipParams['id'])) {
     //for consistency lets make sure id is set as this will get passed to hooks downstream
     $membershipParams['id'] = $membershipID;
   }
@@ -183,4 +171,3 @@ SELECT start_date, end_date, join_date, membership_type_id
   $dao->free();
   return $result;
 }
-

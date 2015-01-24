@@ -1,17 +1,21 @@
 <?php
 /**
- * Test Generated example of using contribution_page get API
+ * Test Generated example of using mailing_a_b create API
  * *
  */
-function contribution_page_get_example(){
+function mailing_a_b_create_example(){
 $params = array(
-  'amount' => '34567',
-  'currency' => 'NZD',
-  'financial_type_id' => 1,
+  'mailing_id_a' => 1,
+  'mailing_id_b' => 2,
+  'mailing_id_c' => 3,
+  'testing_criteria_id' => 1,
+  'winner_criteria_id' => 1,
+  'declare_winning_time' => '+2 days',
+  'group_percentage' => 10,
 );
 
 try{
-  $result = civicrm_api3('contribution_page', 'get', $params);
+  $result = civicrm_api3('mailing_a_b', 'create', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -27,7 +31,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function contribution_page_get_expectedresult(){
+function mailing_a_b_create_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -37,25 +41,15 @@ function contribution_page_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'title' => 'Test Contribution Page',
-          'financial_type_id' => '1',
-          'is_credit_card_only' => 0,
-          'is_monetary' => '1',
-          'is_recur' => 0,
-          'is_confirm_enabled' => '1',
-          'is_recur_interval' => 0,
-          'is_recur_installments' => 0,
-          'is_pay_later' => '1',
-          'is_partial_payment' => 0,
-          'is_allow_other_amount' => 0,
-          'goal_amount' => '34567.00',
-          'is_for_organization' => 0,
-          'is_email_receipt' => 0,
-          'is_active' => '1',
-          'amount_block_is_active' => '1',
-          'currency' => 'NZD',
-          'is_share' => '1',
-          'is_billing_required' => 0,
+          'mailing_id_a' => '1',
+          'mailing_id_b' => '2',
+          'mailing_id_c' => '3',
+          'domain_id' => '1',
+          'testing_criteria_id' => '1',
+          'winner_criteria_id' => '1',
+          'specific_url' => '',
+          'declare_winning_time' => '20140728171837',
+          'group_percentage' => '10',
         ),
     ),
 );
@@ -67,8 +61,8 @@ function contribution_page_get_expectedresult(){
 /*
 * This example has been generated from the API test suite. The test that created it is called
 *
-* testGetContributionPageByAmount and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
+* testMailingABCreateSuccess and can be found in
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingABTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

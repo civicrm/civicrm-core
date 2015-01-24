@@ -86,6 +86,8 @@ function contribution_create_expectedresult(){
           'address_id' => '',
           'check_number' => '',
           'campaign_id' => '',
+          'creditnote_id' => '',
+          'tax_amount' => 0,
           'contribution_type_id' => '1',
           'api.line_item.create' => array(
               '0' => array(
@@ -108,6 +110,7 @@ function contribution_create_expectedresult(){
                           'price_field_value_id' => '',
                           'financial_type_id' => '',
                           'deductible_amount' => '',
+                          'tax_amount' => '',
                         ),
                     ),
                 ),
@@ -131,6 +134,7 @@ function contribution_create_expectedresult(){
                           'price_field_value_id' => '',
                           'financial_type_id' => '',
                           'deductible_amount' => '',
+                          'tax_amount' => '',
                         ),
                     ),
                 ),

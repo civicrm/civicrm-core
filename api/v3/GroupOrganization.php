@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -44,11 +43,13 @@
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *
- * @param  array $params  name value pair of contact information
+ * @param array $params
+ *   Name value pair of contact information.
  * {@getfields GroupOrganization_get}
  * @example GroupOrganizationGet.php
  *
- * @return  array  list of groups, given contact subsribed to
+ * @return array
+ *   list of groups, given contact subsribed to
  */
 function civicrm_api3_group_organization_get($params) {
   return _civicrm_api3_basic_get('CRM_Contact_DAO_GroupOrganization', $params);
@@ -58,7 +59,8 @@ function civicrm_api3_group_organization_get($params) {
  * @example GroupOrganizationCreate.php
  * {@getfields GroupOrganization_create}
  *
- * @param $params array
+ * @param array $params
+ *   Array.
  *
  * @return array
  *
@@ -79,7 +81,8 @@ function civicrm_api3_group_organization_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_group_organization_create_spec(&$params) {
   $params['organization_id']['api.required'] = 1;
@@ -91,16 +94,16 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
  *
  * This API is used for deleting a Group Organization
  *
- * @param  array  $params  with 'id' = ID of the Group Organization to be deleted
+ * @param array $params
+ *   With 'id' = ID of the Group Organization to be deleted.
  *
- * @return array API Result
- * {@getfields GroupOrganization_delete}
+ * @return array
+ *   API Result
+ *   {@getfields GroupOrganization_delete}
  * @example GroupOrganizationDelete.php
- * @access public
  */
 function civicrm_api3_group_organization_delete($params) {
 
   $result = CRM_Contact_BAO_GroupOrganization::deleteGroupOrganization($params['id']);
   return $result ? civicrm_api3_create_success('Deleted Group Organization successfully') : civicrm_api3_create_error('Could not delete Group Organization');
 }
-

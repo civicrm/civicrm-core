@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -45,13 +44,13 @@
  * @todo possibly add ability to add payment if there are less payments than pledge installments
  * @todo possibly add ability to recalculate dates if the schedule is changed
  *
- * @param  array   $params    input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_create}
  * @example PledgePaymentCreate.php
  *
- * @return array API Result
- * @static void
- * @access public
+ * @return array
+ *   API Result
  */
 function civicrm_api3_pledge_payment_create($params) {
 
@@ -67,11 +66,11 @@ function civicrm_api3_pledge_payment_create($params) {
   }
 
   $dao = CRM_Pledge_BAO_PledgePayment::add($paymentParams);
-  if(empty($dao->pledge_id)){
-    $dao->find(True);
+  $result = array();
+  if (empty($dao->pledge_id)) {
+    $dao->find(TRUE);
   }
   _civicrm_api3_object_to_array($dao, $result[$dao->id]);
-
 
   //update pledge status
   CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($dao->pledge_id);
@@ -83,7 +82,8 @@ function civicrm_api3_pledge_payment_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_pledge_payment_create_spec(&$params) {
   $params['pledge_id']['api.required'] = 1;
@@ -93,18 +93,18 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 /**
  * Delete a pledge Payment - Note this deletes the contribution not just the link
  *
- * @param  array   $params     input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_delete}
  * @example PledgePaymentDelete.php
  *
- * @return array API result
- * @static void
- * @access public
+ * @return array
+ *   API result
  */
 function civicrm_api3_pledge_payment_delete($params) {
 
   if (CRM_Pledge_BAO_PledgePayment::del($params['id'])) {
-    return civicrm_api3_create_success(array('id' => $params['id']), $params,'pledge_payment','delete');
+    return civicrm_api3_create_success(array('id' => $params['id']), $params, 'pledge_payment', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete payment');
@@ -114,41 +114,25 @@ function civicrm_api3_pledge_payment_delete($params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array   $params     input parameters
+ * @param array $params
+ *   Input parameters.
  * {@getfields PledgePayment_get}
  * @example PledgePaymentGet.php *
  *
- * @return array (reference )        array of pledges, if error an array with an error id and error message
- * @static void
- * @access public
+ * @return array
+ *   (reference )        array of pledges, if error an array with an error id and error message
  */
 function civicrm_api3_pledge_payment_get($params) {
-
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * @param $pledgeId
- * @param $paymentStatusId
- * @param $paymentIds
- *
- * @return mixed
- */
-function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
-
-  $result = updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds = NULL);
-  return $result;
-}
-
-/**
  * Gets field for civicrm_pledge_payment functions
  *
- * @param $params
- *
- * @return array fields valid for other functions
+ * @param array $params
+ *   Modifiable list of fields allowed for the PledgePayment.get action.
  */
 function civicrm_api3_pledge_payment_get_spec(&$params) {
   $params['option.create_new'] = array('title' => "Create new field rather than update an unpaid payment");
 }
-

@@ -1,8 +1,7 @@
 <?php
 /*
-/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
@@ -38,13 +37,14 @@
 /**
  * Create or update a contribution_page
  *
- * @param array $params  Associative array of property
+ * @param array $params
+ *   Associative array of property.
  *                       name/value pairs to insert in new 'contribution_page'
  * @example ContributionPageCreate.php Std Create example
  *
- * @return array api result array
- * {@getfields contribution_page_create}
- * @access public
+ * @return array
+ *   api result array
+ *   {@getfields contribution_page_create}
  */
 function civicrm_api3_contribution_page_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,7 +57,8 @@ function civicrm_api3_contribution_page_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_contribution_page_create_spec(&$params) {
   $params['financial_type_id']['api.required'] = 1;
@@ -68,11 +69,12 @@ function _civicrm_api3_contribution_page_create_spec(&$params) {
 /**
  * Returns array of contribution_pages  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid property_name=>value pairs.
+ * @param array $params
+ *   Array of one or more valid property_name=>value pairs.
  *
- * @return array API Result array Array of matching contribution_pages
- * {@getfields contribution_page_get}
- * @access public
+ * @return array
+ *   API Result array Array of matching contribution_pages
+ *   {@getfields contribution_page_get}
  */
 function civicrm_api3_contribution_page_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -84,12 +86,13 @@ function civicrm_api3_contribution_page_get($params) {
  * This method is used to delete any existing contribution_page. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params
+ *   Array containing id of the group.
  *                       to be deleted
  *
- * @return array API result Array
- * {@getfields contribution_page_delete}
- * @access public
+ * @return array
+ *   API result Array
+ *   {@getfields contribution_page_delete}
  */
 function civicrm_api3_contribution_page_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -101,12 +104,13 @@ function civicrm_api3_contribution_page_delete($params) {
  * This method is used to delete any existing contribution_page. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params
+ *   (reference) array containing id of the group.
  *                       to be deleted
  *
- * @return array API result array
- * {@getfields contribution_page_delete}
- * @access public
+ * @return array
+ *   API result array
+ *   {@getfields contribution_page_delete}
  */
 function civicrm_api3_contribution_page_submit($params) {
   $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);

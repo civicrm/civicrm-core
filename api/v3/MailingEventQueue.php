@@ -24,7 +24,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-
 /**
  *
  * APIv3 functions for registering/processing mailing group events.
@@ -33,46 +32,56 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
+ *
  */
 
 /**
- * Handle a confirm event.
+ * Handle a confirm event
  *
  * @param array $params
  *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
  * @return array
  *   api result array
  */
-function civicrm_api3_mailing_event_confirm_create($params) {
-
-  $contact_id   = $params['contact_id'];
-  $subscribe_id = $params['subscribe_id'];
-  $hash         = $params['hash'];
-
-  $confirm = CRM_Mailing_Event_BAO_Confirm::confirm($contact_id, $subscribe_id, $hash) !== FALSE;
-
-  if (!$confirm) {
-    throw new Exception('Confirmation failed');
+function civicrm_api3_mailing_event_queue_create($params) {
+  if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
+    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required");
   }
-  return civicrm_api3_create_success($params);
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_MailingJob',
+    array('job_id', 'contact_id'),
+    FALSE
+  );
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
 }
 
 /**
- * Adjust Metadata for Create action.
+ * @param array $params
+ * @return array
+ */
+function civicrm_api3_mailing_event_queue_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_Queue', $params);
+}
+
+/**
+ * @param array $params
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_mailing_event_queue_delete($params) {
+  return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_Queue', $params);
+}
+
+/**
+ * Adjust Metadata for Create action
  *
- * The metadata is used for setting defaults, documentation & validation.
- *
+ * The metadata is used for setting defaults, documentation & validation
  * @param array $params
  *   Array or parameters determined by getfields.
  */
-function _civicrm_api3_mailing_event_confirm_create_spec(&$params) {
+function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
+  $params['job_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
-  $params['contact_id']['title'] = 'Contact ID';
-  $params['subscribe_id']['api.required'] = 1;
-  $params['subscribe_id']['title'] = 'Subscribe Event ID';
-  $params['hash']['api.required'] = 1;
-  $params['hash']['title'] = 'Hash';
 }

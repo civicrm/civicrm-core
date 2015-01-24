@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 email functions
@@ -43,11 +42,10 @@
  *
  * @example EmailCreate.php Standard Create Example
  *
- * @param $params
+ * @param array $params
  *
- * @return array API result array
- * {@getfields email_create}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_email_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,7 +55,8 @@ function civicrm_api3_email_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_email_create_spec(&$params) {
   // TODO a 'clever' default should be introduced
@@ -69,13 +68,12 @@ function _civicrm_api3_email_create_spec(&$params) {
 /**
  * Deletes an existing Email
  *
- * @param  array  $params
+ * @param array $params
  *
  * @example EmailDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
- * {@getfields email_delete}
- * @access public
+ * @return bool
+ *   | error  true if successfull, error otherwise
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -84,19 +82,13 @@ function civicrm_api3_email_delete($params) {
 /**
  * Retrieve one or more emails
  *
- * @param  array input parameters
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
- *
- * @example EmailGet.php Standard Get Example
- *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array api result array
- * {@getfields email_get}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_email_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

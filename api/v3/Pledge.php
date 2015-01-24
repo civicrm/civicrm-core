@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * File for the CiviCRM APIv3 Pledge functions
@@ -44,11 +43,13 @@
 /**
  * Creates or updates an Activity. See the example for usage
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params
+ *   Associative array of property name/value.
  *                             pairs for the activity.
  * {@getfields pledge_create}
  *
- * @return array Array containing 'is_error' to denote success or failure and details of the created pledge
+ * @return array
+ *   Array containing 'is_error' to denote success or failure and details of the created pledge
  *
  * @example PledgeCreate.php Standard create example
  *
@@ -64,18 +65,18 @@ function civicrm_api3_pledge_create($params) {
 /**
  * Delete a pledge
  *
- * @param  array   $params           array included 'pledge_id' of pledge to delete
+ * @param array $params
+ *   Array included 'pledge_id' of pledge to delete.
  *
- * @return boolean        true if success, else false
- * @static void
- * {@getfields pledge_delete}
+ * @return bool
+ *   true if success, else false
+ *   {@getfields pledge_delete}
  * @example PledgeDelete.php
- * @access public
  */
 function civicrm_api3_pledge_delete($params) {
   if (CRM_Pledge_BAO_Pledge::deletePledge($params['id'])) {
     return civicrm_api3_create_success(array(
-      'id' => $params['id']
+      'id' => $params['id'],
     ), $params, 'pledge', 'delete');
   }
   else {
@@ -84,7 +85,7 @@ function civicrm_api3_pledge_delete($params) {
 }
 
 /**
- * @param $params
+ * @param array $params
  */
 function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
@@ -93,6 +94,7 @@ function _civicrm_api3_pledge_delete_spec(&$params) {
 
 /**
  * return field specification specific to get requests
+ * @param array $params
  */
 function _civicrm_api3_pledge_get_spec(&$params) {
   $params['next_pay_date'] = array(
@@ -109,6 +111,7 @@ function _civicrm_api3_pledge_get_spec(&$params) {
 
 /**
  * return field specification specific to get requests
+ * @param array $params
  */
 function _civicrm_api3_pledge_create_spec(&$params) {
 
@@ -124,12 +127,13 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array $params input parameters. Use interrogate for possible fields
+ * @param array $params
+ *   Input parameters. Use interrogate for possible fields.
  *
- * @return array  array of pledges, if error an array with an error id and error message
- * {@getfields pledge_get}
+ * @return array
+ *   array of pledges, if error an array with an error id and error message
+ *   {@getfields pledge_get}
  * @example PledgeGet.php
- * @access public
  */
 function civicrm_api3_pledge_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;
@@ -158,17 +162,11 @@ function _civicrm_api3_pledge_get_defaults() {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array $values The reformatted properties that we can use internally
- *                            '
+ * @param array $values
+ *   The reformatted properties that we can use internally.
  *
- * @param bool $create
- *
- * @internal param array $params Associative array of property name/value
- *                             pairs to insert in new contact.
- * @return array|CRM_Error
- * @access public
  */
-function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
+function _civicrm_api3_pledge_format_params(&$values) {
 
   // probably most of the below can be removed.... just needs a little more review
   if (array_key_exists('original_installment_amount', $values)) {
@@ -199,4 +197,3 @@ function _civicrm_api3_pledge_format_params(&$values, $create = FALSE) {
     $values['scheduled_date'] = $values['start_date'];
   }
 }
-
