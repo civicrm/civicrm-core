@@ -55,15 +55,15 @@
           <div crm-mailing-block-review crm-mailing="mailing"/>
         </div>
         <center>
-          <a class="crmMailing-submit-button" ng-click="submit()">
+          <a class="crmMailing-submit-button" ng-click="submit()" ng-disabled="block.check()">
             <div>{{ts('Submit Mailing')}}</div>
           </a>
         </center>
       </div>
 
       <span crm-ui-wizard-buttons style="float:right;">
-        <button crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete()">{{ts('Delete Draft')}}</button>
-        <button ng-click="save()">{{ts('Save Draft')}}</button>
+        <button ng-disabled="block.check()" crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete()">{{ts('Delete Draft')}}</button>
+        <button ng-disabled="block.check()" ng-click="save()">{{ts('Save Draft')}}</button>
       </span>
     </div>
   </div>

@@ -61,7 +61,7 @@
     $location.replace();
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr, crmBlocker) {
     $scope.mailing = selectedMail;
     $scope.attachments = new CrmAttachments(function () {
       return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
@@ -70,6 +70,7 @@
     $scope.crmMailingConst = CRM.crmMailing;
 
     var ts = $scope.ts = CRM.ts(null);
+    var block = $scope.block = crmBlocker();
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size($scope.mailing.jobs) > 0;
@@ -86,10 +87,10 @@
         .then(function () {
           return attachments.save();
         });
-      return crmStatus({start: ts('Saving...'), success: ''}, savePromise)
+      return block(crmStatus({start: ts('Saving...'), success: ''}, savePromise)
         .then(function () {
           crmMailingPreviewMgr.sendTest(mailing, recipient);
-        });
+        }));
     };
 
     // @return Promise
@@ -106,29 +107,29 @@
             leave('scheduled');
           })
         ;
-      return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise);
+      return block(crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise));
     };
 
     // @return Promise
     $scope.save = function save() {
-      return crmStatus(null,
+      return block(crmStatus(null,
         crmMailingMgr
           .save($scope.mailing)
           .then(function () {
             // pre-condition: the mailing exists *before* saving attachments to it
             return $scope.attachments.save();
           })
-      );
+      ));
     };
 
     // @return Promise
     $scope.delete = function cancel() {
-      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
+      return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
           .then(function () {
             leave('unscheduled');
           })
-      );
+      ));
     };
 
     // @param string listingScreen 'archive', 'scheduled', 'unscheduled'
