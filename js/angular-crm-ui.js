@@ -511,6 +511,9 @@
           /// @return bool whether the current step is last
           this.$last = function() { return this.$index() === steps.length -1; };
           this.$maxVisit = function() { return maxVisited; };
+          this.$validStep = function() {
+            return steps[selectedIndex].isStepValid();
+          };
           this.iconFor = function(index) {
             if (index < this.$index()) return '√';
             if (index === this.$index()) return '»';
@@ -584,13 +587,13 @@
       };
     })
 
-    // example: <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
     .directive('crmUiWizardStep', function() {
       var nextWeight = 1;
       return {
-        require: '^crmUiWizard',
+        require: ['^crmUiWizard', 'form'],
         restrict: 'EA',
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
@@ -598,12 +601,16 @@
         },
         template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
         transclude: true,
-        link: function (scope, element, attrs, crmUiWizardCtrl) {
+        link: function (scope, element, attrs, ctrls) {
+          var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
           if (scope.crmUiWizardStep) {
             scope.crmUiWizardStep = parseInt(scope.crmUiWizardStep);
           } else {
             scope.crmUiWizardStep = nextWeight++;
           }
+          scope.isStepValid = function() {
+            return form.$valid;
+          };
           crmUiWizardCtrl.add(scope);
           element.on('$destroy', function(){
             crmUiWizardCtrl.remove(scope);
