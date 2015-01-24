@@ -34,6 +34,26 @@
     };
   });
 
+  // usage:
+  // var block = $scope.block = crmBlocker();
+  // $scope.save = function() { return block(crmApi('MyEntity','create',...)); };
+  // <button ng-click="save()" ng-disabled="block.check()">Do something</button>
+  angular.module('crmUtil').factory('crmBlocker', function() {
+    return function() {
+      var blocks = 0;
+      var result = function(promise) {
+        blocks++;
+        promise.finally(function() {
+          blocks--;
+        });
+      };
+      result.check = function() {
+        return blocks > 0;
+      };
+      return result;
+    };
+  });
+
   angular.module('crmUtil').factory('crmLegacy', function() {
     return CRM;
   });
@@ -101,7 +121,11 @@
   // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
   angular.module('crmUtil').factory('crmStatus', function($q){
     return function(options, aPromise){
-      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+      if (aPromise) {
+        return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+      } else {
+        return CRM.toAPromise($q, CRM.status(options));
+      }
     };
   });
 

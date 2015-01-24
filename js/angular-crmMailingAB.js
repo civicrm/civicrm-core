@@ -1,18 +1,11 @@
 (function (angular, $, _) {
 
-  var partialUrl = function (relPath, module) {
-    if (!module) {
-      module = 'crmMailingAB';
-    }
-    return '~/' + module + '/' + relPath;
-  };
-
   angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
   angular.module('crmMailingAB').config([
     '$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/abtest', {
-        templateUrl: partialUrl('list.html'),
+        templateUrl: '~/crmMailingAB/list.html',
         controller: 'CrmMailingABListCtrl',
         resolve: {
           mailingABList: function ($route, crmApi) {
@@ -21,7 +14,7 @@
         }
       });
       $routeProvider.when('/abtest/:id', {
-        templateUrl: partialUrl('edit.html'),
+        templateUrl: '~/crmMailingAB/edit.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
@@ -31,7 +24,7 @@
         }
       });
       $routeProvider.when('/abtest/:id/report', {
-        templateUrl: partialUrl('report.html'),
+        templateUrl: '~/crmMailingAB/report.html',
         controller: 'CrmMailingABReportCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
@@ -55,7 +48,6 @@
     var ts = $scope.ts = CRM.ts(null);
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
-    $scope.partialUrl = partialUrl;
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
@@ -205,7 +197,7 @@
           1: mailingName.toUpperCase()
         })
       };
-      return dialogService.open('selectWinnerDialog', partialUrl('selectWinner.html'), model, options);
+      return dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options);
     };
   });
 

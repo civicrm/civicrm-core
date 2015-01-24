@@ -17,9 +17,14 @@ class Manager {
    * @var array|NULL
    *   Each item has some combination of these keys:
    *   - ext: string
+   *     The Civi extension which defines the Angular module.
    *   - js: array(string $relativeFilePath)
+   *     List of JS files (relative to the extension).
    *   - css: array(string $relativeFilePath)
+   *     List of CSS files (relative to the extension).
    *   - partials: array(string $relativeFilePath)
+   *     A list of partial-HTML folders (relative to the extension).
+   *     This will be mapped to "~/moduleName" by crmResource.
    */
   protected $modules = NULL;
 
@@ -35,7 +40,16 @@ class Manager {
    * Get a list of AngularJS modules which should be autoloaded
    *
    * @return array
-   *   (string $name => array('ext' => string $key, 'js' => array $paths, 'css' => array $paths))
+   *   Each item has some combination of these keys:
+   *   - ext: string
+   *     The Civi extension which defines the Angular module.
+   *   - js: array(string $relativeFilePath)
+   *     List of JS files (relative to the extension).
+   *   - css: array(string $relativeFilePath)
+   *     List of CSS files (relative to the extension).
+   *   - partials: array(string $relativeFilePath)
+   *     A list of partial-HTML folders (relative to the extension).
+   *     This will be mapped to "~/moduleName" by crmResource.
    */
   public function getModules() {
     if ($this->modules === NULL) {
@@ -54,6 +68,10 @@ class Manager {
         'js' => array('js/angular-crmAttachment.js'),
         'css' => array('css/angular-crmAttachment.css'),
         'partials' => array('partials/crmAttachment'),
+      );
+      $angularModules['crmAutosave'] = array(
+        'ext' => 'civicrm',
+        'js' => array('js/angular-crmAutosave.js'),
       );
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
@@ -270,4 +288,5 @@ class Manager {
     }
     return $result;
   }
+
 }

@@ -102,8 +102,6 @@ function civicrm_api3_mailing_get_token($params) {
  *   Array or parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
-  $params['name']['api.required'] = 1;
-  $params['subject']['api.required'] = 1;
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
   $params['api.mailing_job.create']['api.default'] = 1;
