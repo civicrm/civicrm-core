@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\Angular;
 
@@ -115,4 +115,5 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->assertTrue(in_array('Save Draft', $strings));
     // If crmMailing changes, feel free to use a different example.
   }
+
 }
