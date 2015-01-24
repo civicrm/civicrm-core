@@ -153,12 +153,12 @@
       create: function create() {
         return {
           jobs: {}, // {jobId: JobRecord}
-          name: "New Mailing",
+          name: "",
           campaign_id: null,
           from_name: crmFromAddresses.getDefault().author,
           from_email: crmFromAddresses.getDefault().email,
           replyto_email: "",
-          subject: "New Mailing",
+          subject: "",
           groups: {include: [], exclude: []},
           mailings: {include: [], exclude: []},
           body_html: "",
@@ -274,9 +274,16 @@
       // Save a (draft) mailing
       // @param mailing Object (per APIv3)
       // @return Promise
-      save: function (mailing) {
+      save: function(mailing) {
         var params = angular.extend({}, mailing, {
           'api.mailing_job.create': 0 // note: exact match to API default
+        });
+
+        // Angular ngModel sometimes treats blank fields as undefined.
+        angular.forEach(mailing, function(value, key) {
+          if (value === undefined) {
+            mailing[key] = '';
+          }
         });
 
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
@@ -286,7 +293,7 @@
 
         delete params.jobs;
 
-        return crmApi('Mailing', 'create', params).then(function (result) {
+        return crmApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
