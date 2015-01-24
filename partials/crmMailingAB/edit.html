@@ -16,7 +16,7 @@
 <form name="crmMailingAB" novalidate ng-hide="isSubmitted()">
   <div class="crm-block crm-form-block crmMailing">
     <div crm-ui-wizard>
-      <div crm-ui-wizard-step="10" crm-title="ts('Setup')">
+      <div crm-ui-wizard-step="10" crm-title="ts('Setup')" ng-form="setupForm">
         <div
           crm-mailing-ab-block-setup="{
             help: 1,
@@ -26,7 +26,7 @@
           }"
           crm-abtest="abtest"></div>
       </div>
-      <div crm-ui-wizard-step="11" crm-title="ts('Target')">
+      <div crm-ui-wizard-step="11" crm-title="ts('Target')" ng-form="targetForm">
         <div
           crm-mailing-ab-block-setup="{
             recipients: 1,
@@ -34,7 +34,7 @@
           }"
           crm-abtest="abtest"></div>
       </div>
-      <div crm-ui-wizard-step="20" crm-title="ts('Compose')" ng-if="criteriaName != 'Two different emails'">
+      <div crm-ui-wizard-step="20" crm-title="ts('Compose')" ng-if="criteriaName != 'Two different emails'" ng-form="composeForm">
         <div crm-ui-tab-set>
           <div crm-ui-tab id="tab-mailing" crm-title="ts('Mailing')">
             <div
@@ -89,7 +89,7 @@
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
-      <div crm-ui-wizard-step="21" crm-title="ts('Compose (A)')" ng-if="criteriaName == 'Two different emails'">
+      <div crm-ui-wizard-step="21" crm-title="ts('Compose (A)')" ng-if="criteriaName == 'Two different emails'" ng-form="composeAForm">
         <div crm-ui-tab-set>
           <div crm-ui-tab id="tab-mailingA" crm-title="ts('Mailing')">
             <div
@@ -124,7 +124,7 @@
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
         </div>
       </div>
-      <div crm-ui-wizard-step="22" crm-title="ts('Compose (B)')" ng-if="criteriaName == 'Two different emails'">
+      <div crm-ui-wizard-step="22" crm-title="ts('Compose (B)')" ng-if="criteriaName == 'Two different emails'" ng-form="composeBForm">
         <div crm-ui-tab-set>
           <div crm-ui-tab id="tab-mailingB" crm-title="ts('Mailing')">
             <div
@@ -159,7 +159,7 @@
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
-      <div crm-ui-wizard-step="30" crm-title="ts('Schedule')">
+      <div crm-ui-wizard-step="30" crm-title="ts('Schedule')" ng-form="schedForm">
         <div
           crm-mailing-ab-block-setup="{
             scheduled_date: 1,
