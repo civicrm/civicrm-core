@@ -458,6 +458,22 @@
       };
     })
 
+    // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" />
+    // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" crm-ui-validate-name="myError" />
+    // Generic, field-independent validator.
+    .directive('crmUiValidate', function() {
+      return {
+        restrict: 'EA',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+          var validationKey = attrs.crmUiValidateName ? attrs.crmUiValidateName : 'crmUiValidate';
+          scope.$watch(attrs.crmUiValidate, function(newValue){
+            ngModel.$setValidity(validationKey, !!newValue);
+          });
+        }
+      };
+    })
+
     // like ng-show, but hides/displays elements using "visibility" which maintains positioning
     // example <div crm-ui-visible="false">...content...</div>
     .directive('crmUiVisible', function($parse) {
