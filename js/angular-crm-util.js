@@ -101,7 +101,11 @@
   // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
   angular.module('crmUtil').factory('crmStatus', function($q){
     return function(options, aPromise){
-      return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+      if (aPromise) {
+        return CRM.toAPromise($q, CRM.status(options, CRM.toJqPromise(aPromise)));
+      } else {
+        return CRM.toAPromise($q, CRM.status(options));
+      }
     };
   });
 
