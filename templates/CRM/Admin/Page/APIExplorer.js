@@ -13,6 +13,9 @@
     returnTpl = _.template($('#api-return-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html()),
 
+    // These types of entityRef don't require any input to open
+    OPEN_IMMEDIATELY = ['RelationshipType', 'Event', 'Group', 'Tag'],
+
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
@@ -222,7 +225,6 @@
       }
       // Select options
       if (options[name]) {
-
         $valField.select2({
           multiple: (operatorType === 'multi'),
           data: _.map(options[name], function (value, key) {
@@ -232,9 +234,13 @@
       }
       // EntityRef
       else {
+        console.log($.inArray(getFieldData[name].FKApiName, OPEN_IMMEDIATELY));
         $valField.crmEntityRef({
           entity: getFieldData[name].FKApiName,
-          select: {multiple: (operatorType === 'multi')}
+          select: {
+            multiple: (operatorType === 'multi'),
+            minimumInputLength: $.inArray(getFieldData[name].FKApiName, OPEN_IMMEDIATELY) > -1 ? 0 : 1
+          }
         });
       }
       return;
@@ -501,7 +507,7 @@
     $('#api-params')
       .on('change', 'input.api-param-name, select.api-param-op', renderValueField)
       .on('change', 'input.api-param-name, .api-option-name', function() {
-        if ($(this).val() === '-') {
+        if ($(this).val() === '-' && $(this).data('select2')) {
           $(this).select2('destroy');
           $(this).val('').focus();
         }
