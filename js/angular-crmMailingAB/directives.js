@@ -137,6 +137,7 @@
               split_count: options.split_count,
               split_count_select: i
             });
+            /*jshint -W083 */
             result.then(function (data) {
               var temp = 0;
               keep_cnt++;
@@ -148,7 +149,7 @@
               var year = t[2];
               var day = t[1].substr(0, t[1].length - 3);
               var t1, hur, hour, min;
-              if (t[3] == "") {
+              if (_.isEmpty(t[3])) {
                 t1 = t[4].split(":");
                 hur = t1[0];
                 if (t[5] == "AM") {
