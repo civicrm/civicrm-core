@@ -3,10 +3,6 @@
 
   var uidCount = 0;
 
-  var partialUrl = function (relPath) {
-    return '~/crmUi/' + relPath;
-  };
-
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
@@ -105,8 +101,8 @@
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
-        default: partialUrl('field.html'),
-        checkbox: partialUrl('field-cb.html')
+        default: '~/crmUi/field.html',
+        checkbox: '~/crmUi/field-cb.html'
       };
 
       return {
@@ -417,7 +413,7 @@
         scope: {
           crmUiTabSet: '@'
         },
-        templateUrl: partialUrl('tabset.html'),
+        templateUrl: '~/crmUi/tabset.html',
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
         controller: function($scope, $parse) {
@@ -462,6 +458,22 @@
       };
     })
 
+    // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" />
+    // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" crm-ui-validate-name="myError" />
+    // Generic, field-independent validator.
+    .directive('crmUiValidate', function() {
+      return {
+        restrict: 'EA',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+          var validationKey = attrs.crmUiValidateName ? attrs.crmUiValidateName : 'crmUiValidate';
+          scope.$watch(attrs.crmUiValidate, function(newValue){
+            ngModel.$setValidity(validationKey, !!newValue);
+          });
+        }
+      };
+    })
+
     // like ng-show, but hides/displays elements using "visibility" which maintains positioning
     // example <div crm-ui-visible="false">...content...</div>
     .directive('crmUiVisible', function($parse) {
@@ -491,7 +503,7 @@
         scope: {
           crmUiWizard: '@'
         },
-        templateUrl: partialUrl('wizard.html'),
+        templateUrl: '~/crmUi/wizard.html',
         transclude: true,
         controllerAs: 'crmUiWizardCtrl',
         controller: function($scope, $parse) {
@@ -515,6 +527,9 @@
           /// @return bool whether the current step is last
           this.$last = function() { return this.$index() === steps.length -1; };
           this.$maxVisit = function() { return maxVisited; };
+          this.$validStep = function() {
+            return steps[selectedIndex].isStepValid();
+          };
           this.iconFor = function(index) {
             if (index < this.$index()) return '√';
             if (index === this.$index()) return '»';
@@ -588,13 +603,13 @@
       };
     })
 
-    // example: <div crm-ui-wizard-step crm-title="ts('My Title')">...content...</div>
+    // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
     .directive('crmUiWizardStep', function() {
       var nextWeight = 1;
       return {
-        require: '^crmUiWizard',
+        require: ['^crmUiWizard', 'form'],
         restrict: 'EA',
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
@@ -602,12 +617,16 @@
         },
         template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
         transclude: true,
-        link: function (scope, element, attrs, crmUiWizardCtrl) {
+        link: function (scope, element, attrs, ctrls) {
+          var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
           if (scope.crmUiWizardStep) {
             scope.crmUiWizardStep = parseInt(scope.crmUiWizardStep);
           } else {
             scope.crmUiWizardStep = nextWeight++;
           }
+          scope.isStepValid = function() {
+            return form.$valid;
+          };
           crmUiWizardCtrl.add(scope);
           element.on('$destroy', function(){
             crmUiWizardCtrl.remove(scope);

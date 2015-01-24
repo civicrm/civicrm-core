@@ -1,7 +1,4 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmMailing/' + relPath;
-  };
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
   // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
@@ -277,9 +274,16 @@
       // Save a (draft) mailing
       // @param mailing Object (per APIv3)
       // @return Promise
-      save: function (mailing) {
+      save: function(mailing) {
         var params = angular.extend({}, mailing, {
           'api.mailing_job.create': 0 // note: exact match to API default
+        });
+
+        // Angular ngModel sometimes treats blank fields as undefined.
+        angular.forEach(mailing, function(value, key) {
+          if (value === undefined) {
+            mailing[key] = '';
+          }
         });
 
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
@@ -289,7 +293,7 @@
 
         delete params.jobs;
 
-        return crmApi('Mailing', 'create', params).then(function (result) {
+        return crmApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
@@ -356,9 +360,9 @@
       // @return Promise
       preview: function preview(mailing, mode) {
         var templates = {
-          html: partialUrl('dialog/previewHtml.html'),
-          text: partialUrl('dialog/previewText.html'),
-          full: partialUrl('dialog/previewFull.html')
+          html: '~/crmMailing/dialog/previewHtml.html',
+          text: '~/crmMailing/dialog/previewText.html',
+          full: '~/crmMailing/dialog/previewFull.html'
         };
         var result = null;
         var p = crmMailingMgr

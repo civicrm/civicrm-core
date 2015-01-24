@@ -1541,7 +1541,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   Reference array contains the id.
    *
    *
-   * @return object
+   * @return CRM_Mailing_DAO_Mailing
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('mailing_id', $ids, CRM_Utils_Array::value('id', $params));
@@ -1554,7 +1554,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailing = new static();
-    $mailing->id = $id;
+    if ($id) {
+      $mailing->id = $id;
+      $mailing->find(TRUE);
+    }
     $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
 
     if (!isset($params['replyto_email']) &&
@@ -1700,12 +1703,19 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
 
+    // If we're going to autosend, then check validity before saving.
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
+      $errors = static::checkSendable($mailing);
+      if (!empty($errors)) {
+        $fields = implode(',', array_keys($errors));
+        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing fields ($fields).", 'cannot-send', $errors);
+      }
+    }
+
     $transaction->commit();
 
-    /**
-     * create parent job if not yet created
-     * condition on the existence of a scheduled date
-     */
+    // Create parent job if not yet created.
+    // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
@@ -1724,6 +1734,27 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     return $mailing;
+  }
+
+  /**
+   * @param CRM_Mailing_DAO_Mailing $mailing
+   *   The mailing which may or may not be sendable.
+   * @return array
+   *   List of error messages.
+   */
+  public static function checkSendable($mailing) {
+    $errors = array();
+    foreach (array('subject', 'name', 'from_name', 'from_email') as $field) {
+      if (empty($mailing->{$field})) {
+        $errors[$field] = ts('Field "%1" is required.', array(
+          1 => $field,
+        ));
+      }
+    }
+    if (empty($mailing->body_html) && empty($mailing->body_text)) {
+      $errors['body'] = ts('Field "body_html" or "body_text" is required.');
+    }
+    return $errors;
   }
 
   /**

@@ -1,14 +1,11 @@
 (function (angular, $, _) {
-  var partialUrl = function (relPath) {
-    return '~/crmMailingAB/' + relPath;
-  };
 
   // example:
   //   scope.myAbtest = new CrmMailingAB();
   //   <crm-mailing-ab-block-mailing="{fromAddressA: 1, fromAddressB: 1}" crm-abtest="myAbtest" />
   var simpleDirectives = {
-    crmMailingAbBlockMailing: partialUrl('joint-mailing.html'),
-    crmMailingAbBlockSetup: partialUrl('setup.html')
+    crmMailingAbBlockMailing: '~/crmMailingAB/joint-mailing.html',
+    crmMailingAbBlockSetup: '~/crmMailingAB/setup.html'
   };
   _.each(simpleDirectives, function (templateUrl, directiveName) {
     angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria) {
@@ -37,7 +34,7 @@
     return {
       require: '?ngModel',
       scope: {},
-      templateUrl: partialUrl('slider.html'),
+      templateUrl: '~/crmMailingAB/slider.html',
       link: function (scope, element, attrs, ngModel) {
         var TEST_MIN = 1, TEST_MAX = 50;
         var sliders = $('.slider-test,.slider-win', element);
@@ -140,6 +137,7 @@
               split_count: options.split_count,
               split_count_select: i
             });
+            /*jshint -W083 */
             result.then(function (data) {
               var temp = 0;
               keep_cnt++;
@@ -151,7 +149,7 @@
               var year = t[2];
               var day = t[1].substr(0, t[1].length - 3);
               var t1, hur, hour, min;
-              if (t[3] == "") {
+              if (_.isEmpty(t[3])) {
                 t1 = t[4].split(":");
                 hur = t1[0];
                 if (t[5] == "AM") {
