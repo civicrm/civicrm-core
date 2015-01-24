@@ -1463,6 +1463,47 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals("http://civicrm.org", $result['values'][$result['id']]['api.website.get']['values'][0]['url']);
   }
 
+  /**
+   *  Verify attempt to create individual with chained arrays and sequential.
+   *
+   *  See https://issues.civicrm.org/jira/browse/CRM-15815
+   */
+  public function testCreateIndividualWithChainedArrayAndSequential() {
+    $params = array(
+      'sequential' => 1,
+      'first_name' => 'abc5',
+      'last_name' => 'xyz5',
+      'contact_type' => 'Individual',
+      'email' => 'woman5@yahoo.com',
+      'api.phone.create' => array(
+        array('phone' => '03-231 07 95'),
+        array('phone' => '03-232 51 62'),
+      ),
+      'api.website.create' => array(
+        'url' => 'http://civicrm.org',
+      ),
+    );
+    $result = $this->callAPISuccess('Contact', 'create', $params);
+
+    // I could try to parse the result to see whether the two phone numbers
+    // and the website are there, but I am not sure about the correct format.
+    // So I will just fetch it again before checking.
+    // See also http://forum.civicrm.org/index.php/topic,35393.0.html
+    $params = array(
+      'sequential' => 1,
+      'id' => $result['id'],
+      'api.website.get' => array(),
+      'api.phone.get' => array(),
+    );
+    $result = $this->callAPISuccess('Contact', 'get', $params);
+
+    // delete the contact
+    $this->callAPISuccess('contact', 'delete', $result);
+
+    $this->assertEquals(2, $result['values'][0]['api.phone.get']['count']);
+    $this->assertEquals(1, $result['values'][0]['api.website.get']['count']);
+  }
+
   public function testGetIndividualWithChainedArraysFormats() {
     $description = "/*this demonstrates the usage of chained api functions. A variety of return formats are used. Note that no notes
     *custom fields or memberships exist";
