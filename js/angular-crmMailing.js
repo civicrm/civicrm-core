@@ -95,6 +95,10 @@
 
     // @return Promise
     $scope.submit = function submit() {
+      if (block.check() || $scope.crmMailing.$invalid) {
+        return;
+      }
+
       var promise = crmMailingMgr.save($scope.mailing)
           .then(function () {
             // pre-condition: the mailing exists *before* saving attachments to it
