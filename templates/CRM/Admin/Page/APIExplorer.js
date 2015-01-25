@@ -70,11 +70,30 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<span class="icon ui-icon-link"></span> API ' + item.text;
+        return '<span class="icon ui-icon-link"></span> API ' +
+          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
       placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
       escapeMarkup: function(m) {return m}
     });
+  }
+
+  /**
+   * Fetch available actions for selected chained entity
+   */
+  function getChainedAction() {
+    var
+      $selector = $(this),
+      entity = $selector.val(),
+      $row = $selector.closest('tr');
+    if (entity) {
+      $selector.prop('disabled', true);
+      CRM.api3(entity, 'getactions')
+        .done(function(actions) {
+          $selector.prop('disabled', false);
+          CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item})}));
+        });
+    }
   }
 
   /**
@@ -516,7 +535,8 @@
         e.preventDefault();
         $(this).closest('tr').remove();
         buildParams();
-      });
+      })
+      .on('change', 'select.api-chain-entity', getChainedAction);
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
