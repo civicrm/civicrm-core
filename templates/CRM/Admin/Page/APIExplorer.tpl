@@ -197,18 +197,16 @@
       <select style="width: 100%;" class="crm-form-select api-chain-entity">
         <option value=""></option>
         {foreach from=$entities.values item=entity}
-          <option value="{$entity}">{$entity}</option>
+          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
+            {$entity}
+          </option>
         {/foreach}
       </select>
     </td>
     <td>
       <select class="crm-form-select api-chain-action">
         <option value="get">get</option>
-        <option value="getsingle">getsingle</option>
-        <option value="getcount">getcount</option>
-        <option value="create">create</option>
-        <option value="delete">delete</option>
-    </select>
+      </select>
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts}Api Params{/ts}"/>
