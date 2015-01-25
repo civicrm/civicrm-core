@@ -138,7 +138,11 @@
       {/if}
     </table>
   </div>
-  <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit"/>
+  <div class="crm-submit-buttons">
+    <span class="crm-button crm-icon-button">
+      <span class="crm-button-icon ui-icon-check"> </span> <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
+    </span>
+  </div>
 <pre id="api-result" class="linenums">
 {ts}The result of api calls are displayed in this area.{/ts}
 </pre>
