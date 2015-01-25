@@ -74,7 +74,7 @@
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
       placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
-      escapeMarkup: function(m) {return m}
+      escapeMarkup: function(m) {return m;}
     });
   }
 
@@ -91,7 +91,7 @@
       CRM.api3(entity, 'getactions')
         .done(function(actions) {
           $selector.prop('disabled', false);
-          CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item})}));
+          CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item});}));
         });
     }
   }
@@ -182,7 +182,7 @@
   function populateActions(el) {
     var val = $('#api-action').val();
     $('#api-action').removeClass('loading').select2({
-      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item})}),
+      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item});}),
       formatSelection: renderAction,
       formatResult: renderAction
     });
