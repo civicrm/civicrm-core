@@ -167,10 +167,20 @@
     }
   }
 
+  /**
+   * Test whether an action is deprecated
+   * @param action
+   * @returns {boolean}
+   */
   function isActionDeprecated(action) {
     return !!(typeof actions.deprecated === 'object' && actions.deprecated[action]);
   }
 
+  /**
+   * Render action text depending on deprecation status
+   * @param option
+   * @returns {string}
+   */
   function renderAction(option) {
     return isActionDeprecated(option.id) ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
   }
@@ -192,6 +202,10 @@
     }
   }
 
+  /**
+   * Check for and display action-specific deprecation notices
+   * @param action
+   */
   function onChangeAction(action) {
     if (isActionDeprecated(action)) {
       CRM.alert(actions.deprecated[action], action + ' deprecated');
@@ -290,7 +304,7 @@
       if ((first === '"' || first === "'") && last === first) {
         return val.slice(1, -1);
       }
-      // Parse json
+      // Parse json - use eval rather than $.parseJSON because it's less strict about formatting
       if ((first === '[' && last === ']') || (first === '{' && last === '}')) {
         return eval('(' + val + ')');
       }
@@ -302,7 +316,7 @@
         });
         return result;
       }
-      // Integers - quote any number that starts with 0 to avoid oddities
+      // Integers - skip any multidigit number that starts with 0 to avoid oddities (it will be treated as a string below)
       if (!isNaN(val) && val.search(/[^\d]/) < 0 && (val.length === 1 || first !== '0')) {
         return parseInt(val, 10);
       }
@@ -395,6 +409,10 @@
     }
   }
 
+  /**
+   * Display error message on incorrectly-formatted params
+   * @param el
+   */
   function setError(el) {
     if (!$(el).hasClass('crm-error')) {
       var msg = ts('Syntax error: input should be valid JSON or a quoted string.');
@@ -407,6 +425,10 @@
     }
   }
 
+  /**
+   * Remove error message
+   * @param el
+   */
   function clearError(el) {
     $(el)
       .removeClass('crm-error')
@@ -416,6 +438,9 @@
       .siblings('.ui-icon-alert').remove();
   }
 
+  /**
+   * Render the api request in various formats
+   */
   function formatQuery() {
     var i = 0, q = {
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
@@ -459,6 +484,10 @@
     prettyPrint();
   }
 
+  /**
+   * Submit button handler
+   * @param e
+   */
   function submit(e) {
     e.preventDefault();
     if (!entity || !action) {
