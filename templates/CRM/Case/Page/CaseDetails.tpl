@@ -38,7 +38,7 @@
 
     {counter start=0 skip=1 print=false}
     {foreach from=$rows item=row}
-    <tr class="{$row.class}">
+    <tr class="crm-entity {$row.class}" data-entity="activity" data-id="{$row.id}">
       <td class="crm-case-display_date">{$row.display_date}</td>
       <td class="crm-case-subject">{$row.subject}</td>
       <td class="crm-case-type">{$row.type}</td>

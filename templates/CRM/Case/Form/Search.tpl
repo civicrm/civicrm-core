@@ -81,5 +81,3 @@
 </div>
 {/if}
 {/if}
-
-{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}

@@ -472,8 +472,6 @@
 {include file="CRM/Case/Form/ActivityTab.tpl"}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
-  {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
 {/if} {* view related cases if end *}
 </div>
 
