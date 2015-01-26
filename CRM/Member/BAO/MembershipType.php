@@ -136,7 +136,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Flush anywhere that membership types might be cached
    * @throws \CiviCRM_API3_Exception
    */
-  static function flush() {
+  public static function flush() {
     CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
     civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
@@ -463,7 +463,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
 
     $membershipDates = array(
-      'start_date' =>  CRM_Utils_Date::customFormat($startDate, '%Y%m%d'),
+      'start_date' => CRM_Utils_Date::customFormat($startDate, '%Y%m%d'),
       'end_date' => CRM_Utils_Date::customFormat($endDate, '%Y%m%d'),
       'join_date' => CRM_Utils_Date::customFormat($joinDate, '%Y%m%d'),
     );
