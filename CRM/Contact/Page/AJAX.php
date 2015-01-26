@@ -1071,6 +1071,10 @@ LIMIT {$offset}, {$rowCount}
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape($_GET['context'], 'String');
 
+    if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
+      return CRM_Utils_System::permissionDenied();
+    }
+
     $sortMapper = array(
       0 => 'relation',
       1 => 'sort_name',
