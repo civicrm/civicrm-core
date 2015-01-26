@@ -33,6 +33,13 @@
  *
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
+  /**
+   * @var int Time to live (seconds).
+   *
+   * 12 hours: 12 * 60 * 60 = 43200
+   */
+  private $ttl = 43200;
+
   public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
       CRM_Core_Error::fatal('Malformed photo name');
@@ -49,18 +56,39 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     }
     if ($cid) {
       $config = CRM_Core_Config::singleton();
-      $buffer = file_get_contents($config->customFileUploadDir . $_GET['photo']);
-      $mimeType = 'image/' . pathinfo($_GET['photo'], PATHINFO_EXTENSION);
-      CRM_Utils_System::download($_GET['photo'], $mimeType, $buffer,
-        NULL,
-        TRUE,
-        'inline'
+      $this->download(
+        $config->customFileUploadDir . $_GET['photo'],
+        'image/' . pathinfo($_GET['photo'], PATHINFO_EXTENSION),
+        $this->ttl
       );
       CRM_Utils_System::civiExit();
     }
     else {
       CRM_Core_Error::fatal('Photo does not exist');
     }
+  }
+
+  /**
+   * @param string $file
+   *   Local file path.
+   * @param string $mimeType
+   * @param int $ttl
+   *   Time to live (seconds).
+   */
+  protected function download($file, $mimeType, $ttl) {
+    if (!file_exists($file)) {
+      header("HTTP/1.0 404 Not Found");
+      return;
+    } elseif (!is_readable($file)) {
+      header('HTTP/1.0 403 Forbidden');
+      return;
+    }
+    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', CRM_Utils_Time::getTimeRaw() + $ttl));
+    header("Content-Type: $mimeType");
+    header("Content-Disposition: inline; filename=\"" . basename($file) . "\"");
+    header("Cache-Control: max-age=$ttl, public");
+    header('Pragma: public');
+    readfile($file);
   }
 
 }
