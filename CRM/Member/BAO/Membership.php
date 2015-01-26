@@ -2200,9 +2200,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $financialTypeID;
-    if (!$contributionType->find(TRUE)) {
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $financialTypeID;
+    if (!$financialType->find(TRUE)) {
       CRM_Core_Error::fatal(ts("Could not find a system table"));
     }
     $tempParams['amount'] = $minimumFee;
@@ -2254,7 +2254,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $tempParams,
       $result,
       $contactID,
-      $contributionType,
+      $financialType,
       $pending,
       TRUE,
       $isTest,
