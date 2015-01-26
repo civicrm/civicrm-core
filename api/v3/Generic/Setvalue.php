@@ -1,6 +1,9 @@
 <?php
 /**
- * params must contain at least id=xx & {one of the fields from getfields}=value
+ * Set a single value using the api.
+ *
+ * This function is called when no specific setvalue api exists.
+ * Params must contain at least id=xx & {one of the fields from getfields}=value
  *
  * @param array $apiRequest
  *
@@ -14,7 +17,10 @@ function civicrm_api3_generic_setValue($apiRequest) {
   civicrm_api3_verify_mandatory($params, NULL, array('id', 'field', 'value'));
   $id = $params['id'];
   if (!is_numeric($id)) {
-    return civicrm_api3_create_error(ts('Please enter a number'), array('error_code' => 'NaN', 'field' => "id"));
+    return civicrm_api3_create_error(ts('Please enter a number'), array(
+      'error_code' => 'NaN',
+      'field' => "id",
+    ));
   }
 
   $field = CRM_Utils_String::munge($params['field']);
