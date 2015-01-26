@@ -32,12 +32,11 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Case
  * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 
 /**
- * Open a new case, add client and manager roles, and add standard timeline
+ * Open a new case, add client and manager roles, and add standard timeline.
  *
  * @param array $params
  * //REQUIRED:
@@ -125,10 +124,10 @@ function civicrm_api3_case_create($params) {
 }
 
 /**
- * Adjust Metadata for Get Action
+ * Adjust Metadata for Get Action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Parameters determined by getfields.
  */
 function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
@@ -136,7 +135,7 @@ function _civicrm_api3_case_get_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Create Action
+ * Adjust Metadata for Create Action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -158,7 +157,7 @@ function _civicrm_api3_case_create_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Update action
+ * Adjust Metadata for Update action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
