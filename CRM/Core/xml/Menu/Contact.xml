@@ -398,6 +398,6 @@
   <item>
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
-    <access_arguments>view all contacts;view my contact</access_arguments>
+    <access_arguments>access CiviCRM;view my contact</access_arguments>
   </item>
 </menu>
