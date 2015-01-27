@@ -1349,7 +1349,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
 
       if ($allowEdit) {
-        $values[$dao->id]['status'] = '<a class="crm-activity-status crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-activity-change-status crm-editable-enabled" activity_id=' . $dao->id . ' current_status=' . $dao->status . ' case_id=' . $caseID . ' href="#" title=\'' . $statusTitle . '\'>' . $values[$dao->id]['status'] . '</a>';
+        $values[$dao->id]['status'] = '<div class="crmf-status_id crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-editable" data-type="select" data-action="create" data-refresh="true">' . $values[$dao->id]['status'] . '</div>';
       }
     }
     $dao->free();

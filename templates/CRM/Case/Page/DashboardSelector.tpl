@@ -118,18 +118,8 @@
 <script type="text/javascript">
 function {/literal}{$context}{$list}{literal}CaseDetails( caseId, contactId, type, context )
 {
-    var dataUrl = {/literal}"{crmURL p='civicrm/case/details' h=0 q='snippet=4&caseId='}{literal}" + caseId +'&cid=' + contactId + '&type=' + type;
-    cj.ajax({
-            url     : dataUrl,
-            dataType: "html",
-            timeout : 5000, //Time in milliseconds
-            success : function( data ){
-                  cj( '#'+ context + '-' + type +'-casedetails-' + caseId ).html( data );
-                      },
-            error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                        CRM.console('error', 'Error: ', textStatus);
-                      }
-         });
+    var dataUrl = CRM.url('civicrm/case/details', {caseId: caseId, cid: contactId, type: type});
+    CRM.loadPage(dataUrl, {target: '#'+ context + '-' + type +'-casedetails-' + caseId});
 }
 
 function showCaseActivities( caseId, type, context ) {
@@ -146,5 +136,3 @@ function hideCaseActivities( caseId , type, context ) {
 
 </script>
 {/literal}
-
-{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
