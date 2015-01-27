@@ -131,7 +131,6 @@ function loadVoterList( )
     "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
        "bServerSide": true,
        "sAjaxSource": sourceUrl,
-    "fnDrawCallback": function() { CRM.$().crmtooltip(); },
 
     "fnServerData": function ( sSource, aoData, fnCallback ) {
       var dataLength = aoData.length;
