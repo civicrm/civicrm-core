@@ -712,15 +712,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     require_once 'api/v3/examples/Contribution/Create.php';
     $result = contribution_create_example();
-    $this->assertArrayHasKey('is_error', $result, print_r($result, TRUE));
-    $contributionId = $result['id'];
     $expectedResult = contribution_create_expectedresult();
     $this->checkArrayEquals($expectedResult, $result);
-    $this->contributionDelete($contributionId);
+    $this->contributionDelete($result['id']);
   }
 
   /**
-   * Function tests that additional financial records are created when fee amount is recorded
+   * Function tests that additional financial records are created when fee amount is recorded.
    */
   public function testCreateContributionWithFee() {
     $params = array(
