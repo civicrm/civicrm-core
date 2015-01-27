@@ -712,9 +712,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     require_once 'api/v3/examples/Contribution/Create.php';
     $result = contribution_create_example();
+    $id = $result['id'];
     $expectedResult = contribution_create_expectedresult();
     $this->checkArrayEquals($expectedResult, $result);
-    $this->contributionDelete($result['id']);
+    $this->contributionDelete($id);
   }
 
   /**
