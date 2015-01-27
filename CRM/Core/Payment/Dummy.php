@@ -26,7 +26,10 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected $_doDirectPaymentResult = array();
 
   /**
+   * Set result from do Direct Payment for test purposes.
+   *
    * @param array $doDirectPaymentResult
+   *  Result to be returned from test.
    */
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
@@ -115,10 +118,15 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * @param null $errorCode
-   * @param null $errorMessage
+   * Generate error object.
    *
-   * @return object
+   * Throwing exceptions is preferred over this.
+   *
+   * @param string $errorCode
+   * @param string $errorMessage
+   *
+   * @return CRM_Core_Error
+   *   Error object.
    */
   public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
