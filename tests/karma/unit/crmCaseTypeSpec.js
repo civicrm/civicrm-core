@@ -167,11 +167,11 @@ describe('crmCaseType', function() {
     }));
 
     it('should load activity statuses', function() {
-      expect(scope.activityStatuses).toEqualData([apiCalls['actStatuses']['values']['272'], apiCalls['actStatuses']['values']['273']]);
+      expect(scope.activityStatuses).toEqualData([apiCalls.actStatuses.values['272'], apiCalls.actStatuses.values['273']]);
     });
 
     it('should load activity types', function() {
-      expect(scope.activityTypes).toEqualData(apiCalls['actTypes']['values']);
+      expect(scope.activityTypes).toEqualData(apiCalls.actTypes.values);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {
