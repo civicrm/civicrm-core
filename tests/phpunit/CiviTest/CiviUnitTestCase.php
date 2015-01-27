@@ -26,6 +26,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Payment\System;
+
 /**
  *  Include configuration
  */
@@ -2580,6 +2582,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->restoreDefaultPriceSetConfig();
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+    Civi\Payment\System::singleton()->flushProcessors();
   }
 
   public function restoreDefaultPriceSetConfig() {
