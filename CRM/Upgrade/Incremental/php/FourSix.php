@@ -125,23 +125,19 @@ class CRM_Upgrade_Incremental_php_FourSix {
     ADD COLUMN `reference_date` date COMMENT 'Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'";
     CRM_Core_DAO::executeQuery($query);
 
-    //Retrieve schedule reminders for membership entity and is not repeatable
+    //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen
     $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
  LEFT JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
- mapper.entity = 'civicrm_membership' AND schedule.is_repeat = 0";
+   mapper.entity = 'civicrm_membership' AND
+   schedule.is_repeat = 0 AND
+   schedule.start_action_date IS NOT NULL";
 
     // construct basic where clauses
     $where = array(
-        'reminder.reference_date IS NOT NULL',
-        '( m.is_override IS NULL OR m.is_override = 0 )',
-        'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)'
-      );
+      'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)'
+    ); //choose reminder older then 9 months
     $dao = CRM_Core_DAO::executeQuery($query);
     while($dao->fetch()) {
-      //if absolute date is chosen then bypass
-      if (empty($dao->start_action_date)) {
-        continue;
-      }
 
       $referenceColumn = str_replace('membership_', "m.", $dao->start_action_date);
       $value = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($dao->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)));
@@ -152,47 +148,16 @@ class CRM_Upgrade_Incremental_php_FourSix {
         $where[] = "m.membership_type_id IS NULL";
       }
 
-      // Update reference_date with action_start_date chosen, only to those which are not additional contacts
-      // (Additional contacts are include via Group/Smart Group or Manual Recipients)
-      $addtionalGroupJoin = NULL;
-      if (!is_null($dao->limit_to) && $dao->limit_to == 0) {
-        if ($dao->group_id) {
-          // CRM-13577 If smart group then use Cache table
-          $group = CRM_Contact_DAO_Group::getTableName();
-          // Get the group information
-        $sql = "
-SELECT     $group.id, $group.cache_date, $group.saved_search_id, $group.children
-FROM       $group
-WHERE      $group.id = {$dao->group_id}
-";
-          $groupDAO = CRM_Core_DAO::executeQuery($sql);
-
-          $isSmartGroup = FALSE;
-          if ($groupDAO->fetch() && !empty($groupDAO->saved_search_id)) {
-            // Check that the group is in place in the cache and up to date
-            CRM_Contact_BAO_GroupContactCache::check($dao->group_id);
-            // Set smart group flag
-            $isSmartGroup = TRUE;
-          }
-          if ($isSmartGroup) {
-            $addtionalGroupJoin = " INNER JOIN civicrm_group_contact_cache grp ON reminder.contact_id = grp.contact_id";
-            $where[] = " grp.group_id NOT IN ({$dao->group_id})";
-          }
-          else {
-            $addtionalGroupJoin = " INNER JOIN civicrm_group_contact grp ON
-  reminder.contact_id = grp.contact_id AND grp.status = 'Added'";
-            $where[] = " grp.group_id NOT IN ({$dao->group_id})";
-          }
-        }
-        if (!empty($dao->recipient_manual)) {
-          $rList = CRM_Utils_Type::escape($dao->recipient_manual, 'String');
-          $where[] = "reminder.contact_id NOT IN ({$rList})";
-        }
-      }
-
+      //Create new action_log records where action_start_date changes and exclude reminders for additional contacts
+      //and select contacts are active
       $sql = "UPDATE civicrm_action_log reminder
- LEFT JOIN civicrm_membership m ON reminder.entity_id = m.id
- {$addtionalGroupJoin}
+ LEFT JOIN civicrm_membership m
+   ON reminder.entity_id = m.id AND
+   reminder.entity_table = 'civicrm_membership' AND
+   ( m.is_override IS NULL OR m.is_override = 0 )
+ INNER JOIN civicrm_contact c
+   ON c.id = e.contact_id AND
+   c.is_deleted = 0 AND c.is_deceased = 0
  SET reminder.reference_date = {$referenceColumn}
  WHERE " . implode(" AND ", $where);
       CRM_Core_DAO::executeQuery($sql);
