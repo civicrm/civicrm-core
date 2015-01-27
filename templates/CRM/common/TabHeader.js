@@ -25,7 +25,7 @@ CRM.$(function($) {
             // Hack: "Save and done" and "Cancel" buttons submit without ajax
             $('.cancel.crm-form-submit, input[name$=upload_done]', this).on('click', function(e) {
               $(this).closest('form').ajaxFormUnbind();
-            })
+            });
           });
         }
         if (ui.tab.hasClass('livePage') && CRM.config.ajaxPopupsEnabled) {
