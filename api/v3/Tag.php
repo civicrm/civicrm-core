@@ -36,7 +36,9 @@
  */
 
 /**
- *  Add a Tag. Tags are used to classify CRM entities (including Contacts, Groups and Actions).
+ * Add a Tag.
+ *
+ * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *
  * Allowed @params array keys are:
  *
@@ -53,7 +55,9 @@ function civicrm_api3_tag_create($params) {
 }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
  *
  * @param array $params
@@ -65,15 +69,12 @@ function _civicrm_api3_tag_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Tag
+ * Delete an existing Tag.
  *
  * @param array $params
  *
- * @example TagDelete.ph
- *
  * @return array
  *   API result array
- *   {@getfields tag_delete}
  */
 function civicrm_api3_tag_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

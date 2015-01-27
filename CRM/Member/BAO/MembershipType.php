@@ -128,8 +128,18 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     if ($id) {
       self::updateAllPriceFieldValue($id, $params);
     }
-
+    self::flush();
     return $membershipType;
+  }
+
+  /**
+   * Flush anywhere that membership types might be cached
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function flush() {
+    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
+    civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
+    civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
   }
 
   /**
@@ -144,12 +154,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     //check dependencies
     $check = FALSE;
     $status = array();
-    $dependancy = array(
+    $dependency = array(
       'Membership' => 'membership_type_id',
       'MembershipBlock' => 'membership_type_default',
     );
 
-    foreach ($dependancy as $name => $field) {
+    foreach ($dependency as $name => $field) {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
       $dao->$field = $membershipTypeId;
@@ -452,16 +462,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
-    $membershipDates = array();
-
-    $dates = array(
-      'start_date' => 'startDate',
-      'end_date' => 'endDate',
-      'join_date' => 'joinDate',
+    $membershipDates = array(
+      'start_date' => CRM_Utils_Date::customFormat($startDate, '%Y%m%d'),
+      'end_date' => CRM_Utils_Date::customFormat($endDate, '%Y%m%d'),
+      'join_date' => CRM_Utils_Date::customFormat($joinDate, '%Y%m%d'),
     );
-    foreach ($dates as $varName => $valName) {
-      $membershipDates[$varName] = CRM_Utils_Date::customFormat($$valName, '%Y%m%d');
-    }
 
     return $membershipDates;
   }

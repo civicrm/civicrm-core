@@ -30,10 +30,10 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -125,7 +125,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
           ),
           'log_action' => array(
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => array('Insert' => ts('Insert'), 'Update' => ts('Update'), 'Delete' => ts('Delete')),
+            'options' => array(
+              'Insert' => ts('Insert'),
+              'Update' => ts('Update'),
+              'Delete' => ts('Delete'),
+            ),
             'title' => ts('Action'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
@@ -157,7 +161,10 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   }
 
   /**
-   * @param $rows
+   * Alter Report Display.
+   *
+   * @param array $rows
+   *   Rows from report query.
    */
   public function alterDisplay(&$rows) {
     // cache for id → is_deleted mapping
@@ -236,7 +243,9 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
   }
 
   /**
-   * @param null $logTable
+   * Generate From Clause.
+   *
+   * @param string $logTable
    */
   public function from($logTable = NULL) {
     static $entity = NULL;
