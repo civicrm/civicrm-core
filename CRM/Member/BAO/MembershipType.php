@@ -77,7 +77,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
@@ -287,9 +287,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *
    * @param int $membershipTypeId
    *   Membership type id.
-   * @param date $joinDate
+   * @param string $joinDate
    *   Member since ( in mysql date format ).
-   * @param date $startDate
+   * @param string $startDate
    *   Start date ( in mysql date format ).
    * @param null $endDate
    * @param int $numRenewTerms
@@ -348,46 +348,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         else {
           $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
         }
-
-        //get start rollover day
-        $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
-          strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
-        );
-        $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
-
-        $fixedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
-
-        //CRM-7825 -membership date rules are :
-        //1. Membership should not be start in future.
-        //2. rollover window should be subset of membership window.
-
-        //store original fixed start date as per current year.
         $actualStartDate = $fixedStartDate;
-
-        //store original fixed rollover date as per current year.
-        $actualRolloverDate = $fixedRolloverDate;
-
-        //get the fixed end date here.
-        $dateParts = explode('-', $actualStartDate);
-        $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
-          $dateParts[1],
-          $dateParts[2] - 1,
-          $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
-        ));
-
-        //make sure rollover window should be
-        //subset of membership period window.
-        if ($fixedEndDate < $actualRolloverDate) {
-          $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
-        }
-        if ($actualRolloverDate < $actualStartDate) {
-          $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
-        }
-
-        //do check signup is in rollover window.
-        if ($actualRolloverDate <= $joinDate) {
-          $fixed_period_rollover = TRUE;
-        }
+        $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $numRenewTerms, $membershipTypeDetails, $year, $fixedStartDate);
 
         if (!$startDate) {
           $startDate = $actualStartDate;
@@ -464,6 +426,62 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
 
     return $membershipDates;
+  }
+
+  /**
+   * Does this membership start between the rollover date and the start of the next period
+   * (in which case they will get an extra membership period)
+   *  ie if annual memberships run June - May & the rollover is in May memberships between
+   * May and June will return TRUE and between June and May will return FALSE
+   *
+   * @param string $startDate start date of current membership period
+   * @param integer $numRenewTerms
+   * @param array $membershipTypeDetails
+   * @param integer $year
+   * @param $fixedStartDate
+   * @return bool is this in the window where the membership gets an extra part-period added
+   */
+  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $numRenewTerms, $membershipTypeDetails, $year, $fixedStartDate) {
+
+    $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
+      strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
+    );
+    $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
+
+    $fixedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
+
+    //CRM-7825 -membership date rules are :
+    //1. Membership should not be start in future.
+    //2. rollover window should be subset of membership window.
+
+    //store original fixed start date as per current year.
+    $actualStartDate = $fixedStartDate;
+
+    //store original fixed rollover date as per current year.
+    $actualRolloverDate = $fixedRolloverDate;
+
+    //get the fixed end date here.
+    $dateParts = explode('-', $actualStartDate);
+    $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
+      $dateParts[1],
+      $dateParts[2] - 1,
+      $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+    ));
+
+    //make sure rollover window should be
+    //subset of membership period window.
+    if ($fixedEndDate < $actualRolloverDate) {
+      $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
+    }
+    if ($actualRolloverDate < $actualStartDate) {
+      $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
+    }
+
+    //do check signup is in rollover window.
+    if ($actualRolloverDate <= $startDate) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -623,7 +641,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * The function returns all the Organization for  all membershiptypes .
+   * The function returns all the Organization for  all membershipTypes .
    *
    * @param int $membershipTypeId
    *
@@ -646,7 +664,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Funtion to retrieve organization and associated membership
+   * Function to retrieve organization and associated membership
    * types
    *
    * @return array
@@ -756,9 +774,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * This function updates all price field value for quick config
    * price set which has membership type
    *
-   * @param  int $membershipTypeId membership type id
+   * @param int $membershipTypeId membership type id
    *
-   * @param  array $params
+   * @param array $params
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
     if (!empty($params['minimum_fee'])) {
