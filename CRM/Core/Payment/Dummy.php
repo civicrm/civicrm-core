@@ -33,6 +33,12 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
+    if (empty($this->_doDirectPaymentResult['trxn_id'])) {
+      $this->_doDirectPaymentResult['trxn_id'] = (array) uniqid();
+    }
+    else {
+      $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
+    }
   }
 
   /**
@@ -83,7 +89,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     );
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
-      return $this->_doDirectPaymentResult;
+      $result = $this->_doDirectPaymentResult;
+      $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
+      return $result;
     }
     if ($this->_mode == 'test') {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
