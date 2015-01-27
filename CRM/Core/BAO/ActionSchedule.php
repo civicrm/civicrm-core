@@ -1303,7 +1303,7 @@ LIMIT 0,1
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       if (!empty($updateQuery)) {
-        $dao = CRM_Core_DAO::executeQuery($referenceQuery, array(1 => array($actionSchedule->id, 'Integer')));
+        CRM_Core_DAO::executeQuery($referenceQuery, array(1 => array($actionSchedule->id, 'Integer')));
         CRM_Core_DAO::executeQuery($updateQuery, array(1 => array($actionSchedule->id, 'Integer')));
       }
 
