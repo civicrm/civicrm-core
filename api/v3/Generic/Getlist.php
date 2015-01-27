@@ -25,9 +25,10 @@
 +--------------------------------------------------------------------+
  */
 /**
- * Generic api wrapper used for quicksearch and autocomplete
+ * Generic api wrapper used for quicksearch and autocomplete.
  *
  * @param array $apiRequest
+ *
  * @return mixed
  */
 function civicrm_api3_generic_getList($apiRequest) {

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Retrieve one or more phones
+ * Retrieve one or more phones.
+ *
  * This function has been declared there instead than in api/v3/Phone.php
  * for no specific reasons, beside to demonstrate this feature
  * (that might be useful in your module, eg if you want to implement a

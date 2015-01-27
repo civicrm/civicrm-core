@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $cid;
@@ -40,6 +39,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $loggingDB;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
@@ -187,16 +187,18 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $customTables = $logging->entityCustomDataLogTables('Address');
     foreach ($customTables as $table) {
       $this->_logTables[$table] = array(
-        'fk' => 'contact_id', // for join of fk_table with contact table
+        // For join of fk_table with contact table.
+        'fk' => 'contact_id',
         'joins' => array(
-          'table' => 'log_civicrm_address', // fk_table
+          // fk_table
+          'table' => 'log_civicrm_address',
           'join' => 'entity_log_civireport.entity_id = fk_table.id',
         ),
         'log_type' => 'Contact',
       );
     }
 
-    // allow log tables to be extended via report hooks
+    // Allow log tables to be extended via report hooks.
     CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->_logTables);
 
     parent::__construct();
@@ -345,7 +347,9 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
   }
 
   /**
-   * @param $entity
+   * Get log type.
+   *
+   * @param string $entity
    *
    * @return string
    */
@@ -358,6 +362,8 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
   }
 
   /**
+   * Get entity value.
+   *
    * @param int $id
    * @param $entity
    * @param $logDate
@@ -408,6 +414,8 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
   }
 
   /**
+   * Get entity action.
+   *
    * @param int $id
    * @param int $connId
    * @param $entity
