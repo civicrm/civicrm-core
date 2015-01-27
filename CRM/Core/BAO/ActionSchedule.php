@@ -1272,8 +1272,8 @@ LEFT JOIN {$reminderJoinClause}
       // value via UNION operation
       if (strpos($selectColumns, 'reference_date') !== FALSE) {
         $dateClause = str_replace('reminder.id IS NULL', 'reminder.id IS NOT NULL', $dateClause);
-        $query .= "
-UNION
+        $referenceQuery = "
+INSERT INTO civicrm_action_log ({$selectColumns})
 {$selectClause}
 {$fromClause}
 {$joinClause}
@@ -1281,6 +1281,7 @@ UNION
 {$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
  reminder.action_date_time IS NOT NULL AND
  (reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField})
+LIMIT 0,1
 ";
 
         // As per the usage of UNION clause above we always INSERT a new reminder if reference_date (RD)
@@ -1290,6 +1291,10 @@ UNION
         $updateQuery = "UPDATE civicrm_action_log reminder
  INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id AND
  reminder.reference_date IS NOT NULL AND reminder.action_date_time IS NOT NULL
+ INNER JOIN civicrm_action_log new_reminder ON
+   new_reminder.action_schedule_id = reminder.action_schedule_id AND
+   new_reminder.reference_date = {$dateField} AND
+   new_reminder.action_date_time IS NULL
  SET reminder.reference_date = {$dateField}
  WHERE reminder.action_schedule_id = %1 AND reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField}
 ";
@@ -1298,6 +1303,7 @@ UNION
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
       if (!empty($updateQuery)) {
+        $dao = CRM_Core_DAO::executeQuery($referenceQuery, array(1 => array($actionSchedule->id, 'Integer')));
         CRM_Core_DAO::executeQuery($updateQuery, array(1 => array($actionSchedule->id, 'Integer')));
       }
 
