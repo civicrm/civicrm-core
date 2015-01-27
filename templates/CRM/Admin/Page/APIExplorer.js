@@ -44,9 +44,8 @@
 
   /**
    * Add a new "options" row
-   * @param name
    */
-  function addOptionField(name) {
+  function addOptionField() {
     if ($('.api-options-row', '#api-params').length) {
       $('.api-options-row:last', '#api-params').after($(optionsTpl({})));
     } else {
@@ -187,9 +186,8 @@
 
   /**
    * Called after getActions to populate action list
-   * @param el
    */
-  function populateActions(el) {
+  function populateActions() {
     var val = $('#api-action').val();
     $('#api-action').removeClass('loading').select2({
       data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item});}),
@@ -298,6 +296,7 @@
         last = val.slice(-1);
       // Simple types
       if (val === 'true' || val === 'false' || val === 'null') {
+        /* jshint evil: true */
         return eval(val);
       }
       // Quoted strings
@@ -453,7 +452,7 @@
     smartyStub = false;
     $.each(params, function(key, value) {
       var js = JSON.stringify(value);
-      if (!i++) {
+      if (!(i++)) {
         q.php += ", array(\n";
         q.json += ", {\n";
       } else {
