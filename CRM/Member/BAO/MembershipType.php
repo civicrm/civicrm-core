@@ -443,44 +443,42 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param int $numRenewTerms
    * @param array $membershipTypeDetails
    * @param int $year
-   * @param $fixedStartDate
+   * @param $actualStartDate
    * @return bool is this in the window where the membership gets an extra part-period added
    */
-  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $numRenewTerms, $membershipTypeDetails, $year, $fixedStartDate) {
+  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $numRenewTerms, $membershipTypeDetails, $year, $actualStartDate) {
 
     $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
       strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
     );
     $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
 
-    $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
+    $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
 
     //CRM-7825 -membership date rules are :
     //1. Membership should not be start in future.
     //2. rollover window should be subset of membership window.
 
-    //store original fixed start date as per current year.
-    $actualStartDate = $fixedStartDate;
-
     //get the fixed end date here.
     $dateParts = explode('-', $actualStartDate);
-    $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
+    $endDateOfFirstYearMembershipPeriod = date('Y-m-d', mktime(0, 0, 0,
       $dateParts[1],
       $dateParts[2] - 1,
       $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
     ));
 
-    //make sure rollover window should be
-    //subset of membership period window.
-    if ($fixedEndDate < $actualRolloverDate) {
-      $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
+    //we know the month and day of the rollover date but not the year (we're just
+    //using the start date year at the moment. So if it's after the end
+    // of the first year of membership then it's the next period & we'll adjust back a year. If it's
+    // before the start_date then it's too early & we'll adjust forward.
+    if ($endDateOfFirstYearMembershipPeriod < $calculatedRolloverDate) {
+      $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
     }
-    if ($actualRolloverDate < $actualStartDate) {
-      $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
+    if ($calculatedRolloverDate < $actualStartDate) {
+      $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
     }
 
-    //do check signup is in rollover window.
-    if ($actualRolloverDate <= $startDate) {
+    if ($calculatedRolloverDate <= $startDate) {
       return TRUE;
     }
     return FALSE;
