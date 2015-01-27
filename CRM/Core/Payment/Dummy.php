@@ -34,7 +34,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
     if (empty($this->_doDirectPaymentResult['trxn_id'])) {
-      $this->_doDirectPaymentResult['trxn_id'] = (array) uniqid();
+      $this->_doDirectPaymentResult['trxn_id'] = array();
     }
     else {
       $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
