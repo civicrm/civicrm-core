@@ -2200,9 +2200,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $financialTypeID;
-    if (!$contributionType->find(TRUE)) {
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $financialTypeID;
+    if (!$financialType->find(TRUE)) {
       CRM_Core_Error::fatal(ts("Could not find a system table"));
     }
     $tempParams['amount'] = $minimumFee;
@@ -2214,55 +2214,53 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
       if ($form->_contributeMode == 'express') {
         $result = $payment->doExpressCheckout($tempParams);
+        if (is_a($result, 'CRM_Core_Error')) {
+          throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+        }
       }
       else {
-        $result = $payment->doDirectPayment($tempParams);
+        $result = $payment->doPayment($tempParams, 'contribute');
       }
     }
 
-    if (is_a($result, 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+    //assign receive date when separate membership payment
+    //and contribution amount not selected.
+    if ($form->_amount == 0) {
+      $now = date('YmdHis');
+      $form->_params['receive_date'] = $now;
+      $receiveDate = CRM_Utils_Date::mysqlToIso($now);
+      $form->set('params', $form->_params);
+      $form->assign('receive_date', $receiveDate);
     }
-    else {
-      //assign receive date when separate membership payment
-      //and contribution amount not selected.
-      if ($form->_amount == 0) {
-        $now = date('YmdHis');
-        $form->_params['receive_date'] = $now;
-        $receiveDate = CRM_Utils_Date::mysqlToIso($now);
-        $form->set('params', $form->_params);
-        $form->assign('receive_date', $receiveDate);
-      }
 
-      $form->set('membership_trx_id', $result['trxn_id']);
-      $form->set('membership_amount', $minimumFee);
+    $form->set('membership_trx_id', $result['trxn_id']);
+    $form->set('membership_amount', $minimumFee);
 
-      $form->assign('membership_trx_id', $result['trxn_id']);
-      $form->assign('membership_amount', $minimumFee);
+    $form->assign('membership_trx_id', $result['trxn_id']);
+    $form->assign('membership_amount', $minimumFee);
 
-      // we don't need to create the user twice, so lets disable cms_create_account
-      // irrespective of the value, CRM-2888
-      $tempParams['cms_create_account'] = 0;
+    // we don't need to create the user twice, so lets disable cms_create_account
+    // irrespective of the value, CRM-2888
+    $tempParams['cms_create_account'] = 0;
 
-      $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : FALSE;
+    $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : FALSE;
 
-      //set this variable as we are not creating pledge for
-      //separate membership payment contribution.
-      //so for differentiating membership contribution from
-      //main contribution.
-      $form->_params['separate_membership_payment'] = 1;
-      $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
-        $tempParams,
-        $result,
-        $contactID,
-        $contributionType,
-        $pending,
-        TRUE,
-        $isTest,
-        $lineItems
-      );
-      return $membershipContribution;
-    }
+    //set this variable as we are not creating pledge for
+    //separate membership payment contribution.
+    //so for differentiating membership contribution from
+    //main contribution.
+    $form->_params['separate_membership_payment'] = 1;
+    $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
+      $tempParams,
+      $result,
+      $contactID,
+      $financialType,
+      $pending,
+      TRUE,
+      $isTest,
+      $lineItems
+    );
+    return $membershipContribution;
   }
 
   /**

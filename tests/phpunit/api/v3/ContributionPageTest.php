@@ -258,7 +258,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test submit recurring membership with immediate confirmation (IATS style)
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
-   * processor (IASTS style - denoted by returning trxn_id)
+   * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */

@@ -77,4 +77,14 @@ class System {
     return self::getByProcessor($processor);
   }
 
+  /**
+   * Flush processors from static cache.
+   *
+   * This is particularly used for tests.
+   *
+   */
+  public function flushProcessors() {
+    $this->cache = array();
+  }
+
 }

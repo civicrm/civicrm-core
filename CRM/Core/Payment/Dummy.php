@@ -26,10 +26,19 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected $_doDirectPaymentResult = array();
 
   /**
+   * Set result from do Direct Payment for test purposes.
+   *
    * @param array $doDirectPaymentResult
+   *  Result to be returned from test.
    */
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
+    if (empty($this->_doDirectPaymentResult['trxn_id'])) {
+      $this->_doDirectPaymentResult['trxn_id'] = array();
+    }
+    else {
+      $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
+    }
   }
 
   /**
@@ -80,7 +89,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     );
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
-      return $this->_doDirectPaymentResult;
+      $result = $this->_doDirectPaymentResult;
+      $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
+      return $result;
     }
     if ($this->_mode == 'test') {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
@@ -115,10 +126,15 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * @param null $errorCode
-   * @param null $errorMessage
+   * Generate error object.
    *
-   * @return object
+   * Throwing exceptions is preferred over this.
+   *
+   * @param string $errorCode
+   * @param string $errorMessage
+   *
+   * @return CRM_Core_Error
+   *   Error object.
    */
   public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
