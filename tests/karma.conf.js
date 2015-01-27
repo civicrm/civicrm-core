@@ -31,6 +31,10 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     port: 9876,
     reporters: ['progress'],
+    junitReporter: {
+      outputFile: 'tests/output/karma.xml',
+      suite: ''
+    },
     singleRun: false
   });
 };
