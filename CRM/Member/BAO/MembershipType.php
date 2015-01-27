@@ -453,7 +453,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     );
     $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
 
-    $fixedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
+    $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
 
     //CRM-7825 -membership date rules are :
     //1. Membership should not be start in future.
@@ -461,9 +461,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     //store original fixed start date as per current year.
     $actualStartDate = $fixedStartDate;
-
-    //store original fixed rollover date as per current year.
-    $actualRolloverDate = $fixedRolloverDate;
 
     //get the fixed end date here.
     $dateParts = explode('-', $actualStartDate);

@@ -52,14 +52,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
 
   public function setUp() {
-    //  Connect to the database
+    // Connect to the database.
     parent::setUp();
     $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     $this->_membershipTypeID2 = $this->membershipTypeCreate(array(
       'period_type' => 'fixed',
+       // Ie. 1 March.
       'fixed_period_start_day' => '301',
+      // Ie. 11 Nov.
       'fixed_period_rollover_day' => '1111',
     ));
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
@@ -97,7 +99,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_membership_delete()
+   * Test membership deletion.
    */
   public function testMembershipDelete() {
     $membershipID = $this->contactMembershipCreate($this->_params);
@@ -118,7 +120,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_membership_delete() with invalid Membership Id
+   * Test civicrm_membership_delete() with invalid Membership Id.
    */
   public function testMembershipDeleteWithInvalidMembershipId() {
     $membershipId = 'membership';
@@ -126,20 +128,17 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  All other methods calls MembershipType and MembershipContact
-   *  api, but putting simple test methods to control existence of
-   *  these methods for backwards compatibility, also verifying basic
-   *  behaviour is the same as new methods.
+   * Test membership get.
    */
   public function testContactMembershipsGet() {
     $this->_membershipID = $this->contactMembershipCreate($this->_params);
-    $params = array();
-    $this->callAPISuccess('membership', 'get', $params);
+    $this->callAPISuccess('membership', 'get', array());
     $this->callAPISuccess('Membership', 'Delete', array('id' => $this->_membershipID));
   }
 
   /**
    * Test civicrm_membership_get with params not array.
+   *
    * Gets treated as contact_id, memberships expected.
    */
   public function testGetWithParamsContactId() {
@@ -165,6 +164,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_membership_get with params not array.
+   *
    * Gets treated as contact_id, memberships expected.
    */
   public function testGetInSyntax() {
@@ -843,6 +843,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('membership', array(), 2);
   }
 
+  /**
+   * Custom hook for update membership.
+   *
+   * @param string $op
+   * @param object $objectName
+   * @param int $id
+   * @param array $params
+   *
+   * @throws \Exception
+   */
   public function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
     if ($objectName == 'Membership' && $op == 'edit') {
       $existingMembership = $this->callAPISuccessGetSingle('membership', array('id' => $params['id']));
@@ -979,6 +989,20 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test that if membership start date is not set it defaults to correct end date
    *  - fixed
+   */
+  public function testEmptyStartEndDateFixedOneYear() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 1));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2009-01-21', $result['join_date']);
+    $this->assertEquals('2008-03-01', $result['start_date']);
+    $this->assertEquals('2010-02-28', $result['end_date']);
+  }
+
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for rolling memberships.
    */
   public function testEmptyStartDateRolling() {
     unset($this->_params['start_date'], $this->_params['is_override']);
