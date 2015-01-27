@@ -435,9 +435,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * May and June will return TRUE and between June and May will return FALSE
    *
    * @param string $startDate start date of current membership period
-   * @param integer $numRenewTerms
+   * @param int $numRenewTerms
    * @param array $membershipTypeDetails
-   * @param integer $year
+   * @param int $year
    * @param $fixedStartDate
    * @return bool is this in the window where the membership gets an extra part-period added
    */
