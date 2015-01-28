@@ -1015,6 +1015,126 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2014-02-28', $result['end_date']);
   }
 
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for fixed multi year memberships.
+   *
+   * In this set our start date is after the start day and before the rollover day so we don't get an extra year
+   * and we end one day before the rollover day. Start day is 1 Jan so we end on 31 Dec
+   * and we add on 4 years rather than 5 because we are not after the rollover day - so we calculate 31 Dec 2019
+   */
+  public function testEmptyStartEndDateFixedMultiYearDateSetTwo() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+
+    $this->callAPISuccess('membership_type', 'create', array(
+      'id' => $this->_membershipTypeID2,
+      'duration_interval' => 5,
+      // Ie 1 Jan.
+      'fixed_period_start_day' => '101',
+      // Ie. 1 Nov.
+      'fixed_period_rollover_day' => '1101',
+    ));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $dates = array(
+      'start_date' => '28-Jan 2015',
+      'join_date' => '28-Jan 2015',
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, $dates));
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2015-01-28', $result['join_date']);
+    $this->assertEquals('2015-01-28', $result['start_date']);
+    $this->assertEquals('2019-12-31', $result['end_date']);
+  }
+
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for fixed single year memberships.
+   *
+   * In this set our start date is after the start day and before the rollover day so we don't get an extra year
+   * and we end one day before the rollover day. Start day is 1 Jan so we end on 31 Dec
+   * and we add on <1 years rather than > 1 because we are not after the rollover day - so we calculate 31 Dec 2015
+   */
+  public function testEmptyStartEndDateFixedSingleYearDateSetTwo() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+
+    $this->callAPISuccess('membership_type', 'create', array(
+      'id' => $this->_membershipTypeID2,
+      'duration_interval' => 1,
+      // Ie 1 Jan.
+      'fixed_period_start_day' => '101',
+      // Ie. 1 Nov.
+      'fixed_period_rollover_day' => '1101',
+    ));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $dates = array(
+      'start_date' => '28-Jan 2015',
+      'join_date' => '28-Jan 2015',
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, $dates));
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2015-01-28', $result['join_date']);
+    $this->assertEquals('2015-01-28', $result['start_date']);
+    $this->assertEquals('2015-12-31', $result['end_date']);
+  }
+
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for fixed multi year memberships.
+   *
+   * In this set our start date is after the start day and after the rollover day so we do get an extra year
+   * and we end one day before the rollover day. Start day is 1 Nov so we end on 31 Oct
+   * and we add on 5 years we are after the rollover day - so we calculate 31 Oct 2020
+   */
+  public function testEmptyStartEndDateFixedSingleYearDateSetThree() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+
+    $this->callAPISuccess('membership_type', 'create', array(
+      'id' => $this->_membershipTypeID2,
+      'duration_interval' => 1,
+      // Ie. 1 Nov.
+      'fixed_period_start_day' => '1101',
+      // Ie 1 Jan.
+      'fixed_period_rollover_day' => '101',
+    ));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $dates = array(
+      'start_date' => '28-Jan 2015',
+      'join_date' => '28-Jan 2015',
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, $dates));
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2015-01-28', $result['join_date']);
+    $this->assertEquals('2015-01-28', $result['start_date']);
+    $this->assertEquals('2016-10-31', $result['end_date']);
+  }
+
+
+  /**
+   * Test that if membership start date is not set it defaults to correct end date for fixed multi year memberships.
+   *
+   * In this set our start date is after the start day and after the rollover day so we do get an extra year
+   * and we end one day before the rollover day. Start day is 1 Nov so we end on 31 Oct
+   * and we add on 5 years we are after the rollover day - so we calculate 31 Oct 2020
+   */
+  public function testEmptyStartEndDateFixedMultiYearDateSetThree() {
+    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+
+    $this->callAPISuccess('membership_type', 'create', array(
+      'id' => $this->_membershipTypeID2,
+      'duration_interval' => 5,
+      // Ie. 1 Nov.
+      'fixed_period_start_day' => '1101',
+      // Ie 1 Jan.
+      'fixed_period_rollover_day' => '101',
+    ));
+    $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $dates = array(
+      'start_date' => '28-Jan 2015',
+      'join_date' => '28-Jan 2015',
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, $dates));
+    $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
+    $this->assertEquals('2015-01-28', $result['join_date']);
+    $this->assertEquals('2015-01-28', $result['start_date']);
+    $this->assertEquals('2020-10-31', $result['end_date']);
+  }
 
   /**
    * Test that if membership start date is not set it defaults to correct end date for fixed single year memberships.
