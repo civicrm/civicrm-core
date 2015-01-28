@@ -1,35 +1,51 @@
 <?php
 /**
- * Test Generated example of using activity_type get API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function activity_type_get_example(){
-$params = array();
 
-try{
-  $result = civicrm_api3('activity_type', 'get', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using activity_type get API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function activity_type_get_example() {
+  $params = array();
 
-return $result;
+  try{
+    $result = civicrm_api3('activity_type', 'get', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function activity_type_get_expectedresult(){
+function activity_type_get_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 48,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 50,
+    'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
       '3' => 'Email',
@@ -78,17 +94,20 @@ function activity_type_get_expectedresult(){
       '46' => 'Payment',
       '47' => 'Refund',
       '48' => 'Change Registration',
+      '49' => 'Downloaded Invoice',
+      '50' => 'Emailed Invoice',
     ),
-);
+    'deprecated' => 'The activity_type api is deprecated. Please use the option_value api instead.',
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testActivityTypeGet and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testActivityTypeGet
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTypeTest.php
 *
 * You can see the outcome of the API tests at

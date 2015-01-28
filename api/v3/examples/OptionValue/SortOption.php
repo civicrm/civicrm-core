@@ -1,56 +1,73 @@
 <?php
 /**
- * Test Generated example of using option_value getsingle API
- * demonstrates use of Sort param (available in many api functions). Also, getsingle *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function option_value_getsingle_example(){
-$params = array(
-  'option_group_id' => 1,
-  'options' => array(
+
+/**
+ * Test Generated example of using option_value getsingle API.
+ *
+ * demonstrates use of Sort param (available in many api functions). Also, getsingle
+ *
+ * @return array
+ *   API result array
+ */
+function option_value_getsingle_example() {
+  $params = array(
+    'option_group_id' => 1,
+    'options' => array(
       'sort' => 'label DESC',
       'limit' => 1,
     ),
-);
+  );
 
-try{
-  $result = civicrm_api3('option_value', 'getsingle', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+  try{
+    $result = civicrm_api3('option_value', 'getsingle', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
 
-return $result;
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function option_value_getsingle_expectedresult(){
+function option_value_getsingle_expectedresult() {
 
   $expectedResult = array(
-  'id' => '4',
-  'option_group_id' => '1',
-  'label' => 'SMS',
-  'value' => '4',
-  'filter' => 0,
-  'weight' => '4',
-  'is_optgroup' => 0,
-  'is_reserved' => 0,
-  'is_active' => '1',
-);
+    'id' => '4',
+    'option_group_id' => '1',
+    'label' => 'SMS',
+    'value' => '4',
+    'filter' => 0,
+    'weight' => '4',
+    'is_optgroup' => 0,
+    'is_reserved' => 0,
+    'is_active' => '1',
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testGetSingleValueOptionValueSort and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testGetSingleValueOptionValueSort
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/OptionValueTest.php
 *
 * You can see the outcome of the API tests at

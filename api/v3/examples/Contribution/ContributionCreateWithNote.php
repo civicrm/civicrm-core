@@ -1,92 +1,109 @@
 <?php
 /**
- * Test Generated example of using contribution create API
- * Demonstrates creating contribution with Note Entity *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function contribution_create_example(){
-$params = array(
-  'contact_id' => 1,
-  'receive_date' => '2012-01-01',
-  'total_amount' => '100',
-  'financial_type_id' => 1,
-  'payment_instrument_id' => 1,
-  'non_deductible_amount' => '10',
-  'fee_amount' => '50',
-  'net_amount' => '90',
-  'trxn_id' => 12345,
-  'invoice_id' => 67890,
-  'source' => 'SSF',
-  'contribution_status_id' => 1,
-  'note' => 'my contribution note',
-);
 
-try{
-  $result = civicrm_api3('contribution', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using contribution create API.
+ *
+ * Demonstrates creating contribution with Note Entity
+ *
+ * @return array
+ *   API result array
+ */
+function contribution_create_example() {
+  $params = array(
+    'contact_id' => 18,
+    'receive_date' => '2012-01-01',
+    'total_amount' => '100',
+    'financial_type_id' => 1,
+    'payment_instrument_id' => 1,
+    'non_deductible_amount' => '10',
+    'fee_amount' => '50',
+    'net_amount' => '90',
+    'trxn_id' => 12345,
+    'invoice_id' => 67890,
+    'source' => 'SSF',
+    'contribution_status_id' => 1,
+    'note' => 'my contribution note',
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('contribution', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function contribution_create_expectedresult(){
+function contribution_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1,
+    'values' => array(
       '1' => array(
-          'id' => '1',
-          'contact_id' => '1',
-          'financial_type_id' => '1',
-          'contribution_page_id' => '',
-          'payment_instrument_id' => '1',
-          'receive_date' => '20120101000000',
-          'non_deductible_amount' => '10',
-          'total_amount' => '100',
-          'fee_amount' => '50',
-          'net_amount' => '90',
-          'trxn_id' => '12345',
-          'invoice_id' => '67890',
-          'currency' => 'USD',
-          'cancel_date' => '',
-          'cancel_reason' => '',
-          'receipt_date' => '',
-          'thankyou_date' => '',
-          'source' => 'SSF',
-          'amount_level' => '',
-          'contribution_recur_id' => '',
-          'is_test' => '',
-          'is_pay_later' => '',
-          'contribution_status_id' => '1',
-          'address_id' => '',
-          'check_number' => '',
-          'campaign_id' => '',
-          'creditnote_id' => '',
-          'tax_amount' => '',
-          'contribution_type_id' => '1',
-        ),
+        'id' => '1',
+        'contact_id' => '18',
+        'financial_type_id' => '1',
+        'contribution_page_id' => '',
+        'payment_instrument_id' => '1',
+        'receive_date' => '20120101000000',
+        'non_deductible_amount' => '10',
+        'total_amount' => '100',
+        'fee_amount' => '50',
+        'net_amount' => '90',
+        'trxn_id' => '12345',
+        'invoice_id' => '67890',
+        'currency' => 'USD',
+        'cancel_date' => '',
+        'cancel_reason' => '',
+        'receipt_date' => '',
+        'thankyou_date' => '',
+        'source' => 'SSF',
+        'amount_level' => '',
+        'contribution_recur_id' => '',
+        'is_test' => '',
+        'is_pay_later' => '',
+        'contribution_status_id' => '1',
+        'address_id' => '',
+        'check_number' => '',
+        'campaign_id' => '',
+        'creditnote_id' => '',
+        'tax_amount' => '',
+        'contribution_type_id' => '1',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCreateContributionWithNote and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testCreateContributionWithNote
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionTest.php
 *
 * You can see the outcome of the API tests at

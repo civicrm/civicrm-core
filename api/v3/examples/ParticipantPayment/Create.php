@@ -1,55 +1,71 @@
 <?php
 /**
- * Test Generated example of using participant_payment create API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function participant_payment_create_example(){
-$params = array(
-  'participant_id' => 1,
-  'contribution_id' => 1,
-);
 
-try{
-  $result = civicrm_api3('participant_payment', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using participant_payment create API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function participant_payment_create_example() {
+  $params = array(
+    'participant_id' => 13,
+    'contribution_id' => 1,
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('participant_payment', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function participant_payment_create_expectedresult(){
+function participant_payment_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1,
+    'values' => array(
       '1' => array(
-          'id' => '1',
-          'participant_id' => '1',
-          'contribution_id' => '1',
-        ),
+        'id' => '1',
+        'participant_id' => '13',
+        'contribution_id' => '1',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testPaymentCreate and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testPaymentCreate
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantPaymentTest.php
 *
 * You can see the outcome of the API tests at
