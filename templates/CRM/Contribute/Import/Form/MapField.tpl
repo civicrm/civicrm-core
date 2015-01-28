@@ -25,7 +25,7 @@
 *}
 {* Contribution Import Wizard - Step 2 (map incoming data fields) *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
-<div class="crm-block crm-form-block crm-contribution-import-form-block id="upload-file">
+<div class="crm-block crm-form-block crm-contribution-import-form-block" id="upload-file">
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
 
