@@ -1,48 +1,64 @@
 <?php
 /**
- * Test Generated example of using entity_tag create API
- * *
+ * @file
+ * Test Generated API Example.
+ * See bottom of this file for more detail.
  */
-function entity_tag_create_example(){
-$params = array(
-  'contact_id' => 12,
-  'tag_id' => '1',
-);
 
-try{
-  $result = civicrm_api3('entity_tag', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+/**
+ * Test Generated example of using entity_tag create API.
+ *
+ *
+ * @return array
+ *   API result array
+ */
+function entity_tag_create_example() {
+  $params = array(
+    'contact_id' => 12,
+    'tag_id' => '9',
+  );
 
-return $result;
+  try{
+    $result = civicrm_api3('entity_tag', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
+
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function entity_tag_create_expectedresult(){
+function entity_tag_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'not_added' => 0,
-  'added' => 1,
-  'total_count' => 1,
-);
+    'is_error' => 0,
+    'not_added' => 0,
+    'added' => 1,
+    'total_count' => 1,
+  );
 
   return $expectedResult;
 }
 
-
-/*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testContactEntityTagCreate and can be found in
+/**
+* This example has been generated from the API test suite.
+* The test that created it is called
+* testContactEntityTagCreate
+* and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EntityTagTest.php
 *
 * You can see the outcome of the API tests at

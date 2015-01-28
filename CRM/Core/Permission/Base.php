@@ -44,12 +44,14 @@ class CRM_Core_Permission_Base {
   /**
    * Translate permission
    *
-   * @param $perm
+   * @param string $perm
+   *   Permission string e.g "administer CiviCRM", "cms:access user record", "Drupal:administer content",
+   *   "Joomla:action:com_asset"
+   *
    * @param string $nativePrefix
    * @param array $map
    *   Array($portableName => $nativeName).
    *
-   * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
    * @return NULL|string
    *   a permission name
    */
