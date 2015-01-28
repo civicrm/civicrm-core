@@ -10,6 +10,7 @@
       var crmAttachments = this;
       this._target = target;
       this.files = [];
+      this.trash = [];
       this.uploader = new FileUploader({
         url: CRM.url('civicrm/ajax/attachment'),
         onAfterAddingFile: function onAfterAddingFile(item) {
@@ -88,6 +89,26 @@
             return dfr.promise;
           });
       },
+      // Compute a digest over the list of files. The signature should change if the attachment list has changed
+      // (become dirty).
+      getAutosaveSignature: function getAutosaveSignature() {
+        var sig = [];
+        // Attachments have a special lifecycle, and attachments.queue is not properly serializable, so
+        // it takes some special effort to figure out a suitable signature. Issues which can cause gratuitous saving:
+        //  - Files move from this.uploader.queue to this.files after upload.
+        //  - File names are munged after upload.
+        //  - Deletes are performed immediately (outside the save process).
+        angular.forEach(this.files, function(item) {
+          sig.push({f: item.name.replace(/[^a-zA0-Z0-9\.]/, '_'), d: item.description});
+        });
+        angular.forEach(this.uploader.queue, function(item) {
+          sig.push({f: item.file.name.replace(/[^a-zA0-Z0-9\.]/, '_'), d: item.crmData.description});
+        });
+        angular.forEach(this.trash, function(item) {
+          sig.push({f: item.name.replace(/[^a-zA0-Z0-9\.]/, '_'), d: item.description});
+        });
+        return _.sortBy(sig, 'name');
+      },
       // @param Object file APIv3 attachment record (e.g. id, entity_table, entity_id, description)
       deleteFile: function deleteFile(file) {
         var crmAttachments = this;
@@ -97,6 +118,8 @@
           this.files.splice(idx, 1);
         }
 
+        this.trash.push(file);
+
         if (file.id) {
           var p = crmApi('Attachment', 'delete', {id: file.id}).then(
             function () { // success
@@ -105,6 +128,11 @@
               var msg = angular.isObject(response) ? response.error_message : '';
               CRM.alert(msg, ts('Deletion failed'));
               crmAttachments.files.push(file);
+
+              var trashIdx = _.indexOf(crmAttachments.trash, file);
+              if (trashIdx != -1) {
+                crmAttachments.trash.splice(trashIdx, 1);
+              }
             }
           );
           return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, p);
