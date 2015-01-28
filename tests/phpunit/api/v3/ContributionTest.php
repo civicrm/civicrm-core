@@ -460,7 +460,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'create', $params2);
     $contribution = $this->callAPISuccess('contribution', 'get', array(
       'sequential' => 1,
-      'contribution_payment_instrument_id' => 'Cash',
+      'contribution_payment_instrument' => 'Cash',
     ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
@@ -1119,7 +1119,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     //This should not be required on update:
     $old_contact_id = $original['values'][$contributionID]['contact_id'];
-    $old_payment_instrument = $original['values'][$contributionID]['payment_instrument_id'];
+    $old_payment_instrument = $original['values'][$contributionID]['instrument_id'];
     $old_fee_amount = $original['values'][$contributionID]['fee_amount'];
     $old_source = $original['values'][$contributionID]['contribution_source'];
 
@@ -1155,7 +1155,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00);
     $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId );
-    $this->assertEquals($contribution['values'][$contributionID]['payment_instrument_id'], $old_payment_instrument);
+    $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument);
     $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00);
     $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount);
     $this->assertEquals($contribution['values'][$contributionID]['net_amount'], 100.00);

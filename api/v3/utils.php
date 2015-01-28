@@ -1425,15 +1425,8 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
         if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
           break;
         }
-        if (is_array($fieldValue)) {
-          foreach($fieldValue as $fieldvalue) {
-            if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
-              throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
-            }
-          }
-        }
-        else {
-          if (!CRM_Utils_Rule::money($fieldValue) && !empty($fieldValue)) {
+        foreach((array)$fieldValue as $fieldvalue) {
+          if (!CRM_Utils_Rule::money($fieldvalue) && !empty($fieldvalue)) {
             throw new Exception($fieldName . " is  not a valid amount: " . $params[$fieldName]);
           }
         }
@@ -1951,28 +1944,21 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     }
     if ($fieldName == 'currency') {
       //When using IN operator $fieldValue is a array of currency codes
-      if (is_array($fieldValue)) {
-        foreach ($fieldValue as $currency) {
-          if (!CRM_Utils_Rule::currencyCode($currency)) {
-            throw new Exception("Currency not a valid code: $currency");
-          }
-        }
-      }
-      else {
-        if (!CRM_Utils_Rule::currencyCode($fieldValue)) {
-          throw new Exception("Currency not a valid code: $fieldValue");
+      foreach ((array)$fieldValue as $currency) {
+        if (!CRM_Utils_Rule::currencyCode($currency)) {
+          throw new Exception("Currency not a valid code: $currency");
         }
       }
     }
-    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
-      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo);
-    }
-    // Check our field length
-    elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($fieldValue)) > $fieldInfo['maxlength']) {
-      throw new API_Exception("Value for $fieldName is " . strlen(utf8_decode($value)) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
-        2100, array('field' => $fieldName)
-      );
-    }
+  }
+  if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
+    _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo);
+  }
+  // Check our field length
+  elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($fieldValue)) > $fieldInfo['maxlength']) {
+    throw new API_Exception("Value for $fieldName is " . strlen(utf8_decode($value)) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
+      2100, array('field' => $fieldName)
+    );
   }
 
   if (!empty($op)) {
@@ -2002,12 +1988,6 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     }
     $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name'], 'context' => 'validate'));
     $options = CRM_Utils_Array::value('values', $options, array());
-
-    if (count($options) == 0 && isset($pseudoconstant['table'])) {
-        $pseudoParams = $pseudoconstant;
-        unset($pseudoParams['table']);
-        $options = CRM_Core_PseudoConstant::get(CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']), $fieldName, $pseudoParams);
-    }
   }
 
   // If passed a value-separated string, explode to an array, then re-implode after matching values

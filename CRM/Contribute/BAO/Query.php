@@ -140,8 +140,9 @@ class CRM_Contribute_BAO_Query {
 
     // get payment instrument id
     if (!empty($query->_returnProperties['payment_instrument_id'])) {
+      $query->_select['instrument_id'] =  "contribution_payment_instrument.value as instrument_id";
       $query->_select['payment_instrument_id'] = "contribution_payment_instrument.value as payment_instrument_id";
-      $query->_element['payment_instrument_id'] = 1;
+      $query->_element['instrument_id'] = $query->_element['payment_instrument_id'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['contribution_payment_instrument'] = 1;
     }
@@ -378,6 +379,9 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
+      case 'contribution_payment_instrument':
+      case 'contribution_payment_instrument_id':
+        $name = str_replace('contribution_', '', $name);
       case 'payment_instrument':
       case 'payment_instrument_id':
         if ($name == 'payment_instrument') {
