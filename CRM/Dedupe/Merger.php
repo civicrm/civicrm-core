@@ -658,10 +658,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // go ahead with merge if there is no conflict
         if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode)) {
           CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
-          $resultStats['merged'][] = array('main_d' => $mainId, 'other_id' => $otherId);
+          $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
         else {
-          $resultStats['skipped'][] = array('main_d' => $mainId, 'other_id' => $otherId);
+          $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
 
         // delete entry from PrevNextCache table so we don't consider the pair next time
