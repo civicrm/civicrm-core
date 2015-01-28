@@ -111,7 +111,7 @@
             return crmMailingMgr.submit($scope.mailing);
           })
           .then(function () {
-            leave('scheduled');
+            $scope.leave('scheduled');
           })
         ;
       return block(crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise));
@@ -134,13 +134,13 @@
       return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
           .then(function () {
-            leave('unscheduled');
+            $scope.leave('unscheduled');
           })
       ));
     };
 
     // @param string listingScreen 'archive', 'scheduled', 'unscheduled'
-    function leave(listingScreen) {
+    $scope.leave = function leave(listingScreen) {
       switch (listingScreen) {
         case 'archive':
           window.location = CRM.url('civicrm/mailing/browse/archived', {
@@ -161,7 +161,7 @@
             scheduled: 'false'
           });
       }
-    }
+    };
   });
 
   // Controller for the edit-recipients fields (

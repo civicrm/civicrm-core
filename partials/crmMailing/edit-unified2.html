@@ -42,7 +42,7 @@
     </div>
 
     <button ng-disabled="block.check() || crmMailing.$invalid" ng-click="submit()">{{ts('Submit Mailing')}}</button>
-    <button ng-disabled="block.check()" ng-click="save()">{{ts('Save Draft')}}</button>
+    <button ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
     <button ng-disabled="block.check()" crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}" on-yes="delete()">{{ts('Delete Draft')}}</button>
   </div>
 </form>

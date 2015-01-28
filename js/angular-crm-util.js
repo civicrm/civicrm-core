@@ -43,7 +43,7 @@
       var blocks = 0;
       var result = function(promise) {
         blocks++;
-        promise.finally(function() {
+        return promise.finally(function() {
           blocks--;
         });
       };
