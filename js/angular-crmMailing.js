@@ -39,6 +39,12 @@
           resolve: {
             selectedMail: function($route, crmMailingMgr) {
               return crmMailingMgr.get($route.current.params.id);
+            },
+            attachments: function($route, CrmAttachments) {
+              var attachments = new CrmAttachments(function () {
+                return {entity_table: 'civicrm_mailing', entity_id: $route.current.params.id};
+              });
+              return attachments.load();
             }
           }
         });
@@ -61,12 +67,9 @@
     $location.replace();
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, CrmAttachments, crmMailingPreviewMgr, crmBlocker) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker) {
     $scope.mailing = selectedMail;
-    $scope.attachments = new CrmAttachments(function () {
-      return {entity_table: 'civicrm_mailing', entity_id: $scope.mailing.id};
-    });
-    $scope.attachments.load();
+    $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
 
     var ts = $scope.ts = CRM.ts(null);
@@ -108,7 +111,7 @@
             return crmMailingMgr.submit($scope.mailing);
           })
           .then(function () {
-            leave('scheduled');
+            $scope.leave('scheduled');
           })
         ;
       return block(crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise));
@@ -131,13 +134,13 @@
       return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')},
         crmMailingMgr.delete($scope.mailing)
           .then(function () {
-            leave('unscheduled');
+            $scope.leave('unscheduled');
           })
       ));
     };
 
     // @param string listingScreen 'archive', 'scheduled', 'unscheduled'
-    function leave(listingScreen) {
+    $scope.leave = function leave(listingScreen) {
       switch (listingScreen) {
         case 'archive':
           window.location = CRM.url('civicrm/mailing/browse/archived', {
@@ -158,7 +161,7 @@
             scheduled: 'false'
           });
       }
-    }
+    };
   });
 
   // Controller for the edit-recipients fields (
