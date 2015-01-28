@@ -163,6 +163,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
       $dao->$field = $membershipTypeId;
+      /** @noinspection PhpUndefinedMethodInspection */
       if ($dao->find(TRUE)) {
         $check = TRUE;
         $status[] = $name;
@@ -359,7 +360,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
           $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
         }
         $actualStartDate = $fixedStartDate;
-        $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $numRenewTerms, $membershipTypeDetails, $year, $fixedStartDate);
+        $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $fixedStartDate);
 
         if (!$startDate) {
           $startDate = $actualStartDate;
@@ -440,13 +441,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * May and June will return TRUE and between June and May will return FALSE
    *
    * @param string $startDate start date of current membership period
-   * @param int $numRenewTerms
    * @param array $membershipTypeDetails
    * @param int $year
-   * @param $actualStartDate
+   * @param $fixedStartDate
    * @return bool is this in the window where the membership gets an extra part-period added
    */
-  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $numRenewTerms, $membershipTypeDetails, $year, $actualStartDate) {
+  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $membershipTypeDetails, $year, $fixedStartDate) {
 
     $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
       strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
@@ -627,17 +627,17 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   array of the details of membership types with Member of Contact id
    */
   public static function getMemberOfContactByMemTypes($membershipTypes) {
-    $memTypeOrgs = array();
+    $memTypeOrganizations = array();
     if (empty($membershipTypes)) {
-      return $memTypeOrgs;
+      return $memTypeOrganizations;
     }
 
     $result = CRM_Core_DAO::executeQuery("SELECT id, member_of_contact_id FROM civicrm_membership_type WHERE id IN (" . implode(',', $membershipTypes) . ")");
     while ($result->fetch()) {
-      $memTypeOrgs[$result->id] = $result->member_of_contact_id;
+      $memTypeOrganizations[$result->id] = $result->member_of_contact_id;
     }
 
-    return $memTypeOrgs;
+    return $memTypeOrganizations;
   }
 
   /**
@@ -648,7 +648,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @return array
    */
   public static function getMembershipTypeOrganization($membershipTypeId = NULL) {
-    $allmembershipTypes = array();
+    $allMembershipTypes = array();
 
     $membershipType = new CRM_Member_DAO_MembershipType();
 
@@ -658,9 +658,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->find();
 
     while ($membershipType->fetch()) {
-      $allmembershipTypes[$membershipType->id] = $membershipType->member_of_contact_id;
+      $allMembershipTypes[$membershipType->id] = $membershipType->member_of_contact_id;
     }
-    return $allmembershipTypes;
+    return $allMembershipTypes;
   }
 
   /**
@@ -779,6 +779,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $params
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
+    $updateFields = array();
     if (!empty($params['minimum_fee'])) {
       $amount = $params['minimum_fee'];
     }
