@@ -1,6 +1,6 @@
 <div ui-jq="tabs" class="crm-tabset">
   <ul>
-    <li ng-repeat="tab in tabs">
+    <li ng-repeat="tab in tabs" class="ui-corner-all">
       <a href="#{{tab.id}}">{{tab.$parent.$eval(tab.crmTitle)}}</a>
     </li>
   </ul>

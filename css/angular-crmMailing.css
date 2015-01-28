@@ -100,7 +100,7 @@ a.crmMailing-submit-button.disabled div:hover {
   border: 1px solid #7a7;
 }
 
-.crm-container .ui-widget {
+.crm-container .crm-form-block label {
   font-size: 13px;
 }
 
