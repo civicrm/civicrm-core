@@ -1194,6 +1194,119 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Reset values for all options those are full.
+   *
+   */
+  public static function resetElementValue($optionFullIds = array(), &$form) {
+    if (!is_array($optionFullIds) ||
+      empty($optionFullIds) ||
+      !$form->isSubmitted()
+    ) {
+      return;
+    }
+
+    foreach ($optionFullIds as $fldId => $optIds) {
+      $name = "price_$fldId";
+      if (!$form->elementExists($name)) {
+        continue;
+      }
+
+      $element = $form->getElement($name);
+      $eleType = $element->getType();
+
+      $resetSubmitted = FALSE;
+      switch ($eleType) {
+        case 'text':
+          if ($element->getValue() && $element->isFrozen()) {
+            $label = "{$element->getLabel()}<tt>(x)</tt>";
+            $element->setLabel($label);
+            $element->setPersistantFreeze();
+            $resetSubmitted = TRUE;
+          }
+          break;
+
+        case 'group':
+          if (is_array($element->_elements)) {
+            foreach ($element->_elements as $child) {
+              $childType = $child->getType();
+              $methodName = 'getName';
+              if ($childType) {
+                $methodName = 'getValue';
+              }
+              if (in_array($child->{$methodName}(), $optIds) && $child->isFrozen()) {
+                $resetSubmitted = TRUE;
+                $child->setPersistantFreeze();
+              }
+            }
+          }
+          break;
+
+        case 'select':
+          if (in_array($element->getValue()[0], $optIds)) {
+            foreach ($element->_options as $option) {
+              if ($option['attr']['value'] === "crm_disabled_opt-{$element->getValue()[0]}") {
+                $placeholder = html_entity_decode($option['text']);
+                $element->updateAttributes(array('placeholder' => $placeholder));
+                break;
+              }
+            }
+            $resetSubmitted = TRUE;
+          }
+          break;
+      }
+
+      //finally unset values from submitted.
+      if ($resetSubmitted) {
+        self::resetSubmittedValue($name, $optIds, $form);
+      }
+    }
+  }
+
+  /**
+   * @param string $elementName
+   * @param array $optionIds
+   */
+  public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
+    if (empty($elementName) ||
+      !$form->elementExists($elementName) ||
+      !$form->getSubmitValue($elementName)
+    ) {
+      return;
+    }
+    foreach (array(
+               'constantValues',
+               'submitValues',
+               'defaultValues',
+             ) as $val) {
+      $values = $form->{"_$val"};
+      if (!is_array($values) || empty($values)) {
+        continue;
+      }
+      $eleVal = CRM_Utils_Array::value($elementName, $values);
+      if (empty($eleVal)) {
+        continue;
+      }
+      if (is_array($eleVal)) {
+        $found = FALSE;
+        foreach ($eleVal as $keyId => $ignore) {
+          if (in_array($keyId, $optionIds)) {
+            $found = TRUE;
+            unset($values[$elementName][$keyId]);
+          }
+        }
+        if ($found && empty($values[$elementName][$keyId])) {
+          $values[$elementName][$keyId] = NULL;
+        }
+      }
+      else {
+        if (!empty($keyId)) {
+          $values[$elementName][$keyId] = NULL;
+        }
+      }
+    }
+  }
+
+  /**
    * Validate price set submitted params for price option limit,
    * as well as user should select at least one price field option.
    *
@@ -1292,8 +1405,13 @@ WHERE  v.option_group_id = g.id
             $optionMaxValues[$priceFieldId][$optId]
               = $currentMaxValue + CRM_Utils_Array::value($optId, CRM_Utils_Array::value($priceFieldId, $optionMaxValues), 0);
           }
-
+          $soldOutPnum[$optId] = $pNum;
         }
+      }
+
+      //validate for price field selection.
+      if (empty($fieldSelected[$pNum])) {
+        $errors[$pNum]['_qf_default'] = ts('Select at least one option from Event Fee(s).');
       }
     }
 
@@ -1304,34 +1422,22 @@ WHERE  v.option_group_id = g.id
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
         $opDbCount = CRM_Utils_Array::value('db_total_count', $options[$optId], 0);
         $total += $opDbCount;
-        if ($optMax && $total > $optMax) {
-          $errors['soldOutOptions'][] = ts('Option %1 has sold out.', array(1 => $feeBlock[$fieldId]['options'][$optId]['label']));
+        if ($optMax && ($total > $optMax)) {
           if ($opDbCount && ($opDbCount >= $optMax)) {
-            $errors[$currentParticipantNum]["price_{$fieldId}"]
+            $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
               = ts('Sorry, this option is currently sold out.');
           }
           elseif (($optMax - $opDbCount) == 1) {
-            $errors[$currentParticipantNum]["price_{$fieldId}"]
+            $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
               = ts('Sorry, currently only a single seat is available for this option.', array(1 => ($optMax - $opDbCount)));
           }
           else {
-            $errors[$currentParticipantNum]["price_{$fieldId}"]
+            $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
               = ts('Sorry, currently only %1 seats are available for this option.', array(1 => ($optMax - $opDbCount)));
           }
         }
       }
     }
-
-    //validate for price field selection.
-    foreach ($params as $pNum => $values) {
-      if (!is_array($values) || $values == 'skip') {
-        continue;
-      }
-      if (empty($fieldSelected[$pNum])) {
-        $errors[$pNum]['_qf_default'] = ts('Select at least one option from Event Fee(s).');
-      }
-    }
-
     return $errors;
   }
 
