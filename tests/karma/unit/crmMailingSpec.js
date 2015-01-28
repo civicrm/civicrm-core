@@ -26,6 +26,7 @@ describe('crmMailing', function() {
 
     it('should redirect to unscheduled', function() {
       expect(navigator.redirect).toHaveBeenCalled();
+      expect(false).toBe(true);
     });
   });
 });
