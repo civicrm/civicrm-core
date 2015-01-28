@@ -353,13 +353,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $startDay = substr($membershipTypeDetails['fixed_period_start_day'], -2);
 
         if (date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year)) <= date('Y-m-d', mktime(0, 0, 0, $month, $day, $year))) {
-          $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
+          $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
         }
         else {
-          $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
+          $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
         }
-        $actualStartDate = $fixedStartDate;
-        $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $numRenewTerms, $membershipTypeDetails, $year, $fixedStartDate);
 
         if (!$startDate) {
           $startDate = $actualStartDate;
@@ -440,13 +438,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * May and June will return TRUE and between June and May will return FALSE
    *
    * @param string $startDate start date of current membership period
-   * @param int $numRenewTerms
    * @param array $membershipTypeDetails
    * @param int $year
    * @param $actualStartDate
    * @return bool is this in the window where the membership gets an extra part-period added
    */
-  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $numRenewTerms, $membershipTypeDetails, $year, $actualStartDate) {
+  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $membershipTypeDetails, $year, $actualStartDate) {
 
     $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
       strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
@@ -464,7 +461,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $endDateOfFirstYearMembershipPeriod = date('Y-m-d', mktime(0, 0, 0,
       $dateParts[1],
       $dateParts[2] - 1,
-      $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+      $dateParts[0] + 1
     ));
 
     //we know the month and day of the rollover date but not the year (we're just
