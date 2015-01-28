@@ -147,9 +147,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $defaults = array_merge($this->_defaults, $defaults);
 
     //reset values for all options those are full.
-    if (!empty($unsetSubmittedOptions) && empty($_POST)) {
-      $this->resetElementValue($unsetSubmittedOptions);
-    }
+    CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
 
     //load default campaign from page.
     if (array_key_exists('participant_campaign_id', $this->_fields)) {
@@ -569,7 +567,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $payment_processor_id = $self->params[0]['payment_processor_id'];
     CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, $self);
 
-    if ($errors) {
+    if (!empty($errors)) {
       return FALSE;
     }
 
@@ -681,13 +679,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $lineItem = array();
           CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
 
-          //build the line item..
-          if (array_key_exists($addParticipantNum, $this->_lineItem)) {
-            $this->_lineItem[$addParticipantNum] = $lineItem;
-          }
-          else {
-            $this->_lineItem[] = $lineItem;
-          }
+          //build line item array..
+          //if requireApproval/waitlist is enabled we hide fees for primary participant
+          // (and not for additional participant which might be is a bug)
+          //lineItem are not correctly build for primary participant
+          //this results in redundancy since now lineItems for additional participant will be build against primary participantNum
+          //therefore lineItems must always be build against current participant No
+          $this->_lineItem[$addParticipantNum] = $lineItem;
         }
       }
 
@@ -710,12 +708,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
 
       //build the params array.
-      if (array_key_exists($addParticipantNum, $this->_params)) {
-        $this->_params[$addParticipantNum] = $params;
-      }
-      else {
-        $this->_params[] = $params;
-      }
+      $this->_params[$addParticipantNum] = $params;
     }
 
     //finally set the params.
@@ -774,106 +767,4 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
     return FALSE;
   }
-
-  /**
-   * Reset values for all options those are full.
-   *
-   */
-  public function resetElementValue($optionFullIds = array()) {
-    if (!is_array($optionFullIds) ||
-      empty($optionFullIds) ||
-      !$this->isSubmitted()
-    ) {
-      return;
-    }
-
-    foreach ($optionFullIds as $fldId => $optIds) {
-      $name = "price_$fldId";
-      if (!$this->elementExists($name)) {
-        continue;
-      }
-
-      $element = $this->getElement($name);
-      $eleType = $element->getType();
-
-      $resetSubmitted = FALSE;
-      switch ($eleType) {
-        case 'text':
-          if ($element->isFrozen()) {
-            $element->setValue('');
-            $resetSubmitted = TRUE;
-          }
-          break;
-
-        case 'group':
-          if (is_array($element->_elements)) {
-            foreach ($element->_elements as $child) {
-              $childType = $child->getType();
-              $methodName = 'getName';
-              if ($childType) {
-                $methodName = 'getValue';
-              }
-              if (in_array($child->{$methodName}(), $optIds) && $child->isFrozen()) {
-                $resetSubmitted = TRUE;
-                $child->updateAttributes(array('checked' => NULL));
-              }
-            }
-          }
-          break;
-
-        case 'select':
-          $resetSubmitted = TRUE;
-          $element->_values = array();
-          break;
-      }
-
-      //finally unset values from submitted.
-      if ($resetSubmitted) {
-        $this->resetSubmittedValue($name, $optIds);
-      }
-    }
-  }
-
-  /**
-   * @param string $elementName
-   * @param array $optionIds
-   */
-  public function resetSubmittedValue($elementName, $optionIds = array()) {
-    if (empty($elementName) ||
-      !$this->elementExists($elementName) ||
-      !$this->getSubmitValue($elementName)
-    ) {
-      return;
-    }
-    foreach (array(
-               'constantValues',
-               'submitValues',
-               'defaultValues',
-             ) as $val) {
-      $values = &$this->{"_$val"};
-      if (!is_array($values) || empty($values)) {
-        continue;
-      }
-      $eleVal = CRM_Utils_Array::value($elementName, $values);
-      if (empty($eleVal)) {
-        continue;
-      }
-      if (is_array($eleVal)) {
-        $found = FALSE;
-        foreach ($eleVal as $keyId => $ignore) {
-          if (in_array($keyId, $optionIds)) {
-            $found = TRUE;
-            unset($values[$elementName][$keyId]);
-          }
-        }
-        if ($found && empty($values[$elementName][$keyId])) {
-          $values[$elementName][$keyId] = NULL;
-        }
-      }
-      else {
-        $values[$elementName][$keyId] = NULL;
-      }
-    }
-  }
-
 }
