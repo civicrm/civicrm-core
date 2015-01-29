@@ -351,7 +351,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
             $dateParts[1],
             $dateParts[2] - 1,
-            $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+            $dateParts[0] + 1
           ));
 
         //make sure rollover window should be
