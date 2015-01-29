@@ -1925,11 +1925,10 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
-  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
+  if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
-  // If fieldname exists in params
-  $fieldValue = !empty($fieldValue) ? $fieldValue : '';
+
   if(!is_array($fieldValue)){
     $fieldValue = (string) $fieldValue;
   }
@@ -1939,13 +1938,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     // & many save incorrectly. But can we change them wholesale?
   }
   if ($fieldValue) {
-    if (!CRM_Utils_Rule::xssString($fieldValue)) {
-      throw new Exception('Illegal characters in input (potential scripting attack)');
-    }
-    if ($fieldName == 'currency') {
-      //When using IN operator $fieldValue is a array of currency codes
-      foreach ((array)$fieldValue as $currency) {
-        if (!CRM_Utils_Rule::currencyCode($currency)) {
+    foreach ((array) $fieldValue as $value) {
+      if (!CRM_Utils_Rule::xssString($fieldValue)) {
+        throw new Exception('Illegal characters in input (potential scripting attack)');
+      }
+      if ($fieldName == 'currency') {
+        //When using IN operator $fieldValue is a array of currency codes
+        if (!CRM_Utils_Rule::currencyCode($value)) {
           throw new Exception("Currency not a valid code: $currency");
         }
       }
@@ -1979,7 +1978,6 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
  */
 function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo) {
   $options = CRM_Utils_Array::value('options', $fieldInfo);
-  $pseudoconstant = CRM_Utils_Array::value('pseudoconstant', $fieldInfo);
 
   if (!$options) {
     if (strtolower($entity) == 'profile' && !empty($fieldInfo['entity'])) {
