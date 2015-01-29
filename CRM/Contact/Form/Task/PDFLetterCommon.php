@@ -156,6 +156,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     );
 
     $config = CRM_Core_Config::singleton();
+    /* CRM-15883 Suppressing Stationery path field until we switch from DOMPDF to a library that supports it.    
     if ($config->wkhtmltopdfPath == FALSE) {
       $form->add(
         'text',
@@ -165,6 +166,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         FALSE
       );
     }
+    */
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
