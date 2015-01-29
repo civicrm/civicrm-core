@@ -360,7 +360,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         else {
           $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
         }
-;
+
         $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $actualStartDate);
 
         if (!$startDate) {
