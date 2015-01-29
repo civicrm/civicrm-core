@@ -150,7 +150,7 @@
   {/if}
   <tr>
     <td class="label">{ts}Paid By{/ts}</td>
-    <td>{$payment_instrument}</td>
+    <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 
   {if $payment_instrument eq 'Check'|ts}
