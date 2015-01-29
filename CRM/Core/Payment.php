@@ -398,8 +398,11 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
+   * Calling this from outside the payment subsystem is deprecated - use doPayment.
+   *
+   * Does a server to server payment transaction.
+   *
+   * Note that doPayment will throw an exception so the code may need to be modified
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -422,7 +425,7 @@ abstract class CRM_Core_Payment {
    *   (modified)
    * @throws CRM_Core_Exception
    */
-  public function doPayment(&$params, $component) {
+  public function doPayment(&$params, $component = 'contribute') {
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
     }
