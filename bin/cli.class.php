@@ -174,7 +174,7 @@ class civicrm_cli {
         $this->_joblog = TRUE;
       }
       else {
-        while (list($short, $long) = each($this->_additional_arguments)) {
+        foreach($this->_additional_arguments as $short => $long) {
           if ($arg == '-' . $short || $arg == '--' . $long) {
             $property = '_' . $long;
             $this->$property = $value;
