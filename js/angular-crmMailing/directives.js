@@ -190,11 +190,11 @@
       },
       template: '<input type="text" class="crmMailingToken" />',
       link: function (scope, element, attrs, crmUiIdCtrl) {
-        $(element).select2({
-          width: "10em",
+        $(element).addClass('crm-action-menu action-icon-token').select2({
+          width: "12em",
           dropdownAutoWidth: true,
           data: CRM.crmMailing.mailTokens,
-          placeholder: ts('Insert')
+          placeholder: ts('Tokens')
         });
         $(element).on('select2-selecting', function (e) {
           var id = crmUiIdCtrl.get(attrs.crmFor);

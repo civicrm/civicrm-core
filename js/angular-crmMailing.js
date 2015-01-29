@@ -404,15 +404,24 @@
       // When using dialogService with a button bar, the major button actions
       // need to be registered with the dialog widget (and not embedded in
       // the body of the dialog).
-      var buttons = {};
-      buttons[ts('Save')] = function () {
-        $scope.save().then(function (item) {
-          dialogService.close('saveTemplateDialog', item);
-        });
-      };
-      buttons[ts('Cancel')] = function () {
-        dialogService.cancel('saveTemplateDialog');
-      };
+      var buttons = [
+        {
+          text: ts('Save'),
+          icons: {primary: 'ui-icon-check'},
+          click: function () {
+            $scope.save().then(function (item) {
+              dialogService.close('saveTemplateDialog', item);
+            });
+          }
+        },
+        {
+          text: ts('Cancel'),
+          icons: {primary: 'ui-icon-close'},
+          click: function () {
+            dialogService.cancel('saveTemplateDialog');
+          }
+        }
+      ];
       dialogService.setButtons('saveTemplateDialog', buttons);
     }
 

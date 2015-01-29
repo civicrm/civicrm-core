@@ -345,21 +345,6 @@
           if (e.target === $(settings.target)[0] && data && !settings.dialog.title && data.title) {
             $(this).dialog('option', 'title', data.title);
           }
-          // Adjust height to fit content (small delay to allow elements to render)
-          window.setTimeout(function() {
-            var currentHeight = $(settings.target).parent().outerHeight(),
-              padding = currentHeight - $(settings.target).height(),
-              newHeight = $(settings.target).prop('scrollHeight') + padding,
-              menuHeight = $('#civicrm-menu').outerHeight(),
-              maxHeight = $(window).height() - menuHeight;
-            newHeight = newHeight > maxHeight ? maxHeight : newHeight;
-            if (newHeight > (currentHeight + 15)) {
-              $(settings.target).dialog('option', {
-                position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
-                height: newHeight
-              });
-            }
-          }, 500);
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -599,6 +584,27 @@
       // Destroy old unsaved dialog
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      })
+      // Auto-resize dialogs when loading content
+      .on('crmLoad', 'div.ui-dialog.ui-resizable.crm-container', function(e) {
+        var
+          $wrapper = $(this),
+          $dialog = $wrapper.children('.ui-dialog-content');
+        // small delay to allow contents to render
+        window.setTimeout(function() {
+          var currentHeight = $wrapper.outerHeight(),
+            padding = currentHeight - $dialog.height(),
+            newHeight = $dialog.prop('scrollHeight') + padding,
+            menuHeight = $('#civicrm-menu').outerHeight(),
+            maxHeight = $(window).height() - menuHeight;
+          newHeight = newHeight > maxHeight ? maxHeight : newHeight;
+          if (newHeight > (currentHeight + 15)) {
+            $dialog.dialog('option', {
+              position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
+              height: newHeight
+            });
+          }
+        }, 500);
       });
   });
 
