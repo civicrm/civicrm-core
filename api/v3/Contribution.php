@@ -292,6 +292,10 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
  */
 function civicrm_api3_contribution_transact($params) {
   // Set some params specific to payment processing
+  // @todo - fix this function - none of the results checked by civicrm_error would ever be an array with
+  // 'is_error' set
+  // also trxn_id is not saved.
+  // but since there is no test it's not desirable to jump in & make the obvious changes.
   $params['payment_processor_mode'] = empty($params['is_test']) ? 'live' : 'test';
   $params['amount'] = $params['total_amount'];
   if (!isset($params['net_amount'])) {
@@ -314,20 +318,8 @@ function civicrm_api3_contribution_transact($params) {
     return $payment;
   }
 
-  $transaction = $payment->doDirectPayment($params);
-  if (civicrm_error($transaction)) {
-    return $transaction;
-  }
+  $transaction = $payment->doPayment($params);
 
-  // but actually, $payment->doDirectPayment() doesn't return a
-  // CRM_Core_Error by itself
-  if (is_object($transaction) && get_class($transaction) == 'CRM_Core_Error') {
-    $errs = $transaction->getErrors();
-    if (!empty($errs)) {
-      $last_error = array_shift($errs);
-      return CRM_Core_Error::createApiError($last_error['message']);
-    }
-  }
   $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
   return civicrm_api('contribution', 'create', $params);
 }
