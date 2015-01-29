@@ -645,7 +645,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // Generate var $migrationInfo. The variable structure is exactly same as
         // $formValues submitted during a UI merge for a pair of contacts.
-        $rowsElementsAndInfo = &CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId);
+        $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId);
 
         $migrationInfo = &$rowsElementsAndInfo['migration_info'];
 
@@ -658,10 +658,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // go ahead with merge if there is no conflict
         if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode)) {
           CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo);
-          $resultStats['merged'][] = array('main_d' => $mainId, 'other_id' => $otherId);
+          $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
         else {
-          $resultStats['skipped'][] = array('main_d' => $mainId, 'other_id' => $otherId);
+          $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
         }
 
         // delete entry from PrevNextCache table so we don't consider the pair next time
@@ -743,14 +743,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // Rule: resolve address conflict if any -
         if ($fieldName == 'address') {
           $mainNewLocTypeId = $migrationInfo['location'][$fieldName][$fieldCount]['locTypeId'];
-          if (!empty($migrationInfo['main_loc_address']) &&
-              array_key_exists("main_{$mainNewLocTypeId}", $migrationInfo['main_loc_address'])) {
+          if (!empty($migrationInfo['main_loc_block']) &&
+              array_key_exists("main_address{$mainNewLocTypeId}", $migrationInfo['main_loc_block'])) {
             // main loc already has some address for the loc-type. Its a overwrite situation.
 
             // look for next available loc-type
             $newTypeId = NULL;
             foreach ($allLocationTypes as $typeId => $typeLabel) {
-              if (!array_key_exists("main_{$typeId}", $migrationInfo['main_loc_address'])) {
+              if (!array_key_exists("main_address{$typeId}", $migrationInfo['main_loc_block'])) {
                 $newTypeId = $typeId;
               }
             }
