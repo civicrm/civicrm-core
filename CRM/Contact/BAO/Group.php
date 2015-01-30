@@ -741,6 +741,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   static function getGroupList(&$params) {
     $config = CRM_Core_Config::singleton();
 
+    $select = $from = $where = $orderBy = $limit = '';
     $whereClause = self::whereClause($params, FALSE);
 
     //$this->pagerAToZ( $whereClause, $params );
