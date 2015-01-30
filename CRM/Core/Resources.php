@@ -566,7 +566,7 @@ class CRM_Core_Resources {
       foreach ($this->coreResourceList() as $file) {
         if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
-          $translate = (substr($file, 0, 9) != 'packages/');
+          $translate = (substr($file, 0, 3) == 'js/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
         else {
