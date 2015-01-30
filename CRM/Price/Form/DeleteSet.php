@@ -56,7 +56,6 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
    * Set up variables to build the form
    *
    * @return void
-   * @access protected
    */
   public function preProcess() {
     $this->_sid = $this->get('sid');
