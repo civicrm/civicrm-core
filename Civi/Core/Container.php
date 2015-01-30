@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -88,6 +89,20 @@ class Container {
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
+
+    // Expose legacy singletons as services in the container.
+    $singletons = array(
+      'resources' => 'CRM_Core_Resources',
+      'httpClient' => 'CRM_Utils_HttpClient',
+      // Maybe? 'config' => 'CRM_Core_Config',
+      // Maybe? 'smarty' => 'CRM_Core_Smarty',
+    );
+    foreach ($singletons as $name => $class) {
+      $container->setDefinition($name, new Definition(
+        $class
+      ))
+        ->setFactoryClass($class)->setFactoryMethod('singleton');
+    }
 
     return $container;
   }
