@@ -274,7 +274,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     //let's check if activity contact record exits and then delete.
     //looks like delete leads to deadlock when multiple simultaneous
     //requests are done. CRM-15470
-    if ($activityContact->find(TRUE)) {
+    if ($activityContact->find()) {
       $activityContact->delete();
     }
   }
@@ -2690,4 +2690,3 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
 }
-
