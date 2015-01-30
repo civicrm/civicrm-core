@@ -1353,7 +1353,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       switch ($query->_fields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field,$lookUp)) {
+          if (in_array($field, $lookUp)) {
             $sqlColumns[$fieldName] = "$fieldName varchar(255)";
           }
           else {
