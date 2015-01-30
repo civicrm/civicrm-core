@@ -108,7 +108,6 @@ function civicrm_api3_relationship_delete($params) {
  *   API Result Array
  *   {@getfields relationship_get}
  * @example RelationshipGet.php
- * @access  public
  */
 function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
