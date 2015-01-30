@@ -384,7 +384,7 @@ function _civicrm_api3_separate_values(&$values) {
       _civicrm_api3_separate_values($value);
     }
     elseif (is_string($value)) {
-      if ($key == 'case_type_id'){// this is to honor the way case API was originally written
+      if ($key == 'case_type_id') {// this is to honor the way case API was originally written
         $value = trim(str_replace($sp, ',', $value), ',');
       }
       elseif (strpos($value, $sp) !== FALSE) {
@@ -1847,7 +1847,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 
     // Check our field length
     if(is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen($fieldValue) > $fieldInfo['maxlength']
-      ){
+      ) {
       throw new API_Exception( $fieldValue . " is " . strlen($fieldValue) . " characters  - longer than $fieldName length" . $fieldInfo['maxlength'] . ' characters',
         2100, array('field' => $fieldName, "max_length"=>$fieldInfo['maxlength'])
       );
@@ -1930,7 +1930,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     return;
   }
 
-  if(!is_array($fieldValue)){
+  if (!is_array($fieldValue)) {
     $fieldValue = (string) $fieldValue;
   }
   else {
