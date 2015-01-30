@@ -443,7 +443,9 @@ class CRM_Utils_Rule {
     // ugly fix for CRM-6391: do not drop the thousand separator if
     // it looks like it’s separating decimal part (because a given
     // value undergoes a second cleanMoney() call, for example)
-    if ($mon_thousands_sep != '.' or substr($value, -3, 1) != '.') {
+    // CRM-15835 - in case the amount/value contains 0 after decimal
+    // eg 150.5 the following if condition will pass
+    if ($mon_thousands_sep != '.' or (substr($value, -3, 1) != '.' && substr($value, -2, 1) != '.')) {
       $value = str_replace($mon_thousands_sep, '', $value);
     }
 
