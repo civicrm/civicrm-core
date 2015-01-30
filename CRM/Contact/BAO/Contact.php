@@ -778,6 +778,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if (!$id) {
       return FALSE;
     }
+    // If trash is disabled in system settings then we always skip
+    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL, 1)) {
+      $skipUndelete = TRUE;
+    }
 
     // make sure we have edit permission for this contact
     // before we delete
@@ -811,14 +815,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     }
 
     $contactType = $contact->contact_type;
-    $action = ($restore) ? 'restore' : 'delete';
-
-    CRM_Utils_Hook::pre($action, $contactType, $id, CRM_Core_DAO::$_nullArray);
 
     if ($restore) {
-      self::contactTrashRestore($contact, TRUE);
-      CRM_Utils_Hook::post($action, $contactType, $contact->id, $contact);
-      return TRUE;
+      return self::contactTrashRestore($contact, TRUE);
     }
 
     // currently we only clear employer cache.
@@ -830,7 +829,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     // start a new transaction
     $transaction = new CRM_Core_Transaction();
 
-    if ($skipUndelete or !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL)) {
+    if ($skipUndelete) {
+      CRM_Utils_Hook::pre('delete', $contactType, $id, CRM_Core_DAO::$_nullArray);
 
       //delete billing address if exists.
       CRM_Contribute_BAO_Contribution::deleteAddress(NULL, $id);
@@ -887,7 +887,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $transaction->commit();
 
-    CRM_Utils_Hook::post('delete', $contactType, $contact->id, $contact);
+    if ($skipUndelete) {
+      CRM_Utils_Hook::post('delete', $contactType, $contact->id, $contact);
+    }
 
     // also reset the DB_DO global array so we can reuse the memory
     // http://issues.civicrm.org/jira/browse/CRM-4387
@@ -1062,31 +1064,34 @@ WHERE id={$id}; ";
   /**
    * Function to set is_delete true or restore deleted contact.
    *
-   * @param int $contact
+   * @param CRM_Contact_DAO_Contact $contact
    *   Contact DAO object.
    * @param bool $restore
    *   True to set the is_delete = 1 else false to restore deleted contact,
-   *                                i.e. is_delete = 0
+   *   i.e. is_delete = 0
+   *
+   * @return bool
    */
   public static function contactTrashRestore($contact, $restore = FALSE) {
-    $op = ($restore ? 'restore' : 'trash');
+    $updateParams = array(
+      'id' => $contact->id,
+      'is_deleted' => $restore ? 0 : 1,
+    );
 
-    CRM_Utils_Hook::pre($op, $contact->contact_type, $contact->id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('update', $contact->contact_type, $contact->id, $updateParams);
 
     $params = array(1 => array($contact->id, 'Integer'));
-    $isDelete = ' is_deleted = 1 ';
-    if ($restore) {
-      $isDelete = ' is_deleted = 0 ';
-    }
-    else {
+    if (!$restore) {
       $query = "DELETE FROM civicrm_uf_match WHERE contact_id = %1";
       CRM_Core_DAO::executeQuery($query, $params);
     }
 
-    $query = "UPDATE civicrm_contact SET {$isDelete} WHERE id = %1";
-    CRM_Core_DAO::executeQuery($query, $params);
+    $contact->copyValues($updateParams);
+    $contact->save();
 
-    CRM_Utils_Hook::post($op, $contact->contact_type, $contact->id, $contact);
+    CRM_Utils_Hook::post('update', $contact->contact_type, $contact->id, $contact);
+
+    return TRUE;
   }
 
   /**
