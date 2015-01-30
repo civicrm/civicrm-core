@@ -1061,8 +1061,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param bool $isForward
    *
    * @return array
-   *   (reference) array    array ref that hold array refs to the verp info, urls, and headers
-   * @access private
+   *   array ref that hold array refs to the verp info, urls, and headers
    */
   private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
