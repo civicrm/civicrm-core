@@ -14,15 +14,23 @@ class Main extends \CRM_Core_Page {
   const DEFAULT_MODULE_WEIGHT = 200;
 
   /**
+   * The resource manager.
+   *
+   * Do not use publicly. Inject your own copy!
+   *
    * @var \CRM_Core_Resources
    */
-  protected $res;
+  public $res;
 
 
   /**
+   * The Angular module manager.
+   *
+   * Do not use publicly. Inject your own copy!
+   *
    * @var \Civi\Angular\Manager
    */
-  protected $angular;
+  public $angular;
 
   /**
    * @param string $title
@@ -56,14 +64,15 @@ class Main extends \CRM_Core_Page {
    */
   public function registerResources() {
     $modules = $this->angular->getModules();
+    $page = $this; // PHP 5.3 does not propagate $this to inner functions.
 
-    $this->res->addSettingsFactory(function () use (&$modules) {
+    $this->res->addSettingsFactory(function () use (&$modules, $page) {
       // TODO optimization; client-side caching
       return array(
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
-          'cacheCode' => $this->res->getCacheCode(),
+          'cacheCode' => $page->res->getCacheCode(),
         ),
         'crmAttachment' => array(
           'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
