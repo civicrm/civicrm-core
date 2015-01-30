@@ -675,7 +675,7 @@ class CRM_Core_Resources {
       "bower_components/jquery/dist/jquery.min.js",
       "bower_components/jquery-ui/jquery-ui.min.js",
       "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
-      "packages/backbone/lodash.compat$min.js",
+      "bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
       "packages/jquery/plugins/select2/select2$min.js",
       "packages/jquery/plugins/select2/select2.css",
