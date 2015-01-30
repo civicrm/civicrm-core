@@ -11,11 +11,9 @@
   <div class="crm-block crm-form-block crmMailing">
     <div crm-ui-wizard>
       <div crm-ui-wizard-step crm-title="ts('Define Mailing')" ng-form="defineForm">
-        <div crm-ui-accordion crm-title="ts('Summary')">
-          <div crm-mailing-block-summary crm-mailing="mailing"/>
-        </div>
         <div crm-ui-tab-set>
           <div crm-ui-tab id="tab-mailing" crm-title="ts('Mailing')">
+            <div crm-mailing-block-summary crm-mailing="mailing"/>
             <div crm-mailing-block-mailing crm-mailing="mailing"/>
             <div crm-ui-accordion crm-title="ts('HTML')">
               <div crm-mailing-body-html crm-mailing="mailing"/>
