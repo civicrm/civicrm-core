@@ -672,9 +672,9 @@ class CRM_Core_Resources {
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
-      "packages/jquery/jquery-1.11.1$min.js",
-      "packages/jquery/jquery-ui/jquery-ui$min.js",
-      "packages/jquery/jquery-ui/jquery-ui$min.css",
+      "bower_components/jquery/dist/jquery.min.js",
+      "bower_components/jquery-ui/jquery-ui.min.js",
+      "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
       "packages/backbone/lodash.compat$min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
       "packages/jquery/plugins/select2/select2$min.js",
@@ -715,7 +715,7 @@ class CRM_Core_Resources {
     if ($config->lcMessages && $config->lcMessages != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $config->lcMessages);
-      $path = "packages/jquery/jquery-ui/i18n";
+      $path = "bower_components/jquery-ui/ui/i18n";
       foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {

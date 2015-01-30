@@ -15,7 +15,7 @@ if (!jQuery) {ldelim}
 var head= document.getElementsByTagName('head')[0];
 var script= document.createElement('script');
 script.type= 'text/javascript';
-script.src= CRM.config.resourceBase + 'js/packages/jquery/jquery.js';
+script.src= CRM.config.resourceBase + 'bower_components/jquery/dist/jquery.min.js';
 head.appendChild(script);
 {rdelim}
 restURL = '{crmURL p="civicrm/api/json"}';
