@@ -1108,7 +1108,7 @@ WHERE id={$id}; ";
    * @param int $id
    *   Id of the contact whose contact sub type is needed.
    *
-   * @param null $implodeDelimiter
+   * @param string $implodeDelimiter
    *
    * @return string
    *   contact_sub_type if $id found else null ""
