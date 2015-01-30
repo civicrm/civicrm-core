@@ -11,11 +11,8 @@
 
     <div crm-ui-wizard>
 
-      <div crm-ui-wizard-step crm-title="ts('Setup')" ng-form="setupForm">
-        <div crm-mailing-block-summary crm-mailing="mailing"/>
-      </div>
-
       <div crm-ui-wizard-step crm-title="ts('Content')" ng-form="contentForm">
+        <div crm-mailing-block-summary crm-mailing="mailing"/>
         <div crm-mailing-block-mailing crm-mailing="mailing"/>
         <div crm-ui-accordion crm-title="ts('HTML')">
           <div crm-mailing-body-html crm-mailing="mailing"/>
