@@ -73,6 +73,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       if ($values['to_financial_account_id']) {
         $values['to_financial_account'] = CRM_Contribute_PseudoConstant::financialAccount($values['to_financial_account_id']);
       }
+      $values['payment_processor_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'payment_processor_id');
+      if ($values['payment_processor_id']) {
+        $values['payment_processor_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', $values['payment_processor_id'], 'name');
+      }
     }
 
     if (!empty($values['contribution_recur_id'])) {
