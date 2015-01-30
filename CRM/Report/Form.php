@@ -3315,6 +3315,7 @@ ORDER BY cg.weight, cf.weight";
               while ($ogDAO->fetch()) {
                 $curFilters[$fieldName]['options'][$ogDAO->value] = $ogDAO->label;
               }
+              CRM_Utils_Hook::customFieldOptions($customDAO->cf_id, $curFilters[$fieldName]['options'], FALSE);
             }
           }
           break;
