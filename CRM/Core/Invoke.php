@@ -267,12 +267,11 @@ class CRM_Core_Invoke {
       }
 
       $result = NULL;
-      if (is_array($item['page_callback'])) {
-        if ($item['page_callback']{0} !== '\\') {
-          // Legacy class-loading for PHP 5.2 namespaces; not sure it's needed, but counter-productive for PHP 5.3 namespaces
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php';
-        }
-        $result = call_user_func($item['page_callback']);
+      // WISHLIST: Refactor this. Instead of pattern-matching on page_callback, lookup
+      // page_callback via Civi\Core\Resolver and check the implemented interfaces. This
+      // would require rethinking the default constructor.
+      if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
+        $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
       elseif (strstr($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
@@ -284,10 +283,6 @@ class CRM_Core_Invoke {
       }
       else {
         $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        if ($item['page_callback']{0} !== '\\') {
-          // Legacy class-loading for PHP 5.2 namespaces; not sure it's needed, but counter-productive for PHP 5.3 namespaces
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php';
-        }
         $mode = 'null';
         if (isset($pageArgs['mode'])) {
           $mode = $pageArgs['mode'];

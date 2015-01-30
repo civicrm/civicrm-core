@@ -126,9 +126,12 @@ class CRM_Core_Menu {
         if (strpos($key, '_callback') &&
           strpos($value, '::')
         ) {
+          // FIXME Remove the rewrite at this level. Instead, change downstream call_user_func*($value)
+          // to call_user_func*(Civi\Core\Resolver::singleton()->get($value)).
           $value = explode('::', $value);
         }
         elseif ($key == 'access_arguments') {
+          // FIXME Move the permission parser to its own class (or *maybe* CRM_Core_Permission).
           if (strpos($value, ',') ||
             strpos($value, ';')
           ) {
