@@ -23,8 +23,10 @@
       };
     })
 
+    // Display a date widget.
     // example: <input crm-ui-date="myobj.datefield" />
     // example: <input crm-ui-date="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
+    // WISHLIST: use ngModel
     .directive('crmUiDate', function ($parse, $timeout) {
       return {
         restrict: 'AE',
@@ -59,7 +61,9 @@
       };
     })
 
+    // Display a date-time widget.
     // example: <div crm-ui-date-time="myobj.mydatetimefield"></div>
+    // WISHLIST: use ngModel
     .directive('crmUiDateTime', function ($parse) {
       return {
         restrict: 'AE',
@@ -203,6 +207,7 @@
       };
     })
 
+    // Define a scope in which a name like "subform.foo" maps to a unique ID.
     // example: <div ng-form="subform" crm-ui-id-scope><label crm-ui-for="subform.foo">Foo:</label><input crm-ui-id="subform.foo" name="foo"/></div>
     .directive('crmUiIdScope', function () {
       return {
@@ -222,6 +227,7 @@
       };
     })
 
+    // Display an HTML blurb inside an IFRAME.
     // example: <iframe crm-ui-iframe="getHtmlContent()"></iframe>
     .directive('crmUiIframe', function ($parse) {
       return {
@@ -251,12 +257,13 @@
           };
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
-          //setTimeout(function () { refresh(); }, 50);
         }
       };
     })
 
+    // Define a rich text editor.
     // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
+    // WISHLIST: use ngModel
     .directive('crmUiRichtext', function ($timeout) {
       return {
         require: '?ngModel',
@@ -286,6 +293,7 @@
       };
     })
 
+    // Display a lock icon (based on a boolean).
     // example: <a crm-ui-lock binding="mymodel.boolfield"></a>
     // example: <a crm-ui-lock
     //            binding="mymodel.boolfield"
@@ -348,6 +356,7 @@
       };
     })
 
+    // Display a fancy SELECT (based on select2).
     // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" ng-model="myobj.field"><option...></select>
     .directive('crmUiSelect', function ($parse, $timeout) {
       return {
@@ -427,7 +436,9 @@
       };
     })
 
+    // Display a time-entry field.
     // example: <input crm-ui-time="myobj.mytimefield" />
+    // WISHLIST: use ngModel
     .directive('crmUiTime', function ($parse, $timeout) {
       return {
         restrict: 'AE',
@@ -458,9 +469,9 @@
       };
     })
 
+    // Generic, field-independent form validator.
     // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" />
     // example: <span ng-model="placeholder" crm-ui-validate="foo && bar || whiz" crm-ui-validate-name="myError" />
-    // Generic, field-independent validator.
     .directive('crmUiValidate', function() {
       return {
         restrict: 'EA',
