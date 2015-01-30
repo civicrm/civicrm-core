@@ -112,7 +112,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    CRM_Case_Info::onToggleComponents($this->_defaults['enableComponents'], $params['enableComponents'], NULL);
     parent::commonProcess($params);
 
     // reset navigation when components are enabled / disabled

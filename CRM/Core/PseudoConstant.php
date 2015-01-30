@@ -274,10 +274,7 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        list($className, $fnName) = explode('::', $pseudoconstant['callback']);
-        if (method_exists($className, $fnName)) {
-          return call_user_func(array($className, $fnName));
-        }
+        return call_user_func(Civi\Core\Callback::create($pseudoconstant['callback']));
       }
 
       // Merge params with schema defaults

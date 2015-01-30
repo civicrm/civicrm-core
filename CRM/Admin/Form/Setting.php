@@ -211,12 +211,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
     // save components to be enabled
     if (array_key_exists('enableComponents', $params)) {
-      CRM_Core_BAO_Setting::setItem($params['enableComponents'],
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components');
-
-      // unset params by emptying the values, so while retrieving we can detect and load from settings table
-      // instead of config-backend for backward compatibility. We could use unset() in later releases.
-      $params['enableComponents'] = $params['enableComponentIDs'] = array();
+      civicrm_api3('setting', 'create', array(
+        'enable_components' => $params['enableComponents'],
+      ));
+      unset($params['enableComponents']);
     }
 
     // save checksum timeout
