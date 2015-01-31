@@ -2579,7 +2579,7 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui/images/ui-icons_222222_256x240.png")
+  background-image: url("../bower_components/jquery-ui/themes/smoothness/images/ui-icons_222222_256x240.png")
 }
 .crm-container .delete-icon {
   background-position: -176px -96px;
@@ -2820,7 +2820,7 @@ div.grippie {
 }
 
 .crm-status-box-outer.status-start {
-  background: #F8FF03 url("../packages/jquery/jquery-ui/images/animated-overlay.gif");
+  background: #F8FF03 url("../bower_components/jquery-ui/themes/smoothness/images/animated-overlay.gif");
 }
 
 .crm-status-box-outer .crm-status-box-inner {

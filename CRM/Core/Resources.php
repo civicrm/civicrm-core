@@ -566,7 +566,7 @@ class CRM_Core_Resources {
       foreach ($this->coreResourceList() as $file) {
         if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
-          $translate = (substr($file, 0, 9) != 'packages/');
+          $translate = (substr($file, 0, 3) == 'js/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
         else {
@@ -672,10 +672,10 @@ class CRM_Core_Resources {
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
-      "packages/jquery/jquery-1.11.1$min.js",
-      "packages/jquery/jquery-ui/jquery-ui$min.js",
-      "packages/jquery/jquery-ui/jquery-ui$min.css",
-      "packages/backbone/lodash.compat$min.js",
+      "bower_components/jquery/dist/jquery.min.js",
+      "bower_components/jquery-ui/jquery-ui.min.js",
+      "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
+      "bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
       "packages/jquery/plugins/select2/select2$min.js",
       "packages/jquery/plugins/select2/select2.css",
@@ -715,7 +715,7 @@ class CRM_Core_Resources {
     if ($config->lcMessages && $config->lcMessages != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $config->lcMessages);
-      $path = "packages/jquery/jquery-ui/i18n";
+      $path = "bower_components/jquery-ui/ui/i18n";
       foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
