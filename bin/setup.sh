@@ -151,6 +151,13 @@ if [ -n "$DO_DOWNLOAD" ]; then
     fi
 
     BOWER=$(pickcmd node_modules/bower/bin/bower bower)
+    BOWER_HARD_RESET_TIME=1422672905
+    if [ -d bower_components -a $( stat bower_components -c%W ) -lt $BOWER_HARD_RESET_TIME ]; then
+      ## If you make a breaking change to bower.json, then update BOWER_HARD_RESET_TIME.
+      ## Ex: If bower.json newly declares a dependency which had been loaded transitively,
+      ## then bower may fail to update the dependency, so should bump BOWER_HARD_RESET_TIME.
+      rm -rf bower_components
+    fi
     $BOWER install
   popd
 fi
