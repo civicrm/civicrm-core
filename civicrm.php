@@ -504,6 +504,9 @@ class CiviCRM_For_WordPress {
     // modify the admin menu
     add_action( 'admin_menu', array( $this, 'add_menu_items' ) );
 
+    // set page title
+    add_filter( 'admin_title', array( $this, 'set_admin_title' ) );
+
     // if settings file does not exist, show notice with link to installer
     if ( ! CIVICRM_INSTALLED ) {
       if ( isset( $_GET['page'] ) && $_GET['page'] == 'civicrm-install' ) {
@@ -1237,6 +1240,25 @@ class CiviCRM_For_WordPress {
       'argString' => $argString
     );
 
+  }
+
+  /**
+   * Add CiviCRM's title to the header's <title>
+   *
+   * @param string $title
+   * @return string
+   */
+  public function set_admin_title($title) {
+    global $civicrm_wp_title;
+    if (!$civicrm_wp_title) {
+      return $title;
+    }
+    // Replace 1st occurance of "CiviCRM" in the title
+    $pos = strpos($title, 'CiviCRM');
+    if ($pos !== FALSE) {
+      return substr_replace($title, $civicrm_wp_title, $pos, 7);
+    }
+    return $civicrm_wp_title;
   }
 
 
