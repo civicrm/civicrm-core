@@ -135,7 +135,7 @@
             mailing.groups = {include: [], exclude: []};
             mailing.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function (mailingGroup) {
-              var bucket = (mailingGroup.entity_table == 'civicrm_group') ? 'groups' : 'mailings';
+              var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
               var entityId = parseInt(mailingGroup.entity_id);
               mailing[bucket][mailingGroup.group_type].push(entityId);
             });
