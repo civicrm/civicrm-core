@@ -3289,11 +3289,9 @@ WHERE  id IN ( $groupIDs )
   }
 
   /*
-   * Where/qill clause for greeting fields
+   * Where/qill clause for greeting fields.
    *
    * @param array $values
-   *
-   * @return void
    */
   function greetings(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
