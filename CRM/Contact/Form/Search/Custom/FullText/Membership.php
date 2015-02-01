@@ -97,6 +97,13 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
     return $tables;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
