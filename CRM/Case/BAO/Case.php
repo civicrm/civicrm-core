@@ -34,19 +34,20 @@
  */
 
 /**
- * This class contains the functions for Case Management
+ * This class contains the functions for Case Management.
  *
  */
 class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
   /**
-   * Static field for all the case information that we can potentially export
+   * Static field for all the case information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -63,9 +64,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Takes an associative array and creates a case object
+   * Create a case object.
    *
-   * the function extract all the params it needs to initialize the create a
+   * The function extracts all the params it needs to initialize the create a
    * case object. the params array could contain additional unused name/value
    * pairs
    *
@@ -82,7 +83,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
   /**
    * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
+   * and store the values in the values array.
    *
    * @param array $params
    *   Input parameters to find object.
@@ -91,7 +92,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Case_BAO_Case|null the found object or null
+   * @return CRM_Case_BAO_Case|null
+   *   The found object or null
    */
   public static function &getValues(&$params, &$values, &$ids) {
     $case = new CRM_Case_BAO_Case();
@@ -107,10 +109,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Takes an associative array and creates a case object
+   * Takes an associative array and creates a case object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Case_BAO_Case
    */
@@ -151,7 +153,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Create case contact record
+   * Create case contact record.
    *
    * @param array $params
    *   case_id, contact_id
@@ -194,11 +196,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Delet case contact record
+   * Delete case contact record.
    *
    * @param int $caseID
-   *
-   * @return void
    */
   public static function deleteCaseContact($caseID) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -214,12 +214,18 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * convert associative array names to values
-   * and vice-versa.
+   * Convert associative array names to values and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   *
+   * @param array $defaults
+   * @param string $property
+   * @param array $lookup
+   * @param bool $reverse
+   *
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
     $id = $property . '_id';
@@ -281,7 +287,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Get the case subject for Activity
+   * Get the case subject for Activity.
    *
    * @param int $activityId
    *   Activity id.
@@ -374,7 +380,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Enable disable case related relationships
+   * Enable disable case related relationships.
    *
    * @param int $caseId
    *   Case id.
@@ -400,7 +406,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Delete the activities related to case
+   * Delete the activities related to case.
    *
    * @param int $activityId
    *   Id of the activity.
@@ -440,7 +446,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Look up a case using an activity ID
+   * Look up a case using an activity ID.
    *
    * @param int $activityId
    *
@@ -505,7 +511,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Retrieve case_id by contact_id
+   * Retrieve case_id by contact_id.
    *
    * @param int $contactID
    * @param bool $includeDeleted
@@ -702,8 +708,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
   }
 
   /**
-   * Retrieve cases related to particular contact or whole contact
-   * used in Dashboad and Tab
+   * Retrieve cases related to particular contact or whole contact used in Dashboard and Tab.
    *
    * @param bool $allCases
    *
@@ -2034,14 +2039,16 @@ SELECT civicrm_contact.id as casemanager_id,
   }
 
   /**
-   * Get all cases with no end dates
+   * Get all cases with no end dates.
    *
    * @param array $params
    * @param array $excludeCaseIds
    * @param bool $excludeDeleted
    *
+   * @param bool $includeClosed
+   *
    * @return array
-   *   case and related data keyed on case id
+   *   Case and related data keyed on case id
    */
   public static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
@@ -2319,6 +2326,9 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @see CRM_Dedupe_Merger::cpTables()
    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
+   *
+   * @param int $mainContactId
+   * @param int $otherContactId
    */
   public static function mergeContacts($mainContactId, $otherContactId) {
     self::mergeCases($mainContactId, NULL, $otherContactId);
@@ -3281,6 +3291,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Helper function, also used by the upgrade in case of error
+   *
+   * @param string $section
    *
    * @return string
    */
