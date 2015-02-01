@@ -89,7 +89,7 @@
  * ie - all other amounts will return a failed response.
  *
  * -----------------------------------------------------------------------------------------------
- **/
+ */
 class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UTF-8';
@@ -102,15 +102,16 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    */
   static private $_singleton = NULL;
 
-  /**********************************************************
+  /**
+   * *******************************************************
    * Constructor
    *
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
+   * @param int $paymentProcessor
    *
-   * @return \CRM_Core_Payment_eWAY *******************************************************
+   * *******************************************************
    */
   public function __construct($mode, &$paymentProcessor) {
     // require Standard eWAY API libraries
@@ -123,10 +124,12 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     $this->_processorName = ts('eWay');
   }
 
-  /**********************************************************
+  /**
+   * *******************************************************
    * This function sends request and receives response from
    * eWAY payment process
-   **********************************************************/
+   * *******************************************************
+   */
   public function doDirectPayment(&$params) {
     if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
       CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
@@ -144,13 +147,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //------------------------------------
     // create eWAY gateway objects
     //------------------------------------
-    $eWAYRequest = new GatewayRequest;
+    $eWAYRequest = new GatewayRequest();
 
     if (($eWAYRequest == NULL) || (!($eWAYRequest instanceof GatewayRequest))) {
       return self::errorExit(9001, "Error: Unable to create eWAY Request object.");
     }
 
-    $eWAYResponse = new GatewayResponse;
+    $eWAYResponse = new GatewayResponse();
 
     if (($eWAYResponse == NULL) || (!($eWAYResponse instanceof GatewayResponse))) {
       return self::errorExit(9002, "Error: Unable to create eWAY Response object.");
@@ -420,9 +423,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     return $contribution->find();
   }
 
-  /*************************************************************************************************
+  /**
+   * **********************************************************************************************
    * This function checks the eWAY response status - returning a boolean false if status != 'true'
-   *************************************************************************************************/
+   * ************************************************************************************************
+   */
   public function isError(&$response) {
     $status = $response->Status();
 
@@ -432,9 +437,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     return FALSE;
   }
 
-  /**************************************************
+  /**
+   * ************************************************
    * Produces error message and returns from class
-   **************************************************/
+   * *************************************************
+   */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
@@ -447,14 +454,17 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     return $e;
   }
 
-  /**************************************************
+  /**
+   * ************************************************
    * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
+   * ************************************************
+   */
   public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /********************************************************************************************
+  /**
+   * *****************************************************************************************
    * This public function checks to see if we have the right processor config values set
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
@@ -467,10 +477,8 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ******************************************************************************************
+   * *****************************************************************************************
    */
-  //function checkConfig( $mode )          // CiviCRM V1.9 Declaration
-  // CiviCRM V2.0 Declaration
   public function checkConfig() {
     $errorMsg = array();
 

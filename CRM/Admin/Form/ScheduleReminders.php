@@ -67,8 +67,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     elseif ($this->_action & (CRM_Core_Action::UPDATE)) {
-      $this->_mappingID =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
+      $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
       if ($this->_context == 'event') {
         $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
       }

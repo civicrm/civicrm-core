@@ -112,7 +112,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
       array(
         'title' => ts('Access Control'),
         'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 

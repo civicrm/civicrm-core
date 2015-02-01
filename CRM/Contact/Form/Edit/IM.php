@@ -66,7 +66,7 @@ class CRM_Contact_Form_Edit_IM {
     $form->addSelect("im[$blockId][location_type_id]", array(
         'entity' => 'im',
         'class' => 'eight',
-        'placeholder' => NULL
+        'placeholder' => NULL,
       ));
 
     //IM box
