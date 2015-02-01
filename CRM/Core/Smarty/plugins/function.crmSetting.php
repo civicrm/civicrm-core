@@ -39,7 +39,7 @@
  * @param $params
  * @param $smarty
  *
- * @return int|string|void
+ * @return int|string|null
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
@@ -53,7 +53,7 @@ function smarty_function_crmSetting($params, &$smarty) {
   unset($errorScope);
   if ($result === FALSE) {
     $smarty->trigger_error("Unknown error");
-    return;
+    return NULL;
   }
 
   if (empty($params['var'])) {
