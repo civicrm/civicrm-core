@@ -33,6 +33,14 @@
  *
  */
 class CRM_Mailing_Page_Optout extends CRM_Mailing_Page_Common {
+  /**
+   * Run page.
+   *
+   * This includes assigning smarty variables and other page processing.
+   *
+   * @return string
+   * @throws Exception
+   */
   public function run() {
     $this->_type = 'optout';
     return parent::run();

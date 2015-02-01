@@ -34,7 +34,12 @@
  */
 
 /**
- * Retrieve CiviCRM settings from the api for use in templates
+ * Retrieve CiviCRM settings from the api for use in templates.
+ *
+ * @param $params
+ * @param $smarty
+ *
+ * @return int|string|void
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
