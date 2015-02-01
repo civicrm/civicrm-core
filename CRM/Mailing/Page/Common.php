@@ -36,6 +36,10 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
   protected $_type = NULL;
 
   /**
+   * Run page.
+   *
+   * This includes assigning smarty variables and other page processing.
+   *
    * @return string
    * @throws Exception
    */

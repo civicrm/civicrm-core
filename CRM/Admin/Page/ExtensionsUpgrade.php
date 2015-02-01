@@ -26,6 +26,8 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
 
   /**
    * Handle the final step of the queue
+   *
+   * @param \CRM_Queue_TaskContext $ctx
    */
   public static function onEnd(CRM_Queue_TaskContext $ctx) {
     CRM_Core_Error::debug_log_message('CRM_Admin_Page_ExtensionsUpgrade: Finish upgrades');
