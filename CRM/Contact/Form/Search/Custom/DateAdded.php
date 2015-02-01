@@ -108,6 +108,14 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }

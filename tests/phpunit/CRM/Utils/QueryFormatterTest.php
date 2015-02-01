@@ -7,6 +7,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
 
+  /**
+   * Generate data for tests to iterate through.
+   *
+   * @return array
+   */
   public function dataProvider() {
     // Array(0=>$inputText, 1=>$language, 2=>$options, 3=>$expectedText).
     $cases = array();
