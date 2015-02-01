@@ -41,6 +41,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
     parent::__construct('Participant', ts('Participants'));
   }
 
+  /**
+   * @return bool
+   */
   public function isActive() {
     $config = CRM_Core_Config::singleton();
     return in_array('CiviEvent', $config->enableComponents) &&

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Util_Smarty
+ */
 class CRM_Core_CodeGen_Util_Smarty {
   /**
    * @var CRM_Core_CodeGen_Util_Smarty
