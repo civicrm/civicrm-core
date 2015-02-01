@@ -51,58 +51,29 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Sets the title of the page
-   *
-   * @param string $title
-   * @param null $pageTitle
-   *
-   * @return void
+   * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
 
-    // get civi-wordpress instance
-    $civi = civi_wp();
+    // FIXME: Why is this global?
+    global $civicrm_wp_title;
+    $civicrm_wp_title = $title;
 
-    // do we have functionality provided by plugin version 4.6+ present?
-    if (method_exists($civi, 'civicrm_context_get')) {
-
-      // FIXME: Why is this global?
-      global $civicrm_wp_title;
-      $civicrm_wp_title = $title;
-
-      // yes, set page title, depending on context
-      $context = civi_wp()->civicrm_context_get();
-      switch ($context) {
-        case 'admin':
-        case 'shortcode':
-          $template = CRM_Core_Smarty::singleton();
-          $template->assign('pageTitle', $pageTitle);
-      }
-
-    }
-    elseif (civicrm_wp_in_civicrm()) {
-
-      // legacy pre-4.6 behaviour
-      global $civicrm_wp_title;
-      $civicrm_wp_title = $title;
-      $template = CRM_Core_Smarty::singleton();
-      $template->assign('pageTitle', $pageTitle);
-
+    // yes, set page title, depending on context
+    $context = civi_wp()->civicrm_context_get();
+    switch ($context) {
+      case 'admin':
+      case 'shortcode':
+        $template = CRM_Core_Smarty::singleton();
+        $template->assign('pageTitle', $pageTitle);
     }
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @param $breadCrumbs
-   *
-   * @internal param string $title
-   * @internal param string $url
-   *
-   * @return void
+   * @inheritDoc
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = wp_get_breadcrumb();
@@ -130,9 +101,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @return void
+   * @inheritDoc
    */
   public function resetBreadCrumb() {
     $bc = array();
@@ -140,12 +109,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append a string to the head of the html file
-   *
-   * @param string $head
-   *   The new string to be appended.
-   *
-   * @return void
+   * @inheritDoc
    */
   public function addHTMLHead($head) {
     static $registered = FALSE;
@@ -160,6 +124,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     ));
   }
 
+  /**
+   * WP action callback
+   */
   public static function _showHTMLHead() {
     $region = CRM_Core_Region::instance('wp_head', FALSE);
     if ($region) {
@@ -168,77 +135,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Add a script file
-   *
-   * @param $url : string, absolute path to file
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
-   */
-  public function addScriptUrl($url, $region) {
-    return FALSE;
-  }
-
-  /**
-   * Add an inline script
-   *
-   * @param $code : string, javascript code
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
-   */
-  public function addScript($code, $region) {
-    return FALSE;
-  }
-
-  /**
-   * Add a css file
-   *
-   * @param $url : string, absolute path to file
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
-   */
-  public function addStyleUrl($url, $region) {
-    return FALSE;
-  }
-
-  /**
-   * Add an inline style
-   *
-   * @param $code : string, css code
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
-   */
-  public function addStyle($code, $region) {
-    return FALSE;
-  }
-
-  /**
-   * Rewrite various system urls to https
-   *
-   * @return void
+   * @inheritDoc
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -246,44 +143,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Figure out the post url for the form
-   *
-   * @param mix $action
-   *   The default action if one is pre-specified.
-   *
-   * @return string
-   *   the url to post the form
-   */
-  public function postURL($action) {
-    if (!empty($action)) {
-      return $action;
-    }
-
-    return $this->url($_GET['q'], NULL, TRUE, NULL, FALSE);
-  }
-
-  /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param string $path
-   *   The path being linked to, such as "civicrm/add".
-   * @param string $query
-   *   A query string to append to the link.
-   * @param bool $absolute
-   *   Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param string $fragment
-   *   A fragment identifier (named anchor) to append to the link.
-   * @param bool $htmlize
-   *   whether to convert to html eqivalant.
-   * @param bool $frontend
-   *   a gross joomla hack.
-   *
-   * @param bool $forceBackend
-   *
-   * @return string
-   *   an HTML string containing a link to the given path.
+   * @inheritDoc
    */
   public function url(
     $path = NULL,
@@ -390,18 +250,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Authenticate the user against the wordpress db
-   *
-   * @param string $name
-   *   The user name.
-   * @param string $password
-   *   The password for the above user name.
-   *
-   * @param bool $loadCMSBootstrap
-   * @param null $realPath
-   *
-   * @return array|bool
-   *   [contactID, ufID, uniqueString] if success else false if no auth
+   * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -415,7 +264,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       return FALSE;
     }
 
-    // need to change this to make sure we matched only one row
+    // TODO: need to change this to make sure we matched only one row
 
     CRM_Core_BAO_UFMatch::synchronizeUFMatch($user->data, $user->data->ID, $user->data->user_email, 'WordPress');
     $contactID = CRM_Core_BAO_UFMatch::getContactId($user->data->ID);
@@ -426,28 +275,28 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Set a message in the UF to display to a user
-   *
-   * @param string $message
-   *   The message to set.
-   *
+   * FIXME: Do something
    */
   public function setMessage($message) {
   }
 
   /**
-   * @param $user
-   *
-   * @return bool
+   * FIXME: Do something
    */
   public function loadUser($user) {
     return TRUE;
   }
 
+  /**
+   * FIXME: Use CMS-native approach
+   */
   public function permissionDenied() {
     CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function logout() {
     // destroy session
     if (session_id()) {
@@ -457,14 +306,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     wp_redirect(wp_login_url());
   }
 
-  public function updateCategories() {
-  }
-
   /**
-   * Get the locale set in the hosting CMS
-   *
-   * @return string
-   *   with the locale or null for none
+   * @inheritDoc
    */
   public function getUFLocale() {
     // WPML plugin
@@ -570,10 +413,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param array $params
-   * @param $mail
-   *
-   * @return mixed
+   * @inheritDoc
    */
   public function createUser(&$params, $mail) {
     $user_data = array(
@@ -609,12 +449,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Change user name in host CMS
-   *
-   * @param int $ufID
-   *   User ID in CMS.
-   * @param string $ufName
-   *   User name.
+   * @inheritDoc
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-10620
@@ -664,9 +499,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check is user logged in.
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -690,10 +523,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get currently logged in user uf id.
-   *
-   * @return int
-   *   $userID logged in user uf id.
+   * @inheritDoc
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -702,10 +532,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get currently logged in user unique identifier - this tends to be the email address or user name.
-   *
-   * @return string
-   *   logged in user unique identifier
+   * @inheritDoc
    */
   public function getLoggedInUniqueIdentifier() {
     $user = $this->getLoggedInUserObject();
@@ -724,24 +551,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user
-   *   Object as described by the User Framework.
-   * @return int|null
-   *   Unique identifier from the user Framework system
+   * @inheritDoc
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->user_email) ? NULL : $user->user_email;
   }
 
   /**
-   * Get user login URL for hosting CMS (method declared in each CMS system class)
-   *
-   * @param string $destination
-   *   If present, add destination to querystring (works for Drupal only).
-   *
-   * @return string
-   *   loginURL for the current CMS
+   * @inheritDoc
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
@@ -751,17 +568,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * FIXME: Do something
    */
   public function getLoginDestination(&$form) {
     return NULL;
   }
 
   /**
-   * Return the current WordPress version if relevant function exists
-   *
-   * @return string
-   *   version number
+   * @inheritDoc
    */
   public function getVersion() {
     if (function_exists('get_bloginfo')) {
@@ -773,20 +587,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get timezone as a string
-   * @return string
-   *   Timezone e.g. 'America/Los_Angeles'
+   * @inheritDoc
    */
   public function getTimeZoneString() {
     return get_option('timezone_string');
   }
 
   /**
-   * Get Url to view user record
-   * @param int $contactID
-   *   Contact ID.
-   *
-   * @return string
+   * @inheritDoc
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
