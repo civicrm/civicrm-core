@@ -34,6 +34,9 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('Participant', ts('Participants'));
   }
