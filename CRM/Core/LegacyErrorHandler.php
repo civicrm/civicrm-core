@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_LegacyErrorHandler
+ */
 class CRM_Core_LegacyErrorHandler {
   /**
    * @param \Civi\Core\Event\UnhandledExceptionEvent $event

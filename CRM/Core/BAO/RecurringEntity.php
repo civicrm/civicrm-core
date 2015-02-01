@@ -35,6 +35,9 @@
 
 require_once 'packages/When/When.php';
 
+/**
+ * Class CRM_Core_BAO_RecurringEntity
+ */
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   const RUNNING = 1;
