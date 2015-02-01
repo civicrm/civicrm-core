@@ -54,7 +54,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     static $mailSettings = array();
     $domainID = CRM_Core_Config::domainID();
     if (empty($mailSettings[$domainID]) || $reset) {
-      $dao = new self;
+      $dao = new self();
       $dao->is_default = 1;
       $dao->domain_id = $domainID;
       $dao->find(TRUE);
@@ -96,7 +96,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Return the "include message ID" flag from the default set of settings.
    *
-   * @return boolean
+   * @return bool
    *   default include message ID
    */
   public static function includeMessageId() {

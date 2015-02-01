@@ -1300,13 +1300,13 @@ class CRM_Utils_System {
    * @param array $params
    *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
    *
-   * @return string|void
+   * @return void|string
    *   URL or link to documentation page, based on provided parameters.
    */
   public static function docURL($params) {
 
     if (!isset($params['page'])) {
-      return;
+      return NULL;
     }
 
     if (CRM_Utils_Array::value('resource', $params) == 'wiki') {
@@ -1464,16 +1464,12 @@ class CRM_Utils_System {
     CRM_ACL_BAO_Cache::resetCache();
 
     // reset various static arrays used here
-    CRM_Contact_BAO_Contact::$_importableFields
-      = CRM_Contact_BAO_Contact::$_exportableFields
+    CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
       = CRM_Contribute_BAO_Contribution::$_importableFields
-      = CRM_Contribute_BAO_Contribution::$_exportableFields
-      = CRM_Pledge_BAO_Pledge::$_exportableFields
-      = CRM_Contribute_BAO_Query::$_contributionFields
-      = CRM_Core_BAO_CustomField::$_importFields
-      = CRM_Core_BAO_Cache::$_cache
-      = CRM_Core_DAO::$_dbColumnValueCache
-      = NULL;
+        = CRM_Contribute_BAO_Contribution::$_exportableFields
+          = CRM_Pledge_BAO_Pledge::$_exportableFields = CRM_Contribute_BAO_Query::$_contributionFields
+            = CRM_Core_BAO_CustomField::$_importFields
+              = CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();

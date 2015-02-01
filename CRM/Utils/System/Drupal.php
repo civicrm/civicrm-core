@@ -416,8 +416,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Rewrite various system urls to https
    *
-   * @param null
-   *
    * @return void
    */
   public function mapConfigToSSL() {
@@ -454,10 +452,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *   Load cms bootstrap?.
    * @param NULL|string $realPath filename of script
    *
-   * @return mixed
-   *   false if no auth
-   *               array(
-   *  contactID, ufID, unique string ) if success
+   * @return mixed false if no auth array(contactID, ufID, unique string ) if success
    */
   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
@@ -561,7 +556,7 @@ AND    u.status = 1
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
    *
-   * @param array params
+   * @param array $params
    *
    * FIXME: Document values accepted/required by $params
    */
@@ -815,7 +810,7 @@ AND    u.status = 1
   /**
    * Check is user logged in.
    *
-   * @return boolean
+   * @return bool
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;

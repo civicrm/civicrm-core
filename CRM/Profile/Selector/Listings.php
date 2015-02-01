@@ -129,17 +129,16 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * Class constructor
    *
-   * @param array $params
-   * @param $customFields
-   * @param string params the params for the where clause
-   *
+   * @param array $params the params for the where clause
+   * @param array $customFields
+   * @param array $ufGroupIds
    * @param bool $map
    * @param bool $editLink
    * @param bool $linkToUF
    *
    * @return \CRM_Profile_Selector_Listings
    */
-  function __construct(
+  public function __construct(
     &$params,
     &$customFields,
     $ufGroupIds = NULL,
@@ -274,8 +273,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $status =
-      CRM_Utils_System::isNull($this->_multiRecordTableName) ? ts('Contact %%StatusMessage%%') : ts('Contact Multi Records %%StatusMessage%%');
+    $status = CRM_Utils_System::isNull($this->_multiRecordTableName) ? ts('Contact %%StatusMessage%%') : ts('Contact Multi Records %%StatusMessage%%');
     $params['status'] = $status;
     $params['csvString'] = NULL;
     $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
@@ -341,7 +339,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
               if (in_array($fieldName, array(
                 'phone',
                 'im',
-                'email'
+                'email',
               ))) {
                 if ($type) {
                   $name = "`$locationTypeName-$fieldName-$type`";
@@ -552,7 +550,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             if (in_array($fieldName, array(
               'phone',
               'im',
-              'email'
+              'email',
             ))) {
               if ($type) {
                 $names[] = "{$locationTypeName}-{$fieldName}-{$type}";
@@ -665,14 +663,14 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         elseif (in_array($name, array(
           'addressee',
           'email_greeting',
-          'postal_greeting'
+          'postal_greeting',
         ))) {
           $dname = $name . '_display';
           $row[] = $result->$dname;
         }
         elseif (in_array($name, array(
           'birth_date',
-          'deceased_date'
+          'deceased_date',
         ))) {
           $row[] = CRM_Utils_Date::customFormat($result->$name);
         }
@@ -771,10 +769,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           }
 
           if ($isSubmitted) {
-            $this->_multiRecordTableName = $multiRecordTableName =
-              CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
+            $this->_multiRecordTableName
+              = $multiRecordTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
             if ($multiRecordTableName) {
-              return;
+              return NULL;
             }
           }
 
@@ -786,14 +784,14 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
 
     if (!isset($customGroupId) || !$customGroupId) {
-      return;
+      return NULL;
     }
 
     //if the field is in selector and not a searchable field
     //get the proper customvalue table name
     if ($selectorSet) {
-      $this->_multiRecordTableName = $multiRecordTableName =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
+      $this->_multiRecordTableName
+        = $multiRecordTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
     }
   } //func close
 }

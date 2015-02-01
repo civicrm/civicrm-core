@@ -341,11 +341,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('activity', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPISuccess('activity', 'get', array(
-        'id' => $result['id'],
-        'version' => $this->_apiversion,
-        'return.assignee_contact_id' => 1,
-        'return.target_contact_id' => 1
-      ));
+      'id' => $result['id'],
+      'version' => $this->_apiversion,
+      'return.assignee_contact_id' => 1,
+      'return.target_contact_id' => 1,
+    ));
 
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['assignee_contact_id'][0], 'in line ' . __LINE__);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['target_contact_id'][0], 'in line ' . __LINE__);
@@ -371,10 +371,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['custom_' . $ids['custom_field_id']] = "custom string";
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $result = $this->callAPISuccess($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'version' => 3,
-        'id' => $result['id']
-      ));
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
     $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -408,9 +408,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile, 'Create');
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
-        'return.custom_' . $customField['id'] => 1,
-        'id' => $result['id']
-      ), __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet', 'get');
+      'return.custom_' . $customField['id'] => 1,
+      'id' => $result['id'],
+    ), __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet', 'get');
 
     $this->assertEquals('Anderson, Anthony', $result['values'][$result['id']]['custom_' . $customField['id']], ' in line ' . __LINE__);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
@@ -590,18 +590,18 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
     $activityget = $this->callAPISuccess('Activity', 'get', array(
-        'id' => $activity['id'],
-        'target_contact_id' => $contact2,
-        'return.target_contact_id' => 1
-      ));
+      'id' => $activity['id'],
+      'target_contact_id' => $contact2,
+      'return.target_contact_id' => 1,
+    ));
     $this->assertEquals($activity['id'], $activityget['id'], 'In line ' . __LINE__);
     $this->assertEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
 
     $activityget = $this->callAPISuccess('activity', 'get', array(
-        'target_contact_id' => $this->_contactID,
-        'return.target_contact_id' => 1,
-        'id' => $activity['id']
-      ));
+      'target_contact_id' => $this->_contactID,
+      'return.target_contact_id' => 1,
+      'id' => $activity['id'],
+    ));
     if ($activityget['count'] > 0) {
       $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
     }
@@ -633,7 +633,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
     $result = $this->callAPISuccess('Activity', 'Get', array(
       'version' => $this->_apiversion,
-      'status_id' => '2'
+      'status_id' => '2',
     ));
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
 
@@ -890,10 +890,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $activityId = $result['id'];
     $result = $this->callAPISuccess($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'version' => 3,
-        'id' => $result['id']
-      ));
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
     $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
     $this->assertEquals("2009-10-18 00:00:00", $result['values'][$result['id']]['activity_date_time'], ' in line ' . __LINE__);
     $fields = $this->callAPISuccess('activity', 'getfields', array('version' => $this->_apiversion));
@@ -914,10 +914,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Activity', 'Create', $params);
 
     $result = $this->callAPISuccess($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'version' => 3,
-        'id' => $result['id']
-      ));
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
     $this->assertEquals("Updated my test data", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
   }
 
@@ -1130,7 +1130,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       ),
       'api.activity.create' => array(
         'subject' => 'send letter',
-        'activity_type_id' => '$value.api.activity_type.create.values.0.value'
+        'activity_type_id' => '$value.api.activity_type.create.values.0.value',
       ),
     ));
 

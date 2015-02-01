@@ -39,8 +39,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
 
   /**
    * called when action is browse
-   *
-   * @return null
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple(
@@ -283,8 +281,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   /**
    * used for the to show the associated
    * contribution for the participant
-   *
-   * @return null
    */
   public function associatedContribution() {
     if (CRM_Core_Permission::access('CiviContribute')) {

@@ -103,13 +103,10 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   }
 
   public function postProcess() {
-
     $values = $this->exportValues();
 
     // check if EmailTyped matches Email address
     $result = CRM_Utils_String::compareStr($this->_email, $values['email_confirm'], TRUE);
-
-
     $job_id = $this->_job_id;
     $queue_id = $this->_queue_id;
     $hash = $this->_hash;
