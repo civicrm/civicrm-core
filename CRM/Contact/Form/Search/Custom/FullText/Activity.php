@@ -34,10 +34,16 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('Activity', ts('Activities'));
   }
 
+  /**
+   * @return bool
+   */
   public function isActive() {
     return CRM_Core_Permission::check('view all activities');
   }

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Case_ManagedEntities
+ */
 class CRM_Case_ManagedEntities {
 
   /**

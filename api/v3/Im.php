@@ -35,10 +35,7 @@
  */
 
 /**
- *  Add an IM for a contact
- *
- * Allowed @params array keys are:
- * {@getfields im_create}
+ *  Add an IM for a contact.
  *
  * @param array $params
  *
@@ -50,9 +47,10 @@ function civicrm_api3_im_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -61,7 +59,7 @@ function _civicrm_api3_im_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing IM
+ * Deletes an existing IM.
  *
  * @param array $params
  *

@@ -7,6 +7,11 @@
  */
 class CRM_Core_ManagedEntities {
 
+  /**
+   * Get clean up options.
+   *
+   * @return array
+   */
   public static function getCleanupOptions() {
     return array(
       'always' => ts('Always'),

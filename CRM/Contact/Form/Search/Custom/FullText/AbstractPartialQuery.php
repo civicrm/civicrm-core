@@ -45,6 +45,8 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
   protected $label;
 
   /**
+   * Class constructor.
+   *
    * @param string $name
    * @param string $label
    */

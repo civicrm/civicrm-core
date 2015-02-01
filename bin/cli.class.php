@@ -77,6 +77,11 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * Ensure function is being run from the cli.
+   *
+   * @return bool
+   */
   public function _accessing_from_cli() {
     if (PHP_SAPI === 'cli') {
       return TRUE;
@@ -370,6 +375,9 @@ class civicrm_cli_csv_file extends civicrm_cli {
     parent::initialize();
   }
 
+  /**
+   * Run CLI function.
+   */
   public function run() {
     $this->row = 1;
     $handle = fopen($this->_file, "r");
@@ -402,7 +410,6 @@ class civicrm_cli_csv_file extends civicrm_cli {
       $this->processLine($params);
     }
     fclose($handle);
-    return NULL;
   }
 
   /* return a params as expected */

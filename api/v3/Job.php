@@ -315,7 +315,7 @@ function civicrm_api3_job_process_mailing($params) {
 }
 
 /**
- * Process sms queue
+ * Process sms queue.
  *
  * @param array $params
  *

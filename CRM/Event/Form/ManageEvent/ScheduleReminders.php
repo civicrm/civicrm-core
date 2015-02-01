@@ -90,6 +90,9 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
 
+  /**
+   * @return string
+   */
   public function getTemplateFileName() {
     return 'CRM/Admin/Page/ScheduleReminders.tpl';
   }
