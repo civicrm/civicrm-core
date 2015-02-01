@@ -41,6 +41,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
     parent::__construct('Contact', ts('Contacts'));
   }
 
+  /**
+   * @return bool
+   */
   public function isActive() {
     return CRM_Core_Permission::check('view all contacts');
   }

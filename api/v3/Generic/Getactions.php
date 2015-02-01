@@ -26,6 +26,8 @@
  */
 
 /**
+ * Get available api actions.
+ *
  * @param array $apiRequest
  *
  * @return array

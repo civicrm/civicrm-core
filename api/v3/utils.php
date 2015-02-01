@@ -73,6 +73,8 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  * @param array $keys
  *   List of required fields. A value can be an array denoting that either this or that is required.
  * @param bool $verifyDAO
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(), $verifyDAO = TRUE) {
 

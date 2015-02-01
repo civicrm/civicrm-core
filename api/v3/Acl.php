@@ -33,7 +33,7 @@
  */
 
 /**
- * Save an acl
+ * Save an acl.
  *
  * {@getfields acl_create}
  * @example aclCreate.php
@@ -48,10 +48,7 @@ function civicrm_api3_acl_create($params) {
 }
 
 /**
- * Get an acl
- *
- * {@getfields acl_get}
- * @example aclCreate.php
+ * Get an acl.
  *
  * @param array $params
  *
@@ -63,10 +60,7 @@ function civicrm_api3_acl_get($params) {
 }
 
 /**
- * Delete an acl
- *
- * {@getfields acl_delete}
- * @example aclCreate.php
+ * Delete an acl.
  *
  * @param array $params
  *

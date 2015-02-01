@@ -86,6 +86,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     return $caseTypeDAO->save();
   }
 
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     if ($fieldName == 'definition') {
       $this->{$fieldName} = "<CaseType><name>TestCaseType{$counter}</name></CaseType>";
