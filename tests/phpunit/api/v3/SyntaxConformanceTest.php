@@ -196,6 +196,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return static::entities(static::toBeSkipped_getlimit());
   }
 
+  /**
+   * Generate list of entities that can be retrieved using SQL operator syntax.
+   *
+   * @return array
+   */
   public static function entities_getSqlOperators() {
     return static::entities(static::toBeSkipped_getSqlOperators());
   }

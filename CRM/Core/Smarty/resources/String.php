@@ -31,6 +31,11 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
+ * @param $tpl_name
+ * @param $tpl_source
+ * @param $smarty_obj
+ *
+ * @return bool
  */
 function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$smarty_obj) {
   $tpl_source = $tpl_name;

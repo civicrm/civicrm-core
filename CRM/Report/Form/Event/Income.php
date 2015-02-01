@@ -311,6 +311,11 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->assign_by_ref('pager', $pager);
   }
 
+  /**
+   * Form post process function.
+   *
+   * @return bool
+   */
   public function postProcess() {
     $this->beginPostProcess();
     $this->_setVariable = TRUE;

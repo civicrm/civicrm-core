@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Our base DAO class. All DAO classes should inherit from this class.
@@ -459,6 +459,31 @@ class CRM_Core_DAO extends DB_DataObject {
     return $this;
   }
 
+  /**
+   * Deletes items from table which match current objects variables
+   *
+   * Returns the true on success
+   *
+   * for example
+   *
+   * Designed to be extended
+   *
+   * $object = new mytable();
+   * $object->ID=123;
+   * echo $object->delete(); // builds a conditon
+   *
+   * $object = new mytable();
+   * $object->whereAdd('age > 12');
+   * $object->limit(1);
+   * $object->orderBy('age DESC');
+   * $object->delete(true); // dont use object vars, use the conditions, limit and order.
+   *
+   * @param bool $useWhere (optional) If DB_DATAOBJECT_WHEREADD_ONLY is passed in then
+   *             we will build the condition only using the whereAdd's.  Default is to
+   *             build the condition only using the object parameters.
+   *
+   *     * @return mixed Int (No. of rows affected) on success, false on failure, 0 on no data affected
+   */
   public function delete($useWhere = FALSE) {
     $result = parent::delete($useWhere);
 

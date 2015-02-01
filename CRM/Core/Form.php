@@ -152,7 +152,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private $_chainSelectFields = array();
 
   /**
-   * Constructor for the basic form page
+   * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
    * of default convenient functions, rules and buttons
@@ -361,7 +361,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * The postProcess hook is typically called by the framework
+   * The postProcess hook is typically called by the framework.
    * However in a few cases, the form exits or redirects early in which
    * case it needs to call this function so other modules can do the needful
    * Calling this function directly should be avoided if possible. In general a

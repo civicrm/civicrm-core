@@ -26,7 +26,9 @@
  */
 
 /**
- * Update function is basically a hack to get around issues listed in
+ * Update function is basically a hack.
+ *
+ * We want to remove it but must resolve issues in
  * http://issues.civicrm.org/jira/browse/CRM-12144
  *
  * It is not recommended & if update doesn't work & fix does then update will not be fixed

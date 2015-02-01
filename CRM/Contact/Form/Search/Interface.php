@@ -36,6 +36,8 @@ interface CRM_Contact_Form_Search_Interface {
 
   /**
    * The constructor gets the submitted form values
+   *
+   * @param $formValues
    */
   public function __construct(&$formValues);
 
