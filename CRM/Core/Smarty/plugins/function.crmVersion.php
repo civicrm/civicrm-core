@@ -41,6 +41,11 @@
  *
  * {crmVersion redact=auto assign=ver}The version is {$ver}.
  * @endcode
+ *
+ * @param $params
+ * @param $smarty
+ *
+ * @return string
  */
 function smarty_function_crmVersion($params, &$smarty) {
   $version = CRM_Utils_System::version();
