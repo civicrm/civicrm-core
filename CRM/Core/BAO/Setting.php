@@ -398,7 +398,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     if (isset($metadata['on_change'])) {
       foreach ($metadata['on_change'] as $callback) {
-        call_user_func($callback, unserialize($dao->value), $value, $metadata);
+        call_user_func(
+          Civi\Core\Callback::create($callback),
+          unserialize($dao->value),
+          $value,
+          $metadata
+        );
       }
     }
 
@@ -588,8 +593,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       return TRUE;
     }
     else {
-      list($class, $fn) = explode('::', $fieldSpec['validate_callback']);
-      if (!$class::$fn($value, $fieldSpec)) {
+      $cb = Civi\Core\Callback::create($fieldSpec['validate_callback']);
+      if (!call_user_func_array($cb, array(&$value, $fieldSpec))) {
         throw new api_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
       }
     }

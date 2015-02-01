@@ -699,8 +699,9 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
     'on_change' => array(
-      array('CRM_Case_Info', 'onToggleComponents'),
-      array('CRM_Core_Component', 'flushEnabledComponents'),
+      'CRM_Case_Info::onToggleComponents',
+      'CRM_Core_Component::flushEnabledComponents',
+      'obj://resources/resetCacheCode',
     ),
   ),
   'disable_core_css' => array(
