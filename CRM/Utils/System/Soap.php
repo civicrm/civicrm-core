@@ -45,21 +45,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   static $ufClass = NULL;
 
   /**
-   * Sets the title of the page
-   *
-   * @param string $title
-   *   Title for page.
-   * @param $pageTitle
-   *
-   * @paqram string $pageTitle
-   *
-   * @return void
-   */
-  public function setTitle($title, $pageTitle) {
-    return NULL;
-  }
-
-  /**
    * Given a permission string, check for access requirements
    *
    * @param string $str
@@ -73,45 +58,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @param string $title
-   * @param string $url
-   *
-   * @return void
-   */
-  public function appendBreadCrumb($title, $url) {
-    return NULL;
-  }
-
-  /**
-   * Append a string to the head of the html file
-   *
-   * @param string $head
-   *   The new string to be appended.
-   *
-   * @return void
-   */
-  public function addHTMLHead($head) {
-    return NULL;
-  }
-
-  /**
-   * Generate an internal CiviCRM URL
-   *
-   * @param string $path
-   *   The path being linked to, such as "civicrm/add".
-   * @param string $query
-   *   A query string to append to the link.
-   * @param bool $absolute
-   *   Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param string $fragment
-   *   A fragment identifier (named anchor) to append to the link.
-   *
-   * @return string
-   *   an HTML string containing a link to the given path.
+   * @inheritDoc
    */
   public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
@@ -125,10 +72,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Figure out the post url for the form
-   *
-   * @return string
-   *   the url to post the form
+   * FIXME: Can this override be removed in favor of the parent?
+   * @inheritDoc
    */
   public function postURL($action) {
     return NULL;
@@ -146,17 +91,9 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Authenticate a user against the real UF
-   *
-   * @param string $name
-   *   Login name.
-   * @param string $pass
-   *   Login password.
-   *
-   * @return array
-   *   Result array
+   * @inheritDoc
    */
-  public function &authenticate($name, $pass) {
+  public function authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $result =& $className::authenticate($name, $pass);
@@ -181,24 +118,11 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get the locale set in the hosting CMS
-   *
-   * @return null
-   *   as the language is set elsewhere
-   */
-  public function getUFLocale() {
-    return NULL;
-  }
-
-  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
-   *   If present, add destination to querystring (works for Drupal only).
    *
    * @throws Exception
-   * @return;
-   *   loginURL for the current CMS
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");

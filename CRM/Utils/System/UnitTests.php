@@ -84,7 +84,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return mixed
    */
-  public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $retVal = array(1, 1, 12345);
     return $retVal;
   }
