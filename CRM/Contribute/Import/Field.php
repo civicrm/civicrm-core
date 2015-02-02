@@ -113,14 +113,20 @@ class CRM_Contribute_Import_Field {
   }
 
   /**
-   * The value is in string format. convert the value to the type of this field
+   * Set a value.
+   *
+   * The value is in string format. Convert the value to the type of this field
    * and set the field value with the appropriate type
+   *
+   * @param $value
    */
   public function setValue($value) {
     $this->_value = $value;
   }
 
   /**
+   * Validate a field.
+   *
    * @return bool
    */
   public function validate() {
