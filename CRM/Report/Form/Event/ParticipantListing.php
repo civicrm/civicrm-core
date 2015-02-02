@@ -616,6 +616,8 @@ ORDER BY  cv.label
    * @param int $rowId
    * @param $rowNum
    * @param $types
+   *
+   * @return bool
    */
   private function _initBasicRow(&$rows, &$entryFound, $row, $rowId, $rowNum, $types) {
     if (!array_key_exists($rowId, $row)) {
