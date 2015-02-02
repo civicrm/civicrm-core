@@ -455,6 +455,11 @@ class CRM_Utils_REST {
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * Return smarty-generated API Documentation.
+   *
+   * @return string
+   */
   public static function APIDoc() {
 
     CRM_Utils_System::setTitle("API Parameters");
@@ -583,6 +588,11 @@ class CRM_Utils_REST {
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * Run ajax request.
+   *
+   * @return array
+   */
   public static function ajax() {
     $requestParams = CRM_Utils_Request::exportValues();
 

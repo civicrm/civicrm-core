@@ -372,6 +372,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $surveysData;
   }
 
+  /**
+   * Browse petitions.
+   *
+   * @return mixed|null
+   */
   public function browsePetition() {
     // ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
