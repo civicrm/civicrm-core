@@ -32,7 +32,12 @@
             <span class="description">{ts}Scheduled Date for Pledge payment.{/ts}</span></td></tr>
         </td></tr>
   <tr><td class="label">{$form.scheduled_amount.label}</td><td class="form-layout">{$form.currency.html}&nbsp;{$form.scheduled_amount.html}
-      {if !$pledgePayment}{ts}<a href="#" onclick="adjustPayment();">adjust scheduled amount</a>{help id="adjust-payment-amount"}{/ts}{/if}
+      {if !$pledgePayment}
+        <a href="#" class="crm-hover-button action-item adjust-pledge-payment">
+          {ts}Adjust scheduled amount{/ts}
+        </a>
+        {help id="adjust-payment-amount"}
+      {/if}
       </td>
   </tr>
   <tr id="adjust-option-type" class="crm-contribution-form-block-option_type">
@@ -46,10 +51,13 @@
 <script type="text/javascript">
   CRM.$(function($) {
     $('#adjust-option-type').hide();
+
+    $('a.adjust-pledge-payment').click(function(e) {
+      e.preventDefault();
+      $(this).hide();
+      $('#adjust-option-type').show();
+      $("#scheduled_amount").prop("readonly", false);
+    });
   });
-  function adjustPayment( ) {
-    cj('#adjust-option-type').show();
-    cj("#scheduled_amount").removeAttr("READONLY").css('background-color', '#ffffff');
-  }
 </script>
 {/literal}
