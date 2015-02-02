@@ -128,6 +128,7 @@ function civicrm_api3_mailing_delete($params) {
  * Handle a get event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_get($params) {
@@ -251,6 +252,8 @@ function civicrm_api3_mailing_event_confirm($params) {
 }
 
 /**
+ * Declare deprecated functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions

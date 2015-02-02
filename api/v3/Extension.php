@@ -68,7 +68,7 @@ function civicrm_api3_extension_install($params) {
 }
 
 /**
- * Upgrade an extension - runs upgrade_N hooks and system.flush
+ * Upgrade an extension - runs upgrade_N hooks and system.flush.
  *
  * @return array
  *   API result
@@ -251,13 +251,12 @@ function civicrm_api3_extension_refresh($params) {
 }
 
 /**
- * Get a list of available extensions
+ * Get a list of available extensions.
  *
  * @param array $params
  *
  * @return array
  *   API result
- * @example ExtensionGet.php
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
@@ -277,10 +276,11 @@ function civicrm_api3_extension_get($params) {
 }
 
 /**
- * Determine the list of extension keys
+ * Determine the list of extension keys.
  *
  * @param array $params
  *   API request params with 'key' or 'keys'.
+ *
  * @return array
  *   Array of extension keys
  * @throws API_Exception

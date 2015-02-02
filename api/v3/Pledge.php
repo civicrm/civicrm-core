@@ -154,7 +154,6 @@ function _civicrm_api3_pledge_get_defaults() {
  *
  * @param array $values
  *   The reformatted properties that we can use internally.
- *
  */
 function _civicrm_api3_pledge_format_params(&$values) {
 

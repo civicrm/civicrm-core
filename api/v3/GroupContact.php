@@ -145,6 +145,7 @@ function _civicrm_api3_group_contact_delete_spec(&$params) {
 }
 
 /**
+ * Get pending group contacts.
  *
  * @param array $params
  *

@@ -67,7 +67,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
 }
 
 /**
- * Returns array of line_items  matching a set of one or more group properties
+ * Returns array of line_items  matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid property_name=>value pairs. If $params is set.

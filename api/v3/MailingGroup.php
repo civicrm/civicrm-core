@@ -74,7 +74,8 @@ function civicrm_api3_mailing_group_event_domain_unsubscribe($params) {
 }
 
 /**
- * Handle a resubscription event
+ * Handle a re-subscription event.
+ *
  * @deprecated
  *
  * @param array $params

@@ -40,7 +40,7 @@
  *
  * The 'extends' value accepts an array or a comma separated string.
  * e.g array(
-   'Individual','Contact') or 'Individual,Contact'
+ * 'Individual','Contact') or 'Individual,Contact'
  * See the CRM Data Model for custom_group property definitions
  * $params['class_name'] is a required field, class being extended.
  *
