@@ -57,7 +57,7 @@ function activity_get_expectedresult() {
         'id' => '1',
         'activity_type_id' => '51',
         'subject' => 'test activity type id',
-        'location' => 'Pensulvania',
+        'location' => 'Pennsylvania',
         'activity_date_time' => '2011-06-02 14:36:13',
         'details' => 'a test activity',
         'status_id' => '2',

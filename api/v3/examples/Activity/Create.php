@@ -21,7 +21,7 @@ function activity_create_example() {
     'status_id' => 2,
     'priority_id' => 1,
     'duration' => 120,
-    'location' => 'Pensulvania',
+    'location' => 'Pennsylvania',
     'details' => 'a test activity',
     'custom_1' => 'custom string',
   );
@@ -65,7 +65,7 @@ function activity_create_expectedresult() {
         'subject' => 'test activity type id',
         'activity_date_time' => '20110602143613',
         'duration' => '120',
-        'location' => 'Pensulvania',
+        'location' => 'Pennsylvania',
         'phone_id' => '',
         'phone_number' => '',
         'details' => 'a test activity',
