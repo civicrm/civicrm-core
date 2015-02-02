@@ -161,10 +161,10 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       $onDuplicate
     );
 
-    // add all the necessary variables to the form
+    // Add all the necessary variables to the form.
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // Check if there is any error occurred.
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
