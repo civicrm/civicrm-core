@@ -1423,8 +1423,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Contact', 'create', $params);
 
-    file_put_contents('/tmp/out.txt', print_r($result, true));
-
     // delete the contact and custom groups
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
     $this->customGroupDelete($ids['custom_group_id']);
