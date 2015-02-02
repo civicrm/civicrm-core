@@ -150,6 +150,11 @@ class CRM_Core_Form_RecurringEntity {
     return $defaults;
   }
 
+  /**
+   * Build form.
+   *
+   * @param $form
+   */
   public static function buildQuickForm(&$form) {
     if (self::$_entityTable) {
       $entityType = explode("_", self::$_entityTable);

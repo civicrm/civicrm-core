@@ -372,6 +372,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     return $dao->N;
   }
 
+  /**
+   * Destructor function.
+   */
   public function __destruct() {
     // the temporary tables are dropped automatically
     // so we don't do it here

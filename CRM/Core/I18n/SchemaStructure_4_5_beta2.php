@@ -192,6 +192,11 @@ class CRM_Core_I18n_SchemaStructure_4_5_beta2 {
     return $result;
   }
 
+  /**
+   * Get indices.
+   *
+   * @return array
+   */
   public static function &indices() {
     static $result = NULL;
     if (!$result) {
@@ -230,6 +235,11 @@ class CRM_Core_I18n_SchemaStructure_4_5_beta2 {
     return $result;
   }
 
+  /**
+   * Get tables.
+   *
+   * @return array
+   */
   public static function &tables() {
     static $result = NULL;
     if (!$result) {

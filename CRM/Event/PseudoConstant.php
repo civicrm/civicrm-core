@@ -156,6 +156,11 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     return self::$participantStatus[$index];
   }
 
+  /**
+   * Get participant status class options.
+   *
+   * @return array
+   */
   public static function participantStatusClassOptions() {
     return array(
       'Positive' => ts('Positive'),

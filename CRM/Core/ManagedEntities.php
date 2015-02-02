@@ -345,6 +345,11 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * Get declarations.
+   *
+   * @return array|null
+   */
   public function getDeclarations() {
     if ($this->declarations === NULL) {
       $this->declarations = array();

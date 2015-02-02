@@ -112,13 +112,25 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $queue->createItem($task, array('weight' => -1));
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
   function upgrade_4_6_alpha3($rev) {
-    // task to process sql
+    // Task to process sql.
     $this->addTask(ts('Add and update reference_date column for Schedule Reminders'), 'updateReferenceDate');
   }
 
-  // CRM-15728, Add new column reference_date to civicrm_action_log in order to track
-  // actual action_start_date for membership entity for only those schedule reminders which are not repeatable
+  /**
+   * Add new column reference_date to civicrm_action_log in order to track.
+   *
+   * CRM-15728, actual action_start_date for membership entity for only those schedule reminders which are not repeatable
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
   static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
     //Add column civicrm_action_log.reference_date if not exists
     $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_action_log' AND COLUMN_NAME = 'reference_date' ";

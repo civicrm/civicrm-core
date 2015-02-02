@@ -3212,6 +3212,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * @see hook_civicrm_triggerInfo
    * @see CRM_Core_DAO::triggerRebuild
    * @see http://issues.civicrm.org/jira/browse/CRM-10554
+   *
+   * @param $info
+   * @param null $tableName
    */
   public static function triggerInfo(&$info, $tableName = NULL) {
     //during upgrade, first check for valid version and then create triggers

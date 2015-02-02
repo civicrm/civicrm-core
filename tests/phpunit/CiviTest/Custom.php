@@ -100,21 +100,26 @@ class Custom extends CiviUnitTestCase {
 
   /**
    * Helper function to delete custom field
+   *
    * @deprecated use function on parent class
+   *
+   * @param $params
    */
   public static function deleteField($params) {
-    require_once 'CRM/Core/BAO/CustomField.php';
     CRM_Core_BAO_CustomField::deleteField($params);
   }
 
   /**
    * Helper function to delete custom group
+   *
    * @deprecated use function on parent class
+   *
+   * @param $params
+   *
    * @return bool
    *   true if Group deleted, false otherwise
    */
   public static function deleteGroup($params) {
-    require_once 'CRM/Core/BAO/CustomGroup.php';
     $deleteCustomGroup = CRM_Core_BAO_CustomGroup::deleteGroup($params, TRUE);
     return $deleteCustomGroup;
   }
