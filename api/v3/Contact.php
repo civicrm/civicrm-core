@@ -837,6 +837,8 @@ LIMIT    0, {$limit}
 }
 
 /**
+ * Declare deprecated api functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions

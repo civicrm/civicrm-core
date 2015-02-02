@@ -34,18 +34,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Event.php 30964 2010-11-29 09:41:54Z shot $
- *
  */
 
 /**
- * Create a Event
- *
- * This API is used for creating a Event
+ * Create a Event.
  *
  * @param array $params
  *   Input parameters.
- *   Allowed @params array keys are:
- * {@getfields event_create}
  *
  * @return array
  *   API result Array.
@@ -81,10 +76,12 @@ function _civicrm_api3_event_create_spec(&$params) {
 }
 
 /**
- * Support for schema changes made in 4.2
+ * Support for schema changes made in 4.2.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ *
  * @param array $params
  */
 function _civicrm_api3_event_create_legacy_support_42(&$params) {
@@ -152,7 +149,7 @@ function civicrm_api3_event_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -164,12 +161,14 @@ function _civicrm_api3_event_get_spec(&$params) {
 }
 
 /**
- * Support for schema changes made in 4.2
+ * Support for schema changes made in 4.2.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
- * @param $event
- * @param $event_id
+ *
+ * @param array $event
+ * @param int $event_id
  */
 function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
   if (!empty($event[$event_id]['payment_processor'])) {
@@ -181,31 +180,28 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
 }
 
 /**
- * Deletes an existing event
+ * Delete an existing event.
  *
- * This API is used for deleting a event
+ * This API is used for deleting a event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_event_delete($params) {
   return CRM_Event_BAO_Event::del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while deleting event'));
 }
-/*
 
 /**
- * add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
+ * Add 'is_full' & 'available_seats' to the return array.
+ *
+ * (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *
  * @param array $event
  *   Return array of the event.
  * @param int $event_id
  *   Id of the event to be updated.
- *
- */
-/**
- * @param $event
- * @param int $event_id
  */
 function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $eventFullResult = CRM_Event_BAO_Participant::eventFull($event_id, 1);
@@ -220,6 +216,8 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 
 
 /**
+ * Get event list parameters.
+ *
  * @see _civicrm_api3_generic_getlist_params
  *
  * @param array $request
@@ -235,6 +233,8 @@ function _civicrm_api3_event_getlist_params(&$request) {
 }
 
 /**
+ * Get event list output.
+ *
  * @see _civicrm_api3_generic_getlist_output
  *
  * @param array $result
@@ -249,7 +249,13 @@ function _civicrm_api3_event_getlist_output($result, $request) {
       $data = array(
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
-        'description' => array(CRM_Core_Pseudoconstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $row['event_type_id'])),
+        'description' => array(
+          CRM_Core_Pseudoconstant::getLabel(
+            'CRM_Event_BAO_Event',
+            'event_type_id',
+            $row['event_type_id']
+          ),
+        ),
       );
       if (!empty($row['start_date'])) {
         $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['start_date']);

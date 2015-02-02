@@ -197,10 +197,10 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 }
 
 /**
- * Retrieve a set of contributions, given a set of input params
+ * Retrieve a set of contributions.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *  Input parameters.
  *
  * @return array
  *   Array of contributions, if error an array with an error id and error message

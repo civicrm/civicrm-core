@@ -61,7 +61,7 @@ function _civicrm_api3_campaign_create_spec(&$params) {
 }
 
 /**
- * Returns array of campaigns  matching a set of one or more group properties
+ * Returns array of campaigns  matching a set of one or more group properties.
  *
  * @param array $params
  *   Array per getfields
@@ -74,7 +74,7 @@ function civicrm_api3_campaign_get($params) {
 }
 
 /**
- * delete an existing campaign
+ * Delete an existing campaign.
  *
  * This method is used to delete any existing campaign. id of the group
  * to be deleted is required field in $params array

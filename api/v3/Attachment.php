@@ -365,6 +365,7 @@ function _civicrm_api3_attachment_parse_params($params) {
  *   Whether to return the full content of the file.
  * @param bool $isTrusted
  *   Whether the current request is trusted to perform file-specific operations.
+ *
  * @return array
  */
 function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $returnContent, $isTrusted) {

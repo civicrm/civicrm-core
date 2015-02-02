@@ -268,7 +268,9 @@ SELECT DISTINCT case_id
 }
 
 /**
- * Deprecated. Use activity API instead
+ * Deprecated API.
+ *
+ * Use activity API instead.
  *
  * @param array $params
  *
@@ -283,6 +285,8 @@ function civicrm_api3_case_activity_create($params) {
 }
 
 /**
+ * Declare deprecated api functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions
