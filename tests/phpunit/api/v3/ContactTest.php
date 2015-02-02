@@ -1396,6 +1396,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Verify attempt to create individual with chained arrays and sequential
+   */
+  public function testGetIndividualWithChainedArraysAndSequential() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+
+    $moreids = $this->CustomGroupMultipleCreateWithFields();
+    $description = "/*this demonstrates the usage of chained api functions. In this case no notes or custom fields have been created ";
+    $subfile = "APIChainedArray";
+    $params = array(
+      'sequential' => 1,
+      'first_name' => 'abc3',
+      'last_name' => 'xyz3',
+      'contact_type' => 'Individual',
+      'email' => 'man3@yahoo.com',
+      'api.website.create' => array(
+        array(
+          'url' => "http://civicrm.org",
+        ),
+        array(
+          'url' => "https://civicrm.org",
+        ),
+      ),
+    );
+
+    $result = $this->callAPISuccess('Contact', 'create', $params);
+
+    // delete the contact and custom groups
+    $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->customGroupDelete($moreids['custom_group_id']);
+
+    $this->assertEquals($result['id'], $result['values'][0]['id']);
+    $this->assertArrayKeyExists('api.website.create', $result['values'][0]);
+  }
+
+  /**
    *  Verify attempt to create individual with chained arrays
    */
   public function testGetIndividualWithChainedArrays() {
