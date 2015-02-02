@@ -279,7 +279,7 @@
 
   // Controller for the "Preview Mailing Component" segment
   // which displays header/footer/auto-responder
-  angular.module('crmMailing').controller('PreviewComponentCtrl', function PreviewMailingDialogCtrl($scope, dialogService) {
+  angular.module('crmMailing').controller('PreviewComponentCtrl', function PreviewComponentCtrl($scope, dialogService) {
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.previewComponent = function previewComponent(title, componentId) {
@@ -299,13 +299,13 @@
     };
   });
 
-  // Controller for the "Preview Mailing" dialog
+  // Controller for the "Preview Mailing Component" dialog
   // Note: Expects $scope.model to be an object with properties:
   //   - "name"
   //   - "subject"
   //   - "body_html"
   //   - "body_text"
-  angular.module('crmMailing').controller('PreviewComponentDialogCtrl', function PreviewMailingDialogCtrl($scope) {
+  angular.module('crmMailing').controller('PreviewComponentDialogCtrl', function PreviewComponentDialogCtrl($scope) {
     $scope.ts = CRM.ts(null);
   });
 
