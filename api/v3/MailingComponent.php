@@ -30,16 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_mailing_component
- *
  */
 
 /**
- * Save a mailing_component
- *
- * Allowed @params array keys are:
- * {@getfields mailing_component_create}
- * @example mailing_componentCreate.php
- *
+ * Save a mailing_component.
  * @param array $params
  *
  * @throws API_Exception

@@ -32,11 +32,10 @@
  * @subpackage API_ActionSchedule
  *
  * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Creates/Updates a new Dashboard Contact Entry
+ * Creates/Updates a new Dashboard Contact Entry.
  *
  * @param array $params
  *

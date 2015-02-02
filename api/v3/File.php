@@ -36,11 +36,10 @@
  * @subpackage API_File
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
- * Create a file
+ * Create a file.
  *
  * This API is used for creating a file
  *

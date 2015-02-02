@@ -1,7 +1,8 @@
 <?php
 
 /**
- *  Functions to inform caller that Location is obsolete and Address, Phone, Email, Website should be used
+ * Function to inform caller that Location is obsolete and Address, Phone, Email, Website should be used.
+ *
  * @param array $params
  * @return array
  */

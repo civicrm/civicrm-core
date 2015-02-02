@@ -34,25 +34,18 @@
  * @subpackage API_Activity
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 
 /**
- * Creates or updates an Activity. See the example for usage
+ * Creates or updates an Activity.
  *
  * @param array $params
- *   Associative array of property name/value.
- *                             pairs for the activity.
- * {@getfields activity_create}
+ *  Array per getfields documentation.
  *
  * @throws API_Exception
  * @return array
- *   Array containing 'is_error' to denote success or failure and details of the created activity
- *
- * @example ActivityCreate.php Standard create example
- * @example Activity/ContactRefCustomField.php Create example including setting a contact reference custom field
- * {@example ActivityCreate.php 0}
+ *   Array containing 'is_error' to denote success or failure and details of the created activity.
  */
 function civicrm_api3_activity_create($params) {
 
@@ -182,14 +175,17 @@ function civicrm_api3_activity_create($params) {
 }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function
- * and is used for pre-filling defaults and ensuring mandatory requirements are met.
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function and is used for pre-filling defaults and
+ * ensuring mandatory requirements are met.
+ *
  * @param array $params
- *   (reference) array of parameters determined by getfields.
+ *  Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 
-  //default for source_contact_id = currently logged in user
+  // Default for source_contact_id = currently logged in user.
   $params['source_contact_id']['api.default'] = 'user_contact_id';
 
   $params['status_id']['api.aliases'] = array('activity_status');
@@ -218,23 +214,18 @@ function _civicrm_api3_activity_create_spec(&$params) {
 }
 
 /**
- * Gets a CiviCRM activity according to parameters
+ * Gets a CiviCRM activity according to parameters.
  *
  * @param array $params
- *   Associative array of property name/value.
- *                             pairs for the activity.
+ *   Array per getfields documentation.
  *
  * @return array
- *
- *   {@getfields activity_get}
- * @example ActivityGet.php Basic example
- * @example Activity/DateTimeHigh.php Example get with date filtering
- * {@example ActivityGet.php 0}
  */
 function civicrm_api3_activity_get($params) {
   if (!empty($params['contact_id'])) {
     $activities = CRM_Activity_BAO_Activity::getContactActivity($params['contact_id']);
-    //BAO function doesn't actually return a contact ID - hack api for now & add to test so when api re-write happens it won't get missed
+    // BAO function doesn't actually return a contact ID - hack api for now & add to test so when api re-write
+    // happens it won't get missed.
     foreach ($activities as $key => $activityArray) {
       $activities[$key]['id'] = $key;
     }
@@ -253,13 +244,14 @@ function civicrm_api3_activity_get($params) {
 }
 
 /**
- * Given a list of activities, append any extra data requested about the activities
+ * Given a list of activities, append any extra data requested about the activities.
  *
  * NOTE: Called by civicrm-core and CiviHR
  *
  * @param array $params
  *   API request parameters.
  * @param array $activities
+ *
  * @return array
  *   new activities list
  */
@@ -319,16 +311,10 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
  *
  * @param array $params
  *   Array holding 'id' of activity to be deleted.
- * {@getfields activity_delete}
  *
  * @throws API_Exception
- * @return void|CRM_Core_Error  An error if 'activityName or ID' is invalid,
- *                         permissions are insufficient, etc. or CiviCRM success array
  *
- *
- *
- * @example ActivityDelete.php Standard Delete Example
- *
+ * @return array
  */
 function civicrm_api3_activity_delete($params) {
 
@@ -341,7 +327,7 @@ function civicrm_api3_activity_delete($params) {
 }
 
 /**
- * Check for required params
+ * Check for required params.
  *
  * @param array $params
  *   Associated array of fields.
@@ -385,7 +371,7 @@ SELECT  count(*)
   FROM  civicrm_contact
  WHERE  id IN (' . implode(', ', $contactIds) . ' )';
     if (count($contactIds) != CRM_Core_DAO::singleValueQuery($sql)) {
-      throw new API_Exception('Invalid ' . ' Contact Id');
+      throw new API_Exception('Invalid Contact Id');
     }
   }
 
@@ -451,6 +437,8 @@ SELECT  count(*)
 }
 
 /**
+ * Get parameters for activity list.
+ *
  * @see _civicrm_api3_generic_getlist_params
  *
  * @param array $request
@@ -472,6 +460,8 @@ function _civicrm_api3_activity_getlist_params(&$request) {
 }
 
 /**
+ * Get output for activity list.
+ *
  * @see _civicrm_api3_generic_getlist_output
  *
  * @param array $result

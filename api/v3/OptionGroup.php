@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Get option groups.
+ *
  * @param array $params
  *
  * @return array

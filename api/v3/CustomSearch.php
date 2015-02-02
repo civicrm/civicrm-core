@@ -1,18 +1,14 @@
 <?php
 
 /**
- * Retrieve a CustomSearches
+ * Retrieve custom searches.
  *
  * FIXME This is a bare-minimum placeholder
  *
  * @param array $params
  *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
  * @return array
  *   details of found Option Values
- *   {@getfields OptionValue_get}
  */
 function civicrm_api3_custom_search_get($params) {
   require_once 'api/v3/OptionValue.php';
