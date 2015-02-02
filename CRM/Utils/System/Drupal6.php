@@ -675,10 +675,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get a list of all installed modules, including enabled and disabled ones
-   *
-   * @return array
-   *   CRM_Core_Module
+   * @inheritDoc
    */
   public function getModules() {
     $result = array();
