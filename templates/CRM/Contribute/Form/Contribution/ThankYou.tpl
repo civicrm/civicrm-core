@@ -133,7 +133,11 @@
           {if $membershipBlock} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
+            {if $frequency_interval > 1}
               <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+            {else}
+              <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+            {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
           {else}
