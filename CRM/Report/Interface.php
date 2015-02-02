@@ -44,7 +44,6 @@ interface CRM_Report_Interface {
   /**
    * Builds the quickform for this search
    * @param $form
-   * @return
    */
   public function buildForm(&$form);
 

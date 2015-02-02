@@ -1,6 +1,11 @@
 <?php
 namespace Civi\CiUtil\Command;
 
+/**
+ * Class LsCommand
+ *
+ * @package Civi\CiUtil\Command
+ */
 class LsCommand {
   public static function main($argv) {
     $paths = $argv;
