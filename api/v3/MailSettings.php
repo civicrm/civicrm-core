@@ -34,16 +34,14 @@
  */
 
 /**
- * Create or update a mail_settings
+ * Create or update a mail_settings.
  *
  * @param array $params
- *   Associative array of property.
+ *   Array of property.
  *                       name/value pairs to insert in new 'mail_settings'
- * @example mail_settingsCreate.php Std Create example
  *
  * @return array
- *   api result array
- *   {@getfields mail_settings_create}
+ *   API result array.
  */
 function civicrm_api3_mail_settings_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -62,7 +60,7 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
 }
 
 /**
- * Returns array of mail_settings  matching a set of one or more group properties
+ * Returns array of mail_settings  matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid.
@@ -70,26 +68,21 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
  *                       as null, all mail_settings will be returned
  *
  * @return array
- *   Array of matching mail_settings
- *   {@getfields mail_settings_get}
+ *   API result array.
  */
 function civicrm_api3_mail_settings_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * delete an existing mail_settings
- *
- * This method is used to delete any existing mail_settings. id of the group
- * to be deleted is required field in $params array
+ * Delete an existing mail_settings.
  *
  * @param array $params
  *   Array containing id of the group.
  *                       to be deleted
  *
  * @return array
- *   api result array
- *   {@getfields mail_settings_delete}
+ *   API result array.
  */
 function civicrm_api3_mail_settings_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

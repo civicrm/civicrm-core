@@ -136,8 +136,6 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  *
  * @throws API_Exception
  * @return array
- *
- *
  */
 function civicrm_api3_custom_value_get($params) {
 

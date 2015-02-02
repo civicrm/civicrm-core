@@ -37,16 +37,13 @@
  */
 
 /**
- * Deletes an existing contact membership
- *
- * This API is used for deleting a contact membership
+ * Deletes an existing contact membership.
  *
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
  *
  * @return array
- *   api result
- *   {@getfields membership_delete}
+ *   API result array.
  */
 function civicrm_api3_membership_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -59,11 +56,10 @@ function civicrm_api3_membership_delete($params) {
  * Required parameters : membership_type_id and status_id.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership.
+ *   Array of name/value property values of civicrm_membership.
  *
  * @return array
- *   Array of newly created membership property values.
- *   {@getfields membership_create}
+ *   API result array.
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
@@ -252,7 +248,7 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
 
 
 /**
- * non-standard behaviour inherited from v2
+ * Non-standard behaviour inherited from v2.
  *
  * @param array $params
  *   Parameters passed into get function.

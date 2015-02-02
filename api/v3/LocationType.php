@@ -36,17 +36,12 @@
  */
 
 /**
- * Add a Location Type
- *
- * Allowed @params array keys are:
- *
- * @example LocationTypeCreate.php Standard Create Example
+ * Add a Location Type.
  *
  * @param array $params
  *
  * @return array
- *   API result array
- *   {@getfields email_create}
+ *   API result array.
  */
 function civicrm_api3_location_type_create($params) {
   //set display_name equal to name if it's not defined
@@ -71,31 +66,25 @@ function _civicrm_api3_location_type_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Location Type
+ * Deletes an existing Location Type.
  *
  * @param array $params
  *
- * @example LocationTypeDelete.php Standard Delete Example
- *
  * @return array
- *   API result array
- *   {@getfields LocationType_delete}
+ *   API result array.
  */
 function civicrm_api3_location_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more Location Types
- *
- * @example LocationTypeGet.php Standard Get Example
+ * Retrieve one or more Location Types.
  *
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
- *   api result
- *   {@getfields LocationType_get}
+ *   API result array.
  */
 function civicrm_api3_location_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

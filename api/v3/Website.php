@@ -36,12 +36,12 @@
  */
 
 /**
- *  Add an Website for a contact.
+ * Add an Website for a contact.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created website property values.
+ *   API result array.
  * @todo convert to using basic create - BAO function non-std
  */
 function civicrm_api3_website_create($params) {
