@@ -648,6 +648,16 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * List modules installed in the CMS, including enabled and disabled ones.
+   *
+   * @return array
+   *   [CRM_Core_Module]
+   */
+  public function getModules() {
+    return array();
+  }
+
+  /**
    * Get Url to view user record
    * @param int $contactID
    *   Contact ID.
