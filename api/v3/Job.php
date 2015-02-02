@@ -68,32 +68,30 @@ function civicrm_api3_job_create($params) {
 }
 
 /**
- * Retrieve one or more job
+ * Retrieve one or more job.
  *
  * @param array $params
  *   input parameters
- * @return array
  *
- *   {@getfields email_get}
+ * @return array
  */
 function civicrm_api3_job_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a job
+ * Delete a job.
  *
  * @param array $params
- *
- * {@getfields Job_delete}
  */
 function civicrm_api3_job_delete($params) {
   _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Dumb wrapper to execute scheduled jobs. Always creates success - errors
- * and results are handled in the job log.
+ * Dumb wrapper to execute scheduled jobs.
+ *
+ * Always creates success - errors and results are handled in the job log.
  *
  * @param array $params
  *   input parameters (unused).
@@ -112,7 +110,7 @@ function civicrm_api3_job_execute($params) {
 }
 
 /**
- * Adjust Metadata for Execute action
+ * Adjust Metadata for Execute action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -121,7 +119,7 @@ function _civicrm_api3_job_execute_spec(&$params) {
 }
 
 /**
- * Geocode group of contacts based on given params
+ * Geocode group of contacts based on given params.
  *
  * @param array $params
  *   input parameters.
@@ -226,12 +224,12 @@ function civicrm_api3_job_mail_report($params) {
 }
 
 /**
- *
  * This method allows to update Email Greetings, Postal Greetings and Addressee for a specific contact type.
+ *
  * IMPORTANT: You must first create valid option value before using via admin interface.
  * Check option lists for Email Greetings, Postal Greetings and Addressee
  *
- *                        id - Integer - greetings option group
+ * @todo - is this here by mistake or should it be added to _spec function :id - Integer - greetings option group.
  *
  * @param array $params
  *
@@ -256,7 +254,7 @@ function civicrm_api3_job_update_greeting($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *

@@ -29,9 +29,10 @@ function civicrm_api3_option_group_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -40,7 +41,7 @@ function _civicrm_api3_option_group_create_spec(&$params) {
 }
 
 /**
- * delete an existing Option Group
+ * Delete an existing Option Group.
  *
  * This method is used to delete any existing Option Group. id of the group
  * to be deleted is required field in $params array
