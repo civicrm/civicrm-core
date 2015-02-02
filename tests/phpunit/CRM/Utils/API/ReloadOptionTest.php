@@ -88,6 +88,29 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
   }
 
   /**
+   * When the reload option is combined with chaining, the reload should munge
+   * the chain results, even if sequential=1.
+   */
+  public function testReloadNoChainInterferenceSequential() {
+    $result = $this->callAPISuccess('contact', 'create', array(
+      'sequential' => 1,
+      'contact_type' => 'Individual',
+      'first_name' => 'First',
+      'last_name' => 'Last',
+      'nick_name' => 'Firstie',
+      'api.Email.create' => array(
+        'email' => 'test@example.com',
+      ),
+      'options' => array(
+        'reload' => 1,
+      ),
+    ));
+    $this->assertEquals('First', $result['values'][0]['first_name']);
+    $this->assertEquals('munged', $result['values'][0]['nick_name']);
+    $this->assertAPISuccess($result['values'][0]['api.Email.create']);
+  }
+
+  /**
    * An implementation of hook_civicrm_post used with all our test cases.
    *
    * @param $op
