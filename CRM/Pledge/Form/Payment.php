@@ -124,7 +124,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'js' => array('onclick' => "return verify( );"),
           'isDefault' => TRUE,
         ),
         array(
