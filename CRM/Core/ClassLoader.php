@@ -101,6 +101,11 @@ class CRM_Core_ClassLoader {
     require_once "$civicrm_base_path/vendor/autoload.php";
   }
 
+  /**
+   * Initialize HTML purifier class.
+   *
+   * @param string $prepend
+   */
   public function initHtmlPurifier($prepend) {
     if (class_exists('HTMLPurifier_Bootstrap')) {
       // HTMLPurifier is already initialized, e.g. by the Drupal module.

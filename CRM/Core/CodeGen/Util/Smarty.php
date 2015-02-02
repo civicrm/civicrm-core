@@ -44,6 +44,11 @@ class CRM_Core_CodeGen_Util_Smarty {
     $this->smarty = NULL;
   }
 
+  /**
+   * Get templates_c directory.
+   *
+   * @return string
+   */
   public function getCompileDir() {
     if ($this->compileDir === NULL) {
       $this->compileDir = CRM_Core_CodeGen_Util_File::createTempDir('templates_c_');
@@ -51,6 +56,11 @@ class CRM_Core_CodeGen_Util_Smarty {
     return $this->compileDir;
   }
 
+  /**
+   * Get smarty instance.
+   *
+   * @return \Smarty
+   */
   public function getSmarty() {
     if ($this->smarty === NULL) {
       require_once 'Smarty/Smarty.class.php';

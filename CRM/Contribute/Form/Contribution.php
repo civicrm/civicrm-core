@@ -1812,7 +1812,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * @param array $paymentParams
-   *
+   * @param $message
    */
   public function cleanupDBAfterPaymentFailure($paymentParams, $message) {
     //make sure to cleanup db for recurring case.

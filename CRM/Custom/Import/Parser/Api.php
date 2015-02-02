@@ -18,7 +18,11 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   protected $_params = array();
 
   /**
-   * Class constructor
+   * Class constructor.
+   *
+   * @param array $mapperKeys
+   * @param null $mapperLocType
+   * @param null $mapperPhoneType
    */
   public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();

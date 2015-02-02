@@ -47,6 +47,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
   /**
    * @param bool $useWhere
+   *
+   * @return mixed|void
    */
   public function delete($useWhere = FALSE) {
     $this->load_associations();
