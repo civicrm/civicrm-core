@@ -108,15 +108,26 @@ class CRM_Core_InnoDBIndexer {
    */
   protected $isActive;
 
+  /**
+   * Class constructor.
+   *
+   * @param $isActive
+   * @param $indices
+   */
   public function __construct($isActive, $indices) {
     $this->isActive = $isActive;
     $this->indices = $this->normalizeIndices($indices);
   }
 
+  /**
+   * Fix schema differences.
+   *
+   * Limitation: This won't pick up stale indices on tables which are not
+   * declared in $this->indices. That's not much of an issue for now b/c
+   * we have a static list of tables.
+   */
   public function fixSchemaDifferences() {
-    // Limitation: This won't pick up stale indices on tables which are not
-    // declared in $this->indices. That's not much of an issue for now b/c
-    // we have a static list of tables.
+    //
     foreach ($this->indices as $tableName => $ign) {
       $todoSqls = $this->reconcileIndexSqls($tableName);
       foreach ($todoSqls as $todoSql) {

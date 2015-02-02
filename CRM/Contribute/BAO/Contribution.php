@@ -1739,6 +1739,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
   /**
    * Returns all contribution related object ids.
+   *
+   * @param $contributionId
+   *
+   * @return array
    */
   public static function getComponentDetails($contributionId) {
     $componentDetails = $pledgePayment = array();
@@ -3561,10 +3565,18 @@ WHERE con.id = {$contributionId}
     return CRM_Utils_Array::value('financial_account_id', $result);
   }
 
+  /**
+   * Check tax amount.
+   *
+   * @param array $params
+   * @param bool $isLineItem
+   *
+   * @return mixed
+   */
   public static function checkTaxAmount($params, $isLineItem = FALSE) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
-    // Update contribution
+    // Update contribution.
     if (!empty($params['id'])) {
       $id = $params['id'];
       $values = $ids = array();

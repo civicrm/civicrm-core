@@ -222,6 +222,8 @@ class CRM_Core_Component {
   /**
    * @param $config
    * @param bool $oldMode
+   *
+   * @return null
    */
   public static function addConfig(&$config, $oldMode = FALSE) {
     $info = self::_info();

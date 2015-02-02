@@ -327,6 +327,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param $objects
    * @param bool $recur
    * @param bool $first
+   *
+   * @return bool
    */
   public function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];

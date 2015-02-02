@@ -69,6 +69,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param $ids
    * @param $objects
    * @param $first
+   *
+   * @return bool
    */
   public function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
@@ -225,6 +227,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param $objects
    * @param bool $recur
    * @param bool $first
+   *
+   * @return bool
    */
   public function single(
     &$input, &$ids, &$objects,
@@ -342,6 +346,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * @param $input
    * @param $ids
+   *
+   * @return bool
    */
   public function getInput(&$input, &$ids) {
     if (!$this->getBillingID($ids)) {

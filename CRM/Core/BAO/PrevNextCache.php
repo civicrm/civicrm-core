@@ -249,6 +249,8 @@ WHERE cacheKey $op %1
    * @param int $rgid
    * @param int $gid
    * @param NULL $cacheKeyString
+   *
+   * @return bool
    */
   public static function refillCache($rgid = NULL, $gid = NULL, $cacheKeyString = NULL) {
     if (!$cacheKeyString && $rgid) {
