@@ -493,12 +493,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * convert associative array names to values
-   * and vice-versa.
+   * Convert associative array names to values and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
+   *
+   * @param array $defaults
+   * @param string $property
+   * @param array $lookup
+   * @param bool $reverse
+   *
+   * @return bool
    */
   public static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
     $id = $property . '_id';
@@ -945,8 +951,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Add extra fields specific to contribtion
-   *
+   * Add extra fields specific to contribution.
    */
   public static function getSpecialContributionFields() {
     $extraFields = array(
@@ -1383,6 +1388,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
   /**
    * Update contribution as well as related objects.
+   *
+   * @param array $params
+   * @param bool $processContributionObject
+   *
+   * @return array
+   * @throws \Exception
    */
   public static function transitionComponents($params, $processContributionObject = FALSE) {
     // get minimum required values.
