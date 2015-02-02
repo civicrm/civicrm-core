@@ -36,17 +36,6 @@
  */
 
 /**
- * Most API functions take in associative arrays ( name => value pairs
- * as parameters. Some of the most commonly used parameters are
- * described below
- *
- * @param array $params
- *   An associative array used in construction.
- *   retrieval of the object
- * @todo missing get function
- */
-
-/**
  * Use this API to create a new group.
  *
  * The 'extends' value accepts an array or a comma separated string.
@@ -56,7 +45,7 @@
  * $params['class_name'] is a required field, class being extended.
  *
  * @param array $params
- *   Array of property name/value pairs to insert in group.
+ *   Array per getfields metadata.
  *
  * @return array
  * @todo $params['extends'] is array format - is that std compatible
@@ -108,10 +97,10 @@ function civicrm_api3_custom_group_delete($params) {
 }
 
 /**
- * Use this API to get existing custom fields.
+ * API to get existing custom fields.
  *
  * @param array $params
- *   Array to search on.
+ *   Array per getfields metadata.
  *
  * @return array
  */
@@ -123,6 +112,7 @@ function civicrm_api3_custom_group_get($params) {
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  */

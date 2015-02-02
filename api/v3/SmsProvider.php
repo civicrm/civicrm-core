@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_sms_provider
- *
  */
 
 /**
- * Save an sms_provider
- *
- * Allowed @params array keys are:
- * {@getfields sms_provider_create}
- * @example sms_providerCreate.php
+ * Save an sms_provider.
  *
  * @param array $params
  *
@@ -50,11 +45,7 @@ function civicrm_api3_sms_provider_create($params) {
 }
 
 /**
- * Get an sms_provider
- *
- * Allowed @params array keys are:
- * {@getfields sms_provider_get}
- * @example sms_providerCreate.php
+ * Get an sms_provider.
  *
  * @param array $params
  *
@@ -66,11 +57,7 @@ function civicrm_api3_sms_provider_get($params) {
 }
 
 /**
- * Delete an sms_provider
- *
- * Allowed @params array keys are:
- * {@getfields sms_provider_delete}
- * @example sms_providerCreate.php
+ * Delete an sms_provider.
  *
  * @param array $params
  *

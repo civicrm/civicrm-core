@@ -40,15 +40,10 @@
  *
  * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *
- * Allowed @params array keys are:
- *
- * {@example TagCreate.php}
- *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
- *   Array of newly created tag property values.
- *   {@getfields tag_create}
  */
 function civicrm_api3_tag_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -86,14 +81,11 @@ function civicrm_api3_tag_delete($params) {
  * This api is used for finding an existing tag.
  * Either id or name of tag are required parameters for this api.
  *
- * @example TagGet.php
- *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   details of found tags else error
- *   {@getfields tag_get}
  */
 function civicrm_api3_tag_get($params) {
 

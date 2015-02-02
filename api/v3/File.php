@@ -41,10 +41,8 @@
 /**
  * Create a file.
  *
- * This API is used for creating a file
- *
  * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of newly created file property values.
@@ -85,11 +83,8 @@ function civicrm_api3_file_create($params) {
 /**
  * Get a file.
  *
- * This api is used for finding an existing file.
- * Required parameters : id OR file_type_id of a file
- *
  * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of all found file object property values.
@@ -102,9 +97,8 @@ function civicrm_api3_file_get($params) {
 /**
  * Update an existing file.
  *
- * This api is used for updating an existing file.
- *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  */
@@ -131,9 +125,8 @@ function civicrm_api3_file_update($params) {
 /**
  * Delete an existing file.
  *
- * This API is used for deleting a file
- *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   API result array

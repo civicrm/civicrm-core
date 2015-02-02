@@ -41,8 +41,7 @@
  * be in $params array.
  *
  * @param array $params
- *   (reference) Associative array of property.
- *                       name/value pairs to insert in new 'contact_type'
+ *   Array per getfields metadata.
  *
  * @return array
  *   contact_type array

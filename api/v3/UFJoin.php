@@ -39,7 +39,7 @@
  * Takes an associative array and creates a uf join in the database.
  *
  * @param array $params
- *   Assoc array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   CRM_Core_DAO_UFJoin Array

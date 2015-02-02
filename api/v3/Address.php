@@ -36,13 +36,10 @@
  */
 
 /**
- *  Add an Address for a contact
- *
- * Allowed @params array keys are:
- * {@getfields address_create}
- * {@example AddressCreate.php}
+ *  Add an Address for a contact.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of newly created tag property values.
@@ -108,10 +105,10 @@ function _civicrm_api3_address_create_spec(&$params) {
   );
 }
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_address_get_spec(&$params) {
   $params['world_region'] = array(
@@ -122,12 +119,10 @@ function _civicrm_api3_address_get_spec(&$params) {
 }
 
 /**
- * Deletes an existing Address
+ * Delete an existing Address.
  *
  * @param array $params
- *
- * {@getfields address_delete}
- * {@example AddressDelete.php 0}
+ *   Array per getfields metadata.
  *
  * @return array
  *   api result array
@@ -137,11 +132,10 @@ function civicrm_api3_address_delete($params) {
 }
 
 /**
- * Retrieve one or more addresses on address_id, contact_id, street_name, city
- * or a combination of those
+ * Retrieve one or more addresses.
  *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   details of found addresses else error

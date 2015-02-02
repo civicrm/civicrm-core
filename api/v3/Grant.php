@@ -34,19 +34,13 @@
  */
 
 /**
- * create/update grant
- *
- * This API is used to create new grant or update any of the existing
- * In case of updating existing grant, id of that particular grant must
- * be in $params array.
+ * Create/update grant.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'grant'
+ *   Array per getfields metadata.
  *
  * @return array
  *   grant array
- *   {@getfields grant_create}
  */
 function civicrm_api3_grant_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
@@ -66,34 +60,29 @@ function _civicrm_api3_grant_create_spec(&$params) {
 }
 
 /**
- * Returns array of grants  matching a set of one or more group properties
+ * Returns array of grants matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all grants will be returned
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of matching grants
- *   {@getfields grant_get}
  */
 function civicrm_api3_grant_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Grant');
 }
 
 /**
- * delete an existing grant
+ * Delete an existing grant.
  *
  * This method is used to delete any existing grant. id of the group
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   Array per getfields metadata.
  *
  * @return array
  *   API Result Array
- *   {@getfields grant_delete}
  */
 function civicrm_api3_grant_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
