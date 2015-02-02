@@ -30,16 +30,13 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Activity_BAO_Query {
 
   /**
-   * Build select for Case
+   * Build select for Case.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {

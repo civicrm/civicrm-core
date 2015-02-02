@@ -35,7 +35,7 @@
 
 /**
  * This class provides the functionality to delete a group of
- * Activites. This class provides functionality for the actual
+ * Activities. This class provides functionality for the actual
  * deletion.
  */
 class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {

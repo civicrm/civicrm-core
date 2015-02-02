@@ -42,6 +42,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   }
 
   /**
+   * Is search active for this user.
+   *
    * @return bool
    */
   public function isActive() {
@@ -123,6 +125,13 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     return $tables;;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
