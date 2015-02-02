@@ -38,9 +38,7 @@
  * Create or update a line_item.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'line_item'
- * @example LineItemCreate.php Std Create example
+ *   Array of property name/value pairs to insert in new 'line_item'
  *
  * @return array
  *   api result array

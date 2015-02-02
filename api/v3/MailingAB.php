@@ -63,6 +63,7 @@ function civicrm_api3_mailing_a_b_delete($params) {
  * Handle a get event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_a_b_get($params) {

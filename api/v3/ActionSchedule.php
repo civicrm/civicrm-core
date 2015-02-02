@@ -72,7 +72,6 @@ function civicrm_api3_action_schedule_create($params) {
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
-  //  $params['entity_status']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
 }
 

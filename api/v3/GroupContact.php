@@ -136,7 +136,8 @@ function civicrm_api3_group_contact_delete($params) {
 }
 
 /**
- * modify metadata
+ * Adjust metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_group_contact_delete_spec(&$params) {
@@ -158,6 +159,7 @@ function civicrm_api3_group_contact_pending($params) {
 }
 
 /**
+ * Group contact helper function.
  *
  * @param array $params
  * @param string $op
@@ -227,8 +229,12 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 }
 
 /**
+ * Update group contact status.
+ *
  * @deprecated - this should be part of create but need to know we aren't missing something
+ *
  * @param array $params
+ *
  * @return bool
  * @throws \API_Exception
  */
@@ -248,6 +254,8 @@ function civicrm_api3_group_contact_update_status($params) {
 }
 
 /**
+ * Deprecated function notices.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions

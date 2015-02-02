@@ -171,11 +171,11 @@ function civicrm_api3_mailing_submit($params) {
   $updateParams = array();
   $updateParams['id'] = $params['id'];
 
-  // the BAO will autocreate the job
-  $updateParams['api.mailing_job.create'] = 0; // note: exact match to API default
+  // The BAO will auto-create the job - note: exact match to API default.
+  $updateParams['api.mailing_job.create'] = 0;
 
-  // note: we'll pass along scheduling/approval fields, but they may get ignored
-  // if we don't have permission
+  // Note: we'll pass along scheduling/approval fields, but they may get ignored
+  // if we don't have permission.
   if (isset($params['scheduled_date'])) {
     $updateParams['scheduled_date'] = $params['scheduled_date'];
     $updateParams['scheduled_id'] = CRM_Core_Session::getLoggedInContactID();

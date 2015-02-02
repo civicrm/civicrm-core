@@ -69,6 +69,7 @@ function _civicrm_api3_website_create_spec(&$params) {
  * Deletes an existing Website.
  *
  * @todo convert to using Basic delete - BAO function non standard
+ *
  * @param array $params
  *
  * @return array

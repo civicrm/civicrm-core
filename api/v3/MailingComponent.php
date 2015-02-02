@@ -34,6 +34,7 @@
 
 /**
  * Save a mailing_component.
+ *
  * @param array $params
  *
  * @throws API_Exception

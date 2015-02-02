@@ -50,7 +50,7 @@ function civicrm_api3_membership_delete($params) {
 }
 
 /**
- * Create a Contact Membership
+ * Create a Contact Membership.
  *
  * This API is used for creating a Membership for a contact.
  * Required parameters : membership_type_id and status_id.
@@ -162,7 +162,7 @@ function _civicrm_api3_membership_create_spec(&$params) {
   );
 }
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -221,6 +221,8 @@ function civicrm_api3_membership_get($params) {
 }
 
 /**
+ * Perform api v2 custom behaviour.
+ *
  * When we copied apiv3 from api v2 we brought across some custom behaviours - in the case of
  * membership a complicated return array is constructed. The original
  * behaviour made contact_id a required field. We still need to keep this for v3 when contact_id

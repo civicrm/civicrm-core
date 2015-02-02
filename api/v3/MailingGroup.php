@@ -87,7 +87,8 @@ function civicrm_api3_mailing_group_event_resubscribe($params) {
 }
 
 /**
- * Handle a subscription event
+ * Handle a subscription event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -99,7 +100,10 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
 }
 
 /**
+ * Create mailing group.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -108,6 +112,8 @@ function civicrm_api3_mailing_group_create($params) {
 }
 
 /**
+ * Get mailing group.
+ *
  * @param array $params
  *
  * @return array
@@ -129,6 +135,8 @@ function civicrm_api3_mailing_group_delete($params) {
 }
 
 /**
+ * Get metadata for mailing group functions.
+ *
  * @param array $params
  *
  * @return array

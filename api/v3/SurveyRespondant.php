@@ -44,7 +44,8 @@ function _civicrm_api3_survey_respondant_deprecation() {
 }
 
 /**
- * Get the list of signatories
+ * Get the list of signatories.
+ *
  * @deprecated - api currently not supported
  *
  * @param array $params
@@ -79,7 +80,10 @@ function civicrm_api3_survey_respondant_get(&$params) {
 }
 
 /**
+ * Count survey respondents.
+ *
  * @deprecated - api currently not supported
+ *
  * @param array $params
  * @return array
  */

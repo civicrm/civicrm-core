@@ -307,8 +307,10 @@ function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName) {
   $fieldName = str_replace('url', 'URL', $fieldName);
   return str_replace('primary', 'Primary', $fieldName);
 }
+
 /**
- * metadata for submit action
+ * Metadata for submit action.
+ *
  * @param array $params
  * @param array $apirequest
  */
@@ -345,8 +347,6 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  *
  * @return array
  *   Updated Contact/ Activity object|CRM_Error
- *
- *
  */
 function civicrm_api3_profile_set($params) {
   return civicrm_api3('profile', 'submit', $params);
@@ -484,8 +484,9 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 }
 
 /**
- * Here we will build  up getfields type data for all the fields in the profile. Because the integration with the
- * form layer in core is so hard-coded we are not going to attempt to re-use it
+ * Here we will build  up getfields type data for all the fields in the profile.
+ *
+ * Because the integration with the form layer in core is so hard-coded we are not going to attempt to re-use it
  * However, as this function is unit-tested & hence 'locked in' we can aspire to extract sharable
  * code out of the form-layer over time.
  *

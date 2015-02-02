@@ -53,7 +53,9 @@ function civicrm_api3($entity, $action, $params = array()) {
 }
 
 /**
- * Call getfields from api wrapper. This function ensures that settings that
+ * Call getfields from api wrapper.
+ *
+ * This function ensures that settings that
  * could alter getfields output (e.g. action for all api & profile_id for
  * profile api ) are consistently passed in.
  *
@@ -64,6 +66,7 @@ function civicrm_api3($entity, $action, $params = array()) {
  * @todo other output modifiers include contact_type
  *
  * @param array $apiRequest
+ *
  * @return array
  *   getfields output
  */
@@ -165,11 +168,12 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
 }
 
 /**
- * Convert possibly camel name to underscore separated entity name
+ * Convert possibly camel name to underscore separated entity name.
  *
  * @param string $entity
  *   Entity name in various formats e.g. Contribution, contribution,
  *   OptionValue, option_value, UFJoin, uf_join.
+ *
  * @return string
  *   Entity name in underscore separated format.
  *
@@ -190,9 +194,11 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 }
 
 /**
- * Having a DAO object find the entity name
+ * Having a DAO object find the entity name.
+ *
  * @param object $bao
  *   DAO being passed in.
+ *
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {

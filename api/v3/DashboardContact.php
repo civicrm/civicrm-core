@@ -101,12 +101,13 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
 }
 
 /**
- * Delete an existing dashboard-contact
+ * Delete an existing dashboard-contact.
  *
  * This method is used to delete any existing dashboard-board. the id of the dashboard-contact
  * is required field in $params array
  *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

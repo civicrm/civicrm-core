@@ -56,7 +56,6 @@ function civicrm_api3_group_organization_get($params) {
  *   Array.
  *
  * @return array
- *
  */
 function civicrm_api3_group_organization_create($params) {
 

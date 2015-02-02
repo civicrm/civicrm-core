@@ -36,7 +36,7 @@
  */
 
 /**
- *  Add a record relating a contact with an activity.
+ * Add a record relating a contact with an activity.
  *
  * @param array $params
  *
@@ -61,7 +61,7 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ActivityContact record
+ * Delete an existing ActivityContact record.
  *
  * @param array $params
  *

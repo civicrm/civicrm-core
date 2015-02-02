@@ -60,6 +60,8 @@ function _civicrm_api3_message_template_create_spec(&$params) {
 }
 
 /**
+ * Delete message template.
+ *
  * @param array $params
  *
  * @return bool

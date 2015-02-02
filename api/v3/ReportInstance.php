@@ -39,7 +39,7 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ReportInstance
+ * Deletes an existing ReportInstance.
  *
  * @param array $params
  *

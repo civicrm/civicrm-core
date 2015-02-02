@@ -60,6 +60,8 @@ class API_Exception extends Exception {
   }
 
   /**
+   * Get extra parameters.
+   *
    * @return array
    */
   public function getExtraParams() {
@@ -67,6 +69,8 @@ class API_Exception extends Exception {
   }
 
   /**
+   * Get error codes.
+   *
    * @return array
    */
   public function getErrorCodes() {
@@ -89,6 +93,8 @@ class CiviCRM_API3_Exception extends Exception {
   private $extraParams = array();
 
   /**
+   * Class constructor.
+   *
    * @param string $message
    *   The human friendly error message.
    * @param mixed $error_code
@@ -125,6 +131,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
+   * Get extra parameters.
+   *
    * @return array
    */
   public function getExtraParams() {

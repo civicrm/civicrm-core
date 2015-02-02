@@ -36,6 +36,8 @@
  */
 
 /**
+ * Declare deprecated api entity.
+ *
  * @deprecated api notice
  * @return string
  *   to indicate this entire api entity is deprecated
@@ -45,6 +47,8 @@ function _civicrm_api3_constant_deprecation() {
 }
 
 /**
+ * Get constant values (deprecated).
+ *
  * @deprecated as of CiviCRM 4.4.
  * It's recommended to use the api getoptions action instead
  *
@@ -136,6 +140,8 @@ function civicrm_api3_constant_get($params) {
 }
 
 /**
+ * Adjust metadata for constant get action.
+ *
  * @param array $params
  */
 function _civicrm_api3_constant_get_spec(&$params) {
