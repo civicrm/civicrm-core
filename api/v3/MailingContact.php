@@ -243,6 +243,8 @@ AND        meb.id IS NULL
 }
 
 /**
+ * Get bounced mailing contact records.
+ *
  * @param int $contactID
  * @param $offset
  * @param $limit

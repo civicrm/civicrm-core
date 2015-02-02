@@ -150,6 +150,7 @@ function _civicrm_api3_profile_get_spec(&$params) {
 
 /**
  * Submit a set of fields against a profile.
+ *
  * Note choice of submit versus create is discussed CRM-13234 & related to the fact
  * 'profile' is being treated as a data-entry entity
  *
@@ -289,10 +290,13 @@ function civicrm_api3_profile_submit($params) {
 }
 
 /**
+ * Translate field names for BAO.
+ *
  * The api standards expect field names to be lower case but the BAO uses mixed case
  * so we accept 'email-primary' but pass 'email-Primary' to the BAO
  * we could make the BAO handle email-primary but this would alter the fieldname seen by hooks
  * & we would need to consider that change
+ *
  * @param string $fieldName
  *   API field name.
  *

@@ -269,15 +269,18 @@ class civicrm_api3 {
   }
 
   /**
-   * Initialize
+   * Initialize.
    */
   public function init() {
     CRM_Core_DAO::init($this->cfg->dsn);
   }
 
   /**
+   * Get attribute.
+   *
    * @param $name
    * @param null $value
+   *
    * @return $this
    */
   public function attr($name, $value = NULL) {
@@ -300,6 +303,8 @@ class civicrm_api3 {
   }
 
   /**
+   * Check if var is set.
+   *
    * @param string $name
    * @return bool
    */
@@ -308,7 +313,9 @@ class civicrm_api3 {
   }
 
   /**
-   * @param $name
+   * Get object.
+   *
+   * @param string $name
    * @return $this
    */
   public function __get($name) {

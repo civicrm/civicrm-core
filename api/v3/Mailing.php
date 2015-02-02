@@ -40,7 +40,7 @@
  *
  * @param array $params
  *
- * @return array API Success Array
+ * @return array
  *    API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException

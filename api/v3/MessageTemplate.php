@@ -70,19 +70,21 @@ function civicrm_api3_message_template_delete($params) {
 }
 
 /**
+ * Adjust metadata for message_template get action.
+ *
  * @param array $params
  */
 function _civicrm_api3_message_template_get_spec(&$params) {
 }
 
 /**
- * Retrieve one or more message_template
+ * Retrieve one or more message_template.
  *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array of name/value pairs.
  *
  * @return array
- *   api result array
+ *   API result array.
  */
 function civicrm_api3_message_template_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -90,6 +92,7 @@ function civicrm_api3_message_template_get($params) {
 
 /**
  * Sends a template.
+ *
  * @param array $params
  */
 function civicrm_api3_message_template_send($params) {

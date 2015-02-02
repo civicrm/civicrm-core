@@ -56,6 +56,7 @@ function civicrm_api3_uf_join_create($params) {
  *
  * @param array $params
  *   Array or parameters determined by getfields.
+ *
  * @todo - suspect module, weight don't need to be required - need to test
  */
 function _civicrm_api3_uf_join_create_spec(&$params) {
@@ -65,13 +66,14 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
 }
 
 /**
- * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record
+ * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record.
  *
  * @param array $params
- *   (reference) an assoc array of name/value pairs.
+ *   Array of name/value pairs.
  *
  * @return array
- *   CiviCRM Result Array or null
+ *   API result array.
+ *
  * @todo Delete function missing
  */
 function civicrm_api3_uf_join_get($params) {
