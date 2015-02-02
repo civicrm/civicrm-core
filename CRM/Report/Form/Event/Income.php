@@ -41,8 +41,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   protected $_add2groupSupported = FALSE;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -69,7 +68,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   }
 
   /**
-   * @param $eventIDs
+   * Build event report.
+   *
+   * @param array $eventIDs
    */
   public function buildEventReport($eventIDs) {
 
@@ -153,7 +154,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $count[$counteDAO->event_id] = $counteDAO->count;
     }
 
-    //Count the Participant by Role ID for Event
+    // Count the Participant by Role ID for Event.
     $role = "
             SELECT civicrm_participant.role_id         as ROLEID,
                    COUNT( civicrm_participant.id )     as participant,
@@ -197,7 +198,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     $rows['Role'] = $roleRows;
 
-    //Count the Participant by status ID for Event
+    // Count the Participant by status ID for Event.
     $status = "
             SELECT civicrm_participant.status_id       as STATUSID,
                    COUNT( civicrm_participant.id )     as participant,
@@ -278,17 +279,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   }
 
   /**
-   * @param int $rowCount
-   *
-   * @return array|void
+   * @inheritdoc
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
 
-    //modify limit
+    // Modify limit.
     $pageId = $this->get(CRM_Utils_Pager::PAGE_ID);
 
-    //if pageId is greator than last page then display last page.
+    //if pageId is greater than last page then display last page.
     if ((($pageId * self::ROW_COUNT_LIMIT) - 1) > $this->_rowsFound) {
       $pageId = ceil((float) $this->_rowsFound / (float) self::ROW_COUNT_LIMIT);
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
