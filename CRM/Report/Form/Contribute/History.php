@@ -420,7 +420,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   /**
    * Override to set limit is 10
+   *
    * @param int $rowCount
+   *
+   * @return array|void
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);

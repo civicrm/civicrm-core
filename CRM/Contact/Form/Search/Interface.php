@@ -45,7 +45,6 @@ interface CRM_Contact_Form_Search_Interface {
    * Builds the quickform for this search.
    *
    * @param CRM_Core_Form $form
-   * @return
    */
   public function buildForm(&$form);
 
@@ -79,8 +78,6 @@ interface CRM_Contact_Form_Search_Interface {
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   *
-   * @return
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
@@ -94,8 +91,6 @@ interface CRM_Contact_Form_Search_Interface {
    * @param null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
-   *
-   * @return
    */
   public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE);
 
@@ -117,8 +112,6 @@ interface CRM_Contact_Form_Search_Interface {
    * The where clause for the query.
    *
    * @param bool $includeContactIDs
-   *
-   * @return
    */
   public function where($includeContactIDs = FALSE);
 
