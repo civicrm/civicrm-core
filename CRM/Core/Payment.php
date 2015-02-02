@@ -172,6 +172,17 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Default payment instrument validation
+   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
+   * Not a static function, because I need to check for payment_type
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    if ($this->_paymentProcessor['payment_type'] == 1) {
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+    }
+  }
+
+  /**
    * Setter for the payment form that wants to use the processor
    * @deprecated
    * @param CRM_Core_Form $paymentForm
