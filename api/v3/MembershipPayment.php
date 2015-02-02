@@ -51,9 +51,10 @@ function civicrm_api3_membership_payment_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */

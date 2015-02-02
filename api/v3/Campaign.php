@@ -34,7 +34,7 @@
  */
 
 /**
- * create/update campaign
+ * Create/update campaign.
  *
  * This API is used to create new campaign or update any of the existing
  * In case of updating existing campaign, id of that particular campaign must
@@ -49,9 +49,10 @@ function civicrm_api3_campaign_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */

@@ -54,9 +54,10 @@ function civicrm_api3_note_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -104,7 +105,8 @@ function civicrm_api3_note_get($params) {
 /**
  * Adjust Metadata for Get action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
