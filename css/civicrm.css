@@ -4541,3 +4541,6 @@ span.crm-status-icon {
 .crm-container table.mergecontact thead th {
   width:30%;
 }
+.crm-container .crm-ui-datetime.ng-dirty input.incomplete {
+  border: 1px solid red;
+}
