@@ -208,16 +208,13 @@ function _civicrm_api3_setting_fill_spec(&$params) {
 }
 
 /**
- * Create or update a setting
+ * Create or update a setting.
  *
  * @param array $params
- *   Associative array of setting.
- *                       name/value pairs + other vars as applicable - see getfields for more
- * @example SettingCreate.php Std Create example
+ *   Parameters as per getfields.
  *
  * @return array
  *   api result array
- *   {@getfields setting_create}
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -245,15 +242,13 @@ function _civicrm_api3_setting_create_spec(&$params) {
 }
 
 /**
- * Returns array of settings matching input parameters
+ * Returns array of settings matching input parameters.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs.
+ *   Array of one or more valid property_name=>value pairs.
  *
  * @return array
  *   Array of matching settings
- *   {@getfields setting_get}
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);

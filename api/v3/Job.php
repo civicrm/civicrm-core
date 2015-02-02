@@ -354,7 +354,7 @@ function civicrm_api3_job_fetch_bounces($params) {
 }
 
 /**
- * Job to get mail and create activities
+ * Job to get mail and create activities.
  *
  * @param array $params
  *
@@ -379,10 +379,10 @@ function civicrm_api3_job_fetch_activities($params) {
 }
 
 /**
- * Process participant statuses
+ * Process participant statuses.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *  Input parameters.
  *
  * @return array
  *   array of properties, if error an array with an error id and error message

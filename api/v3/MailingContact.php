@@ -199,6 +199,8 @@ LIMIT %2, %3
 }
 
 /**
+ * Get delivered mailing contacts.
+ *
  * @param int $contactID
  * @param $offset
  * @param $limit
