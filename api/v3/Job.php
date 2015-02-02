@@ -35,13 +35,13 @@
  * @subpackage API_Job
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Adjust metadata for "Create" action
+ * Adjust metadata for "Create" action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -56,14 +56,12 @@ function _civicrm_api3_job_create_spec(&$params) {
 }
 
 /**
- * create scheduled job
+ * Create scheduled job.
  *
  * @param array $params
  *   Associative array of property name/value pairs to insert in new job.
  *
  * @return array
- *
- *   {@getfields Job_create}
  */
 function civicrm_api3_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -145,7 +143,7 @@ function civicrm_api3_job_geocode($params) {
 }
 
 /**
- * First check on Code documentation
+ * First check on Code documentation.
  *
  * @param array $params
  */
@@ -158,7 +156,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 }
 
 /**
- * Send the scheduled reminders for all contacts (either for activities or events)
+ * Send the scheduled reminders for all contacts (either for activities or events).
  *
  * @param array $params
  *   (reference ) input parameters.
@@ -189,9 +187,10 @@ function civicrm_api3_job_send_reminder($params) {
   }
 }
 /**
- * Adjust metadata for "send_reminder" action
+ * Adjust metadata for "send_reminder" action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -204,7 +203,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
   );
 }
 /**
- * Execute a specific report instance and send the output via email
+ * Execute a specific report instance and send the output via email.
  *
  * @param array $params
  *   (reference ) input parameters.
@@ -259,7 +258,8 @@ function civicrm_api3_job_update_greeting($params) {
 /**
  * Adjust Metadata for Get action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -277,9 +277,10 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
 }
 
 /**
- * Mass update pledge statuses
+ * Mass update pledge statuses.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_job_process_pledge($params) {
@@ -297,7 +298,7 @@ function civicrm_api3_job_process_pledge($params) {
 }
 
 /**
- * Process mail queue
+ * Process mail queue.
  *
  * @param array $params
  *
@@ -332,7 +333,7 @@ function civicrm_api3_job_process_sms($params) {
 }
 
 /**
- * Job to get mail responses from civiMailing
+ * Job to get mail responses from civiMailing.
  *
  * @param array $params
  *

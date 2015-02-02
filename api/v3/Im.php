@@ -35,7 +35,7 @@
  */
 
 /**
- *  Add an IM for a contact.
+ * Add an IM for a contact.
  *
  * @param array $params
  *
@@ -71,14 +71,13 @@ function civicrm_api3_im_delete($params) {
 }
 
 /**
- * Retrieve one or more IM
+ * Retrieve one or more IM.
  *
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
  *   details of found IM
- *
  */
 function civicrm_api3_im_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -167,7 +167,7 @@ function _civicrm_api3_case_update_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Delete action
+ * Adjust Metadata for Delete action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -302,7 +302,6 @@ function _civicrm_api3_case_deprecation() {
  * @throws API_Exception
  * @return array
  *   api result array
- *
  */
 function civicrm_api3_case_update($params) {
   //check parameters
