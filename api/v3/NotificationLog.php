@@ -5,7 +5,7 @@
  */
 function civicrm_api3_notification_log_retry($params) {
   if(!empty($params['id'])) {
-    $raw = CRM_Core_DAO::executeQuery("SELECT message_raw, message_type FROM civicrm_notification_log
+    $raw = CRM_Core_DAO::executeQuery("SELECT message_raw, message_type, timestamp FROM civicrm_notification_log
       WHERE id = %1", array(1 => array($params['id'], 'Integer')));
   }
   while ($raw->fetch()) {
