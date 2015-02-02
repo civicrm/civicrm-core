@@ -1526,7 +1526,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Create the recurring contribution record
+   * Create the recurring contribution record.
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -1614,7 +1614,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Add on behalf of organization and it's location
+   * Add on behalf of organization and it's location.
    *
    * @param array $behalfOrganization
    *   array of organization info.
@@ -1626,8 +1626,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   form values array.
    * @param array $params
    * @param null $fields
-   *
-   * @return void
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
@@ -1726,16 +1724,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to save pcp / soft credit entry
+   * Function used to save pcp / soft credit entry.
+   *
    * This is used by contribution and also event pcps
    *
    * @param array $params
    * @param object $contribution
    *   Contribution object.
-   *
    */
   public static function processPcpSoft(&$params, &$contribution) {
-    //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
+    // Add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['soft_credit_to'])) {
       $contributionSoftParams = array();
       foreach (array(

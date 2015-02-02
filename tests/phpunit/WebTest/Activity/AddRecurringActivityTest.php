@@ -32,6 +32,9 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
+/**
+ * Class WebTest_Activity_AddRecurringActivityTest
+ */
 class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

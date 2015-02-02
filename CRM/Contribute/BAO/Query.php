@@ -30,12 +30,11 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Contribute_BAO_Query {
 
   /**
-   * Static field for all the export/import contribution fields
+   * Static field for all the export/import contribution fields.
    *
    * @var array
    */
@@ -63,7 +62,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * If contributions are involved, add the specific contribute fields
+   * If contributions are involved, add the specific contribute fields.
    *
    * @param $query
    *

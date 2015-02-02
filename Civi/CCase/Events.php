@@ -26,6 +26,11 @@
  */
 namespace Civi\CCase;
 
+/**
+ * Class Events
+ *
+ * @package Civi\CCase
+ */
 class Events {
   /**
    * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
@@ -74,6 +79,9 @@ class Events {
     }
   }
 
+  /**
+   * @param $caseId
+   */
   public static function fireCaseChangeForRealz($caseId) {
     if (!isset(self::$isActive[$caseId])) {
       $tx = new \CRM_Core_Transaction();

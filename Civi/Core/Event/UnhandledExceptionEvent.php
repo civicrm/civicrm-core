@@ -43,6 +43,10 @@ class UnhandledExceptionEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public $request;
 
+  /**
+   * @param $e
+   * @param $request
+   */
   public function __construct($e, $request) {
     $this->request = $request;
     $this->exception = $e;

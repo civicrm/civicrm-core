@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_versionCheckTest
+ */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
   /**

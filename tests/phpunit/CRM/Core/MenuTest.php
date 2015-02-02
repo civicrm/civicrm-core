@@ -7,6 +7,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   public function pathArguments() {
     $cases = array(); // array(0 => string $input, 1 => array $expectedOutput)
     //$cases[] = array(NULL, array());

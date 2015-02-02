@@ -6,6 +6,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_Page_RedirectTest
  */
 class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
+  /**
+   * Get example data.
+   *
+   * @return array
+   */
+  /**
+   * @return array
+   */
   public function examples() {
     $cases = array();
     // $cases[] = array(string $requestPath, string $requestArgs, string $pageArgs, string $expectedUrl)

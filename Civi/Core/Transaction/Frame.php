@@ -99,10 +99,16 @@ class Frame {
     $this->refCount--;
   }
 
+  /**
+   * @return bool
+   */
   public function isEmpty() {
     return ($this->refCount == 0);
   }
 
+  /**
+   * @return bool
+   */
   public function isRollbackOnly() {
     return !$this->doCommit;
   }

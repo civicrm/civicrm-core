@@ -7,6 +7,9 @@ namespace Civi\CiUtil\Command;
  * @package Civi\CiUtil\Command
  */
 class LsCommand {
+  /**
+   * @param $argv
+   */
   public static function main($argv) {
     $paths = $argv;
     array_shift($paths);
