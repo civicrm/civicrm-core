@@ -453,29 +453,13 @@ AND    $cond
           $fieldName = "custom_{$fieldID}";
           if ($isMultiple[$tableName]) {
             if ($formatMultiRecordField) {
-              if($file[$tableName][$fieldID] == 'File') {
-                if($fileid = $dao->$fieldName) {
-                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
-                  $result["{$dao->id}"]["{$fieldID}"] = $fileurl[$dao->$fieldName];
-                }
-              }
-              else {
-                $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
-              }
+              $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
             } else {
               $result["{$fieldID}_{$dao->id}"] = $dao->$fieldName;
             }
           }
           else {
-            if($file[$tableName][$fieldID] == 'File') {
-              if($fileid = $dao->$fieldName) {
-                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
-                $result[$fieldID] = $fileurl[$dao->$fieldName];
-              }
-            }
-            else {
-              $result[$fieldID] = $dao->$fieldName;
-            }
+            $result[$fieldID] = $dao->$fieldName;
           }
         }
       }
