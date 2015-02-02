@@ -1765,13 +1765,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to send notification mail to pcp owner
-   * This is used by contribution and also event pcps
+   * Function used to send notification mail to pcp owner.
+   *
+   * This is used by contribution and also event PCPs.
    *
    * @param object $contribution
    * @param object $contributionSoft
    *   Contribution object.
-   *
    */
 
   public static function pcpNotifyOwner($contribution, $contributionSoft) {
