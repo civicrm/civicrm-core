@@ -39,13 +39,11 @@
         <td>{ts}Localization settings include user language, default currency and available countries for address input.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info{/ts}</a></td>
         <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components{/ts}</a></td>
         <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
     </tr>
     <tr class="even">
