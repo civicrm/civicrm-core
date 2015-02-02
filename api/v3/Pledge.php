@@ -36,15 +36,10 @@
  */
 
 /**
- * Include utility functions.
- */
-
-/**
- * Creates or updates an Pledge.
+ * Create or updates an Pledge.
  *
  * @return array
  *   Array containing 'is_error' to denote success or failure and details of the created pledge
- *
  */
 function civicrm_api3_pledge_create($params) {
   _civicrm_api3_pledge_format_params($params, TRUE);
@@ -55,15 +50,12 @@ function civicrm_api3_pledge_create($params) {
 }
 
 /**
- * Delete a pledge
+ * Delete a pledge.
  *
  * @param array $params
  *   Array included 'pledge_id' of pledge to delete.
  *
- * @return bool
- *   true if success, else false
- *   {@getfields pledge_delete}
- * @example PledgeDelete.php
+ * @return array
  */
 function civicrm_api3_pledge_delete($params) {
   if (CRM_Pledge_BAO_Pledge::deletePledge($params['id'])) {
@@ -77,6 +69,8 @@ function civicrm_api3_pledge_delete($params) {
 }
 
 /**
+ * Adjust metadata for pledge delete action.
+ *
  * @param array $params
  */
 function _civicrm_api3_pledge_delete_spec(&$params) {
@@ -85,7 +79,8 @@ function _civicrm_api3_pledge_delete_spec(&$params) {
 }
 
 /**
- * return field specification specific to get requests
+ * Adjust field specification specific to get requests.
+ *
  * @param array $params
  */
 function _civicrm_api3_pledge_get_spec(&$params) {
@@ -102,7 +97,8 @@ function _civicrm_api3_pledge_get_spec(&$params) {
 }
 
 /**
- * return field specification specific to get requests
+ * Adjust field specification specific to get requests.
+ *
  * @param array $params
  */
 function _civicrm_api3_pledge_create_spec(&$params) {
@@ -117,7 +113,7 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 }
 
 /**
- * Retrieve a set of pledges, given a set of input params
+ * Retrieve a set of pledges, given a set of input params.
  *
  * @param array $params
  *   Input parameters. Use interrogate for possible fields.
@@ -142,14 +138,16 @@ function civicrm_api3_pledge_get($params) {
 }
 
 /**
- * Set default to not return test params
+ * Set default to not return test params.
  */
 function _civicrm_api3_pledge_get_defaults() {
   return array('pledge_test' => 0);
 }
 
 /**
- * Legacy function - I removed a bunch of stuff no longer required from here but it still needs
+ * Legacy function to format pledge parameters.
+ *
+ * I removed a bunch of stuff no longer required from here but it still needs
  * more culling
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object

@@ -68,15 +68,14 @@ function _civicrm_api3_note_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing note
+ * Deletes an existing note.
  *
  * This API is used for deleting a note
  *
  * @param array $params
  *   Including id of the note to be deleted.
- * {@getfields note_delete}
  *
- * @return null
+ * @return array
  */
 function civicrm_api3_note_delete($params) {
 
@@ -100,7 +99,7 @@ function civicrm_api3_note_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -112,10 +111,10 @@ function _civicrm_api3_note_get_spec(&$params) {
 }
 
 /**
- * Get all descendents of given note
+ * Get all descendants of given note.
  *
  * @param array $params
- *   Associative array; only required 'id' parameter is used.
+ *   array; only required 'id' parameter is used.
  *
  * @return array
  *   Nested associative array beginning with direct children of given note.

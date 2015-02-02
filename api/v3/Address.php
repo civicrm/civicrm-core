@@ -36,7 +36,7 @@
  */
 
 /**
- *  Add an Address for a contact.
+ * Add an Address for a contact.
  *
  * @param array $params
  *   Array per getfields metadata.

@@ -33,20 +33,17 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * Subscribe from mailing group
+ * Subscribe from mailing group.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
+ *   Array per getfields metadata.
  *
  * @throws API_Exception
  * @return array
  *   api result array
- *   {@getfields mailing_event_subscribe_create}
  */
 function civicrm_api3_mailing_event_subscribe_create($params) {
   $email      = $params['email'];

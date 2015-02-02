@@ -51,6 +51,7 @@ function civicrm_api3_group_nesting_get($params) {
 
 /**
  * Creates group nesting record for given parent and child id.
+ *
  * Parent and child groups need to exist.
  *
  * @param array $params

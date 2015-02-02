@@ -33,10 +33,11 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
+ * Declare deprecated functions.
+ *
  * @deprecated api notice
  * @return string
  *   to indicate this entire api entity is deprecated
@@ -115,7 +116,10 @@ function civicrm_api3_mailing_group_get($params) {
 }
 
 /**
+ * Delete mailing group.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -125,6 +129,7 @@ function civicrm_api3_mailing_group_delete($params) {
 
 /**
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_group_getfields($params) {

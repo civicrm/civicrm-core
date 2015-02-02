@@ -35,19 +35,19 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: GroupContact.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 
 /**
- * This API will give list of the groups for particular contact
- * Particular status can be sent in params array
+ * This API will give list of the groups for particular contact.
+ *
+ * Particular status can be sent in params array.
+ *
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *
  * @param array $params
  *   Name value pair of contact information.
- * {@getfields GroupContact_get}
  *
  * @return array
  *   list of groups, given contact subsribed to
@@ -70,7 +70,8 @@ function civicrm_api3_group_contact_get($params) {
 }
 
 /**
- * Add contact(s) to group(s)
+ * Add contact(s) to group(s).
+ *
  * @param array $params
  *   Input parameters.
  *
@@ -80,7 +81,6 @@ function civicrm_api3_group_contact_get($params) {
  * "contact_id.1" etc. (optional) : another contact to add<br>
  * "group_id.1" etc. (optional) : additional group to add contact(s) to<br>
  * "status" (optional) : one of "Added", "Pending" or "Removed" (default is "Added")
- * {@example GroupContactCreate.php 0}
  *
  * @return array
  *   Information about operation results
@@ -121,11 +121,12 @@ function civicrm_api3_group_contact_create($params) {
 }
 
 /**
+ * Delete group contact record.
  *
  * @param array $params
  *
  * @return array
- *   <type>
+ *
  * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {

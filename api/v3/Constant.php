@@ -93,9 +93,8 @@ function _civicrm_api3_constant_deprecation() {
  *    <li>worldRegion</li>
  *    <li>wysiwygEditor</li>
  *  </ul>
+ *
  * @return array
- * @example ConstantGet.php
- *  {@getfields constant_get}
  */
 function civicrm_api3_constant_get($params) {
 

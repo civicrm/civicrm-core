@@ -107,6 +107,8 @@ function civicrm_error($result) {
 }
 
 /**
+ * Get camel case version of entity or action name.
+ *
  * @param $entity
  *
  * @return string
@@ -116,7 +118,9 @@ function _civicrm_api_get_camel_name($entity) {
 }
 
 /**
- * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
+ * Swap out any $values vars.
+ *
+ * Ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
  * 'tag_id'  => '$value.api.tag.create.id',
  * 'tag1_id' => '$value.api.entity.create.0.id'

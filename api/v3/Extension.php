@@ -142,7 +142,7 @@ function civicrm_api3_extension_disable($params) {
 }
 
 /**
- * Uninstall an extension
+ * Uninstall an extension,
  *
  * @param array $params
  *   Input parameters.
