@@ -33,31 +33,24 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: GroupContact.php 21624 2009-06-04 22:02:55Z mover $
- *
  */
 
 
 /**
- * This API will give list of the groups for particular contact
- * Particualr status can be sent in params array
- * If no status mentioned in params, by default 'added' will be used
- * to fetch the records
+ * Get group organization record/s.
  *
  * @param array $params
  *   Name value pair of contact information.
- * {@getfields GroupOrganization_get}
- * @example GroupOrganizationGet.php
  *
  * @return array
- *   list of groups, given contact subsribed to
+ *   list of groups, given contact subscribed to
  */
 function civicrm_api3_group_organization_get($params) {
   return _civicrm_api3_basic_get('CRM_Contact_DAO_GroupOrganization', $params);
 }
 
 /**
- * @example GroupOrganizationCreate.php
- * {@getfields GroupOrganization_create}
+ * Create group organization record.
  *
  * @param array $params
  *   Array.
@@ -91,7 +84,7 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Group Organization
+ * Deletes an existing Group Organization.
  *
  * This API is used for deleting a Group Organization
  *
@@ -100,8 +93,6 @@ function _civicrm_api3_group_organization_create_spec(&$params) {
  *
  * @return array
  *   API Result
- *   {@getfields GroupOrganization_delete}
- * @example GroupOrganizationDelete.php
  */
 function civicrm_api3_group_organization_delete($params) {
 

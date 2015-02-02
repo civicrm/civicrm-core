@@ -32,7 +32,6 @@
  * @subpackage API_ActivityProfile
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Profile.php 30486 2011-05-20 16:12:09Z rajan $
- *
  */
 
 /**
@@ -138,6 +137,8 @@ function civicrm_api3_profile_get($params) {
 }
 
 /**
+ * Adjust profile get function metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_profile_get_spec(&$params) {

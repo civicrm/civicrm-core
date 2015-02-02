@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Flush all system caches
+ * Flush all system caches.
  *
  * @param array $params
  *   Input parameters.
@@ -55,7 +54,7 @@ function civicrm_api3_system_flush($params) {
 }
 
 /**
- * Adjust Metadata for Flush action
+ * Adjust Metadata for Flush action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -68,12 +67,13 @@ function _civicrm_api3_system_flush_spec(&$params) {
 }
 
 /**
- * System.Check API specification (optional)
+ * System.Check API specification (optional).
+ *
  * This is used for documentation and validation.
  *
  * @param array $spec
  *   Description of fields supported by this API call.
- * @return void
+ *
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */
 function _civicrm_api3_system_check_spec(&$spec) {
@@ -81,9 +81,10 @@ function _civicrm_api3_system_check_spec(&$spec) {
 }
 
 /**
- * System.Check API
+ * System.Check API.
  *
  * @param array $params
+ *
  * @return array
  *   API result descriptor; return items are alert codes/messages
  * @see civicrm_api3_create_success
@@ -101,13 +102,15 @@ function civicrm_api3_system_check($params) {
 }
 
 /**
+ * Log entry to system log table.
+ *
  * @param array $params
  *
  * @return array
  */
 function civicrm_api3_system_log($params) {
   $log = new CRM_Utils_SystemLogger();
-  // this part means fields with separate db storage are accepted as params which kind of seems more intuitive to me
+  // This part means fields with separate db storage are accepted as params which kind of seems more intuitive to me
   // because I felt like not doing this required a bunch of explanation in the spec function - but perhaps other won't see it as helpful?
   if (!isset($params['context'])) {
     $params['context'] = array();

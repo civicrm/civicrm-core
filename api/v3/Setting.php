@@ -119,7 +119,7 @@ function civicrm_api3_setting_getdefaults(&$params) {
   return civicrm_api3_create_success($defaults, $params, 'setting', 'getfields');
 }
 /**
- * Metadata for setting create function
+ * Metadata for setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -134,8 +134,10 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
 }
 
 /**
- * Revert settings to defaults
+ * Revert settings to defaults.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \Exception
  */
@@ -199,7 +201,8 @@ function civicrm_api3_setting_fill(&$params) {
 }
 
 /**
- * Alter metadata for getfields functions
+ * Alter metadata for getfields functions.
+ *
  * @param array $params
  */
 function _civicrm_api3_setting_fill_spec(&$params) {

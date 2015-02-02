@@ -33,25 +33,19 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Create an Event Participant
- *
- * This API is used for creating a participants in an event.
- * Required parameters : event_id AND contact_id for new creation
- *                     : participant as name/value with participantid for edit
+ * Create an Event Participant.
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_participant.
  *
  * @return array
- *   apiresult
- *   {@getfields participant_create}
+ *   API result array
  */
 function civicrm_api3_participant_create($params) {
-  //check that event id is not an template - should be done @ BAO layer
+  // Check that event id is not an template - should be done @ BAO layer.
   if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
@@ -74,10 +68,13 @@ function civicrm_api3_participant_create($params) {
 }
 
 /**
- * @todo this should be done in the BAO not the api
  * Create a default participant line item
+ *
+ * @todo this should be done in the BAO not the api
+ *
  * @param array $params
  * @param $participant
+ *
  * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant) {
@@ -155,16 +152,13 @@ function _civicrm_api3_participant_create_spec(&$params) {
 }
 
 /**
- * Retrieve a specific participant, given a set of input params
- * If more than one matching participant exists, return an error, unless
- * the client has requested to return the first found contact
+ * Retrieve a specific participant, given a set of input params.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   input parameters.
  *
  * @return array
- *   (reference )        array of properties, if error an array with an error id and error message
- *   {@getfields participant_get}
+ *   array of properties, if error an array with an error id and error message
  */
 function civicrm_api3_participant_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_EVENT;
@@ -183,7 +177,7 @@ function civicrm_api3_participant_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -196,14 +190,13 @@ function _civicrm_api3_participant_get_spec(&$params) {
 }
 
 /**
- * Deletes an existing contact participant
+ * Deletes an existing contact participant.
  *
  * This API is used for deleting a contact participant
  *
  * @param array $params
  *   Array containing Id of the contact participant to be deleted.
  *
- * {@getfields participant_delete}
  * @throws Exception
  * @return array
  */

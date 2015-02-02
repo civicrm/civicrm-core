@@ -33,10 +33,11 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: SystemLog.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
+ * Delete system log record.
+ *
  * @param array $params
  *
  * @return array
@@ -46,9 +47,11 @@ function civicrm_api3_system_log_delete($params) {
 }
 
 /**
- * Create system log
+ * Create system log record.
+ *
  * It's arguable whether this function should exist as it fits our crud pattern and adding it meets our SyntaxConformance test requirements
  * but it just wraps system.log which is more consistent with the PSR3 implemented.
+ *
  * @param array $params
  *
  * @return array
@@ -58,9 +61,9 @@ function civicrm_api3_system_log_create($params) {
 }
 
 /**
- * @param array $params
+ * Adjust system log create metadata.
  *
- * @return void
+ * @param array $params
  */
 function _civicrm_api3_system_log_create_spec(&$params) {
   require_once 'api/v3/System.php';
@@ -68,6 +71,8 @@ function _civicrm_api3_system_log_create_spec(&$params) {
 }
 
 /**
+ * Get system log record.
+ *
  * @param array $params
  *
  * @return array

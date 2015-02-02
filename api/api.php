@@ -12,6 +12,8 @@
  */
 
 /**
+ * CiviCRM API wrapper function.
+ *
  * @param string $entity
  *   type of entities to deal with
  * @param string $action
@@ -27,7 +29,9 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 }
 
 /**
- * Version 3 wrapper for civicrm_api. Throws exception
+ * Version 3 wrapper for civicrm_api.
+ *
+ * Throws exception.
  *
  * @param string $entity
  *   Type of entities to deal with.

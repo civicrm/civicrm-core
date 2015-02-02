@@ -33,25 +33,17 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Pledge.php
- *
  */
 
 /**
- * Include utility functions
+ * Include utility functions.
  */
 
 /**
- * Creates or updates an Activity. See the example for usage
- *
- * @param array $params
- *   Associative array of property name/value.
- *                             pairs for the activity.
- * {@getfields pledge_create}
+ * Creates or updates an Pledge.
  *
  * @return array
  *   Array containing 'is_error' to denote success or failure and details of the created pledge
- *
- * @example PledgeCreate.php Standard create example
  *
  */
 function civicrm_api3_pledge_create($params) {

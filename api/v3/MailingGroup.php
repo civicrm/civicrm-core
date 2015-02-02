@@ -46,7 +46,8 @@ function _civicrm_api3_mailing_group_deprecation() {
 }
 
 /**
- * Handle an unsubscribe event
+ * Handle an unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -58,7 +59,8 @@ function civicrm_api3_mailing_group_event_unsubscribe($params) {
 }
 
 /**
- * Handle a site-level unsubscribe event
+ * Handle a site-level unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params

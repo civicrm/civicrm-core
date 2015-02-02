@@ -58,7 +58,15 @@ function civicrm_api3_file_create($params) {
   }
 
   $fileDAO = new CRM_Core_DAO_File();
-  $properties = array('id', 'file_type_id', 'mime_type', 'uri', 'document', 'description', 'upload_date');
+  $properties = array(
+    'id',
+    'file_type_id',
+    'mime_type',
+    'uri',
+    'document',
+    'description',
+    'upload_date',
+  );
 
   foreach ($properties as $name) {
     if (array_key_exists($name, $params)) {
@@ -92,12 +100,12 @@ function civicrm_api3_file_get($params) {
 }
 
 /**
- * Update an existing file
+ * Update an existing file.
  *
  * This api is used for updating an existing file.
- * Required parameters : id of a file
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_file_update($params) {
@@ -121,10 +129,9 @@ function civicrm_api3_file_update($params) {
 }
 
 /**
- * Deletes an existing file
+ * Delete an existing file.
  *
  * This API is used for deleting a file
- * Required parameters : id of a file
  *
  * @param array $params
  *

@@ -33,7 +33,6 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: GroupNesting.php 21624 2009-08-07 22:02:55Z wmorgan $
- *
  */
 
 /**
@@ -41,7 +40,6 @@
  *
  * @param array $params
  *   An array containing at least child_group_id or parent_group_id.
- * {@getfields GroupNesting_get}
  *
  * @return array
  *   list of group nesting records

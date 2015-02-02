@@ -120,7 +120,7 @@ function civicrm_api3_extension_enable($params) {
 }
 
 /**
- * Disable an extension
+ * Disable an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -130,7 +130,6 @@ function civicrm_api3_extension_enable($params) {
  *
  * @return array
  *   API result
- * @example ExtensionDisable.php
  */
 function civicrm_api3_extension_disable($params) {
   $keys = _civicrm_api3_getKeys($params);

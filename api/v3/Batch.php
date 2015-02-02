@@ -66,11 +66,7 @@ function _civicrm_api3_batch_create_spec(&$params) {
 }
 
 /**
- * Get a Batch
- *
- * Allowed @params array keys are:
- * {@getfields batch_get}
- * @example BatchCreate.php
+ * Get a Batch.
  *
  * @param array $params
  *
@@ -82,11 +78,7 @@ function civicrm_api3_batch_get($params) {
 }
 
 /**
- * Delete a Batch
- *
- * Allowed @params array keys are:
- * {@getfields batch_delete}
- * @example BatchCreate.php
+ * Delete a Batch.
  *
  * @param array $params
  *

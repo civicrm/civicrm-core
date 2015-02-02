@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: UFJoin.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * takes an associative array and creates a uf join in the database
+ * Takes an associative array and creates a uf join in the database.
  *
  * @param array $params
  *   Assoc array of name/value pairs.

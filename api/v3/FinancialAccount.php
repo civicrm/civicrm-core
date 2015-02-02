@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_financial_account
- *
  */
 
 /**
- * Save a financial_account
- *
- * Allowed @params array keys are:
- * {@getfields financial_account_create}
- * @example financial_accountCreate.php
+ * Save a financial_account.
  *
  * @param array $params
  *
@@ -50,11 +45,7 @@ function civicrm_api3_financial_account_create($params) {
 }
 
 /**
- * Get a financial_account
- *
- * Allowed @params array keys are:
- * {@getfields financial_account_get}
- * @example financial_accountCreate.php
+ * Get a financial_account.
  *
  * @param array $params
  *
@@ -66,11 +57,7 @@ function civicrm_api3_financial_account_get($params) {
 }
 
 /**
- * Delete a financial_account
- *
- * Allowed @params array keys are:
- * {@getfields financial_account_delete}
- * @example financial_accountCreate.php
+ * Delete a financial_account.
  *
  * @param array $params
  *
