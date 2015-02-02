@@ -964,39 +964,42 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $activity = $this->processActivity($params);
     }
 
-    //Set for repeat configuration in create mode
-    $params['entity_id'] = $this->_activityId;
-    $params['entity_table'] = 'civicrm_activity';
-    $scheduleReminderDetails = array();
-    if (!empty($params['entity_id']) && !empty($params['entity_table'])) {
-      $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);
-      if ($checkParentExistsForThisId) {
-        $params['parent_entity_id'] = $checkParentExistsForThisId;
-        $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $params['entity_table']);
+    $activityIds = empty($this->_activityIds) ? array($this->_activityId) : $this->_activityIds;
+    foreach ($activityIds as $activityId) {
+      // set params for repeat configuration in create mode
+      $params['entity_id'] = $activityId;
+      $params['entity_table'] = 'civicrm_activity';
+      $scheduleReminderDetails = array();
+      if (!empty($params['entity_id']) && !empty($params['entity_table'])) {
+        $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);
+        if ($checkParentExistsForThisId) {
+          $params['parent_entity_id'] = $checkParentExistsForThisId;
+          $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($checkParentExistsForThisId, $params['entity_table']);
+        }
+        else {
+          $params['parent_entity_id'] = $params['entity_id'];
+          $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($params['entity_id'], $params['entity_table']);
+        }
+        if (property_exists($scheduleReminderDetails, 'id')) {
+          $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
+        }
       }
-      else {
-        $params['parent_entity_id'] = $params['entity_id'];
-        $scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEntityId($params['entity_id'], $params['entity_table']);
-      }
-      if (property_exists($scheduleReminderDetails, 'id')) {
-        $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
-      }
-    }
-    $params['dateColumns'] = array('activity_date_time');
+      $params['dateColumns'] = array('activity_date_time');
 
-    //Unset activity id
-    unset($params['id']);
-    $linkedEntities = array(
-      array(
-        'table' => 'civicrm_activity_contact',
-        'findCriteria' => array(
-          'activity_id' => $this->_activityId,
+      // unset activity id
+      unset($params['id']);
+      $linkedEntities = array(
+        array(
+          'table' => 'civicrm_activity_contact',
+          'findCriteria' => array(
+            'activity_id' => $activityId,
+          ),
+          'linkedColumns' => array('activity_id'),
+          'isRecurringEntityRecord' => FALSE,
         ),
-        'linkedColumns' => array('activity_id'),
-        'isRecurringEntityRecord' => FALSE,
-      ),
-    );
-    CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_activity', $linkedEntities);
+      );
+      CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_activity', $linkedEntities);
+    }
 
     return array('activity' => $activity);
   }
