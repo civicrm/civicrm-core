@@ -64,7 +64,11 @@ function civicrm_api3_case_create($params) {
     return civicrm_api3_case_update($params);
   }
 
-  civicrm_api3_verify_mandatory($params, NULL, array('contact_id', 'subject', array('case_type', 'case_type_id')));
+  civicrm_api3_verify_mandatory($params, NULL, array(
+    'contact_id',
+    'subject',
+    array('case_type', 'case_type_id'))
+  );
   _civicrm_api3_case_format_params($params);
 
   // If format_params didn't find what it was looking for, return error
@@ -177,7 +181,7 @@ function _civicrm_api3_case_delete_spec(&$params) {
 }
 
 /**
- * Get details of a particular case, or search for cases, depending on params
+ * Get details of a particular case, or search for cases, depending on params.
  *
  * Please provide one (and only one) of the four get/search parameters:
  *

@@ -67,7 +67,7 @@ function civicrm_api3_generic_getList($apiRequest) {
 }
 
 /**
- * Set defaults for api.getlist
+ * Set defaults for api.getlist.
  *
  * @param string $entity
  * @param array $request
@@ -145,7 +145,7 @@ function _civicrm_api3_generic_getlist_params(&$request) {
 }
 
 /**
- * Fallback implementation of getlist_output. May be overridden by individual apis
+ * Fallback implementation of getlist_output. May be overridden by individual api functions.
  *
  * @param array $result
  * @param array $request
