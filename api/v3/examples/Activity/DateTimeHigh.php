@@ -58,7 +58,7 @@ function activity_get_expectedresult() {
         'subject' => 'Make-it-Happen Meeting',
         'activity_date_time' => '2011-01-01 00:00:00',
         'duration' => '120',
-        'location' => 'Pensulvania',
+        'location' => 'Pennsylvania',
         'details' => 'a test activity',
         'status_id' => '1',
         'priority_id' => '1',
