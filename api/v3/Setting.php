@@ -32,7 +32,13 @@
  * @subpackage API_Settings
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Settings.php
+ */
+
+/**
+ * Get fields for setting api calls.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_setting_getfields($params) {

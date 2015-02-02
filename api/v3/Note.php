@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Note.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Create Note
+ * Create Note.
  *
  * This API is used for creating a note.
  * Required parameters : entity_id AND note

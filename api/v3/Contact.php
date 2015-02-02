@@ -139,7 +139,9 @@ function _civicrm_api3_contact_create_spec(&$params) {
 }
 
 /**
- * Retrieve one or more contacts, given a set of search params
+ * Retrieve one or more contacts, given a set of search params.
+ *
+ * @param array $params
  *
  * @return array
  *   API Result Array
@@ -152,6 +154,8 @@ function civicrm_api3_contact_get($params) {
 }
 
 /**
+ * Get count of contact.
+ *
  * @param array $params
  *
  * @return int

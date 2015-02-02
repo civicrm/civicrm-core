@@ -32,13 +32,13 @@
  * @subpackage API_ActionSchedule
  *
  * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Get CiviCRM Action Schedule details
- * {@getfields action_schedule_create}
+ * Get CiviCRM Action Schedule details.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_action_schedule_get($params) {

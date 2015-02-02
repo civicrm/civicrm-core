@@ -1,8 +1,9 @@
 <?php
 
 /**
- * Get information about fields for a given api request. Getfields information
- * is used for documentation, validation, default setting
+ * Get information about fields for a given api request.
+ *
+ * Getfields information is used for documentation, validation, default setting
  * We first query the scheme using the $dao->fields function & then augment
  * that information by calling the _spec functions that apply to the relevant function
  * Note that we use 'unique' field names as described in the xml/schema files

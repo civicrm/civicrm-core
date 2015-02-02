@@ -1,8 +1,12 @@
 <?php
 
 /**
+ * Get list of deprecated entities.
+ *
  * @deprecated api notice
+ *
  * @param array $entities
+ *
  * @return array
  *   Array of deprecated api entities
  */

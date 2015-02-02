@@ -1,7 +1,8 @@
 <?php
 
 /**
- * File for the CiviCRM APIv3 API wrapper
+ * @file
+ * File for the CiviCRM APIv3 API wrapper.
  *
  * @package CiviCRM_APIv3
  * @subpackage API

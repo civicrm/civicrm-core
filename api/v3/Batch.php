@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Batch
- *
  */
 
 /**
- * Save a Batch
- *
- * Allowed @params array keys are:
- * {@getfields batch_create}
- * @example BatchCreate.php
+ * Save a Batch.
  *
  * @param array $params
  *

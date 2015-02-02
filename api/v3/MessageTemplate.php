@@ -32,7 +32,10 @@
  */
 
 /**
+ * Create message template.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

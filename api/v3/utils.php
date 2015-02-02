@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: utils.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Initialize CiviCRM - should be run at the start of each API function
+ * Initialize CiviCRM - should be run at the start of each API function.
  */
 function _civicrm_api3_initialize() {
   require_once 'CRM/Core/ClassLoader.php';
@@ -46,7 +45,7 @@ function _civicrm_api3_initialize() {
 }
 
 /**
- * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
+ * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking.
  *
  * @param array $params
  *   Array of fields to check.
@@ -64,7 +63,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
 }
 
 /**
- * check mandatory fields are included
+ * Check mandatory fields are included.
  *
  * @param array $params
  *   Array of fields to check.
@@ -126,9 +125,11 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
 }
 
 /**
+ * Create error array.
  *
- * @param $msg
+ * @param string $msg
  * @param array $data
+ *
  * @return array
  */
 function civicrm_api3_create_error($msg, $data = array()) {
@@ -137,7 +138,8 @@ function civicrm_api3_create_error($msg, $data = array()) {
   // we will show sql to privileged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?)
   if (isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
-    $data['debug_information'] = $data['sql']; // Isn't this redundant?
+    // Isn't this redundant?
+    $data['debug_information'] = $data['sql'];
   }
   else {
     unset($data['sql']);
@@ -261,7 +263,8 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
 }
 
 /**
- * Load the DAO of the entity
+ * Load the DAO of the entity.
+ *
  * @param $entity
  * @return bool
  */
@@ -275,11 +278,13 @@ function _civicrm_api3_load_DAO($entity) {
 }
 
 /**
- * return the DAO of the function or Entity
+ * Return the DAO of the function or Entity.
+ *
  * @param string $name
  *   Either a function of the api (civicrm_{entity}_create or the entity name.
  *   return the DAO name to manipulate this function
  *   eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ *
  * @return mixed|string
  */
 function _civicrm_api3_get_DAO($name) {
@@ -343,11 +348,13 @@ function _civicrm_api3_get_DAO($name) {
 }
 
 /**
- * return the DAO of the function or Entity
+ * Return the DAO of the function or Entity.
+ *
  * @param string $name
  *   Is either a function of the api (civicrm_{entity}_create or the entity name.
  *   return the DAO name to manipulate this function
  *   eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ *
  * @return mixed
  */
 function _civicrm_api3_get_BAO($name) {
@@ -366,7 +373,8 @@ function _civicrm_api3_get_BAO($name) {
 }
 
 /**
- *  Recursive function to explode value-separated strings into arrays
+ * Recursive function to explode value-separated strings into arrays.
+ *
  * @param $values
  */
 function _civicrm_api3_separate_values(&$values) {
@@ -376,7 +384,8 @@ function _civicrm_api3_separate_values(&$values) {
       _civicrm_api3_separate_values($value);
     }
     elseif (is_string($value)) {
-      if ($key == 'case_type_id') {// this is to honor the way case API was originally written
+      // This is to honor the way case API was originally written.
+      if ($key == 'case_type_id') {
         $value = trim(str_replace($sp, ',', $value), ',');
       }
       elseif (strpos($value, $sp) !== FALSE) {
@@ -387,12 +396,14 @@ function _civicrm_api3_separate_values(&$values) {
 }
 
 /**
- * This is a legacy wrapper for api_store_values which will check the suitable fields using getfields
- * rather than DAO->fields
+ * This is a legacy wrapper for api_store_values.
  *
- * Getfields has handling for how to deal with uniquenames which dao->fields doesn't
+ * It checks suitable fields using getfields rather than DAO->fields.
+ *
+ * Getfields has handling for how to deal with unique names which dao->fields doesn't
  *
  * Note this is used by BAO type create functions - eg. contribution
+ *
  * @param string $entity
  * @param array $params
  * @param array $values
@@ -403,6 +414,7 @@ function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values) {
   _civicrm_api3_store_values($fields, $params, $values);
 }
 /**
+ * Store values.
  *
  * @param array $fields
  * @param array $params
@@ -424,7 +436,9 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 }
 
 /**
- * The API supports 2 types of get requestion. The more complex uses the BAO query object.
+ * Get function for query object api.
+ *
+ * The API supports 2 types of get request. The more complex uses the BAO query object.
  *  This is a generic function for those functions that call it
  *
  *  At the moment only called by contact we should extend to contribution &
@@ -433,6 +447,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *
  * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
  * 2 variants call
+ *
  * @param $entity
  * @param array $params
  *   As passed into api get or getcount function.
@@ -528,13 +543,15 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
 }
 
 /**
- * get dao query object based on input params
+ * Get dao query object based on input params.
+ *
  * Ideally this would be merged with _civicrm_get_using_query_object but we need to resolve differences in what the
  * 2 variants call
  *
  * @param array $params
  * @param string $mode
  * @param string $entity
+ *
  * @return array
  *   [CRM_Core_DAO|CRM_Contact_BAO_Query]
  */
@@ -569,7 +586,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 }
 
 /**
- * Function transfers the filters being passed into the DAO onto the params object
+ * Function transfers the filters being passed into the DAO onto the params object.
+ *
  * @param CRM_Core_DAO $dao
  * @param array $params
  * @param bool $unique
@@ -642,7 +660,8 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       $dao->selectAdd($returnValue);
     }
 
-    $unmatchedFields = array_diff(// not already matched on the field names
+    // Not already matched on the field names.
+    $unmatchedFields = array_diff(
       array_keys($options['return']),
       $returnMatched
     );
@@ -659,7 +678,8 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
 }
 
 /**
- * Apply filters (e.g. high, low) to DAO object (prior to find)
+ * Apply filters (e.g. high, low) to DAO object (prior to find).
+ *
  * @param string $filterField
  *   Field name of filter.
  * @param string $filterValue
@@ -908,6 +928,8 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
 }
 
 /**
+ * Determine if custom fields need to be retrieved.
+ *
  * We currently retrieve all custom fields or none at this level so if we know the entity
  * && it can take custom fields & there is the string 'custom' in their return request we get them all, they are filtered on the way out
  * @todo filter so only required fields are queried
@@ -923,14 +945,14 @@ function _civicrm_api3_custom_fields_are_required($entity, $params) {
     return FALSE;
   }
   $options = _civicrm_api3_get_options_from_params($params);
-  //we check for possibility of 'custom' => 1 as well as specific custom fields
+  // We check for possibility of 'custom' => 1 as well as specific custom fields.
   $returnString = implode('', $options['return']) . implode('', array_keys($options['return']));
   if (stristr($returnString, 'custom')) {
     return TRUE;
   }
 }
 /**
- * Converts an object to an array
+ * Converts an object to an array.
  *
  * @param object $dao
  *   (reference) object to convert.
