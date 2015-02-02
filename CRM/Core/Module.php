@@ -66,9 +66,7 @@ class CRM_Core_Module {
       $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
 
       $config = CRM_Core_Config::singleton();
-      if (is_callable(array($config->userSystem, 'getModules'))) {
-        $result = array_merge($result, $config->userSystem->getModules());
-      }
+      $result = array_merge($result, $config->userSystem->getModules());
     }
     return $result;
   }

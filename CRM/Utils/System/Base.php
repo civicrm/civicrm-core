@@ -48,6 +48,162 @@ abstract class CRM_Utils_System_Base {
   var $supports_form_extensions = FALSE;
 
   /**
+   * Append an additional breadcrumb tag to the existing breadcrumb
+   *
+   * @param array $breadCrumbs
+   */
+  public function appendBreadCrumb($breadCrumbs) {
+  }
+
+  /**
+   * Reset an additional breadcrumb tag to the existing breadcrumb
+   */
+  public function resetBreadCrumb() {
+  }
+
+  /**
+   * Append a string to the head of the html file
+   *
+   * @param string $head
+   *   The new string to be appended.
+   */
+  public function addHTMLHead($head) {
+  }
+
+  /**
+   * Rewrite various system urls to https
+   */
+  public function mapConfigToSSL() {
+    // dont need to do anything, let CMS handle their own switch to SSL
+  }
+
+  /**
+   * Figure out the post url for QuickForm
+   *
+   * @param string $action
+   *   The default url if one is pre-specified.
+   *
+   * @return string
+   *   The url to post the form.
+   */
+  public function postURL($action) {
+    $config = CRM_Core_Config::singleton();
+    if (!empty($action)) {
+      return $action;
+    }
+
+    return $this->url(CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET),
+      NULL, TRUE, NULL, FALSE
+    );
+  }
+
+  /**
+   * Generate the url string to a CiviCRM path.
+   *
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param string $query
+   *   A query string to append to the link.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with http).
+   *   Useful for links that will be displayed outside the site, such as in an RSS feed.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $htmlize
+   *   Whether to encode special html characters such as &.
+   * @param bool $frontend
+   *   This link should be to the CMS front end (applies to WP & Joomla).
+   * @param bool $forceBackend
+   *   This link should be to the CMS back end (applies to WP & Joomla).
+   *
+   * @return string
+   */
+  public function url(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = TRUE,
+    $frontend = FALSE,
+    $forceBackend = FALSE
+  ) {
+    return NULL;
+  }
+
+  /**
+   * Authenticate the user against the CMS db
+   *
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
+   * @param string $realPath
+   *   Filename of script
+   *
+   * @return array|bool
+   *   [contactID, ufID, unique string] else false if no auth
+   */
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    return FALSE;
+  }
+
+  /**
+   * Set a message in the CMS to display to a user
+   *
+   * @param string $message
+   *   The message to set.
+   */
+  public function setMessage($message) {
+  }
+
+  /**
+   * Load user into session
+   *
+   * @param $user
+   *
+   * @return bool
+   */
+  public function loadUser($user) {
+    return TRUE;
+  }
+
+  /**
+   * Immediately stop script execution and display a 401 "Access Denied" page
+   */
+  public function permissionDenied() {
+    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+  }
+
+  /**
+   * Immediately stop script execution, log out the user and redirect to the home page
+   *
+   * @deprecated
+   *   This function should be removed in favor of linking to the CMS's logout page
+   */
+  public function logout() {
+  }
+
+  /**
+   * Clear CMS caches related to the user registration/profile forms.
+   * Used when updating/embedding profiles on CMS user forms.
+   * @see CRM-3600
+   */
+  public function updateCategories() {
+  }
+
+  /**
+   * Get the locale set in the CMS
+   *
+   * @return string|null
+   *   Locale or null for none
+   */
+  public function getUFLocale() {
+    return NULL;
+  }
+
+  /**
    * If we are using a theming system, invoke theme, else just print the
    * content
    *
@@ -126,6 +282,8 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Get CMS Version
+   *
    * @return string
    */
   public function getVersion() {
@@ -161,6 +319,40 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Create a user in the CMS.
+   *
+   * @param array $params
+   * @param string $mail
+   *   Email id for cms user.
+   *
+   * @return int|bool
+   *   uid if user exists, false otherwise
+   */
+  public function createUser(&$params, $mail) {
+    return FALSE;
+  }
+
+  /**
+   * Update a user's email address in the CMS.
+   *
+   * @param int $ufID
+   *   User ID in CMS.
+   * @param string $email
+   *   Primary contact email address.
+   */
+  public function updateCMSName($ufID, $email) {
+  }
+
+  /**
+   * Check if user is logged in to the CMS.
+   *
+   * @return bool
+   */
+  public function isUserLoggedIn() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -172,12 +364,24 @@ abstract class CRM_Utils_System_Base {
   public abstract function getLoginURL($destination = '');
 
   /**
+   * Get the login destination string. When this is passed in the
+   * URL the user will be directed to it after filling in the CMS form
+   *
+   * @param CRM_Core_Form $form
+   *   Form object representing the 'current' form - to which the user will be returned.
+   * @return string|NULL
+   *   destination value for URL
+   */
+  public function getLoginDestination(&$form) {
+    return NULL;
+  }
+
+  /**
    * Determine the native ID of the CMS user
    *
    * @param string $username
    *
    * @throws CRM_Core_Exception
-   * @return;
    */
   public function getUfId($username) {
     $className = get_class($this);
@@ -210,6 +414,85 @@ abstract class CRM_Utils_System_Base {
    */
   public function clearResourceCache() {
     // nullop by default
+  }
+
+  /**
+   * Add a script file
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @param $url : string, absolute path to file
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
+   *
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   */
+  public function addScriptUrl($url, $region) {
+    return FALSE;
+  }
+
+  /**
+   * Add an inline script
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @param $code : string, javascript code
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
+   *
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   */
+  public function addScript($code, $region) {
+    return FALSE;
+  }
+
+  /**
+   * Add a css file
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @param $url : string, absolute path to file
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
+   *
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   */
+  public function addStyleUrl($url, $region) {
+    return FALSE;
+  }
+
+  /**
+   * Add an inline style
+   *
+   * Note: This function is not to be called directly
+   * @see CRM_Core_Region::render()
+   *
+   * @param $code : string, css code
+   * @param string $region
+   *   location within the document: 'html-header', 'page-header', 'page-footer'.
+   *
+   * @return bool
+   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   */
+  public function addStyle($code, $region) {
+    return FALSE;
+  }
+
+  /**
+   * Sets the title of the page
+   *
+   * @param string $title
+   *   Title to set in html header
+   * @param string|null $pageTitle
+   *   Title to set in html body (if different)
+   */
+  public function setTitle($title, $pageTitle = NULL) {
   }
 
   /**
@@ -279,10 +562,9 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Over-ridable function to get timezone as a string eg.
-   *
+   * Get timezone as a string
    * @return string
-   *   Time zone, e.g. 'America/Los_Angeles'
+   *   Timezone string e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     return date_default_timezone_get();
@@ -296,34 +578,37 @@ abstract class CRM_Utils_System_Base {
    *   $uniqueIdentifer Unique identifier from the user Framework system
    */
   public function getUniqueIdentifierFromUserObject($user) {
+    return NULL;
   }
 
   /**
    * Get User ID from UserFramework system (CMS)
    * @param object $user
    *   Object as described by the User Framework.
-   * @return mixed
-   *   <NULL, number>
+   * @return null|int
    */
   public function getUserIDFromUserObject($user) {
+    return NULL;
   }
 
   /**
    * Get currently logged in user uf id.
    *
-   * @return;
-   *   $userID logged in user uf id.
+   * @return int|null
+   *   logged in user uf id.
    */
   public function getLoggedInUfID() {
+    return NULL;
   }
 
   /**
    * Get currently logged in user unique identifier - this tends to be the email address or user name.
    *
-   * @return;
+   * @return string|null
    *   logged in user unique identifier
    */
   public function getLoggedInUniqueIdentifier() {
+    return NULL;
   }
 
   /**
@@ -363,11 +648,21 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * List modules installed in the CMS, including enabled and disabled ones.
+   *
+   * @return array
+   *   [CRM_Core_Module]
+   */
+  public function getModules() {
+    return array();
+  }
+
+  /**
    * Get Url to view user record
    * @param int $contactID
    *   Contact ID.
    *
-   * @return string
+   * @return string|null
    */
   public function getUserRecordUrl($contactID) {
     return NULL;
@@ -391,13 +686,16 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Log error to CMS
+   *
+   * $param string $message
    */
   public function logger($message) {
-
   }
 
   /**
    * Append to coreResourcesList
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
   }
