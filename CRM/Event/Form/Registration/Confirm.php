@@ -393,6 +393,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->addFormRule(array('CRM_Event_Form_Registration_Confirm', 'formRule'), $this);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array|bool
+   */
   public static function formRule($fields, $files, $self) {
     $errors = array();
     $eventFull = CRM_Event_BAO_Participant::eventFull($self->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $self->_values['event']));

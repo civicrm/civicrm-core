@@ -128,8 +128,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
-   *
-   * @return array|void
    */
   public function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));

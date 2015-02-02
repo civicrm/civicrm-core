@@ -34,15 +34,13 @@
  */
 
 /**
- * This class generates form components for processing a ontribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
    * Variable defined for Contribution Page Id
    */
-
   public $_pageId = NULL;
   public $_id = NULL;
   public $_component = NULL;
