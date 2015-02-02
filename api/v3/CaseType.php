@@ -35,13 +35,10 @@
  */
 
 /**
- * create or update case type
+ * Create or update case type.
  *
  * @param array $params
  *   Input parameters.
- *
- * Allowed @params array keys are:
- * {@getfields case_type_create}
  *
  * @throws API_Exception
  * @return array
@@ -50,13 +47,15 @@
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
-  unset($params['is_forkable']); // computed property
-  unset($params['is_forked']); // computed property
+  // Computed properties.
+  unset($params['is_forkable']);
+  unset($params['is_forked']);
 
   if (!array_key_exists('is_active', $params) && empty($params['id'])) {
     $params['is_active'] = TRUE;
   }
-  if (!empty($params['id']) // this is an existing case-type
+  // This is an existing case-type.
+  if (!empty($params['id'])
     && !CRM_Case_BAO_CaseType::isForked($params['id']) // which is not yet forked
     && !CRM_Case_BAO_CaseType::isForkable($params['id']) // for which new forks are prohibited
   ) {
@@ -67,7 +66,7 @@ function civicrm_api3_case_type_create($params) {
 }
 
 /**
- * retrieve case types
+ * Retrieve case types.
  *
  * @param array $params
  *
@@ -84,9 +83,10 @@ function civicrm_api3_case_type_get($params) {
 }
 
 /**
- * format definition
+ * Format definition.
  *
  * @param array $result
+ *
  * @return array
  * @throws \CRM_Core_Exception
  */
@@ -107,7 +107,7 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
 }
 
 /**
- * Function to delete case type
+ * Function to delete case type.
  *
  * @param array $params
  *   Array including id of case_type to delete.

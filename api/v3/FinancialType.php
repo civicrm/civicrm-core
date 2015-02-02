@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_financial_type
- *
  */
 
 /**
- * Save a financial_type
- *
- * Allowed @params array keys are:
- * {@getfields financial_type_create}
- * @example financial_typeCreate.php
+ * Save a financial_type.
  *
  * @param array $params
  *
@@ -50,11 +45,7 @@ function civicrm_api3_financial_type_create($params) {
 }
 
 /**
- * Get a financial_type
- *
- * Allowed @params array keys are:
- * {@getfields financial_type_get}
- * @example financial_typeCreate.php
+ * Get a financial_type.
  *
  * @param array $params
  *
@@ -66,11 +57,7 @@ function civicrm_api3_financial_type_get($params) {
 }
 
 /**
- * Delete a financial_type
- *
- * Allowed @params array keys are:
- * {@getfields financial_type_delete}
- * @example financial_typeCreate.php
+ * Delete a financial_type.
  *
  * @param array $params
  *

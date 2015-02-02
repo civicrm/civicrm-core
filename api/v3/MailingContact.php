@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id$
- *
  */
 
 /**
- * Get all the mailings and details that a contact was involved with
+ * Get all the mailings and details that a contact was involved with.
  *
  * @param array $params
  *   Input parameters - see _spec for details (returned by getfields)
@@ -49,10 +48,11 @@ function civicrm_api3_mailing_contact_get($params) {
   return civicrm_api3_create_success(_civicrm_api3_mailing_contact_getresults($params, FALSE));
 }
 /**
- * This is a wrapper for the functions that return the results from the 'quasi-entity'
- * mailing contact
+ * This is a wrapper for the functions that return the results from the 'quasi-entity' mailing contact.
+ *
  * @param array $params
  * @param bool $count
+ *
  * @throws Exception
  */
 function _civicrm_api3_mailing_contact_getresults($params, $count) {
@@ -70,8 +70,9 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
       $count
   );
 }
+
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -91,6 +92,8 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
 }
 
 /**
+ * Helper function for mailing contact queries.
+ *
  * @param int $contactID
  * @param $offset
  * @param $limit

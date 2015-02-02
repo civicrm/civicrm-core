@@ -18,6 +18,7 @@
  *   - version: string
  *   - function: callback (mixed)
  *   - params: array, varies
+ *
  * @return array
  *   API success object
  */
@@ -31,7 +32,11 @@ function civicrm_api3_generic_getfields($apiRequest) {
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }
     if (!empty($apiRequest['params']['option_group_id'])) {
-      $optionGroupName = civicrm_api('option_group', 'getvalue', array('version' => 3, 'id' => $apiRequest['params']['option_group_id'], 'return' => 'name'));
+      $optionGroupName = civicrm_api('option_group', 'getvalue', array(
+        'version' => 3,
+        'id' => $apiRequest['params']['option_group_id'],
+        'return' => 'name',
+      ));
       if (is_string($optionGroupName)) {
         CRM_Utils_PseudoConstant::flushConstant(_civicrm_api_get_camel_name($optionGroupName));
       }
@@ -145,7 +150,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
 }
 
 /**
- * API return function to reformat results as count
+ * API return function to reformat results as count.
  *
  * @param array $apiRequest
  *   Api request as an array. Keys are.
@@ -167,7 +172,7 @@ function civicrm_api3_generic_getcount($apiRequest) {
 }
 
 /**
- * API return function to reformat results as single result
+ * API return function to reformat results as single result.
  *
  * @param array $apiRequest
  *   Api request as an array. Keys are.
@@ -176,7 +181,7 @@ function civicrm_api3_generic_getcount($apiRequest) {
  *   count of results
  */
 function civicrm_api3_generic_getsingle($apiRequest) {
-  // so the first entity is always result['values'][0]
+  // So the first entity is always result['values'][0].
   $apiRequest['params']['sequential'] = 1;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
   if ($result['is_error'] !== 0) {
@@ -192,7 +197,7 @@ function civicrm_api3_generic_getsingle($apiRequest) {
 }
 
 /**
- * API return function to reformat results as single value
+ * API return function to reformat results as single value.
  *
  * @param array $apiRequest
  *   Api request as an array. Keys are.
@@ -224,6 +229,8 @@ function civicrm_api3_generic_getvalue($apiRequest) {
 }
 
 /**
+ * Get count of contact references.
+ *
  * @param array $params
  */
 function _civicrm_api3_generic_getrefcount_spec(&$params) {
@@ -232,7 +239,7 @@ function _civicrm_api3_generic_getrefcount_spec(&$params) {
 }
 
 /**
- * API to determine if a record is in-use
+ * API to determine if a record is in-use.
  *
  * @param array $apiRequest
  *   Api request as an array.
@@ -260,7 +267,7 @@ function civicrm_api3_generic_getrefcount($apiRequest) {
 }
 
 /**
- * API wrapper for replace function
+ * API wrapper for replace function.
  *
  * @param array $apiRequest
  *   Api request as an array. Keys are.
@@ -273,7 +280,7 @@ function civicrm_api3_generic_replace($apiRequest) {
 }
 
 /**
- * API wrapper for getoptions function
+ * API wrapper for getoptions function.
  *
  * @param array $apiRequest
  *   Api request as an array.
@@ -282,7 +289,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *   Array of results
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
-  // Resolve aliases
+  // Resolve aliases.
   $fieldName = _civicrm_api3_api_resolve_alias($apiRequest['entity'], $apiRequest['params']['field']);
   if (!$fieldName) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");

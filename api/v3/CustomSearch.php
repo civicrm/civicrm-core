@@ -19,17 +19,12 @@ function civicrm_api3_custom_search_get($params) {
 }
 
 /**
- * Add a CustomSearch
- *
- * Allowed @params array keys are:
- *
- * {@example OptionValueCreate.php}
+ * Add a CustomSearch.
  *
  * @param array $params
  *
  * @return array
  *   Array of newly created option_value property values.
- *   {@getfields OptionValue_create}
  */
 function civicrm_api3_custom_search_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -61,15 +56,12 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ReportTemplate
+ * Deletes an existing ReportTemplate.
  *
  * @param array $params
  *
- * {@example ReportTemplateDelete.php 0}
- *
  * @return array
  *   Api result
- *   {@getfields ReportTemplate_create}
  */
 function civicrm_api3_custom_search_delete($params) {
   require_once 'api/v3/OptionValue.php';

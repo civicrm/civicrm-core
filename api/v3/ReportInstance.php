@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Retrieve a report instance
+ * Retrieve a report instance.
  *
  * @param array $params
  *   Input parameters.
  *
  * @return array
- *   details of found instances
+ *   Details of found instances
  */
 function civicrm_api3_report_instance_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- *  Add or update a report instance.
+ * Add or update a report instance.
  *
  * @param array $params
  *

@@ -33,7 +33,6 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: UFField.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
@@ -106,12 +105,9 @@ function civicrm_api3_uf_field_create($params) {
 }
 
 /**
- * Gets field for civicrm_uf_field create
+ * Adjust metadata for civicrm_uf_field create.
  *
  * @param array $params
- *
- * @return void
- *   fields valid for other functions
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
@@ -125,24 +121,19 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
 }
 
 /**
- * Returns array of uf groups (profiles)  matching a set of one or more group properties
+ * Returns array of uf groups (profiles)  matching a set of one or more group properties.
  *
  * @param array $params
- *   (reference) Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all surveys will be returned
+ *   Array per getfields metadata.
  *
  * @return array
- *   (reference) Array
- *   {@getfields UFField_get
- * @example UFFieldGet.php
  */
 function civicrm_api3_uf_field_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFField', $params);
 }
 
 /**
- * Delete uf field
+ * Delete uf field.
  *
  * @param array $params
  *

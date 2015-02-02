@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_product
- *
  */
 
 /**
- * Save a product
- *
- * Allowed @params array keys are:
- * {@getfields product_create}
- * @example productCreate.php
+ * Save a product.
  *
  * @param array $params
  *
@@ -51,11 +46,7 @@ function civicrm_api3_product_create($params) {
 }
 
 /**
- * Get a product
- *
- * Allowed @params array keys are:
- * {@getfields product_get}
- * @example productCreate.php
+ * Get a product.
  *
  * @param array $params
  *
@@ -67,11 +58,7 @@ function civicrm_api3_product_get($params) {
 }
 
 /**
- * Delete a product
- *
- * Allowed @params array keys are:
- * {@getfields product_delete}
- * @example productCreate.php
+ * Delete a product.
  *
  * @param array $params
  *

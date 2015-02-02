@@ -33,14 +33,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Contribution.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Add or update a contribution
+ * Add or update a contribution.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   Input parameters.
  *
  * @throws API_Exception
  * @return array
@@ -64,7 +63,7 @@ function civicrm_api3_contribution_create(&$params) {
 
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  // make sure tax calculation is handled via api
+  // Make sure tax calculation is handled via api.
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
 
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
@@ -144,7 +143,8 @@ function _civicrm_api3_contribution_create_spec(&$params) {
 }
 
 /**
- * Support for schema changes made in 4.5
+ * Support for schema changes made in 4.5.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
@@ -169,13 +169,12 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 }
 
 /**
- * Delete a contribution
+ * Delete a contribution.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   Input parameters.
  *
- * @return bool
- *   true if success, else false
+ * @return array
  */
 function civicrm_api3_contribution_delete($params) {
 
@@ -189,7 +188,10 @@ function civicrm_api3_contribution_delete($params) {
 }
 
 /**
- * modify metadata. Legacy support for contribution_id
+ * Modify metadata for delete action.
+ *
+ * Legacy support for contribution_id.
+ *
  * @param array $params
  */
 function _civicrm_api3_contribution_delete_spec(&$params) {
@@ -430,7 +432,8 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 }
 
 /**
- * provide function metadata
+ * Provide function metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_contribution_completetransaction_spec(&$params) {

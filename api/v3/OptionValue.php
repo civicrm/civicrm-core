@@ -1,16 +1,12 @@
 <?php
 
 /**
- * Retrieve one or more OptionValues
+ * Retrieve one or more option values.
  *
  * @param array $params
  *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
  * @return array
- *   details of found Option Values
- *   {@getfields OptionValue_get}
+ *   Details of found Option Values
  */
 function civicrm_api3_option_value_get($params) {
 
@@ -27,18 +23,13 @@ function civicrm_api3_option_value_get($params) {
 }
 
 /**
- *  Add a OptionValue. OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
- *
- * Allowed @params array keys are:
- *
- * {@example OptionValueCreate.php}
+ * Add an OptionValue.
  *
  * @param array $params
  *
  * @throws API_Exception
  * @return array
  *   Array of newly created option_value property values.
- *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -72,18 +63,15 @@ function _civicrm_api3_option_value_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing OptionValue
+ * Deletes an existing option value.
  *
  * @param array $params
  *
- * {@example OptionValueDelete.php 0}
- *
  * @return array
  *   Api result
- *   {@getfields OptionValue_create}
  */
 function civicrm_api3_option_value_delete($params) {
-  // we will get the option group id before deleting so we can flush pseudoconstants
+  // We will get the option group id before deleting so we can flush pseudoconstants.
   $optionGroupID = civicrm_api('option_value', 'getvalue', array('version' => 3, 'id' => $params['id'], 'return' => 'option_group_id'));
   if (CRM_Core_BAO_OptionValue::del((int) $params['id'])) {
     civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID));

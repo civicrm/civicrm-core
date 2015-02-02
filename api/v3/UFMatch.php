@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: UFGroup.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * get the contact_id given a uf_id or vice versa
+ * Get the contact_id given a uf_id or vice versa.
  *
  * @param array $params
  *
@@ -48,16 +47,13 @@ function civicrm_api3_uf_match_get($params) {
 }
 
 /**
- * Create or update a UF Match record
+ * Create or update a UF Match record.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
- * @example UFMatch.php Std Create example
+ *   Array per getfields metadata.
  *
  * @return array
- *   api result array
- *   {@getfields uf_match_create}
+ *   Api result array
  */
 function civicrm_api3_uf_match_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -78,16 +74,12 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
 }
 
 /**
- * Create or update a survey
+ * Delete a UF Match record.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
- * @example UFMatch.php Std Create example
  *
  * @return array
- *   api result array
- *   {@getfields uf_match_create}
+ *   Api result array.
  */
 function civicrm_api3_uf_match_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

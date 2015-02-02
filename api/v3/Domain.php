@@ -33,14 +33,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Get CiviCRM domain details
- * {@getfields domain_create}
- * @example DomainGet.php
+ * Get CiviCRM domain details.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -114,7 +113,7 @@ function civicrm_api3_domain_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -126,13 +125,11 @@ function _civicrm_api3_domain_get_spec(&$params) {
 }
 
 /**
- * Create a new domain
+ * Create a new domain.
  *
  * @param array $params
  *
  * @return array
- * @example DomainCreate.php
- * {@getfields domain_create}
  */
 function civicrm_api3_domain_create($params) {
   $params['version'] = $params['domain_version'];

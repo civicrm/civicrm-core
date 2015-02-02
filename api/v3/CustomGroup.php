@@ -44,20 +44,19 @@
  *   An associative array used in construction.
  *   retrieval of the object
  * @todo missing get function
- *
- *
  */
 
 /**
- * Use this API to create a new group.  The 'extends' value accepts an array or a comma separated string.
+ * Use this API to create a new group.
+ *
+ * The 'extends' value accepts an array or a comma separated string.
  * e.g array(
    'Individual','Contact') or 'Individual,Contact'
  * See the CRM Data Model for custom_group property definitions
  * $params['class_name'] is a required field, class being extended.
  *
  * @param array $params
- *   Array Associative array of property name/value pairs to insert in group.
- * {@getfields CustomGroup_create}
+ *   Array of property name/value pairs to insert in group.
  *
  * @return array
  * @todo $params['extends'] is array format - is that std compatible
@@ -121,8 +120,10 @@ function civicrm_api3_custom_group_get($params) {
 }
 
 /**
- * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group
+ * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom group.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_custom_group_setvalue($params) {

@@ -12,19 +12,12 @@ function civicrm_api3_option_group_get($params) {
 }
 
 /**
- * create/update survey
- *
- * This API is used to create new survey or update any of the existing
- * In case of updating existing survey, id of that particular survey must
- * be in $params array.
+ * Create/update option group.
  *
  * @param array $params
- *   (reference) Associative array of property.
- *   name/value pairs to insert in new 'survey'
+ *   Array per getfields metadata.
  *
  * @return array
- *   survey array
- *
  */
 function civicrm_api3_option_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -54,7 +47,6 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
- *   {@getfields OptionGroup_delete}
  */
 function civicrm_api3_option_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
