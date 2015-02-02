@@ -64,8 +64,8 @@ function civicrm_api3_membership_delete($params) {
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update
   if (!empty($params['id']) && !isset($params['skipStatusCal'])) {
-    //don't calculate status on exisiting membership - expect API use to pass them in
-    // or leave unchanged
+    // Don't calculate status on existing membership - expect API use to pass them in
+    // or leave unchanged.
     $params['skipStatusCal'] = 1;
   }
   else {
@@ -161,6 +161,7 @@ function _civicrm_api3_membership_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
   );
 }
+
 /**
  * Adjust Metadata for Get action.
  *
@@ -171,6 +172,10 @@ function _civicrm_api3_membership_create_spec(&$params) {
  */
 function _civicrm_api3_membership_get_spec(&$params) {
   $params['membership_type_id']['api.aliases'] = array('membership_type');
+  $params['active_only'] = array(
+    'title' => 'Only retrieve active memberships',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**
@@ -284,7 +289,7 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
 
   $members = $membershipValues;
 
-  // populating contacts in members array based on their relationship with direct members.
+  // Populating contacts in members array based on their relationship with direct members.
   if (!empty($relationships)) {
     foreach ($relationships as $relTypeId => $membershipId) {
       // As members are not direct members, there should not be
