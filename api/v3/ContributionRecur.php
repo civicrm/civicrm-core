@@ -34,12 +34,10 @@
  */
 
 /**
- * Create or update a contribution_recur
+ * Create or update a contribution_recur.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'contribution_recur'
- * @example ContributionRecurCreate.php Std Create example
+ *   Array per getfields metadata.
  *
  * @return array
  *   api result array

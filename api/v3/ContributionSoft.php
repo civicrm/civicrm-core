@@ -70,7 +70,7 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * @param array $params
  */
 function civicrm_api3_contribution_soft_delete($params) {
-  // non standard BAO - we have to write custom code to cope
+  // Non standard BAO - we have to write custom code to cope.
   CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
 
 }
@@ -78,11 +78,11 @@ function civicrm_api3_contribution_soft_delete($params) {
 /**
  * Retrieve one or more Soft Credits.
  *
- * @example ContributionSoftGet.php Standard Get Example
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @param array $params An associative array of name/value pairs.
- *
- * @return array api result {@getfields contribution_soft_get}
+ * @return array
+ *  API result
  */
 function civicrm_api3_contribution_soft_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

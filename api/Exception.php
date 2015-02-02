@@ -24,6 +24,8 @@ class API_Exception extends Exception {
   private $extraParams = array();
 
   /**
+   * Class constructor.
+   *
    * @param string $message
    *   The human friendly error message.
    * @param mixed $error_code

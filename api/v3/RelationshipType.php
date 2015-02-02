@@ -39,7 +39,7 @@
  * Create relationship type.
  *
  * @param array $params
- *   Associative array of property name/value pairs to insert in new relationship type.
+ *   Array per getfields metadata.
  *
  * @return array
  */

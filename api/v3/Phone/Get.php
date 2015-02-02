@@ -10,7 +10,7 @@
  * your module under api/v3/Phone/Dial.php.
  *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   details of found phones else error

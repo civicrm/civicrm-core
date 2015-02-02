@@ -37,16 +37,12 @@
  * @version $Id: Country.php 2011-02-16 ErikHommel $
  */
 
-require_once 'CRM/Core/DAO/Country.php';
-
 /**
- * Add an Country for a contact
- *
- * Allowed @params array keys are:
- *
- * @example CountryCreate.php Standard Create Example
+ * Add an Country for a contact.
  *
  * @param array $params
+ *   Array per getfields metadata.
+ *
  * @return array
  *   API result array
  * @throws \API_Exception
@@ -68,31 +64,24 @@ function _civicrm_api3_country_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Country
+ * Deletes an existing Country.
  *
  * @param array $params
  *
- * @example CountryDelete.php Standard Delete Example
- *
- * @return bool
- *   | error  true if successfull, error otherwise
- *   {@getfields country_delete}
+ * @return array
  */
 function civicrm_api3_country_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more countrys
- *
- * @example CountryGet.php Standard Get Example
+ * Retrieve one or more countryies.
  *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   api result array
- *   {@getfields country_get}
  */
 function civicrm_api3_country_get($params) {
 

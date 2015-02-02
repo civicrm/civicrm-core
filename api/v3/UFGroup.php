@@ -54,7 +54,7 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  * See the CRM Data Model for uf_group property definitions
  *
  * @param array $params
- *   Array Associative array of property name/value pairs to insert in group.
+ *   Array per getfields metadata.
  *
  * @return array
  *   API result array
