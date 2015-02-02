@@ -501,8 +501,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
