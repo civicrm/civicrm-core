@@ -70,14 +70,6 @@ class CRM_Utils_Pager extends Pager_Sliding {
    *
    * @param array $params
    *
-   * @internal param \total $int the total count of items to be displayed
-   * @internal param \currentPage $int the page currently being displayed
-   * @internal param \status $string the status message to be displayed. It embeds a token
-   *                             %%statusMessage%% that will be replaced with which items
-   *                             are currently being displayed
-   * @internal param \csvString $string the title of the link to be displayed for the export
-   * @internal param \perPage $int the number of items displayed per page
-   *
    * @return \CRM_Utils_Pager the newly created and initialized pager object
    */
   public function __construct($params) {
@@ -136,7 +128,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
    * Helper function to assign remaining pager options as good default
-   * values
+   * values.
    *
    * @param array $params
    *   The set of options needed to initialize the parent.
