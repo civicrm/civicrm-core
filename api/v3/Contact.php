@@ -117,7 +117,7 @@ function civicrm_api3_contact_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.

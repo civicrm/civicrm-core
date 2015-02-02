@@ -73,7 +73,8 @@ function civicrm_api3_mailing_a_b_get($params) {
 /**
  * Adjust Metadata for submit action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -163,7 +164,8 @@ function civicrm_api3_mailing_a_b_submit($params) {
 /**
  * Adjust Metadata for graph_stats action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
