@@ -27,6 +27,9 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->cids = array();
   }
 
+  /**
+   * @return array
+   */
   public function dataCreateStyle() {
     return array(
       array('sql-insert'),
@@ -34,6 +37,9 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   public function dataCreateAndCommitStyles() {
     return array(
       array('sql-insert', 'implicit-commit'),
@@ -423,18 +429,34 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     } // else: implicit-commit
   }
 
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
   public function _preCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_preCommit', $arg1, $arg2);
   }
 
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
   public function _postCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_postCommit', $arg1, $arg2);
   }
 
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
   public function _preRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_preRollback', $arg1, $arg2);
   }
 
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
   public function _postRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_postRollback', $arg1, $arg2);
   }

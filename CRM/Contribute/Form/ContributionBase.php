@@ -200,8 +200,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Set variables up before form is built
    *
-   * @throws CRM_Contribution_Exception_InactiveContributionPageException
-   * @return void
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
+   * @throws \Exception
    */
   public function preProcess() {
 

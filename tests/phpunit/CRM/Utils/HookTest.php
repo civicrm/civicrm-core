@@ -100,6 +100,9 @@ function hooktestb_civicrm_testRunHooks_inner() {
   $test->log[] = 'b-inner';
 }
 
+/**
+ * @return array
+ */
 function hooktesta_civicrm_testRunHooks_merge() {
   return array('from-module-a1', 'from-module-a2');
 }
@@ -113,10 +116,16 @@ function hooktestc_civicrm_testRunHooks_merge() {
   return array();
 }
 
+/**
+ * @return null
+ */
 function hooktestd_civicrm_testRunHooks_merge() {
   return NULL;
 }
 
+/**
+ * @return array
+ */
 function hookteste_civicrm_testRunHooks_merge() {
   return array('from-module-e');
 }

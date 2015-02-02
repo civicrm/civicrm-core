@@ -11,6 +11,9 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * @return array
+   */
   public function htmlToTextExamples() {
     $cases = array(); // array(0 => string $html, 1 => string $text)
 

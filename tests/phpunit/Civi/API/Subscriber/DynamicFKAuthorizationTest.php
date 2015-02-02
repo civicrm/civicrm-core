@@ -103,6 +103,9 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     \CRM_Core_DAO_AllCoreTables::init(TRUE);
   }
 
+  /**
+   * @return array
+   */
   public function okDataProvider() {
     $cases = array();
 
@@ -121,6 +124,9 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badDataProvider() {
     $cases = array();
 
