@@ -43,6 +43,10 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
   /**
    * Create a new bounce event, update the email address if necessary
+   *
+   * @param $params
+   *
+   * @return bool|null
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
