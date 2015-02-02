@@ -37,6 +37,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param $caseType
    * @param array $params
    *
+   * @return bool
    * @throws Exception
    */
   public function run($caseType, &$params) {

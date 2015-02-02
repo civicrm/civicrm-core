@@ -35,7 +35,7 @@
 
 /**
  * This class provides the functionality to delete a group of
- * participations. This class provides functionality for the actual
+ * case records. This class provides functionality for the actual
  * deletion.
  */
 class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
@@ -56,12 +56,9 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   public $_moveToTrash = TRUE;
 
   /**
-   * Build all the data structures needed to build the form
-   *
-   * @return void
+   * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
@@ -71,7 +68,6 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   /**
    * Build the form object
    *
-   *
    * @return void
    */
   public function buildQuickForm() {
@@ -79,8 +75,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
-   *
+   * Process the form after the input has been submitted and validated.
    *
    * @return void
    */
