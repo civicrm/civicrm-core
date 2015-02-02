@@ -365,6 +365,8 @@ ACOS(
   /**
    * @param array $input
    * retun void
+   *
+   * @return null
    */
   public static function fixInputParams(&$input) {
     foreach ($input as $param) {

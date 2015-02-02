@@ -34,6 +34,9 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('Case', ts('Cases'));
   }
@@ -60,8 +63,11 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
   }
 
   /**
+   * Prepare queries.
+   *
    * @param string $queryText
    * @param string $entityIDTableName
+   *
    * @return array
    *   list tables/queries (for runQueries)
    */
@@ -111,6 +117,13 @@ GROUP BY   et.entity_id
     return $tables;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}

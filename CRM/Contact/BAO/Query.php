@@ -1436,6 +1436,8 @@ class CRM_Contact_BAO_Query {
    * @param int $wildcard
    * @param bool $useEquals
    *
+   * @param string $apiEntity
+   *
    * @return array
    */
   public static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
@@ -1505,6 +1507,8 @@ class CRM_Contact_BAO_Query {
    * @param $values
    * @param int $wildcard
    * @param bool $useEquals
+   *
+   * @param string $apiEntity
    *
    * @return array|null
    */
@@ -2749,6 +2753,7 @@ class CRM_Contact_BAO_Query {
   /**
    * @param $value
    * @param $grouping
+   * @param string $op
    */
   public function includeContactSubTypes($value, $grouping, $op = 'LIKE') {
 
@@ -3288,14 +3293,12 @@ WHERE  id IN ( $groupIDs )
     }
   }
 
-  /*
-   * Where/qill clause for greeting fields
+  /**
+   * Where/qill clause for greeting fields.
    *
    * @param array $values
-   *
-   * @return void
    */
-  function greetings(&$values) {
+  public function greetings(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $name .= '_display';
 
@@ -5632,6 +5635,19 @@ AND   displayRelType.is_active = 1
     return array($presentClause, $presentSimpleFromClause);
   }
 
+  /**
+   * Build qill for field.
+   *
+   * Qill refers to the query detail visible on the UI.
+   *
+   * @param $daoName
+   * @param $fieldName
+   * @param $fieldValue
+   * @param $op
+   * @param array $pseduoExtraParam
+   *
+   * @return array
+   */
   public static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
     $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();

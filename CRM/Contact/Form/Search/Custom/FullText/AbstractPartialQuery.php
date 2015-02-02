@@ -55,6 +55,11 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
     $this->label = $label;
   }
 
+  /**
+   * Get label.
+   *
+   * @return string
+   */
   public function getLabel() {
     return $this->label;
   }
