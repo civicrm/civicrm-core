@@ -495,7 +495,8 @@ GROUP BY  cv.label
     if ($this->_lineitemField){
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
-                  ON line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
+                  ON line_item_civireport.entity_table = 'civicrm_participant' AND
+                    line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
       ";
     }
   }

@@ -650,6 +650,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
@@ -787,8 +788,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
       }
       $formValues['contact_id'] = $this->_contactID;
-
-      CRM_Member_BAO_Membership::recordMembershipContribution(array_merge($formValues, array('membership_id' => $renewMembership->id)));
+      //recordMembershipContribution receives params as a reference & adds one variable. This is
+      // not a great pattern & ideally it would not receive as a reference. We assign our params as a
+      // temporary variable to avoid e-notice & to make it clear to future refactorer that
+      // this function is NOT reliant on that var being set
+      $temporaryParams = array_merge($formValues, array('membership_id' => $renewMembership->id));
+      CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
     $receiptSend = FALSE;

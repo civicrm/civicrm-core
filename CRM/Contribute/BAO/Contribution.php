@@ -2070,9 +2070,13 @@ WHERE  contribution_id = %1 ";
         $entity = 'contribution';
         $entityID = $ids['contribution'];
       }
-      if (isset($ids['membership']) && $ids['membership']) {
+      if (!empty($ids['membership'])) {
+        //not sure whether is is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
+        // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
+        // line having loaded an array
+        $ids['membership'] = (array) $ids['membership'];
         $entity = 'membership';
-        $entityID = $ids['membership'];
+        $entityID = $ids['membership'][0];
       }
 
       $url = $paymentObject->subscriptionURL($entityID, $entity);

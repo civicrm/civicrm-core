@@ -10,7 +10,7 @@ function civicrm_api3_notification_log_retry($params) {
   }
   while ($raw->fetch()) {
     if($raw->message_type == 'authorize.net') {
-      $anet = new CRM_Core_Payment_AuthorizeNetIPN2(json_decode($raw->message_raw, TRUE));
+      $anet = new CRM_Core_Payment_AuthorizeNetIPN2(array_merge(json_decode($raw->message_raw, TRUE), array('receive_date' => $raw->timestamp)));
       $anet->main();
     }
     elseif($raw->message_type == 'cmcic') {

@@ -71,7 +71,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
     }
     else {
-      CRM_Utils_Hook::pre('create', 'Membership', $params['id'], $params);
+      CRM_Utils_Hook::pre('create', 'Membership', NULL, $params);
     }
     $id = $params['id'];
     // we do this after the hooks are called in case it has been altered
@@ -1997,8 +1997,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @static
    * @access public
    */
-  static function createRelatedMemberships(&$params, &$dao) {
+  static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     static $relatedContactIds = array();
+    if ($reset) {
+      // not sure why a static var is in use here - we need a way to reset it from the test suite
+      $relatedContactIds = array();
+      return;
+    }
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;
