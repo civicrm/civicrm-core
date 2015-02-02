@@ -39,14 +39,7 @@
 class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
-   * Create a user in Drupal.
-   *
-   * @param array $params
-   * @param string $mail
-   *   Email id for cms user.
-   *
-   * @return int|bool
-   *   uid if user exists, false otherwise
+   * @inheritDoc
    */
   public function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
@@ -98,12 +91,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Change user name in host CMS
-   *
-   * @param int $ufID
-   *   User ID in CMS
-   * @param string $ufName
-   *   User name
+   * @inheritDoc
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -175,68 +163,15 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get the drupal destination string. When this is passed in the
-   * URL the user will be directed to it after filling in the drupal form
-   *
-   * @param CRM_Core_Form $form
-   *   Form object representing the 'current' form - to which the user will be returned.
-   * @return null|string
-   *   destination value for URL
-   */
-  public function getLoginDestination(&$form) {
-    $args = NULL;
-
-    $id = $form->get('id');
-    if ($id) {
-      $args .= "&id=$id";
-    }
-    else {
-      $gid = $form->get('gid');
-      if ($gid) {
-        $args .= "&gid=$gid";
-      }
-      else {
-        // Setup Personal Campaign Page link uses pageId
-        $pageId = $form->get('pageId');
-        if ($pageId) {
-          $component = $form->get('component');
-          $args .= "&pageId=$pageId&component=$component&action=add";
-        }
-      }
-    }
-
-    $destination = NULL;
-    if ($args) {
-      // append destination so user is returned to form they came from after login
-      $destination = CRM_Utils_System::currentPath() . '?reset=1' . $args;
-    }
-    return $destination;
-  }
-
-  /**
-   * Get user login URL for hosting CMS (method declared in each CMS system class)
-   *
-   * @param string $destination
-   *   If present, add destination to querystring (works for Drupal only).
-   *
-   * @return string
-   *   loginURL for the current CMS
+   * @inheritDoc
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? array('destination' => $destination) : array();
     return url('user', array('query' => $query));
   }
 
-
   /**
-   * Sets the title of the page
-   *
-   * @param string $title
-   * @param null $pageTitle
-   *
-   * @paqram string $pageTitle
-   *
-   * @return void
+   * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (arg(0) == 'civicrm') {
@@ -249,13 +184,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @param array $breadCrumbs
-   * @internal param string $title
-   * @internal param string $url
-   *
-   * @return void
+   * @inheritDoc
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
@@ -280,9 +209,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @return void
+   * @inheritDoc
    */
   public function resetBreadCrumb() {
     $bc = array();
@@ -290,12 +217,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Append a string to the head of the html file
-   *
-   * @param string $header
-   *   The new string to be appended.
-   *
-   * @return void
+   * @inheritDoc
    */
   public function addHTMLHead($header) {
     static $count = 0;
@@ -310,17 +232,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Add a script file
-   *
-   * @param $url : string, absolute path to file
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
     $params = array('group' => JS_LIBRARY, 'weight' => 10);
@@ -340,17 +252,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Add an inline script
-   *
-   * @param $code : string, javascript code
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   * @inheritDoc
    */
   public function addScript($code, $region) {
     $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
@@ -368,17 +270,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Add a css file
-   *
-   * @param $url : string, absolute path to file
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   * @inheritDoc
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -392,17 +284,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Add an inline style
-   *
-   * @param $code : string, css code
-   * @param string $region
-   *   location within the document: 'html-header', 'page-header', 'page-footer'.
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool
-   *   TRUE if we support this operation in this CMS, FALSE otherwise
+   * @inheritDoc
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -414,9 +296,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Rewrite various system urls to https
-   *
-   * @return void
+   * @inheritDoc
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -424,37 +304,9 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Figure out the post url for the form
-   *
-   * @param mix $action
-   *   The default action if one is pre-specified.
-   *
-   * @return string
-   *   the url to post the form
+   * @inheritDoc
    */
-  public function postURL($action) {
-    if (!empty($action)) {
-      return $action;
-    }
-
-    return $this->url($_GET['q']);
-  }
-
-
-  /**
-   * Authenticate the user against the drupal db
-   *
-   * @param string $name
-   *   The user name.
-   * @param string $password
-   *   The password for the above user name.
-   * @param bool $loadCMSBootstrap
-   *   Load cms bootstrap?.
-   * @param NULL|string $realPath filename of script
-   *
-   * @return mixed false if no auth array(contactID, ufID, unique string ) if success
-   */
-  public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -526,11 +378,7 @@ AND    u.status = 1
   }
 
   /**
-   * Load user into session
-   *
-   * @param string $username
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function loadUser($username) {
     global $user;
@@ -579,28 +427,11 @@ AND    u.status = 1
   }
 
   /**
-   * Set a message in the UF to display to a user
-   *
-   * @param string $message
-   *   The message to set.
-   */
-  public function setMessage($message) {
-    drupal_set_message($message);
-  }
-
-  /**
-   * @return mixed
+   * @inheritDoc
    */
   public function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
-  }
-
-  public function updateCategories() {
-    // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
-    // CRM-3600
-    cache_clear_all();
-    menu_rebuild();
   }
 
   /**
@@ -610,44 +441,6 @@ AND    u.status = 1
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
-  }
-
-  /**
-   * Get the locale set in the hosting CMS
-   *
-   * @return string
-   *   with the locale or null for none
-   */
-  public function getUFLocale() {
-    // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
-    // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
-    // sometimes for CLI based on order called, this might not be set and/or empty
-    global $language;
-
-    if (empty($language)) {
-      return NULL;
-    }
-
-    if ($language->language == 'zh-hans') {
-      return 'zh_CN';
-    }
-
-    if ($language->language == 'zh-hant') {
-      return 'zh_TW';
-    }
-
-    if (preg_match('/^.._..$/', $language->language)) {
-      return $language->language;
-    }
-
-    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
-  }
-
-  /**
-   * @return string
-   */
-  public function getVersion() {
-    return defined('VERSION') ? VERSION : 'Unknown';
   }
 
   /**
@@ -808,9 +601,7 @@ AND    u.status = 1
   }
 
   /**
-   * Check is user logged in.
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -822,10 +613,7 @@ AND    u.status = 1
   }
 
   /**
-   * Get currently logged in user uf id.
-   *
-   * @return int
-   *   $userID logged in user uf id.
+   * @inheritDoc
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -840,15 +628,7 @@ AND    u.status = 1
   }
 
   /**
-   * Format the url as per language Negotiation.
-   *
-   * @param string $url
-   *
-   * @param bool $addLanguagePart
-   * @param bool $removeLanguagePart
-   *
-   * @return string
-   *   , formatted url.
+   * @inheritDoc
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
@@ -933,21 +713,6 @@ AND    u.status = 1
   }
 
   /**
-   * Get a list of all installed modules, including enabled and disabled ones
-   *
-   * @return array
-   *   CRM_Core_Module
-   */
-  public function getModules() {
-    $result = array();
-    $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
-    foreach ($q as $row) {
-      $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
-    }
-    return $result;
-  }
-
-  /**
    * Wrapper for og_membership creation
    *
    * @param int $ogID
@@ -992,9 +757,7 @@ AND    u.status = 1
   }
 
   /**
-   * Over-ridable function to get timezone as a string eg.
-   * @return string
-   *   Timezone e.g. 'America/Los_Angeles'
+   * @inheritDoc
    */
   public function getTimeZoneString() {
     global $user;
@@ -1008,14 +771,6 @@ AND    u.status = 1
       $timezone = parent::getTimeZoneString();
     }
     return $timezone;
-  }
-
-  /**
-   * Reset any system caches that may be required for proper CiviCRM
-   * integration.
-   */
-  public function flush() {
-    drupal_flush_all_caches();
   }
 
 }
