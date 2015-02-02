@@ -382,6 +382,8 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
 
   /**
    * @param int $rowCount
+   *
+   * @return array|void
    */
   public function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
