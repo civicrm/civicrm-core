@@ -154,13 +154,10 @@ function civicrm_api3_report_template_getstatistics($params) {
   return civicrm_api3_create_success($stats, $params, 'report_template', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**
- * Retrieve rows from a report template.
+ * Adjust metadata for template getrows action.
  *
  * @param array $params
  *   Input parameters.
- *
- * @return void
- *   details of found instances
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(

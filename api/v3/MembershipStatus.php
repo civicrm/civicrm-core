@@ -71,7 +71,8 @@ function civicrm_api3_membership_status_get($params) {
  * Required parameters : id of a membership status
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership_status.
+ *   Array of name/value property values of civicrm_membership_status.
+ *
  * @deprecated - should just use create
  *
  * @return array

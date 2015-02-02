@@ -36,7 +36,7 @@
  */
 
 /**
- * Create a Event Participant Payment
+ * Create a Event Participant Payment.
  *
  * This API is used for creating a Participant Payment of Event.
  * Required parameters : participant_id, contribution_id.

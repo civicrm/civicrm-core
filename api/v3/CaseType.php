@@ -43,7 +43,6 @@
  * @throws API_Exception
  * @return array
  *   API result array
- *
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));

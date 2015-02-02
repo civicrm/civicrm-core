@@ -312,6 +312,8 @@ function civicrm_api3_generic_getoptions($apiRequest) {
 }
 
 /**
+ * Get metadata.
+ *
  * Function fills the 'options' array on the metadata returned by getfields if
  * 1) the param option 'get_options' is defined - e.g. $params['options']['get_options'] => array('custom_1)
  * (this is passed in as the $fieldsToResolve array)

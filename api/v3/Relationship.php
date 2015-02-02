@@ -71,7 +71,6 @@ function _civicrm_api3_relationship_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_relationship_delete($params) {
 

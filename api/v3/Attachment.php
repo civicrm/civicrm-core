@@ -66,7 +66,6 @@
  * @subpackage API_Attachment
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
@@ -163,7 +162,10 @@ function _civicrm_api3_attachment_get_spec(&$spec) {
 }
 
 /**
+ * Get attachment.
+ *
  * @param array $params
+ *
  * @return array
  *   per APIv3
  * @throws API_Exception validation errors
@@ -308,7 +310,8 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
  *
  * @param array $params
  *
- * @return array (0 => int $id, 1 => array $file, 2 => array $entityFile, 3 => string $name, 4 => string $content,
+ * @return array
+ *   (0 => int $id, 1 => array $file, 2 => array $entityFile, 3 => string $name, 4 => string $content,
  *    5 => string $moveFile, 6 => $isTrusted, 7 => bool $returnContent)
  *    - array $file: whitelisted fields that can pass through directly to civicrm_file
  *    - array $entityFile: whitelisted fields that can pass through directly to civicrm_entity_file

@@ -60,6 +60,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
  * Get mailing event queue record.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_event_queue_get($params) {

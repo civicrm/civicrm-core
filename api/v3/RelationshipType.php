@@ -117,6 +117,7 @@ function civicrm_api3_relationship_type_delete($params) {
  * @see _civicrm_api3_generic_getlist_defaults
  *
  * @param array $request
+ *
  * @return array
  */
 function _civicrm_api3_relationship_type_getlist_defaults($request) {

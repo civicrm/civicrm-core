@@ -94,7 +94,7 @@ function civicrm_api3_contribution_page_delete($params) {
 }
 
 /**
- *  Submit a contribution_page.
+ * Submit a contribution_page.
  *
  * @param array $params
  *   Array per getfields metadata.

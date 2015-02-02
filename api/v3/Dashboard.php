@@ -34,7 +34,6 @@
  * @subpackage API_Activity
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 

@@ -1006,7 +1006,13 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 function _civicrm_api3_contact_getlist_output($result, $request) {
   $output = array();
   if (!empty($result['values'])) {
-    $addressFields = array_intersect(array('street_address', 'city', 'state_province', 'country'), $request['params']['return']);
+    $addressFields = array_intersect(array(
+        'street_address',
+        'city',
+        'state_province',
+        'country',
+      ),
+      $request['params']['return']);
     foreach ($result['values'] as $row) {
       $data = array(
         'id' => $row[$request['id_field']],

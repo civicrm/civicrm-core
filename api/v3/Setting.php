@@ -166,7 +166,8 @@ function civicrm_api3_setting_revert(&$params) {
 }
 
 /**
- * Alter metadata for getfields functions
+ * Alter metadata for getfields functions.
+ *
  * @param array $params
  */
 function _civicrm_api3_setting_revert_spec(&$params) {
@@ -174,8 +175,8 @@ function _civicrm_api3_setting_revert_spec(&$params) {
   $params['component_id'] = array('title' => 'id of relevant component');
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
-    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-      an array or "all" are acceptable values for multiple domains',
+    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain'
+    . ' an array or "all" are acceptable values for multiple domains',
     'title' => 'Setting Domain',
   );
 }
@@ -219,7 +220,7 @@ function _civicrm_api3_setting_fill_spec(&$params) {
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',
     'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the '
-     . 'current domain, an array or "all" are acceptable values for multiple domains',
+    . 'current domain, an array or "all" are acceptable values for multiple domains',
   );
 }
 
