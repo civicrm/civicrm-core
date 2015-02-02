@@ -333,12 +333,14 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
 }
 
 /**
+ * Set profile - deprecated.
+ *
  * @deprecated - calling this function directly is deprecated as 'set' is not a clear action
  * use submit
  * Update Profile field values.
  *
  * @param array $params
- *   Associative array of property name/value.
+ *   Array of property name/value.
  *                             pairs to update profile field values
  *
  * @return array
@@ -351,11 +353,13 @@ function civicrm_api3_profile_set($params) {
 }
 
 /**
+ * Apply profile - deprecated.
+ *
  * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
  * @param array $params
- *   Associative array of property name/value.
+ *   Array of property name/value.
  *                             pairs to profile field values
  *
  * @throws API_Exception
@@ -395,6 +399,8 @@ function civicrm_api3_profile_apply($params) {
 
 
 /**
+ * Get pseudo profile 'billing'.
+ *
  * This is a function to help us 'pretend' billing is a profile & treat it like it is one.
  * It gets standard credit card address fields etc
  * Note this is 'better' that the inbuilt version as it will pull in fallback values

@@ -277,7 +277,7 @@ INNER JOIN civicrm_mailing_event_bounce meb ON meb.event_queue_id = meq.id
 }
 
 /**
- * Get count of all the mailings that a contact was involved with
+ * Get count of all the mailings that a contact was involved with.
  *
  * @param array $params
  *   Input parameters per getfields

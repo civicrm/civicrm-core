@@ -126,7 +126,8 @@ function civicrm_api3_system_log($params) {
 }
 
 /**
- * Metadata for log function
+ * Metadata for log function.
+ *
  * @param array $params
  */
 function _civicrm_api3_system_log_spec(&$params) {
@@ -161,9 +162,10 @@ function _civicrm_api3_system_log_spec(&$params) {
 }
 
 /**
- * System.Get API
+ * System.Get API.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_system_get($params) {

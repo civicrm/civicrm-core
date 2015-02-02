@@ -71,7 +71,7 @@ function _civicrm_api3_dashboard_create_spec(&$params) {
 }
 
 /**
- * Gets a CiviCRM Dashlets according to parameters
+ * Gets a CiviCRM Dashlets according to parameters.
  *
  * @param array $params
  *

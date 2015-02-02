@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: MembershipBlock.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * API to Create or update a Membership Type
+ * API to Create or update a Membership Type.
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_block.
@@ -80,7 +79,7 @@ function civicrm_api3_membership_block_get($params) {
 }
 
 /**
- * Deletes an existing membership type
+ * Deletes an existing membership type.
  *
  * This API is used for deleting a membership type
  * Required parameters : id of a membership type

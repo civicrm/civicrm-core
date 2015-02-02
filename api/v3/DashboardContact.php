@@ -40,7 +40,6 @@
  * @param array $params
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_contact_create($params) {
   if (empty($params['id'])) {

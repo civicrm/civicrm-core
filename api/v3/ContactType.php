@@ -90,7 +90,6 @@ function civicrm_api3_contact_type_get($params) {
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_contact_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

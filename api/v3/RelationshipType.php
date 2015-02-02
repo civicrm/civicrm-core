@@ -92,6 +92,7 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
  * Get all relationship types.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_relationship_type_get($params) {

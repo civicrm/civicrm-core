@@ -35,10 +35,7 @@
  */
 
 /**
- * Add/Update a PaymentProcessor
- *
- * Allowed @params array keys are:
- * {@getfields payment_processor_create}
+ * Add/Update a PaymentProcessor.
  *
  * @param array $params
  *
@@ -64,10 +61,9 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing PaymentProcessor
+ * Deletes an existing PaymentProcessor.
  *
  * @param array $params
- * {@getfields payment_processor_delete}
  *
  * @return array
  *   API result Array
@@ -77,11 +73,10 @@ function civicrm_api3_payment_processor_delete($params) {
 }
 
 /**
- * Retrieve one or more PaymentProcessor
+ * Retrieve one or more PaymentProcessor.
  *
  * @param array $params
- *   An associative array of name/value pairs.
- * {@getfields payment_processor_get}
+ *   Array of name/value pairs.
  *
  * @return array
  *   details of found PaymentProcessor

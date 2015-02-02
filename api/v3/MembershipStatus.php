@@ -33,20 +33,16 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: MembershipStatus.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Create a Membership Status
- *
- * This API is used for creating a Membership Status
+ * Create a Membership Status.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership_status.
+ *   Array of name/value property values of civicrm_membership_status.
  *
  * @return array
  *   Array of newly created membership status property values.
- *   {@getfields MembershipStatus_create}
  */
 function civicrm_api3_membership_status_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -69,7 +65,7 @@ function civicrm_api3_membership_status_get($params) {
 }
 
 /**
- * Update an existing membership status
+ * Update an existing membership status.
  *
  * This api is used for updating an existing membership status.
  * Required parameters : id of a membership status
@@ -81,7 +77,7 @@ function civicrm_api3_membership_status_get($params) {
  * @return array
  *   Array of updated membership status property values
  */
-function &civicrm_api3_membership_status_update($params) {
+function civicrm_api3_membership_status_update($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
   //don't allow duplicate names.

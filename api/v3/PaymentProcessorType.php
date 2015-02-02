@@ -76,8 +76,10 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
 }
 
 /**
- * get all payment_processor types
+ * Get all payment_processor types.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_payment_processor_type_get($params) {
