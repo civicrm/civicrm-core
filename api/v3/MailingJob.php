@@ -33,12 +33,13 @@
  * @subpackage API_Mailing
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * Handle creation of a Mailing Job for a Mailing.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -61,14 +62,13 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
 }
 
 /**
- * Returns array of Mailing Jobs  matching a set of one or more group properties
+ * Returns array of Mailing Jobs matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid.
  *
  * @return array
  *   API return Array of matching mailing jobs.
- *   {@getfields mailing_job_get}
  */
 function civicrm_api3_mailing_job_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -76,7 +76,9 @@ function civicrm_api3_mailing_job_get($params) {
 
 /**
  * Handle deletion of a Mailing Job for a Mailing.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

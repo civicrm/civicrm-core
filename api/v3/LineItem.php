@@ -27,7 +27,7 @@
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * File for the CiviCRM APIv3 line item functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_LineItem
@@ -35,7 +35,7 @@
  */
 
 /**
- * Create or update a line_item
+ * Create or update a line_item.
  *
  * @param array $params
  *   Associative array of property.
@@ -81,7 +81,7 @@ function civicrm_api3_line_item_get($params) {
 }
 
 /**
- * delete an existing line_item
+ * Delete an existing line_item.
  *
  * This method is used to delete any existing line_item. id of the group
  * to be deleted is required field in $params array

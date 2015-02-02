@@ -112,11 +112,12 @@ function &civicrm_api3_membership_status_update($params) {
 }
 
 /**
- * Deletes an existing membership status
+ * Deletes an existing membership status.
  *
  * This API is used for deleting a membership status
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_membership_status_delete($params) {
@@ -126,7 +127,7 @@ function civicrm_api3_membership_status_delete($params) {
 }
 
 /**
- * Derives the Membership Status of a given Membership Reocrd
+ * Derives the Membership Status of a given Membership Record.
  *
  * This API is used for deriving Membership Status of a given Membership
  * record using the rules encoded in the membership_status table.
@@ -137,7 +138,6 @@ function civicrm_api3_membership_status_delete($params) {
  *
  * @return array
  *   Array of status id and status name
- * @public
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
   if (!($membershipID = CRM_Utils_Array::value('membership_id', $membershipParams))) {

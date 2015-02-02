@@ -51,7 +51,8 @@ class API_Exception extends Exception {
   }
 
   /**
-   * custom string representation of object
+   * Custom string representation of object.
+   *
    * @return string
    */
   public function __toString() {
@@ -106,7 +107,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
-   * custom string representation of object
+   * Custom string representation of object.
+   *
    * @return string
    */
   public function __toString() {
@@ -114,6 +116,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
+   * Get error code.
+   *
    * @return mixed
    */
   public function getErrorCode() {

@@ -58,10 +58,13 @@ function civicrm_api3_dashboard_create($params) {
 }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
+ *
  * @param array $params
- *   (reference) array of parameters determined by getfields.
+ *   array of parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_create_spec(&$params) {
   unset($params['version']);

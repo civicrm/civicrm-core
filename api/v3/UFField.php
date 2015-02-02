@@ -121,7 +121,7 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
 }
 
 /**
- * Returns array of uf groups (profiles)  matching a set of one or more group properties.
+ * Returns array of uf groups (profiles) matching a set of one or more group properties.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -158,7 +158,8 @@ function civicrm_api3_uf_field_delete($params) {
 }
 
 /**
- * field id accepted for backward compatibility - unset required on id
+ * Field id accepted for backward compatibility - unset required on id.
+ *
  * @param array $params
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {

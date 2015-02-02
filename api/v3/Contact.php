@@ -46,7 +46,6 @@
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_contact_create($params) {
 
@@ -417,7 +416,6 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  *   Array per getfields metadata.
  *
  * @throws API_Exception
- *
  */
 function _civicrm_api3_greeting_format_params($params) {
   $greetingParams = array('', '_id', '_custom');
@@ -428,7 +426,7 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     $formatParams = FALSE;
-    // unset display value from params.
+    // Unset display value from params.
     if (isset($params["{$key}{$greeting}_display"])) {
       unset($params["{$key}{$greeting}_display"]);
     }
@@ -951,6 +949,8 @@ WHERE     $whereClause
 
 
 /**
+ * Get parameters for getlist function.
+ *
  * @see _civicrm_api3_generic_getlist_params
  *
  * @param array $request
@@ -994,6 +994,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 }
 
 /**
+ * Get output for getlist function.
+ *
  * @see _civicrm_api3_generic_getlist_output
  *
  * @param array $result

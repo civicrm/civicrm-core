@@ -83,7 +83,6 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  *
  * @return array
  *   API result array
- *
  */
 function civicrm_api3_word_replacement_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

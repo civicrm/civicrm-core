@@ -106,7 +106,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  *
  * @param array $params
  *   Array including id of activity_type to delete.
-
+ *
  * @return array
  *   API result array
  *

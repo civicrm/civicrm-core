@@ -68,7 +68,7 @@ function civicrm_api3_participant_create($params) {
 }
 
 /**
- * Create a default participant line item
+ * Create a default participant line item.
  *
  * @todo this should be done in the BAO not the api
  *

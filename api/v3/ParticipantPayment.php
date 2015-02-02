@@ -33,7 +33,6 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
@@ -76,16 +75,12 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Participant Payment
- *
- * This API is used for deleting a Participant Payment
+ * Deletes an existing Participant Payment.
  *
  * @param array $params
  *
  * @return array
  *   API result
- * @example ParticipantPaymentDelete.php
- * {@getfields ParticipantPayment_delete}
  */
 function civicrm_api3_participant_payment_delete($params) {
   $participant = new CRM_Event_BAO_ParticipantPayment();
@@ -93,16 +88,13 @@ function civicrm_api3_participant_payment_delete($params) {
 }
 
 /**
- * Retrieve one / all contribution(s) / participant(s) linked to a
- * contribution.
+ * Retrieve one or more participant payment records.
  *
  * @param array $params
  *   Input parameters.
  *
  * @return array
  *   array of properties, if error an array with an error id and error message
- * @example ParticipantPaymentGet
- * {@getfields ParticipantPayment_get}
  */
 function civicrm_api3_participant_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Event_DAO_ParticipantPayment', $params);

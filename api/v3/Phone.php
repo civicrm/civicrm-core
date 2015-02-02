@@ -36,13 +36,10 @@
  */
 
 /**
- *  Add an Phone for a contact
- *
- * Allowed @params array keys are:
- * {@getfields phone_create}
- * @example PhoneCreate.php
+ * Add an Phone for a contact.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of newly created phone property values.
@@ -67,14 +64,13 @@ function _civicrm_api3_phone_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Phone
+ * Delete an existing Phone.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   Api Result
- *   {@getfields phone_delete}
- * @example PhoneDelete.php
  */
 function civicrm_api3_phone_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
