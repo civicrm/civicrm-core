@@ -39,13 +39,20 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
+  /**
+   * @var int
+   */
+  protected $priceFieldID;
+
+  /**
+   * Setup function.
+   */
   public function setUp() {
     parent::setUp();
-    // put stuff here that should happen before all tests in this unit
-    $priceSetparams = array(
-      #     [domain_id] =>
+    // Put stuff here that should happen before all tests in this unit.
+    $priceSetParams = array(
       'name' => 'default_goat_priceset',
-      'title' => 'Goat accomodation',
+      'title' => 'Goat accommodation',
       'is_active' => 1,
       'help_pre' => "Where does your goat sleep",
       'help_post' => "thank you for your time",
@@ -55,10 +62,10 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_reserved' => 1,
     );
 
-    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetparams);
+    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetParams);
     $this->priceSetID = $price_set['id'];
 
-    $priceFieldparams = array(
+    $priceFieldParams = array(
       'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
@@ -66,18 +73,18 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldparams);
+    $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldParams);
     $this->priceFieldID = $priceField['id'];
     $this->_params = array(
       'price_field_id' => $this->priceFieldID,
-      'name' => 'ryegrass',
+      'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
     );
 
     $membershipOrgId = $this->organizationCreate(NULL);
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $membershipOrgId));
-    $priceSetparams1 = array(
+    $priceSetParams1 = array(
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
@@ -86,9 +93,9 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_quick_config' => 1,
       'is_reserved' => 1,
     );
-    $price_set1 = $this->callAPISuccess('price_set', 'create', $priceSetparams1);
+    $price_set1 = $this->callAPISuccess('price_set', 'create', $priceSetParams1);
     $this->priceSetID1 = $price_set1['id'];
-    $priceFieldparams1 = array(
+    $priceFieldParams1 = array(
       'price_set_id' => $this->priceSetID1,
       'name' => 'memtype',
       'label' => 'memtype',
@@ -96,10 +103,15 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
     );
-    $priceField1 = $this->callAPISuccess('price_field', 'create', $priceFieldparams1);
+    $priceField1 = $this->callAPISuccess('price_field', 'create', $priceFieldParams1);
     $this->priceFieldID1 = $priceField1['id'];
   }
 
+  /**
+   * Tear down function.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_contact',

@@ -749,7 +749,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Assert that two numbers are approximately equal
+   * Assert that two numbers are approximately equal.
    *
    * @param int|float $expected
    * @param int|float $actual
@@ -764,9 +764,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Assert attributes are equal.
+   *
    * @param $expectedValues
    * @param $actualValues
-   * @param null $message
+   * @param string $message
    *
    * @throws PHPUnit_Framework_AssertionFailedError
    */
@@ -808,8 +810,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Check that api returned 'is_error' => 0
-   * else provide full message
+   * Check that api returned 'is_error' => 0.
+   *
    * @param array $apiResult
    *   Api result.
    * @param string $prefix
@@ -831,8 +833,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Check that api returned 'is_error' => 1
-   * else provide full message
+   * Check that api returned 'is_error' => 1.
    *
    * @param array $apiResult
    *   Api result.
@@ -861,7 +862,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Check that a deleted item has been deleted
+   * Check that a deleted item has been deleted.
+   *
    * @param $entity
    * @param $id
    */
@@ -2242,9 +2244,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Create test generated example in api/v3/examples.
+   *
    * To turn this off (e.g. on the server) set
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
    * in your settings file
+   *
    * @param array $params
    *   Array as passed to civicrm_api function.
    * @param array $result
