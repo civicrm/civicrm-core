@@ -35,14 +35,16 @@
 interface CRM_Contact_Form_Search_Interface {
 
   /**
-   * The constructor gets the submitted form values
+   * The constructor gets the submitted form values.
    *
-   * @param $formValues
+   * @param array $formValues
    */
   public function __construct(&$formValues);
 
   /**
-   * Builds the quickform for this search
+   * Builds the quickform for this search.
+   *
+   * @param CRM_Core_Form $form
    */
   public function buildForm(&$form);
 
@@ -54,27 +56,41 @@ interface CRM_Contact_Form_Search_Interface {
    */
 
   /**
-   * Count of records that match the current input parameters
-   * Used by pager
+   * Count of records that match the current input parameters.
+   *
+   * Used by pager.
    */
   public function count();
 
   /**
-   * Summary information for the query that can be displayed in the template
+   * Summary information for the query that can be displayed in the template.
+   *
    * This is useful to pass total / sub total information if needed
    */
   public function summary();
 
   /**
-   * List of contact ids that match the current input parameters
+   * List of contact ids that match the current input parameters.
+   *
    * Used by different tasks. Will be also used to optimize the
    * 'all' query below to avoid excessive LEFT JOIN blowup
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
   /**
-   * Retrieve all the values that match the current input parameters
+   * Retrieve all the values that match the current input parameters.
+   *
    * Used by the selector
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
    */
   public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE);
 
@@ -88,22 +104,24 @@ interface CRM_Contact_Form_Search_Interface {
    */
 
   /**
-   * The from clause for the query
+   * The from clause for the query.
    */
   public function from();
 
   /**
-   * The where clause for the query
+   * The where clause for the query.
+   *
+   * @param bool $includeContactIDs
    */
   public function where($includeContactIDs = FALSE);
 
   /**
-   * The template FileName to use to display the results
+   * The template FileName to use to display the results.
    */
   public function templateFile();
 
   /**
-   * Returns an array of column headers and field names and sort options
+   * Returns an array of column headers and field names and sort options.
    */
   public function &columns();
 

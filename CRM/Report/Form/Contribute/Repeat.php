@@ -268,6 +268,8 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
 
   /**
    * @param bool $tableCol
+   *
+   * @return array|void
    */
   public function groupBy($tableCol = FALSE) {
     $this->_groupBy = "";

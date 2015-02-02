@@ -1782,6 +1782,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * Get hash value of the mailing
+   *
+   * @param $id
+   *
+   * @return null|string
    */
   public static function getMailingHash($id) {
     $hash = NULL;

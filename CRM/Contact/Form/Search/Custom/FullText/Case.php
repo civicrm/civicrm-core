@@ -42,6 +42,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
   }
 
   /**
+   * Is CiviCase active?
+   *
    * @return bool
    */
   public function isActive() {

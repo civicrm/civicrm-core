@@ -1964,6 +1964,9 @@ LIMIT $offset, $limit
 
   /**
    * Manipulate header rows for relationship fields
+   *
+   * @param $headerRows
+   * @param $contactRelationshipTypes
    */
   public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
     foreach ($headerRows as & $header) {
@@ -1978,6 +1981,10 @@ LIMIT $offset, $limit
   /**
    * Exclude contacts who are deceased, have "Do not mail" privacy setting,
    * or have no street address
+   * @param $exportTempTable
+   * @param $headerRows
+   * @param $sqlColumns
+   * @param $exportParams
    */
   public static function postalMailingFormat($exportTempTable, &$headerRows, &$sqlColumns, $exportParams) {
     $whereClause = array();

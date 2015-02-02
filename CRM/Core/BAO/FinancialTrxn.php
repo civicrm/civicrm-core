@@ -360,6 +360,7 @@ WHERE ceft.entity_id = %1";
    * @param array $params
    *   To create trxn entries.
    *
+   * @return bool
    */
   public static function recordFees($params) {
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));

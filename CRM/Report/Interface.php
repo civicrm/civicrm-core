@@ -36,11 +36,14 @@ interface CRM_Report_Interface {
 
   /**
    * The constructor gets the submitted form values
+   *
+   * @param $formValues
    */
   public function __construct(&$formValues);
 
   /**
    * Builds the quickform for this search
+   * @param $form
    */
   public function buildForm(&$form);
 

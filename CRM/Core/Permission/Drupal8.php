@@ -43,6 +43,8 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
    * @param string $str
    *   The permission to check.
    *
+   * @param null $contactID
+   *
    * @return bool
    */
   public function check($str, $contactID = NULL) {

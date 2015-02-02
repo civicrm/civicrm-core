@@ -108,15 +108,25 @@ class CRM_Core_InnoDBIndexer {
    */
   protected $isActive;
 
+  /**
+   * Class constructor.
+   *
+   * @param $isActive
+   * @param $indices
+   */
   public function __construct($isActive, $indices) {
     $this->isActive = $isActive;
     $this->indices = $this->normalizeIndices($indices);
   }
 
+  /**
+   * Fix schema differences.
+   *
+   * Limitation: This won't pick up stale indices on tables which are not
+   * declared in $this->indices. That's not much of an issue for now b/c
+   * we have a static list of tables.
+   */
   public function fixSchemaDifferences() {
-    // Limitation: This won't pick up stale indices on tables which are not
-    // declared in $this->indices. That's not much of an issue for now b/c
-    // we have a static list of tables.
     foreach ($this->indices as $tableName => $ign) {
       $todoSqls = $this->reconcileIndexSqls($tableName);
       foreach ($todoSqls as $todoSql) {
@@ -126,7 +136,7 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Determine if an index is expected to exist
+   * Determine if an index is expected to exist.
    *
    * @param string $table
    * @param array $fields
@@ -187,6 +197,7 @@ class CRM_Core_InnoDBIndexer {
    * FTS index.
    *
    * @param $table
+   *
    * @return array
    *   (string $indexName => string $sql)
    */
@@ -202,9 +213,10 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Generate a "DROP INDEX" statement for each existing FTS index
+   * Generate a "DROP INDEX" statement for each existing FTS index.
    *
    * @param string $table
+   *
    * @return array
    *   (string $idxName => string $sql)
    */
@@ -221,7 +233,8 @@ class CRM_Core_InnoDBIndexer {
    * Construct a set of SQL statements which will create (or preserve)
    * required indices and destroy unneeded indices.
    *
-   * @param $table
+   * @param string $table
+   *
    * @return array
    */
   public function reconcileIndexSqls($table) {
@@ -249,7 +262,7 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Put the indices into a normalized format
+   * Put the indices into a normalized format.
    *
    * @param $indices
    * @return array
@@ -266,6 +279,8 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
+   * Setter for isActive.
+   *
    * @param bool $isActive
    */
   public function setActive($isActive) {
@@ -273,6 +288,8 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
+   * Getter for isActive.
+   *
    * @return bool
    */
   public function getActive() {

@@ -11,12 +11,15 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $participants = array();
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
+   * Add participant to cart.
+   *
    * @param $participant
    */
   public function add_participant($participant) {
@@ -47,6 +50,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
   /**
    * @param bool $useWhere
+   *
+   * @return mixed|void
    */
   public function delete($useWhere = FALSE) {
     $this->load_associations();
@@ -64,7 +69,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     foreach (array_keys($contacts_to_delete) as $contact_id) {
       CRM_Contact_BAO_Contact::deleteContact($contact_id);
     }
-    parent::delete();
+    return parent::delete();
   }
 
   /**

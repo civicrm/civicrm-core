@@ -74,6 +74,9 @@ class CRM_Core_Form_RecurringEntity {
    */
   public static $_hasParent = FALSE;
 
+  /**
+   * @param $entityTable
+   */
   public static function preProcess($entityTable) {
     self::$_entityId = (int) CRM_Utils_Request::retrieve('id', 'Positive');
     self::$_entityTable = $entityTable;

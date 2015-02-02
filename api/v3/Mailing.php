@@ -95,9 +95,10 @@ function civicrm_api3_mailing_get_token($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -212,7 +213,8 @@ function civicrm_api3_mailing_event_bounce($params) {
 /**
  * Adjust Metadata for bounce_spec action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -278,7 +280,8 @@ function civicrm_api3_mailing_event_reply($params) {
 /**
  * Adjust Metadata for event_reply action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -320,7 +323,8 @@ function civicrm_api3_mailing_event_forward($params) {
 /**
  * Adjust Metadata for event_forward action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -535,7 +539,8 @@ function civicrm_api3_mailing_send_test($params) {
 /**
  * Adjust Metadata for send_mail action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */

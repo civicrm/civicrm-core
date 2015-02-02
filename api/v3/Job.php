@@ -35,13 +35,13 @@
  * @subpackage API_Job
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Adjust metadata for "Create" action
+ * Adjust metadata for "Create" action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -56,46 +56,42 @@ function _civicrm_api3_job_create_spec(&$params) {
 }
 
 /**
- * create scheduled job
+ * Create scheduled job.
  *
  * @param array $params
  *   Associative array of property name/value pairs to insert in new job.
  *
  * @return array
- *
- *   {@getfields Job_create}
  */
 function civicrm_api3_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more job
+ * Retrieve one or more job.
  *
  * @param array $params
  *   input parameters
- * @return array
  *
- *   {@getfields email_get}
+ * @return array
  */
 function civicrm_api3_job_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a job
+ * Delete a job.
  *
  * @param array $params
- *
- * {@getfields Job_delete}
  */
 function civicrm_api3_job_delete($params) {
   _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Dumb wrapper to execute scheduled jobs. Always creates success - errors
- * and results are handled in the job log.
+ * Dumb wrapper to execute scheduled jobs.
+ *
+ * Always creates success - errors and results are handled in the job log.
  *
  * @param array $params
  *   input parameters (unused).
@@ -114,7 +110,7 @@ function civicrm_api3_job_execute($params) {
 }
 
 /**
- * Adjust Metadata for Execute action
+ * Adjust Metadata for Execute action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -123,7 +119,7 @@ function _civicrm_api3_job_execute_spec(&$params) {
 }
 
 /**
- * Geocode group of contacts based on given params
+ * Geocode group of contacts based on given params.
  *
  * @param array $params
  *   input parameters.
@@ -145,7 +141,7 @@ function civicrm_api3_job_geocode($params) {
 }
 
 /**
- * First check on Code documentation
+ * First check on Code documentation.
  *
  * @param array $params
  */
@@ -158,7 +154,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 }
 
 /**
- * Send the scheduled reminders for all contacts (either for activities or events)
+ * Send the scheduled reminders for all contacts (either for activities or events).
  *
  * @param array $params
  *   (reference ) input parameters.
@@ -189,9 +185,10 @@ function civicrm_api3_job_send_reminder($params) {
   }
 }
 /**
- * Adjust metadata for "send_reminder" action
+ * Adjust metadata for "send_reminder" action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -204,7 +201,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
   );
 }
 /**
- * Execute a specific report instance and send the output via email
+ * Execute a specific report instance and send the output via email.
  *
  * @param array $params
  *   (reference ) input parameters.
@@ -227,12 +224,12 @@ function civicrm_api3_job_mail_report($params) {
 }
 
 /**
- *
  * This method allows to update Email Greetings, Postal Greetings and Addressee for a specific contact type.
+ *
  * IMPORTANT: You must first create valid option value before using via admin interface.
  * Check option lists for Email Greetings, Postal Greetings and Addressee
  *
- *                        id - Integer - greetings option group
+ * @todo - is this here by mistake or should it be added to _spec function :id - Integer - greetings option group.
  *
  * @param array $params
  *
@@ -257,9 +254,10 @@ function civicrm_api3_job_update_greeting($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */
@@ -277,9 +275,10 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
 }
 
 /**
- * Mass update pledge statuses
+ * Mass update pledge statuses.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_job_process_pledge($params) {
@@ -297,7 +296,7 @@ function civicrm_api3_job_process_pledge($params) {
 }
 
 /**
- * Process mail queue
+ * Process mail queue.
  *
  * @param array $params
  *
@@ -332,7 +331,7 @@ function civicrm_api3_job_process_sms($params) {
 }
 
 /**
- * Job to get mail responses from civiMailing
+ * Job to get mail responses from civiMailing.
  *
  * @param array $params
  *

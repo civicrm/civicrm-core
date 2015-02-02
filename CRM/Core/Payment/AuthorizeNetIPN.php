@@ -206,6 +206,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * @param $input
    * @param $ids
+   *
+   * @return bool
    */
   public function getInput(&$input, &$ids) {
     $input['amount'] = $this->retrieve('x_amount', 'String');

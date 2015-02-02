@@ -164,6 +164,7 @@ class CRM_Core_Menu {
    * @param boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
    *
+   * @return array
    */
   public static function &items($fetchFromXML = FALSE) {
     return self::xmlItems($fetchFromXML);

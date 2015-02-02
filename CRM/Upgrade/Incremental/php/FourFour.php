@@ -379,6 +379,15 @@ ALTER TABLE civicrm_dashboard
     $this->addTask(ts('Update saved search information'), 'changeSavedSearch');
   }
 
+  /**
+   * Upgrade image URLs.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $startId
+   * @param $endId
+   *
+   * @return bool
+   */
   public static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $dao = self::findContactImageUrls($startId, $endId);
     $failures = array();
@@ -408,6 +417,13 @@ ALTER TABLE civicrm_dashboard
     return TRUE;
   }
 
+  /**
+   * Change saved search.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
   public static function changeSavedSearch(CRM_Queue_TaskContext $ctx) {
     $membershipStatuses = array_flip(CRM_Member_PseudoConstant::membershipStatus());
 
