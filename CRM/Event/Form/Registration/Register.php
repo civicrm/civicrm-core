@@ -930,7 +930,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (!empty($self->_paymentFields)) {
         CRM_Core_Form::validateMandatoryFields($self->_paymentFields, $fields, $errors);
       }
-      CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
+      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessorID, $fields, $errors, $self);
     }
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {

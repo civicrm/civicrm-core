@@ -1083,7 +1083,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!empty($self->_paymentFields)) {
       CRM_Core_Form::validateMandatoryFields($self->_paymentFields, $fields, $errors);
     }
-    CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
+    CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor'], $fields, $errors, $self);
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
