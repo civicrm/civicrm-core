@@ -1408,6 +1408,16 @@ FROM   civicrm_domain
     return $newObject;
   }
 
+  /**
+   * Cascade update through related entities.
+   *
+   * @param string $daoName
+   * @param $fromId
+   * @param $toId
+   * @param array $newData
+   *
+   * @return null
+   */
   public static function cascadeUpdate($daoName, $fromId, $toId, $newData = array()) {
     $object = new $daoName();
     $object->id = $fromId;

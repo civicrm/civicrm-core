@@ -42,8 +42,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_nonDisplayFields = array();
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
@@ -346,8 +345,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   /**
    * Adding address fields with dbAlias for order clause.
+   *
+   * @param bool $orderBy
+   *
    * @return array
-   *   address fields
+   *   Address fields
    */
   public function addressFields($orderBy = FALSE) {
     $address = parent::addAddressFields(FALSE, TRUE);

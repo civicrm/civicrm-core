@@ -680,12 +680,19 @@ WHERE  option_group_id = (
     return TRUE;
   }
 
+  /**
+   * Disable specified component.
+   *
+   * @param string $componentName
+   *
+   * @return bool
+   */
   public static function disableComponent($componentName) {
     $config = CRM_Core_Config::singleton();
     if (!in_array($componentName, $config->enableComponents) ||
       !array_key_exists($componentName, CRM_Core_Component::getComponents())
     ) {
-      // post-condition satisified
+      // Post-condition is satisfied.
       return TRUE;
     }
 
@@ -699,6 +706,11 @@ WHERE  option_group_id = (
     return TRUE;
   }
 
+  /**
+   * Set enabled components.
+   *
+   * @param array $enabledComponents
+   */
   public static function setEnabledComponents($enabledComponents) {
     $config = CRM_Core_Config::singleton();
     $components = CRM_Core_Component::getComponents();

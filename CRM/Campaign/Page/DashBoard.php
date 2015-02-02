@@ -372,8 +372,13 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $surveysData;
   }
 
+  /**
+   * Browse petitions.
+   *
+   * @return mixed|null
+   */
   public function browsePetition() {
-    // ensure valid javascript - this must have a value set
+    // Ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('petitionCampaigns', json_encode(NULL));
 
@@ -383,11 +388,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     //don't load find interface when no petition in db.
     if (!$petitionCount) {
       $this->assign('hasPetitions', FALSE);
-      return;
+      return NULL;
     }
     $this->assign('hasPetitions', TRUE);
 
-    //build the ajaxify petition search and selector.
+    // Build the ajax petition search and selector.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Search_Petition', ts('Search Petition'));
     $controller->set('searchTab', 'petition');
     $controller->setEmbedded(TRUE);

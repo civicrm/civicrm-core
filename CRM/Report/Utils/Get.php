@@ -55,6 +55,8 @@ class CRM_Report_Utils_Get {
    * @param string $fieldName
    * @param $field
    * @param $defaults
+   *
+   * @return bool
    */
   public static function dateParam($fieldName, &$field, &$defaults) {
     // type = 12 (datetime) is not recognized by Utils_Type::escape() method,

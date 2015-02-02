@@ -57,7 +57,8 @@ function civicrm_api3_system_flush($params) {
 /**
  * Adjust Metadata for Flush action
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
  *   Array or parameters determined by getfields.
  */

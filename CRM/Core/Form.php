@@ -1696,6 +1696,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * that small pieces of duplication are not being refactored into separate functions because their only shared parent
    * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
    * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
+   *
+   * @param $onlinePaymentProcessorEnabled
    */
   public function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
     $this->assign('nocid', TRUE);

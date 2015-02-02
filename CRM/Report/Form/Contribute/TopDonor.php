@@ -392,7 +392,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
       $rowCount = $this->_dashBoardRowCount;
     }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
-      //replace only first occurence of SELECT
+      // Replace only first occurrence of SELECT.
       $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
       $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
 
