@@ -42,7 +42,7 @@
  *   Array per getfields metadata.
  *
  * @return array
- *  Api result array
+ *   Api result array
  */
 function civicrm_api3_mailing_event_unsubscribe_create($params) {
 

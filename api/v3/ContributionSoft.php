@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -82,7 +80,7 @@ function civicrm_api3_contribution_soft_delete($params) {
  *   Array per getfields metadata.
  *
  * @return array
- *  API result
+ *   API result
  */
 function civicrm_api3_contribution_soft_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
