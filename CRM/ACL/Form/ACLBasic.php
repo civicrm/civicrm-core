@@ -74,7 +74,7 @@ SELECT object_table
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -123,7 +123,7 @@ SELECT object_table
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

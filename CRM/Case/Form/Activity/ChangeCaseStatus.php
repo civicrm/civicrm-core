@@ -101,7 +101,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   Posted values of the form.
@@ -117,7 +117,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @param CRM_Core_Form $form
@@ -130,7 +130,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @param CRM_Core_Form $form

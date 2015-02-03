@@ -40,35 +40,35 @@
 class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
   /**
-   * The default variable defined
+   * The default variable defined.
    *
    * @var int
    */
   public $_caseId;
 
   /**
-   * The default case type variable defined
+   * The default case type variable defined.
    *
    * @var int
    */
   public $_caseType;
 
   /**
-   * The default values of an activity
+   * The default values of an activity.
    *
    * @var array
    */
   public $_defaults = array();
 
   /**
-   * The array of releted contact info
+   * The array of releted contact info.
    *
    * @var array
    */
   public $_relatedContacts;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -351,7 +351,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -372,7 +372,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @param array $params
