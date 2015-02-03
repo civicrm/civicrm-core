@@ -553,6 +553,41 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   }
 
   /**
+   *
+   */
+  public function testCustomFileField() {
+    $customGroup = $this->customGroupCreate(array('title' => 'attachment_test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'test_file_attachment',
+      'label' => 'test_file_attachment',
+      'html_type' => 'File',
+      'data_type' => 'File',
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $cfId = 'custom_' . $customField['id'];
+
+    $cid = $this->individualCreate();
+
+    $attachment = $this->callAPISuccess('attachment', 'create', array(
+      'name' => self::getFilePrefix() . 'testCustomFileField.txt',
+      'mime_type' => 'text/plain',
+      'content' => 'My test content',
+      'field_name' => $cfId,
+      'entity_id' => $cid,
+    ));
+    $this->assertAttachmentExistence(TRUE, $attachment);
+
+    $result = $this->callAPISuccess('contact', 'getsingle', array(
+      'id' => $cid,
+      'return' => $cfId,
+    ));
+
+    $this->assertEquals($attachment['id'], $result[$cfId]);
+  }
+
+  /**
    * @param $exists
    * @param array $apiResult
    */
