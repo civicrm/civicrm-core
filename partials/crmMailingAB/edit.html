@@ -167,7 +167,7 @@
           }"
           crm-abtest="abtest"></div>
         <center>
-          <a class="crmMailing-submit-button" ng-click="submit()">
+          <a class="crmMailing-submit-button" ng-click="submit()" ng-class="{disabled: crmMailing.$invalid}">
             <div>{{ts('Submit Mailing')}}</div>
           </a>
         </center>
