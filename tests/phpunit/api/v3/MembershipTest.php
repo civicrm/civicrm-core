@@ -1170,7 +1170,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test correct end and start dates are calculated for fixed multi year memberships.
    *
-   *  The empty start date is calculated to be the start_date (1 Nov prior to the join_date - so 1 Nov 14)
+   * The empty start date is calculated to be the start_date (1 Nov prior to the join_date - so 1 Nov 14)
    *
    * In this set our start date is after the start day and after the rollover day so we do get an extra year
    * and we end one day before the rollover day. Start day is 1 Nov so we end on 31 Oct
@@ -1231,7 +1231,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test correct end and start dates are calculated for fixed multi year memberships.
    *
-   *  The empty start date is calculated to be the start_date (1 Nov prior to the join_date - so 1 Nov 14)
+   * The empty start date is calculated to be the start_date (1 Nov prior to the join_date - so 1 Nov 14)
    *
    * The empty start date is calculated to be the start_date (1 Nov prior to the join_date - so 1 Nov 14)
    * In this set our join date is after the start day and after the rollover day so we do get an extra year

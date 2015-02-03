@@ -281,7 +281,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   *  civicrm_contribution_soft_delete methods
+   * civicrm_contribution_soft_delete methods
    *
    */
   public function testDeleteEmptyParamsContributionSoft() {
@@ -316,8 +316,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   ///////////////// civicrm_contribution_search methods
 
   /**
-   *  Test civicrm_contribution_search with empty params.
-   *  All available contributions expected.
+   * Test civicrm_contribution_search with empty params.
+   * All available contributions expected.
    */
   public function testSearchEmptyParams() {
     $p = array(
@@ -339,7 +339,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contribution_soft_search. Success expected.
+   * Test civicrm_contribution_soft_search. Success expected.
    */
   public function testSearch() {
     $p1 = array(

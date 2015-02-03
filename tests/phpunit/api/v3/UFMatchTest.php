@@ -116,7 +116,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_create() using example code
+   * Test civicrm_activity_create() using example code
    */
   public function testUFMatchGetExample() {
     require_once 'api/v3/examples/UFMatch/Get.php';

@@ -69,11 +69,15 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   /**
-   * test that error doesn't occur for non-existant file
+   * Test that error doesn't occur for non-existent file.
    */
   public function testAPIWrapperIncludeNoFile() {
-
-    $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
+    $this->callAPIFailure(
+      'RandomFile',
+      'get',
+      array(),
+      'API (RandomFile,get) does not exist (join the API team and  implement it!)'
+    );
   }
 
   public function testAPIWrapperCamelCaseFunction() {
@@ -133,7 +137,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that calling via wrapper works
+   * Test that calling via wrapper works.
    */
   public function testv3Wrapper() {
     try {
@@ -147,11 +151,11 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   /**
-   * Test exception is thrown
+   * Test exception is thrown.
    */
-  public function testv3WrapperException() {
+  public function testV3WrapperException() {
     try {
-      $result = civicrm_api3('contact', 'create', array('debug' => 1));
+      civicrm_api3('contact', 'create', array('debug' => 1));
     }
     catch (CiviCRM_API3_Exception $e) {
       $this->assertEquals('mandatory_missing', $e->getErrorCode());
@@ -163,7 +167,10 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->fail('Exception was expected');
   }
 
-  public function testCreate_NoStringNullResult() {
+  /**
+   * Test result parsing for null.
+   */
+  public function testCreateNoStringNullResult() {
     // create an example contact
     // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
     $result = $this->callAPISuccess('ContributionPage', 'create', array(
@@ -187,11 +194,12 @@ class api_v3_APITest extends CiviUnitTestCase {
       'currency' => '',
     ));
 
-    // check return format
+    // Check return format.
     $this->assertEquals(1, $result['count']);
     foreach ($result['values'] as $resultValue) {
       $this->assertEquals('New title', $resultValue['title']);
-      $this->assertEquals('', $resultValue['currency']); // BUG: $resultValue['location'] === 'null'
+      // BUG: $resultValue['location'] === 'null'.
+      $this->assertEquals('', $resultValue['currency']);
     }
   }
 
