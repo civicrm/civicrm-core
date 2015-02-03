@@ -163,7 +163,7 @@
   <field>
     <name>external_identifier</name>
     <type>varchar</type>
-    <length>32</length>
+    <length>64</length>
     <html>
       <type>Text</type>
       <size>EIGHT</size>
