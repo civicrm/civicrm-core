@@ -43,7 +43,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_type_get()
+   * Test civicrm_activity_type_get().
    */
   public function testActivityTypeGet() {
     $params = array();
@@ -53,7 +53,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_type_create()
+   * Test civicrm_activity_type_create().
    */
   public function testActivityTypeCreate() {
     $params = array(
@@ -68,7 +68,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_type_create - check id
+   * Test civicrm_activity_type_create - check id
    */
   public function testActivityTypecreatecheckId() {
     $params = array(
@@ -81,7 +81,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_type_delete()
+   * Test civicrm_activity_type_delete()
    */
   public function testActivityTypeDelete() {
     $params = array(

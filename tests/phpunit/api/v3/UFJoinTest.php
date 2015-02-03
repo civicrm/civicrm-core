@@ -209,7 +209,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_activity_create() using example code
+   * Test civicrm_activity_create() using example code.
    */
   public function testUFJoinCreateExample() {
     require_once 'api/v3/examples/UFJoin/Create.php';

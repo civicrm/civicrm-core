@@ -47,7 +47,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create a sample batch
+   * Create a sample batch.
    */
   public function batchCreate() {
     $params = $this->_params;
@@ -116,7 +116,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_batch_delete using the new $params['id'] syntax
+   * Test civicrm_batch_delete using the new $params['id'] syntax.
    */
   public function testBatchDeleteCorrectSyntax() {
     $batchID = $this->batchCreate();

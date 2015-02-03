@@ -174,7 +174,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   ///////////////// civicrm_group_organization_remove methods
 
   /**
-   *  Test civicrm_group_organization_remove with params not an array.
+   * Test civicrm_group_organization_remove with params not an array.
    */
   public function testGroupOrganizationDeleteParamsNotArray() {
     $params = 'delete';
@@ -192,7 +192,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_group_organization_remove with valid params.
+   * Test civicrm_group_organization_remove with valid params.
    */
   public function testGroupOrganizationDelete() {
     $paramsC = array(
@@ -208,7 +208,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_group_organization_remove with invalid params key.
+   * Test civicrm_group_organization_remove with invalid params key.
    */
   public function testGroupOrganizationDeleteWithInvalidKey() {
     $paramsDelete = array(

@@ -45,10 +45,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   protected $followup_activity_type_value;
 
   /**
-   *  Test setup for every test
+   * Test setup for every test
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     $this->_entity = 'case';
@@ -247,7 +247,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   *  Test activity api create for case activities
+   * Test activity api create for case activities
    */
   public function testCaseActivityCreate() {
     // Create a case first
@@ -285,7 +285,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   *  Test activity api update for case activities
+   * Test activity api update for case activities
    */
   public function testCaseActivityUpdate() {
     // Need to create the case and activity before we can update it
