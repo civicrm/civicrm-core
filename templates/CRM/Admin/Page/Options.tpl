@@ -33,21 +33,21 @@
 
 <div id="help">
   {if $gName eq "gender"}
-    {ts}CiviCRM is pre-configured with standard options for individual gender (e.g. Male, Female, Transgender). You can use this page to customize these options and add new options as needed for your installation.{/ts}
+    {ts}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Transgender). Modify these options as needed for your installation.{/ts}
   {elseif $gName eq "individual_prefix"}
-      {ts}CiviCRM is pre-configured with standard options for individual contact prefixes (e.g. Ms., Mr., Dr. etc.). You can use this page to customize these options and add new ones as needed for your installation.{/ts}
+      {ts}CiviCRM is pre-configured with standard options for individual contact prefixes (Ms., Mr., Dr. etc.). Customize these options and add new ones as needed for your installation.{/ts}
   {elseif $gName eq "mobile_provider"}
      {ts}When recording mobile phone numbers for contacts, it may be useful to include the Mobile Phone Service Provider (e.g. Cingular, Sprint, etc.). CiviCRM is installed with the most commonly encountered service providers. Administrators may define as many additional providers as needed.{/ts}
   {elseif $gName eq "instant_messenger_service"}
      {ts}When recording Instant Messenger (IM) 'screen names' for contacts, it is useful to include the IM Service Provider (e.g. AOL, Yahoo, etc.). CiviCRM is installed with the most commonly encountered service providers. Administrators may define as many additional providers as needed.{/ts}
   {elseif $gName eq "individual_suffix"}
-     {ts}CiviCRM is pre-configured with standard options for individual contact name suffixes (e.g. Jr., Sr., II etc.). You can use this page to customize these options and add new ones as needed for your installation.{/ts}
+     {ts}CiviCRM is pre-configured with standard options for individual contact name suffixes (Jr., Sr., II etc.). Customize these options and add new ones as needed for your installation.{/ts}
   {elseif $gName eq "activity_type"}
      {ts}Activities are 'interactions with contacts' which you want to record and track. This list is sorted by component and then by weight within the component.{/ts} {help id='id-activity-types'}
   {elseif $gName eq "payment_instrument"}
      {ts}You may choose to record the payment method used for each contribution and fee. Reserved payment methods are required - you may modify their labels but they can not be deleted (e.g. Check, Credit Card, Debit Card). If your site requires additional payment methods, you can add them here. You can associate each payment method with a Financial Account which specifies where the payment is going (e.g. a bank account for checks and cash).{/ts}
   {elseif $gName eq "accept_creditcard"}
-    {ts}This page lists the credit card options that will be offered to contributors using your Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}<br /><br />
+    {ts}The following credit card options will be offered to contributors using Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}<br /><br />
     {ts}IMPORTANT: This page does NOT control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor's website).{/ts}
   {elseif $gName eq "acl_role"}
     {capture assign=docLink}{docURL page="user/current/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
