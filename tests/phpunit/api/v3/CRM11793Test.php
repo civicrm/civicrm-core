@@ -14,10 +14,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_CRM11793Test extends CiviUnitTestCase {
 
   /**
-   *  Test setup for every test
+   * Test setup for every test
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
@@ -35,10 +35,10 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contact_create
+   * Test civicrm_contact_create
    *
-   *  Verify that attempt to create individual contact with only
-   *  first and last names succeeds
+   * Verify that attempt to create individual contact with only
+   * first and last names succeeds
    */
   public function testCRM11793Organization() {
     $this->_testCRM11793ContactType('Organization');

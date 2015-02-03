@@ -128,7 +128,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code
+   * Test  using example code
    */
   public function testRelationshipTypeCreateExample() {
     require_once 'api/v3/examples/RelationshipType/Create.php';

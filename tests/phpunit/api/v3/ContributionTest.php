@@ -1208,8 +1208,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contribution_search with empty params.
-   *  All available contributions expected.
+   * Test civicrm_contribution_search with empty params.
+   * All available contributions expected.
    */
   public function testSearchEmptyParams() {
     $params = array();
@@ -1250,7 +1250,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contribution_search. Success expected.
+   * Test civicrm_contribution_search. Success expected.
    */
   public function testSearch() {
     $p1 = array(

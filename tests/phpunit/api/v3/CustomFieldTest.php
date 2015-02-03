@@ -204,7 +204,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code
+   * Test  using example code
    */
   /*function testCustomFieldCreateExample( )
   {

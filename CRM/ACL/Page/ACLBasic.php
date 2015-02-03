@@ -43,14 +43,14 @@
 class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -60,7 +60,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -129,7 +129,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all acls
+   * Browse all acls.
    *
    * @return void
    */
@@ -188,7 +188,7 @@ ORDER BY entity_id
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
    * @return string
    *   Classname of edit form.
@@ -198,7 +198,7 @@ ORDER BY entity_id
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
    * @return string
    *   name of this page.
