@@ -14,7 +14,7 @@
   <p>{ts}Your fundraising total has been updated.{/ts}<br/>
     {ts}The donor's information is listed below.  You can choose to contact them and convey your thanks if you wish.{/ts} <br/>
     {if $is_honor_roll_enabled}
-      {ts}The donor's name has been added to your honor roll unless they asked not to be included.{/ts}<br/>
+      {ts}Their name has been added to your honor roll unless they asked not to be included.{/ts}<br/>
     {/if}
   </p>
   <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
