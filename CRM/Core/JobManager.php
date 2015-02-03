@@ -54,7 +54,7 @@ class CRM_Core_JobManager {
   /**
    * Class constructor
    *
-   * @param void
+   * @return void
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -201,7 +201,7 @@ class CRM_Core_JobManager {
   /**
    * @param string $message
    *
-   * @return array|null
+   * @return void
    *   collection of permissions, null if none
    */
   public function logEntry($message) {

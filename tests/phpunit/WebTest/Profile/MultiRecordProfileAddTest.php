@@ -120,7 +120,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/uf/group/field/add', array(
         'action' => 'add',
         'reset' => 1,
-        'gid' => $gid
+        'gid' => $gid,
       ), 'field_name[0]');
 
     //Add field to profile

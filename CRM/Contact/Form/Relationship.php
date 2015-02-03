@@ -352,7 +352,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
     $contactField = $this->addEntityRef('related_contact_id', $label, array(
         'multiple' => TRUE,
-        'create' => TRUE
+        'create' => TRUE,
       ), TRUE);
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -471,25 +471,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if ($valid) {
       CRM_Core_Session::setStatus(ts('Relationship created.', array(
             'count' => $valid,
-            'plural' => '%count relationships created.'
+            'plural' => '%count relationships created.',
           )), ts('Saved'), 'success');
     }
     if ($invalid) {
       CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array(
             'count' => $invalid,
-            'plural' => '%count relationship records were not created due to invalid contact types.'
+            'plural' => '%count relationship records were not created due to invalid contact types.',
           )), ts('%count invalid relationship record', array(
             'count' => $invalid,
-            'plural' => '%count invalid relationship records'
+            'plural' => '%count invalid relationship records',
           )));
     }
     if ($duplicate) {
       CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array(
             'count' => $duplicate,
-            'plural' => '%count relationships were not created because they already exist.'
+            'plural' => '%count relationships were not created because they already exist.',
           )), ts('%count duplicate relationship', array(
             'count' => $duplicate,
-            'plural' => '%count duplicate relationships'
+            'plural' => '%count duplicate relationships',
           )));
     }
     if ($saved) {

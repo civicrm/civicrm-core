@@ -111,7 +111,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
         'url' => CRM_Utils_System::url('civicrm/admin/sms/provider',
           'reset=1'
         ),
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
@@ -128,7 +128,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   /**
    * Browse all Providers.
    *
-   * @param null $action
+   * @param array $action
    *
    * @return void
    */
