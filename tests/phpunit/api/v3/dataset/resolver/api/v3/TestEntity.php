@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Example result for API Test.
+ *
  * @param array $params
  *
  * @return array

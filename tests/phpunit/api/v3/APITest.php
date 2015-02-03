@@ -29,7 +29,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * Test class for API functions
+ * Test class for API functions.
  *
  * @package CiviCRM_APIv3
  */
@@ -81,16 +81,19 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   public function testAPIWrapperCamelCaseFunction() {
-    $result = $this->callAPISuccess('OptionGroup', 'Get', array());
+    $this->callAPISuccess('OptionGroup', 'Get', array());
   }
 
   public function testAPIWrapperLcaseFunction() {
-    $result = $this->callAPISuccess('OptionGroup', 'get', array());
+    $this->callAPISuccess('OptionGroup', 'get', array());
   }
 
+  /**
+   * Test resolver.
+   */
   public function testAPIResolver() {
-    $oldpath = get_include_path();
-    set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
+    $oldPath = get_include_path();
+    set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
     $result = $this->callAPISuccess('contact', 'example_action1', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
@@ -99,7 +102,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('test_entity', 'example_action3', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
-    set_include_path($oldpath);
+    set_include_path($oldPath);
   }
 
   public function testFromCamel() {
@@ -127,7 +130,6 @@ class api_v3_APITest extends CiviUnitTestCase {
       'optionValue' => 'OptionValue',
       'option_value' => 'OptionValue',
       'UFJoin' => 'UFJoin',
-      // dommage 'ufJoin' => 'UFJoin',
       'uf_join' => 'UFJoin',
     );
     foreach ($cases as $input => $expected) {
