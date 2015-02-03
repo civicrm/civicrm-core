@@ -446,7 +446,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   }
 
   /**
-   * Get all of the ACLs through ACL groups
+   * Get all of the ACLs through ACL groups.
    *
    * @param int $contact_id
    *   ID of a contact to search for.
@@ -512,7 +512,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   }
 
   /**
-   * Get all ACLs granted to a contact through all group memberships
+   * Get all ACLs granted to a contact through all group memberships.
    *
    * @param int $contact_id
    *   The contact's ID.
@@ -557,7 +557,7 @@ SELECT      $acl.*
   }
 
   /**
-   * Get all of the ACLs for a contact through ACL groups owned by Contact
+   * Get all of the ACLs for a contact through ACL groups owned by Contact.
    * groups.
    *
    * @param int $contact_id
@@ -963,7 +963,7 @@ ORDER BY a.object_id
   }
 
   /**
-   * Delete ACL records
+   * Delete ACL records.
    *
    * @param int $aclId
    *   ID of the ACL record to be deleted.
