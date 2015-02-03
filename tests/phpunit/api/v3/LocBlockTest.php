@@ -34,6 +34,9 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'loc_block';
 
+  /**
+   * Set up.
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -113,7 +116,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone']);
     $this->assertEquals($params['address']['street_address'], $result['address']['street_address']);
 
-     $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
   }
 
 }

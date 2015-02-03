@@ -1,6 +1,7 @@
 <?php
 /**
- *  File for the TestActionSchedule class
+ * @file
+ * File for the TestActionSchedule class
  *
  *  (PHP 5)
  *
@@ -37,24 +38,21 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   protected $_entity = 'action_schedule';
   protected $_apiversion = 3;
 
-
   /**
-   *  Test setup for every test
-   *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Test setup for every test.
    */
   public function setUp() {
-    //  Connect to the database
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
+  /**
+   * Test simple create action schedule.
+   */
   public function testSimpleActionScheduleCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
     $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
@@ -71,14 +69,14 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'mapping_id' => $mappingId,
     );
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
-    $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
-    $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
+    $this->assertTrue(is_numeric($actionSchedule['id']));
+    $this->assertTrue($actionSchedule['id'] > 0);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $this->assertEquals($oldCount + 1, $newCount);
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testActionScheduleCreateWithoutRequired() {
     $params = array(
@@ -89,7 +87,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   *
+   * Test create with scheduled dates.
    */
   public function testActionScheduleWithScheduledDatesCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
@@ -123,8 +121,8 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'Test subject',
     );
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
-    $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
-    $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
+    $this->assertTrue(is_numeric($actionSchedule['id']));
+    $this->assertTrue($actionSchedule['id'] > 0);
     $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'][0], $params['start_action_offset']);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $this->assertEquals($oldCount + 1, $newCount);
