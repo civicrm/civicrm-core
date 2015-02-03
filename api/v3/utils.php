@@ -527,6 +527,10 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $returnProperties = NULL;
   }
 
+  if (substr($sort, 0, 2) == 'id') {
+    $sort = $entity . "_" . $sort;
+  }
+
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
   foreach ($newParams as &$newParam) {
     if ($newParam[1] == '='  && is_array($newParam[2])) {
@@ -538,7 +542,6 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
         $newParam[2] = $sqlFilter;
       }
     }
-
   }
 
   $skipPermissions = !empty($params['check_permissions']) ? 0 : 1;
