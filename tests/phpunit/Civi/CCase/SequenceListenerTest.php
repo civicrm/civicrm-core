@@ -3,6 +3,11 @@ namespace Civi\CCase;
 
 require_once 'CiviTest/CiviCaseTestCase.php';
 
+/**
+ * Class SequenceListenerTest
+ *
+ * @package Civi\CCase
+ */
 class SequenceListenerTest extends \CiviCaseTestCase {
 
   public function setUp() {
@@ -101,6 +106,11 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     );
   }
 
+  /**
+   * @param $expected
+   * @param $actual
+   * @param int $tolerance
+   */
   public function assertApproxTime($expected, $actual, $tolerance = 1) {
     $diff = abs(strtotime($expected) - strtotime($actual));
     $this->assertTrue($diff <= $tolerance, sprintf("Check approx time equality. expected=[%s] actual=[%s] tolerance=[%s]",

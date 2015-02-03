@@ -268,7 +268,9 @@ SELECT DISTINCT case_id
 }
 
 /**
- * Deprecated. Use activity API instead
+ * Deprecated API.
+ *
+ * Use activity API instead.
  *
  * @param array $params
  *
@@ -283,6 +285,8 @@ function civicrm_api3_case_activity_create($params) {
 }
 
 /**
+ * Declare deprecated api functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions
@@ -430,7 +434,7 @@ function _civicrm_api3_case_read($caseId, $options) {
 }
 
 /**
- * Internal function to format create params for processing
+ * Internal function to format create params for processing.
  *
  * @param array $params
  */
@@ -444,7 +448,7 @@ function _civicrm_api3_case_format_params(&$params) {
     if (!$params['case_type_id']) {
       $caseTypeLabels = CRM_Case_PseudoConstant::caseType('title', FALSE);
       $params['case_type_id'] = array_search($params['case_type'], $caseTypeLabels);
-      $params['case_type'] = $caseTypes[$params['case_type_id']]; // label => name
+      $params['case_type'] = $caseTypes[$params['case_type_id']];
     }
   }
   elseif (empty($params['case_type'])) {

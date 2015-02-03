@@ -1,7 +1,15 @@
 <?php
 namespace Civi\CiUtil\Command;
 
+/**
+ * Class CompareCommand
+ *
+ * @package Civi\CiUtil\Command
+ */
 class CompareCommand {
+  /**
+   * @param $argv
+   */
   public static function main($argv) {
     if (empty($argv[1])) {
       echo "summary: Compares the output of different test runs\n";

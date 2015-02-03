@@ -260,15 +260,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Store multiple items in the setting table
+   * Store multiple items in the setting table.
    *
    * @param array $params
    *   (required) An api formatted array of keys and values.
-   * @param null $domains
+   * @param array $domains Array of domains to get settings for. Default is the current domain
    * @param $settingsToReturn
    *
-   * @domains array an array of domains to get settings for. Default is the current domain
-   * @return void
+   * @return array
    */
   public static function getItems(&$params, $domains = NULL, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();

@@ -32,13 +32,13 @@
  * @subpackage API_ActionSchedule
  *
  * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Get CiviCRM Action Schedule details
- * {@getfields action_schedule_create}
+ * Get CiviCRM Action Schedule details.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_action_schedule_get($params) {
@@ -47,13 +47,11 @@ function civicrm_api3_action_schedule_get($params) {
 
 
 /**
- * Create a new Action Schedule
+ * Create a new Action Schedule.
  *
  * @param array $params
  *
  * @return array
- *
- *   {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));
@@ -74,12 +72,11 @@ function civicrm_api3_action_schedule_create($params) {
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
-  //  $params['entity_status']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
 }
 
 /**
- * delete an existing action_schedule
+ * Delete an existing action_schedule.
  *
  * @param array $params
  *   Array containing id of the action_schedule.
@@ -87,7 +84,6 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
  *
  * @return array
  *   API result array
- *
  */
 function civicrm_api3_action_schedule_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

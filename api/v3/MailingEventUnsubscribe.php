@@ -33,17 +33,16 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * Unsubscribe from mailing group
+ * Unsubscribe from mailing group.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
+ *   Array per getfields metadata.
  *
- * @return array  api result array {@getfields mailing_event_unsubscribe_create}
+ * @return array
+ *   Api result array
  */
 function civicrm_api3_mailing_event_unsubscribe_create($params) {
 

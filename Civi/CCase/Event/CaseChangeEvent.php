@@ -37,6 +37,9 @@ class CaseChangeEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public $analyzer;
 
+  /**
+   * @param $analyzer
+   */
   public function __construct($analyzer) {
     $this->analyzer = $analyzer;
   }

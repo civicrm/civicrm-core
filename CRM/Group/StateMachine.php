@@ -35,7 +35,10 @@
 class CRM_Group_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * Class constructor
+   * Class constructor.
+   *
+   * @param object $controller
+   * @param \const|int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

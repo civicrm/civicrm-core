@@ -30,54 +30,41 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_mailing_component
- *
  */
 
 /**
- * Save a mailing_component
- *
- * Allowed @params array keys are:
- * {@getfields mailing_component_create}
- * @example mailing_componentCreate.php
+ * Save a mailing_component.
  *
  * @param array $params
  *
  * @throws API_Exception
  * @return array
- *   Array of newly created mailing_component property values.
+ *   API result array.
  */
 function civicrm_api3_mailing_component_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a mailing_component
- *
- * Allowed @params array keys are:
- * {@getfields mailing_component_get}
- * @example mailing_componentCreate.php
+ * Get a mailing_component.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved mailing_component property values.
+ *   API result array.
  */
 function civicrm_api3_mailing_component_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a mailing_component
- *
- * Allowed @params array keys are:
- * {@getfields mailing_component_delete}
- * @example mailing_componentCreate.php
+ * Delete a mailing_component.
  *
  * @param array $params
  *
  * @throws API_Exception
  * @return array
- *   Array of deleted values.
+ *   API result array.
  */
 function civicrm_api3_mailing_component_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

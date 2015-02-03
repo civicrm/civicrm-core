@@ -36,16 +36,12 @@
  */
 
 /**
- *  Add a record relating a contact with an activity
- *
- * Allowed @params array keys are:
- *
- * @example ActivityContact.php
+ * Add a record relating a contact with an activity.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created activity contact records.
+ *   API result array.
  */
 function civicrm_api3_activity_contact_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -65,14 +61,12 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ActivityContact record
+ * Delete an existing ActivityContact record.
  *
  * @param array $params
  *
  * @return array
  *   Api Result
- *
- * @example ActivityContact.php
  */
 function civicrm_api3_activity_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -81,14 +75,11 @@ function civicrm_api3_activity_contact_delete($params) {
 /**
  * Get a ActivityContact.
  *
- * @example ActivityContact.php
- *
  * @param array $params
  *   An associative array of name/value pairs.
  *
  * @return array
  *   details of found tags else error
- *
  */
 function civicrm_api3_activity_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

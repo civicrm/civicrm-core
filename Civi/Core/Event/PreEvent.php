@@ -53,6 +53,12 @@ class PreEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public $params;
 
+  /**
+   * @param $action
+   * @param $entity
+   * @param $id
+   * @param $params
+   */
   public function __construct($action, $entity, $id, $params) {
     $this->action = $action;
     $this->entity = $entity;

@@ -34,25 +34,18 @@
  * @subpackage API_Contact
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Create or update a contact (note you should always call this via civicrm_api() & never directly)
+ * Create or update a contact (note you should always call this via civicrm_api() & never directly).
  *
  * @param array $params
  *   Input parameters.
  *
- * Allowed @params array keys are:
- * {@getfields contact_create}
- *
- *
  * @throws API_Exception
- * @example ContactCreate.php Example of Create Call
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_contact_create($params) {
 
@@ -139,7 +132,9 @@ function _civicrm_api3_contact_create_spec(&$params) {
 }
 
 /**
- * Retrieve one or more contacts, given a set of search params
+ * Retrieve one or more contacts, given a set of search params.
+ *
+ * @param array $params
  *
  * @return array
  *   API Result Array
@@ -152,6 +147,8 @@ function civicrm_api3_contact_get($params) {
 }
 
 /**
+ * Get count of contact.
+ *
  * @param array $params
  *
  * @return int
@@ -164,7 +161,7 @@ function civicrm_api3_contact_getcount($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * @param array $params
  *   Array or parameters determined by getfields.
@@ -172,7 +169,7 @@ function civicrm_api3_contact_getcount($params) {
 function _civicrm_api3_contact_get_spec(&$params) {
   $params['contact_is_deleted']['api.default'] = 0;
 
-  //we declare all these pseudofields as there are other undocumented fields accessible
+  // We declare all these pseudoFields as there are other undocumented fields accessible
   // via the api - but if check permissions is set we only allow declared fields
   $params['address_id']['title'] = 'Primary Address ID';
   $params['street_address']['title'] = 'Primary Address Street Address';
@@ -212,6 +209,8 @@ function _civicrm_api3_contact_get_spec(&$params) {
 }
 
 /**
+ * Support for historical oddities.
+ *
  * We are supporting 'showAll' = 'all', 'trash' or 'active' for contact get
  * and for getcount
  * - hopefully some day we'll come up with a std syntax for the 3-way-boolean of
@@ -257,7 +256,7 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
 }
 
 /**
- * Delete a contact with given contact id
+ * Delete a contact with given contact id.
  *
  * @param array $params
  *   input parameters per getfields
@@ -292,6 +291,10 @@ function civicrm_api3_contact_delete($params) {
 
 
 /**
+ * Check parameters passed in.
+ *
+ * This function is on it's way out.
+ *
  * @param array $params
  * @param bool $dupeCheck
  *
@@ -388,8 +391,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck) {
 }
 
 /**
- * Takes an associative array and creates a contact object and all the associated
- * derived objects (i.e. individual, location, email, phone etc)
+ * Helper function for contact create.
  *
  * @param array $params
  *   (reference ) an assoc array of name/value pairs.
@@ -408,14 +410,12 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
 }
 
 /**
- * Validate the addressee or email or postal greetings
+ * Validate the addressee or email or postal greetings.
  *
  * @param array $params
- *   Associative array of property name/value.
- *                                   pairs to insert in new contact.
+ *   Array per getfields metadata.
  *
  * @throws API_Exception
- *
  */
 function _civicrm_api3_greeting_format_params($params) {
   $greetingParams = array('', '_id', '_custom');
@@ -426,7 +426,7 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     $formatParams = FALSE;
-    // unset display value from params.
+    // Unset display value from params.
     if (isset($params["{$key}{$greeting}_display"])) {
       unset($params["{$key}{$greeting}_display"]);
     }
@@ -535,12 +535,12 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
- * Old contact quick search api
+ * Old contact quick search api.
  *
  * @deprecated
  *
- * {@example ContactGetquick.php 0}
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -837,6 +837,8 @@ LIMIT    0, {$limit}
 }
 
 /**
+ * Declare deprecated api functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions
@@ -860,7 +862,6 @@ function _civicrm_api3_contact_deprecation() {
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_contact_merge($params) {
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
@@ -881,6 +882,8 @@ function civicrm_api3_contact_merge($params) {
 }
 
 /**
+ * Adjust metadata for contact_proximity api function.
+ *
  * @param array $params
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
@@ -893,6 +896,8 @@ function _civicrm_api3_contact_proximity_spec(&$params) {
 }
 
 /**
+ * Get contacts by proximity.
+ *
  * @param array $params
  *
  * @return array
@@ -944,6 +949,8 @@ WHERE     $whereClause
 
 
 /**
+ * Get parameters for getlist function.
+ *
  * @see _civicrm_api3_generic_getlist_params
  *
  * @param array $request
@@ -987,6 +994,8 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 }
 
 /**
+ * Get output for getlist function.
+ *
  * @see _civicrm_api3_generic_getlist_output
  *
  * @param array $result
@@ -997,7 +1006,13 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 function _civicrm_api3_contact_getlist_output($result, $request) {
   $output = array();
   if (!empty($result['values'])) {
-    $addressFields = array_intersect(array('street_address', 'city', 'state_province', 'country'), $request['params']['return']);
+    $addressFields = array_intersect(array(
+        'street_address',
+        'city',
+        'state_province',
+        'country',
+      ),
+      $request['params']['return']);
     foreach ($result['values'] as $row) {
       $data = array(
         'id' => $row[$request['id_field']],

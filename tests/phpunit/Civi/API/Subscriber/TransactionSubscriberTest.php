@@ -7,6 +7,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class TransactionSubscriberTest extends \CiviUnitTestCase {
 
+  /**
+   * Get transaction options.
+   *
+   * @return array
+   */
   public function transactionOptions() {
     $r = array();
     // $r[] = array(string $entity, string $action, array $params, bool $isTransactional, bool $isForceRollback, bool $isNested);
@@ -78,15 +83,18 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
   }
 
   /**
-   * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly
+   * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly.
+   *
    * @dataProvider transactionOptions
+   *
    * @param $version
    * @param $entity
    * @param $action
-   * @param $params
-   * @param $isTransactional
-   * @param $isForceRollback
-   * @param $isNested
+   * @param array $params
+   * @param bool $isTransactional
+   * @param bool $isForceRollback
+   * @param bool $isNested
+   *
    * @throws \API_Exception
    */
   public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {

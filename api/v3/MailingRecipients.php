@@ -33,15 +33,14 @@
  * @subpackage API_Mailing
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 
 /**
- * Returns array of Mailing Recipients
+ * Returns array of Mailing Recipients.
  *
  * @param array $params
- *   Array of one or more valid.
+ *   Array per getfields metadata.
  *
  * @return array
  *   API return Array of matching mailing jobs

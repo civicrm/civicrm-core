@@ -29,12 +29,13 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Upgrade_Incremental_php_FourSix {
   const BATCH_SIZE = 5000;
 
   /**
+   * Verify DB state.
+   *
    * @param $errors
    *
    * @return bool
@@ -44,7 +45,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
   /**
-   * Compute any messages which should be displayed beforeupgrade
+   * Compute any messages which should be displayed before upgrade.
    *
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
@@ -53,8 +54,6 @@ class CRM_Upgrade_Incremental_php_FourSix {
    * @param string $rev
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
-   *
-   * @return void
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
@@ -112,15 +111,27 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $queue->createItem($task, array('weight' => -1));
   }
 
-  function upgrade_4_6_alpha3($rev) {
-    // task to process sql
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_6_alpha3($rev) {
+    // Task to process sql.
     $this->addTask(ts('Add and update reference_date column for Schedule Reminders'), 'updateReferenceDate');
   }
 
-  // CRM-15728, Add new column reference_date to civicrm_action_log in order to track
-  // actual action_start_date for membership entity for only those schedule reminders which are not repeatable
-  static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
-    //Add column civicrm_action_log.reference_date if not exists
+  /**
+   * Add new column reference_date to civicrm_action_log in order to track.
+   *
+   * CRM-15728, actual action_start_date for membership entity for only those schedule reminders which are not repeatable
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function updateReferenceDate(CRM_Queue_TaskContext $ctx) {
+    //Add column civicrm_action_log.reference_date if not exists.
     $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_action_log' AND COLUMN_NAME = 'reference_date' ";
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
@@ -130,7 +141,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
       CRM_Core_DAO::executeQuery($query);
     }
 
-    //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen
+    //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen.
     $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
  LEFT JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
    mapper.entity = 'civicrm_membership' AND
@@ -139,10 +150,10 @@ class CRM_Upgrade_Incremental_php_FourSix {
 
     // construct basic where clauses
     $where = array(
-      'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)'
+      'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)',
     ); //choose reminder older then 9 months
     $dao = CRM_Core_DAO::executeQuery($query);
-    while($dao->fetch()) {
+    while ($dao->fetch()) {
 
       $referenceColumn = str_replace('membership_', "m.", $dao->start_action_date);
       $value = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($dao->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)));
@@ -170,4 +181,5 @@ class CRM_Upgrade_Incremental_php_FourSix {
 
     return TRUE;
   }
+
 }

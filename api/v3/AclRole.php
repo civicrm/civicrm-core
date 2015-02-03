@@ -30,15 +30,12 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_acl_role
- *
  */
 
 /**
- * Save an acl_role
+ * Save an acl_role.
  *
  * Allowed @params array keys are:
- * {@getfields acl_role_create}
- * @example acl_roleCreate.php
  *
  * @param array $params
  *
@@ -50,11 +47,7 @@ function civicrm_api3_acl_role_create($params) {
 }
 
 /**
- * Get an acl_role
- *
- * Allowed @params array keys are:
- * {@getfields acl_role_get}
- * @example acl_roleCreate.php
+ * Get an acl_role.
  *
  * @param array $params
  *
@@ -66,11 +59,7 @@ function civicrm_api3_acl_role_get($params) {
 }
 
 /**
- * Delete an acl_role
- *
- * Allowed @params array keys are:
- * {@getfields acl_role_delete}
- * @example acl_roleCreate.php
+ * Delete an acl_role.
  *
  * @param array $params
  *

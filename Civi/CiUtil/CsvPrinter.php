@@ -1,11 +1,20 @@
 <?php
 namespace Civi\CiUtil;
 
+/**
+ * Class CsvPrinter
+ *
+ * @package Civi\CiUtil
+ */
 class CsvPrinter {
   var $file;
   var $headers;
   var $hasHeader = FALSE;
 
+  /**
+   * @param $file
+   * @param $headers
+   */
   public function __construct($file, $headers) {
     $this->file = fopen($file, "w");
     $this->headers = $headers;
@@ -23,6 +32,10 @@ class CsvPrinter {
     $this->hasHeader = TRUE;
   }
 
+  /**
+   * @param $test
+   * @param $values
+   */
   public function printRow($test, $values) {
     $this->printHeader();
     $row = $values;

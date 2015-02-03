@@ -33,14 +33,14 @@
  * @subpackage API_Mailing
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
  * Handle a create event.
  *
  * @param array $params
- * @return array API Success Array
+ *
+ * @return array
  *    API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
@@ -65,7 +65,10 @@ function civicrm_api3_mailing_create($params) {
 }
 
 /**
+ * Get mailing token.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -125,6 +128,7 @@ function civicrm_api3_mailing_delete($params) {
  * Handle a get event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_get($params) {
@@ -132,6 +136,8 @@ function civicrm_api3_mailing_get($params) {
 }
 
 /**
+ * Adjust metadata for mailing submit api function.
+ *
  * @param array $spec
  */
 function _civicrm_api3_mailing_submit_spec(&$spec) {
@@ -145,7 +151,10 @@ function _civicrm_api3_mailing_submit_spec(&$spec) {
 }
 
 /**
+ * Mailing submit.
+ *
  * @param array $params
+ *
  * @return array
  * @throws API_Exception
  */
@@ -162,11 +171,11 @@ function civicrm_api3_mailing_submit($params) {
   $updateParams = array();
   $updateParams['id'] = $params['id'];
 
-  // the BAO will autocreate the job
-  $updateParams['api.mailing_job.create'] = 0; // note: exact match to API default
+  // The BAO will auto-create the job - note: exact match to API default.
+  $updateParams['api.mailing_job.create'] = 0;
 
-  // note: we'll pass along scheduling/approval fields, but they may get ignored
-  // if we don't have permission
+  // Note: we'll pass along scheduling/approval fields, but they may get ignored
+  // if we don't have permission.
   if (isset($params['scheduled_date'])) {
     $updateParams['scheduled_date'] = $params['scheduled_date'];
     $updateParams['scheduled_id'] = CRM_Core_Session::getLoggedInContactID();
@@ -211,7 +220,7 @@ function civicrm_api3_mailing_event_bounce($params) {
 }
 
 /**
- * Adjust Metadata for bounce_spec action
+ * Adjust Metadata for bounce_spec action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -230,7 +239,8 @@ function _civicrm_api3_mailing_event_bounce_spec(&$params) {
 }
 
 /**
- * Handle a confirm event
+ * Handle a confirm event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -242,6 +252,8 @@ function civicrm_api3_mailing_event_confirm($params) {
 }
 
 /**
+ * Declare deprecated functions.
+ *
  * @deprecated api notice
  * @return array
  *   Array of deprecated actions
@@ -251,7 +263,7 @@ function _civicrm_api3_mailing_deprecation() {
 }
 
 /**
- * Handle a reply event
+ * Handle a reply event.
  *
  * @param array $params
  *
@@ -278,7 +290,7 @@ function civicrm_api3_mailing_event_reply($params) {
 }
 
 /**
- * Adjust Metadata for event_reply action
+ * Adjust Metadata for event_reply action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -297,7 +309,7 @@ function _civicrm_api3_mailing_event_reply_spec(&$params) {
 }
 
 /**
- * Handle a forward event
+ * Handle a forward event.
  *
  * @param array $params
  *
@@ -321,7 +333,7 @@ function civicrm_api3_mailing_event_forward($params) {
 }
 
 /**
- * Adjust Metadata for event_forward action
+ * Adjust Metadata for event_forward action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -340,7 +352,7 @@ function _civicrm_api3_mailing_event_forward_spec(&$params) {
 }
 
 /**
- * Handle a click event
+ * Handle a click event.
  *
  * @param array $params
  *
@@ -366,7 +378,7 @@ function civicrm_api3_mailing_event_click($params) {
 }
 
 /**
- * Handle an open event
+ * Handle an open event.
  *
  * @param array $params
  *
@@ -391,7 +403,11 @@ function civicrm_api3_mailing_event_open($params) {
 }
 
 /**
+ * Preview mailing.
+ *
  * @param array $params
+ *   Array per getfields metadata.
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -440,6 +456,8 @@ function civicrm_api3_mailing_preview($params) {
 }
 
 /**
+ * Adjust metadata for send test function.
+ *
  * @param array $spec
  */
 function _civicrm_api3_mailing_send_test_spec(&$spec) {
@@ -448,7 +466,10 @@ function _civicrm_api3_mailing_send_test_spec(&$spec) {
 }
 
 /**
+ * Send test mailing.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  * @throws \CiviCRM_API3_Exception
@@ -537,7 +558,7 @@ function civicrm_api3_mailing_send_test($params) {
 }
 
 /**
- * Adjust Metadata for send_mail action
+ * Adjust Metadata for send_mail action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -550,7 +571,10 @@ function _civicrm_api3_mailing_stats_spec(&$params) {
 }
 
 /**
+ * Function which needs to be explained.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -609,10 +633,13 @@ function civicrm_api3_mailing_stats($params) {
 }
 
 /**
- * Fix the reset dates on the email record based on when a mail was last delivered
+ * Fix the reset dates on the email record based on when a mail was last delivered.
+ *
  * We only consider mailings that were completed and finished in the last 3 to 7 days
  * Both the min and max days can be set via the params
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_update_email_resetdate($params) {

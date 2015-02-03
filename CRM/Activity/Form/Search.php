@@ -191,12 +191,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *        the form values associated with the saved search are used for searching.
    *      - if user has done a submit with new values the regular post submissing is
    *        done.
+   *
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {

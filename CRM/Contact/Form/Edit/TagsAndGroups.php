@@ -184,6 +184,15 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $form->assign('tagGroup', $form->_tagGroup);
   }
 
+  /**
+   * Climb tree.
+   *
+   * @param $form
+   * @param $tree
+   * @param $elements
+   *
+   * @return mixed
+   */
   public static function climbtree($form, $tree, &$elements) {
     foreach ($tree as $tagID => $varValue) {
       $tagAttribute = array(

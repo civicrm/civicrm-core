@@ -484,8 +484,6 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param bool $required
    * @param bool $validOnly
    *
-   * @internal param int $setId - price set id whose details are needed
-   *
    * @return array
    *   array consisting of field details
    */

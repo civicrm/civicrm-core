@@ -26,6 +26,11 @@
  */
 namespace Civi\CCase;
 
+/**
+ * Class Analyzer
+ *
+ * @package Civi\CCase
+ */
 class Analyzer {
   /**
    * @var int
@@ -57,6 +62,9 @@ class Analyzer {
    */
   private $indices;
 
+  /**
+   * @param $caseId
+   */
   public function __construct($caseId) {
     $this->caseId = $caseId;
     $this->flush();

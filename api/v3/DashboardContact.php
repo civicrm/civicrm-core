@@ -32,16 +32,14 @@
  * @subpackage API_ActionSchedule
  *
  * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Creates/Updates a new Dashboard Contact Entry
+ * Creates/Updates a new Dashboard Contact Entry.
  *
  * @param array $params
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_contact_create($params) {
   if (empty($params['id'])) {
@@ -60,14 +58,12 @@ function civicrm_api3_dashboard_contact_create($params) {
 }
 
 /**
- * Gets a CiviCRM Dashlets of Contacts according to parameters
+ * Gets a CiviCRM Dashlets of Contacts according to parameters.
  *
  * @param array $params
- *   Associative array of property name/value.
- *                             pairs for the activity.
+ *   Array per getfields metadata.
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -86,7 +82,10 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
 }
 
 /**
+ * Check permissions on contact dashboard retrieval.
+ *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array|null
  */
@@ -102,12 +101,13 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
 }
 
 /**
- * Delete an existing dashboard-contact
+ * Delete an existing dashboard-contact.
  *
  * This method is used to delete any existing dashboard-board. the id of the dashboard-contact
  * is required field in $params array
  *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

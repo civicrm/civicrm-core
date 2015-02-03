@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * File for the CiviCRM APIv3 API wrapper
  *
  * @package CiviCRM_APIv3
@@ -23,6 +24,8 @@ class API_Exception extends Exception {
   private $extraParams = array();
 
   /**
+   * Class constructor.
+   *
    * @param string $message
    *   The human friendly error message.
    * @param mixed $error_code
@@ -48,7 +51,8 @@ class API_Exception extends Exception {
   }
 
   /**
-   * custom string representation of object
+   * Custom string representation of object.
+   *
    * @return string
    */
   public function __toString() {
@@ -56,6 +60,8 @@ class API_Exception extends Exception {
   }
 
   /**
+   * Get extra parameters.
+   *
    * @return array
    */
   public function getExtraParams() {
@@ -63,6 +69,8 @@ class API_Exception extends Exception {
   }
 
   /**
+   * Get error codes.
+   *
    * @return array
    */
   public function getErrorCodes() {
@@ -85,6 +93,8 @@ class CiviCRM_API3_Exception extends Exception {
   private $extraParams = array();
 
   /**
+   * Class constructor.
+   *
    * @param string $message
    *   The human friendly error message.
    * @param mixed $error_code
@@ -103,7 +113,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
-   * custom string representation of object
+   * Custom string representation of object.
+   *
    * @return string
    */
   public function __toString() {
@@ -111,6 +122,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
+   * Get error code.
+   *
    * @return mixed
    */
   public function getErrorCode() {
@@ -118,6 +131,8 @@ class CiviCRM_API3_Exception extends Exception {
   }
 
   /**
+   * Get extra parameters.
+   *
    * @return array
    */
   public function getExtraParams() {

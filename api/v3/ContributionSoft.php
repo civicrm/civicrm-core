@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -28,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 soft credit functions
+ * File for the CiviCRM APIv3 soft credit functions.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionSoft
@@ -38,15 +36,13 @@
  */
 
 /**
- * Create or Update a Soft Credit
+ * Create or Update a Soft Credit.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'contribution_soft'
+ *   Array per getfields metadata.
  *
- * @example ContributionSoftCreate.php Standard Create Example //FIXME
- *
- * @return array API result array {@getfields contribution_soft_create}
+ * @return array
+ *   API result array
  */
 function civicrm_api3_contribution_soft_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -67,27 +63,24 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Soft Credit
+ * Deletes an existing Soft Credit.
  *
  * @param array $params
- *
- * @example ContributionSoftDelete.php Standard Delete Example
- * {@getfields contribution_soft_delete}
  */
 function civicrm_api3_contribution_soft_delete($params) {
-  // non standard BAO - we have to write custom code to cope
+  // Non standard BAO - we have to write custom code to cope.
   CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
 
 }
 
 /**
- * Retrieve one or more Soft Credits
+ * Retrieve one or more Soft Credits.
  *
- * @example ContributionSoftGet.php Standard Get Example
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @param array $params An associative array of name/value pairs.
- *
- * @return array api result {@getfields contribution_soft_get}
+ * @return array
+ *   API result
  */
 function civicrm_api3_contribution_soft_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

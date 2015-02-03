@@ -47,7 +47,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   }
 
   /**
-   * Funtion to add activity contact
+   * Function to add activity contact.
    *
    * @param array $params
    *   The values for this table: activity id, contact id, record type.

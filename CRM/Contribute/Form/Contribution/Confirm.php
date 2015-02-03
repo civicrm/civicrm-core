@@ -661,9 +661,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
+   * Note that in edit/view mode
+   * the default values are retrieved from the database
    *
    * @return void
    */
@@ -1058,10 +1059,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Wrangle financial type ID.
+   *
    * This wrangling of the financialType ID was happening in a shared function rather than in the form it relates to & hence has been moved to that form
    * Pledges are not relevant to the membership code so that portion will not go onto the membership form.
    *
-   * Comments from previous refactor indicate doubt as to what was going on
+   * Comments from previous refactor indicate doubt as to what was going on.
+   *
    * @param int $contributionTypeId
    *
    * @return null|string
@@ -1080,12 +1084,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @param array $premiumParams
    * @param $contribution
-   *
-   * @return void
    */
   public function postProcessPremium($premiumParams, $contribution) {
     $hour = $minute = $second = 0;
@@ -1204,7 +1206,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Process the contribution
+   * Process the contribution.
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -1526,7 +1528,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Create the recurring contribution record
+   * Create the recurring contribution record.
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -1614,7 +1616,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Add on behalf of organization and it's location
+   * Add on behalf of organization and it's location.
    *
    * @param array $behalfOrganization
    *   array of organization info.
@@ -1626,8 +1628,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   form values array.
    * @param array $params
    * @param null $fields
-   *
-   * @return void
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
@@ -1726,16 +1726,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to save pcp / soft credit entry
+   * Function used to save pcp / soft credit entry.
+   *
    * This is used by contribution and also event pcps
    *
    * @param array $params
    * @param object $contribution
    *   Contribution object.
-   *
    */
   public static function processPcpSoft(&$params, &$contribution) {
-    //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
+    // Add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['soft_credit_to'])) {
       $contributionSoftParams = array();
       foreach (array(
@@ -1767,15 +1767,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to send notification mail to pcp owner
-   * This is used by contribution and also event pcps
+   * Function used to send notification mail to pcp owner.
+   *
+   * This is used by contribution and also event PCPs.
    *
    * @param object $contribution
    * @param object $contributionSoft
    *   Contribution object.
-   *
    */
-
   public static function pcpNotifyOwner($contribution, $contributionSoft) {
     $params = array('id' => $contributionSoft->pcp_id);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
@@ -1827,8 +1826,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to se pcp related defaults / params
-   * This is used by contribution and also event pcps
+   * Function used to se pcp related defaults / params.
+   *
+   * This is used by contribution and also event PCPs
    *
    * @param CRM_Core_Form $page
    *   Form object.
@@ -1861,6 +1861,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Process membership.
+   *
    * @param array $membershipParams
    * @param int $contactID
    * @param array $customFieldsFormatted
@@ -1908,10 +1910,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Are we going to do 2 financial transactions?
-   * ie the membership block supports a separate transactions AND the contribution form has been configured for a contribution
-   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
+   * Are we going to do 2 financial transactions.
    *
+   * Ie the membership block supports a separate transactions AND the contribution form has been configured for a
+   * contribution
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
    *
    * @param int $formID
    * @param bool $amountBlockActiveOnForm
@@ -1927,7 +1930,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * This function sets the fields
+   * This function sets the fields.
+   *
    * - $this->_params['amount_level']
    * - $this->_params['selectMembership']
    * And under certain circumstances sets
@@ -1956,7 +1960,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'membership_type_id');
         }
-      } // if separate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
+      }
+      // If separate payment we set contribution amount to be null, so that it will not show contribution amount same
+      // as membership amount.
       // @todo - this needs more documentation - it appears the setting to null is tied up with separate membership payments
       // but the circumstances are very confusing. Many of these conditions are repeated in the next conditional
       // so we should merge them together
@@ -1988,6 +1994,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Submit function.
+   *
    * @param array $params
    *
    * @throws CiviCRM_API3_Exception
@@ -2031,7 +2039,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass in
+   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass
+   * in.
+   *
    * @param int $id
    * @param array $params
    *

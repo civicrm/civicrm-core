@@ -34,19 +34,17 @@
  */
 
 /**
- * create/update contact_type
+ * Create/update contact_type.
  *
  * This API is used to create new contact_type or update any of the existing
  * In case of updating existing contact_type, id of that particular contact_type must
  * be in $params array.
  *
  * @param array $params
- *   (reference) Associative array of property.
- *                       name/value pairs to insert in new 'contact_type'
+ *   Array per getfields metadata.
  *
  * @return array
  *   contact_type array
- *
  */
 function civicrm_api3_contact_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name', 'parent_id'));
@@ -65,7 +63,7 @@ function civicrm_api3_contact_type_create($params) {
 }
 
 /**
- * Returns array of contact_types  matching a set of one or more group properties
+ * Returns array of contact_types  matching a set of one or more group properties.
  *
  * @param array $params
  *   One or more valid.
@@ -81,7 +79,7 @@ function civicrm_api3_contact_type_get($params) {
 }
 
 /**
- * delete an existing contact_type
+ * Delete an existing contact_type.
  *
  * This method is used to delete any existing contact_type. id of the group
  * to be deleted is required field in $params array
@@ -92,7 +90,6 @@ function civicrm_api3_contact_type_get($params) {
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_contact_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

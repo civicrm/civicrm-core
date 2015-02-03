@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_print_label
- *
  */
 
 /**
- * Save a print_label
- *
- * Allowed @params array keys are:
- * {@getfields print_label_create}
- * @example print_labelCreate.php
+ * Save a print_label.
  *
  * @param array $params
  *
@@ -50,11 +45,7 @@ function civicrm_api3_print_label_create($params) {
 }
 
 /**
- * Get a print_label
- *
- * Allowed @params array keys are:
- * {@getfields print_label_get}
- * @example print_labelCreate.php
+ * Get a print_label.
  *
  * @param array $params
  *
@@ -66,11 +57,7 @@ function civicrm_api3_print_label_get($params) {
 }
 
 /**
- * Delete a print_label
- *
- * Allowed @params array keys are:
- * {@getfields print_label_delete}
- * @example print_labelCreate.php
+ * Delete a print_label.
  *
  * @param array $params
  *

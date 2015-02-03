@@ -32,14 +32,13 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * Handle a confirm event
+ * Handle a confirm event.
  *
  * @param array $params
- *   Associative array of property.
+ *   Array of property.
  *
  * @throws Exception
  * @return array
@@ -58,7 +57,10 @@ function civicrm_api3_mailing_event_queue_create($params) {
 }
 
 /**
+ * Get mailing event queue record.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_event_queue_get($params) {
@@ -66,7 +68,10 @@ function civicrm_api3_mailing_event_queue_get($params) {
 }
 
 /**
+ * Delete mailing event queue record.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

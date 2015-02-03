@@ -124,6 +124,17 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
+  /**
+   * Convert html to tcpdf.
+   *
+   * @param $paper_size
+   * @param $orientation
+   * @param $margins
+   * @param $html
+   * @param $output
+   * @param $fileName
+   * @param $stationery_path
+   */
   public static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
     // Documentation on the TCPDF library can be found at: http://www.tcpdf.org
     // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/

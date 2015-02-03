@@ -1,7 +1,8 @@
 <?php
 
 /**
- * File for the CiviCRM APIv3 API wrapper
+ * @file
+ * File for the CiviCRM APIv3 API wrapper.
  *
  * @package CiviCRM_APIv3
  * @subpackage API
@@ -11,6 +12,8 @@
  */
 
 /**
+ * CiviCRM API wrapper function.
+ *
  * @param string $entity
  *   type of entities to deal with
  * @param string $action
@@ -26,7 +29,9 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 }
 
 /**
- * Version 3 wrapper for civicrm_api. Throws exception
+ * Version 3 wrapper for civicrm_api.
+ *
+ * Throws exception.
  *
  * @param string $entity
  *   Type of entities to deal with.
@@ -48,7 +53,9 @@ function civicrm_api3($entity, $action, $params = array()) {
 }
 
 /**
- * Call getfields from api wrapper. This function ensures that settings that
+ * Call getfields from api wrapper.
+ *
+ * This function ensures that settings that
  * could alter getfields output (e.g. action for all api & profile_id for
  * profile api ) are consistently passed in.
  *
@@ -59,6 +66,7 @@ function civicrm_api3($entity, $action, $params = array()) {
  * @todo other output modifiers include contact_type
  *
  * @param array $apiRequest
+ *
  * @return array
  *   getfields output
  */
@@ -102,6 +110,8 @@ function civicrm_error($result) {
 }
 
 /**
+ * Get camel case version of entity or action name.
+ *
  * @param $entity
  *
  * @return string
@@ -111,7 +121,9 @@ function _civicrm_api_get_camel_name($entity) {
 }
 
 /**
- * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
+ * Swap out any $values vars.
+ *
+ * Ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
  * 'tag_id'  => '$value.api.tag.create.id',
  * 'tag1_id' => '$value.api.entity.create.0.id'
@@ -156,11 +168,12 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
 }
 
 /**
- * Convert possibly camel name to underscore separated entity name
+ * Convert possibly camel name to underscore separated entity name.
  *
  * @param string $entity
  *   Entity name in various formats e.g. Contribution, contribution,
  *   OptionValue, option_value, UFJoin, uf_join.
+ *
  * @return string
  *   Entity name in underscore separated format.
  *
@@ -181,9 +194,11 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 }
 
 /**
- * Having a DAO object find the entity name
+ * Having a DAO object find the entity name.
+ *
  * @param object $bao
  *   DAO being passed in.
+ *
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {

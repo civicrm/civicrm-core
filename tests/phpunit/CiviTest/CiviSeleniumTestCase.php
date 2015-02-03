@@ -103,6 +103,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @return string
+   */
   protected function prepareTestSession() {
     $result = parent::prepareTestSession();
 

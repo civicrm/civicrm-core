@@ -35,16 +35,13 @@
 
 
 /**
- * Create or update a survey
+ * Create or update a survey.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
- * @example SurveyCreate.php Std Create example
+ *   Array per getfields metadata.
  *
  * @return array
  *   api result array
- *   {@getfields survey_create}
  */
 function civicrm_api3_survey_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Survey');
@@ -63,7 +60,7 @@ function _civicrm_api3_survey_create_spec(&$params) {
 }
 
 /**
- * Returns array of surveys  matching a set of one or more group properties
+ * Returns array of surveys  matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid.
@@ -72,14 +69,13 @@ function _civicrm_api3_survey_create_spec(&$params) {
  *
  * @return array
  *   API result Array of matching surveys
- *   {@getfields survey_get}
  */
 function civicrm_api3_survey_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Survey');
 }
 
 /**
- * delete an existing survey
+ * Delete an existing survey.
  *
  * This method is used to delete any existing survey. id of the group
  * to be deleted is required field in $params array
@@ -90,7 +86,6 @@ function civicrm_api3_survey_get($params) {
  *
  * @return array
  *   api result array
- *   {@getfields survey_delete}
  */
 function civicrm_api3_survey_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

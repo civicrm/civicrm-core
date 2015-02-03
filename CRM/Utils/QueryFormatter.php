@@ -144,6 +144,14 @@ class CRM_Utils_QueryFormatter {
     return $text;
   }
 
+  /**
+   * Format Fts.
+   *
+   * @param string $text
+   * @param $mode
+   *
+   * @return mixed
+   */
   protected function _formatFts($text, $mode) {
     $result = NULL;
 
@@ -187,6 +195,14 @@ class CRM_Utils_QueryFormatter {
     return $this->dedupeWildcards($result, '%');
   }
 
+  /**
+   * Format FTS.
+   *
+   * @param string $text
+   * @param $mode
+   *
+   * @return mixed
+   */
   protected function _formatFtsBool($text, $mode) {
     $result = NULL;
 
@@ -238,6 +254,14 @@ class CRM_Utils_QueryFormatter {
     return $this->dedupeWildcards($result, '%');
   }
 
+  /**
+   * Format like.
+   *
+   * @param $text
+   * @param $mode
+   *
+   * @return mixed
+   */
   protected function _formatLike($text, $mode) {
     $result = NULL;
 
@@ -309,6 +333,11 @@ class CRM_Utils_QueryFormatter {
     return $text;
   }
 
+  /**
+   * Get modes.
+   *
+   * @return array
+   */
   public static function getModes() {
     return array(
       self::MODE_NONE,
@@ -319,6 +348,11 @@ class CRM_Utils_QueryFormatter {
     );
   }
 
+  /**
+   * Get languages.
+   *
+   * @return array
+   */
   public static function getLanguages() {
     return array(
       self::LANG_SOLR,
