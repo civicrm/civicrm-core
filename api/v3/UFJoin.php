@@ -33,14 +33,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: UFJoin.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * takes an associative array and creates a uf join in the database
+ * Takes an associative array and creates a uf join in the database.
  *
  * @param array $params
- *   Assoc array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   CRM_Core_DAO_UFJoin Array
@@ -57,6 +56,7 @@ function civicrm_api3_uf_join_create($params) {
  *
  * @param array $params
  *   Array or parameters determined by getfields.
+ *
  * @todo - suspect module, weight don't need to be required - need to test
  */
 function _civicrm_api3_uf_join_create_spec(&$params) {
@@ -66,13 +66,14 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
 }
 
 /**
- * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record
+ * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record.
  *
  * @param array $params
- *   (reference) an assoc array of name/value pairs.
+ *   Array of name/value pairs.
  *
  * @return array
- *   CiviCRM Result Array or null
+ *   API result array.
+ *
  * @todo Delete function missing
  */
 function civicrm_api3_uf_join_get($params) {

@@ -26,7 +26,17 @@
  */
 namespace Civi\CCase;
 
+/**
+ * Interface CaseChangeListener
+ *
+ * @package Civi\CCase
+ */
 interface CaseChangeListener {
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   *
+   * @return mixed
+   */
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event);
 
 }

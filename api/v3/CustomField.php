@@ -37,19 +37,20 @@
 
 /**
  * Create a 'custom field' within a custom field group.
+ *
  * We also empty the static var in the getfields
  * function after deletion so that the field is available for us (getfields manages date conversion
  * among other things
  *
  * @param array $params
- *   Array Associative array of property name/value pairs to create new custom field.
+ *   Array per getfields metadata.
  *
  * @return array
  *   API success array
  */
 function civicrm_api3_custom_field_create($params) {
 
-  // Array created for passing options in params
+  // Array created for passing options in params.
   if (isset($params['option_values']) && is_array($params['option_values'])) {
     foreach ($params['option_values'] as $key => $value) {
       $params['option_label'][$key] = $value['label'];
@@ -66,7 +67,7 @@ function civicrm_api3_custom_field_create($params) {
 }
 
 /**
- * Flush static caches in functions that might have stored available custom fields
+ * Flush static caches in functions that might have stored available custom fields.
  */
 function _civicrm_api3_custom_field_flush_static_caches() {
   civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
@@ -122,7 +123,8 @@ function civicrm_api3_custom_field_get($params) {
 }
 
 /**
- * Helper function to validate custom field value
+ * Helper function to validate custom field value.
+ *
  * @deprecated
  *
  * @param string $fieldName
@@ -246,8 +248,11 @@ SELECT count(*)
 }
 
 /**
- * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field
+ * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field.
+ *
  * @param array $params
+ *   Array per getfields metadata.
+ *
  * @return array
  */
 function civicrm_api3_custom_field_setvalue($params) {

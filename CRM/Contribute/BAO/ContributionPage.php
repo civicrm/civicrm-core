@@ -924,7 +924,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Helper to determine if the page supports separate membership payments
+   * Helper to determine if the page supports separate membership payments.
+   *
    * @param int $id form id
    *
    * @return bool

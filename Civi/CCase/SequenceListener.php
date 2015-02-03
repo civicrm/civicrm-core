@@ -25,10 +25,18 @@ class SequenceListener implements CaseChangeListener {
     return self::$singleton;
   }
 
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   */
   public static function onCaseChange_static(\Civi\CCase\Event\CaseChangeEvent $event) {
     self::singleton()->onCaseChange($event);
   }
 
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event) {
     /** @var \Civi\CCase\Analyzer $analyzer */
     $analyzer = $event->analyzer;

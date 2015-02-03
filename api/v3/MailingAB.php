@@ -33,11 +33,10 @@
  * @subpackage API_MailingAB
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- * Handle a create mailing ab testing
+ * Handle a create mailing ab testing.
  *
  * @param array $params
  *
@@ -64,6 +63,7 @@ function civicrm_api3_mailing_a_b_delete($params) {
  * Handle a get event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_a_b_get($params) {
@@ -71,7 +71,7 @@ function civicrm_api3_mailing_a_b_get($params) {
 }
 
 /**
- * Adjust Metadata for submit action
+ * Adjust Metadata for submit action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -93,9 +93,10 @@ function _civicrm_api3_mailing_a_b_submit_spec(&$params) {
 }
 
 /**
- * Send A/B mail to A/B recipients respectively
+ * Send A/B mail to A/B recipients respectively.
  *
  * @param array $params
+ *
  * @return array
  * @throws API_Exception
  */
@@ -162,7 +163,7 @@ function civicrm_api3_mailing_a_b_submit($params) {
 }
 
 /**
- * Adjust Metadata for graph_stats action
+ * Adjust Metadata for graph_stats action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -183,9 +184,10 @@ function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
 }
 
 /**
- * Send graph detail for A/B tests mail
+ * Send graph detail for A/B tests mail.
  *
  * @param array $params
+ *
  * @return array
  * @throws API_Exception
  */

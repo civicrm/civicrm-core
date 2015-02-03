@@ -128,20 +128,29 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ),
     );
 
+  /**
+   * Getter for status.
+   *
+   * @return string
+   */
   public static function getStatus() {
     return self::$status;
   }
 
+  /**
+   * Setter for status.
+   *
+   * @param string $status
+   */
   public static function setStatus($status) {
     self::$status = $status;
   }
 
   /**
-   * Save records in civicrm_recujrring_entity table
+   * Save records in civicrm_recurring_entity table.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form .
-   *
+   *   Reference array contains the values submitted by the form.
    *
    * @return object
    */

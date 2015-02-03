@@ -6,6 +6,8 @@
 interface API_Wrapper {
 
   /**
+   * Interface for interpreting api input.
+   *
    * @param array $apiRequest
    *
    * @return array
@@ -14,6 +16,8 @@ interface API_Wrapper {
   public function fromApiInput($apiRequest);
 
   /**
+   * Interface for interpreting api output.
+   *
    * @param array $apiRequest
    * @param array $result
    *

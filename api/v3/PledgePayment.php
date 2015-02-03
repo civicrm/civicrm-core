@@ -33,11 +33,12 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: PledgePayment.php
- *
  */
 
 /**
- * Add or update a plege payment. Pledge Payment API doesn't actually add a pledge
+ * Add or update a pledge payment.
+ *
+ * Pledge Payment API doesn't actually add a pledge
  *  if the request is to 'create' and 'id' is not passed in
  * the oldest pledge with no associated contribution is updated
  *
@@ -46,8 +47,6 @@
  *
  * @param array $params
  *   Input parameters.
- * {@getfields PledgePayment_create}
- * @example PledgePaymentCreate.php
  *
  * @return array
  *   API Result
@@ -92,12 +91,10 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 }
 
 /**
- * Delete a pledge Payment - Note this deletes the contribution not just the link
+ * Delete a pledge Payment - Note this deletes the contribution not just the link.
  *
  * @param array $params
  *   Input parameters.
- * {@getfields PledgePayment_delete}
- * @example PledgePaymentDelete.php
  *
  * @return array
  *   API result
@@ -113,15 +110,13 @@ function civicrm_api3_pledge_payment_delete($params) {
 }
 
 /**
- * Retrieve a set of pledges, given a set of input params
+ * Retrieve a set of pledges, given a set of input params.
  *
  * @param array $params
  *   Input parameters.
- * {@getfields PledgePayment_get}
- * @example PledgePaymentGet.php *
  *
  * @return array
- *   (reference )        array of pledges, if error an array with an error id and error message
+ *   array of pledges, if error an array with an error id and error message
  */
 function civicrm_api3_pledge_payment_get($params) {
 
@@ -129,7 +124,7 @@ function civicrm_api3_pledge_payment_get($params) {
 }
 
 /**
- * Gets field for civicrm_pledge_payment functions
+ * Gets field for civicrm_pledge_payment functions.
  *
  * @param array $params
  *   Modifiable list of fields allowed for the PledgePayment.get action.

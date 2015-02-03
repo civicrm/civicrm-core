@@ -95,10 +95,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
@@ -199,9 +196,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -219,9 +213,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

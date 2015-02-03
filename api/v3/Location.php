@@ -1,8 +1,10 @@
 <?php
 
 /**
- *  Functions to inform caller that Location is obsolete and Address, Phone, Email, Website should be used
+ * Function to inform caller that Location is obsolete and Address, Phone, Email, Website should be used.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_location_create($params) {
@@ -10,6 +12,8 @@ function civicrm_api3_location_create($params) {
 }
 
 /**
+ * Function to inform caller that Location is obsolete and Address, Phone, Email, Website should be used.
+ *
  * @param array $params
  *
  * @return array
@@ -19,6 +23,8 @@ function civicrm_api3_location_get($params) {
 }
 
 /**
+ * Function to inform caller that Location is obsolete and Address, Phone, Email, Website should be used.
+ *
  * @param array $params
  *
  * @return array

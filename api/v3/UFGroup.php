@@ -33,10 +33,11 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: UFGroup.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
+ * Adjust metadata for create action.
+ *
  * @param array $params
  */
 function _civicrm_api3_uf_group_create_spec(&$params) {
@@ -44,36 +45,36 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
   $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['is_update_dupe']['api.default'] = 1;
-  $params['created_id']['api.default'] = 'user_contact_id';//the current user
+  // Default to the logged in user.
+  $params['created_id']['api.default'] = 'user_contact_id';
   $params['created_date']['api.default'] = 'now';
 }
+
 /**
- * Use this API to create a new group. See the CRM Data Model for uf_group property definitions
+ * Use this API to create a new group.
+ *
+ * See the CRM Data Model for uf_group property definitions
  *
  * @param array $params
- *   Array Associative array of property name/value pairs to insert in group.
+ *   Array per getfields metadata.
  *
  * @return array
  *   API result array
- *   {@getfields UFGroup_create}
- * @example UFGroupCreate.php
  */
 function civicrm_api3_uf_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Returns array of uf groups (profiles)  matching a set of one or more group properties
+ * Returns array of uf groups (profiles) matching a set of one or more group properties.
  *
  * @param array $params
- *   (reference) Array of one or more valid.
+ *   Array of one or more valid.
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
  * @return array
  *   Array of matching profiles
- *   {@getfields UFGroup_get}
- * @example UFGroupGet.php
  */
 function civicrm_api3_uf_group_get($params) {
 
@@ -81,10 +82,9 @@ function civicrm_api3_uf_group_get($params) {
 }
 
 /**
- * Delete uf group
+ * Delete uf group.
  *
  * @param array $params
- *
  *
  * @return array
  */

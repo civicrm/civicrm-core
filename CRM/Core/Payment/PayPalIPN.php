@@ -290,6 +290,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
   }
 
+  /**
+   * Main function.
+   *
+   * @return bool
+   */
   public function main() {
     //@todo - this could be refactored like PayPalProIPN & a test could be added
 

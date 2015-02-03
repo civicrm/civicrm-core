@@ -732,7 +732,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   The uploaded files if any.
    * @param $self
    *
-   *
    * @return bool|array
    *   true if no errors, else array of errors
    */
@@ -1398,8 +1397,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Handle Payment Processor switching
-   * For contribution and event registration forms
+   * Handle Payment Processor switching for contribution and event registration forms.
+   *
    * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param bool $noFees
    */

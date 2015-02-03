@@ -1,18 +1,14 @@
 <?php
 
 /**
- * Retrieve a report template
+ * Retrieve a report template.
  *
  * FIXME This is a bare-minimum placeholder
  *
  * @param array $params
  *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
  * @return array
  *   details of found Option Values
- *   {@getfields OptionValue_get}
  */
 function civicrm_api3_report_template_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -23,17 +19,14 @@ function civicrm_api3_report_template_get($params) {
 }
 
 /**
- *  Add a OptionValue. OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
+ * Add an OptionValue.
  *
- * Allowed @params array keys are:
- *
- * {@example OptionValueCreate.php}
+ * OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
  *
  * @param array $params
  *
  * @return array
  *   Array of newly created option_value property values.
- *   {@getfields OptionValue_create}
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -67,15 +60,12 @@ function _civicrm_api3_report_template_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ReportTemplate
+ * Deletes an existing ReportTemplate.
  *
  * @param array $params
  *
- * {@example ReportTemplateDelete.php 0}
- *
  * @return array
  *   Api result
- *   {@getfields ReportTemplate_create}
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -83,7 +73,7 @@ function civicrm_api3_report_template_delete($params) {
 }
 
 /**
- * Retrieve rows from a report template
+ * Retrieve rows from a report template.
  *
  * @param array $params
  *   Input parameters.
@@ -98,6 +88,8 @@ function civicrm_api3_report_template_getrows($params) {
 }
 
 /**
+ * Get report template rows.
+ *
  * @param array $params
  *
  * @return array
@@ -150,6 +142,8 @@ function _civicrm_api3_report_template_getrows($params) {
 }
 
 /**
+ * Get statistics from a given report.
+ *
  * @param array $params
  *
  * @return array
@@ -160,13 +154,10 @@ function civicrm_api3_report_template_getstatistics($params) {
   return civicrm_api3_create_success($stats, $params, 'report_template', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**
- * Retrieve rows from a report template
+ * Adjust metadata for template getrows action.
  *
  * @param array $params
  *   Input parameters.
- *
- * @return void
- *   details of found instances
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(

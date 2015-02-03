@@ -100,13 +100,12 @@ function civicrm_api3_job_delete($params) {
  *   API Result Array
  */
 function civicrm_api3_job_execute($params) {
-  // @noinspection PhpUnusedParameterInspection
 
   $facility = new CRM_Core_JobManager();
   $facility->execute(FALSE);
 
-  // always creates success - results are handled elsewhere
-  return civicrm_api3_create_success();
+  // Always creates success - results are handled elsewhere.
+  return civicrm_api3_create_success(1, $params);
 }
 
 /**
@@ -354,7 +353,7 @@ function civicrm_api3_job_fetch_bounces($params) {
 }
 
 /**
- * Job to get mail and create activities
+ * Job to get mail and create activities.
  *
  * @param array $params
  *
@@ -379,10 +378,10 @@ function civicrm_api3_job_fetch_activities($params) {
 }
 
 /**
- * Process participant statuses
+ * Process participant statuses.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *  Input parameters.
  *
  * @return array
  *   array of properties, if error an array with an error id and error message
@@ -400,8 +399,9 @@ function civicrm_api3_job_process_participant($params) {
 
 
 /**
- * This api checks and updates the status of all membership records for a given domain using the calc_membership_status and
- * update_contact_membership APIs.
+ * This api checks and updates the status of all membership records for a given domain.
+ *
+ * The function uses the calc_membership_status and update_contact_membership APIs.
  *
  * IMPORTANT:
  * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
@@ -422,7 +422,7 @@ function civicrm_api3_job_process_membership($params) {
   $lock->release();
 
   if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success($result['messages']);
+    return civicrm_api3_create_success($result['messages'], $params);
   }
   else {
     return civicrm_api3_create_error($result['messages']);
@@ -457,7 +457,6 @@ function civicrm_api3_job_process_respondent($params) {
  *
  * @return array
  *   API Result Array
- *
  */
 function civicrm_api3_job_process_batch_merge($params) {
   $rgid = CRM_Utils_Array::value('rgid', $params);
@@ -477,6 +476,8 @@ function civicrm_api3_job_process_batch_merge($params) {
 }
 
 /**
+ * Metadata for batch merge function.
+ *
  * @param $params
  */
 function _civicrm_api3_job_process_batch_merge_spec(&$params) {
@@ -501,14 +502,14 @@ function _civicrm_api3_job_process_batch_merge_spec(&$params) {
 }
 
 /**
- * Runs handlePaymentCron method in the specified payment processor
+ * Runs handlePaymentCron method in the specified payment processor.
  *
  * @param array $params
  *   Input parameters.
  *
- * Expected @params array keys are:
+ * Expected @params array keys are: INCORRECTLY DOCUMENTED AND SHOULD BE IN THE _spec function
+ * for retrieval via getfields.
  * {string  'processor_name' - the name of the payment processor, eg: Sagepay}
- *
  */
 function civicrm_api3_job_run_payment_cron($params) {
 
@@ -536,7 +537,9 @@ function civicrm_api3_job_run_payment_cron($params) {
 }
 
 /**
- * This api cleans up all the old session entries and temp tables. We recommend that sites run this on an hourly basis
+ * This api cleans up all the old session entries and temp tables.
+ *
+ * We recommend that sites run this on an hourly basis.
  *
  * @param array $params
  *   Sends in various config parameters to decide what needs to be cleaned.
@@ -568,26 +571,30 @@ function civicrm_api3_job_cleanup($params) {
 
 /**
  * Set expired relationships to disabled.
- * @param $params
+ *
+ * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
 function civicrm_api3_job_disable_expired_relationships($params) {
-  /** @noinspection PhpUnusedParameterInspection */
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
   if (!$result) {
     throw new API_Exception('Failed to disable all expired relationships.');
   }
-  return civicrm_api3_create_success();
+  return civicrm_api3_create_success(1, $params);
 }
 
 /**
- * This api reloads all the smart groups. If the org has a large number of smart groups
- * it is recommended that they use the limit clause to limit the number of smart groups
- * evaluated on a per job basis. Might also help to increase the smartGroupCacheTimeout
- * and use the cache
+ * This api reloads all the smart groups.
+ *
+ * If the org has a large number of smart groups it is recommended that they use the limit clause
+ * to limit the number of smart groups evaluated on a per job basis.
+ *
+ * Might also help to increase the smartGroupCacheTimeout and use the cache.
  *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */

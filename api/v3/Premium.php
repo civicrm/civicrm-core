@@ -30,15 +30,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_premium
- *
  */
 
 /**
- * Save a premium
- *
- * Allowed @params array keys are:
- * {@getfields premium_create}
- * @example premiumCreate.php
+ * Save a premium.
  *
  * @param array $params
  *
@@ -51,11 +46,7 @@ function civicrm_api3_premium_create($params) {
 }
 
 /**
- * Get a premium
- *
- * Allowed @params array keys are:
- * {@getfields premium_get}
- * @example premiumCreate.php
+ * Get a premium.
  *
  * @param array $params
  *
@@ -67,11 +58,7 @@ function civicrm_api3_premium_get($params) {
 }
 
 /**
- * Delete a premium
- *
- * Allowed @params array keys are:
- * {@getfields premium_delete}
- * @example premiumCreate.php
+ * Delete a premium.
  *
  * @param array $params
  *
@@ -84,7 +71,8 @@ function civicrm_api3_premium_delete($params) {
 }
 
 /**
- * return field specification specific to get requests
+ * Return field specification specific to get requests.
+ *
  * @param array $params
  */
 function _civicrm_api3_premium_get_spec(&$params) {
@@ -92,7 +80,8 @@ function _civicrm_api3_premium_get_spec(&$params) {
 }
 
 /**
- * return field specification specific to create requests
+ * Return field specification specific to create requests.
+ *
  * @param array $params
  */
 function _civicrm_api3_premium_create_spec(&$params) {

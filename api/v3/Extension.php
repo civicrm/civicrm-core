@@ -36,11 +36,10 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id$
- *
  */
 
 /**
- * Install an extension
+ * Install an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -68,7 +67,7 @@ function civicrm_api3_extension_install($params) {
 }
 
 /**
- * Upgrade an extension - runs upgrade_N hooks and system.flush
+ * Upgrade an extension - runs upgrade_N hooks and system.flush.
  *
  * @return array
  *   API result
@@ -98,7 +97,7 @@ function civicrm_api3_extension_upgrade() {
 }
 
 /**
- * Enable an extension
+ * Enable an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -120,7 +119,7 @@ function civicrm_api3_extension_enable($params) {
 }
 
 /**
- * Disable an extension
+ * Disable an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -130,7 +129,6 @@ function civicrm_api3_extension_enable($params) {
  *
  * @return array
  *   API result
- * @example ExtensionDisable.php
  */
 function civicrm_api3_extension_disable($params) {
   $keys = _civicrm_api3_getKeys($params);
@@ -143,7 +141,7 @@ function civicrm_api3_extension_disable($params) {
 }
 
 /**
- * Uninstall an extension
+ * Uninstall an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -167,7 +165,7 @@ function civicrm_api3_extension_uninstall($params) {
 }
 
 /**
- * Download and install an extension
+ * Download and install an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -218,7 +216,7 @@ function civicrm_api3_extension_download($params) {
 }
 
 /**
- * Download and install an extension
+ * Download and install an extension.
  *
  * @param array $params
  *   Input parameters.
@@ -227,8 +225,6 @@ function civicrm_api3_extension_download($params) {
  *
  * @return array
  *   API result
- * @example ExtensionRefresh.php
- *
  */
 function civicrm_api3_extension_refresh($params) {
   $defaults = array('local' => TRUE, 'remote' => TRUE);
@@ -252,13 +248,12 @@ function civicrm_api3_extension_refresh($params) {
 }
 
 /**
- * Get a list of available extensions
+ * Get a list of available extensions.
  *
  * @param array $params
  *
  * @return array
  *   API result
- * @example ExtensionGet.php
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
@@ -278,10 +273,11 @@ function civicrm_api3_extension_get($params) {
 }
 
 /**
- * Determine the list of extension keys
+ * Determine the list of extension keys.
  *
  * @param array $params
  *   API request params with 'key' or 'keys'.
+ *
  * @return array
  *   Array of extension keys
  * @throws API_Exception

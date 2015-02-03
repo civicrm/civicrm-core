@@ -35,12 +35,7 @@
  */
 
 /**
- * create/update group
- *
- * This API is used to create new group or update any of the existing
- * In case of updating existing group, id of that particular group must
- * be in $params array. Either id or name is required field in the
- * $params array
+ * Create/update group.
  *
  * @param array $params
  *   Associative array of property.
@@ -48,8 +43,6 @@
  *
  * @return array
  *   API result array
- * @example GroupCreate.php
- * {@getfields group_create}
  */
 function civicrm_api3_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Group');
@@ -69,7 +62,7 @@ function _civicrm_api3_group_create_spec(&$params) {
 }
 
 /**
- * Returns array of groups  matching a set of one or more group properties
+ * Returns array of groups matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid.
@@ -78,8 +71,6 @@ function _civicrm_api3_group_create_spec(&$params) {
  *
  * @return array
  *   Array of matching groups
- * @example GroupGet.php
- * {@getfields group_get}
  */
 function civicrm_api3_group_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
@@ -95,10 +86,7 @@ function civicrm_api3_group_get($params) {
 }
 
 /**
- * delete an existing group
- *
- * This method is used to delete any existing group. id of the group
- * to be deleted is required field in $params array
+ * Delete an existing group.
  *
  * @param array $params
  *   Array containing id of the group.
@@ -106,9 +94,6 @@ function civicrm_api3_group_get($params) {
  *
  * @return array
  *   API result array
- * @example GroupDelete.php
- * {@getfields group_delete}
- *
  */
 function civicrm_api3_group_delete($params) {
 

@@ -33,10 +33,11 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: ActivityType.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
+ * Notification of deprecated function.
+ *
  * @deprecated api notice
  * @return string
  *   to indicate this entire api entity is deprecated
@@ -46,7 +47,7 @@ function _civicrm_api3_activity_type_deprecation() {
 }
 
 /**
- * retrieve activity types
+ * Retrieve activity types.
  *
  * @param array $params
  *
@@ -61,7 +62,7 @@ function civicrm_api3_activity_type_get($params) {
 }
 
 /**
- * create activity type (
+ * Create activity type.
  *
  * @param array $params
  *
@@ -101,11 +102,11 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 }
 
 /**
- * delete activity type
+ * Delete activity type.
  *
  * @param array $params
  *   Array including id of activity_type to delete.
-
+ *
  * @return array
  *   API result array
  *

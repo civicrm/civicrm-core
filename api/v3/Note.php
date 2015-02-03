@@ -33,11 +33,10 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Note.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
- * Create Note
+ * Create Note.
  *
  * This API is used for creating a note.
  * Required parameters : entity_id AND note
@@ -69,15 +68,14 @@ function _civicrm_api3_note_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing note
+ * Deletes an existing note.
  *
  * This API is used for deleting a note
  *
  * @param array $params
  *   Including id of the note to be deleted.
- * {@getfields note_delete}
  *
- * @return null
+ * @return array
  */
 function civicrm_api3_note_delete($params) {
 
@@ -86,7 +84,7 @@ function civicrm_api3_note_delete($params) {
 }
 
 /**
- * Retrieve a specific note, given a set of input params
+ * Retrieve a specific note or notes, given a set of input params.
  *
  * @param array $params
  *   Input parameters.
@@ -94,8 +92,6 @@ function civicrm_api3_note_delete($params) {
  * @return array
  *   array of properties,
  *   if error an array with an error id and error message
- *
- *   {@getfields note_get}
  */
 function civicrm_api3_note_get($params) {
 
@@ -103,7 +99,7 @@ function civicrm_api3_note_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -115,10 +111,10 @@ function _civicrm_api3_note_get_spec(&$params) {
 }
 
 /**
- * Get all descendents of given note
+ * Get all descendants of given note.
  *
  * @param array $params
- *   Associative array; only required 'id' parameter is used.
+ *   array; only required 'id' parameter is used.
  *
  * @return array
  *   Nested associative array beginning with direct children of given note.

@@ -33,15 +33,10 @@
  * @subpackage API_Contact
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: PaymentProcessorType.php 30415 2010-10-29 12:02:47Z shot $
- *
  */
 
 /**
- * Include common API util functions
- */
-
-/**
- * create payment_processor type
+ * Create payment_processor type.
  *
  * @param array $params
  *   Associative array of property name/value pairs to insert in new payment_processor type.
@@ -81,8 +76,10 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
 }
 
 /**
- * get all payment_processor types
+ * Get all payment_processor types.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_payment_processor_type_get($params) {
@@ -90,7 +87,7 @@ function civicrm_api3_payment_processor_type_get($params) {
 }
 
 /**
- * Delete a payment_processor type delete
+ * Delete a payment_processor type delete.
  *
  * @param array $params
  *

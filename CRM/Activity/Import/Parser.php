@@ -46,7 +46,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   protected $_fileSize;
 
   /**
-   * Seperator being used
+   * Separator being used.
    */
   protected $_seperator;
 

@@ -135,6 +135,13 @@ GROUP BY   et.entity_id
     return $tables;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param $fromTable
+   * @param $toTable
+   * @param $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}

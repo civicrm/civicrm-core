@@ -123,6 +123,9 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  /**
+   * @return array
+   */
   public function booleanDataProvider() {
     $cases = array(); // array(0 => $input, 1 => $expectedOutput)
     $cases[] = array(TRUE, TRUE);

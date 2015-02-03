@@ -79,6 +79,8 @@
 class civicrm_api3 {
 
   /**
+   * Class constructor.
+   *
    * @param array $config API configuration.
    */
   public function __construct($config = NULL) {
@@ -126,6 +128,8 @@ class civicrm_api3 {
   }
 
   /**
+   * Convert to string.
+   *
    * @return string
    */
   public function __toString() {
@@ -133,9 +137,11 @@ class civicrm_api3 {
   }
 
   /**
-   * Perform action
+   * Perform action.
+   *
    * @param $action
    * @param $params
+   *
    * @return bool
    */
   public function __call($action, $params) {
@@ -149,7 +155,8 @@ class civicrm_api3 {
   }
 
   /**
-   *  As of PHP 5.3.0
+   * As of PHP 5.3.0.
+   *
    * @param $name
    * @param $arguments
    */
@@ -159,10 +166,12 @@ class civicrm_api3 {
   }
 
   /**
-   * Call via rest
+   * Call via rest.
+   *
    * @param $entity
    * @param $action
    * @param array $params
+   *
    * @return \stdClass
    */
   public function remoteCall($entity, $action, $params = array()) {
@@ -208,6 +217,8 @@ class civicrm_api3 {
   }
 
   /**
+   * Call api function.
+   *
    * @param $entity
    * @param string $action
    * @param array $params
@@ -269,15 +280,18 @@ class civicrm_api3 {
   }
 
   /**
-   * Initialize
+   * Initialize.
    */
   public function init() {
     CRM_Core_DAO::init($this->cfg->dsn);
   }
 
   /**
+   * Get attribute.
+   *
    * @param $name
    * @param null $value
+   *
    * @return $this
    */
   public function attr($name, $value = NULL) {
@@ -293,6 +307,8 @@ class civicrm_api3 {
   }
 
   /**
+   * Is this an error.
+   *
    * @return bool
    */
   public function is_error() {
@@ -300,7 +316,10 @@ class civicrm_api3 {
   }
 
   /**
+   * Check if var is set.
+   *
    * @param string $name
+   *
    * @return bool
    */
   public function is_set($name) {
@@ -308,7 +327,10 @@ class civicrm_api3 {
   }
 
   /**
-   * @param $name
+   * Get object.
+   *
+   * @param string $name
+   *
    * @return $this
    */
   public function __get($name) {

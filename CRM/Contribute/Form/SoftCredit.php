@@ -34,7 +34,7 @@
  */
 
 /**
- * This class build form elements for select exitsing or create new soft block
+ * This class build form elements for select existing or create new soft block
  */
 class CRM_Contribute_Form_SoftCredit {
 

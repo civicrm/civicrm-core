@@ -33,14 +33,13 @@
  * @subpackage API_Contact
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30415 2010-10-29 12:02:47Z shot $
- *
  */
 
 /**
- * create relationship type
+ * Create relationship type.
  *
  * @param array $params
- *   Associative array of property name/value pairs to insert in new relationship type.
+ *   Array per getfields metadata.
  *
  * @return array
  */
@@ -90,11 +89,10 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
 }
 
 /**
- * get all relationship type
- * retruns  An array of Relationship_type
- * {@getfields RelationshipType_get}
- * @example RelationshipTypeGet.php
+ * Get all relationship types.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_relationship_type_get($params) {
@@ -102,7 +100,7 @@ function civicrm_api3_relationship_type_get($params) {
 }
 
 /**
- * Delete a relationship type delete
+ * Delete a relationship type.
  *
  * @param array $params
  *
@@ -114,9 +112,12 @@ function civicrm_api3_relationship_type_delete($params) {
 }
 
 /**
+ * Get list defaults for relationship types.
+ *
  * @see _civicrm_api3_generic_getlist_defaults
  *
  * @param array $request
+ *
  * @return array
  */
 function _civicrm_api3_relationship_type_getlist_defaults($request) {

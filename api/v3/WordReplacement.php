@@ -33,13 +33,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Get CiviCRM Word Replacement details
- * {@getfields word_replacement_create}
+ * Get CiviCRM Word Replacement details.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -53,13 +53,11 @@ function civicrm_api3_word_replacement_get($params) {
 
 
 /**
- * Create a new Word Replacement
+ * Create a new Word Replacement.
  *
  * @param array $params
  *
  * @return array
- *
- *   {@getfields word_replacement_create}
  */
 function civicrm_api3_word_replacement_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -78,16 +76,13 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
 }
 
 /**
- * delete an existing word_replacement
- *
+ * Delete an existing word_replacement.
  *
  * @param array $params
- *   Array containing id of the word_replacement.
- *   to be deleted
+ *   Array containing id of the word_replacement to be deleted.
  *
  * @return array
- *   api result array
- *
+ *   API result array
  */
 function civicrm_api3_word_replacement_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

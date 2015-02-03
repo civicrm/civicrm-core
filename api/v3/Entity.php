@@ -1,8 +1,12 @@
 <?php
 
 /**
+ * Get list of deprecated entities.
+ *
  * @deprecated api notice
+ *
  * @param array $entities
+ *
  * @return array
  *   Array of deprecated api entities
  */
@@ -19,8 +23,12 @@ function _civicrm_api3_entity_deprecation($entities) {
 }
 
 /**
- *  Placeholder function. This should never be called, as it doesn't have any meaning
+ * Placeholder function.
+ *
+ * This should never be called, as it doesn't have any meaning.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_entity_create($params) {
@@ -28,8 +36,12 @@ function civicrm_api3_entity_create($params) {
 }
 
 /**
- *  Placeholder function. This should never be called, as it doesn't have any meaning
+ * Placeholder function.
+ *
+ * This should never be called, as it doesn't have any meaning.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_entity_delete($params) {
@@ -37,8 +49,12 @@ function civicrm_api3_entity_delete($params) {
 }
 
 /**
- *  Placeholder function. This should never be called, as it doesn't have any meaning
+ * Placeholder function.
+ *
+ * This should never be called, as it doesn't have any meaning.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_entity_getfields($params) {

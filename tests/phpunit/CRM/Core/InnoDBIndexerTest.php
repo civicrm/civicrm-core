@@ -78,6 +78,9 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_contact WHERE MATCH(first_name,last_name) AGAINST ("joe")');
   }
 
+  /**
+   * @return mixed
+   */
   public function supportsFts() {
     return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.6.0', '>=');
   }

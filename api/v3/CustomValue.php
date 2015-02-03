@@ -64,7 +64,6 @@
  * @throws Exception
  * @return array
  *   ['values' => TRUE] or ['is_error' => 1, 'error_message' => 'what went wrong']
- *
  */
 function civicrm_api3_custom_value_create($params) {
   // @todo it's not clear where the entity_table is used as  CRM_Core_BAO_CustomValueTable::setValues($create)
@@ -136,8 +135,6 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  *
  * @throws API_Exception
  * @return array
- *
- *
  */
 function civicrm_api3_custom_value_get($params) {
 
@@ -228,7 +225,7 @@ function civicrm_api3_custom_value_get($params) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *

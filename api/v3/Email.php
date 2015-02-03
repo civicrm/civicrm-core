@@ -36,13 +36,10 @@
  */
 
 /**
- * Add an Email for a contact
- *
- * Allowed @params array keys are:
- *
- * @example EmailCreate.php Standard Create Example
+ * Add an Email for a contact.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   API result array
@@ -67,24 +64,23 @@ function _civicrm_api3_email_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Email
+ * Deletes an existing Email.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
- * @example EmailDelete.php Standard Delete Example
- *
- * @return bool
- *   | error  true if successfull, error otherwise
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more emails
+ * Retrieve one or more emails.
  *
  * @param array $params
- *   An associative array of name/value pairs.
+ *   Array per getfields metadata.
  *
  * @return array
  *   api result array

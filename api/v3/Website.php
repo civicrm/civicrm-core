@@ -36,17 +36,12 @@
  */
 
 /**
- *  Add an Website for a contact
- *
- * Allowed @params array keys are:
- * {@getfields website_create}
- * @example WebsiteCreate.php
- * {@example WebsiteCreate.php}
+ * Add an Website for a contact.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created website property values.
+ *   API result array.
  * @todo convert to using basic create - BAO function non-std
  */
 function civicrm_api3_website_create($params) {
@@ -71,10 +66,12 @@ function _civicrm_api3_website_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Website
+ * Deletes an existing Website.
+ *
  * @todo convert to using Basic delete - BAO function non standard
+ *
  * @param array $params
- * {@getfields website_delete}
+ *
  * @return array
  *   API result
  * @throws \API_Exception
@@ -97,15 +94,12 @@ function civicrm_api3_website_delete($params) {
 }
 
 /**
- * Retrieve one or more websites
+ * Retrieve one or more websites.
  *
  * @param array $params
- * {@example WebsiteGet.php 0}
- * @example WebsiteGet.php
  *
  * @return array
  *   details of found websites
- *
  */
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');

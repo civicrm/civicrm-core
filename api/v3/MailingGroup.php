@@ -33,10 +33,11 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
+ * Declare deprecated functions.
+ *
  * @deprecated api notice
  * @return string
  *   to indicate this entire api entity is deprecated
@@ -46,7 +47,8 @@ function _civicrm_api3_mailing_group_deprecation() {
 }
 
 /**
- * Handle an unsubscribe event
+ * Handle an unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -58,7 +60,8 @@ function civicrm_api3_mailing_group_event_unsubscribe($params) {
 }
 
 /**
- * Handle a site-level unsubscribe event
+ * Handle a site-level unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -71,7 +74,8 @@ function civicrm_api3_mailing_group_event_domain_unsubscribe($params) {
 }
 
 /**
- * Handle a resubscription event
+ * Handle a re-subscription event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -83,7 +87,8 @@ function civicrm_api3_mailing_group_event_resubscribe($params) {
 }
 
 /**
- * Handle a subscription event
+ * Handle a subscription event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -95,7 +100,10 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
 }
 
 /**
+ * Create mailing group.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -104,6 +112,8 @@ function civicrm_api3_mailing_group_create($params) {
 }
 
 /**
+ * Get mailing group.
+ *
  * @param array $params
  *
  * @return array
@@ -113,7 +123,10 @@ function civicrm_api3_mailing_group_get($params) {
 }
 
 /**
+ * Delete mailing group.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -122,7 +135,10 @@ function civicrm_api3_mailing_group_delete($params) {
 }
 
 /**
+ * Get metadata for mailing group functions.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_group_getfields($params) {

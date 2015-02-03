@@ -33,14 +33,13 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Contribution.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Add or update a contribution
+ * Add or update a contribution.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   Input parameters.
  *
  * @throws API_Exception
  * @return array
@@ -64,7 +63,7 @@ function civicrm_api3_contribution_create(&$params) {
 
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  // make sure tax calculation is handled via api
+  // Make sure tax calculation is handled via api.
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
 
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
@@ -144,10 +143,12 @@ function _civicrm_api3_contribution_create_spec(&$params) {
 }
 
 /**
- * Support for schema changes made in 4.5
+ * Support for schema changes made in 4.5.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ *
  * @param array $params
  */
 function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
@@ -169,13 +170,12 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 }
 
 /**
- * Delete a contribution
+ * Delete a contribution.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   Input parameters.
  *
- * @return bool
- *   true if success, else false
+ * @return array
  */
 function civicrm_api3_contribution_delete($params) {
 
@@ -189,7 +189,10 @@ function civicrm_api3_contribution_delete($params) {
 }
 
 /**
- * modify metadata. Legacy support for contribution_id
+ * Modify metadata for delete action.
+ *
+ * Legacy support for contribution_id.
+ *
  * @param array $params
  */
 function _civicrm_api3_contribution_delete_spec(&$params) {
@@ -197,10 +200,10 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 }
 
 /**
- * Retrieve a set of contributions, given a set of input params
+ * Retrieve a set of contributions.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *  Input parameters.
  *
  * @return array
  *   Array of contributions, if error an array with an error id and error message
@@ -224,9 +227,11 @@ function civicrm_api3_contribution_get($params) {
 }
 
 /**
- * This function is used to format the soft credit for backward compatibility
- * as of v4.4 we support multiple soft credit, so now contribution returns array with 'soft_credit' as key
+ * This function is used to format the soft credit for backward compatibility.
+ *
+ * As of v4.4 we support multiple soft credit, so now contribution returns array with 'soft_credit' as key
  * but we still return first soft credit as a part of contribution array
+ *
  * @param $contribution
  */
 function _civicrm_api3_format_soft_credit(&$contribution) {
@@ -237,7 +242,7 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -254,8 +259,10 @@ function _civicrm_api3_contribution_get_spec(&$params) {
 }
 
 /**
- * take the input parameter list as specified in the data model and
- * convert it into the same format that we use in QF and BAO object
+ * Legacy handling for contribution parameters.
+ *
+ * Take the input parameter list as specified in the data model and
+ * convert it into the same format that we use in QF and BAO object.
  *
  * @param array $params
  *   property name/value  pairs to insert in new contact.
@@ -271,7 +278,7 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
 }
 
 /**
- * Adjust Metadata for Transact action
+ * Adjust Metadata for Transact action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -288,7 +295,7 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
  * Process a transaction and record it against the contact.
  *
  * @param array $params
- *   (reference ) input parameters.
+ *   Input parameters.
  *
  * @return array
  *   contribution of created or updated record (or a civicrm error)
@@ -328,7 +335,8 @@ function civicrm_api3_contribution_transact($params) {
 }
 
 /**
- * Send a contribution confirmation (receipt or invoice)
+ * Send a contribution confirmation (receipt or invoice).
+ *
  * The appropriate online template will be used (the existence of related objects
  * (e.g. memberships ) will affect this selection
  *
@@ -336,7 +344,6 @@ function civicrm_api3_contribution_transact($params) {
  *   Input parameters.
  *
  * @throws Exception
- *   Api result array.
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -350,7 +357,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
 }
 
 /**
- * Adjust Metadata for sendconfirmation action
+ * Adjust Metadata for sendconfirmation action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -381,15 +388,16 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
 }
 
 /**
- * Complete an existing (pending) transaction, updating related entities (participant, membership, pledge etc)
- * and taking any complete actions from the contribution page (e.g. send receipt)
+ * Complete an existing (pending) transaction.
+ *
+ * This will update related entities (participant, membership, pledge etc)
+ * and take any complete actions from the contribution page (e.g. send receipt).
  *
  * @todo - most of this should live in the BAO layer but as we want it to be an addition
  * to 4.3 which is already stable we should add it to the api layer & re-factor into the BAO layer later
  *
  * @param array $params
  *   Input parameters.
- * {@getfields Contribution_completetransaction}
  *
  * @throws API_Exception
  *   Api result array.
@@ -430,7 +438,8 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 }
 
 /**
- * provide function metadata
+ * Provide function metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_contribution_completetransaction_spec(&$params) {

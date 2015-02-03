@@ -100,7 +100,7 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Getter for name
+   * Getter for name.
    *
    * @return string
    */
@@ -109,7 +109,7 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Setter for name
+   * Setter for name.
    *
    * @param string $name
    *
@@ -120,7 +120,9 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Do a state transition jump. Currently only supported types are
+   * Do a state transition jump.
+   *
+   * Currently only supported types are
    * Next and Back. The other actions (Cancel, Done, Submit etc) do
    * not need the state machine to figure out where to go
    *
@@ -171,7 +173,7 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Helper function to add a State to the state machine
+   * Helper function to add a State to the state machine.
    *
    * @param string $name
    *   The internal name.
@@ -189,7 +191,7 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Given a name find the corresponding state
+   * Given a name find the corresponding state.
    *
    * @param string $name
    *   The state name.
@@ -207,7 +209,7 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * Return the list of state objects
+   * Return the list of state objects.
    *
    * @return array
    *   array of states in the state machine
@@ -255,18 +257,12 @@ class CRM_Core_StateMachine {
   }
 
   /**
-   * AddSequentialStates: meta level function to create a simple
-   * wizard for a state machine that is completely sequential.
+   * Add sequential pages.
    *
+   * Meta level function to create a simple wizard for a state machine that is completely sequential.
    *
    * @param array $pages
    *   (reference ) the array of page objects.
-   *
-   * @internal param array $states states is an array of arrays. Each element
-   * of the top level array describes a state. Each state description
-   * includes the name, the display name and the class name
-   *
-   * @return void
    */
   public function addSequentialPages(&$pages) {
     $this->_pages = &$pages;

@@ -154,6 +154,11 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * Get context.
+   *
+   * @param $form
+   */
   public static function setContext(&$form) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
 

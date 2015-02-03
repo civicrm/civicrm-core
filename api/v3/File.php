@@ -36,16 +36,13 @@
  * @subpackage API_File
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
- * Create a file
- *
- * This API is used for creating a file
+ * Create a file.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of newly created file property values.
@@ -59,7 +56,15 @@ function civicrm_api3_file_create($params) {
   }
 
   $fileDAO = new CRM_Core_DAO_File();
-  $properties = array('id', 'file_type_id', 'mime_type', 'uri', 'document', 'description', 'upload_date');
+  $properties = array(
+    'id',
+    'file_type_id',
+    'mime_type',
+    'uri',
+    'document',
+    'description',
+    'upload_date',
+  );
 
   foreach ($properties as $name) {
     if (array_key_exists($name, $params)) {
@@ -78,11 +83,8 @@ function civicrm_api3_file_create($params) {
 /**
  * Get a file.
  *
- * This api is used for finding an existing file.
- * Required parameters : id OR file_type_id of a file
- *
  * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ *   Array per getfields metadata.
  *
  * @return array
  *   Array of all found file object property values.
@@ -93,12 +95,11 @@ function civicrm_api3_file_get($params) {
 }
 
 /**
- * Update an existing file
- *
- * This api is used for updating an existing file.
- * Required parameters : id of a file
+ * Update an existing file.
  *
  * @param array $params
+ *   Array per getfields metadata.
+ *
  * @return array
  */
 function civicrm_api3_file_update($params) {
@@ -122,12 +123,10 @@ function civicrm_api3_file_update($params) {
 }
 
 /**
- * Deletes an existing file
- *
- * This API is used for deleting a file
- * Required parameters : id of a file
+ * Delete an existing file.
  *
  * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
  *   API result array

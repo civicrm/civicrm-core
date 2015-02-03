@@ -1,7 +1,15 @@
 <?php
 namespace Civi\CiUtil\Command;
 
+/**
+ * Class AntagonistCommand
+ *
+ * @package Civi\CiUtil\Command
+ */
 class AntagonistCommand {
+  /**
+   * @param $argv
+   */
   public static function main($argv) {
     if (count($argv) != 3) {
       print "usage: {$argv[0]} <TargetTest::testFunc> </path/to/suite>\n";

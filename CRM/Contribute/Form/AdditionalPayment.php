@@ -11,7 +11,7 @@
  | under the terms of the GNU Affero General Public License           |
  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
- | CiviCRM is distributed in the hope that it will be usefusul, but   |
+ | CiviCRM is distributed in the hope that it will be useful, but   |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
  | See the GNU Affero General Public License for more details.        |

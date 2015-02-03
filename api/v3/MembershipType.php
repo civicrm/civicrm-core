@@ -33,17 +33,16 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: MembershipType.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * API to Create or update a Membership Type
+ * API to Create or update a Membership Type.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership_type.
+ *   Array of name/value property values of civicrm_membership_type.
  *
  * @return array
- *   newly created or updated membership type property values.
+ *   API result array.
  */
 function civicrm_api3_membership_type_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Membership_type');
@@ -73,26 +72,22 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  * This api is used for finding an existing membership type.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership_type.
- * {getfields MembershipType_get}
+ *   Array of name/value property values of civicrm_membership_type.
  *
  * @return array
- *   Array of all found membership type property values.
+ *   API result array.
  */
 function civicrm_api3_membership_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Deletes an existing membership type
- *
- * This API is used for deleting a membership type
- * Required parameters : id of a membership type
+ * Deletes an existing membership type.
  *
  * @param array $params
  *
- * @return bool
- *   true if success, else false
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_membership_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

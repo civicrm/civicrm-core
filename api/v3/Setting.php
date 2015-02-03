@@ -32,7 +32,13 @@
  * @subpackage API_Settings
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Settings.php
+ */
+
+/**
+ * Get fields for setting api calls.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_setting_getfields($params) {
@@ -72,7 +78,8 @@ function civicrm_api3_setting_getfields($params) {
 }
 
 /**
- * Alter metadata for getfields functions
+ * Alter metadata for getfields functions.
+ *
  * @param array $params
  */
 function _civicrm_api3_setting_getfields_spec(&$params) {
@@ -82,10 +89,14 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
 }
 
 /**
- * Return default values for settings. We will domain key this as it could vary by domain (ie. urls)
+ * Return default values for settings.
+ *
+ * We will domain key this as it could vary by domain (ie. urls)
  * as we will be creating the option for a function rather than an value to be in the defaults
- * Note that is not in place as yet
+ * Note that is not in place as yet.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -113,7 +124,7 @@ function civicrm_api3_setting_getdefaults(&$params) {
   return civicrm_api3_create_success($defaults, $params, 'setting', 'getfields');
 }
 /**
- * Metadata for setting create function
+ * Metadata for setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -128,8 +139,10 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
 }
 
 /**
- * Revert settings to defaults
+ * Revert settings to defaults.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \Exception
  */
@@ -153,7 +166,8 @@ function civicrm_api3_setting_revert(&$params) {
 }
 
 /**
- * Alter metadata for getfields functions
+ * Alter metadata for getfields functions.
+ *
  * @param array $params
  */
 function _civicrm_api3_setting_revert_spec(&$params) {
@@ -161,15 +175,17 @@ function _civicrm_api3_setting_revert_spec(&$params) {
   $params['component_id'] = array('title' => 'id of relevant component');
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
-    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-      an array or "all" are acceptable values for multiple domains',
+    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain'
+    . ' an array or "all" are acceptable values for multiple domains',
     'title' => 'Setting Domain',
   );
 }
 
 /**
- * Revert settings to defaults
+ * Revert settings to defaults.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -193,7 +209,8 @@ function civicrm_api3_setting_fill(&$params) {
 }
 
 /**
- * Alter metadata for getfields functions
+ * Alter metadata for getfields functions.
+ *
  * @param array $params
  */
 function _civicrm_api3_setting_fill_spec(&$params) {
@@ -202,22 +219,19 @@ function _civicrm_api3_setting_fill_spec(&$params) {
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',
-    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain
-      an array or "all" are acceptable values for multiple domains',
+    'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the '
+    . 'current domain, an array or "all" are acceptable values for multiple domains',
   );
 }
 
 /**
- * Create or update a setting
+ * Create or update a setting.
  *
  * @param array $params
- *   Associative array of setting.
- *                       name/value pairs + other vars as applicable - see getfields for more
- * @example SettingCreate.php Std Create example
+ *   Parameters as per getfields.
  *
  * @return array
  *   api result array
- *   {@getfields setting_create}
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -226,7 +240,7 @@ function civicrm_api3_setting_create($params) {
 }
 
 /**
- * Metadata for setting create function
+ * Metadata for setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -245,15 +259,13 @@ function _civicrm_api3_setting_create_spec(&$params) {
 }
 
 /**
- * Returns array of settings matching input parameters
+ * Returns array of settings matching input parameters.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs.
+ *   Array of one or more valid property_name=>value pairs.
  *
  * @return array
  *   Array of matching settings
- *   {@getfields setting_get}
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -261,7 +273,7 @@ function civicrm_api3_setting_get($params) {
   return civicrm_api3_create_success($result, $params, 'setting', 'get');
 }
 /**
- * Metadata for setting create function
+ * Metadata for setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -278,16 +290,17 @@ function _civicrm_api3_setting_get_spec(&$params) {
   );
 }
 /**
- * Returns value for specific parameter. Function requires more fields than 'get' but is intended for
+ * Returns value for specific parameter.
+ *
+ * Function requires more fields than 'get' but is intended for
  * runtime usage & should be quicker
  *
  * @param array $params
- *   (reference) Array of one or more valid.
+ *   Array of one or more valid.
  *                       property_name=>value pairs.
  *
  * @return array
- *   Array of matching settings
- *   {@getfields setting_get}
+ *   API result array.
  */
 function civicrm_api3_setting_getvalue($params) {
   $config = CRM_Core_Config::singleton();
@@ -305,7 +318,7 @@ function civicrm_api3_setting_getvalue($params) {
 }
 
 /**
- * Metadata for setting create function
+ * Metadata for setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -336,13 +349,17 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
 }
 
 /**
- * Converts domain input into an array. If an array is passed in this is used, if 'all' is passed
+ * Converts domain input into an array.
+ *
+ * If an array is passed in this is used, if 'all' is passed
  * in this is converted to 'all arrays'
  *
  * Really domain_id should always be set but doing an empty check because at the moment
  * using crm-editable will pass an id & default won't be applied
- * we did talk about id being a pseudonym for domain_id in this api so applying it here
+ * we did talk about id being a pseudonym for domain_id in this api so applying it here.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \Exception
  */

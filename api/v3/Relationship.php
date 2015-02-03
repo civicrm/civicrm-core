@@ -33,21 +33,18 @@
  *
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Relationship.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Add or update a relationship
+ * Add or update a relationship.
  *
  * @param array $params
  *   Input parameters.
  *
  * @throws API_Exception
- * @example RelationshipCreate.php Std Create example
  *
  * @return array
  *   API Result Array
- *   {@getfields relationship_create}
  */
 function civicrm_api3_relationship_create($params) {
   _civicrm_api3_handle_relationship_type($params);
@@ -68,15 +65,12 @@ function _civicrm_api3_relationship_create_spec(&$params) {
 }
 
 /**
- * Delete a relationship
+ * Delete a relationship.
  *
  * @param array $params
  *
  * @return array
  *   API Result Array
- *   {@getfields relationship_delete}
- * @example RelationshipDelete.php Delete Example
- *
  */
 function civicrm_api3_relationship_delete($params) {
 
@@ -96,18 +90,17 @@ function civicrm_api3_relationship_delete($params) {
 }
 
 /**
- * get the relationship
+ * Get one or more relationship/s.
  *
  * @param array $params
  *   Input parameters.
+ *
  * @todo  Result is inconsistent depending on whether contact_id is passed in :
  * -  if you pass in contact_id - it just returns all relationships for 'contact_id'
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
  *
  * @return array
  *   API Result Array
- *   {@getfields relationship_get}
- * @example RelationshipGet.php
  */
 function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
@@ -141,7 +134,7 @@ function civicrm_api3_relationship_get($params) {
 }
 
 /**
- * legacy handling for relationship_type parameter
+ * Legacy handling for relationship_type parameter.
  *
  * @param array $params
  *   Associative array of property name/value.

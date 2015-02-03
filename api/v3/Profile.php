@@ -32,7 +32,6 @@
  * @subpackage API_ActivityProfile
  * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Profile.php 30486 2011-05-20 16:12:09Z rajan $
- *
  */
 
 /**
@@ -138,6 +137,8 @@ function civicrm_api3_profile_get($params) {
 }
 
 /**
+ * Adjust profile get function metadata.
+ *
  * @param array $params
  */
 function _civicrm_api3_profile_get_spec(&$params) {
@@ -149,6 +150,7 @@ function _civicrm_api3_profile_get_spec(&$params) {
 
 /**
  * Submit a set of fields against a profile.
+ *
  * Note choice of submit versus create is discussed CRM-13234 & related to the fact
  * 'profile' is being treated as a data-entry entity
  *
@@ -288,10 +290,13 @@ function civicrm_api3_profile_submit($params) {
 }
 
 /**
+ * Translate field names for BAO.
+ *
  * The api standards expect field names to be lower case but the BAO uses mixed case
  * so we accept 'email-primary' but pass 'email-Primary' to the BAO
  * we could make the BAO handle email-primary but this would alter the fieldname seen by hooks
  * & we would need to consider that change
+ *
  * @param string $fieldName
  *   API field name.
  *
@@ -302,8 +307,10 @@ function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName) {
   $fieldName = str_replace('url', 'URL', $fieldName);
   return str_replace('primary', 'Primary', $fieldName);
 }
+
 /**
- * metadata for submit action
+ * Metadata for submit action.
+ *
  * @param array $params
  * @param array $apirequest
  */
@@ -328,29 +335,31 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
 }
 
 /**
+ * Set profile - deprecated.
+ *
  * @deprecated - calling this function directly is deprecated as 'set' is not a clear action
  * use submit
  * Update Profile field values.
  *
  * @param array $params
- *   Associative array of property name/value.
+ *   Array of property name/value.
  *                             pairs to update profile field values
  *
  * @return array
  *   Updated Contact/ Activity object|CRM_Error
- *
- *
  */
 function civicrm_api3_profile_set($params) {
   return civicrm_api3('profile', 'submit', $params);
 }
 
 /**
+ * Apply profile - deprecated.
+ *
  * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
  * @param array $params
- *   Associative array of property name/value.
+ *   Array of property name/value.
  *                             pairs to profile field values
  *
  * @throws API_Exception
@@ -390,6 +399,8 @@ function civicrm_api3_profile_apply($params) {
 
 
 /**
+ * Get pseudo profile 'billing'.
+ *
  * This is a function to help us 'pretend' billing is a profile & treat it like it is one.
  * It gets standard credit card address fields etc
  * Note this is 'better' that the inbuilt version as it will pull in fallback values
@@ -473,8 +484,9 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 }
 
 /**
- * Here we will build  up getfields type data for all the fields in the profile. Because the integration with the
- * form layer in core is so hard-coded we are not going to attempt to re-use it
+ * Here we will build  up getfields type data for all the fields in the profile.
+ *
+ * Because the integration with the form layer in core is so hard-coded we are not going to attempt to re-use it
  * However, as this function is unit-tested & hence 'locked in' we can aspire to extract sharable
  * code out of the form-layer over time.
  *
