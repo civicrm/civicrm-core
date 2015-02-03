@@ -55,11 +55,9 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    *
    * gets session variables for group or field id
    *
-   * @param null
-   *
    * @return void
    */
-  function preProcess() {
+  public function preProcess() {
     // get the controller vars
     $groupId = $this->get('groupId');
     $fieldId = $this->get('fieldId');
@@ -73,7 +71,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
         array(
           'title' => ts('Price Set Fields'),
           'url' => $url,
-        )
+        ),
       );
     }
     else {
@@ -86,7 +84,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
         array(
           'title' => ts('Price Sets'),
           'url' => $url,
-        )
+        ),
       );
     }
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -94,8 +92,6 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
 
   /**
    * Set the default form values
-   *
-   * @param null
    *
    * @return array
    *   the default array reference
@@ -123,8 +119,6 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
 
   /**
    * Build the form object
-   *
-   * @param null
    *
    * @return void
    */

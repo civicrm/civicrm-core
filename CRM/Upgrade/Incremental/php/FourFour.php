@@ -104,7 +104,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       if ($dao->N) {
         $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(
               1 => $dao->N,
-              2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades'
+              2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades',
             )) . '</strong>';
       }
     }
@@ -357,11 +357,11 @@ ALTER TABLE civicrm_dashboard
   }
 
   /**
-   * @param CRM_Queue_TaskContext $ctx
-   * @param int $startId
-   * @param int $endId
+   * @param $rev
+   * @param $originalVer
+   * @param $latestVer
    *
-   * @return bool
+   * @return void
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
@@ -788,9 +788,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
 
-  /***
+  /**
    * CRM-13998 missing alter statements for civicrm_report_instance
-   ***/
+   */
   public function updateReportInstanceTable() {
 
     // add civicrm_report_instance.name

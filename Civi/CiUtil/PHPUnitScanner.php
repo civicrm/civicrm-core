@@ -12,11 +12,10 @@ class PHPUnitScanner {
    * @return array <string> class names
    */
   public static function _findTestClasses($path) {
-//    print_r(array(
-//      'loading' => $path,
-//      get_included_files()
-//    ));
-
+    //    print_r(array(
+    //      'loading' => $path,
+    //      get_included_files()
+    //    ));
     $origClasses = get_declared_classes();
     require_once $path;
     $newClasses = get_declared_classes();
@@ -30,7 +29,6 @@ class PHPUnitScanner {
   /**
    * @param $paths
    * @return array (string $file => string $class)
-   * (string $file => string $class)
    * @throws \Exception
    */
   public static function findTestClasses($paths) {
@@ -88,7 +86,7 @@ class PHPUnitScanner {
           $r[] = array(
             'file' => $testFile,
             'class' => $testClass,
-            'method' => $method->name
+            'method' => $method->name,
           );
         }
       }

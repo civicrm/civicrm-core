@@ -1332,6 +1332,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     switch ($type) {
       case CRM_Report_Form::OP_INT:
       case CRM_Report_Form::OP_FLOAT:
+
         return array(
           'lte' => ts('Is less than or equal to'),
           'gte' => ts('Is greater than or equal to'),
@@ -1353,12 +1354,14 @@ class CRM_Report_Form extends CRM_Core_Form {
       case CRM_Report_Form::OP_MONTH:
       case CRM_Report_Form::OP_MULTISELECT:
       case CRM_Report_Form::OP_ENTITYREF:
+
         return array(
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
         );
 
       case CRM_Report_Form::OP_DATE:
+
         return array(
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
@@ -1842,7 +1845,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function formatCustomValues($value, $customField, $fieldValueMap) {
     if (CRM_Utils_System::isNull($value)) {
-      return;
+      return NULL;
     }
 
     $htmlType = $customField['html_type'];

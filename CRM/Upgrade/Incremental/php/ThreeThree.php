@@ -362,13 +362,13 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
       $config = CRM_Core_Config::singleton();
       if (is_callable(array(
         $config->userSystem,
-        'replacePermission'
+        'replacePermission',
       ))) {
         $config->userSystem->replacePermission('access CiviMail', array(
             'access CiviMail',
             'create mailings',
             'approve mailings',
-            'schedule mailings'
+            'schedule mailings',
           ));
       }
     }

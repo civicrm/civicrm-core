@@ -44,7 +44,7 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
    * @param int $contributionPageID
    * @param string $widgetID
    *
-   * @return stdClass
+   * @return object
    */
   public static function getContributionPageData($contributionPageID, $widgetID) {
     $config = CRM_Core_Config::singleton();
@@ -125,10 +125,9 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
           ) {
             $data['is_active'] = FALSE;
             $data['campaign_start'] = ts('Campaign starts on %1', array(
-              1 => CRM_Utils_Date::customFormat($dao->start_date,
-                $config->dateformatFull
+                1 => CRM_Utils_Date::customFormat($dao->start_date, $config->dateformatFull),
               )
-            ));
+            );
           }
         }
 
@@ -138,25 +137,25 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
             $endDate < $now
           ) {
             $data['is_active'] = FALSE;
-            $data['campaign_start'] = ts('Campaign ended on %1', array(
-              1 => CRM_Utils_Date::customFormat($dao->end_date,
-                $config->dateformatFull
+            $data['campaign_start'] = ts('Campaign ended on %1',
+              array(
+                1 => CRM_Utils_Date::customFormat($dao->end_date, $config->dateformatFull),
               )
-            ));
+            );
           }
           elseif ($startDate >= $now) {
-            $data['campaign_start'] = ts('Campaign starts on %1', array(
-              1 => CRM_Utils_Date::customFormat($dao->start_date,
-                $config->dateformatFull
+            $data['campaign_start'] = ts('Campaign starts on %1',
+              array(
+                1 => CRM_Utils_Date::customFormat($dao->start_date, $config->dateformatFull),
               )
-            ));
+            );
           }
           else {
-            $data['campaign_start'] = ts('Campaign ends on %1', array(
-              1 => CRM_Utils_Date::customFormat($dao->end_date,
-                $config->dateformatFull
+            $data['campaign_start'] = ts('Campaign ends on %1',
+              array(
+                1 => CRM_Utils_Date::customFormat($dao->end_date, $config->dateformatFull),
               )
-            ));
+            );
           }
         }
       }
@@ -175,7 +174,7 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
       $data['money_target_display'] = CRM_Utils_Money::format($data['money_target']);
       $data['money_raised'] = ts('Raised %1 of %2', array(
           1 => CRM_Utils_Money::format($data['money_raised']),
-          2 => $data['money_target_display']
+          2 => $data['money_target_display'],
         ));
     }
     else {

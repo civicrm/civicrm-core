@@ -43,9 +43,7 @@
  *   Associative array of property.
  *                       name/value pairs to insert in new 'survey'
  *
- * @return array
- *   api result array
- * {@getfields mailing_event_unsubscribe_create}
+ * @return array  api result array {@getfields mailing_event_unsubscribe_create}
  */
 function civicrm_api3_mailing_event_unsubscribe_create($params) {
 
@@ -68,7 +66,6 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
     CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue, NULL, TRUE, $job);
     return civicrm_api3_create_success($params);
   }
-
 
   return civicrm_api3_create_error('Queue event could not be found');
 }
