@@ -436,7 +436,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   ///////////////// civicrm_event_search methods
 
   /**
-   *  Test civicrm_event_search with wrong params type
+   * Test civicrm_event_search with wrong params type
    */
   public function testSearchWrongParamsType() {
     $params = 'a string';
@@ -444,23 +444,23 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_event_search with empty params
+   * Test civicrm_event_search with empty params.
    */
   public function testSearchEmptyParams() {
-    $event = $this->callAPISuccess('event', 'create', $this->_params[1]);
+    $this->callAPISuccess('event', 'create', $this->_params[1]);
 
-    $getparams = array(
+    $getParams = array(
       'sequential' => 1,
     );
-    $result = $this->callAPISuccess('event', 'get', $getparams);
-    $this->assertEquals($result['count'], 3, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('event', 'get', $getParams);
+    $this->assertEquals($result['count'], 3);
     $res = $result['values'][0];
-    $this->assertArrayKeyExists('title', $res, 'In line ' . __LINE__);
-    $this->assertEquals($res['event_type_id'], $this->_params[1]['event_type_id'], 'In line ' . __LINE__);
+    $this->assertArrayKeyExists('title', $res);
+    $this->assertEquals($res['event_type_id'], $this->_params[1]['event_type_id']);
   }
 
   /**
-   *  Test civicrm_event_search. Success expected.
+   * Test civicrm_event_search. Success expected.
    */
   public function testSearch() {
     $params = array(
@@ -476,8 +476,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_event_search. Success expected.
-   *  return.offset and return.max_results test (CRM-5266)
+   * Test civicrm_event_search. Success expected.
+   * return.offset and return.max_results test (CRM-5266)
    */
   public function testSearchWithOffsetAndMaxResults() {
     $maxEvents = 5;

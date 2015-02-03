@@ -56,7 +56,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test limit param
+   * Test limit param
    */
   public function testGetOptionValueLimit() {
     $params = array();
@@ -68,7 +68,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test offset param
+   * Test offset param
    */
   public function testGetOptionValueOffSet() {
 
@@ -85,7 +85,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test offset param
+   * Test offset param
    */
   public function testGetSingleValueOptionValueSort() {
     $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";

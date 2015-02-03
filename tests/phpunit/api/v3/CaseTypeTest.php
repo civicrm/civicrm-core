@@ -64,6 +64,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
+   *
    * This method is called after a test is executed.
    */
   public function tearDown() {
@@ -72,14 +73,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testCaseTypeCreateEmpty() {
     $this->callAPIFailure('CaseType', 'create', array());
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testCaseTypeCreateWithoutRequired() {
     $params = array(
@@ -95,11 +96,12 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test create methods with valid data
-   * success expected
+   * Test create methods with valid data.
+   *
+   * Success expected.
    */
   public function testCaseTypeCreate() {
-    // Create Case Type
+    // Create Case Type.
     $params = array(
       'title' => 'Application',
       'name' => 'Application',
@@ -110,14 +112,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $result = $this->callAPISuccess('CaseType', 'create', $params);
     $id = $result['id'];
 
-    // Check result
+    // Check result.
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
     $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['title'], $params['title'], 'in line ' . __LINE__);
   }
 
   /**
-   * Create a case with an invalid name
+   * Create a case with an invalid name.
    */
   public function testCaseTypeCreate_invalidName() {
     // Create Case Type
@@ -133,7 +135,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
 
   /**
-   * Test update (create with id) function with valid parameters
+   * Test update (create with id) function with valid parameters.
    */
   public function testCaseTypeUpdate() {
     // Create Case Type
@@ -148,21 +150,21 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
     $caseType = $result['values'][$id];
 
-    // Update Case Type
+    // Update Case Type.
     $params = array('id' => $id);
     $params['title'] = $caseType['title'] = 'Something Else';
     $this->callAPISuccess('CaseType', 'create', $params);
 
-    // Verify that updated case Type is exactly equal to the original with new title
+    // Verify that updated case Type is exactly equal to the original with new title.
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
-    $this->assertEquals($result['values'][$id], $caseType, 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id], $caseType);
   }
 
   /**
-   * Test delete function with valid parameters
+   * Test delete function with valid parameters.
    */
   public function testCaseTypeDelete_New() {
-    // Create Case Type
+    // Create Case Type.
     $params = array(
       'title' => 'Application',
       'name' => 'Application',
@@ -180,8 +182,9 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test create methods with xml file
-   * success expected
+   * Test create methods with xml file.
+   *
+   * Success expected.
    */
   public function testCaseTypeCreateWithDefinition() {
     // Create Case Type
@@ -219,10 +222,10 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $getCaseType = $this->callAPISuccess('CaseType', 'get', array('id' => $createCaseType['id']));
     $this->assertEquals(1, $getCaseType['count']);
 
-    // Deletion succeeds when it's not in-use
+    // Deletion succeeds when it's not in-use.
     $this->callAPISuccess('Case', 'delete', array('id' => $createCase['id']));
 
-    // Check result - case type should no longer exist
+    // Check result - case type should no longer exist.
     $this->callAPISuccess('CaseType', 'delete', array('id' => $createCaseType['id']));
     $getCaseType = $this->callAPISuccess('CaseType', 'get', array('id' => $createCaseType['id']));
     $this->assertEquals(0, $getCaseType['count']);

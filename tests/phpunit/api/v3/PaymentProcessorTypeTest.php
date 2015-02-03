@@ -88,7 +88,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test  using example code
+   * Test  using example code
    */
   public function testPaymentProcessorTypeCreateExample() {
     require_once 'api/v3/examples/PaymentProcessorType/Create.php';

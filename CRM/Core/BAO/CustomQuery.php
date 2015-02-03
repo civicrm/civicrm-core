@@ -37,21 +37,21 @@ class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
 
   /**
-   * The set of custom field ids
+   * The set of custom field ids.
    *
    * @var array
    */
   protected $_ids;
 
   /**
-   * The select clause
+   * The select clause.
    *
    * @var array
    */
   public $_select;
 
   /**
-   * The name of the elements that are in the select clause
+   * The name of the elements that are in the select clause.
    * used to extract the values
    *
    * @var array
@@ -59,7 +59,7 @@ class CRM_Core_BAO_CustomQuery {
   public $_element;
 
   /**
-   * The tables involved in the query
+   * The tables involved in the query.
    *
    * @var array
    */
@@ -67,28 +67,28 @@ class CRM_Core_BAO_CustomQuery {
   public $_whereTables;
 
   /**
-   * The where clause
+   * The where clause.
    *
    * @var array
    */
   public $_where;
 
   /**
-   * The english language version of the query
+   * The english language version of the query.
    *
    * @var array
    */
   public $_qill;
 
   /**
-   * The cache to translate the option values into labels
+   * The cache to translate the option values into labels.
    *
    * @var array
    */
   public $_options;
 
   /**
-   * The custom fields information
+   * The custom fields information.
    *
    * @var array
    */
@@ -104,7 +104,7 @@ class CRM_Core_BAO_CustomQuery {
   protected $_locationSpecificCustomFields;
 
   /**
-   * This stores custom data group types and tables that it extends
+   * This stores custom data group types and tables that it extends.
    *
    * @var array
    */
@@ -129,7 +129,7 @@ class CRM_Core_BAO_CustomQuery {
   );
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * Takes in a set of custom field ids andsets up the data structures to
    * generate a query
@@ -253,7 +253,7 @@ SELECT label, value
   }
 
   /**
-   * Generate the select clause and the associated tables
+   * Generate the select clause and the associated tables.
    * for the from clause
    *
    * @return void
@@ -318,7 +318,7 @@ SELECT label, value
   }
 
   /**
-   * Generate the where clause and also the english language
+   * Generate the where clause and also the english language.
    * equivalent
    *
    * @return void
@@ -548,7 +548,7 @@ SELECT label, value
   }
 
   /**
-   * Function that does the actual query generation
+   * Function that does the actual query generation.
    * basically ties all the above functions together
    *
    * @return array

@@ -44,10 +44,10 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
-   *  Test setup for every test
+   * Test setup for every test
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
@@ -56,7 +56,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( ) for unknown constant
+   * Test civicrm_constant_get( ) for unknown constant
    */
   public function testUnknownConstant() {
     $result = $this->callAPIFailure('constant', 'get', array(
@@ -65,7 +65,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityStatus' )
+   * Test civicrm_constant_get( 'activityStatus' )
    */
   public function testActivityStatus() {
 
@@ -81,7 +81,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityType' )
+   * Test civicrm_constant_get( 'activityType' )
    */
   public function testActivityType() {
 
@@ -95,7 +95,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_address_getoptions( 'location_type_id' )
+   * Test civicrm_address_getoptions( 'location_type_id' )
    */
   public function testLocationTypeGet() {
     // needed to get rid of cached values from previous tests
@@ -113,7 +113,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_phone_getoptions( 'phone_type_id' )
+   * Test civicrm_phone_getoptions( 'phone_type_id' )
    */
   public function testPhoneType() {
     $params = array(
@@ -130,7 +130,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'mailProtocol' )
+   * Test civicrm_constant_get( 'mailProtocol' )
    */
   public function testmailProtocol() {
     $params = array(

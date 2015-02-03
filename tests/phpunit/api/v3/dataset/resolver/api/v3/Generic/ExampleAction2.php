@@ -1,7 +1,9 @@
 <?php
 
 /**
- * @param $apiRequest
+ * Example result for API Test.
+ *
+ * @param array $apiRequest
  *
  * @return array
  */

@@ -325,7 +325,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Delete the record that are associated with this case
+   * Delete the record that are associated with this case.
    * record are deleted from case
    *
    * @param int $caseId
@@ -468,7 +468,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Retrieve contact names by caseId
+   * Retrieve contact names by caseId.
    *
    * @param int $caseId
    *   ID of the case.
@@ -959,7 +959,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Get Case roles
+   * Get Case roles.
    *
    * @param int $contactID
    *   Contact id.
@@ -1017,7 +1017,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Get Case Activities
+   * Get Case Activities.
    *
    * @param int $caseID
    *   Case id.
@@ -1363,7 +1363,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Get Case Related Contacts
+   * Get Case Related Contacts.
    *
    * @param int $caseID
    *   Case id.
@@ -1586,7 +1586,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Create an activity for a case via email
+   * Create an activity for a case via email.
    *
    * @param int $file
    *   Email sent.
@@ -1676,7 +1676,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Retrieve the scheduled activity type and date
+   * Retrieve the scheduled activity type and date.
    *
    * @param array $cases
    *   Array of contact and case id.
@@ -1720,7 +1720,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object.
    *
    * @return array
    *   array of exportable Fields
@@ -1748,7 +1748,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Restore the record that are associated with this case
+   * Restore the record that are associated with this case.
    *
    * @param int $caseId
    *   Id of the case to restore.
@@ -1818,7 +1818,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   }
 
   /**
-   * Convenience function to get both case contacts and global in one array
+   * Convenience function to get both case contacts and global in one array.
    * @param int $caseId
    *
    * @return array
@@ -3068,7 +3068,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Verify user has permission to access a case
+   * Verify user has permission to access a case.
    *
    * @param int $caseId
    * @param bool $denyClosed
@@ -3117,7 +3117,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Check whether activity is a case Activity
+   * Check whether activity is a case Activity.
    *
    * @param int $activityID
    *   Activity id.
@@ -3138,7 +3138,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get all the case type ids currently in use
+   * Get all the case type ids currently in use.
    *
    * @return array
    */
@@ -3162,7 +3162,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get all the case status ids currently in use
+   * Get all the case status ids currently in use.
    *
    * @return array
    */
@@ -3183,7 +3183,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get all the encounter medium ids currently in use
+   * Get all the encounter medium ids currently in use.
    *
    * @return array
    */
@@ -3254,7 +3254,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Used during case component enablement and during ugprade
+   * Used during case component enablement and during ugprade.
    *
    * @return bool
    */
@@ -3365,7 +3365,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get the list of clients for a case
+   * Get the list of clients for a case.
    *
    * @param int $caseId
    *

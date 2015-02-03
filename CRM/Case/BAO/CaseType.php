@@ -40,14 +40,14 @@
 class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
   /**
-   * Static field for all the case information that we can potentially export
+   * Static field for all the case information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Takes an associative array and creates a Case Type object
+   * Takes an associative array and creates a Case Type object.
    *
    * the function extract all the params it needs to initialize the create a
    * case type object. the params array could contain additional unused name/value
@@ -188,7 +188,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   /**
-   * Get the case definition either from db or read from xml file
+   * Get the case definition either from db or read from xml file.
    *
    * @param SimpleXmlElement $xml
    *   A single case-type record.
@@ -272,7 +272,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   }
 
   /**
-   * Takes an associative array and creates a case type object
+   * Takes an associative array and creates a case type object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

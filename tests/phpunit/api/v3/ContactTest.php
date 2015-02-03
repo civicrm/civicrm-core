@@ -53,8 +53,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test setup for every test.
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     // Connect to the database.
@@ -232,7 +232,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test old keys still work.
    *
    * Verify that attempt to create individual contact with
-   *  first and last names and old key values works
+   * first and last names and old key values works
    */
   public function testCreateNameIndividualOldKeys() {
     $params = array(
@@ -257,7 +257,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test preferred keys work.
    *
    * Verify that attempt to create individual contact with
-   *  first and last names and old key values works
+   * first and last names and old key values works
    */
   public function testCreateNameIndividualRecommendedKeys2() {
     $params = array(
@@ -283,7 +283,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test household name is sufficient for create.
    *
    * Verify that attempt to create household contact with only
-   *  household name succeeds
+   * household name succeeds
    */
   public function testCreateNameHousehold() {
     $params = array(
@@ -298,7 +298,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test organization name is sufficient for create.
    *
    * Verify that attempt to create organization contact with only
-   *  organization name succeeds.
+   * organization name succeeds.
    */
   public function testCreateNameOrganization() {
     $params = array(
@@ -797,7 +797,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify that attempt to create individual contact with first
-   *  and last names and email succeeds
+   * and last names and email succeeds
    */
   public function testCreateIndividualWithNameEmail() {
     $params = array(
@@ -826,7 +826,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify that attempt to create individual contact with first
-   *  and last names, email and location type succeeds
+   * and last names, email and location type succeeds
    */
   public function testCreateIndividualWithNameEmailLocationType() {
     $params = array(
@@ -892,7 +892,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify that attempt to create household contact with details
-   *  succeeds
+   * succeeds
    */
   public function testCreateHouseholdDetails() {
     $params = array(
@@ -1132,7 +1132,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test civicrm_contact_get() return only first name & last name.
    *
-   *  Use comma separated string return without a space
+   * Use comma separated string return without a space
    */
   public function testContactGetReturnFirstLastNoComma() {
     $contact = $this->callAPISuccess('contact', 'create', $this->_params);
@@ -1257,7 +1257,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test birth date params incl value, array & birth_date_high, birth_date_low
-   *  && deceased
+   * && deceased
    */
   public function testContactGetBirthDate() {
     $contact1 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('birth_date' => 'first day of next month - 2 years')));
@@ -1288,7 +1288,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test Deceased date params incl value, array & Deceased_date_high, Deceased date_low
-   *  && deceased.
+   * && deceased.
    */
   public function testContactGetDeceasedDate() {
     $contact1 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('deceased_date' => 'first day of next month - 2 years')));

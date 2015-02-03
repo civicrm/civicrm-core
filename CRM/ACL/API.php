@@ -35,7 +35,7 @@
 class CRM_ACL_API {
 
   /**
-   * The various type of permissions
+   * The various type of permissions.
    *
    * @var int
    */
@@ -72,7 +72,7 @@ class CRM_ACL_API {
   }
 
   /**
-   * Get the permissioned where clause for the user
+   * Get the permissioned where clause for the user.
    *
    * @param int $type
    *   The type of permission needed.
@@ -143,7 +143,7 @@ class CRM_ACL_API {
   }
 
   /**
-   * Get all the groups the user has access to for the given operation
+   * Get all the groups the user has access to for the given operation.
    *
    * @param int $type
    *   The type of permission needed.

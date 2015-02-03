@@ -63,13 +63,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no name
+   * Check with no name.
    */
   public function testCreateWithoutName() {
     $params = array(
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('job', 'create', $params,
+    $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
   }
@@ -92,7 +92,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create job
+   * Create job.
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -105,7 +105,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testDeleteEmpty() {
     $params = array();
@@ -113,14 +113,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with No array
+   * Check with No array.
    */
   public function testDeleteParamsNotArray() {
     $result = $this->callAPIFailure('job', 'delete', 'string');
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testDeleteWithoutRequired() {
     $params = array(
@@ -134,7 +134,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with incorrect required fields
+   * Check with incorrect required fields.
    */
   public function testDeleteWithIncorrectData() {
     $params = array(
@@ -144,7 +144,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check job delete
+   * Check job delete.
    */
   public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
