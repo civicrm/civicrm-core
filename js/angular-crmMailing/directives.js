@@ -101,46 +101,46 @@
   });
 
   // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
-  // example: <div crm-mailing-radio-date="mySchedule" crm-model="mailing.scheduled_date">...</div>
-  // FIXME: use ngModel instead of adhoc crmModel
+  // example: <div crm-mailing-radio-date="mySchedule" ng-model="mailing.scheduled_date">...</div>
   angular.module('crmMailing').directive('crmMailingRadioDate', function ($parse) {
     return {
-      link: function ($scope, element, attrs) {
-        var schedModel = $parse(attrs.crmModel);
+      require: 'ngModel',
+      link: function ($scope, element, attrs, ngModel) {
 
         var schedule = $scope[attrs.crmMailingRadioDate] = {
           mode: 'now',
           datetime: ''
         };
-        var updateChildren = (function () {
-          var sched = schedModel($scope);
-          if (sched) {
+
+        ngModel.$render = function $render() {
+          var sched = ngModel.$viewValue;
+          if (!_.isEmpty(sched)) {
             schedule.mode = 'at';
             schedule.datetime = sched;
           }
           else {
             schedule.mode = 'now';
           }
-        });
+        };
+
         var updateParent = (function () {
           switch (schedule.mode) {
             case 'now':
-              schedModel.assign($scope, null);
+              ngModel.$setViewValue(null);
               break;
             case 'at':
-              schedModel.assign($scope, schedule.datetime);
+              ngModel.$setViewValue(schedule.datetime);
               break;
             default:
               throw 'Unrecognized schedule mode: ' + schedule.mode;
           }
         });
 
-        $scope.$watch(attrs.crmModel, updateChildren);
         $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
         $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {
           // automatically switch mode based on datetime entry
           if (oldValue != newValue) {
-            if (!newValue || newValue == " ") {
+            if (_.isEmpty(newValue) || newValue == " ") {
               schedule.mode = 'now';
             }
             else {

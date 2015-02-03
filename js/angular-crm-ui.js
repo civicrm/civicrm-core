@@ -24,76 +24,92 @@
     })
 
     // Display a date widget.
-    // example: <input crm-ui-date="myobj.datefield" />
-    // example: <input crm-ui-date="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
-    // WISHLIST: use ngModel
+    // example: <input crm-ui-date ng-model="myobj.datefield" />
+    // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
     .directive('crmUiDate', function ($parse, $timeout) {
       return {
         restrict: 'AE',
+        require: 'ngModel',
         scope: {
-          crmUiDate: '@', // expression, model binding
           crmUiDateFormat: '@' // expression, date format (default: "yy-mm-dd")
         },
-        link: function (scope, element, attrs) {
+        link: function (scope, element, attrs, ngModel) {
           var fmt = attrs.crmUiDateFormat ? $parse(attrs.crmUiDateFormat)() : "yy-mm-dd";
-          var model = $parse(attrs.crmUiDate);
 
           element.addClass('dateplugin');
           $(element).datepicker({
             dateFormat: fmt
           });
 
-          var updateChildren = (function() {
-            element.off('change', updateParent);
-            $(element).datepicker('setDate', model(scope.$parent));
-            element.on('change', updateParent);
-          });
+          ngModel.$render = function $render() {
+            $(element).datepicker('setDate', ngModel.$viewValue);
+          };
           var updateParent = (function() {
             $timeout(function () {
-              model.assign(scope.$parent, $(element).val());
+              ngModel.$setViewValue(element.val());
             });
           });
 
-          updateChildren();
-          scope.$parent.$watch(attrs.crmUiDate, updateChildren);
           element.on('change', updateParent);
         }
       };
     })
 
     // Display a date-time widget.
-    // example: <div crm-ui-date-time="myobj.mydatetimefield"></div>
-    // WISHLIST: use ngModel
+    // example: <div crm-ui-date-time ng-model="myobj.mydatetimefield"></div>
     .directive('crmUiDateTime', function ($parse) {
       return {
         restrict: 'AE',
+        require: 'ngModel',
         scope: {
-          crmUiDateTime: '@'
+          ngRequired: '@'
         },
-        template: '<input crm-ui-date="dtparts.date" placeholder="{{dateLabel}}"/> <input crm-ui-time="dtparts.time" placeholder="{{timeLabel}}"/>',
-        link: function (scope, element, attrs) {
-          var model = $parse(attrs.crmUiDateTime);
+        templateUrl: '~/crmUi/datetime.html',
+        link: function (scope, element, attrs, ngModel) {
+          var ts = scope.ts = CRM.ts(null);
           scope.dateLabel = ts('Date');
           scope.timeLabel = ts('Time');
+          element.addClass('crm-ui-datetime');
 
-          var updateChildren = (function () {
-            var value = model(scope.$parent);
-            if (value) {
-              var dtparts = value.split(/ /);
+          ngModel.$render = function $render() {
+            if (!_.isEmpty(ngModel.$viewValue)) {
+              var dtparts = ngModel.$viewValue.split(/ /);
               scope.dtparts = {date: dtparts[0], time: dtparts[1]};
             }
             else {
               scope.dtparts = {date: '', time: ''};
             }
-          });
-          var updateParent = (function () {
-            model.assign(scope.$parent, scope.dtparts.date + " " + scope.dtparts.time);
-          });
+          };
 
-          updateChildren();
-          scope.$parent.$watch(attrs.crmUiDateTime, updateChildren);
+          function updateParent() {
+            var incompleteDateTime = _.isEmpty(scope.dtparts.date) ^ _.isEmpty(scope.dtparts.time);
+            ngModel.$setValidity('incompleteDateTime', !incompleteDateTime);
+
+            if (_.isEmpty(scope.dtparts.date) && _.isEmpty(scope.dtparts.time)) {
+              ngModel.$setViewValue(' ');
+            }
+            else {
+              //ngModel.$setViewValue(scope.dtparts.date + ' ' + scope.dtparts.time);
+              ngModel.$setViewValue((scope.dtparts.date ? scope.dtparts.date : '') + ' ' + (scope.dtparts.time ? scope.dtparts.time : ''));
+            }
+          }
+
           scope.$watch('dtparts.date', updateParent);
           scope.$watch('dtparts.time', updateParent);
+
+          function updateRequired() {
+            scope.required = scope.$parent.$eval(attrs.ngRequired);
+          }
+
+          if (attrs.ngRequired) {
+            updateRequired();
+            scope.$parent.$watch(attrs.ngRequired, updateRequired);
+          }
+
+          scope.reset = function reset() {
+            scope.dtparts = {date: '', time: ''};
+            ngModel.$setViewValue('');
+          };
         }
       };
     })
@@ -437,33 +453,26 @@
     })
 
     // Display a time-entry field.
-    // example: <input crm-ui-time="myobj.mytimefield" />
-    // WISHLIST: use ngModel
+    // example: <input crm-ui-time ng-model="myobj.mytimefield" />
     .directive('crmUiTime', function ($parse, $timeout) {
       return {
         restrict: 'AE',
+        require: 'ngModel',
         scope: {
-          crmUiTime: '@'
         },
-        link: function (scope, element, attrs) {
-          var model = $parse(attrs.crmUiTime);
-
+        link: function (scope, element, attrs, ngModel) {
           element.addClass('crm-form-text six');
-          $(element).timeEntry({show24Hours: true});
+          element.timeEntry({show24Hours: true});
 
-          var updateChildren = (function() {
-            element.off('change', updateParent);
-            $(element).timeEntry('setTime', model(scope.$parent));
-            element.on('change', updateParent);
-          });
+          ngModel.$render = function $render() {
+            element.timeEntry('setTime', ngModel.$viewValue);
+          };
+
           var updateParent = (function () {
             $timeout(function () {
-              model.assign(scope.$parent, element.val());
+              ngModel.$setViewValue(element.val());
             });
           });
-
-          updateChildren();
-          scope.$parent.$watch(attrs.crmUiTime, updateChildren);
           element.on('change', updateParent);
         }
       };

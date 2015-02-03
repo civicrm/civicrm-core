@@ -1,0 +1,18 @@
+<input
+  crm-ui-date
+  ng-model="dtparts.date"
+  ng-required="required"
+  ng-class="{incomplete: !dtparts.date && (required||dtparts.time)}"
+  placeholder="{{dateLabel}}"/>
+<input
+  crm-ui-time
+  ng-model="dtparts.time"
+  ng-required="required"
+  ng-class="{incomplete: !dtparts.time && (required||dtparts.date)}"
+  placeholder="{{timeLabel}}"/>
+<a
+  class="crm-hover-button"
+  ng-click="reset()"
+  ng-show="dtparts.date || dtparts.time"
+  title="Clear"
+  ><span class="icon ui-icon-close"></span></a>
