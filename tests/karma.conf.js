@@ -8,7 +8,7 @@ module.exports = function(config) {
     files: [
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/jquery-ui/jquery-ui.min.js',
-      'packages/backbone/lodash.compat.min.js',
+      'bower_components/lodash-compat/lodash.min.js',
       'packages/jquery/plugins/select2/select2.min.js',
       'packages/jquery/plugins/jquery.blockUI.js',
       'packages/jquery/plugins/jquery.validate.js',
