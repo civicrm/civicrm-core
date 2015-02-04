@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using payment_processor_type create API.
  *
  *

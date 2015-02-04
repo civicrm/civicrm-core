@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using campaign create API.
  *
  * Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php

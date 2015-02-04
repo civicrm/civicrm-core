@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using tax_contribution_page create API.
  *
  * Create Contribution with Nested Line Items

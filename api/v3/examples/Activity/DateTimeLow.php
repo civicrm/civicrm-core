@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using activity get API.
  *
  * demonstrates _low filter (at time of writing doesn't work if contact_id is set

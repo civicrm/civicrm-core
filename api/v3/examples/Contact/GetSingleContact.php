@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using contact getsingle API.
  *
  * This demonstrates use of the 'format.single_entity_array' param.

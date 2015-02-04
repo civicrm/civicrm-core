@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using report_template getrows API.
  *
  * Retrieve rows from a report template (optionally providing the instance_id)

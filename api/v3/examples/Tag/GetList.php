@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using tag getlist API.
  *
  * Demonstrates use of api.getlist for autocomplete and quicksearch applications

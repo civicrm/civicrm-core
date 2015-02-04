@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using setting getvalue API.
  *
  * Demonstrates getvalue action - intended for runtime use as better caching than get

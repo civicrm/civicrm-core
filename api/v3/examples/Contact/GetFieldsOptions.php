@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using contact GetFields API.
  *
  * Demonstrate retrieving metadata with custom field options
