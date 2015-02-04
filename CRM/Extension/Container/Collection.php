@@ -126,7 +126,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * Get the container which defines a particular key
+   * Get the container which defines a particular key.
    *
    * @param string $key
    *   Extension name.

@@ -39,7 +39,7 @@
 class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
 
   /**
-   * Takes an associative array and adds im
+   * Takes an associative array and adds im.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -164,7 +164,7 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);

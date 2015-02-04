@@ -44,7 +44,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   const NUM_OPTION = 15;
 
   /**
-   * The custom set id saved to the session for an update
+   * The custom set id saved to the session for an update.
    *
    * @var int
    */
@@ -58,19 +58,19 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   protected $_fid;
 
   /**
-   * The extended component Id
+   * The extended component Id.
    *
    * @var array
    */
   protected $_extendComponentId;
 
   /**
-   * Variable is set if price set is used for membership
+   * Variable is set if price set is used for membership.
    */
   protected $_useForMember;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    */
   public function preProcess() {
 
@@ -159,7 +159,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    */
   public function buildQuickForm() {
     // lets trim all the whitespace
@@ -372,7 +372,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -591,7 +591,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    */
   public function postProcess() {
     // store the submitted values in an array

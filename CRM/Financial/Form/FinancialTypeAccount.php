@@ -40,7 +40,7 @@
 class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
-   * The financial type id saved to the session for an update
+   * The financial type id saved to the session for an update.
    *
    * @var int
    */
@@ -54,21 +54,21 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   protected $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
   /**
-   * Flag if its a AR account type
+   * Flag if its a AR account type.
    *
    * @var boolean
    */
   protected $_isARFlag = FALSE;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -119,7 +119,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -230,7 +230,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   posted values of the form
@@ -301,7 +301,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    * @return void
    */

@@ -106,28 +106,28 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   public $_queryParams;
 
   /**
-   * Represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_memberClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.
@@ -305,7 +305,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

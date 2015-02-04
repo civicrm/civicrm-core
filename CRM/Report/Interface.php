@@ -35,14 +35,14 @@
 interface CRM_Report_Interface {
 
   /**
-   * The constructor gets the submitted form values
+   * The constructor gets the submitted form values.
    *
    * @param $formValues
    */
   public function __construct(&$formValues);
 
   /**
-   * Builds the quickform for this search
+   * Builds the quickform for this search.
    * @param $form
    */
   public function buildForm(&$form);
@@ -92,22 +92,22 @@ interface CRM_Report_Interface {
    */
 
   /**
-   * The from clause for the query
+   * The from clause for the query.
    */
   public function from();
 
   /**
-   * The where clause for the query
+   * The where clause for the query.
    */
   public function where($includeContactIDs = FALSE);
 
   /**
-   * The template FileName to use to display the results
+   * The template FileName to use to display the results.
    */
   public function templateFile();
 
   /**
-   * Returns an array of column headers and field names and sort options
+   * Returns an array of column headers and field names and sort options.
    */
   public function &columns();
 

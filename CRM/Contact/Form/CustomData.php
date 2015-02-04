@@ -171,7 +171,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -229,7 +229,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array

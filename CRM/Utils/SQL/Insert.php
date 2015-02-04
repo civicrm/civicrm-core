@@ -40,7 +40,7 @@ class CRM_Utils_SQL_Insert {
   private $columns;
 
   /**
-   * Create a new INSERT query
+   * Create a new INSERT query.
    *
    * @param string $table
    *   Table-name and optional alias.
@@ -51,7 +51,7 @@ class CRM_Utils_SQL_Insert {
   }
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
    * @param string $table
    *   Table-name and optional alias.
@@ -98,7 +98,7 @@ class CRM_Utils_SQL_Insert {
   }
 
   /**
-   * Use REPLACE INTO instead of INSERT INTO
+   * Use REPLACE INTO instead of INSERT INTO.
    *
    * @param bool $asReplace
    * @return CRM_Utils_SQL_Insert

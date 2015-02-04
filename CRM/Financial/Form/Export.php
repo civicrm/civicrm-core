@@ -48,22 +48,22 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * Financial batch ids
+   * Financial batch ids.
    */
   protected $_batchIds = array();
 
   /**
-   * Export status id
+   * Export status id.
    */
   protected $_exportStatusId;
 
   /**
-   * Export format
+   * Export format.
    */
   protected $_exportFormat;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -111,7 +111,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -150,7 +150,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    * @return void
    */

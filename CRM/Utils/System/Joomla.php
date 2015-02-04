@@ -109,7 +109,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if username and email exists in the drupal db
+   * Check if username and email exists in the drupal db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -314,7 +314,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Set the email address of the user
+   * Set the email address of the user.
    *
    * @param object $user
    *   Handle to the user object.
@@ -421,7 +421,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Set a init session with user object
+   * Set a init session with user object.
    *
    * @param array $data
    *   Array with user specific data.
@@ -489,7 +489,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Load joomla bootstrap
+   * Load joomla bootstrap.
    *
    * @param array $params
    *   with uid or name and password.
@@ -703,7 +703,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Output code from error function
+   * Output code from error function.
    * @param string $content
    */
   public function outputError($content) {
@@ -720,7 +720,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append Joomla js to coreResourcesList
+   * Append Joomla js to coreResourcesList.
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.joomla.js';

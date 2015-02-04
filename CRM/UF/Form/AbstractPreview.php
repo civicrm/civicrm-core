@@ -41,7 +41,7 @@
 class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
 
   /**
-   * The fields needed to build this form
+   * The fields needed to build this form.
    *
    * @var array
    */
@@ -73,7 +73,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array
@@ -94,7 +94,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -107,7 +107,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

@@ -36,7 +36,7 @@
 class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
   /**
-   * The template to display the required "red" asterick
+   * The template to display the required "red" asterick.
    * @var string
    */
   static $_requiredTemplate = NULL;

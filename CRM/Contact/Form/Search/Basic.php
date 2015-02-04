@@ -51,7 +51,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   static $csv = array('contact_type', 'group', 'tag');
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -106,7 +106,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array
@@ -138,7 +138,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -148,7 +148,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * This method is called for processing a submitted search form
+   * This method is called for processing a submitted search form.
    *
    * @return void
    */

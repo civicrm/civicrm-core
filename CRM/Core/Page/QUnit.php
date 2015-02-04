@@ -46,7 +46,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
   }
 
   /**
-   * Extrac the extension and suite from the request path
+   * Extrac the extension and suite from the request path.
    *
    * @return array
    */

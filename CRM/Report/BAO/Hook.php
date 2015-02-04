@@ -45,7 +45,7 @@ class CRM_Report_BAO_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
    */

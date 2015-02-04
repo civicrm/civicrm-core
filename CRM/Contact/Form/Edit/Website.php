@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_Website {
 
   /**
-   * Build the form object elements for an Website object
+   * Build the form object elements for an Website object.
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.

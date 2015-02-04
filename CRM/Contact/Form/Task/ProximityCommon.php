@@ -39,28 +39,28 @@
 class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
   /**
-   * The context that we are working on
+   * The context that we are working on.
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * The groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -70,7 +70,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @param CRM_Core_Form $form
@@ -104,7 +104,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @param CRM_Core_Form $form

@@ -73,7 +73,7 @@ class CRM_Utils_REST {
   }
 
   /**
-   * Generates values needed for error messages
+   * Generates values needed for error messages.
    * @param string $message
    *
    * @return array

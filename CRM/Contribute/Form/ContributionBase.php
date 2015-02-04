@@ -198,7 +198,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    * @throws \Exception
@@ -521,7 +521,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Set the default values
+   * Set the default values.
    *
    * @return void
    */
@@ -530,7 +530,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template.
    *
    * @return void
    */
@@ -661,7 +661,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Add the custom fields
+   * Add the custom fields.
    *
    * @param int $id
    * @param string $name
@@ -787,7 +787,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Check template file exists
+   * Check template file exists.
    * @param null $suffix
    *
    * @return null|string
@@ -804,7 +804,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

@@ -38,7 +38,7 @@
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
-   * Add Dashboard
+   * Add Dashboard.
    *
    * @param array $params
    *   Values.
@@ -55,7 +55,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Get the list of dashlets enabled by admin
+   * Get the list of dashlets enabled by admin.
    *
    * @param bool $all
    *   All or only active.
@@ -147,7 +147,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Setup default dashlets for new users
+   * Setup default dashlets for new users.
    *
    * When a user accesses their dashboard for the first time, set up
    * the default dashlets.
@@ -192,7 +192,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
 
   /**
-   * Check dashlet permission for current user
+   * Check dashlet permission for current user.
    *
    * @param string $permission
    *   Comma separated list.
@@ -271,7 +271,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Get details of each dashlets
+   * Get details of each dashlets.
    *
    * @param int $dashletID
    *   Widget ID.
@@ -340,7 +340,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Save changes made by use to the Dashlet
+   * Save changes made by use to the Dashlet.
    *
    * @param array $columns
    *
@@ -407,7 +407,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Add dashlets
+   * Add dashlets.
    *
    * @param array $params
    *
@@ -475,7 +475,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Update contact dashboard with new dashlet
+   * Update contact dashboard with new dashlet.
    *
    * @param object : $dashlet
    *
@@ -542,7 +542,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Reset dashlet cache
+   * Reset dashlet cache.
    *
    * @param int $contactID
    *   Reset cache only for specific contact.
@@ -561,7 +561,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Delete Dashlet
+   * Delete Dashlet.
    *
    * @param int $dashletID
    *

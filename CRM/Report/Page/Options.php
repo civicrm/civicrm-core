@@ -41,14 +41,14 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * The option group name
+   * The option group name.
    *
    * @var array
    */
@@ -62,7 +62,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   static $_GName = NULL;
 
   /**
-   * The option group id
+   * The option group id.
    *
    * @var array
    */
@@ -97,7 +97,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -107,7 +107,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -154,7 +154,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all options
+   * Browse all options.
    *
    *
    * @return void
@@ -177,7 +177,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
    * @return string
    *   Classname of edit form.
@@ -187,7 +187,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
    * @return string
    *   name of this page.
@@ -209,7 +209,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get userContext params
+   * Get userContext params.
    *
    * @param int $mode
    *   Mode that we are in.

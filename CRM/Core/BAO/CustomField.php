@@ -61,7 +61,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static $_importFields = NULL;
 
   /**
-   * Build and retrieve the list of data types and descriptions
+   * Build and retrieve the list of data types and descriptions.
    *
    * @return array
    *   Data type => Description
@@ -118,7 +118,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Takes an associative array and creates a custom field object
+   * Takes an associative array and creates a custom field object.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -313,7 +313,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -327,7 +327,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -666,7 +666,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Get the field id from an import key
+   * Get the field id from an import key.
    *
    * @param string $key
    *   The key to parse.
@@ -692,7 +692,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Use the cache to get all values of a specific custom field
+   * Use the cache to get all values of a specific custom field.
    *
    * @param int $fieldID
    *   The custom field ID.
@@ -726,7 +726,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * This function for building custom fields
+   * This function for building custom fields.
    *
    * @param CRM_Core_Form $qf
    *   Form object (reference).
@@ -1339,7 +1339,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Set default values for custom data used in profile
+   * Set default values for custom data used in profile.
    *
    * @param int $customFieldId
    *   Custom field id.
@@ -1546,7 +1546,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Format custom fields before inserting
+   * Format custom fields before inserting.
    *
    * @param int $customFieldId
    *   Custom field id.
@@ -1908,7 +1908,7 @@ SELECT $columnName
   }
 
   /**
-   * Determine whether it would be safe to move a field
+   * Determine whether it would be safe to move a field.
    *
    * @param int $fieldID
    *   FK to civicrm_custom_field.
@@ -2041,7 +2041,7 @@ WHERE  id IN ( %1, %2 )
   }
 
   /**
-   * Get the database table name and column name for a custom field
+   * Get the database table name and column name for a custom field.
    *
    * @param int $fieldID
    *   The fieldID of the custom field.
@@ -2076,7 +2076,7 @@ AND    cf.id = %1";
   }
 
   /**
-   * Get custom option groups
+   * Get custom option groups.
    *
    * @param array $includeFieldIds
    *   Ids of custom fields for which.
@@ -2123,7 +2123,7 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * Fix orphan groups
+   * Fix orphan groups.
    *
    * @param int $customFieldId
    *   Custom field id.

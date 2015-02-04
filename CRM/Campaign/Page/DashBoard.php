@@ -39,7 +39,7 @@
 class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */

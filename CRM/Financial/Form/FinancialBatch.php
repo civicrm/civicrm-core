@@ -47,7 +47,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   protected $_id;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -83,7 +83,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -171,7 +171,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    * @param $files
@@ -202,7 +202,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    * @return void
    */
@@ -288,7 +288,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param $action
    * @param $permissions

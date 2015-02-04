@@ -704,7 +704,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * Get address columns to add to array
+   * Get address columns to add to array.
    *
    * @param array $options
    *   Options for the report.
@@ -915,7 +915,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * Get Information about advertised Joins
+   * Get Information about advertised Joins.
    *
    * @return array
    */
@@ -1031,7 +1031,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * Define join from line item table to participant table
+   * Define join from line item table to participant table.
    */
   public function joinParticipantFromLineItem() {
     $this->_from .= " LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
@@ -1056,7 +1056,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * Define join from Participant to Contribution table
+   * Define join from Participant to Contribution table.
    */
   public function joinContributionFromParticipant() {
     $this->_from .= " LEFT JOIN civicrm_participant_payment pp
@@ -1067,7 +1067,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   /**
-   * Define join from Membership to Contribution table
+   * Define join from Membership to Contribution table.
    */
   public function joinContributionFromMembership() {
     $this->_from .= " LEFT JOIN civicrm_membership_payment pp
@@ -1218,7 +1218,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   }
 
   /**
-   * Retrieve text for financial type from pseudoconstant
+   * Retrieve text for financial type from pseudoconstant.
    *
    * @param $value
    * @param array $row
@@ -1236,7 +1236,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   }
 
   /**
-   * Retrieve text for contribution type from pseudoconstant
+   * Retrieve text for contribution type from pseudoconstant.
    *
    * @param $value
    * @param array $row
@@ -1248,7 +1248,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   }
 
   /**
-   * Retrieve text for contribution status from pseudoconstant
+   * Retrieve text for contribution status from pseudoconstant.
    *
    * @param $value
    * @param array $row
@@ -1260,7 +1260,7 @@ WHERE   line_item_civireport.id IS NOT NULL
   }
 
   /**
-   * Retrieve text for payment instrument from pseudoconstant
+   * Retrieve text for payment instrument from pseudoconstant.
    *
    * @param $value
    * @param array $row

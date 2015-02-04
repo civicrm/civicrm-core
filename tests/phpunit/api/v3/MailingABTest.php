@@ -60,7 +60,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_create
+   * Test civicrm_mailing_create.
    */
   public function testMailingABCreateSuccess() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -69,7 +69,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_delete
+   * Test civicrm_mailing_delete.
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);

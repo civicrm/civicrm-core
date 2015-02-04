@@ -614,7 +614,7 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * Check if there is a record with the same name in the db
+   * Check if there is a record with the same name in the db.
    *
    * @param string $value
    *   The value of the field we are checking.

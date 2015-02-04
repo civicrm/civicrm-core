@@ -277,7 +277,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   }
 
   /**
-   * manipulate the select function to query count functions
+   * manipulate the select function to query count functions.
    */
   public function select() {
 

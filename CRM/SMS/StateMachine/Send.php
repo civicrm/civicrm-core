@@ -40,7 +40,7 @@
 class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action

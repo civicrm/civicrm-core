@@ -39,7 +39,7 @@
 class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
 
   /**
-   * Takes an associative array and adds OpenID
+   * Takes an associative array and adds OpenID.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -73,7 +73,7 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   }
 
   /**
-   * Returns whether or not this OpenID is allowed to login
+   * Returns whether or not this OpenID is allowed to login.
    *
    * @param string $identity_url
    *   The OpenID to check.
@@ -142,7 +142,7 @@ ORDER BY
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);

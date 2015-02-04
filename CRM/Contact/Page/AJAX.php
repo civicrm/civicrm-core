@@ -103,7 +103,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Ajax callback for custom fields of type ContactReference
+   * Ajax callback for custom fields of type ContactReference.
    *
    * Todo: Migrate contact reference fields to use EntityRef
    */
@@ -331,7 +331,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Fetch the custom field help
+   * Fetch the custom field help.
    */
   public static function customField() {
     $fieldId = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
@@ -533,7 +533,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   * Delete custom value
+   * Delete custom value.
    */
   public static function deleteCustomValue() {
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
@@ -594,7 +594,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   *  check the CMS username
+   *  check the CMS username.
    */
   static public function checkUserName() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
@@ -630,7 +630,7 @@ ORDER BY sort_name ";
   }
 
   /**
-   *  Function to get email address of a contact
+   *  Function to get email address of a contact.
    */
   public static function getContactEmail() {
     if (!empty($_REQUEST['contact_id'])) {
@@ -856,7 +856,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function used for CiviCRM dashboard operations
+   * Function used for CiviCRM dashboard operations.
    */
   public static function dashboard() {
     $operation = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
@@ -888,7 +888,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Retrieve signature based on email id
+   * Retrieve signature based on email id.
    */
   public static function getSignature() {
     $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
@@ -989,7 +989,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Retrieve a PDF Page Format for the PDF Letter form
+   * Retrieve a PDF Page Format for the PDF Letter form.
    */
   public function pdfFormat() {
     $formatId = CRM_Utils_Type::escape($_REQUEST['formatId'], 'Integer');
@@ -1000,7 +1000,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Retrieve Paper Size dimensions
+   * Retrieve Paper Size dimensions.
    */
   public static function paperSize() {
     $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
@@ -1073,7 +1073,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Retrieve contact relationships
+   * Retrieve contact relationships.
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');

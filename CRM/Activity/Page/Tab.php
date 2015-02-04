@@ -40,7 +40,7 @@
 class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
   /**
-   * Browse all activities for a particular contact
+   * Browse all activities for a particular contact.
    *
    * @return void
    */

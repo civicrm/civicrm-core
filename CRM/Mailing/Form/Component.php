@@ -47,7 +47,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
@@ -59,7 +59,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -128,7 +128,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -150,7 +150,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.

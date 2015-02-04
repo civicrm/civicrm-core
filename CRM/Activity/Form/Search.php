@@ -42,42 +42,42 @@
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * The params that are sent to the query
+   * The params that are sent to the query.
    *
    * @var array
    */
   protected $_queryParams;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * Prefix for the controller
+   * Prefix for the controller.
    */
   protected $_prefix = "activity_";
 
   protected $_defaults;
 
   /**
-   * The saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars.
    *
    * @var int
    */
   protected $_ssID;
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -158,7 +158,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void

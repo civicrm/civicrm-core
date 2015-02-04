@@ -39,14 +39,13 @@ class api_v3_SystemTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
+   *
    * This method is called before a test is executed.
    */
   protected function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
-
-  ///////////////// civicrm_domain_get methods
 
   /**
    * Test system flush.

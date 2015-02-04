@@ -156,7 +156,7 @@ class CRM_Dedupe_Merger {
   }
 
   /**
-   * Returns the related tables groups for which a contact has any info entered
+   * Returns the related tables groups for which a contact has any info entered.
    */
   public static function getActiveRelTables($cid) {
     $cid = (int) $cid;
@@ -243,7 +243,7 @@ WHERE
   }
 
   /**
-   * Return tables using locations
+   * Return tables using locations.
    */
   public static function locTables() {
     static $locTables;

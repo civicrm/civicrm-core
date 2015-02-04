@@ -54,7 +54,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   static $_commentLinks = NULL;
 
   /**
-   * View details of a note
+   * View details of a note.
    *
    * @return void
    */
@@ -80,7 +80,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * called when action is browse
+   * called when action is browse.
    */
   public function browse() {
     $note = new CRM_Core_DAO_Note();
@@ -157,7 +157,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    */
   public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Note_Form_Note', ts('Contact Notes'), $this->_action);
@@ -232,7 +232,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * Delete the note object from the db
+   * Delete the note object from the db.
    *
    * @return void
    */
@@ -241,7 +241,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
    * @return array
    *   (reference) of action links
@@ -281,7 +281,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * Get action links for comments
+   * Get action links for comments.
    *
    * @return array
    *   (reference) of action links

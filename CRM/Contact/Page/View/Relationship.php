@@ -35,14 +35,14 @@
 class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * Casid set if called from case context
+   * Casid set if called from case context.
    *
    * @var int
    */
@@ -52,7 +52,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * View details of a relationship
+   * View details of a relationship.
    *
    * @return void
    */
@@ -133,7 +133,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * called when action is browse
+   * called when action is browse.
    *
    */
   public function browse() {
@@ -141,7 +141,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    */
   public function edit() {
@@ -256,7 +256,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * called to delete the relationship of a contact
+   * called to delete the relationship of a contact.
    *
    */
   public function delete() {
@@ -265,7 +265,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
    * @return array
    *   (reference) of action links

@@ -47,7 +47,7 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
   public $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
@@ -98,7 +98,7 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

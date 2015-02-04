@@ -45,21 +45,21 @@ class CRM_Activity_Task {
     EMAIL_SMS = 6;
 
   /**
-   * The task array
+   * The task array.
    *
    * @var array
    */
   static $_tasks = NULL;
 
   /**
-   * The optional task array
+   * The optional task array.
    *
    * @var array
    */
   static $_optionalTasks = NULL;
 
   /**
-   * These tasks are the core set of tasks that the user can perform
+   * These tasks are the core set of tasks that the user can perform.
    * on a contact / group of contacts
    *
    * @return array
@@ -143,7 +143,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of task titles
+   * These tasks are the core set of task titles.
    * on activity
    *
    * @return array
@@ -159,7 +159,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * Show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level.
    * of the user
    *
    * @param int $permission
@@ -186,7 +186,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of tasks that the user can perform
+   * These tasks are the core set of tasks that the user can perform.
    * on activity
    *
    * @param int $value

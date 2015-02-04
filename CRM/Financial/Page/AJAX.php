@@ -39,7 +39,7 @@
 class CRM_Financial_Page_AJAX {
 
   /**
-   * get financial accounts of required account relationship
+   * get financial accounts of required account relationship.
    * $financialAccountType array with key account relationship and value financial account type option groups
    *
    * @param $config

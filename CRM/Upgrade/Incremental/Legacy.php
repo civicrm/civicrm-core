@@ -40,7 +40,7 @@
 class CRM_Upgrade_Incremental_Legacy {
 
   /**
-   * Compute any messages which should be displayed before upgrade
+   * Compute any messages which should be displayed before upgrade.
    *
    * @param string $preUpgradeMessage
    *   alterable.
@@ -209,7 +209,7 @@ SELECT  id
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage
    *   alterable.
@@ -279,7 +279,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -324,7 +324,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -352,7 +352,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * This function should check if if need to skip current sql file
+   * This function should check if if need to skip current sql file.
    * Name of this function will change according to the latest release
    */
   public static function upgrade_2_2_alpha3($rev) {
@@ -365,7 +365,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -380,7 +380,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -404,7 +404,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -420,7 +420,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -441,7 +441,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -462,7 +462,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -495,7 +495,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -518,7 +518,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -539,7 +539,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -570,7 +570,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).
@@ -584,7 +584,7 @@ SELECT  count( id ) as statusCount
   }
 
   /**
-   * Perform an incremental upgrade
+   * Perform an incremental upgrade.
    *
    * @param string $rev
    *   the revision to which we are upgrading (Note: When processing a series of upgrades, this is the immediate upgrade - not the final).

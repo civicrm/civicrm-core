@@ -41,7 +41,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
   public $_mailing_id;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO

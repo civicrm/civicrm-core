@@ -91,7 +91,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public $countY = 0;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param $format
    *   Either the name of a Label Format in the Option Value table.
@@ -150,7 +150,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /**
-   * initialize label format settings
+   * initialize label format settings.
    *
    * @param $format
    * @param $unit
@@ -228,7 +228,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   }
 
   /**
-   * Print a label
+   * Print a label.
    *
    * @param $texte
    */

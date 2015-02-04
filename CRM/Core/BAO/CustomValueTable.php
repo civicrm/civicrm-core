@@ -251,7 +251,7 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
-   * Given a field return the mysql data type associated with it
+   * Given a field return the mysql data type associated with it.
    *
    * @param string $type
    * @param int $maxLength
@@ -326,7 +326,7 @@ class CRM_Core_BAO_CustomValueTable {
           'file_id' => $customValue['file_id'],
         );
 
-        // fix Date type to be timestamp, since that is how we store in db
+        // Fix Date type to be timestamp, since that is how we store in db.
         if ($cvParam['type'] == 'Date') {
           $cvParam['type'] = 'Timestamp';
         }
@@ -351,6 +351,8 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
+   * Post process function.
+   *
    * @param array $params
    * @param $customFields
    * @param $entityTable
@@ -415,7 +417,7 @@ class CRM_Core_BAO_CustomValueTable {
     }
     $cond = implode(' AND ', $cond);
 
-    // first find all the fields that extend this type of entity
+    // First find all the fields that extend this type of entity.
     $query = "
 SELECT cg.table_name,
        cg.id as groupID,
@@ -455,7 +457,8 @@ AND    $cond
           if ($isMultiple[$tableName]) {
             if ($formatMultiRecordField) {
               $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
-            } else {
+            }
+            else {
               $result["{$fieldID}_{$dao->id}"] = $dao->$fieldName;
             }
           }

@@ -249,10 +249,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. We'll tweak this function to be more
-   * full featured over a period of time. This is the inverse function of
-   * create.  It also stores all the retrieved values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -420,7 +419,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Retrieve contact_id by case_id
+   * Retrieve contact_id by case_id.
    *
    * @param int $caseId
    *   ID of the case.

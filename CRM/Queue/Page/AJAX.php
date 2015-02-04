@@ -31,7 +31,7 @@
 class CRM_Queue_Page_AJAX {
 
   /**
-   * Run the next task and return status information
+   * Run the next task and return status information.
    *
    * Outputs JSON: array(
    *   is_error => bool,
@@ -55,7 +55,7 @@ class CRM_Queue_Page_AJAX {
   }
 
   /**
-   * Run the next task and return status information
+   * Run the next task and return status information.
    *
    * Outputs JSON: array(
    *   is_error => bool,
@@ -79,7 +79,7 @@ class CRM_Queue_Page_AJAX {
   }
 
   /**
-   * Run the next task and return status information
+   * Run the next task and return status information.
    *
    * Outputs JSON: array(
    *   is_error => bool,

@@ -3027,7 +3027,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -3041,7 +3041,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Compile the report content
+   * Compile the report content.
    * Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
    *
    * @return string
@@ -3251,7 +3251,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Generate Membership Type SQL Clause
+   * Generate Membership Type SQL Clause.
    * @param mixed $value
    * @param string $op
    *
@@ -3649,7 +3649,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Fetch array of DAO tables having columns included in SELECT or ORDER BY clause
+   * Fetch array of DAO tables having columns included in SELECT or ORDER BY clause.
    * (building the array if it's unset)
    *
    * @return array
@@ -3863,7 +3863,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Do AlterDisplay processing on Address Fields
+   * Do AlterDisplay processing on Address Fields.
    *
    * @param $row
    * @param $rows
@@ -3948,7 +3948,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Add Address into From Table if required
+   * Add Address into From Table if required.
    */
   public function addAddressFromClause() {
     // include address field if address column is to be included
@@ -3966,7 +3966,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Add Phone into From Table if required
+   * Add Phone into From Table if required.
    */
   public function addPhoneFromClause() {
     // include address field if address column is to be included
@@ -3981,7 +3981,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Get phone columns to add to array
+   * Get phone columns to add to array.
    *
    * @param array $options
    *   - prefix Prefix to add to table (in case of more than one instance of the table)
@@ -4013,7 +4013,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Get address columns to add to array
+   * Get address columns to add to array.
    *
    * @param array $options
    *   - prefix Prefix to add to table (in case of more than one instance of the table)
@@ -4069,7 +4069,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * function used for showing charts on print screen
+   * function used for showing charts on print screen.
    */
   public static function uploadChartImage() {
     // upload strictly for '.png' images
@@ -4103,7 +4103,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Apply common settings to entityRef fields
+   * Apply common settings to entityRef fields.
    *
    * @param array $field
    * @param string $table

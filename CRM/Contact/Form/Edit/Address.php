@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_Address {
 
   /**
-   * Build form for address input fields
+   * Build form for address input fields.
    *
    * @param CRM_Core_Form $form
    * @param int $addressBlockCount
@@ -330,7 +330,7 @@ class CRM_Contact_Form_Edit_Address {
   }
 
   /**
-   * Set default values for address block
+   * Set default values for address block.
    *
    * @param array $defaults
    *   Defaults associated array.

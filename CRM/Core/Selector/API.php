@@ -61,7 +61,7 @@ interface CRM_Core_Selector_API {
   public function getPagerParams($action, &$params);
 
   /**
-   * Returns the sort order array for the given action
+   * Returns the sort order array for the given action.
    *
    * @param string $action
    *   The action being performed.
@@ -86,7 +86,7 @@ interface CRM_Core_Selector_API {
   public function &getColumnHeaders($action = NULL, $type = NULL);
 
   /**
-   * Returns the number of rows for this action
+   * Returns the number of rows for this action.
    *
    * @param string $action
    *   The action being performed.
@@ -97,7 +97,7 @@ interface CRM_Core_Selector_API {
   public function getTotalCount($action);
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -126,7 +126,7 @@ interface CRM_Core_Selector_API {
   public function getTemplateFileName($action = NULL);
 
   /**
-   * Return the filename for the exported CSV
+   * Return the filename for the exported CSV.
    *
    * @param string $type
    *   The type of export required: csv/xml/foaf etc.

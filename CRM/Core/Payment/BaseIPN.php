@@ -48,14 +48,14 @@ class CRM_Core_Payment_BaseIPN {
   protected $_isFirstOrLastRecurringPayment = FALSE;
 
   /**
-   * Constructor
+   * Constructor.
    */
   public function __construct() {
     self::$_now = date('YmdHis');
   }
 
   /**
-   * Store input array on the class
+   * Store input array on the class.
    *
    * @param array $parameters
    *
@@ -124,7 +124,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Load objects related to contribution
+   * Load objects related to contribution.
    *
    * @input array information from Payment processor
    *
@@ -181,7 +181,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Set contribution to failed
+   * Set contribution to failed.
    * @param array $objects
    * @param object $transaction
    * @param array $input
@@ -262,7 +262,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Handled pending contribution status
+   * Handled pending contribution status.
    * @param array $objects
    * @param object $transaction
    * @return bool
@@ -764,7 +764,7 @@ LIMIT 1;";
   }
 
   /**
-   * Send start or end notification for recurring payments
+   * Send start or end notification for recurring payments.
    * @param $ids
    * @param $recur
    */
@@ -904,7 +904,7 @@ LIMIT 1;";
   }
 
   /**
-   * Update pledge associated with a recurring contribution
+   * Update pledge associated with a recurring contribution.
    *
    * If the contribution has a pledge_payment record pledge, then update the pledge_payment record & pledge based on that linkage.
    *
@@ -1017,7 +1017,7 @@ LIMIT 1;";
   }
 
   /**
-   * copy custom data of the initial contribution into its recurring contributions
+   * copy custom data of the initial contribution into its recurring contributions.
    * @param int $recurId
    * @param int $targetContributionId
    */
@@ -1061,7 +1061,7 @@ LIMIT 1;";
   }
 
   /**
-   * copy soft credit record of first recurring contribution
+   * copy soft credit record of first recurring contribution.
    * and add new soft credit against $targetContributionId
    *
    * @param int $recurId

@@ -16,7 +16,7 @@
   /* ------------ Assertions ------------ */
 
   /**
-   * Assert "result" contains an API error
+   * Assert "result" contains an API error.
    * @param result
    */
   function assertApiError(result) {

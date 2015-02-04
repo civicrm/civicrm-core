@@ -46,7 +46,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The contact_id of domain
+   * The contact_id of domain.
    *
    * @var int
    */
@@ -60,7 +60,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_fromEmailId = NULL;
 
   /**
-   * Default location type fields
+   * Default location type fields.
    *
    * @var array
    */
@@ -91,7 +91,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
+   * This virtual function is used to set the default values of.
    * various form elements
    *
    * @return array
@@ -139,7 +139,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -176,7 +176,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -186,7 +186,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -221,7 +221,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

@@ -1,6 +1,4 @@
 <?php
-// vim: set si ai expandtab tabstop=4 shiftwidth=4 softtabstop=4:
-
 /**
  *  File for the CRM_Utils_Cache_AllTests class
  *
@@ -31,12 +29,12 @@
  */
 
 /**
- *  Include parent class definition
+ *  Include parent class definition.
  */
 require_once 'CiviTest/CiviTestSuite.php';
 
 /**
- *  Class containing all test suites
+ *  Class containing all test suites.
  *
  * @package   CiviCRM
  */
@@ -44,6 +42,7 @@ class CRM_Utils_Cache_AllTests extends CiviTestSuite {
   private static $instance = NULL;
 
   /**
+   * Get instance.
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {
@@ -53,7 +52,7 @@ class CRM_Utils_Cache_AllTests extends CiviTestSuite {
   }
 
   /**
-   *  Build test suite dynamically.
+   * Build test suite dynamically.
    */
   public static function suite() {
     $inst = self::getInstance();
@@ -61,13 +60,3 @@ class CRM_Utils_Cache_AllTests extends CiviTestSuite {
   }
 
 }
-// class CRM_Utils_Cache_AllTests
-
-// -- set Emacs parameters --
-// Local variables:
-// mode: php;
-// tab-width: 4
-// c-basic-offset: 4
-// c-hanging-comment-ender-p: nil
-// indent-tabs-mode: nil
-// End:

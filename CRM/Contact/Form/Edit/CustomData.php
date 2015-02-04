@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Edit_CustomData {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
    *
@@ -66,7 +66,7 @@ class CRM_Contact_Form_Edit_CustomData {
   }
 
   /**
-   * Build the form object elements for CustomData object
+   * Build the form object elements for CustomData object.
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.

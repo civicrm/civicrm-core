@@ -87,7 +87,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Check if the queue exists
+   * Check if the queue exists.
    *
    * @return bool
    */
@@ -96,7 +96,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Add a new item to the queue
+   * Add a new item to the queue.
    *
    * @param mixed $data
    *   Serializable PHP object or array.
@@ -111,7 +111,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Determine number of items remaining in the queue
+   * Determine number of items remaining in the queue.
    *
    * @return int
    */
@@ -120,7 +120,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Get and remove the next item
+   * Get and remove the next item.
    *
    * @param int $leaseTime
    *   Seconds.
@@ -150,7 +150,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Get the next item
+   * Get the next item.
    *
    * @param int $leaseTime
    *   Seconds.
@@ -174,7 +174,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Remove an item from the queue
+   * Remove an item from the queue.
    *
    * @param object $item
    *   The item returned by claimItem.
@@ -185,7 +185,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Return an item that could not be processed
+   * Return an item that could not be processed.
    *
    * @param CRM_Core_DAO $item
    *   The item returned by claimItem.

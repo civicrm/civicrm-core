@@ -246,7 +246,7 @@ GROUP BY {$tableValues['id']}
   }
 
   /**
-   * Create a SQL expression for matching against a list of
+   * Create a SQL expression for matching against a list of.
    * text columns.
    *
    * @param string $table

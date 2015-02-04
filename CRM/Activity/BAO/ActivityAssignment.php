@@ -40,7 +40,7 @@
 class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -67,7 +67,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   }
 
   /**
-   * Retrieve assignee_id by activity_id
+   * Retrieve assignee_id by activity_id.
    *
    * @param int $activity_id
    *
@@ -99,7 +99,7 @@ AND        civicrm_contact.is_deleted = 0
   }
 
   /**
-   * Retrieve assignee names by activity_id
+   * Retrieve assignee names by activity_id.
    *
    * @param array $activityIDs
    *   IDs of the activities.

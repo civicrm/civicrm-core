@@ -46,7 +46,7 @@ class CRM_Utils_Geocode_Google {
   static protected $_server = 'maps.googleapis.com';
 
   /**
-   * Uri of service
+   * Uri of service.
    *
    * @var string
    */

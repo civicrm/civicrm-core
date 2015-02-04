@@ -45,7 +45,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object.
    *
    * the function extract all the params it needs to initialize the create a
    * friend object. the params array could contain additional unused name/value
@@ -86,7 +86,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -233,7 +233,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @param CRM_Core_Form $form
    *   Form object.
@@ -331,7 +331,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Takes an associative array and creates a tell a friend object
+   * Takes an associative array and creates a tell a friend object.
    *
    * the function extract all the params it needs to initialize the create/edit a
    * friend object. the params array could contain additional unused name/value

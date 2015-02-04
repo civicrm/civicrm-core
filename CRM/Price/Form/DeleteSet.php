@@ -39,21 +39,21 @@
 class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
 
   /**
-   * The set id
+   * The set id.
    *
    * @var int
    */
   protected $_sid;
 
   /**
-   * The title of the set being deleted
+   * The title of the set being deleted.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    */
@@ -66,7 +66,7 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -87,7 +87,7 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

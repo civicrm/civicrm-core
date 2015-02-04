@@ -65,7 +65,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -145,7 +145,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -231,7 +231,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -384,7 +384,7 @@ SELECT count(*)
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

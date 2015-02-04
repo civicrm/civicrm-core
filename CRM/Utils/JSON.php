@@ -39,7 +39,7 @@
 class CRM_Utils_JSON {
 
   /**
-   * Output json to the client
+   * Output json to the client.
    * @param mixed $input
    */
   public static function output($input) {
@@ -49,7 +49,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * Create JSON object
+   * Create JSON object.
    * @deprecated
    *
    * @param array $params
@@ -121,7 +121,7 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * encode data for dataTable plugin
+   * encode data for dataTable plugin.
    *
    * @param array $params
    *   Associated array of row elements.

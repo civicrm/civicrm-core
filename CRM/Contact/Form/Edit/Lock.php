@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Edit_Lock {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @param CRM_Core_Form $form
    *   Form object.

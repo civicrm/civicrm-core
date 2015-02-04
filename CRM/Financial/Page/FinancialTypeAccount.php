@@ -38,21 +38,21 @@
  */
 class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * The account id that we need to display for the browse screen
+   * The account id that we need to display for the browse screen.
    *
    * @var array
    */
   protected $_aid = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -62,7 +62,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -118,7 +118,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
   }
 
   /**
-   * Browse all Financial Type Account data
+   * Browse all Financial Type Account data.
    *
    * @return void
    */

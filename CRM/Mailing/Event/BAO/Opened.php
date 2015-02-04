@@ -35,14 +35,14 @@
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Register an open event
+   * Register an open event.
    *
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
@@ -68,7 +68,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -166,7 +166,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   }
 
   /**
-   * Get opened count for each mailing for a given set of mailing IDs and a specific contact
+   * Get opened count for each mailing for a given set of mailing IDs and a specific contact.
    *
    * @param int $mailingIDs
    *   IDs of the mailing (comma separated).
@@ -208,7 +208,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.

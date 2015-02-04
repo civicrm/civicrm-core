@@ -53,14 +53,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_skipPermission = FALSE;
 
   /**
-   * The contact id that we are editing
+   * The contact id that we are editing.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
@@ -72,40 +72,40 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_ufGroup = array('name' => 'unknown');
 
   /**
-   * The group id that we are passing in url
+   * The group id that we are passing in url.
    *
    * @var int
    */
   public $_grid;
 
   /**
-   * Name of button for saving matching contacts
+   * Name of button for saving matching contacts.
    * @var
    */
   protected $_duplicateButtonName;
   /**
-   * The title of the category we are editing
+   * The title of the category we are editing.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * The fields needed to build this form
+   * The fields needed to build this form.
    *
    * @var array
    */
   public $_fields;
 
   /**
-   * store contact details
+   * store contact details.
    *
    * @var array
    */
   protected $_contact;
 
   /**
-   * Do we allow updates of the contact
+   * Do we allow updates of the contact.
    *
    * @var int
    */
@@ -123,7 +123,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * THe contact type for registration case
+   * THe contact type for registration case.
    *
    * @var string
    */
@@ -145,7 +145,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_isContactActivityProfile = FALSE;
 
   /**
-   * Activity Id connected to the profile
+   * Activity Id connected to the profile.
    *
    * @var string
    */
@@ -588,7 +588,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -836,7 +836,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Validate profile and provided activity Id
+   * Validate profile and provided activity Id.
    *
    * @param int $activityId
    * @param int $contactId
@@ -876,7 +876,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -1354,7 +1354,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

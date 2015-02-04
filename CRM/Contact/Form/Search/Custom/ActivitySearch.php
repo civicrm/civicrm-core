@@ -156,7 +156,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
   }
 
   /**
-   * Construct the search query
+   * Construct the search query.
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -282,7 +282,7 @@ ORDER BY contact_a.sort_name';
   }
 
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
    *

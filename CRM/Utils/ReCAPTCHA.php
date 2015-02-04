@@ -51,7 +51,7 @@ class CRM_Utils_ReCAPTCHA {
   static private $_singleton = NULL;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    *
    * @return object
@@ -69,7 +69,7 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
-   * Add element to form
+   * Add element to form.
    */
   public static function add(&$form) {
     $error = NULL;

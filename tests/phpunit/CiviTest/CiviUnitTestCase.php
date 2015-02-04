@@ -1194,7 +1194,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Private helper function for calling civicrm_contact_add
+   * Private helper function for calling civicrm_contact_add.
    *
    * @param array $params
    *   For civicrm_contact_add api function call.

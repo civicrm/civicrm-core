@@ -39,7 +39,7 @@
 class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -56,7 +56,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   protected $_isTemplate = FALSE;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -98,7 +98,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   }
 
   /**
-   * Get tab  Links for events
+   * Get tab  Links for events.
    *
    * @param $enableCart
    *
@@ -243,7 +243,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   }
 
   /**
-   * Browse all events
+   * Browse all events.
    *
    * @return void
    */

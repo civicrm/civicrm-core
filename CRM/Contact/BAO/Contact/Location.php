@@ -75,7 +75,7 @@ WHERE     civicrm_contact.id = %1";
   }
 
   /**
-   * Get the sms number and display name of a contact
+   * Get the sms number and display name of a contact.
    *
    * @param int $id
    *   Id of the contact.
@@ -112,7 +112,7 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Get the information to map a contact
+   * Get the information to map a contact.
    *
    * @param array $ids
    *   The list of ids for which we want map info.

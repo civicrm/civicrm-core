@@ -36,7 +36,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
   /**
-   * Assume empty database with just civicrm_data
+   * Assume empty database with just civicrm_data.
    */
   protected $_individualId; //the hard credit contact
   protected $_softIndividual1Id; //the first soft credit contact
@@ -156,7 +156,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
 
   /**
-   * civicrm_contribution_soft
+   * civicrm_contribution_soft.
    */
   public function testCreateEmptyParamsContributionSoft() {
     $softcontribution = $this->callAPIFailure('contribution_soft', 'create', array(),
@@ -281,7 +281,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   * civicrm_contribution_soft_delete methods
+   * civicrm_contribution_soft_delete methods.
    *
    */
   public function testDeleteEmptyParamsContributionSoft() {

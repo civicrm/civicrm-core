@@ -39,14 +39,14 @@
 class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
   /**
-   * class constructor
+   * class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Construct a new mailingab object
+   * Construct a new mailingab object.
    *
    * @params array $params
    *   Form values.
@@ -71,7 +71,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
   }
 
   /**
-   * function to add the mailings
+   * function to add the mailings.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -113,7 +113,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
 
   /**
-   * Delete MailingAB and all its associated records
+   * Delete MailingAB and all its associated records.
    *
    * @param int $id
    *   Id of the mail to delete.

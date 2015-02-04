@@ -58,7 +58,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   protected $_newParticipants;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
@@ -123,7 +123,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -135,7 +135,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode
+   * Handle the values in preview mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -148,7 +148,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Handle the values in summary mode
+   * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -265,7 +265,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Handle the values in import mode
+   * Handle the values in import mode.
    *
    * @param int $onDuplicate
    *   The code for what action to take on duplicates.
@@ -493,7 +493,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Get the array of successfully imported Participation ids
+   * Get the array of successfully imported Participation ids.
    *
    * @return array
    */

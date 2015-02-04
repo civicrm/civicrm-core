@@ -101,7 +101,7 @@ class CRM_Case_Task {
   }
 
   /**
-   * These tasks are the core set of task titles
+   * These tasks are the core set of task titles.
    *
    * @return array
    *   the set of task titles
@@ -116,7 +116,7 @@ class CRM_Case_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
    * @return array
    *   the set of optional tasks for a group of contacts
@@ -127,7 +127,7 @@ class CRM_Case_Task {
   }
 
   /**
-   * Show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level.
    * of the user
    *
    * @param int $permission
@@ -156,7 +156,7 @@ class CRM_Case_Task {
   }
 
   /**
-   * These tasks are the core set of tasks
+   * These tasks are the core set of tasks.
    *
    * @param int $value
    *

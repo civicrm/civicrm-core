@@ -647,7 +647,7 @@ AND        a.is_deleted = 0
   }
 
   /**
-   * Retrieves AllowMultipleCaseClients setting
+   * Retrieves AllowMultipleCaseClients setting.
    *
    * @return string
    *   1 if allowed, 0 if not
@@ -661,7 +661,7 @@ AND        a.is_deleted = 0
   }
 
   /**
-   * Retrieves NaturalActivityTypeSort setting
+   * Retrieves NaturalActivityTypeSort setting.
    *
    * @return string
    *   1 if natural, 0 if alphabetic

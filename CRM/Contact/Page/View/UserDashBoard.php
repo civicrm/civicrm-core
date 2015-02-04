@@ -42,7 +42,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * Always show public groups
+   * Always show public groups.
    * @var bool
    */
   public $_onlyPublicGroups = TRUE;
@@ -50,7 +50,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public $_edit = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -108,7 +108,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * Build user dashboard
+   * Build user dashboard.
    *
    * @return void
    */
@@ -198,7 +198,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * Perform actions and display for user dashboard
+   * Perform actions and display for user dashboard.
    *
    * @return void
    */
@@ -209,7 +209,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
    * @return array
    *   (reference) of action links

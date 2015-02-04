@@ -35,7 +35,7 @@
 class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
   /**
-   * Static field for all the membership information that we can potentially import
+   * Static field for all the membership information that we can potentially import.
    *
    * @var array
    */
@@ -46,7 +46,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   static $_signupActType = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Member_DAO_Membership
    */
@@ -57,7 +57,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   }
 
   /**
-   * Takes an associative array and creates a membership object
+   * Takes an associative array and creates a membership object.
    *
    * the function extracts all the params it needs to initialize the created
    * membership object. The params array could contain additional unused name/value
@@ -224,7 +224,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   }
 
   /**
-   * Takes an associative array and creates a membership object
+   * Takes an associative array and creates a membership object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -437,7 +437,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   }
 
   /**
-   * Check the membership extended through relationship
+   * Check the membership extended through relationship.
    *
    * @param int $membershipId
    *   Membership id.
@@ -503,10 +503,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. We'll tweak this function to be more
-   * full featured over a period of time. This is the inverse function of
-   * create.  It also stores all the retrieved values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -668,7 +667,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Delete related memberships
+   * Delete related memberships.
    *
    * @param int $ownerMembershipId
    * @param int $contactId
@@ -729,7 +728,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Build Membership  Block in Contribution Pages
+   * Build Membership  Block in Contribution Pages.
    *
    * @param CRM_Core_Form $form
    *   Form object.
@@ -934,7 +933,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Return Membership Block info in Contribution Pages
+   * Return Membership Block info in Contribution Pages.
    *
    * @param int $pageID
    *   Contribution page id.
@@ -972,7 +971,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Return a current membership of given contact
+   * Return a current membership of given contact.
    * NB: if more than one membership meets criteria, a randomly selected one is returned.
    *
    * @param int $contactID
@@ -1071,7 +1070,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * @param string $contactType
    *   Contact type.
@@ -1136,7 +1135,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Get all exportable fields
+   * Get all exportable fields.
    *
    * @retun array return array of all exportable fields
    */
@@ -1265,7 +1264,7 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * Function check the status of the membership before adding membership for a contact
+   * Function check the status of the membership before adding membership for a contact.
    *
    * @param int $contactId
    *   Contact id.
@@ -1279,7 +1278,7 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * Process the Memberships
+   * Process the Memberships.
    *
    * @param array $membershipParams
    *   Array of membership fields.
@@ -1560,7 +1559,7 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * Method to fix membership status of stale membership
+   * Method to fix membership status of stale membership.
    *
    * This method first checks if the membership is stale. If it is,
    * then status will be updated based on existing start and end
@@ -1653,7 +1652,7 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * Get the contribution page id from the membership record
+   * Get the contribution page id from the membership record.
    *
    * @param int $membershipID
    *
@@ -1675,7 +1674,7 @@ SELECT c.contribution_page_id as pageID
   }
 
   /**
-   * Updated related memberships
+   * Updated related memberships.
    *
    * @param int $ownerMembershipId
    *   Owner Membership Id.
@@ -1699,7 +1698,7 @@ SELECT c.contribution_page_id as pageID
   }
 
   /**
-   * Get list of membership fields for profile
+   * Get list of membership fields for profile.
    * For now we only allow custom membership fields to be in
    * profile
    *
@@ -1725,7 +1724,7 @@ SELECT c.contribution_page_id as pageID
   }
 
   /**
-   * Get the sort name of a contact for a particular membership
+   * Get the sort name of a contact for a particular membership.
    *
    * @param int $id
    *   Id of the membership.
@@ -1746,7 +1745,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
-   * Create memberships for related contacts
+   * Create memberships for related contacts.
    * takes into account the maximum related memberships
    *
    * @param array $params
@@ -1919,7 +1918,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
-   * Delete the record that are associated with this Membership Payment
+   * Delete the record that are associated with this Membership Payment.
    *
    * @param int $membershipId
    *
@@ -2003,7 +2002,7 @@ FROM   civicrm_membership_type
   }
 
   /**
-   * Get membership record count for a Contact
+   * Get membership record count for a Contact.
    *
    * @param int $contactID
    * @param bool $activeOnly
@@ -2058,7 +2057,7 @@ FROM   civicrm_membership_type
   }
 
   /**
-   * Check whether subscription is already cancelled
+   * Check whether subscription is already cancelled.
    *
    * @param int $mid
    *   Membership id.
@@ -2185,7 +2184,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Where a second separate financial transaction is supported we will process it here
+   * Where a second separate financial transaction is supported we will process it here.
    *
    * @param int $contactID
    * @param CRM_Contribute_Form_Contribution_Confirm $form
@@ -2307,7 +2306,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Turn array of errors into message string
+   * Turn array of errors into message string.
    *
    * @param array $errors
    *
@@ -2323,7 +2322,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Extract relevant values from the form so we can separate form logic from BAO logcis
+   * Extract relevant values from the form so we can separate form logic from BAO logcis.
    *
    * @param CRM_Core_Form $form
    * @param $changeToday
@@ -2661,7 +2660,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Retrieve the contribution id for the associated Membership id
+   * Retrieve the contribution id for the associated Membership id.
    * @todo we should get this off the line item
    *
    * @param int $membershipId
@@ -2894,7 +2893,7 @@ WHERE      civicrm_membership.is_test = 0";
   }
 
   /**
-   * Record contribution record associated with membership
+   * Record contribution record associated with membership.
    *
    * @param array $params
    *   Array of submitted params.
@@ -2983,7 +2982,7 @@ WHERE      civicrm_membership.is_test = 0";
   }
 
   /**
-   * Record line items for default membership
+   * Record line items for default membership.
    *
    * @param CRM_Core_Form $qf
    * @param array $membershipType

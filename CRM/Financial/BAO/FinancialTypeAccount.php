@@ -35,20 +35,20 @@
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Financial account
+   * Financial account.
    * @var array
    */
   private static $financialAccount;
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -71,7 +71,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Add the financial types
+   * Add the financial types.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -100,7 +100,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Delete financial Types
+   * Delete financial Types.
    *
    * @param int $financialTypeAccountId
    * @param int $accountId
@@ -155,7 +155,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Get Financial Account Name
+   * Get Financial Account Name.
    *
    * @param int $entityId
    *
@@ -183,7 +183,7 @@ AND entity_id = %2";
   }
 
   /**
-   * Financial Account for payment instrument
+   * Financial Account for payment instrument.
    *
    * @param int $paymentInstrumentValue
    *   Payment instrument value.

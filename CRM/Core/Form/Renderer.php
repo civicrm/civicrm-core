@@ -49,7 +49,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   static private $_singleton = NULL;
 
   /**
-   * The converter from array size to css class
+   * The converter from array size to css class.
    *
    * @var array
    */
@@ -65,7 +65,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   );
 
   /**
-   * Constructor
+   * Constructor.
    */
   public function __construct() {
     $template = CRM_Core_Smarty::singleton();
@@ -85,7 +85,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   }
 
   /**
-   * Creates an array representing an element containing
+   * Creates an array representing an element containing.
    * the key for storing this. We allow the parent to do most of the
    * work, but then we add some CiviCRM specific enhancements to
    * make the html compliant with our css etc
@@ -200,7 +200,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   }
 
   /**
-   * Convert IDs to values and format for display
+   * Convert IDs to values and format for display.
    *
    * @param HTML_QuickForm_element $field
    */

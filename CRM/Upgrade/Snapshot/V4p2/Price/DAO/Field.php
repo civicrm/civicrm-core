@@ -180,7 +180,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   public $visibility_id;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    */
@@ -190,7 +190,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * return foreign links
+   * Return foreign links.
    *
    * @return array
    */
@@ -204,7 +204,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns all the column names of this table
+   * Returns all the column names of this table.
    *
    * @return array
    */
@@ -320,7 +320,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns the names of this table
+   * returns the names of this table.
    *
    * @return string
    */
@@ -329,7 +329,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns if this table needs to be logged
+   * returns if this table needs to be logged.
    *
    * @return boolean
    */
@@ -338,7 +338,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be imported
+   * returns the list of fields that can be imported.
    *
    * @return array
    */
@@ -361,7 +361,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be exported
+   * returns the list of fields that can be exported.
    *
    * @return array
    */
@@ -384,7 +384,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
   }
 
   /**
-   * returns an array containing the enum fields of the civicrm_price_field table
+   * returns an array containing the enum fields of the civicrm_price_field table.
    *
    * @return array
    *   (reference)  the array of enum fields

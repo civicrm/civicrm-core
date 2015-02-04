@@ -44,7 +44,7 @@ class CRM_Contact_BAO_Query_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
    */

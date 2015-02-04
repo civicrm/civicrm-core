@@ -96,7 +96,7 @@ class CRM_Pledge_Task {
   }
 
   /**
-   * These tasks are the core set of task titles
+   * These tasks are the core set of task titles.
    *
    * @return array
    *   the set of task titles
@@ -111,7 +111,7 @@ class CRM_Pledge_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
    * @return array
    *   the set of optional tasks for a group of contacts

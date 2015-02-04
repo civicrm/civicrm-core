@@ -236,7 +236,7 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
-   * convert value from one metric to another
+   * convert value from one metric to another.
    *
    * @param $value
    * @param $from

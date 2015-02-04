@@ -35,14 +35,14 @@
 class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Delete the discount
+   * Delete the discount.
    *
    * @param int $entityId
    * @param string $entityTable
@@ -104,7 +104,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
   /**
-   * Determine in which discount set the registration date falls
+   * Determine in which discount set the registration date falls.
    *
    * @param int $entityID
    *   Entity id to be searched.

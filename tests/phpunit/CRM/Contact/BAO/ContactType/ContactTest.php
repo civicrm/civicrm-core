@@ -60,7 +60,8 @@ DELETE FROM civicrm_contact_type
 
   /**
    * Methods create Contact with valid data.
-   * success expected
+   *
+   * Success expected
    */
   public function testCreateContact() {
     //check for Type:Individual
@@ -142,9 +143,10 @@ DELETE FROM civicrm_contact_type
 
   /**
    * Update the contact with no subtype to a valid subtype.
-   * success expected
+   *
+   * Success expected.
    */
-  public function testUpdateContactNosubtypeToValid() {
+  public function testUpdateContactNoSubtypeToValid() {
     $params = array(
       'first_name' => 'Anne',
       'last_name' => 'Grant',

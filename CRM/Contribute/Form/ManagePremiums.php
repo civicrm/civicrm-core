@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Pre  process the form
+   * Pre  process the form.
    *
    *
    * @return void
@@ -85,7 +85,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -209,7 +209,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Function for validation
+   * Function for validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -275,7 +275,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -360,7 +360,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   }
 
   /**
-   * Resize a premium image to a different size
+   * Resize a premium image to a different size.
    *
    *
    * @param string $filename

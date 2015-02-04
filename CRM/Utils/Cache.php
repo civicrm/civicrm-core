@@ -47,7 +47,7 @@ class CRM_Utils_Cache {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.
@@ -59,7 +59,7 @@ class CRM_Utils_Cache {
   }
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
    */
@@ -91,7 +91,7 @@ class CRM_Utils_Cache {
   }
 
   /**
-   * Get cache relevant settings
+   * Get cache relevant settings.
    *
    * @param $cachePlugin
    *

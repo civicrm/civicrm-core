@@ -142,7 +142,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Wrapper for token matching
+   * Wrapper for token matching.
    *
    * @param string $type
    *   The token type (domain,mailing,contact,action).
@@ -160,7 +160,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Wrapper for token replacing
+   * Wrapper for token replacing.
    *
    * @param string $type
    *   The token type.
@@ -201,7 +201,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Escape the string so a malicious user cannot inject smarty code into the template
+   * Escape the string so a malicious user cannot inject smarty code into the template.
    *
    * @param string $string
    *   A string that needs to be escaped from smarty parsing.
@@ -808,7 +808,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Parse html through Smarty resolving any smarty functions
+   * Parse html through Smarty resolving any smarty functions.
    * @param string $tokenHtml
    * @param array $entity
    * @param string $entityType
@@ -869,7 +869,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace unsubscribe tokens
+   * Replace unsubscribe tokens.
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -915,7 +915,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace resubscribe tokens
+   * Replace resubscribe tokens.
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -1048,7 +1048,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Find and replace tokens for each component
+   * Find and replace tokens for each component.
    *
    * @param string $str
    *   The string to search.
@@ -1087,7 +1087,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Get array of string tokens
+   * Get array of string tokens.
    *
    * @param string $string
    *   The input string to parse for tokens.
@@ -1390,7 +1390,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Get Membership Token Details
+   * Get Membership Token Details.
    * @param array $membershipIDs
    *   Array of membership IDS.
    */
@@ -1577,7 +1577,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Store membership tokens on the static _tokens array
+   * Store membership tokens on the static _tokens array.
    */
   protected static function _buildMembershipTokens() {
     $key = 'membership';
@@ -1592,7 +1592,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace tokens for an entity
+   * Replace tokens for an entity.
    * @param string $entity
    * @param array $entityArray
    *   (e.g. in format from api).
@@ -1620,7 +1620,7 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace Contribution tokens in html
+   * Replace Contribution tokens in html.
    *
    * @param string $str
    * @param array $contribution

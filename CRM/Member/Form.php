@@ -118,7 +118,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

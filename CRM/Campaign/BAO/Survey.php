@@ -40,21 +40,14 @@ require_once 'CRM/Campaign/DAO/Survey.php';
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * campaign_id.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
-   */
-
-  /**
-   * The action links that we need to display for the browse screen
-   *
-   * @param array $params
-   * @param $defaults
    *
    * @return CRM_Campaign_DAO_Survey|null
    */
@@ -71,7 +64,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * Takes an associative array and creates a Survey object
+   * Takes an associative array and creates a Survey object.
    *
    * the function extract all the params it needs to initialize the create a
    * survey object.
@@ -246,7 +239,7 @@ SELECT  survey.id                         as id,
   }
 
   /**
-   * Get Surveys
+   * Get Surveys.
    *
    * @param bool $onlyActive
    *   Retrieve only active surveys.
@@ -336,7 +329,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Get Surveys custom groups
+   * Get Surveys custom groups.
    *
    * @param array $surveyTypes
    *   an array of survey type id.
@@ -376,7 +369,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -391,7 +384,7 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Delete the survey
+   * Delete the survey.
    *
    * @param int $id
    *   Survey id.
@@ -711,7 +704,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * This function retrieve all option groups which are created as a result set
+   * This function retrieve all option groups which are created as a result set.
    *
    * @param string $valueColumnName
    * @return array
@@ -759,7 +752,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * This function retrive all response options of survey
+   * This function retrive all response options of survey.
    *
    * @param int $surveyId
    *   Survey id.
@@ -781,7 +774,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * This function return all voter links with respecting permissions
+   * This function return all voter links with respecting permissions.
    *
    * @param int $surveyId
    * @param bool $enclosedInUL
@@ -933,7 +926,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Get survey supportable profile types
+   * Get survey supportable profile types.
    */
   public static function surveyProfileTypes() {
     static $profileTypes;
@@ -947,7 +940,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   }
 
   /**
-   * Get the valid survey response fields those
+   * Get the valid survey response fields those.
    * are configured with profile and custom fields.
    *
    * @param int $surveyId

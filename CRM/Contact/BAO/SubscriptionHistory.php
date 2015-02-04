@@ -38,7 +38,7 @@
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Contact_DAO_SubscriptionHistory
    */
@@ -49,7 +49,7 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   }
 
   /**
-   * Create a new subscription history record
+   * Create a new subscription history record.
    *
    * @param array $params
    *   Values for the new history record.

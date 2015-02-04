@@ -189,7 +189,7 @@ class CRM_Core_Report_Excel {
   }
 
   /**
-   * Write a CSV file to the browser output
+   * Write a CSV file to the browser output.
    *
    * @param string $fileName
    *   The name of the file that will be downloaded (this is sent to the browser).

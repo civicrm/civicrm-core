@@ -90,7 +90,7 @@ class CRM_Utils_Verp {
   }
 
   /**
-   * Decode the address and return the sender and recipient as an array
+   * Decode the address and return the sender and recipient as an array.
    *
    * @param string $address
    *   The address to be decoded.

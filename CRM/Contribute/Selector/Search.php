@@ -146,7 +146,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   protected $_includeSoftCredits = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.
@@ -295,7 +295,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

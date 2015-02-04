@@ -38,7 +38,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * called when action is browse
+   * called when action is browse.
    */
   public function browse() {
     $controller = new CRM_Core_Controller_Simple(
@@ -68,7 +68,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is view
+   * called when action is view.
    *
    * @return null
    */
@@ -89,7 +89,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    * @return null
    */

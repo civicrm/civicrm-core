@@ -37,7 +37,7 @@
 class CRM_Extension_Browser {
 
   /**
-   * An URL for public extensions repository
+   * An URL for public extensions repository.
    */
   const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
@@ -88,7 +88,7 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * Determine whether downloading is supported
+   * Determine whether downloading is supported.
    *
    * @return array
    *   List of error messages; empty if OK.
@@ -118,7 +118,7 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * Get a list of all available extensions
+   * Get a list of all available extensions.
    *
    * @return array
    *   ($key => CRM_Extension_Info)
@@ -141,7 +141,7 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * Get a description of a particular extension
+   * Get a description of a particular extension.
    *
    * @param string $key
    *   Fully-qualified extension name.
@@ -325,7 +325,7 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * A dummy function required for suppressing download errors
+   * A dummy function required for suppressing download errors.
    */
   public static function downloadError($errorNumber, $errorString) {
   }

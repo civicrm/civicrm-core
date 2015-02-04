@@ -42,7 +42,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   static $_entityID;
 
   /**
-   * Batch status
+   * Batch status.
    * @var
    */
   protected $_batchStatusId;
@@ -73,7 +73,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

@@ -43,7 +43,7 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

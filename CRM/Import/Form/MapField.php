@@ -92,7 +92,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   }
 
   /**
-   * Attempt to match header labels with our mapper fields
+   * Attempt to match header labels with our mapper fields.
    *
    * @param string $header
    * @param array $patterns
@@ -116,7 +116,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   }
 
   /**
-   * Guess at the field names given the data and patterns from the schema
+   * Guess at the field names given the data and patterns from the schema.
    *
    * @param array $patterns
    * @param string $index

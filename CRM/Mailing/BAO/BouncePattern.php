@@ -40,14 +40,14 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
   static $_patterns = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Build the static pattern array
+   * Build the static pattern array.
    *
    * @return void
    */

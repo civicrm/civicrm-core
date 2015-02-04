@@ -46,27 +46,27 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_single = FALSE;
 
   /**
-   * Gives all the statues for conribution
+   * Gives all the statues for conribution.
    */
   public $_contributionStatusId;
 
   /**
-   * Gives the HTML template of PDF Invoice
+   * Gives the HTML template of PDF Invoice.
    */
   public $_messageInvoice;
 
   /**
-   * This variable is used to assign parameters for HTML template of PDF Invoice
+   * This variable is used to assign parameters for HTML template of PDF Invoice.
    */
   public $_invoiceTemplate;
 
   /**
-   * Selected output
+   * Selected output.
    */
   public $_selectedOutput;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -203,7 +203,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *
@@ -221,7 +221,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void
@@ -232,7 +232,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the PDf and email with activity and attachment
+   * Process the PDf and email with activity and attachment.
    * on click of Print Invoices
    *
    * @param array $contribIDs
@@ -572,7 +572,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Add activity for Email Invoice and the PDF Invoice
+   * Add activity for Email Invoice and the PDF Invoice.
    *
    * @param string $subject
    *   Activity subject.
@@ -620,7 +620,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Create the Invoice file in upload folder for attachment
+   * Create the Invoice file in upload folder for attachment.
    *
    * @param string $html
    *   Content for pdf in html format.

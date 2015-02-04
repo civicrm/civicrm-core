@@ -39,7 +39,7 @@
 class CRM_Member_Page_MembershipType extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -48,7 +48,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
   public $useLivePageJS = TRUE;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links

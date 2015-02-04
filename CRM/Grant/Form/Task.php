@@ -40,35 +40,35 @@
 class CRM_Grant_Form_Task extends CRM_Core_Form {
 
   /**
-   * The task being performed
+   * The task being performed.
    *
    * @var int
    */
   protected $_task;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_componentClause = NULL;
 
   /**
-   * The array that holds all the component ids
+   * The array that holds all the component ids.
    *
    * @var array
    */
   protected $_componentIds;
 
   /**
-   * The array that holds all the grant ids
+   * The array that holds all the grant ids.
    *
    * @var array
    */
   protected $_grantIds;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *
@@ -145,7 +145,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to.
    * the form with a customized title for the main Submit
    *
    * @param string $title

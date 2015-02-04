@@ -17,8 +17,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcases for create() method
-   * create() method Add/Edit activity.
+   * Test case for create() method.
    */
   public function testCreate() {
     $contactId = Contact::createIndividual();
@@ -57,8 +56,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcase for getContactActivity() method.
-   * getContactActivity() method get activities detail for given target contact id
+   * Test case for getContactActivity() method.
+   *
+   * getContactActivity() method get activities detail for given target contact id.
    */
   public function testGetContactActivity() {
     $contactId = Contact::createIndividual();
@@ -92,8 +92,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcase for retrieve() method.
-   * retrieve($params, $defaults) method return activity detail for given params
+   * Test case for retrieve() method.
+   *
+   * Retrieve($params, $defaults) method return activity detail for given params
    *                              and set defaults.
    */
   public function testRetrieve() {
@@ -140,7 +141,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcase for deleteActivity() method.
+   * Test case for deleteActivity() method.
+   *
    * deleteActivity($params) method deletes activity for given params.
    */
   public function testDeleteActivity() {
@@ -187,7 +189,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcase for deleteActivityTarget() method.
+   * Test case for deleteActivityTarget() method.
+   *
    * deleteActivityTarget($activityId) method deletes activity target for given activity id.
    */
   public function testDeleteActivityTarget() {
@@ -228,7 +231,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testcase for deleteActivityAssignment() method.
+   * Test case for deleteActivityAssignment() method.
+   *
    * deleteActivityAssignment($activityId) method deletes activity assignment for given activity id.
    */
   public function testDeleteActivityAssignment() {

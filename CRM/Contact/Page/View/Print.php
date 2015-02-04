@@ -56,7 +56,7 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
   }
 
   /**
-   * View summary details of a contact
+   * View summary details of a contact.
    *
    * @return void
    */

@@ -341,7 +341,7 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
   }
 
   /**
-   * Save checkbox selections
+   * Save checkbox selections.
    *
    * @param $cacheKey
    * @param string $action
@@ -395,7 +395,7 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   }
 
   /**
-   * Get the selections
+   * Get the selections.
    *
    * @param string $cacheKey
    *   Cache key.

@@ -106,7 +106,7 @@ class Analyzer {
   }
 
   /**
-   * Get a list of all activities in the case
+   * Get a list of all activities in the case.
    *
    * @return array
    *   list of activity records (api/v3 format)
@@ -131,7 +131,7 @@ class Analyzer {
   }
 
   /**
-   * Get a single activity record by type
+   * Get a single activity record by type.
    *
    * @param string $type
    * @throws \Civi\CCase\Exception\MultipleActivityException
@@ -215,7 +215,7 @@ class Analyzer {
   }
 
   /**
-   * Flush any cached information
+   * Flush any cached information.
    *
    * @return void
    */

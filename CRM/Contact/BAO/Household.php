@@ -42,7 +42,7 @@ class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Update the household with primary contact id
+   * Update the household with primary contact id.
    *
    * @param int $primaryContactId
    *   Null if deleting primary contact.

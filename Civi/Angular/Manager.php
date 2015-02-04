@@ -37,7 +37,7 @@ class Manager {
   }
 
   /**
-   * Get a list of AngularJS modules which should be autoloaded
+   * Get a list of AngularJS modules which should be autoloaded.
    *
    * @return array
    *   Each item has some combination of these keys:

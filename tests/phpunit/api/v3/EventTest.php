@@ -111,7 +111,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * civicrm_event_get methods
+   * civicrm_event_get methods.
    */
   public function testGetEventById() {
     $params = array(
@@ -263,8 +263,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Legacy support for Contribution Type ID. We need to ensure this is supported
-   * as an alias for financial_type_id
+   * Legacy support for Contribution Type ID.
+   *
+   * We need to ensure this is supported as an alias for financial_type_id.
    */
   public function testCreateGetEventLegacyContributionTypeID() {
     $contributionTypeArray = array('contribution_type_id' => 3);
@@ -278,13 +279,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals($result['id'], $getresult['id']);
     $this->callAPISuccess('event', 'delete', array('id' => $result['id']));
   }
-  ///////////////// civicrm_event_create methods
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
-   * and / or moved to the automated test suite
+   * and / or moved to the automated test suite.
    */
   public function testCreateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -401,7 +402,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check event_id still supported for delete
+   * Check event_id still supported for delete.
    */
   public function testDeleteWithEventId() {
     $params = array(
@@ -436,7 +437,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   ///////////////// civicrm_event_search methods
 
   /**
-   * Test civicrm_event_search with wrong params type
+   * Test civicrm_event_search with wrong params type.
    */
   public function testSearchWrongParamsType() {
     $params = 'a string';
@@ -476,7 +477,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_event_search. Success expected.
+   * Test civicrm_event_search.
+   *
+   * Success expected.
+   *
    * return.offset and return.max_results test (CRM-5266)
    */
   public function testSearchWithOffsetAndMaxResults() {
@@ -516,7 +520,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('event', 'create', $params);
     $this->assertEquals('API permission check failed for event/create call; insufficient permission: require access CiviCRM and access CiviEvent and edit all events', $result['error_message'], 'lacking permissions should not be enough to create an event');
 
-    $config->userPermissionClass->permissions = array('access CiviEvent', 'edit all events', 'access CiviCRM');
+    $config->userPermissionClass->permissions = array(
+      'access CiviEvent',
+      'edit all events',
+      'access CiviCRM',
+    );
     $result = $this->callAPISuccess('event', 'create', $params);
   }
 
@@ -528,7 +536,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test api_action param also works
+   * Test api_action param also works.
    */
   public function testgetfieldsRest() {
     $description = "demonstrate use of getfields to interrogate api";

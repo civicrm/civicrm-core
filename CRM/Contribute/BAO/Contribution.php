@@ -65,7 +65,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   public $_component = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Contribute_DAO_Contribution
    */
@@ -76,7 +76,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Takes an associative array and creates a contribution object
+   * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a
    * contribution object. the params array could contain additional unused name/value
@@ -196,7 +196,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Get defaults for new entity
+   * Get defaults for new entity.
    * @return array
    */
   public static function getDefaults() {
@@ -283,7 +283,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Takes an associative array and creates a contribution object
+   * Takes an associative array and creates a contribution object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -528,10 +528,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. We'll tweak this function to be more
-   * full featured over a period of time. This is the inverse function of
-   * create.  It also stores all the retrieved values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -549,7 +548,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important and should be done in the
@@ -774,7 +773,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Delete the indirect records associated with this contribution first
+   * Delete the indirect records associated with this contribution first.
    *
    * @param int $id
    *
@@ -846,7 +845,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Check if there is a contribution with the same trxn_id or invoice_id
+   * Check if there is a contribution with the same trxn_id or invoice_id.
    *
    * @param array $input
    *   An assoc array of name/value pairs.
@@ -898,7 +897,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Takes an associative array and creates a contribution_product object
+   * Takes an associative array and creates a contribution_product object.
    *
    * the function extract all the params it needs to initialize the create a
    * contribution_product object. the params array could contain additional unused name/value
@@ -916,7 +915,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-   * Get list of contribution fields for profile
+   * Get list of contribution fields for profile.
    * For now we only allow custom contribution fields to be in
    * profile
    *
@@ -1013,7 +1012,7 @@ GROUP BY p.id
   }
 
   /**
-   * Get list of contribution In Honor of contact Ids
+   * Get list of contribution In Honor of contact Ids.
    *
    * @param int $honorId
    *   In Honor of Contact ID.
@@ -1051,7 +1050,7 @@ GROUP BY p.id
   }
 
   /**
-   * Get the sort name of a contact for a particular contribution
+   * Get the sort name of a contact for a particular contribution.
    *
    * @param int $id
    *   Id of the contribution.
@@ -1181,7 +1180,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   }
 
   /**
-   * Get the contribution details for component export
+   * Get the contribution details for component export.
    *
    * @param int $exportMode
    *   Export mode.
@@ -1283,7 +1282,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   }
 
   /**
-   * Delete billing address record related contribution
+   * Delete billing address record related contribution.
    *
    * @param int $contributionId
    * @param int $contactId
@@ -1843,7 +1842,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
-   * Get individual id for onbehalf contribution
+   * Get individual id for onbehalf contribution.
    *
    * @param int $contributionId
    *   Contribution id.
@@ -1951,7 +1950,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Load objects relations to contribution object
+   * Load objects relations to contribution object.
    * Objects are stored in the $_relatedObjects property
    * In the first instance we are just moving functionality from BASEIpn -
    * @see http://issues.civicrm.org/jira/browse/CRM-9996
@@ -2613,7 +2612,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Check whether subscription is already cancelled
+   * Check whether subscription is already cancelled.
    *
    * @param int $contributionId
    *   Contribution id.
@@ -2637,7 +2636,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Create all financial accounts entry
+   * Create all financial accounts entry.
    *
    * @param array $params
    *   Contribution object, line item array and params for trxn.
@@ -2936,7 +2935,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Update all financial accounts entry
+   * Update all financial accounts entry.
    *
    * @param array $params
    *   Contribution object, line item array and params for trxn.
@@ -3108,7 +3107,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Check status validation on update of a contribution
+   * Check status validation on update of a contribution.
    *
    * @param array $values
    *   Previous form values before submit.
@@ -3146,7 +3145,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Delete contribution of contact
+   * Delete contribution of contact.
    *
    * CRM-12155
    *
@@ -3202,7 +3201,7 @@ WHERE  contribution_id = %1 ";
   }
 
   /**
-   * Validate financial type
+   * Validate financial type.
    *
    * CRM-13231
    *
@@ -3225,7 +3224,7 @@ WHERE  contribution_id = %1 ";
 
 
   /**
-   * Function to record additional payment for partial and refund contributions
+   * Function to record additional payment for partial and refund contributions.
    *
    * @param int $contributionId
    *   is the invoice contribution id (got created after processing participant payment).
@@ -3443,7 +3442,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * Get list of payments displayed by Contribute_Page_PaymentInfo
+   * Get list of payments displayed by Contribute_Page_PaymentInfo.
    *
    * @param int $id
    * @param $component

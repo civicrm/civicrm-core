@@ -360,7 +360,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   }
 
   /**
-   * Set variables to be accessed by API and form layer in processing
+   * Set variables to be accessed by API and form layer in processing.
    */
   public function beginPostProcessCommon() {
     $getRelationship = $this->_params['relationship_type_id_value'];

@@ -7,7 +7,7 @@
 class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @param CRM_Contribute_Form_Task $form
@@ -311,7 +311,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   }
 
   /**
-   * Send pdf by email
+   * Send pdf by email.
    *
    * @param array $contact
    * @param string $html

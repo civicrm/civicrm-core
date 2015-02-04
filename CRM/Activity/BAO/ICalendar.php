@@ -45,7 +45,7 @@ class CRM_Activity_BAO_ICalendar {
   protected $activity;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param object $act
    *   Reference to an activity object.
@@ -57,7 +57,7 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   /**
-   * Add an ics attachment to the input array
+   * Add an ics attachment to the input array.
    *
    * @param array $attachments
    *   Reference to array in same format returned from CRM_Core_BAO_File::getEntityFile().
@@ -105,7 +105,7 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   /**
-   * Remove temp file
+   * Remove temp file.
    */
   public function cleanup() {
     if (!empty ($this->icsfile)) {

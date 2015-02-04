@@ -60,7 +60,7 @@ abstract class CRM_Queue_Queue {
   }
 
   /**
-   * Determine the string name of this queue
+   * Determine the string name of this queue.
    *
    * @return string
    */
@@ -84,14 +84,14 @@ abstract class CRM_Queue_Queue {
   public abstract function deleteQueue();
 
   /**
-   * Check if the queue exists
+   * Check if the queue exists.
    *
    * @return bool
    */
   public abstract function existsQueue();
 
   /**
-   * Add a new item to the queue
+   * Add a new item to the queue.
    *
    * @param mixed $data
    *   Serializable PHP object or array.
@@ -102,14 +102,14 @@ abstract class CRM_Queue_Queue {
   public abstract function createItem($data, $options = array());
 
   /**
-   * Determine number of items remaining in the queue
+   * Determine number of items remaining in the queue.
    *
    * @return int
    */
   public abstract function numberOfItems();
 
   /**
-   * Get the next item
+   * Get the next item.
    *
    * @param int $lease_time
    *   Seconds.
@@ -131,7 +131,7 @@ abstract class CRM_Queue_Queue {
   public abstract function stealItem($lease_time = 3600);
 
   /**
-   * Remove an item from the queue
+   * Remove an item from the queue.
    *
    * @param object $item
    *   The item returned by claimItem.
@@ -139,7 +139,7 @@ abstract class CRM_Queue_Queue {
   public abstract function deleteItem($item);
 
   /**
-   * Return an item that could not be processed
+   * Return an item that could not be processed.
    *
    * @param object $item
    *   The item returned by claimItem.
