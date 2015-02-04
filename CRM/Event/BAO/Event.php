@@ -35,14 +35,14 @@
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -77,7 +77,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Add the event
+   * Add the event.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -116,7 +116,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Create the event
+   * Create the event.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -173,7 +173,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Delete the event
+   * Delete the event.
    *
    * @param int $id
    *   Event id.
@@ -311,7 +311,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
   }
 
   /**
-   * Get events Summary
+   * Get events Summary.
    *
    *
    * @return array
@@ -576,7 +576,7 @@ $event_summary_limit
   }
 
   /**
-   * Get participant count
+   * Get participant count.
    *
    * @param int $eventId
    * @param bool $considerStatus consider status for participant count.
@@ -642,7 +642,7 @@ $event_summary_limit
   }
 
   /**
-   * Get the information to map a event
+   * Get the information to map a event.
    *
    * @param int $id
    *   For which we want map info.
@@ -709,7 +709,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   }
 
   /**
-   * Get the complete information for one or more events
+   * Get the complete information for one or more events.
    *
    * @param date $start
    *   Get events with start date >= this date.
@@ -1431,7 +1431,7 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Build the array for display the profile fields
+   * Build the array for display the profile fields.
    *
    * @param array $params
    *   Key value.
@@ -1881,7 +1881,7 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * Check if event registration is valid according to permissions AND Dates
+   * Check if event registration is valid according to permissions AND Dates.
    *
    * @param array $values
    * @param int $eventID
@@ -1992,7 +1992,7 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * Make sure that the user has permission to access this event
+   * Make sure that the user has permission to access this event.
    *
    * @param int $eventId
    * @param int $type
@@ -2137,7 +2137,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
   }
 
   /**
-   * Retrieve event template default values to be set
+   * Retrieve event template default values to be set.
    *  as default values for current new event.
    *
    * @param int $templateId
@@ -2179,7 +2179,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
   }
 
   /**
-   * Update the Campaign Id of all the participants of the given event
+   * Update the Campaign Id of all the participants of the given event.
    *
    * @param int $eventID
    *   Event id.

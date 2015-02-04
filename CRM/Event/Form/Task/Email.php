@@ -55,7 +55,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * All the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */

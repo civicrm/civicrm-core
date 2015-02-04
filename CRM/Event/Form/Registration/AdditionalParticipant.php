@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_Registration {
 
   /**
-   * The defaults involved in this page
+   * The defaults involved in this page.
    */
   public $_defaults = array();
 
@@ -51,7 +51,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $additionalParticipantId = NULL;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -160,7 +160,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -375,7 +375,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -583,7 +583,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -759,7 +759,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * Check whether call current participant is last one
+   * Check whether call current participant is last one.
    *
    * @param bool $isButtonJs
    *

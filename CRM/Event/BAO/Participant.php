@@ -37,21 +37,21 @@
 class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
   /**
-   * Static field for all the participant information that we can potentially import
+   * Static field for all the participant information that we can potentially import.
    *
    * @var array
    */
   static $_importableFields = NULL;
 
   /**
-   * Static field for all the participant information that we can potentially export
+   * Static field for all the participant information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Static array for valid status transitions rules
+   * Static array for valid status transitions rules.
    *
    * @var array
    */
@@ -71,7 +71,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   }
 
   /**
-   * Takes an associative array and creates a participant object
+   * Takes an associative array and creates a participant object.
    *
    * the function extract all the params it needs to initialize the create a
    * participant object. the params array could contain additional unused name/value
@@ -183,7 +183,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   }
 
   /**
-   * Takes an associative array and creates a participant object
+   * Takes an associative array and creates a participant object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -335,7 +335,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   }
 
   /**
-   * Check whether the event is full for participation and return as
+   * Check whether the event is full for participation and return as.
    * per requirements.
    *
    * @param int $eventId
@@ -614,7 +614,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * Combine all the importable fields from the lower levels object
+   * Combine all the importable fields from the lower levels object.
    *
    * @param string $contactType
    * @param bool $status
@@ -728,7 +728,7 @@ GROUP BY  participant.event_id
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object.
    *
    * @return array
    *   array of exportable Fields
@@ -854,7 +854,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * Delete the record that are associated with this participation
+   * Delete the record that are associated with this participation.
    *
    * @param int $id
    *   Id of the participation to delete.
@@ -914,7 +914,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * Checks duplicate participants
+   * Checks duplicate participants.
    *
    * @param array $input
    *   An assosiative array of name /value pairs.
@@ -958,7 +958,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * Fix the event level
+   * Fix the event level.
    *
    * When price sets are used as event fee, fee_level is set as ^A
    * separated string. We need to change that string to comma
@@ -1141,7 +1141,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   }
 
   /**
-   * Function for update primary and additional participant status
+   * Function for update primary and additional participant status.
    *
    * @param int $participantID
    *   Primary participant's id.
@@ -1176,7 +1176,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   }
 
   /**
-   * Function for update status for given participant ids
+   * Function for update status for given participant ids.
    *
    * @param int $participantIds
    *   Array of participant ids.
@@ -1655,7 +1655,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Check for whether participant is primary or not
+   * Check for whether participant is primary or not.
    *
    * @param int $participantId
    *
@@ -1674,7 +1674,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Get additional participant Ids for cascading with primary participant status
+   * Get additional participant Ids for cascading with primary participant status.
    *
    * @param int $participantId
    *   Participant id.
@@ -1706,7 +1706,7 @@ UPDATE  civicrm_participant
   }
 
   /**
-   * Get participant record count for a Contact
+   * Get participant record count for a Contact.
    *
    * @param int $contactID
    *
@@ -1722,7 +1722,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Get participant ids by contribution id
+   * Get participant ids by contribution id.
    *
    * @param int $contributionId
    *   Contribution Id.
@@ -1822,7 +1822,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
   }
 
   /**
-   * Delete participants of contact
+   * Delete participants of contact.
    *
    * CRM-12155
    *

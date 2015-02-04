@@ -60,21 +60,21 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_fields;
 
   /**
-   * The title for field
+   * The title for field.
    *
    * @var int
    */
   protected $_title;
 
   /**
-   * The set of fields sent to the select element
+   * The set of fields sent to the select element.
    *
    * @var array
    */
   protected $_selectFields;
 
   /**
-   * store fields with if locationtype exits status
+   * store fields with if locationtype exits status.
    *
    * @var array
    */

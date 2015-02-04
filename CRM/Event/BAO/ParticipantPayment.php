@@ -36,7 +36,7 @@
 class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment {
 
   /**
-   * Creates or updates a participant payment record
+   * Creates or updates a participant payment record.
    *
    * @param array $params
    *   of values to initialize the record with.
@@ -93,7 +93,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
   }
 
   /**
-   * Delete the record that are associated with this ParticipantPayment
+   * Delete the record that are associated with this ParticipantPayment.
    * Also deletes the associated contribution for this participant
    *
    * @param array $params
