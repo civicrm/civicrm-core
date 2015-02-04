@@ -117,7 +117,7 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailbox for all the settings from civicrm_mail_settings
+   * Process the mailbox for all the settings from civicrm_mail_settings.
    *
    * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
    *

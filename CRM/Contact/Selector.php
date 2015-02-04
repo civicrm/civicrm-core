@@ -136,7 +136,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   protected $_fields;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param $customSearchClass
    * @param array $formValues
@@ -511,7 +511,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -1115,7 +1115,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   }
 
   /**
-   * Get colunmn headers for search selector
+   * Get colunmn headers for search selector.
    *
    * @return array
    */

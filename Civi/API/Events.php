@@ -71,7 +71,7 @@ class Events {
   const RESPOND = 'api.respond';
 
   /**
-   * Handle any exceptions
+   * Handle any exceptions.
    *
    * @see ExceptionEvent
    */

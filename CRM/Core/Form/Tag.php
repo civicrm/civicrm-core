@@ -122,7 +122,7 @@ class CRM_Core_Form_Tag {
   }
 
   /**
-   * Save entity tags when it is not save used AJAX
+   * Save entity tags when it is not save used AJAX.
    *
    * @param array $params
    * @param int $entityId

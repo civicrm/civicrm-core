@@ -40,7 +40,7 @@
 class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
   /**
-   * Validate a value against a CustomField type
+   * Validate a value against a CustomField type.
    *
    * @param string $type
    *   The type of the data.
@@ -192,7 +192,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * Delete option value give an option value and custom group id
+   * Delete option value give an option value and custom group id.
    *
    * @param int $customValueID
    *   Custom value ID.

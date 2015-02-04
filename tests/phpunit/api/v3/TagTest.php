@@ -105,7 +105,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_tag_create
+   * Test civicrm_tag_create.
    */
   public function testCreatePasstagInParams() {
     $params = array(
@@ -132,8 +132,9 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_tag_create activity tag- success expected. Test checks that used_for is set
-   * and not over-written by default on update
+   * Test civicrm_tag_create activity tag- success expected.
+   *
+   * Test checks that used_for is set and not over-written by default on update.
    */
   public function testCreateEntitySpecificTag() {
     $params = array(

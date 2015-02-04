@@ -55,7 +55,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   protected $_newActivity;
 
   /**
-   * Class constructor
+   * Class constructor.
    * @param $mapperKeys
    * @param null $mapperLocType
    * @param null $mapperPhoneType
@@ -130,7 +130,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * Handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -142,7 +142,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode
+   * Handle the values in preview mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -155,7 +155,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * Handle the values in summary mode
+   * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -238,7 +238,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * Handle the values in import mode
+   * Handle the values in import mode.
    *
    * @param int $onDuplicate
    *   The code for what action to take on duplicates.

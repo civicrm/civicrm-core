@@ -44,7 +44,7 @@
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
   /**
-   * The group tree data
+   * The group tree data.
    *
    * @var array
    */
@@ -90,7 +90,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    * @return array
    *   the default array reference
@@ -104,7 +104,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

@@ -243,7 +243,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the valid accepted credit cards
+   * Get all the valid accepted credit cards.
    *
    *
    * @return array
@@ -254,7 +254,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all premiums
+   * Get all premiums.
    *
    *
    * @param int $pageID
@@ -301,7 +301,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the contribution statuses
+   * Get all the contribution statuses.
    *
    *
    * @param int $id
@@ -325,7 +325,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Personal campaign pages
+   * Get all the Personal campaign pages.
    *
    *
    * @param null $pageType
@@ -413,7 +413,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all batches
+   * Get all batches.
    *
    *
    * @param int $id

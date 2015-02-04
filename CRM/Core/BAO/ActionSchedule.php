@@ -69,7 +69,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * Get all fields of the type Date
+   * Get all fields of the type Date.
    */
   public static function getDateFields() {
     $allFields = CRM_Core_BAO_CustomField::getFields('');
@@ -313,7 +313,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * Retrieve list of Scheduled Reminders
+   * Retrieve list of Scheduled Reminders.
    *
    * @param bool $namesOnly
    *   Return simple list of names.
@@ -586,7 +586,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Add the schedules reminders in the db
+   * Add the schedules reminders in the db.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -603,9 +603,9 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -634,7 +634,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Delete a Reminder
+   * Delete a Reminder.
    *
    * @param int $id
    *   ID of the Reminder to be deleted.
@@ -653,7 +653,7 @@ AND   cas.entity_value = $id AND
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.

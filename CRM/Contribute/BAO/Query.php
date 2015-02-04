@@ -851,7 +851,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between contribute search and advnaced search
+   * Add all the elements shared between contribute search and advnaced search.
    *
    *
    * @param CRM_Core_Form $form
@@ -1019,7 +1019,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * Add the where for dates
+   * Add the where for dates.
    *
    * @param array $values
    *   Array of query values.

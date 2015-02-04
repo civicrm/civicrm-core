@@ -64,7 +64,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Takes an associative array and creates a entityTag object
+   * Takes an associative array and creates a entityTag object.
    *
    * the function extract all the params it needs to initialize the create a
    * group object. the params array could contain additional unused name/value
@@ -98,7 +98,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   An assoc array of name/value pairs.
@@ -110,7 +110,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Delete the tag for a contact
+   * Delete the tag for a contact.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -216,7 +216,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Takes an associative array and creates tag entity record for all tag entities
+   * Takes an associative array and creates tag entity record for all tag entities.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
@@ -260,7 +260,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * This function returns all entities assigned to a specific tag
+   * This function returns all entities assigned to a specific tag.
    *
    * @param object $tag
    *   An object of a tag.
@@ -280,7 +280,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Get contact tags
+   * Get contact tags.
    */
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();
@@ -313,7 +313,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Get child contact tags given parentId
+   * Get child contact tags given parentId.
    */
   public static function getChildEntityTags($parentId, $entityId, $entityTable = 'civicrm_contact') {
     $entityTags = array();

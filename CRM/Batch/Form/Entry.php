@@ -66,7 +66,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   public $_membershipId = NULL;
   /**
-   * When not to reset sort_name
+   * When not to reset sort_name.
    */
   protected $_preserveDefault = TRUE;
 

@@ -46,21 +46,21 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   public $useLivePageJS = TRUE;
 
   /**
-   * The price set group id of the field
+   * The price set group id of the field.
    *
    * @var int
    */
   protected $_sid;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   private static $_actionLinks;
 
   /**
-   * The price set is reserved or not
+   * The price set is reserved or not.
    *
    * @var boolean
    */
@@ -325,7 +325,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * Preview price field
+   * Preview price field.
    *
    * @param int $fid
    *

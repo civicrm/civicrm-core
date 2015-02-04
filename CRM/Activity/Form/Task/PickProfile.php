@@ -39,24 +39,24 @@
 class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
-   * The title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Maximum Activities that should be allowed to update
+   * Maximum Activities that should be allowed to update.
    */
   protected $_maxActivities = 100;
 
   /**
-   * Variable to store redirect path
+   * Variable to store redirect path.
    */
   protected $_userContext;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -88,7 +88,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -136,7 +136,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -146,7 +146,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -159,7 +159,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

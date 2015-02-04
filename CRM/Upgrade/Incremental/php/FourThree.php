@@ -44,7 +44,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
   }
 
   /**
-   * Compute any messages which should be displayed beforeupgrade
+   * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
@@ -115,7 +115,7 @@ WHERE {$key}.id IS NULL";
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage
    *   alterable.
@@ -983,7 +983,7 @@ ALTER TABLE civicrm_financial_account
   }
 
   /**
-   * Change index and add missing constraints for civicrm_contribution_recur
+   * Change index and add missing constraints for civicrm_contribution_recur.
    */
   public function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
     $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
@@ -1013,7 +1013,7 @@ ALTER TABLE civicrm_financial_account
   }
 
   /**
-   * Update financial_account_id for bad data in financial_trxn table
+   * Update financial_account_id for bad data in financial_trxn table.
    * CRM-12844
    */
   public function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
@@ -1075,7 +1075,7 @@ id IN (' . implode(',', $val) . ')';
   }
 
   /**
-   * Update financial_account_id for bad data in financial_trxn table
+   * Update financial_account_id for bad data in financial_trxn table.
    * CRM-12844
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
@@ -1139,7 +1139,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
   }
 
   /**
-   * Replace contribution_type to financial_type in table
+   * Replace contribution_type to financial_type in table.
    * civicrm_saved_search and Structure civicrm_report_instance
    */
   public function replaceContributionTypeId(CRM_Queue_TaskContext $ctx, $query, $table) {
@@ -1215,7 +1215,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
   }
 
   /**
-   * Add ON DELETE options for constraint if not present
+   * Add ON DELETE options for constraint if not present.
    * CRM-13088 && CRM-12156
    *
    * @param CRM_Queue_TaskContext $ctx

@@ -35,19 +35,19 @@
 class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
   /**
-   * Static holder for the default LT
+   * Static holder for the default LT.
    */
   static $_defaultContributionType = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -67,7 +67,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -82,7 +82,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * Add the financial types
+   * Add the financial types.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -116,7 +116,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * Delete financial Types
+   * Delete financial Types.
    *
    * @param int $financialAccountId
    */
@@ -151,7 +151,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
   }
 
   /**
-   * Get accounting code for a financial type with account relation Income Account is
+   * Get accounting code for a financial type with account relation Income Account is.
    *
    * @param int $financialTypeId
    *
@@ -174,7 +174,7 @@ WHERE cft.id = %1
   }
 
   /**
-   * Get AR account
+   * Get AR account.
    *
    * @param $financialAccountId
    *   Financial account id.

@@ -44,7 +44,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * View details of a recurring contribution
+   * View details of a recurring contribution.
    *
    * @return void
    */

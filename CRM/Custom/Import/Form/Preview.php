@@ -8,7 +8,7 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
   protected $_importParserUrl = '&parser=CRM_Custom_Import_Parser';
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -75,7 +75,7 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
+   * Process the mapped fields and map it into the uploaded file.
    * preview the file and extract some summary statistics
    *
    * @return void

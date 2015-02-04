@@ -41,7 +41,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   public $_context;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    */
   public function preProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -131,7 +131,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -177,7 +177,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -192,7 +192,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

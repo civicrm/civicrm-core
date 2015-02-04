@@ -79,7 +79,9 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get function succeeds (this is actually largely tested in the get
+   * Test get function succeeds.
+   *
+   * This is actually largely tested in the get
    * action on create. Add extra checks for any 'special' return values or
    * behaviours
    */
@@ -101,9 +103,11 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test & document chained delete pattern. Note that explanation of the pattern
+   * Test & document chained delete pattern.
+   *
+   * Note that explanation of the pattern
    * is best put in the $description variable as it will then be displayed in the
-   * test generated examples. (these are to be found in the api/examples folder)
+   * test generated examples. (these are to be found in the api/examples folder).
    */
   public function testGetSurveyChainDelete() {
     $description = "demonstrates get + delete in the same call";

@@ -286,7 +286,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * this is a very drupal specific function for now
+   * this is a very drupal specific function for now.
    */
   public static function updateCategories() {
     $config = CRM_Core_Config::singleton();
@@ -489,7 +489,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine the post URL for a form
+   * Determine the post URL for a form.
    *
    * @param $action
    *   The default action if one is pre-specified.
@@ -1342,7 +1342,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get the locale set in the hosting CMS
+   * Get the locale set in the hosting CMS.
    *
    * @return string
    *   The used locale or null for none.
@@ -1822,7 +1822,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine the standard URL for viewing or editing the specified link
+   * Determine the standard URL for viewing or editing the specified link.
    *
    * This function delegates the decision-making to (a) the hook system and
    * (b) the BAO system.

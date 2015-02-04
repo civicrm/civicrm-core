@@ -166,7 +166,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Return abbreviated weekday names according to the locale
+   * Return abbreviated weekday names according to the locale.
    *
    * @return array
    *   0-based array with abbreviated weekday names
@@ -187,7 +187,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Return full weekday names according to the locale
+   * Return full weekday names according to the locale.
    *
    * @return array
    *   0-based array with full weekday names
@@ -208,7 +208,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Return abbreviated month names according to the locale
+   * Return abbreviated month names according to the locale.
    *
    * @param bool $month
    *
@@ -233,7 +233,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Return full month names according to the locale
+   * Return full month names according to the locale.
    *
    * @return array
    *   1-based array with full month names
@@ -272,7 +272,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Create a date and time string in a provided format
+   * Create a date and time string in a provided format.
    *
    * %b - abbreviated month name ('Jan'..'Dec')
    * %B - full month name ('January'..'December')
@@ -710,7 +710,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Get customized today
+   * Get customized today.
    *
    * This function is used for getting customized today. To get
    * actuall today pass 'dayParams' as null. or else pass the day,
@@ -803,7 +803,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Calculate Age in Years if greater than one year else in months
+   * Calculate Age in Years if greater than one year else in months.
    *
    * @param date $birthDate
    *   Birth Date.
@@ -958,7 +958,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Resolves the given relative time interval into finite time limits
+   * Resolves the given relative time interval into finite time limits.
    *
    * @param array $relativeTerm
    *   Relative time frame like this, previous, etc.
@@ -1631,7 +1631,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Calculate current fiscal year based on the fiscal month and day
+   * Calculate current fiscal year based on the fiscal month and day.
    *
    * @param int $fyDate
    *   Fiscal start date.
@@ -1691,7 +1691,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   *  Function to convert mysql to date plugin format
+   *  Function to convert mysql to date plugin format.
    *
    * @param string $mysqlDate
    *   Date string.
@@ -1763,7 +1763,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Function get date format
+   * Function get date format.
    *
    * @param string $formatType
    *   Date name e.g. birth.

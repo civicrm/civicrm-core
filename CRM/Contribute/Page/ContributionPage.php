@@ -47,7 +47,7 @@
 class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -388,7 +388,7 @@ AND         cp.page_type = 'contribute'
   }
 
   /**
-   * Browse all contribution pages
+   * Browse all contribution pages.
    *
    * @param mixed $action
    *   Unused parameter.

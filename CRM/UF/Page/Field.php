@@ -46,14 +46,14 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   public $useLivePageJS = TRUE;
 
   /**
-   * The group id of the field
+   * The group id of the field.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -275,7 +275,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * Preview custom field
+   * Preview custom field.
    *
    * @param int $fieldId
    *   Custom field id.

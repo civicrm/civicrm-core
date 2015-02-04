@@ -263,7 +263,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * add shortcut to Create New
+   * add shortcut to Create New.
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {

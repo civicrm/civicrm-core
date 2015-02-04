@@ -108,7 +108,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   }
 
   /**
-   * Construct the search query
+   * Construct the search query.
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -202,7 +202,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   }
 
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
    *

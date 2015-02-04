@@ -40,28 +40,28 @@
 class CRM_Mailing_Form_Task extends CRM_Core_Form {
 
   /**
-   * The task being performed
+   * The task being performed.
    *
    * @var int
    */
   protected $_task;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_componentClause = NULL;
 
   /**
-   * The array that holds all the component ids
+   * The array that holds all the component ids.
    *
    * @var array
    */
   protected $_componentIds;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *

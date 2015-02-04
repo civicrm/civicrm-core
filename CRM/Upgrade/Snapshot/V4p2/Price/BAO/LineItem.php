@@ -69,10 +69,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.  Typically, the valid params are only
-   * price_field_id.  This is the inverse function of create.  It also
-   * stores all of the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -169,7 +168,7 @@ WHERE     %2.id = %1";
   }
 
   /**
-   * This method will create the lineItem array required for
+   * This method will create the lineItem array required for.
    * processAmount method
    *
    * @param int $fid

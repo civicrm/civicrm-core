@@ -41,21 +41,21 @@
 class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 
   /**
-   * Name of the tag
+   * Name of the tag.
    *
    * @var string
    */
   protected $_name;
 
   /**
-   * All the tags in the system
+   * All the tags in the system.
    *
    * @var array
    */
   protected $_tags;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -94,7 +94,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

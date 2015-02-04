@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
-   * Various constants to indicate different type of relationships
+   * Various constants to indicate different type of relationships.
    *
    * @var int
    */
@@ -69,7 +69,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Takes an associative array and creates a relationship object
+   * Takes an associative array and creates a relationship object.
    * @deprecated For single creates use the api instead (it's tested).
    * For multiple a new variant of this function needs to be written and migrated to as this is a bit
    * nasty
@@ -262,7 +262,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Add relationship to recent links
+   * Add relationship to recent links.
    * @param array $params
    * @param CRM_Contact_DAO_Relationship $relationship
    */
@@ -347,7 +347,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Specifiy defaults for creating a relationship
+   * Specifiy defaults for creating a relationship.
    *
    * @return array
    *   array of defaults for creating relationship
@@ -366,7 +366,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -526,7 +526,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Delete the relationship
+   * Delete the relationship.
    *
    * @param int $id
    *   Relationship id.
@@ -616,7 +616,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Delete the object records that are associated with this contact
+   * Delete the object records that are associated with this contact.
    *
    * @param int $contactId
    *   Id of the contact to delete.
@@ -636,7 +636,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Get the other contact in a relationship
+   * Get the other contact in a relationship.
    *
    * @param int $id
    *   Relationship id.
@@ -657,7 +657,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Check if the relationship type selected between two contacts is correct
+   * Check if the relationship type selected between two contacts is correct.
    *
    * @param int $contact_a
    *   1st contact id.
@@ -700,7 +700,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * This function does the validtion for valid relationship
+   * This function does the validtion for valid relationship.
    *
    * @param array $params
    *   This array contains the values there are subitted by the form.
@@ -726,7 +726,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * This function checks for duplicate relationship
+   * This function checks for duplicate relationship.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -806,7 +806,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -876,7 +876,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   }
 
   /**
-   * Helper function to form the sql for relationship retrieval
+   * Helper function to form the sql for relationship retrieval.
    *
    * @param int $contactId
    *   Contact id.
@@ -1021,7 +1021,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * Get a list of relationships
+   * Get a list of relationships.
    *
    * @param int $contactId
    *   Contact id.
@@ -1527,7 +1527,7 @@ SELECT count(*)
   }
 
   /**
-   * Get Current Employer for Contact
+   * Get Current Employer for Contact.
    *
    * @param $contactIds
    *   Contact Ids.
@@ -1578,7 +1578,7 @@ WHERE id IN ( {$contacts} )
 
 
   /**
-   * Function to return list of permissioned contacts for a given contact and relationship type
+   * Function to return list of permissioned contacts for a given contact and relationship type.
    *
    * @param int $contactID
    *   contact id whose permissioned contacts are to be found.
@@ -1626,7 +1626,7 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * Merge relationships from otherContact to mainContact
+   * Merge relationships from otherContact to mainContact.
    * Called during contact merge operation
    *
    * @param int $mainId
@@ -1689,7 +1689,7 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * Function filters the query by possible relationships for the membership type
+   * Function filters the query by possible relationships for the membership type.
    * It is intended to be called when constructing queries for the api (reciprocal & non-reciprocal)
    * and to add clauses to limit the return to those relationships which COULD inherit a membership type
    * (as opposed to those who inherit a particular membership
@@ -1741,7 +1741,7 @@ AND cc.sort_name LIKE '%$name%'";
 
 
   /**
-   * wrapper for contact relationship selector
+   * wrapper for contact relationship selector.
    *
    * @param array $params
    *   Associated array for params record id.

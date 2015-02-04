@@ -75,7 +75,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   protected $_voterIds;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *
@@ -132,7 +132,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to.
    * the form with a customized title for the main Submit
    *
    * @param string $title

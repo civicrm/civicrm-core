@@ -81,7 +81,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Add general billing fields
+   * Add general billing fields.
    * @todo set these like processor fields & let payment processors alter them
    *
    * @param CRM_Core_Form $form
@@ -335,7 +335,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Make sure that credit card number and cvv are valid
+   * Make sure that credit card number and cvv are valid.
    * Called within the scope of a QF formRule function
    */
   public static function validateCreditCard($values, &$errors) {
@@ -357,7 +357,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Map address fields
+   * Map address fields.
    *
    * @param int $id
    * @param $src
@@ -398,7 +398,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Get the credit card expiration month
+   * Get the credit card expiration month.
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
@@ -415,7 +415,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Get the credit card expiration year
+   * Get the credit card expiration year.
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistent with getCreditCardExpirationMonth
    *

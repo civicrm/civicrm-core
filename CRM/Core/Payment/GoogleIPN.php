@@ -83,7 +83,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.

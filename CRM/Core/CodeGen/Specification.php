@@ -639,7 +639,7 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * Sets the size property of a textfield
+   * Sets the size property of a textfield.
    * See constants defined in CRM_Utils_Type for possible values
    */
   protected function getSize($fieldXML) {

@@ -44,7 +44,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -245,7 +245,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
    *
    * @return string

@@ -271,7 +271,7 @@ class CRM_Utils_Mail {
   }
 
   /**
-   * Get the Active outBound email
+   * Get the Active outBound email.
    *
    * @return bool
    *   TRUE if valid outBound email configuration found, false otherwise.

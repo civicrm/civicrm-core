@@ -388,7 +388,7 @@ class CRM_Utils_Array {
   }
 
   /**
-   * convert associative array names to values
+   * convert associative array names to values.
    * and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
@@ -781,7 +781,7 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Get the first element of an array
+   * Get the first element of an array.
    *
    * @param array $array
    * @return mixed|NULL

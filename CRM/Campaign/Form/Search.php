@@ -39,21 +39,21 @@
 class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * The params that are sent to the query
+   * The params that are sent to the query.
    *
    * @var array
    */
   protected $_queryParams;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
@@ -62,7 +62,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * Prefix for the controller
+   * Prefix for the controller.
    */
   protected $_prefix = "survey_";
 
@@ -70,7 +70,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   private $_operation = 'reserve';
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -194,7 +194,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void

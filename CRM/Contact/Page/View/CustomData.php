@@ -47,7 +47,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return CRM_Contact_Page_View_CustomData
    */
@@ -56,7 +56,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   }
 
   /**
-   * Add a few specific things to view contact
+   * Add a few specific things to view contact.
    *
    * @return void
    */

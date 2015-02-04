@@ -12,7 +12,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   protected $_multipleCustomData = '';
 
   /**
-   * Params for the current entity being prepared for the api
+   * Params for the current entity being prepared for the api.
    * @var array
    */
   protected $_params = array();
@@ -58,7 +58,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -70,7 +70,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode
+   * Handle the values in preview mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -133,7 +133,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Handle the values in import mode
+   * Handle the values in import mode.
    *
    * @param int $onDuplicate
    *   The code for what action to take on duplicates.
@@ -185,7 +185,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Format Date params
+   * Format Date params.
    *
    * Although the api will accept any strtotime valid string CiviCRM accepts at least one date format
    * not supported by strtotime so we should run this through a conversion
@@ -202,7 +202,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   }
 
   /**
-   * Set import entity
+   * Set import entity.
    * @param string $entity
    */
   public function setEntity($entity) {

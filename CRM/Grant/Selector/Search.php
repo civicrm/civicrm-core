@@ -77,28 +77,28 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   );
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * What context are we being invoked from
+   * What context are we being invoked from.
    *
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * QueryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on.
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -106,28 +106,28 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   public $_queryParams;
 
   /**
-   * Represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_grantClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.

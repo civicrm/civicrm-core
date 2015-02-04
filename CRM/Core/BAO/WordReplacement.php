@@ -47,8 +47,9 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Function that must have never worked & should be removed.
    *
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

@@ -40,7 +40,7 @@
 class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
-   * Static holder for the PDF Page Formats Option Group ID
+   * Static holder for the PDF Page Formats Option Group ID.
    */
   private static $_gid = NULL;
 
@@ -123,7 +123,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Option Group ID for PDF Page Formats
+   * Get Option Group ID for PDF Page Formats.
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
@@ -139,7 +139,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Add ordering fields to Page Format list
+   * Add ordering fields to Page Format list.
    *
    * @param array (reference) $list List of PDF Page Formats
    * @param string $returnURL
@@ -183,7 +183,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get the default PDF Page Format values
+   * Get the default PDF Page Format values.
    *
    * @return array
    *   Name/value pairs containing the default PDF Page Format values.
@@ -205,7 +205,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get PDF Page Format from the DB
+   * Get PDF Page Format from the DB.
    *
    * @param string $field
    *   Field name to search by.
@@ -227,7 +227,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get PDF Page Format by Name
+   * Get PDF Page Format by Name.
    *
    * @param int $name
    *   PDF Page Format name. Empty = get default PDF Page Format.
@@ -240,7 +240,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get PDF Page Format by ID
+   * Get PDF Page Format by ID.
    *
    * @param int $id
    *   PDF Page Format id. 0 = get default PDF Page Format.
@@ -253,7 +253,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get PDF Page Format field from associative array
+   * Get PDF Page Format field from associative array.
    *
    * @param string $field
    *   Name of a PDF Page Format field.
@@ -284,9 +284,9 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * format id. It also stores all the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -322,7 +322,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Save the PDF Page Format in the DB
+   * Save the PDF Page Format in the DB.
    *
    * @param array (reference) $values associative array of name/value pairs
    * @param int $id
@@ -378,7 +378,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Delete a PDF Page Format
+   * Delete a PDF Page Format.
    *
    * @param int $id
    *   ID of the PDF Page Format to be deleted.

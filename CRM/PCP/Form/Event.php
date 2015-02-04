@@ -90,7 +90,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -133,7 +133,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -175,7 +175,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

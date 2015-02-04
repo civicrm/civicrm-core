@@ -35,7 +35,7 @@
 class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -46,7 +46,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * called when action is browse
+   * called when action is browse.
    */
   public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
@@ -216,7 +216,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is view
+   * called when action is view.
    *
    * @return null
    */
@@ -234,7 +234,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    * @return null
    */
@@ -453,7 +453,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
    * @param string $status
    * @param null $isPaymentProcessor
@@ -546,7 +546,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * Define action links for membership types of related organization
+   * Define action links for membership types of related organization.
    *
    * @return array
    *   self::$_membershipTypesLinks array of action links
@@ -572,7 +572,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * used for the to show the associated
+   * used for the to show the associated.
    * contribution for the membership
    *
    * @param int $contactId
@@ -596,7 +596,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.

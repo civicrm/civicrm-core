@@ -125,7 +125,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.
@@ -278,7 +278,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

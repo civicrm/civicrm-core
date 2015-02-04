@@ -40,7 +40,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getTree()
+   * Test getTree().
    */
   public function testGetTree() {
     $params = array();

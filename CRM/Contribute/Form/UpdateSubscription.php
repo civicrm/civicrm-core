@@ -61,7 +61,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   public $_paymentProcessorObj = NULL;
 
   /**
-   * The id of the contact associated with this recurring contribution
+   * The id of the contact associated with this recurring contribution.
    *
    * @var int
    */
@@ -141,7 +141,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Actually build the components of the form
+   * Actually build the components of the form.
    *
    * @return void
    */
@@ -181,7 +181,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * called after the user submits the form
+   * called after the user submits the form.
    *
    *
    * @return void

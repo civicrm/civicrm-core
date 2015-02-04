@@ -39,12 +39,12 @@
 class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
-   * Location block element array
+   * Location block element array.
    */
   static $blocks = array('phone', 'email', 'im', 'openid', 'address');
 
   /**
-   * Create various elements of location block
+   * Create various elements of location block.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -95,7 +95,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * Creates the entry in the civicrm_loc_block
+   * Creates the entry in the civicrm_loc_block.
    */
   public static function createLocBlock(&$location, &$entityElements) {
     $locId = self::findExisting($entityElements);
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * Takes an entity array and finds the existing location block
+   * Takes an entity array and finds the existing location block.
    */
   public static function findExisting($entityElements) {
     $eid = $entityElements['entity_id'];
@@ -152,7 +152,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * Takes an associative array and adds location block
+   * Takes an associative array and adds location block.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -169,7 +169,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * Delete the Location Block
+   * Delete the Location Block.
    *
    * @param int $locBlockId
    *   Id of the Location Block.
@@ -211,7 +211,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -263,7 +263,7 @@ WHERE e.id = %1";
   }
 
   /**
-   * Delete all the block associated with the location
+   * Delete all the block associated with the location.
    *
    * @param int $contactId
    *   Contact id.

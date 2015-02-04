@@ -40,21 +40,21 @@
 class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
   /**
-   * The id of the object being edited
+   * The id of the object being edited.
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * Action
+   * Action.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * SurveyTitle
+   * SurveyTitle.
    *
    * @var string
    */
@@ -90,7 +90,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

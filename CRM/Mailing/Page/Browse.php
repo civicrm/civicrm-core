@@ -41,7 +41,7 @@
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
   /**
-   * All the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
    */
@@ -67,7 +67,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public $_archived;
 
   /**
-   * Scheduled mailing
+   * Scheduled mailing.
    *
    * @boolean
    */

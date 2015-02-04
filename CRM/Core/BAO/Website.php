@@ -39,7 +39,7 @@
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
   /**
-   * Takes an associative array and adds im
+   * Takes an associative array and adds im.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -60,7 +60,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Process website
+   * Process website.
    *
    * @param array $params
    * @param int $contactID
@@ -110,7 +110,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Delete website
+   * Delete website.
    *
    * @param array $ids
    *   Website ids.
@@ -152,7 +152,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Get all the websites for a specified contact_id
+   * Get all the websites for a specified contact_id.
    *
    * @param int $id
    *   The contact id.

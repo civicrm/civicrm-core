@@ -35,19 +35,19 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * Static holder for the default LT
+   * Static holder for the default LT.
    */
   static $_defaultPreferencesDate = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -68,7 +68,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -84,7 +84,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   }
 
   /**
-   * Delete preference dates
+   * Delete preference dates.
    *
    * @param int $id
    *

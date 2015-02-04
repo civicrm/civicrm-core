@@ -332,7 +332,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   /**
-   * Form submission of petition signature
+   * Form submission of petition signature.
    *
    *
    * @return void
@@ -575,7 +575,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   /**
-   * Build the petition profile form
+   * Build the petition profile form.
    *
    * @param int $id
    * @param string $name
@@ -648,7 +648,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   /**
-   * check if user has already signed this petition
+   * check if user has already signed this petition.
    * @param array $params
    */
   public function redirectIfSigned($params) {

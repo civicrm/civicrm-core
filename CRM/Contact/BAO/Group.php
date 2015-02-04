@@ -42,11 +42,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * group_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -148,7 +146,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Get the count of a members in a group with the specific status
+   * Get the count of a members in a group with the specific status.
    *
    * @param int $id
    *   Group id.
@@ -196,7 +194,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Get the list of member for a group id
+   * Get the list of member for a group id.
    *
    * @param int $groupID
    * @param bool $useCache
@@ -300,7 +298,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Make sure that the user has permission to access this group
+   * Make sure that the user has permission to access this group.
    *
    * @param int $id
    *   The id of the object.
@@ -339,7 +337,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Create a new group
+   * Create a new group.
    *
    * @param array $params
    *
@@ -518,7 +516,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Defines a new smart group
+   * Defines a new smart group.
    *
    * @param array $params
    *   Associative array of parameters.
@@ -546,7 +544,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -600,7 +598,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Get permission relevant clauses
+   * Get permission relevant clauses.
    * CRM-12209
    *
    * @param bool $force
@@ -704,7 +702,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * wrapper for ajax group selector
+   * wrapper for ajax group selector.
    *
    * @param array $params
    *   Associated array for params record id.
@@ -774,7 +772,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * This function to get list of groups
+   * This function to get list of groups.
    *
    * @param array $params
    *   Associated array for params.
@@ -1133,7 +1131,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Generate permissioned where clause for group search
+   * Generate permissioned where clause for group search.
    * @param array $params
    * @param bool $sortBy
    * @param bool $excludeHidden
@@ -1224,7 +1222,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Define action links
+   * Define action links.
    *
    * @return array
    *   array of action links

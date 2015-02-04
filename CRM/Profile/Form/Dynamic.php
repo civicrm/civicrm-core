@@ -69,7 +69,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -91,7 +91,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

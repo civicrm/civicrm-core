@@ -41,7 +41,7 @@
 class CRM_Core_Block {
 
   /**
-   * The following blocks are supported
+   * The following blocks are supported.
    *
    * @var int
    */
@@ -55,12 +55,12 @@ class CRM_Core_Block {
     FULLTEXT_SEARCH = 7;
 
   /**
-   * Template file names for the above blocks
+   * Template file names for the above blocks.
    */
   static $_properties = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
   }
@@ -230,7 +230,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Creates the info block for drupal
+   * Creates the info block for drupal.
    *
    * @return array
    */
@@ -346,7 +346,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of options to create New objects for the application and format is as a block
+   * Create the list of options to create New objects for the application and format is as a block.
    *
    * @return void
    */
@@ -469,7 +469,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of dashboard links
+   * Create the list of dashboard links.
    *
    * @return void
    */
@@ -506,7 +506,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of mail urls for the application and format is as a block
+   * Create the list of mail urls for the application and format is as a block.
    *
    * @return void
    */
@@ -539,7 +539,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of shortcuts for the application and format is as a block
+   * Create the list of shortcuts for the application and format is as a block.
    *
    * @return void
    */
@@ -554,7 +554,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the event blocks for upcoming events
+   * Create the event blocks for upcoming events.
    *
    * @return void
    */

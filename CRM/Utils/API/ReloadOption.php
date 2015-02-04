@@ -116,7 +116,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   }
 
   /**
-   * Identify the fields which should be returned
+   * Identify the fields which should be returned.
    *
    * @param $apiRequest
    * @return array

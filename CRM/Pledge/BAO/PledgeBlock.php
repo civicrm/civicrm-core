@@ -35,18 +35,16 @@
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * pledgeBlock id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -66,7 +64,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Takes an associative array and creates a pledgeBlock object
+   * Takes an associative array and creates a pledgeBlock object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -90,7 +88,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Add pledgeBlock
+   * Add pledgeBlock.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -145,7 +143,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Delete the pledgeBlock
+   * Delete the pledgeBlock.
    *
    * @param int $id
    *   PledgeBlock id.
@@ -171,7 +169,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Return Pledge  Block info in Contribution Pages
+   * Return Pledge  Block info in Contribution Pages.
    *
    * @param int $pageID
    *   Contribution page id.
@@ -192,7 +190,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Build Pledge Block in Contribution Pages
+   * Build Pledge Block in Contribution Pages.
    *
    * @param CRM_Core_Form $form
    */

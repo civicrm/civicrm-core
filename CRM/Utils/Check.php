@@ -58,7 +58,7 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Execute "checkAll"
+   * Execute "checkAll".
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
    */
@@ -84,7 +84,7 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Throw an exception if any of the checks fail
+   * Throw an exception if any of the checks fail.
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
    *

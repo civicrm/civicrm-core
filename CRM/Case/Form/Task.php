@@ -68,7 +68,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
   protected $_caseIds;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *

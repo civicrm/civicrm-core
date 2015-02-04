@@ -39,7 +39,7 @@
 class CRM_Core_Page_AJAX {
 
   /**
-   * Call generic ajax forms
+   * Call generic ajax forms.
    *
    */
   public static function run() {
@@ -89,7 +89,7 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * Change is_quick_config priceSet to complex
+   * Change is_quick_config priceSet to complex.
    *
    */
   public static function setIsQuickConfig() {
@@ -199,7 +199,7 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * Set headers appropriate for a js file
+   * Set headers appropriate for a js file.
    *
    * @param int|NULL $ttl
    *   Time-to-live (seconds).

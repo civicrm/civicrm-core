@@ -59,7 +59,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
 
   /**
-   * Test civicrm_membership_status_get with empty params
+   * Test civicrm_membership_status_get with empty params.
    */
   public function testGetEmptyParams() {
     $result = $this->callAPISuccess('membership_status', 'get', array());

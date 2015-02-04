@@ -40,7 +40,7 @@
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
 
   /**
-   * Define default MembershipType Id
+   * Define default MembershipType Id.
    */
   public $_defaultMemTypeId;
 
@@ -65,7 +65,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected $_snippet;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -191,7 +191,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Set the default values
+   * Set the default values.
    *
    * @return void
    */
@@ -378,7 +378,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -652,7 +652,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Build elements to collect information for recurring contributions
+   * Build elements to collect information for recurring contributions.
    *
    *
    * @param CRM_Core_Form $form
@@ -724,7 +724,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -1135,7 +1135,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

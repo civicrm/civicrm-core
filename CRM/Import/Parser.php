@@ -192,7 +192,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Abstract function definitions
+   * Abstract function definitions.
    */
   abstract protected function init();
 
@@ -231,7 +231,7 @@ abstract class CRM_Import_Parser {
   abstract protected function import($onDuplicate, &$values);
 
   /**
-   * Set and validate field values
+   * Set and validate field values.
    *
    * @param array $elements
    *   array.
@@ -265,7 +265,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api
+   * Format the field values for input to the api.
    *
    * @return array
    *   (reference) associative array of name/value pairs
@@ -351,7 +351,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Setter function
+   * Setter function.
    *
    * @param int $max
    *
@@ -362,7 +362,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Determines the file extension based on error code
+   * Determines the file extension based on error code.
    *
    * @var $type error code constant
    * @return string
@@ -401,7 +401,7 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Determines the file name based on error code
+   * Determines the file name based on error code.
    *
    * @var $type error code constant
    * @return string

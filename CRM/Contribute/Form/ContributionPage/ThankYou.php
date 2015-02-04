@@ -52,7 +52,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -90,7 +90,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -117,7 +117,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

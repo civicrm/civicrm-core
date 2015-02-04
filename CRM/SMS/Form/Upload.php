@@ -119,7 +119,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -291,7 +291,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -426,7 +426,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
    *
    * @return string

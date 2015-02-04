@@ -60,7 +60,7 @@ class CRM_Mailing_Page_AJAX {
   }
 
   /**
-   * Retrieve contact mailings
+   * Retrieve contact mailings.
    */
   public static function getContactMailings() {
     $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');

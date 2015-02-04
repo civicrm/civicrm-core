@@ -35,7 +35,7 @@
 class CRM_Member_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
-   * The task that the wizard is currently processing
+   * The task that the wizard is currently processing.
    *
    * @var string
    */

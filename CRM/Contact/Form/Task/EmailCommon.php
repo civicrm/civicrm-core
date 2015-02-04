@@ -130,7 +130,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @param CRM_Core_Form $form
@@ -318,7 +318,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * Form rule
+   * Form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -348,7 +348,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @param CRM_Core_Form $form

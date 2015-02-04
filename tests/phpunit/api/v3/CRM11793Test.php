@@ -35,7 +35,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_contact_create
+   * Test civicrm_contact_create.
    *
    * Verify that attempt to create individual contact with only
    * first and last names succeeds

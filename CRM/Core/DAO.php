@@ -70,7 +70,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   static $_testEntitiesToSkip = array();
   /**
-   * The factory class for this application
+   * The factory class for this application.
    * @var object
    */
   static $_factory = NULL;
@@ -78,7 +78,7 @@ class CRM_Core_DAO extends DB_DataObject {
   static $_checkedSqlFunctionsExist = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Core_DAO
    */
@@ -88,14 +88,14 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Empty definition for virtual function
+   * Empty definition for virtual function.
    */
   public static function getTableName() {
     return NULL;
   }
 
   /**
-   * Initialize the DAO object
+   * Initialize the DAO object.
    *
    * @param string $dsn
    *   The database connection string.
@@ -393,7 +393,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Returns list of FK relationships
+   * Returns list of FK relationships.
    *
    *
    * @return array
@@ -404,7 +404,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Returns all the column names of this table
+   * Returns all the column names of this table.
    *
    *
    * @return array
@@ -460,7 +460,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Deletes items from table which match current objects variables
+   * Deletes items from table which match current objects variables.
    *
    * Returns the true on success
    *
@@ -682,7 +682,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Check if there is a record with the same name in the db
+   * Check if there is a record with the same name in the db.
    *
    * @param string $value
    *   The value of the field we are checking.
@@ -712,7 +712,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Check if there is a given column in a specific table
+   * Check if there is a given column in a specific table.
    *
    * @param string $tableName
    * @param string $columnName
@@ -890,7 +890,7 @@ LIKE %1
   }
 
   /**
-   * Check whether a specific column in a specific table has always the same value
+   * Check whether a specific column in a specific table has always the same value.
    *
    * @param string $tableName
    * @param string $columnName
@@ -908,7 +908,7 @@ LIKE %1
   }
 
   /**
-   * Check whether a specific column in a specific table is always NULL
+   * Check whether a specific column in a specific table is always NULL.
    *
    * @param string $tableName
    * @param string $columnName
@@ -925,7 +925,7 @@ LIKE %1
   }
 
   /**
-   * Check if there is a given table in the database
+   * Check if there is a given table in the database.
    *
    * @param string $tableName
    *
@@ -1061,7 +1061,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Get sort string
+   * Get sort string.
    *
    * @param array|object $sort either array or CRM_Utils_Sort
    * @param string $default
@@ -1087,7 +1087,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param string $daoName
    *   Name of the dao object.
@@ -1119,7 +1119,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Delete the object records that are associated with this contact
+   * Delete the object records that are associated with this contact.
    *
    * @param string $daoName
    *   Name of the dao object.
@@ -1137,7 +1137,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Execute a query
+   * Execute a query.
    *
    * @param string $query
    *   Query to be executed.
@@ -1193,7 +1193,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * Execute a query and get the single result
+   * Execute a query and get the single result.
    *
    * @param string $query
    *   Query to be executed.
@@ -1484,7 +1484,7 @@ SELECT contact_id
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param string $daoName
    *   Name of the dao object.
@@ -1699,7 +1699,7 @@ SELECT contact_id
   }
 
   /**
-   * Deletes the this object plus any dependent objects that are associated with it
+   * Deletes the this object plus any dependent objects that are associated with it.
    * ONLY USE FOR TESTING
    *
    * @param string $daoName
@@ -1745,7 +1745,7 @@ SELECT contact_id
   }
 
   /**
-   * Set defaults when creating new entity
+   * Set defaults when creating new entity.
    * (don't call this set defaults as already in use with different signature in some places)
    *
    * @param array $params
@@ -1893,7 +1893,7 @@ SELECT contact_id
   }
 
   /**
-   * Wrapper function to drop triggers
+   * Wrapper function to drop triggers.
    *
    * @param string $tableName
    *   the specific table requiring a rebuild; or NULL to rebuild all tables.

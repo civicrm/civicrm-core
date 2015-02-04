@@ -40,7 +40,7 @@
 class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
-   * Display name of the member
+   * Display name of the member.
    *
    * @var string
    */
@@ -52,7 +52,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected $_memberEmail = NULL;
 
   /**
-   * Contact ID of the member
+   * Contact ID of the member.
    *
    *
    * @var int
@@ -266,7 +266,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -477,7 +477,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -511,7 +511,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Process the renewal form
+   * Process the renewal form.
    *
    *
    * @return void

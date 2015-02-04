@@ -41,7 +41,7 @@
 class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -59,7 +59,7 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

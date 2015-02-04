@@ -200,7 +200,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function updates the mode column in the civicrm_recurring_entity table
+   * This function updates the mode column in the civicrm_recurring_entity table.
    *
    * @param int $mode
    *   Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity .
@@ -222,7 +222,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function generates all new entities based on object vars
+   * This function generates all new entities based on object vars.
    *
    * @return array
    */
@@ -259,7 +259,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * Generate new DAOs and along with entries in civicrm_recurring_entity table
+   * Generate new DAOs and along with entries in civicrm_recurring_entity table.
    *
    * @return array
    */
@@ -401,7 +401,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function gets all the children for a particular parent entity
+   * This function gets all the children for a particular parent entity.
    *
    * @param int $parentId
    *   Parent entity id .
@@ -497,7 +497,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function gets the parent for the entity id passed to it
+   * This function gets the parent for the entity id passed to it.
    *
    * @param int $entityId
    *   Entity ID .
@@ -533,7 +533,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function copies the information from parent entity and creates other entities with same information
+   * This function copies the information from parent entity and creates other entities with same information.
    *
    * @param string $entityTable
    *   Entity table name .
@@ -834,7 +834,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function maps values posted from form to civicrm_action_schedule columns
+   * This function maps values posted from form to civicrm_action_schedule columns.
    *
    * @param array $formParams
    *   And array of form values posted .
@@ -937,7 +937,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * wrapper of getScheduleReminderDetailsById function
+   * wrapper of getScheduleReminderDetailsById function.
    *
    * @param int $scheduleReminderId
    *   Primary key of civicrm_action_schedule table .
@@ -1065,7 +1065,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
 
   /**
-   * This function gets time difference between the two datetime object
+   * This function gets time difference between the two datetime object.
    *
    * @param DateTime $startDate
    *   Start Date .
@@ -1085,7 +1085,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function gets all columns from civicrm_action_schedule on the basis of event id
+   * This function gets all columns from civicrm_action_schedule on the basis of event id.
    *
    * @param int $entityId
    *   Entity ID .
@@ -1115,7 +1115,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * Update mode column in civicrm_recurring_entity table for event related tabs
+   * Update mode column in civicrm_recurring_entity table for event related tabs.
    *
    * @param int $entityId
    *   Event id .

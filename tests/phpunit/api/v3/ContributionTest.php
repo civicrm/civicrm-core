@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviMailUtils.php';
 class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
-   * Assume empty database with just civicrm_data
+   * Assume empty database with just civicrm_data.
    */
   protected $_individualId;
   protected $_contribution;

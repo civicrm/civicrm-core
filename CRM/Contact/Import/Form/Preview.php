@@ -40,7 +40,7 @@
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -136,7 +136,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -199,7 +199,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.

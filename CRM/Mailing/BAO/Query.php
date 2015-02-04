@@ -378,7 +378,7 @@ class CRM_Mailing_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between Mailing search and advnaced search
+   * Add all the elements shared between Mailing search and advnaced search.
    *
    *
    * @param CRM_Core_Form $form

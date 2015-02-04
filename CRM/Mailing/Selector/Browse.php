@@ -55,7 +55,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   protected $_parent;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    *
    * @return \CRM_Mailing_Selector_Browse
@@ -206,7 +206,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

@@ -241,7 +241,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   Posted values of the form.
@@ -326,7 +326,7 @@ class CRM_Core_Form_RecurringEntity {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

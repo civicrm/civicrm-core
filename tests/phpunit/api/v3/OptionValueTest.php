@@ -154,7 +154,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that domain_id is honoured
+   * Check that domain_id is honoured.
    */
   public function testCreateOptionSpecifyDomain() {
     $result = $this->callAPISuccess('option_group', 'get', array(
@@ -172,7 +172,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that component_id is honoured
+   * Check that component_id is honoured.
    */
   public function testCreateOptionSpecifyComponentID() {
     $result = $this->callAPISuccess('option_group', 'get', array(
@@ -234,7 +234,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that domain_id is honoured
+   * Check that domain_id is honoured.
    */
   public function testCRM12133CreateOptionWeightNoValue() {
     $optionGroup = $this->callAPISuccess(
@@ -263,7 +263,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that domain_id is honoured
+   * Check that domain_id is honoured.
    */
   public function testCreateOptionNoName() {
     $optionGroup = $this->callAPISuccess('option_group', 'get', array(
@@ -278,8 +278,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that pseudoconstant reflects new value added
-   * and deleted
+   * Check that pseudoconstant reflects new value added.
    */
   public function testCRM11876CreateOptionPseudoConstantUpdated() {
     $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(

@@ -76,7 +76,7 @@ SELECT   title, description
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

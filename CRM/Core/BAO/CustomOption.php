@@ -40,7 +40,7 @@
 class CRM_Core_BAO_CustomOption {
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomOption {
   }
 
   /**
-   * Returns all active options ordered by weight for a given field
+   * Returns all active options ordered by weight for a given field.
    *
    * @param int $fieldID
    *   Field whose options are needed.
@@ -168,7 +168,7 @@ WHERE  id = %1
   }
 
   /**
-   * Delete Option
+   * Delete Option.
    *
    * @param $optionId integer
    *   option id

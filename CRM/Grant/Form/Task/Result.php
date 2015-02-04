@@ -41,7 +41,7 @@
 class CRM_Grant_Form_Task_Result extends CRM_Grant_Form_Task {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -65,7 +65,7 @@ class CRM_Grant_Form_Task_Result extends CRM_Grant_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

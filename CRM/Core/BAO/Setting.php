@@ -44,7 +44,7 @@
 class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
   /**
-   * Various predefined settings that have been migrated to the setting table
+   * Various predefined settings that have been migrated to the setting table.
    */
   const
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
@@ -115,7 +115,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Allow key o be cleared
+   * Allow key o be cleared.
    * @param string $cacheKey
    */
   public static function flushCache($cacheKey) {
@@ -201,7 +201,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Retrieve the value of a setting from the DB table
+   * Retrieve the value of a setting from the DB table.
    *
    * @param string $group
    *   (required) The group name of the item.
@@ -324,7 +324,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Store an item in the setting table
+   * Store an item in the setting table.
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
@@ -364,7 +364,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Store an item in a setting table
+   * Store an item in a setting table.
    *
    * _setItem() is the common logic shared by setItem() and setItems().
    *
@@ -689,7 +689,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Load the settings files defined in a series of folders
+   * Load the settings files defined in a series of folders.
    * @param array $metaDataFolders
    *   List of folder paths.
    * @return array
@@ -708,7 +708,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Load up settings metadata from files
+   * Load up settings metadata from files.
    */
   public static function loadSettingsMetadata($metaDataFolder) {
     $settingMetaData = array();

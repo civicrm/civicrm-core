@@ -120,7 +120,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db
+   * Check if username and email exists in the drupal db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -278,7 +278,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately
+   * Check if a resource url is within the drupal directory and format appropriately.
    *
    * This seems to be a legacy function. We assume all resources are within the drupal
    * directory and always return TRUE. As well, we clean up the $url.
@@ -377,7 +377,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Determine the native ID of the CMS user
+   * Determine the native ID of the CMS user.
    *
    * @param string $username
    * @return int|NULL
@@ -404,7 +404,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Load drupal bootstrap
+   * Load drupal bootstrap.
    *
    * @param array $params
    *   Either uid, or name & pass.

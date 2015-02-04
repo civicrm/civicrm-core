@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -362,7 +362,7 @@ WHERE  type.name IS NOT NULL
   }
 
   /**
-   * Get a list of elements for select box
+   * Get a list of elements for select box.
    * Note that this used to default to using the hex(01) character - which results in an invalid character being used in form fields
    * which was not handled well be anything that loaded & resaved the html (outside core)
    * The use of this separator is now explicit in the calling functions as a step towards it's removal
@@ -444,7 +444,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   }
 
   /**
-   * Check if a given type is a subtype
+   * Check if a given type is a subtype.
    *
    * @param string $subType
    *   Contact subType.
@@ -534,7 +534,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * Create shortcuts menu for contactTypes
+   * Create shortcuts menu for contactTypes.
    *
    * @return array
    *   of contactTypes
@@ -571,7 +571,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   }
 
   /**
-   * Delete Contact SubTypes
+   * Delete Contact SubTypes.
    *
    * @param int $contactTypeId
    *   ID of the Contact Subtype to be deleted.
@@ -623,7 +623,7 @@ WHERE name = %1";
   }
 
   /**
-   * Add or update Contact SubTypes
+   * Add or update Contact SubTypes.
    *
    * @param array $params
    *   An assoc array of name/value pairs.
@@ -688,7 +688,7 @@ WHERE name = %1";
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -857,7 +857,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
   }
 
   /**
-   * Function that does something
+   * Function that does something.
    * @todo what does this function do?
    *
    * @param int $contactID

@@ -40,19 +40,19 @@
 class CRM_Friend_Form extends CRM_Core_Form {
 
   /**
-   * Constants for number of friend contacts
+   * Constants for number of friend contacts.
    */
   const NUM_OPTION = 3;
 
   /**
-   * The id of the entity that we are proceessing
+   * The id of the entity that we are proceessing.
    *
    * @var int
    */
   protected $_entityId;
 
   /**
-   * The table name of the entity that we are proceessing
+   * The table name of the entity that we are proceessing.
    *
    * @var string
    */
@@ -61,7 +61,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   protected $_campaignId;
 
   /**
-   * The contact ID
+   * The contact ID.
    *
    * @var int
    */
@@ -174,7 +174,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -227,7 +227,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $fields
    *
@@ -265,7 +265,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

@@ -35,14 +35,14 @@
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**
-   * Construct method
+   * Construct method.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Add contribution soft credit record
+   * Add contribution soft credit record.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -63,7 +63,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -83,7 +83,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Delete soft credits
+   * Delete soft credits.
    *
    * @param array $params
    *

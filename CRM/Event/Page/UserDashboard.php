@@ -39,7 +39,7 @@
 class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
-   * List participations for the UF user
+   * List participations for the UF user.
    *
    */
   public function listParticipations() {

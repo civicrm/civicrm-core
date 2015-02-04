@@ -37,7 +37,7 @@ class CRM_Utils_Cache_APCcache {
   const DEFAULT_PREFIX = '';
 
   /**
-   * The default timeout to use
+   * The default timeout to use.
    *
    * @var int
    */
@@ -55,7 +55,7 @@ class CRM_Utils_Cache_APCcache {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

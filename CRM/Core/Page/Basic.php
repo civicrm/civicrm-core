@@ -37,18 +37,18 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   protected $_action;
 
   /**
-   * Define all the abstract functions here
+   * Define all the abstract functions here.
    */
 
   /**
-   * Name of the BAO to perform various DB manipulations
+   * Name of the BAO to perform various DB manipulations.
    *
    * @return string
    */
   abstract protected function getBAOName();
 
   /**
-   * An array of action links
+   * An array of action links.
    *
    * @return array
    *   (reference)
@@ -56,21 +56,21 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract protected function &links();
 
   /**
-   * Name of the edit form class
+   * Name of the edit form class.
    *
    * @return string
    */
   abstract protected function editForm();
 
   /**
-   * Name of the form
+   * Name of the form.
    *
    * @return string
    */
   abstract protected function editName();
 
   /**
-   * UserContext to pop back to
+   * UserContext to pop back to.
    *
    * @param int $mode
    *   Mode that we are in.
@@ -80,7 +80,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   abstract protected function userContext($mode = NULL);
 
   /**
-   * Get userContext params
+   * Get userContext params.
    *
    * @param int $mode
    *   Mode that we are in.
@@ -92,7 +92,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * Allow objects to be added based on permission
+   * Allow objects to be added based on permission.
    *
    * @param int $id
    *   The id of the object.
@@ -119,7 +119,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   }
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param string $title
    *   Title of the page.

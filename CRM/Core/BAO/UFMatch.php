@@ -356,7 +356,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Update the uf_name in the user object
+   * Update the uf_name in the user object.
    *
    * @param int $contactId
    *   Id of the contact to update.
@@ -409,7 +409,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Update the email value for the contact and user profile
+   * Update the email value for the contact and user profile.
    *
    * @param int $contactId
    *   Contact ID of the user.
@@ -465,7 +465,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Delete the object records that are associated with this cms user
+   * Delete the object records that are associated with this cms user.
    *
    * @param int $ufID
    *   Id of the user to delete.
@@ -481,7 +481,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the contact_id given a uf_id
+   * Get the contact_id given a uf_id.
    *
    * @param int $ufID
    *   Id of UF for which related contact_id is required.
@@ -505,7 +505,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the uf_id given a contact_id
+   * Get the uf_id given a contact_id.
    *
    * @param int $contactID
    *   ID of the contact for which related uf_id is required.
@@ -537,7 +537,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the list of contact_id
+   * Get the list of contact_id.
    *
    *
    * @return int

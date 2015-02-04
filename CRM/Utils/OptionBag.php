@@ -21,7 +21,7 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   }
 
   /**
-   * Retrieve a value from the bag
+   * Retrieve a value from the bag.
    *
    * @param string $key
    * @param string|null $type

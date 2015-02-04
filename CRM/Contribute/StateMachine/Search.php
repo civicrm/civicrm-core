@@ -42,7 +42,7 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
   protected $_task;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action
@@ -94,7 +94,7 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
   }
 
   /**
-   * Return the form name of the task
+   * Return the form name of the task.
    *
    * @return string
    */

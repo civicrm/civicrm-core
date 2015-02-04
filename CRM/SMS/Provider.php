@@ -44,7 +44,7 @@ abstract class CRM_SMS_Provider {
   const MAX_SMS_CHAR = 460;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @param array $providerParams
    * @param bool $force
@@ -87,7 +87,7 @@ abstract class CRM_SMS_Provider {
   }
 
   /**
-   * Send an SMS Message via the API Server
+   * Send an SMS Message via the API Server.
    */
   abstract public function send($recipients, $header, $message, $dncID = NULL);
 

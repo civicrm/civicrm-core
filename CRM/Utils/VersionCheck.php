@@ -95,7 +95,7 @@ class CRM_Utils_VersionCheck {
   protected $cacheFile;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     global $civicrm_root;
@@ -130,7 +130,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Static instance provider
+   * Static instance provider.
    *
    * Method providing static instance of CRM_Utils_VersionCheck,
    * as in Singleton pattern
@@ -145,7 +145,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Finds the release info for a minor version
+   * Finds the release info for a minor version.
    * @param string $version
    * @return array|null
    */
@@ -238,7 +238,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Alert the site admin of new versions of CiviCRM
+   * Alert the site admin of new versions of CiviCRM.
    * Show the message once a day
    */
   public function versionAlert() {
@@ -278,7 +278,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Collect info about the site to be sent as pingback data
+   * Collect info about the site to be sent as pingback data.
    */
   private function getSiteStats() {
     $config = CRM_Core_Config::singleton();
@@ -306,7 +306,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Get active payment processor types
+   * Get active payment processor types.
    */
   private function getPayProcStats() {
     $dao = new CRM_Financial_DAO_PaymentProcessor();
@@ -325,7 +325,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Fetch counts from entity tables
+   * Fetch counts from entity tables.
    * Add info to the 'entities' array
    */
   private function getEntityStats() {
@@ -435,7 +435,7 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Save version info to file
+   * Save version info to file.
    * @param string $contents
    */
   private function writeCacheFile($contents) {

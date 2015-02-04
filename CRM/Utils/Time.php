@@ -44,7 +44,7 @@ class CRM_Utils_Time {
   static private $_delta = 0;
 
   /**
-   * Get the time
+   * Get the time.
    *
    * @param string $returnFormat
    *   Format in which date is to be retrieved.
@@ -57,7 +57,7 @@ class CRM_Utils_Time {
   }
 
   /**
-   * Get the time
+   * Get the time.
    *
    * @return int, seconds since epoch
    */
@@ -66,7 +66,7 @@ class CRM_Utils_Time {
   }
 
   /**
-   * Set the given time
+   * Set the given time.
    *
    * @param string $newDateTime
    *   A date formatted with strtotime.
@@ -82,7 +82,7 @@ class CRM_Utils_Time {
   }
 
   /**
-   * Remove any time overrides
+   * Remove any time overrides.
    */
   public static function resetTime() {
     self::$_delta = 0;

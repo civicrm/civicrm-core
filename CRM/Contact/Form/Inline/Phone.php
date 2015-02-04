@@ -49,7 +49,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   private $_blockCount = 6;
 
   /**
-   * Call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,7 +62,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for phone object
+   * Build the form object elements for phone object.
    *
    * @return void
    */
@@ -96,7 +96,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -135,7 +135,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -155,7 +155,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

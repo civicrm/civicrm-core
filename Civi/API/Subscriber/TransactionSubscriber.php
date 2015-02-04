@@ -69,7 +69,7 @@ class TransactionSubscriber implements EventSubscriberInterface {
   private $forceRollback = array();
 
   /**
-   * Determine if an API request should be treated as transactional
+   * Determine if an API request should be treated as transactional.
    *
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for this request.
@@ -144,7 +144,7 @@ class TransactionSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Close any pending transactions
+   * Close any pending transactions.
    *
    * @param \Civi\API\Event\RespondEvent $event
    *   API response event.
@@ -160,7 +160,7 @@ class TransactionSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Rollback the pending transaction
+   * Rollback the pending transaction.
    *
    * @param \Civi\API\Event\ExceptionEvent $event
    *   API exception event.

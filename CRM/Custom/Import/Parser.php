@@ -308,7 +308,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api
+   * Format the field values for input to the api.
    *
    * @return array
    *   (reference ) associative array of name/value pairs
@@ -327,7 +327,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Store parser values
+   * Store parser values.
    *
    * @param CRM_Core_Session $store
    *

@@ -67,7 +67,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -166,7 +166,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -321,7 +321,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -339,7 +339,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array

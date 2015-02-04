@@ -75,6 +75,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   /**
    * Check checkbox type custom fields are created correctly.
+   *
    * We want to ensure they are saved with separators as appropriate
    */
   public function testCreateCustomCheckboxGrant() {
@@ -159,6 +160,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   /**
    * This is a test to check if setting fields one at a time alters other fields.
+   *
    * Issues Hit so far =
    * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
    *  - in which case it is valid

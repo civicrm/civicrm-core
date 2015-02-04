@@ -35,14 +35,14 @@
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -63,7 +63,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Delete the mapping
+   * Delete the mapping.
    *
    * @param int $id
    *   Mapping id.
@@ -89,7 +89,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object.
    *
    * The function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -110,7 +110,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Get the list of mappings
+   * Get the list of mappings.
    *
    * @param string $mappingTypeId
    *   Mapping type id.
@@ -132,7 +132,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Get the mapping fields
+   * Get the mapping fields.
    *
    * @param int $mappingId
    *   Mapping id.
@@ -197,7 +197,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Check Duplicate Mapping Name
+   * Check Duplicate Mapping Name.
    *
    * @param string $nameField
    *   mapping Name.
@@ -245,7 +245,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Build the mapping form
+   * Build the mapping form.
    *
    * @param CRM_Core_Form $form
    * @param string $mappingType
@@ -952,7 +952,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
 
   /**
-   * Function returns all  Custom group Names
+   * Function returns all  Custom group Names.
    *
    * @param int $customfieldId
    *   Related file id.

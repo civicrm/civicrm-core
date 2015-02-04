@@ -39,35 +39,35 @@
 class CRM_Custom_Form_Group extends CRM_Core_Form {
 
   /**
-   * The set id saved to the session for an update
+   * The set id saved to the session for an update.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   *  set is empty or not
+   *  set is empty or not.
    *
    * @var bool
    */
   protected $_isGroupEmpty = TRUE;
 
   /**
-   * Array of existing subtypes set for a custom set
+   * Array of existing subtypes set for a custom set.
    *
    * @var array
    */
   protected $_subtypes = array();
 
   /**
-   * Array of default params
+   * Array of default params.
    *
    * @var array
    */
   protected $_defaults = array();
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    *
    * @return void
@@ -104,7 +104,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -182,7 +182,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -451,7 +451,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    *
    * @return void

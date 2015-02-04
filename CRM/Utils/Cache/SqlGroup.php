@@ -41,7 +41,7 @@
 class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
-   * The host name of the memcached server
+   * The host name of the memcached server.
    *
    * @var string
    */
@@ -58,7 +58,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   protected $frontCache;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

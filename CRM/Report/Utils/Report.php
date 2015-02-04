@@ -155,7 +155,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
   }
 
   /**
-   * get instance count for a template
+   * get instance count for a template.
    * @param $optionVal
    *
    * @return int|null|string

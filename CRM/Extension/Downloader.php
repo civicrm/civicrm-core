@@ -57,7 +57,7 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * Determine whether downloading is supported
+   * Determine whether downloading is supported.
    *
    * @return array
    *   list of error messages; empty if OK
@@ -96,7 +96,7 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * Install or upgrade an extension from a remote URL
+   * Install or upgrade an extension from a remote URL.
    *
    * @param string $key
    *   The name of the extension being installed.
@@ -154,7 +154,7 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * Extract an extension from a zip file
+   * Extract an extension from a zip file.
    *
    * @param string $key
    *   The name of the extension being installed; this usually matches the basedir in the .zip.

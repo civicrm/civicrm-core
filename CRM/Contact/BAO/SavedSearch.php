@@ -40,7 +40,7 @@
 class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
@@ -66,8 +66,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -149,7 +150,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Get the where clause for a saved search
+   * Get the where clause for a saved search.
    *
    * @param int $id
    *   Saved search id.

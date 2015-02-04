@@ -35,7 +35,7 @@
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();

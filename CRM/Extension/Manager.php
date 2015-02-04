@@ -36,12 +36,12 @@
  */
 class CRM_Extension_Manager {
   /**
-   * The extension is fully installed and enabled
+   * The extension is fully installed and enabled.
    */
   const STATUS_INSTALLED = 'installed';
 
   /**
-   * The extension config has been applied to database but deactivated
+   * The extension config has been applied to database but deactivated.
    */
   const STATUS_DISABLED = 'disabled';
 
@@ -331,7 +331,7 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Remove all database references to an extension
+   * Remove all database references to an extension.
    *
    * Add records of the extension to the database -- and enable it
    *
@@ -382,7 +382,7 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Determine the status of an extension
+   * Determine the status of an extension.
    *
    * @param $key
    *
@@ -400,7 +400,7 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Determine the status of all extensions
+   * Determine the status of all extensions.
    *
    * @return array
    *   ($key => status_constant)

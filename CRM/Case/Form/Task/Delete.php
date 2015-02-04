@@ -49,7 +49,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * Are we moving case to Trash
+   * Are we moving case to Trash.
    *
    * @var boolean
    */
@@ -66,7 +66,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

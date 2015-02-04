@@ -56,7 +56,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   protected $_htmlTypeTransitions;
 
   /**
-   * Set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
@@ -90,7 +90,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -133,7 +133,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

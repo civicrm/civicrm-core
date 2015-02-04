@@ -39,7 +39,7 @@
 class CRM_Export_Form_Select extends CRM_Core_Form {
 
   /**
-   * Various Contact types
+   * Various Contact types.
    */
   const
     EXPORT_ALL = 1,
@@ -49,7 +49,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     EXPORT_MERGE_HOUSEHOLD = 2;
 
   /**
-   * Export modes
+   * Export modes.
    */
   const
     CONTACT_EXPORT = 1,
@@ -62,7 +62,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     ACTIVITY_EXPORT = 8;
 
   /**
-   * Current export mode
+   * Current export mode.
    *
    * @var int
    */
@@ -71,7 +71,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   public $_componentTable;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *
@@ -244,7 +244,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -338,7 +338,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -375,7 +375,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Process the uploaded file
+   * Process the uploaded file.
    *
    * @return void
    */
@@ -448,7 +448,7 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Build mapping form element
+   * Build mapping form element.
    */
   public function buildMapping() {
     switch ($this->_exportMode) {

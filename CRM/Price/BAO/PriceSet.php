@@ -40,21 +40,21 @@
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
   /**
-   * Static field for default price set details
+   * Static field for default price set details.
    *
    * @var array
    */
   static $_defaultPriceSet = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes an associative array and creates a price set object
+   * Takes an associative array and creates a price set object.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
@@ -77,7 +77,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -91,7 +91,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -274,7 +274,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Delete the price set
+   * Delete the price set.
    *
    * @param int $id
    *   Price Set id.
@@ -313,7 +313,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Link the price set with the specified table and id
+   * Link the price set with the specified table and id.
    *
    * @param string $entityTable
    * @param int $entityId
@@ -342,7 +342,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Delete price set for the given entity and id
+   * Delete price set for the given entity and id.
    *
    * @param string $entityTable
    * @param int $entityId
@@ -399,7 +399,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Find a price_set_id associated with the given option value or  field ID
+   * Find a price_set_id associated with the given option value or  field ID.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
@@ -431,7 +431,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Return an associative array of all price sets
+   * Return an associative array of all price sets.
    *
    * @param bool $withInactive
    *   Whether or not to include inactive entries.
@@ -476,7 +476,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Get price set details
+   * Get price set details.
    *
    * An array containing price set details (including price fields) is returned
    *
@@ -1076,7 +1076,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get field ids of a price set
+   * Get field ids of a price set.
    *
    * @param int $id
    *   Price Set id.
@@ -1143,7 +1143,7 @@ WHERE  id = %1";
   }
 
   /**
-   * check price set permission
+   * check price set permission.
    *
    * @param int $sid
    *   The price set id.
@@ -1223,7 +1223,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Check if auto renew option should be shown
+   * Check if auto renew option should be shown.
    *
    * @param int $priceSetId
    *   Price set id.
@@ -1272,7 +1272,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Retrieve auto renew frequency and interval
+   * Retrieve auto renew frequency and interval.
    *
    * @param int $priceSetId
    *   Price set id.
@@ -1304,7 +1304,7 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Update the is_quick_config flag in the db
+   * Update the is_quick_config flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -1405,7 +1405,7 @@ WHERE       ps.id = %1
   }
 
   /**
-   * Function to set tax_amount and tax_rate in LineItem
+   * Function to set tax_amount and tax_rate in LineItem.
    *
    * @param array $field
    * @param array $lineItem

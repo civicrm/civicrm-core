@@ -49,7 +49,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -131,7 +131,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void
@@ -140,7 +140,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Assign smarty variables to the template that will be used by google api to plot the contacts
+   * Assign smarty variables to the template that will be used by google api to plot the contacts.
    *
    * @param $ids
    * @param int $locationId

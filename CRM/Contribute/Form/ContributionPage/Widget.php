@@ -218,7 +218,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.

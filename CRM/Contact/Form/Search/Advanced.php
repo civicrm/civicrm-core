@@ -43,7 +43,7 @@ s | under the terms of the GNU Affero General Public License           |
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -176,7 +176,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -199,7 +199,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array
@@ -409,7 +409,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Normalize default values for multiselect plugins
+   * Normalize default values for multiselect plugins.
    *
    * @param array $defaults
    * @return array

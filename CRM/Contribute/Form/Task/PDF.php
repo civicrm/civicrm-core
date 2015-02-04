@@ -48,7 +48,7 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -101,7 +101,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -137,7 +137,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Set default values
+   * Set default values.
    */
   public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
@@ -145,7 +145,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void
@@ -234,7 +234,7 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Declaration of common variables for Invoice and PDF
+   * Declaration of common variables for Invoice and PDF.
    *
    *
    * @param array $contribIds

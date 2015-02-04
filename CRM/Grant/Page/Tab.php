@@ -40,7 +40,7 @@
 class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -49,7 +49,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   public $_contactId = NULL;
 
   /**
-   * called when action is browse
+   * called when action is browse.
    *
    */
   public function browse() {
@@ -69,7 +69,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * called when action is view
+   * called when action is view.
    *
    * @return null
    */
@@ -83,7 +83,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    * @return null
    */
@@ -97,7 +97,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
   }
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */

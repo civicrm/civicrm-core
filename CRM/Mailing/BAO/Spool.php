@@ -35,7 +35,7 @@
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();

@@ -35,7 +35,7 @@
 class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -102,7 +102,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   // end function
 
   /**
-   * called when action is browse
+   * called when action is browse.
    *
    */
   public function browse() {
@@ -197,7 +197,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is view
+   * called when action is view.
    *
    * @return null
    */
@@ -215,7 +215,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    * @return null
    */

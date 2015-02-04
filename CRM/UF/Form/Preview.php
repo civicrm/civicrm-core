@@ -123,7 +123,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

@@ -50,14 +50,14 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * All the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -72,7 +72,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -85,7 +85,7 @@ class CRM_Activity_Form_Task_Email extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

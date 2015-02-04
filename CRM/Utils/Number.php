@@ -5,7 +5,7 @@
  */
 class CRM_Utils_Number {
   /**
-   * Create a random number with a given precision
+   * Create a random number with a given precision.
    *
    * @param array $precision
    *   (int $significantDigits, int $postDecimalDigits).

@@ -102,7 +102,7 @@ class Requirements {
   }
 
   /**
-   * Check configured php Memory
+   * Check configured php Memory.
    * @return array
    */
   public function checkMemory() {
@@ -133,7 +133,7 @@ class Requirements {
   }
 
   /**
-   * Get Configured PHP memory
+   * Get Configured PHP memory.
    * @return float
    */
   protected function getPHPMemory() {

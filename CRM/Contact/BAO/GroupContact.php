@@ -35,14 +35,14 @@
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes an associative array and creates a groupContact object
+   * Takes an associative array and creates a groupContact object.
    *
    * the function extract all the params it needs to initialize the create a
    * group object. the params array could contain additional unused name/value
@@ -68,7 +68,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -260,7 +260,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * Get list of all the groups and groups for a contact
+   * Get list of all the groups and groups for a contact.
    *
    * @param int $contactId
    *   Contact id.
@@ -303,7 +303,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * Get the list of groups for contact based on status of group membership
+   * Get the list of groups for contact based on status of group membership.
    *
    * @param int $contactId
    *   Contact id.
@@ -439,7 +439,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   }
 
   /**
-   * Returns membership details of a contact for a group
+   * Returns membership details of a contact for a group.
    *
    * @param int $contactId
    *   Id of the contact.
@@ -483,7 +483,7 @@ SELECT    *
   }
 
   /**
-   * Method to get Group Id
+   * Method to get Group Id.
    *
    * @param int $groupContactID
    *   Id of a perticuler group.
@@ -587,7 +587,7 @@ SELECT    *
   }
 
   /**
-   * Function merges the groups from otherContactID to mainContactID
+   * Function merges the groups from otherContactID to mainContactID.
    * along with subscription history
    *
    * @param int $mainContactId

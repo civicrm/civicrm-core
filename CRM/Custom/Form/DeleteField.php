@@ -39,21 +39,21 @@
 class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
   /**
-   * The group id
+   * The group id.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title of the group being deleted
+   * The title of the group being deleted.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
@@ -71,7 +71,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -92,7 +92,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

@@ -70,7 +70,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   static $activityTypeList = array();
 
   /**
-   * Get all the case statues
+   * Get all the case statues.
    *
    *
    * @param string $column
@@ -98,7 +98,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the redaction rules
+   * Get all the redaction rules.
    *
    *
    * @param null $filter
@@ -126,7 +126,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the case type
+   * Get all the case type.
    *
    *
    * @param string $column
@@ -159,7 +159,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Encounter Medium
+   * Get all the Encounter Medium.
    *
    *
    * @param string $column
@@ -181,7 +181,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all Activity types for the CiviCase component
+   * Get all Activity types for the CiviCase component.
    *
    * The static array activityType is returned
    *

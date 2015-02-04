@@ -39,14 +39,14 @@
 class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
   /**
-   * The page id saved to the session for an update
+   * The page id saved to the session for an update.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The pledgeBlock id saved to the session for an update
+   * The pledgeBlock id saved to the session for an update.
    *
    * @var int
    */
@@ -83,7 +83,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_values;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -143,7 +143,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -346,7 +346,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */
@@ -438,7 +438,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

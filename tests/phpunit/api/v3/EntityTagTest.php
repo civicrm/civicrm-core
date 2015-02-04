@@ -120,7 +120,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   /**
-   * civicrm_entity_tag_get methods
+   * civicrm_entity_tag_get methods.
    */
   public function testGetNoEntityID() {
     $ContactId = $this->_individualID;
@@ -181,7 +181,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   /**
-   * civicrm_entity_tag_Delete methods
+   * civicrm_entity_tag_Delete methods.
    */
   public function testEntityTagDeleteNoTagId() {
     $entityTagParams = array(
@@ -257,7 +257,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   /**
-   * civicrm_tag_entities_get methods
+   * civicrm_tag_entities_get methods.
    */
   public function testCommonContactEntityTagAdd() {
     $params = array(

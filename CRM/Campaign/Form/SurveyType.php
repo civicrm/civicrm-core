@@ -62,7 +62,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   protected $_action;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -111,7 +111,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -142,7 +142,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

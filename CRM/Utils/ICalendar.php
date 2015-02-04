@@ -43,7 +43,7 @@
 class CRM_Utils_ICalendar {
 
   /**
-   * Escape text elements for safe ICalendar use
+   * Escape text elements for safe ICalendar use.
    *
    * @param $text
    *   Text to escape.
@@ -63,7 +63,7 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   * Escape date elements for safe ICalendar use
+   * Escape date elements for safe ICalendar use.
    *
    * @param $date
    *   Date to escape.

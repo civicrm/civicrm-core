@@ -39,12 +39,12 @@
 class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_ContributionBase {
 
   /**
-   * Membership price set status
+   * Membership price set status.
    */
   public $_useForMember;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -88,7 +88,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

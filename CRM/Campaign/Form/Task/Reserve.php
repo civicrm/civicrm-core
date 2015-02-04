@@ -68,7 +68,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   protected $_numVoters;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -151,7 +151,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -200,7 +200,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -233,7 +233,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

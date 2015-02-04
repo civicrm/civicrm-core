@@ -60,7 +60,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -109,7 +109,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -128,7 +128,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

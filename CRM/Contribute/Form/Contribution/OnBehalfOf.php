@@ -35,7 +35,7 @@
 class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
    *

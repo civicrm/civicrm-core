@@ -403,7 +403,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * Get the list of contacts for a profile
+   * Get the list of contacts for a profile.
    *
    * @param int $gid
    *
@@ -487,7 +487,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

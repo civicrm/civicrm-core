@@ -5,6 +5,7 @@
  */
 class test_extension_manager_reporttest extends CRM_Core_Report {
   /**
+   * Class constructor.
    */
   public function __construct() {
     $logging        = new CRM_Logging_Schema();

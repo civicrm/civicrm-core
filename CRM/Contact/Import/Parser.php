@@ -402,7 +402,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Given a list of the importable field keys that the user has selected
+   * Given a list of the importable field keys that the user has selected.
    * set the active fields array to this list
    *
    * @param array $fieldKeys
@@ -451,7 +451,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Set IM Service Provider type fields
+   * Set IM Service Provider type fields.
    *
    * @param array $elements
    *   IM service provider type ids.
@@ -519,7 +519,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Set IM Service Provider type fields for related contacts
+   * Set IM Service Provider type fields for related contacts.
    *
    * @param array $elements
    *   IM service provider type ids of related contact.
@@ -533,7 +533,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api
+   * Format the field values for input to the api.
    *
    * @return array
    *   (reference ) associative array of name/value pairs
@@ -662,7 +662,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values
+   * Store parser values.
    *
    * @param CRM_Core_Session $store
    *
@@ -726,7 +726,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Export data to a CSV file
+   * Export data to a CSV file.
    *
    * @param string $fileName
    * @param array $header

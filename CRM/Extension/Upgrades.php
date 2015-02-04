@@ -38,7 +38,7 @@ class CRM_Extension_Upgrades {
   const QUEUE_NAME = 'ext-upgrade';
 
   /**
-   * Determine whether any extensions have pending upgrades
+   * Determine whether any extensions have pending upgrades.
    *
    * @return bool
    */
@@ -56,7 +56,7 @@ class CRM_Extension_Upgrades {
   }
 
   /**
-   * Fill a queue with upgrade tasks
+   * Fill a queue with upgrade tasks.
    *
    * @return CRM_Queue_Queue
    */

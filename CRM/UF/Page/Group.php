@@ -44,7 +44,7 @@
 class CRM_UF_Page_Group extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -265,7 +265,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Edit uf group
+   * Edit uf group.
    *
    * @param int $id
    *   Uf group id.
@@ -378,7 +378,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * for preview mode for ufoup
+   * for preview mode for ufoup.
    *
    * @param int $id
    *   Uf group id.

@@ -42,7 +42,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
   public $useLivePageJS = TRUE;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -219,7 +219,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

@@ -45,7 +45,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   private $_mergeCases = FALSE;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -206,7 +206,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -443,7 +443,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

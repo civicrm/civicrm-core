@@ -39,14 +39,14 @@
 class CRM_UF_Form_Group extends CRM_Core_Form {
 
   /**
-   * The form id saved to the session for an update
+   * The form id saved to the session for an update.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title for group
+   * The title for group.
    *
    * @var int
    */
@@ -56,7 +56,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   protected $_allPanes;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -106,7 +106,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -285,7 +285,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -317,7 +317,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

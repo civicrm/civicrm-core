@@ -79,7 +79,7 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local ignore folder
+   * Fetch the specified message to the local ignore folder.
    *
    * @param int $nr
    *   Number of the message to fetch.
@@ -97,7 +97,7 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local processed folder
+   * Fetch the specified message to the local processed folder.
    *
    * @param int $nr
    *   Number of the message to fetch.
