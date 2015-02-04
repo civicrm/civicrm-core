@@ -142,6 +142,9 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $this->addElement('checkbox', 'is_active', ts('Active'));
+    if ($this->_context == 'dashboard') {
+      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/pcp', 'reset=1'));
+    }
 
     $this->addButtons(
       array(
@@ -191,7 +194,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active');
+    $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active', 'is_notify');
 
     foreach ($checkBoxes as $key) {
       if (!isset($params[$key])) {
