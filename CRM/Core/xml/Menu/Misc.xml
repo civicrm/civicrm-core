@@ -96,6 +96,11 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+     <path>civicrm/ajax/apiexample</path>
+     <page_callback>CRM_Admin_Page_APIExplorer::getExampleFile</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/api/doc</path>
      <aapage_callback>CRM_Utils_REST::APIDoc</aapage_callback>
      <page_callback>CRM_Admin_Page_APIDoc</page_callback>

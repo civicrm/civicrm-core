@@ -1,4 +1,6 @@
 (function($, _, undefined) {
+  "use strict";
+  /* jshint validthis: true */
   var
     entity,
     action,
@@ -523,8 +525,51 @@
     });
   }
 
+  /**
+   * Fetch list of example files for a given entity
+   */
+  function getExamples() {
+    CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
+    $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
+      .done(function(result) {
+        CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
+      });
+  }
+
+  /**
+   * Fetch and display an example file
+   */
+  function getExample() {
+    var
+      entity = $('#example-entity').val(),
+      action = $('#example-action').val();
+    if (entity && action) {
+      $('#example-result').block();
+      $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
+        .done(function(result) {
+          $('#example-result').unblock().addClass('prettyprint').removeClass('prettyprinted').text(result);
+          prettyPrint();
+        });
+    } else {
+      $('#example-result').text($('#example-result').attr('title'));
+    }
+  }
+
   $(document).ready(function() {
-    $('#api-entity').crmSelect2({
+    // Set up tabs - bind active tab to document hash because... it's cool?
+    document.location.hash = document.location.hash || 'explorer';
+      $('#mainTabContainer')
+      .tabs({
+          active: $(document.location.hash + '-tab').index() - 1
+        })
+      .on('tabsactivate', function(e, ui) {
+        if (ui.newPanel) {
+          document.location.hash = ui.newPanel.attr('id').replace('-tab', '');
+        }
+      });
+
+    // Initialize widgets
+    $('#api-entity, #example-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
@@ -565,6 +610,8 @@
         buildParams();
       })
       .on('change', 'select.api-chain-entity', getChainedAction);
+    $('#example-entity').on('change', getExamples);
+    $('#example-action').on('change', getExample);
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
