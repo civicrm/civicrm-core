@@ -882,7 +882,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Validate the address fields based on the address options enabled
+   * Validate the address fields based on the address options enabled.
    * in the Address Settings
    *
    * @param array $fields

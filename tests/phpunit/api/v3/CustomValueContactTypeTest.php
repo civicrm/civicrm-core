@@ -113,7 +113,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that custom fields is returned for correct contact type only
+   * Test that custom fields is returned for correct contact type only.
    */
   public function testGetFields() {
     $result = $this->callAPISuccess('Contact', 'getfields', array());
@@ -236,7 +236,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   // Retrieve Methods
 
   /**
-   * Retrieve Valid custom Data added to  Individual Contact Type
+   * Retrieve Valid custom Data added to  Individual Contact Type.
    */
   public function testRetrieveValidCustomDataToIndividual() {
 

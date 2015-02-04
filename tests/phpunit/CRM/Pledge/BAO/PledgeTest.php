@@ -92,7 +92,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Retrieve a payment based on a Null pledge id random string
+   *  Retrieve a payment based on a Null pledge id random string.
    */
   public function testRetrieveStringPledgeID() {
     $defaults = array();
@@ -103,7 +103,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test that payment retrieve wrks based on known pledge id
+   *  Test that payment retrieve wrks based on known pledge id.
    */
   public function testRetrieveKnownPledgeID() {
     $params = array(

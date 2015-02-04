@@ -39,7 +39,7 @@
 class CRM_Admin_Page_Persistent extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -47,7 +47,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
   private static $_customizeActionLinks;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -99,7 +99,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
   }
 
   /**
-   * Browse all options
+   * Browse all options.
    *
    *
    * @return void

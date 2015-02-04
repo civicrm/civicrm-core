@@ -10,7 +10,7 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   }
 
   /**
-   * Spot check a few fields that should appear in schema
+   * Spot check a few fields that should appear in schema.
    */
   public function testGetSchema() {
     $schema = CRM_UF_Page_ProfileEditor::getSchema(array('IndividualModel', 'ActivityModel'));

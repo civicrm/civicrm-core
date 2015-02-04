@@ -53,7 +53,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_type_add methods
 
   /**
-   * Check with no name
+   * Check with no name.
    */
   public function testPaymentProcessorTypeCreateWithoutName() {
     $payProcParams = array(
@@ -66,7 +66,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create payment processor type
+   * Create payment processor type.
    */
   public function testPaymentProcessorTypeCreate() {
     $params = array(
@@ -88,7 +88,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code
+   * Test  using example code.
    */
   public function testPaymentProcessorTypeCreateExample() {
     require_once 'api/v3/examples/PaymentProcessorType/Create.php';
@@ -100,7 +100,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_type_delete methods
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testPaymentProcessorTypeDeleteEmpty() {
     $params = array();
@@ -108,14 +108,14 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with No array
+   * Check with No array.
    */
   public function testPaymentProcessorTypeDeleteParamsNotArray() {
     $result = $this->callAPIFailure('payment_processor_type', 'delete', 'string');
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testPaymentProcessorTypeDeleteWithoutRequired() {
     $params = array(
@@ -129,14 +129,14 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with incorrect required fields
+   * Check with incorrect required fields.
    */
   public function testPaymentProcessorTypeDeleteWithIncorrectData() {
     $result = $this->callAPIFailure('payment_processor_type', 'delete', array('id' => 'abcd'));
   }
 
   /**
-   * Check payment processor type delete
+   * Check payment processor type delete.
    */
   public function testPaymentProcessorTypeDelete() {
     $payProcType = $this->paymentProcessorTypeCreate();
@@ -150,7 +150,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_type_update
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testPaymentProcessorTypeUpdateEmpty() {
     $params = array();
@@ -159,7 +159,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with No array
+   * Check with No array.
    */
   public function testPaymentProcessorTypeUpdateParamsNotArray() {
     $result = $this->callAPIFailure('payment_processor_type', 'create', 'string');
@@ -167,7 +167,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with all parameters
+   * Check with all parameters.
    */
   public function testPaymentProcessorTypeUpdate() {
     // create sample payment processor type.
@@ -191,7 +191,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_types_get methods
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testPaymentProcessorTypesGetEmptyParams() {
     $results = $this->callAPISuccess('payment_processor_type', 'get', array());

@@ -71,7 +71,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create function succeeds
+   * Test create function succeeds.
    */
   public function testCreateSurvey() {
     $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -91,7 +91,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check the delete function succeeds
+   * Check the delete function succeeds.
    */
   public function testDeleteSurvey() {
     $entity = $this->createTestEntity();

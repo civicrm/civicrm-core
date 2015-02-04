@@ -263,7 +263,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that pledge with weekly schedule calculates dates correctly
+   * Test that pledge with weekly schedule calculates dates correctly.
    */
   public function testCreatePledgeWeeklySchedule() {
     $params = array(
@@ -286,7 +286,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that pledge with weekly schedule calculates dates correctly
+   * Test that pledge with weekly schedule calculates dates correctly.
    */
   public function testCreatePledgeMontlySchedule() {
     $params = array(
@@ -362,7 +362,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that status is set to pending
+   * Test that status is set to pending.
    */
   public function testCreatePledgeNoStatus() {
 
@@ -377,7 +377,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Update Pledge
+   * Update Pledge.
    */
   public function testCreateUpdatePledge() {
     // we test 'sequential' param here too
@@ -491,7 +491,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Std is to accept id
+   * Std is to accept id.
    */
   public function testDeletePledgeUseID() {
 
@@ -503,7 +503,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test to make sure empty get returns nothing
+   * Test to make sure empty get returns nothing.
    * Note that the function gives incorrect results if no pledges exist as it does a
    * contact search instead - test only checks that the get finds the one existing
    */

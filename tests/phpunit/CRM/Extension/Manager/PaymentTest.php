@@ -55,7 +55,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
   public function testInstallDisableUninstall() {
     $manager = $this->system->getManager();
@@ -75,7 +75,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
   public function testInstallDisableEnable() {
     $manager = $this->system->getManager();

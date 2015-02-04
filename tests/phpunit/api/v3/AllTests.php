@@ -44,7 +44,8 @@ class api_v3_AllTests extends CiviTestSuite {
   private static $instance = NULL;
 
   /**
-   * Simple name based constructor
+   * Simple name based constructor.
+   *
    * @param string $theClass
    * @param string $name
    */
@@ -62,7 +63,7 @@ class api_v3_AllTests extends CiviTestSuite {
   }
 
   /**
-   * Build test suite dynamically
+   * Build test suite dynamically.
    */
   public static function suite() {
     $inst = self::getInstance();

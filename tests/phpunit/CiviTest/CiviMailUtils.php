@@ -59,7 +59,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   protected $_webtest = FALSE;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param CiviSeleniumTestCase|CiviUnitTestCase $unit_test The currently running test
    * @param bool $startImmediately
@@ -79,7 +79,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Start writing emails to db instead of current option
+   * Start writing emails to db instead of current option.
    */
   public function start() {
     if ($this->_webtest) {
@@ -248,7 +248,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    */
 
   /**
-   * Check contents of mail log
+   * Check contents of mail log.
    *
    * @param array $strings
    *   Strings that should be included.
@@ -270,7 +270,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Check that mail log is empty
+   * Check that mail log is empty.
    * @param string $prefix
    */
   public function assertMailLogEmpty($prefix = '') {
@@ -299,7 +299,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Remove any sent messages from the log
+   * Remove any sent messages from the log.
    */
   public function clearMessages() {
     if ($this->_webtest) {

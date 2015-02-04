@@ -252,7 +252,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
   public function testInvalidDeclarationModule() {
     // create first managed entity ('foo')
@@ -278,7 +278,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
   public function testMissingName() {
     // create first managed entity ('foo')
@@ -304,7 +304,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
   public function testMissingEntity() {
     // create first managed entity ('foo')

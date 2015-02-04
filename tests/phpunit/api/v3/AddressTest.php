@@ -116,7 +116,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create an address with a master ID and ensure that a relationship is created
+   * Create an address with a master ID and ensure that a relationship is created.
    */
   public function testCreateAddressWithMasterRelationshipHousehold() {
     $householdID = $this->householdCreate();
@@ -134,7 +134,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create an address with a master ID and ensure that a relationship is created
+   * Create an address with a master ID and ensure that a relationship is created.
    */
   public function testCreateAddressWithMasterRelationshipOrganization() {
     $address = $this->callAPISuccess('address', 'create', $this->_params);
@@ -151,7 +151,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create an address with a master ID and ensure that a relationship is created
+   * Create an address with a master ID and ensure that a relationship is created.
    */
   public function testCreateAddressWithMasterRelationshipChangingOrganization() {
     $address = $this->callAPISuccess('address', 'create', $this->_params);
@@ -196,7 +196,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * test address deletion
+   * test address deletion.
    */
   public function testDeleteAddress() {
     //check there are no address to start with

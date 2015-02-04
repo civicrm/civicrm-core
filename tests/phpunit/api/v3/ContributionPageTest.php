@@ -44,7 +44,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $contribution_result = NULL;
   protected $_priceSetParams = array();
   /**
-   * Payment processor details
+   * Payment processor details.
    * @var array
    */
   protected $_paymentProcessor = array();
@@ -133,7 +133,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
 
   /**
-   * Test form submission with basic price set
+   * Test form submission with basic price set.
    */
   public function testSubmit() {
     $this->setUpContributionPage();
@@ -150,7 +150,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockNotSeparatePayment() {
     $this->setUpMembershipContributionPage();
@@ -171,7 +171,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockIsSeparatePayment() {
     $this->setUpMembershipContributionPage(TRUE);
@@ -195,7 +195,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockTwoTypesIsSeparatePayment() {
     $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 6)));
@@ -224,7 +224,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place
+   * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
     $this->setUpMembershipContributionPage(TRUE);
@@ -395,7 +395,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Set up membership contribution page
+   * Set up membership contribution page.
    * @param bool $isSeparatePayment
    */
   public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
@@ -453,7 +453,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Help function to set up contribution page with some defaults
+   * Help function to set up contribution page with some defaults.
    */
   public function setUpContributionPage() {
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);

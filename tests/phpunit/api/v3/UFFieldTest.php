@@ -140,7 +140,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Deleting field
+   * Deleting field.
    */
   public function testDeleteUFField() {
     $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);

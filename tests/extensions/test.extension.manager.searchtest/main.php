@@ -14,7 +14,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Prepare a set of search fields
+   * Prepare a set of search fields.
    *
    * @param CRM_Core_Form $form
    *   Modifiable.
@@ -46,7 +46,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Get a list of summary data points
+   * Get a list of summary data points.
    *
    * @return mixed; NULL or array with keys:
    *   - summary: string
@@ -61,7 +61,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Get a list of displayable columns
+   * Get a list of displayable columns.
    *
    * @return array, keys are printable column headers and values are SQL column names
    */
@@ -77,7 +77,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a full SQL query which returns one page worth of results
+   * Construct a full SQL query which returns one page worth of results.
    *
    * @param int $offset
    * @param int $rowcount
@@ -92,7 +92,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a SQL SELECT clause
+   * Construct a SQL SELECT clause.
    *
    * @return string, sql fragment with SELECT arguments
    */
@@ -106,7 +106,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a SQL FROM clause
+   * Construct a SQL FROM clause.
    *
    * @return string, sql fragment with FROM and JOIN clauses
    */
@@ -122,7 +122,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a SQL WHERE clause
+   * Construct a SQL WHERE clause.
    *
    * @param bool $includeContactIDs
    *
@@ -168,7 +168,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Determine the Smarty template for the search screen
+   * Determine the Smarty template for the search screen.
    *
    * @return string, template path (findable through Smarty template path)
    */
@@ -177,7 +177,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Modify the content of each row
+   * Modify the content of each row.
    *
    * @param array $row
    *   Modifiable SQL result row.

@@ -46,21 +46,21 @@ class CRM_Admin_Form extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The default values for form fields
+   * The default values for form fields.
    *
    * @var int
    */
   protected $_values;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
   /**
-   * Basic setup
+   * Basic setup.
    */
   public function preProcess() {
     $this->_id = $this->get('id');
@@ -105,7 +105,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * Add standard buttons
+   * Add standard buttons.
    *
    * @return void
    */

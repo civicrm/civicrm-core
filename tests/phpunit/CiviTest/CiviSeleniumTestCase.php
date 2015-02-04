@@ -49,7 +49,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   protected $loggedInAs = NULL;
 
   /**
-   *  Constructor
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of
@@ -154,7 +154,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Authenticate as drupal user
+   * Authenticate as drupal user.
    * @param $user : (str) the key 'user' or 'admin', or a literal username
    * @param $pass : (str) if $user is a literal username and not 'user' or 'admin', supply the password
    */
@@ -229,7 +229,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click on a link or button
+   * Click on a link or button.
    * Wait for the page to load
    * Wait for an element to be present
    * @param $element
@@ -249,7 +249,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a link or button and wait for an ajax dialog to load
+   * Click a link or button and wait for an ajax dialog to load.
    * @param string $element
    * @param string $waitFor
    */
@@ -261,7 +261,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a link or button and wait for ajax content to load or refresh
+   * Click a link or button and wait for ajax content to load or refresh.
    * @param string $element
    * @param string $waitFor
    */
@@ -289,7 +289,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Wait for all ajax snippets to finish loading
+   * Wait for all ajax snippets to finish loading.
    */
   public function waitForAjaxContent() {
     $this->waitForElementNotPresent('css=.blockOverlay');
@@ -302,7 +302,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Call the API on the local server
+   * Call the API on the local server.
    * (kind of defeats the point of a webtest - see CRM-11889)
    * @param $entity
    * @param $action
@@ -320,7 +320,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Call the API on the remote server
+   * Call the API on the remote server.
    * Experimental - currently only works if permissions on remote site allow anon user to access ajax api
    * @see CRM-11889
    * @param $entity
@@ -405,7 +405,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Ensures the required CiviCRM components are enabled
+   * Ensures the required CiviCRM components are enabled.
    * @param $components
    */
   public function enableComponents($components) {
@@ -427,7 +427,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Add a contact with the given first and last names and either a given email
+   * Add a contact with the given first and last names and either a given email.
    * (when specified), a random email (when true) or no email (when unspecified or null).
    *
    * @param string $fname
@@ -605,7 +605,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Types text into a ckEditor rich text field in a form
+   * Types text into a ckEditor rich text field in a form.
    *
    * @param string $fieldName
    *   Form field name (as assigned by PHP buildForm class).
@@ -638,7 +638,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Types option label and name into a table of multiple choice options
+   * Types option label and name into a table of multiple choice options.
    * (for price set fields of type select, radio, or checkbox)
    * TODO: extend for custom field multiple choice table input
    *
@@ -666,7 +666,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Use a contact EntityRef field to add a new contact
+   * Use a contact EntityRef field to add a new contact.
    * @param string $field
    *   Selector.
    * @param string $contactType
@@ -749,7 +749,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Generic function to check that strings are present in the page
+   * Generic function to check that strings are present in the page.
    *
    * @strings  array    array of strings or a single string
    *
@@ -787,7 +787,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Returns a single argument from the url query
+   * Returns a single argument from the url query.
    * @param $arg
    * @param null $url
    * @return null
@@ -1640,7 +1640,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Generic function to compare expected values after an api call to retrieved
+   * Generic function to compare expected values after an api call to retrieved.
    * DB values.
    *
    * @param string $daoName
@@ -1700,7 +1700,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Compare all values in a single retrieved DB record to an array of expected values
+   * Compare all values in a single retrieved DB record to an array of expected values.
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues
@@ -1721,7 +1721,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Add new Financial Account
+   * Add new Financial Account.
    * @param $financialAccountTitle
    * @param bool $financialAccountDescription
    * @param bool $accountingCode
@@ -1811,7 +1811,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Edit Financial Account
+   * Edit Financial Account.
    * @param $editfinancialAccount
    * @param bool $financialAccountTitle
    * @param bool $financialAccountDescription
@@ -1910,7 +1910,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Delete Financial Account
+   * Delete Financial Account.
    * @param $financialAccountTitle
    */
   public function _testDeleteFinancialAccount($financialAccountTitle) {
@@ -1922,7 +1922,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Verify data after ADD and EDIT
+   * Verify data after ADD and EDIT.
    * @param $verifyData
    */
   public function _assertFinancialAccount($verifyData) {
@@ -2001,7 +2001,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Give the specified permissions
+   * Give the specified permissions.
    * Note: this function logs in as 'admin' (logging out if necessary)
    * @param $permission
    */
@@ -2081,7 +2081,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Ensure we have a default mailbox set up for CiviMail
+   * Ensure we have a default mailbox set up for CiviMail.
    */
   public function setupDefaultMailbox() {
     $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1');
@@ -2242,7 +2242,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Type and select first occurance of autocomplete
+   * Type and select first occurance of autocomplete.
    * @param $fieldName
    * @param $label
    * @param bool $multiple
@@ -2278,7 +2278,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Select multiple options
+   * Select multiple options.
    * @param $fieldid
    * @param $params
    */
@@ -2338,7 +2338,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Attempt to get information about what went wrong if we encounter an error when loading a page
+   * Attempt to get information about what went wrong if we encounter an error when loading a page.
    */
   public function checkForErrorsOnPage() {
     foreach (array('Access denied', 'Page not found') as $err) {

@@ -84,7 +84,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Fetch contact id by uf id
+   * Fetch contact id by uf id.
    */
   public function testGetUFMatchID() {
     $params = array(
@@ -100,7 +100,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Fetch uf id by contact id
+   * Fetch uf id by contact id.
    */
   public function testGetUFID() {
     $params = array(

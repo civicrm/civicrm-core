@@ -306,7 +306,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that an event with a price set can be created
+   * Test that an event with a price set can be created.
    */
   public function testCreatePaidEvent() {
     //@todo alter API so that an integer is converted to an array
@@ -354,7 +354,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that passing in Unique field names works
+   * Test that passing in Unique field names works.
    */
   public function testCreateEventSuccessUniqueFieldNames() {
     $this->_params[0]['event_start_date'] = $this->_params[0]['start_date'];
@@ -412,7 +412,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Trying to delete an event with participants should return error
+   * Trying to delete an event with participants should return error.
    */
   public function testDeleteWithExistingParticipant() {
     $contactID = $this->individualCreate();

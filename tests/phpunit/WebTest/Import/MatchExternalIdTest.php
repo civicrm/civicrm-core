@@ -233,7 +233,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to add new contact
+   * Helper function to add new contact.
    *
    * @param string $firstName
    * @param string $lastName
@@ -263,7 +263,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to add new event
+   * Helper function to add new event.
    *
    * @param array $params
    *

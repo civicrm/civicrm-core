@@ -215,7 +215,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to check match for sumbit Advance Search
+   * function to check match for sumbit Advance Search.
    * @param string $firstName
    */
   public function submitSearch($firstName) {
@@ -259,7 +259,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill basic search detail
+   * function to fill basic search detail.
    * @param string $firstName
    * @param string $groupName
    * @param $tagName
@@ -286,7 +286,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill address search block values in advance search
+   * function to fill address search block values in advance search.
    * @param $firstName
    */
   public function addAddressSearchDetail($firstName) {
@@ -307,7 +307,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill activity search block in advance search
+   * function to fill activity search block in advance search.
    * @param $firstName
    */
   public function addActivitySearchDetail($firstName) {
@@ -328,7 +328,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill demographic search details
+   * function to fill demographic search details.
    */
   public function addDemographicSearchDetail() {
     // fill birth date range
@@ -345,7 +345,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill contribution search details
+   * function to fill contribution search details.
    * @param $firstName
    */
   public function addContributionSearchDetail($firstName) {
@@ -370,7 +370,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill participant search details
+   * function to fill participant search details.
    */
   public function addParticipantSearchDetail() {
     // fill event name
@@ -389,7 +389,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill member search details
+   * function to fill member search details.
    * @param $firstName
    */
   public function addMemberSearchDetail($firstName) {
@@ -416,7 +416,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * function to fill member search details
+   * function to fill member search details.
    * @param $firstName
    */
   public function addPledgeSearchDetail($firstName) {

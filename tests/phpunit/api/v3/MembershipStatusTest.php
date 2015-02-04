@@ -155,7 +155,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that trying to delete membership status while membership still exists creates error
+   * Test that trying to delete membership status while membership still exists creates error.
    */
   public function testDeleteWithMembershipError() {
     $membershipStatusID = $this->membershipStatusCreate();

@@ -36,7 +36,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   }
 
   /**
-   * this functionality is broken hence skipping the test
+   * this functionality is broken hence skipping the test.
    */
   public function skiptestAuthenticatedMultipleEvent() {
 
@@ -131,7 +131,7 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
   }
 
   /**
-   * this functionality is broken hence skipping the test
+   * this functionality is broken hence skipping the test.
    */
   public function skiptestAnonymousMultipleEvent() {
     // This is the path where our testing install resides.

@@ -59,7 +59,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create Contact with valid data
+   * Methods create Contact with valid data.
    * success expected
    */
   public function testCreateContact() {
@@ -141,7 +141,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Update the contact with no subtype to a valid subtype
+   * Update the contact with no subtype to a valid subtype.
    * success expected
    */
   public function testUpdateContactNosubtypeToValid() {
@@ -197,7 +197,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Update the contact with subtype to another valid subtype
+   * Update the contact with subtype to another valid subtype.
    * success expected
    */
   public function testUpdateContactSubtype() {

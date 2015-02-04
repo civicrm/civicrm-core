@@ -42,7 +42,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   const FIELD_ROWCOUNT = 6;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -182,7 +182,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
