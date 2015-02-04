@@ -44,28 +44,28 @@
 class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   /**
-   * The contact id of the person we are viewing
+   * The contact id of the person we are viewing.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The profile group are are interested in
+   * The profile group are are interested in.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * The profile types we restrict this page to display
+   * The profile types we restrict this page to display.
    *
    * @var string
    */
   protected $_restrict;
 
   /**
-   * Should we bypass permissions
+   * Should we bypass permissions.
    *
    * @var boolean
    */
@@ -85,7 +85,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_isContactActivityProfile = FALSE;
 
   /**
-   * Activity Id connected to the profile
+   * Activity Id connected to the profile.
    *
    * @var string
    */
@@ -101,7 +101,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_allFields = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param int $id
    *   The contact id.
@@ -411,7 +411,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

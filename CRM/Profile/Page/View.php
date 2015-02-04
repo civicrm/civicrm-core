@@ -40,14 +40,14 @@
 class CRM_Profile_Page_View extends CRM_Core_Page {
 
   /**
-   * The id of the contact
+   * The id of the contact.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
@@ -198,7 +198,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */

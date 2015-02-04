@@ -50,7 +50,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   static $mailsProcessed = 0;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -220,7 +220,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * post process to determine if the parent job
+   * post process to determine if the parent job.
    * as well as the mailing is complete after the run
    * @param null $mode
    */
@@ -379,7 +379,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * Split the parent job into n number of child job based on an offset
+   * Split the parent job into n number of child job based on an offset.
    * If null or 0 , we create only one child job
    * @param int $offset
    */
@@ -471,7 +471,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * Send the mailing
+   * Send the mailing.
    *
    * @param object $mailer
    *   A Mail object to send the messages.
@@ -811,7 +811,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * Cancel a mailing
+   * Cancel a mailing.
    *
    * @param int $mailingId
    *   The id of the mailing to be canceled.
@@ -858,7 +858,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
-   * Return a translated status enum string
+   * Return a translated status enum string.
    *
    * @param string $status
    *   The status enum.

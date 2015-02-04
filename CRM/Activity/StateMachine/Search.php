@@ -34,7 +34,7 @@
 class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
-   * The task that the wizard is currently processing
+   * The task that the wizard is currently processing.
    *
    * @var string
    */
@@ -91,7 +91,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   }
 
   /**
-   * Return the form name of the task
+   * Return the form name of the task.
    *
    * @return string
    */
@@ -100,7 +100,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
   }
 
   /**
-   * Should the controller reset the session
+   * Should the controller reset the session.
    * In some cases, specifically search we want to remember
    * state across various actions and want to go back to the
    * beginning from the final state, but retain the same session

@@ -43,35 +43,35 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   static $_exceptions = array('logging/contact/detail');
 
   /**
-   * Name of component if report list is filtered
+   * Name of component if report list is filtered.
    *
    * @var string
    */
   protected $_compName = NULL;
 
   /**
-   * ID of component if report list is filtered
+   * ID of component if report list is filtered.
    *
    * @var int
    */
   protected $_compID = NULL;
 
   /**
-   * ID of grouping if report list is filtered
+   * ID of grouping if report list is filtered.
    *
    * @var int
    */
   protected $_grouping = NULL;
 
   /**
-   * ID of parent report template if list is filtered by template
+   * ID of parent report template if list is filtered by template.
    *
    * @var int
    */
   protected $_ovID = NULL;
 
   /**
-   * Title of parent report template if list is filtered by template
+   * Title of parent report template if list is filtered by template.
    *
    * @var string
    */

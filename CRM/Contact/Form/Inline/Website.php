@@ -39,17 +39,17 @@
 class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
   /**
-   * Websitess of the contact that is been viewed
+   * Websitess of the contact that is been viewed.
    */
   private $_websites = array();
 
   /**
-   * No of website blocks for inline edit
+   * No of website blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * Call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -61,7 +61,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for website object
+   * Build the form object elements for website object.
    *
    * @return void
    */
@@ -94,7 +94,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

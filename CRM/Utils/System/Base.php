@@ -48,7 +48,7 @@ abstract class CRM_Utils_System_Base {
   var $supports_form_extensions = FALSE;
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
+   * Append an additional breadcrumb tag to the existing breadcrumb.
    *
    * @param array $breadCrumbs
    */
@@ -56,13 +56,13 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb
+   * Reset an additional breadcrumb tag to the existing breadcrumb.
    */
   public function resetBreadCrumb() {
   }
 
   /**
-   * Append a string to the head of the html file
+   * Append a string to the head of the html file.
    *
    * @param string $head
    *   The new string to be appended.
@@ -71,14 +71,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Rewrite various system urls to https
+   * Rewrite various system urls to https.
    */
   public function mapConfigToSSL() {
     // dont need to do anything, let CMS handle their own switch to SSL
   }
 
   /**
-   * Figure out the post url for QuickForm
+   * Figure out the post url for QuickForm.
    *
    * @param string $action
    *   The default url if one is pre-specified.
@@ -131,7 +131,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Authenticate the user against the CMS db
+   * Authenticate the user against the CMS db.
    *
    * @param string $name
    *   The user name.
@@ -150,7 +150,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set a message in the CMS to display to a user
+   * Set a message in the CMS to display to a user.
    *
    * @param string $message
    *   The message to set.
@@ -159,7 +159,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Load user into session
+   * Load user into session.
    *
    * @param $user
    *
@@ -194,7 +194,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get the locale set in the CMS
+   * Get the locale set in the CMS.
    *
    * @return string|null
    *   Locale or null for none
@@ -282,7 +282,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get CMS Version
+   * Get CMS Version.
    *
    * @return string
    */
@@ -377,7 +377,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Determine the native ID of the CMS user
+   * Determine the native ID of the CMS user.
    *
    * @param string $username
    *
@@ -389,7 +389,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set a init session with user object
+   * Set a init session with user object.
    *
    * @param array $data
    *   Array with user specific data
@@ -417,7 +417,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Add a script file
+   * Add a script file.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -434,7 +434,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Add an inline script
+   * Add an inline script.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -451,7 +451,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Add a css file
+   * Add a css file.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -468,7 +468,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Add an inline style
+   * Add an inline style.
    *
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
@@ -485,7 +485,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Sets the title of the page
+   * Sets the title of the page.
    *
    * @param string $title
    *   Title to set in html header
@@ -496,7 +496,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Return default Site Settings
+   * Return default Site Settings.
    *
    * @param string $dir
    *
@@ -524,7 +524,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set timezone in mysql so that timestamp fields show the correct time
+   * Set timezone in mysql so that timestamp fields show the correct time.
    */
   public function setMySQLTimeZone() {
     $timeZoneOffset = $this->getTimeZoneOffset();
@@ -536,7 +536,7 @@ abstract class CRM_Utils_System_Base {
 
 
   /**
-   * Get timezone from CMS
+   * Get timezone from CMS.
    *
    * @return string|false|null
    */
@@ -562,7 +562,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get timezone as a string
+   * Get timezone as a string.
    * @return string
    *   Timezone string e.g. 'America/Los_Angeles'
    */
@@ -658,7 +658,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get Url to view user record
+   * Get Url to view user record.
    * @param int $contactID
    *   Contact ID.
    *
@@ -669,7 +669,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Is the current user permitted to add a user
+   * Is the current user permitted to add a user.
    * @return bool
    */
   public function checkPermissionAddUser() {
@@ -677,7 +677,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Output code from error function
+   * Output code from error function.
    * @param string $content
    */
   public function outputError($content) {
@@ -685,7 +685,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Log error to CMS
+   * Log error to CMS.
    *
    * $param string $message
    */
@@ -693,7 +693,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Append to coreResourcesList
+   * Append to coreResourcesList.
    *
    * @param array $list
    */

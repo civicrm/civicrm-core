@@ -54,7 +54,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
+   * This virtual function is used to set the default values of.
    * various form elements
    *
    * access        public
@@ -173,7 +173,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

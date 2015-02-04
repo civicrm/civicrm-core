@@ -40,7 +40,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
   public $_contactId;
 
   /**
-   * called when action is browse
+   * called when action is browse.
    *
    */
   public function browse() {

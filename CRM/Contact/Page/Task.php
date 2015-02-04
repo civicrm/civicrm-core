@@ -43,7 +43,7 @@
 class CRM_Contact_Page_Task extends CRM_Core_Page {
 
   /**
-   * Returns the page title
+   * Returns the page title.
    *
    * @return string
    *   the title of the page

@@ -343,7 +343,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * Determine whether a given file is listed in the PHP include path
+   * Determine whether a given file is listed in the PHP include path.
    *
    * @param string $name
    *   Name of file.
@@ -550,7 +550,7 @@ HTACCESS;
   }
 
   /**
-   * Make a file path relative to some base dir
+   * Make a file path relative to some base dir.
    *
    * @param $directory
    * @param $basePath
@@ -567,7 +567,7 @@ HTACCESS;
   }
 
   /**
-   * Create a path to a temporary file which can endure for multiple requests
+   * Create a path to a temporary file which can endure for multiple requests.
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *
@@ -585,7 +585,7 @@ HTACCESS;
   }
 
   /**
-   * Create a path to a temporary directory which can endure for multiple requests
+   * Create a path to a temporary directory which can endure for multiple requests.
    *
    * TODO: Automatic file cleanup using, eg, TTL policy
    *

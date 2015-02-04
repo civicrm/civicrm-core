@@ -39,7 +39,7 @@
 class CRM_Pledge_Page_AJAX {
 
   /**
-   * Building Pledge Name combo box
+   * Building Pledge Name combo box.
    */
   public static function pledgeName() {
 

@@ -354,7 +354,7 @@ class CRM_Contact_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
    * @return array
    *   the set of optional tasks for a group of contacts

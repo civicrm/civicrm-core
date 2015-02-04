@@ -40,7 +40,7 @@
 class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action

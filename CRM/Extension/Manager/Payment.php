@@ -178,7 +178,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * Run hooks in the payment processor class
+   * Run hooks in the payment processor class.
    * Load requested payment processor and call the method specified.
    *
    * @param CRM_Extension_Info $info

@@ -60,7 +60,7 @@ class CRM_Core_Selector_Base {
   protected $_key;
 
   /**
-   * This function gets the attribute for the action that
+   * This function gets the attribute for the action that.
    * it matches.
    *
    * @param string $match the action to match against
@@ -97,7 +97,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * Compose the template file name from the class name
+   * Compose the template file name from the class name.
    *
    * @param string $action
    *   The action being performed.
@@ -147,7 +147,7 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * Setter for permission
+   * Setter for permission.
    *
    * @var string
    */

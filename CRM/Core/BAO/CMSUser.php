@@ -45,7 +45,7 @@ require_once 'DB.php';
 class CRM_Core_BAO_CMSUser {
 
   /**
-   * Synchronizing cms users with CiviCRM contacts
+   * Synchronizing cms users with CiviCRM contacts.
    *
    * @param bool $is_interactive
    *   Whether to show statuses & perform redirects.
@@ -222,7 +222,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Create CMS user using Profile
+   * Create CMS user using Profile.
    *
    * @param array $params
    * @param string $mail
@@ -251,7 +251,7 @@ class CRM_Core_BAO_CMSUser {
   }
 
   /**
-   * Create Form for CMS user using Profile
+   * Create Form for CMS user using Profile.
    *
    * @param CRM_Core_Form $form
    * @param int $gid

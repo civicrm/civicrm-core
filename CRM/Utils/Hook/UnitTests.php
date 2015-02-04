@@ -60,7 +60,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Register a piece of code to run when invoking a hook
+   * Register a piece of code to run when invoking a hook.
    * @param string $hook
    *   Hook name, e.g civicrm_pre.
    * @param array $callable
@@ -72,7 +72,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Invoke hooks
+   * Invoke hooks.
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.

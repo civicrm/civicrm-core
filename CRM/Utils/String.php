@@ -23,20 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
 
 /**
- * This class contains string functions
+ * This class contains string functions.
  *
  */
 class CRM_Utils_String {
@@ -48,8 +47,7 @@ class CRM_Utils_String {
   const ALPHANUMERIC = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
   /**
-   * Convert a display name into a potential variable
-   * name that we could use in forms/code
+   * Convert a display name into a potential variable name.
    *
    * @param $title title of the string
    * @param int $maxLength
@@ -70,8 +68,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Given a string, replace all non alpha numeric characters and
-   * spaces with the replacement character
+   * Replace all non alpha numeric characters and spaces with the replacement character.
    *
    * @param string $name
    *   The name to be worked on.
@@ -80,12 +77,11 @@ class CRM_Utils_String {
    * @param int $len
    *   Length of valid variables.
    *
-   *
    * @return string
    *   returns the manipulated string
    */
   public static function munge($name, $char = '_', $len = 63) {
-    // replace all white space and non-alpha numeric with $char
+    // Replace all white space and non-alpha numeric with $char
     // we only use the ascii character set since mysql does not create table names / field names otherwise
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
@@ -120,7 +116,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Takes a variable name and munges it randomly into another variable name
+   * Takes a variable name and munges it randomly into another variable name.
    *
    * @param string $name
    *   Initial Variable Name.
@@ -137,7 +133,8 @@ class CRM_Utils_String {
 
   /**
    * Takes a string and returns the last tuple of the string.
-   * useful while converting file names to class names etc
+   *
+   * Useful while converting file names to class names etc
    *
    * @param string $string
    *   The input string.
@@ -159,7 +156,8 @@ class CRM_Utils_String {
 
   /**
    * Appends a name to a string and separated by delimiter.
-   * does the right thing for an empty string
+   *
+   * Does the right thing for an empty string
    *
    * @param string $str
    *   The string to be appended to.
@@ -167,8 +165,6 @@ class CRM_Utils_String {
    *   The delimiter to use.
    * @param mixed $name
    *   The string (or array of strings) to append.
-   *
-   * @return void
    */
   public static function append(&$str, $delim, $name) {
     if (empty($name)) {
@@ -199,7 +195,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine if the string is composed only of ascii characters
+   * Determine if the string is composed only of ascii characters.
    *
    * @param string $str
    *   Input string.
@@ -242,7 +238,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine the string replacements for redaction
+   * Determine the string replacements for redaction.
    * on the basis of the regular expressions
    *
    * @param string $str
@@ -358,7 +354,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Extract the civicrm path from the url
+   * Extract the civicrm path from the url.
    *
    * @param string $query
    *   A url string.
@@ -660,7 +656,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Generate a random string
+   * Generate a random string.
    *
    * @param $len
    * @param $alphabet
@@ -725,7 +721,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * This function compares two strings
+   * This function compares two strings.
    *
    * @param string $strOne
    *   String one.
@@ -778,7 +774,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Formats a string of attributes for insertion in an html tag
+   * Formats a string of attributes for insertion in an html tag.
    *
    * @param array $attributes
    *

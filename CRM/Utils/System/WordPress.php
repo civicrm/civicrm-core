@@ -125,7 +125,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * WP action callback
+   * WP action callback.
    */
   public static function _showHTMLHead() {
     $region = CRM_Core_Region::instance('wp_head', FALSE);
@@ -326,7 +326,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Load wordpress bootstrap
+   * Load wordpress bootstrap.
    *
    * @param string $name
    *   optional username for login.

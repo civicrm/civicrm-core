@@ -50,7 +50,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   var $params = array();
 
   /**
-   * If there are no rules in rule group
+   * If there are no rules in rule group.
    */
   var $noRules = FALSE;
 
@@ -313,7 +313,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   }
 
   /**
-   * sort queries by number of records for the table associated with them
+   * sort queries by number of records for the table associated with them.
    * @param $tableQueries
    */
   public static function orderByTableCount(&$tableQueries) {
@@ -411,7 +411,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   }
 
   /**
-   * Get all of the combinations of fields that would work with a rule
+   * Get all of the combinations of fields that would work with a rule.
    */
   public static function combos($rgFields, $threshold, &$combos, $running = array()) {
     foreach ($rgFields as $rgField => $weight) {

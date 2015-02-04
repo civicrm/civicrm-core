@@ -81,7 +81,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   protected $_groupOrganizationID;
 
   /**
-   * Set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
@@ -209,7 +209,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -305,7 +305,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -366,7 +366,7 @@ WHERE  title = %1
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */
@@ -434,7 +434,7 @@ WHERE  title = %1
   }
 
   /**
-   * Build parent groups form elements
+   * Build parent groups form elements.
    *
    * @param CRM_Core_Form $form
    *

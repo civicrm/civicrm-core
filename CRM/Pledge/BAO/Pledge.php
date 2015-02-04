@@ -35,25 +35,23 @@
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
   /**
-   * Static field for all the pledge information that we can potentially export
+   * Static field for all the pledge information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * pledge id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -73,7 +71,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Add pledge
+   * Add pledge.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -139,7 +137,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Takes an associative array and creates a pledge object
+   * Takes an associative array and creates a pledge object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -259,7 +257,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Delete the pledge
+   * Delete the pledge.
    *
    * @param int $id
    *   Pledge id.
@@ -448,7 +446,7 @@ GROUP BY  currency
   }
 
   /**
-   * Get list of pledges In Honor of contact Ids
+   * Get list of pledges In Honor of contact Ids.
    *
    * @param int $honorId
    *   In Honor of Contact ID.
@@ -698,7 +696,7 @@ GROUP BY  currency
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object.
    *
    * @return array
    *   array of exportable Fields
@@ -762,7 +760,7 @@ GROUP BY  currency
   }
 
   /**
-   * Get pending or in progress pledges
+   * Get pending or in progress pledges.
    *
    * @param int $contactID
    *   Contact id.
@@ -810,7 +808,7 @@ GROUP BY  currency
   }
 
   /**
-   * Get pledge record count for a Contact
+   * Get pledge record count for a Contact.
    *
    * @param int $contactID
    *
@@ -1145,7 +1143,7 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Get array of non transactional statuses
+   * Get array of non transactional statuses.
    * @return array
    *   non transactional status ids
    */
@@ -1155,7 +1153,7 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Get array of non transactional statuses
+   * Get array of non transactional statuses.
    * @return array
    *   non transactional status ids
    */

@@ -38,14 +38,14 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   const CACHE_KEY_STRLEN = 8;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -123,7 +123,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -147,7 +147,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Calculate navigation weight
+   * Calculate navigation weight.
    *
    * @param int $parentID
    *   Parent_id of a menu.
@@ -177,7 +177,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Get formatted menu list
+   * Get formatted menu list.
    *
    * @return array
    *   returns associated array
@@ -263,7 +263,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * Build navigation tree
+   * Build navigation tree.
    *
    * @param array $navigationTree
    *   Nested array of menus.
@@ -321,7 +321,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Build menu
+   * Build menu.
    *
    * @param bool $json
    *   By default output is html.
@@ -387,7 +387,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Recursively check child menus
+   * Recursively check child menus.
    *
    * @param array $value
    * @param string $navigationString
@@ -464,7 +464,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Get Menu name
+   * Get Menu name.
    *
    * @param $value
    * @param array $skipMenuItems
@@ -578,7 +578,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Create navigation for CiviCRM Admin Menu
+   * Create navigation for CiviCRM Admin Menu.
    *
    * @param int $contactID
    *   Contact id.
@@ -643,7 +643,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Reset navigation for all contacts or a specified contact
+   * Reset navigation for all contacts or a specified contact.
    *
    * @param int $contactID
    *   Reset only entries belonging to that contact ID.
@@ -680,7 +680,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Process navigation
+   * Process navigation.
    *
    * @param array $params
    *   Associated array, $_GET.
@@ -714,7 +714,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Process move action
+   * Process move action.
    *
    * @param $nodeID
    *   Node that is being moved.
@@ -779,7 +779,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   *  Function to process rename action for tree
+   *  Function to process rename action for tree.
    *
    * @param int $nodeID
    * @param $label
@@ -789,7 +789,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Process delete action for tree
+   * Process delete action for tree.
    *
    * @param int $nodeID
    */
@@ -799,7 +799,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Get the info on navigation item
+   * Get the info on navigation item.
    *
    * @param int $navigationID
    *   Navigation id.
@@ -819,7 +819,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   * Update menu
+   * Update menu.
    *
    * @param array $params
    * @param array $newParams

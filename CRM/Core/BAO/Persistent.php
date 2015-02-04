@@ -59,7 +59,7 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
   }
 
   /**
-   * Add the Persistent Record
+   * Add the Persistent Record.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.

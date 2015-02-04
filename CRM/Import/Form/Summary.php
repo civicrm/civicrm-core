@@ -41,7 +41,7 @@
 abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

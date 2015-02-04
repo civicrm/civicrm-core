@@ -42,7 +42,7 @@ class CRM_Mailing_Config extends CRM_Core_Component_Config {
   const OUTBOUND_OPTION_REDIRECT_TO_DB = 5;
 
   /**
-   * What should be the verp separator we use
+   * What should be the verp separator we use.
    *
    * @var char
    */

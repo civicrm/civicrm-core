@@ -39,7 +39,7 @@
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
   /**
-   * Takes an associative array and creates a address
+   * Takes an associative array and creates a address.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Takes an associative array and adds address
+   * Takes an associative array and adds address.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -197,7 +197,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Format the address params to have reasonable values
+   * Format the address params to have reasonable values.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -399,7 +399,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -667,7 +667,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Get address sequence
+   * Get address sequence.
    *
    * @return array
    *   Array of address sequence.
@@ -911,7 +911,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Check if current address is used by any other contacts
+   * Check if current address is used by any other contacts.
    *
    * @param int $addressId
    *   Address id.
@@ -925,7 +925,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
-   * Check if current address fields are shared with any other address
+   * Check if current address fields are shared with any other address.
    *
    * @param array $fields
    *   Address fields in profile.
@@ -996,7 +996,7 @@ SELECT is_primary,
   }
 
   /**
-   * Update the shared addresses if master address is modified
+   * Update the shared addresses if master address is modified.
    *
    * @param int $addressId
    *   Address id.
@@ -1025,7 +1025,7 @@ SELECT is_primary,
   }
 
   /**
-   * Merge contacts with the Same address to get one shared label
+   * Merge contacts with the Same address to get one shared label.
    * @param array $rows
    *   Array[contact_id][contactDetails].
    */
@@ -1098,7 +1098,7 @@ SELECT is_primary,
   }
 
   /**
-   * Create relationship between contacts who share an address
+   * Create relationship between contacts who share an address.
    *
    * Note that currently we create relationship only for Individual contacts
    * Individual + Household and Individual + Orgnization
@@ -1172,7 +1172,7 @@ SELECT is_primary,
   }
 
   /**
-   * Check and set the status for shared address delete
+   * Check and set the status for shared address delete.
    *
    * @param int $addressId
    *   Address id.
@@ -1234,7 +1234,7 @@ SELECT is_primary,
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);

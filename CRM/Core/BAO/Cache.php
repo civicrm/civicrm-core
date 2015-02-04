@@ -52,7 +52,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   static $_cache = NULL;
 
   /**
-   * Retrieve an item from the DB cache
+   * Retrieve an item from the DB cache.
    *
    * @param string $group
    *   (required) The group name of the item.
@@ -93,7 +93,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   }
 
   /**
-   * Retrieve all items in a group
+   * Retrieve all items in a group.
    *
    * @param string $group
    *   (required) The group name of the item.
@@ -134,7 +134,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   }
 
   /**
-   * Store an item in the DB cache
+   * Store an item in the DB cache.
    *
    * @param object $data
    *   (required) A reference to the data that will be serialized and stored.

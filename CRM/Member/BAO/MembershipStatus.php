@@ -35,19 +35,19 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
-   * Static holder for the default LT
+   * Static holder for the default LT.
    */
   static $_defaultMembershipStatus = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -67,7 +67,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -82,7 +82,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Takes an associative array and creates a membership Status object
+   * Takes an associative array and creates a membership Status object.
    * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *
    * @param array $params
@@ -109,7 +109,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Add the membership types
+   * Add the membership types.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -152,7 +152,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Get defaults for new entity
+   * Get defaults for new entity.
    * @return array
    */
   public static function getDefaults() {
@@ -165,7 +165,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Get  membership status
+   * Get  membership status.
    *
    * @param int $membershipStatusId
    *
@@ -182,7 +182,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Delete membership Types
+   * Delete membership Types.
    *
    * @param int $membershipStatusId
    *
@@ -375,7 +375,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Function that return the status ids whose is_current_member is set
+   * Function that return the status ids whose is_current_member is set.
    *
    * @return array
    */

@@ -150,6 +150,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Test that item leases expire at the expected time.
    *
    * @dataProvider getQueueSpecs
+   *
    * @param $queueSpec
    */
   public function testTimeoutRelease($queueSpec) {

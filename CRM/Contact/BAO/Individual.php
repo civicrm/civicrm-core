@@ -45,7 +45,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Function is used to format the individual contact values
+   * Function is used to format the individual contact values.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -393,7 +393,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Creates display name
+   * Creates display name.
    *
    * @return string
    *   the constructed display name
@@ -405,7 +405,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

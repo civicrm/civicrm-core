@@ -39,7 +39,7 @@
 class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
-   * Cache for the current domain object
+   * Cache for the current domain object.
    */
   static $_domain = NULL;
 
@@ -49,7 +49,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   private $_location = NULL;
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -63,7 +63,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Get the domain BAO
+   * Get the domain BAO.
    *
    * @param null $reset
    *
@@ -129,7 +129,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Get the location values of a domain
+   * Get the location values of a domain.
    *
    * @return array
    *   Location::getValues
@@ -150,7 +150,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Save the values of a domain
+   * Save the values of a domain.
    *
    * @param array $params
    * @param int $id
@@ -167,7 +167,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Create a new domain
+   * Create a new domain.
    *
    * @param array $params
    *

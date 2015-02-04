@@ -242,7 +242,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   }
 
   /**
-   * Use the pager class to get the pageId and Offset
+   * Use the pager class to get the pageId and Offset.
    *
    * @return array
    *   an array of the pageID and offset
@@ -315,7 +315,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   }
 
   /**
-   * Build a url for pager links
+   * Build a url for pager links.
    */
   public function makeURL($key, $value) {
     $href = CRM_Utils_System::makeURL($key, TRUE);
@@ -327,7 +327,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   }
 
   /**
-   * Output the html pager link
+   * Output the html pager link.
    * @param string $href
    * @param string $title
    * @param string $image

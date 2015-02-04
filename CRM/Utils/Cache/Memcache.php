@@ -39,21 +39,21 @@ class CRM_Utils_Cache_Memcache {
   const DEFAULT_PREFIX = '';
 
   /**
-   * The host name of the memcached server
+   * The host name of the memcached server.
    *
    * @var string
    */
   protected $_host = self::DEFAULT_HOST;
 
   /**
-   * The port on which to connect on
+   * The port on which to connect on.
    *
    * @var int
    */
   protected $_port = self::DEFAULT_PORT;
 
   /**
-   * The default timeout to use
+   * The default timeout to use.
    *
    * @var int
    */
@@ -71,14 +71,14 @@ class CRM_Utils_Cache_Memcache {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * The actual memcache object
+   * The actual memcache object.
    *
    * @var resource
    */
   protected $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

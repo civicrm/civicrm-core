@@ -35,7 +35,7 @@
 class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
   /**
-   * Takes an associative array and creates a campaign object
+   * Takes an associative array and creates a campaign object.
    *
    * the function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -98,7 +98,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * Delete the campaign
+   * Delete the campaign.
    *
    * @param int $id
    *   Id of the campaign.
@@ -115,9 +115,9 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * campaign_id.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -489,7 +489,7 @@ SELECT  campaign.id               as id,
   }
 
   /**
-   * Get Campaigns groups
+   * Get Campaigns groups.
    *
    * @param int $campaignId
    *   Campaign id.
@@ -523,7 +523,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.

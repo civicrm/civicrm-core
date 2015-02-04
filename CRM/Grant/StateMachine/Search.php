@@ -35,14 +35,14 @@
 class CRM_Grant_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
-   * The task that the wizard is currently processing
+   * The task that the wizard is currently processing.
    *
    * @var string
    */
   protected $_task;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action
@@ -97,7 +97,7 @@ class CRM_Grant_StateMachine_Search extends CRM_Core_StateMachine {
   }
 
   /**
-   * Return the form name of the task
+   * Return the form name of the task.
    *
    * @return string
    */

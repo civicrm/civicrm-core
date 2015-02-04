@@ -163,7 +163,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * Look up the implementation for a given API request
+   * Look up the implementation for a given API request.
    *
    * @param array $apiRequest
    *   Array with keys:

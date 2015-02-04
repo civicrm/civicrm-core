@@ -54,7 +54,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -72,7 +72,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -92,7 +92,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

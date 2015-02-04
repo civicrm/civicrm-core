@@ -112,6 +112,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test getrows on contact summary report.
    */
   public function testReportTemplateGetRowsContactSummary() {
     $description = "Retrieve rows from a report template (optionally providing the instance_id)";
@@ -135,22 +136,30 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tet api to get rows from reports.
+   *
    * @dataProvider getReportTemplates
+   *
    * @param $reportID
+   *
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
     if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-    $result = $this->callAPISuccess('report_template', 'getrows', array(
+    $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => $reportID,
     ));
   }
 
   /**
+   * Test get statistics.
+   *
    * @dataProvider getReportTemplates
+   *
    * @param $reportID
+   *
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetStatisticsAllReports($reportID) {
@@ -167,7 +176,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Data provider function for getting all templates, note that the function needs to
+   * Data provider function for getting all templates.
+   *
+   * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
    */
   public static function getReportTemplates() {

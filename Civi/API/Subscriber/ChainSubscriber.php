@@ -75,7 +75,7 @@ class ChainSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Call any nested api calls
+   * Call any nested api calls.
    *
    * TODO: We don't really need this to be a separate function.
    * @param $params

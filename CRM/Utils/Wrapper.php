@@ -40,7 +40,7 @@
 class CRM_Utils_Wrapper {
 
   /**
-   * Simple Controller
+   * Simple Controller.
    *
    * The controller which will handle the display and processing of this page.
    */

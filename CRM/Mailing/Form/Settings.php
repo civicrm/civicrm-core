@@ -39,7 +39,7 @@
 class CRM_Mailing_Form_Settings extends CRM_Core_Form {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -99,7 +99,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -249,7 +249,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
    *
    * @return string

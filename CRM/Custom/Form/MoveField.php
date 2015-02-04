@@ -39,42 +39,42 @@
 class CRM_Custom_Form_MoveField extends CRM_Core_Form {
 
   /**
-   * The src group id
+   * The src group id.
    *
    * @var int
    */
   protected $_srcGID;
 
   /**
-   * The src field id
+   * The src field id.
    *
    * @var int
    */
   protected $_srcFID;
 
   /**
-   * The dst group id
+   * The dst group id.
    *
    * @var int
    */
   protected $_dstGID;
 
   /**
-   * The dst field id
+   * The dst field id.
    *
    * @var int
    */
   protected $_dstFID;
 
   /**
-   * The title of the field being moved
+   * The title of the field being moved.
    *
    * @var string
    */
   protected $_srcFieldLabel;
 
   /**
-   * Set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
@@ -103,7 +103,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -159,7 +159,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

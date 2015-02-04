@@ -28,7 +28,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -173,7 +173,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
 
   /**
-   * This function checks the PayJunction response code
+   * This function checks the PayJunction response code.
    *
    * @return bool
    */
@@ -200,7 +200,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   }
 
   /**
-   * Get the value of a field if set
+   * Get the value of a field if set.
    *
    * @param string $field
    *   The field.
@@ -257,7 +257,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @return string
    *   the error message if any

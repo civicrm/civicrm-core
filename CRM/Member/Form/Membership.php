@@ -52,7 +52,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_memTypeSelected;
 
   /**
-   * Display name of the member
+   * Display name of the member.
    *
    * @var string
    */
@@ -64,7 +64,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_memberEmail = NULL;
 
   /**
-   * Contact ID of the member
+   * Contact ID of the member.
    *
    * @var int
    */
@@ -90,7 +90,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_contributorContactID = NULL;
 
   /**
-   * ID of the person the receipt is to go to
+   * ID of the person the receipt is to go to.
    *
    * @var int
    */
@@ -372,7 +372,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -750,7 +750,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -992,7 +992,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -1714,7 +1714,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * Send email receipt
+   * Send email receipt.
    *
    * @param CRM_Core_Form $form
    *   Form object.

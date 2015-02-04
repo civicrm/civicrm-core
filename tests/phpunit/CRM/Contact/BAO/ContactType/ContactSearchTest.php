@@ -87,7 +87,8 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
   /**
    * Search with only type.
-   * success expected.
+   *
+   * Success expected.
    */
   public function testSearchWithType() {
 
@@ -151,7 +152,8 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
   /**
    * Search with only subtype.
-   * success expected.
+   *
+   * Success expected.
    */
   public function testSearchWithSubype() {
 
@@ -198,7 +200,8 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
   /**
    * Search with type as well as subtype.
-   * success expected.
+   *
+   * Success expected.
    */
   public function testSearchWithTypeSubype() {
 

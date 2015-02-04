@@ -38,7 +38,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -74,7 +74,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a payment using Advanced Integration Method
+   * Submit a payment using Advanced Integration Method.
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -191,7 +191,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Submit an Automated Recurring Billing subscription
+   * Submit an Automated Recurring Billing subscription.
    */
   public function doRecurPayment() {
     $template = CRM_Core_Smarty::singleton();
@@ -374,7 +374,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
    *   The ID to check.
@@ -455,7 +455,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Calculate and return the transaction fingerprint
+   * Calculate and return the transaction fingerprint.
    *
    * @return string
    *   fingerprint
@@ -507,7 +507,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Extract variables from returned XML
+   * Extract variables from returned XML.
    *
    * Function is from Authorize.Net sample code, and used
    * to prevent the requirement of XML functions.
@@ -534,7 +534,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Helper function for _parseArbReturn
+   * Helper function for _parseArbReturn.
    *
    * Function is from Authorize.Net sample code, and used to avoid using
    * PHP5 XML functions
@@ -551,7 +551,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Get the value of a field if set
+   * Get the value of a field if set.
    *
    * @param string $field
    *   The field.
@@ -606,7 +606,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @return string
    *   the error message if any

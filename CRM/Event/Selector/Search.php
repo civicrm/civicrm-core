@@ -119,28 +119,28 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   public $_queryParams;
 
   /**
-   * Represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_eventClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.
@@ -191,7 +191,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
-   * Can be used to alter the number of participation returned from a buildForm hook
+   * Can be used to alter the number of participation returned from a buildForm hook.
    *
    * @param int $limit
    *   How many participations do we want returned.
@@ -289,7 +289,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

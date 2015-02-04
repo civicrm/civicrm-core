@@ -56,7 +56,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array
@@ -100,7 +100,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

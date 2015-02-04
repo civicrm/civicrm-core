@@ -1422,7 +1422,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
 
   /**
-   * Verify that HTML metacharacters provided as inputs appear consistently
+   * Verify that HTML metacharacters provided as inputs appear consistently.
    * as outputs.
    *
    * At time of writing, the encoding scheme requires (for example) that an

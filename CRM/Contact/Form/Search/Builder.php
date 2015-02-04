@@ -39,21 +39,21 @@
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
-   * Number of columns in where
+   * Number of columns in where.
    *
    * @var int
    */
   public $_columnCount;
 
   /**
-   * Number of blocks to be shown
+   * Number of blocks to be shown.
    *
    * @var int
    */
   public $_blockCount;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -123,7 +123,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -133,7 +133,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param $values
    * @param $files
@@ -319,7 +319,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Process the uploaded file
+   * Process the uploaded file.
    *
    * @return void
    */

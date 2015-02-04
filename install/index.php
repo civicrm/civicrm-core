@@ -278,7 +278,7 @@ class InstallRequirements {
   const MINIMUM_THREAD_STACK = 192;
 
   /**
-   * Just check that the database configuration is okay
+   * Just check that the database configuration is okay.
    * @param $databaseConfig
    * @param $dbName
    */
@@ -398,7 +398,7 @@ class InstallRequirements {
   }
 
   /**
-   * Check everything except the database
+   * Check everything except the database.
    */
   public function check() {
     global $crmPath, $installType;

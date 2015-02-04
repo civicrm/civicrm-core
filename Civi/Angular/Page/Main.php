@@ -9,7 +9,7 @@ namespace Civi\Angular\Page;
  */
 class Main extends \CRM_Core_Page {
   /**
-   * The weight to assign to any Angular JS module files
+   * The weight to assign to any Angular JS module files.
    */
   const DEFAULT_MODULE_WEIGHT = 200;
 

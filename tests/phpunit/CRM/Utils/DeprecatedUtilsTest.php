@@ -25,7 +25,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contact_check_params with no contact type
+   *  Test civicrm_contact_check_params with no contact type.
    */
   public function testCheckParamsWithNoContactType() {
     $params = array('foo' => 'bar');
@@ -35,7 +35,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
 
   /**
-   *  Test civicrm_contact_check_params with a duplicate
+   *  Test civicrm_contact_check_params with a duplicate.
    */
   public function testCheckParamsWithDuplicateContact() {
     //  Insert a row in civicrm_contact creating individual contact
@@ -66,7 +66,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
 
   /**
-   *  Test civicrm_contact_check_params with a duplicate
+   *  Test civicrm_contact_check_params with a duplicate.
    *  and request the error in array format
    */
   public function testCheckParamsWithDuplicateContact2() {

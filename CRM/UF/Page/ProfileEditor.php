@@ -77,7 +77,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   }
 
   /**
-   * AJAX callback
+   * AJAX callback.
    */
   public static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);

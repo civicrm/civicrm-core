@@ -41,19 +41,19 @@
 class CRM_Financial_BAO_ExportFormat {
 
   /**
-   * data which the individual export formats will output in the desired format
+   * data which the individual export formats will output in the desired format.
    * @var array
    */
   protected $_exportParams;
 
   /**
-   * smarty template
+   * smarty template.
    * @var CRM_Core_Smarty
    */
   static protected $_template;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     if (!isset(self::$_template)) {
@@ -62,7 +62,7 @@ class CRM_Financial_BAO_ExportFormat {
   }
 
   /**
-   * Override to assemble the appropriate subset of financial data for the specific export format
+   * Override to assemble the appropriate subset of financial data for the specific export format.
    * @param array $exportParams
    *
    * @return mixed
@@ -105,7 +105,7 @@ class CRM_Financial_BAO_ExportFormat {
   }
 
   /**
-   * Override this if appropriate
+   * Override this if appropriate.
    * @return null
    */
   public function getTemplateFileName() {

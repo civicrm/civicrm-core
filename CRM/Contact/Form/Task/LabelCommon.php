@@ -71,7 +71,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
 
   /**
-   * Get the rows for the labels
+   * Get the rows for the labels.
    *
    * @param $contactIDs
    * @param int $locationTypeID
@@ -250,7 +250,7 @@ class CRM_Contact_Form_Task_LabelCommon {
   }
 
   /**
-   * Get array of return properties for address fields required for mailing label
+   * Get array of return properties for address fields required for mailing label.
    *
    * @return array
    *   return properties for address e.g

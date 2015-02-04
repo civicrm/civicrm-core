@@ -77,7 +77,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * If a new email is set to is_primary the prev should no longer be
+   * If a new email is set to is_primary the prev should no longer be.
    *
    * If is_primary is not set then it should become is_primary is no others exist
    */

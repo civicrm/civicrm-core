@@ -140,7 +140,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * Handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -152,7 +152,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * Handle the values in preview mode
+   * Handle the values in preview mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -165,7 +165,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * Handle the values in summary mode
+   * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -242,7 +242,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   }
 
   /**
-   * Handle the values in import mode
+   * Handle the values in import mode.
    *
    * @param int $onDuplicate
    *   The code for what action to take on duplicates.

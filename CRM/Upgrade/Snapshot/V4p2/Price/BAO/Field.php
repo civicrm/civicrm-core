@@ -42,7 +42,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   protected $_options;
 
   /**
-   * Takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object.
    *
    * the function extract all the params it needs to initialize the create a
    * price field object. the params array could contain additional unused name/value
@@ -67,7 +67,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -154,7 +154,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -168,7 +168,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -198,7 +198,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * This function for building custom fields
+   * This function for building custom fields.
    *
    * @param CRM_Core_Form $qf
    *   Form object (reference).
@@ -458,7 +458,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Retrieve a list of options for the specified field
+   * Retrieve a list of options for the specified field.
    *
    * @param int $fieldId
    *   Price field ID.
@@ -562,7 +562,7 @@ WHERE
   }
 
   /**
-   * Validate the priceset
+   * Validate the priceset.
    *
    * @param int $priceSetId
    * @param array $fields

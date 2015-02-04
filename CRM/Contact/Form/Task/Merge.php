@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */

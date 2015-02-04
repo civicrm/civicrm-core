@@ -51,7 +51,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
   const NUM_OPTION = 11;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -274,7 +274,7 @@ SELECT id
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -407,7 +407,7 @@ SELECT id
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

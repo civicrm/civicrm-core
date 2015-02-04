@@ -146,7 +146,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Function returns the string for the order by clause
+   * Function returns the string for the order by clause.
    *
    * @return string
    *   the order by clause
@@ -169,7 +169,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Create the sortID string to be used in the GET param
+   * Create the sortID string to be used in the GET param.
    *
    * @param int $index
    *   The field index.
@@ -184,7 +184,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Init the sort ID values in the object
+   * Init the sort ID values in the object.
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
@@ -221,7 +221,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Init the object
+   * Init the object.
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
@@ -257,7 +257,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Getter for currentSortID
+   * Getter for currentSortID.
    *
    * @return int
    *   returns of the current sort id
@@ -268,7 +268,7 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Getter for currentSortDirection
+   * Getter for currentSortDirection.
    *
    * @return int
    *   returns of the current sort direction

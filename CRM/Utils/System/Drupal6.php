@@ -129,7 +129,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db
+   * Check if username and email exists in the drupal db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -249,7 +249,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Append a string to the head of the html file
+   * Append a string to the head of the html file.
    *
    * @param string $head
    *   The new string to be appended.
@@ -261,7 +261,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Add a css file
+   * Add a css file.
    *
    * @param $url : string, absolute path to file
    * @param string $region
@@ -375,7 +375,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Determine the native ID of the CMS user
+   * Determine the native ID of the CMS user.
    *
    * @param string $username
    * @return int|NULL
@@ -397,7 +397,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Load drupal bootstrap
+   * Load drupal bootstrap.
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -701,7 +701,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Wrapper for og_membership creation
+   * Wrapper for og_membership creation.
    *
    * @param int $ogID
    *   Organic Group ID.
@@ -713,7 +713,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Wrapper for og_membership deletion
+   * Wrapper for og_membership deletion.
    *
    * @param int $ogID
    *   Organic Group ID.

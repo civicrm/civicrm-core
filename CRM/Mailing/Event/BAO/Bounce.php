@@ -35,7 +35,7 @@
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -123,7 +123,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -177,7 +177,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.

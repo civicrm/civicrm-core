@@ -77,7 +77,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_payment_create methods
 
   /**
-   * Test civicrm_participant_payment_create with wrong params type
+   * Test civicrm_participant_payment_create with wrong params type.
    */
   public function testPaymentCreateWrongParamsType() {
     $params = 'a string';
@@ -85,7 +85,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_participant_payment_create with empty params
+   * Test civicrm_participant_payment_create with empty params.
    */
   public function testPaymentCreateEmptyParams() {
     $params = array();
@@ -93,7 +93,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without contribution_id
+   * Check without contribution_id.
    */
   public function testPaymentCreateMissingContributionId() {
     //Without Payment EntityID
@@ -128,7 +128,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_payment_create methods
 
   /**
-   * Test civicrm_participant_payment_create with wrong params type
+   * Test civicrm_participant payment create with wrong params type.
    */
   public function testPaymentUpdateWrongParamsType() {
     $params = 'a string';
@@ -140,24 +140,21 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * Check with empty array.
    */
   public function testPaymentUpdateEmpty() {
-    $params = array();
-    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
+    $this->callAPIFailure('participant_payment', 'create', array());
   }
 
   /**
-   * Check with missing participant_id
+   * Check with missing participant_id.
    */
   public function testPaymentUpdateMissingParticipantId() {
-    //WithoutParticipantId
     $params = array(
       'contribution_id' => '3',
     );
-
-    $participantPayment = $this->callAPIFailure('participant_payment', 'create', $params);
+    $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
-   * Check with missing contribution_id
+   * Check with missing contribution_id.
    */
   public function testPaymentUpdateMissingContributionId() {
     $params = array(
@@ -263,14 +260,13 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
-  ///////////////// civicrm_participant_payment_delete methods
 
   /**
-   * Test civicrm_participant_payment_delete with wrong params type
+   * Test civicrm_participant_payment_delete with wrong params type.
    */
   public function testPaymentDeleteWrongParamsType() {
     $params = 'a string';
-    $result = $this->callAPIFailure('participant_payment', 'delete', $params);
+    $this->callAPIFailure('participant_payment', 'delete', $params);
   }
 
   /**

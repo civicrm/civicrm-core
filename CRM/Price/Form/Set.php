@@ -39,14 +39,14 @@
 class CRM_Price_Form_Set extends CRM_Core_Form {
 
   /**
-   * The set id saved to the session for an update
+   * The set id saved to the session for an update.
    *
    * @var int
    */
   protected $_sid;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -78,7 +78,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -110,7 +110,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -253,7 +253,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

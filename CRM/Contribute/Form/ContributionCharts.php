@@ -35,14 +35,14 @@
 class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
   /**
-   *  Year of chart
+   *  Year of chart.
    *
    * @var int
    */
   protected $_year = NULL;
 
   /**
-   *  The type of chart
+   *  The type of chart.
    *
    * @var string
    */
@@ -62,7 +62,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

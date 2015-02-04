@@ -35,14 +35,14 @@
 class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -52,7 +52,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -94,7 +94,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Run the page
+   * Run the page.
    *
    * This method is called after the page is created. It checks for the type
    * of action and executes that action. Finally it calls the parent's run
@@ -135,7 +135,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all rule groups
+   * Browse all rule groups.
    *
    * @return void
    */
@@ -180,7 +180,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
    * @return string
    *   classname of edit form
@@ -190,7 +190,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
    * @return string
    *   name of this page
@@ -200,7 +200,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get user context
+   * Get user context.
    *
    * @param null $mode
    *

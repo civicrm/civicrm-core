@@ -40,7 +40,7 @@
 class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -144,7 +144,7 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links

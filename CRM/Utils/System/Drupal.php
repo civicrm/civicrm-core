@@ -105,7 +105,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db
+   * Check if username and email exists in the drupal db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -413,7 +413,7 @@ AND    u.status = 1
   }
 
   /**
-   * Determine the native ID of the CMS user
+   * Determine the native ID of the CMS user.
    *
    * @param string $username
    * @return int|NULL
@@ -435,7 +435,7 @@ AND    u.status = 1
   }
 
   /**
-   * Get the default location for CiviCRM blocks
+   * Get the default location for CiviCRM blocks.
    *
    * @return string
    */
@@ -444,7 +444,7 @@ AND    u.status = 1
   }
 
   /**
-   * Load drupal bootstrap
+   * Load drupal bootstrap.
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -713,7 +713,7 @@ AND    u.status = 1
   }
 
   /**
-   * Wrapper for og_membership creation
+   * Wrapper for og_membership creation.
    *
    * @param int $ogID
    *   Organic Group ID.
@@ -736,7 +736,7 @@ AND    u.status = 1
   }
 
   /**
-   * Wrapper for og_membership deletion
+   * Wrapper for og_membership deletion.
    *
    * @param int $ogID
    *   Organic Group ID.

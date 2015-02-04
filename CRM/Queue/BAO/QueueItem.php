@@ -41,7 +41,7 @@
 class CRM_Queue_BAO_QueueItem extends CRM_Queue_DAO_QueueItem {
 
   /**
-   * Ensure that the required SQL table exists
+   * Ensure that the required SQL table exists.
    *
    * @return bool
    *   TRUE if table now exists

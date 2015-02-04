@@ -40,7 +40,7 @@
 class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -94,7 +94,7 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

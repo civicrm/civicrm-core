@@ -43,7 +43,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   static $_defaultPaymentProcessor = NULL;
 
   /**
-   * Create Payment Processor
+   * Create Payment Processor.
    *
    * @param array $params
    *   Parameters for Processor entity.
@@ -85,16 +85,16 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -115,7 +115,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -131,7 +131,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Retrieve the default payment processor
+   * Retrieve the default payment processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor|null
    *   The default payment processor object on success,
@@ -147,7 +147,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Delete payment processor
+   * Delete payment processor.
    *
    * @param int $paymentProcessorID
    *
@@ -173,7 +173,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Get the payment processor details
+   * Get the payment processor details.
    *
    * @param int $paymentProcessorID
    *   Payment processor id.
@@ -250,7 +250,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Build payment processor details
+   * Build payment processor details.
    *
    * @param object $dao
    *   Payment processor object.
@@ -388,7 +388,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Is there a processor on this site with the specified capability
+   * Is there a processor on this site with the specified capability.
    * @param array $capabilities
    * @param bool $isIncludeTest
    *

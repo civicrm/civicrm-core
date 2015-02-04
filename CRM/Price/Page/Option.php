@@ -46,28 +46,28 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
   public $useLivePageJS = TRUE;
 
   /**
-   * The field id of the option
+   * The field id of the option.
    *
    * @var int
    */
   protected $_fid;
 
   /**
-   * The field id of the option
+   * The field id of the option.
    *
    * @var int
    */
   protected $_sid;
 
   /**
-   * The price set is reserved or not
+   * The price set is reserved or not.
    *
    * @var boolean
    */
   protected $_isSetReserved = FALSE;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */

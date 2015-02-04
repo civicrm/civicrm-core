@@ -35,14 +35,14 @@
 class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Get pledge payment details
+   * Get pledge payment details.
    *
    * @param int $pledgeId
    *   Pledge id.
@@ -162,7 +162,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Add pledge payment
+   * Add pledge payment.
    *
    * @param array $params
    *   Associate array of field.
@@ -199,11 +199,9 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * pledge id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -223,7 +221,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Delete pledge payment
+   * Delete pledge payment.
    *
    * @param int $id
    *
@@ -250,7 +248,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Delete all pledge payments
+   * Delete all pledge payments.
    *
    * @param int $id
    *   Pledge id.
@@ -320,7 +318,7 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Update Pledge Payment Status
+   * Update Pledge Payment Status.
    *
    * @param int $pledgeID
    *   , id of pledge.
@@ -576,7 +574,7 @@ WHERE  civicrm_pledge.id = %2
   }
 
   /**
-   * Calculate the pledge status
+   * Calculate the pledge status.
    *
    * @param int $pledgeId
    *   Pledge id.
@@ -616,7 +614,7 @@ WHERE  civicrm_pledge.id = %2
   }
 
   /**
-   * Update pledge payment table
+   * Update pledge payment table.
    *
    * @param int $pledgeId
    *   Pledge id.
@@ -667,7 +665,7 @@ WHERE  civicrm_pledge_payment.pledge_id = %1
   }
 
   /**
-   * Update pledge payment table when reminder is sent
+   * Update pledge payment table when reminder is sent.
    *
    * @param int $paymentId
    *   Payment id.
@@ -684,7 +682,7 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
   }
 
   /**
-   * Get oldest pending or in progress pledge payments
+   * Get oldest pending or in progress pledge payments.
    *
    * @param int $pledgeID
    *   Pledge id.

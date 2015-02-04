@@ -35,14 +35,14 @@
 class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -62,7 +62,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -77,7 +77,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Add the Option Group
+   * Add the Option Group.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -109,7 +109,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Delete Option Group
+   * Delete Option Group.
    *
    * @param int $optionGroupId
    *   Id of the Option Group to be deleted.
@@ -126,7 +126,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   }
 
   /**
-   * Get title of the option group
+   * Get title of the option group.
    *
    * @param int $optionGroupId
    *   Id of the Option Group.

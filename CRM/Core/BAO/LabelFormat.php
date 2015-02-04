@@ -40,7 +40,7 @@
 class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
-   * Static holder for the Label Formats Option Group ID
+   * Static holder for the Label Formats Option Group ID.
    */
   private static $_gid = NULL;
 
@@ -240,7 +240,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Option Group ID for Label Formats
+   * Get Option Group ID for Label Formats.
    *
    * @param string $name
    *
@@ -258,7 +258,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Add ordering fields to Label Format list
+   * Add ordering fields to Label Format list.
    *
    * @param array (reference) $list List of Label Formats
    * @param string $returnURL
@@ -306,7 +306,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Retrieve the default Label Format values
+   * Retrieve the default Label Format values.
    *
    * @param string $groupName
    *   Label format group name.
@@ -328,7 +328,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Label Format from the DB
+   * Get Label Format from the DB.
    *
    * @param string $field
    *   Field name to search by.
@@ -352,7 +352,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Label Format by Name
+   * Get Label Format by Name.
    *
    * @param int $name
    *   Label format name. Empty = get default label format.
@@ -365,7 +365,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Label Format by ID
+   * Get Label Format by ID.
    *
    * @param int $id
    *   Label format id. 0 = get default label format.
@@ -380,7 +380,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Label Format field from associative array
+   * Get Label Format field from associative array.
    *
    * @param string $field
    *   Name of a label format field.
@@ -411,9 +411,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * label id. It also stores all the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -451,7 +451,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Return the name of the group for customized labels
+   * Return the name of the group for customized labels.
    *
    * @return void
    */
@@ -460,7 +460,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Save the Label Format in the DB
+   * Save the Label Format in the DB.
    *
    * @param array (reference) $values associative array of name/value pairs
    * @param int $id
@@ -530,7 +530,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Delete a Label Format
+   * Delete a Label Format.
    *
    * @param int $id
    *   ID of the label format to be deleted.

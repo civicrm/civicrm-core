@@ -33,7 +33,7 @@
 class CRM_Utils_Address {
 
   /**
-   * Format an address string from address fields and a format string
+   * Format an address string from address fields and a format string.
    *
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.

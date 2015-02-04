@@ -40,7 +40,7 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -61,7 +61,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   }
 
   /**
-   * Delete an extension
+   * Delete an extension.
    *
    * @param int $id
    *   Id of the extension to be deleted.
@@ -76,7 +76,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   }
 
   /**
-   * Change the schema version of an extension
+   * Change the schema version of an extension.
    *
    * @param string $fullName
    *   the fully-qualified name (eg "com.example.myextension").
@@ -93,7 +93,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
   }
 
   /**
-   * Determine the schema version of an extension
+   * Determine the schema version of an extension.
    *
    * @param string $fullName
    *   the fully-qualified name (eg "com.example.myextension").

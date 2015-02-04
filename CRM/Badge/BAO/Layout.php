@@ -42,9 +42,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and.
-   * retrieves the relevant objects. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -65,7 +65,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.

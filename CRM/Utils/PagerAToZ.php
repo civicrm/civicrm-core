@@ -40,7 +40,7 @@
 class CRM_Utils_PagerAToZ {
 
   /**
-   * Returns the alphabetic array for sorting by character
+   * Returns the alphabetic array for sorting by character.
    *
    * @param array $query
    *   The query object.
@@ -58,7 +58,7 @@ class CRM_Utils_PagerAToZ {
   }
 
   /**
-   * Return the all the static characters
+   * Return the all the static characters.
    *
    * @return array
    *   is a array of static characters
@@ -96,7 +96,7 @@ class CRM_Utils_PagerAToZ {
   }
 
   /**
-   * Return the all the dynamic characters
+   * Return the all the dynamic characters.
    *
    * @param $query
    * @param $isDAO
@@ -123,7 +123,7 @@ class CRM_Utils_PagerAToZ {
   }
 
   /**
-   * Create the links
+   * Create the links.
    *
    * @param array $query
    *   The form values for search.

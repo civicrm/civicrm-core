@@ -39,7 +39,7 @@
 class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
   /**
-   * UF container variables
+   * UF container variables.
    */
   static $uf = NULL;
   static $ufClass = NULL;
@@ -80,7 +80,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Set the email address of the user
+   * Set the email address of the user.
    *
    * @param object $user
    *   Handle to the user object.
@@ -105,7 +105,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Swap the current UF for soap
+   * Swap the current UF for soap.
    */
   public function swapUF() {
     $config = CRM_Core_Config::singleton();

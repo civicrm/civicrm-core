@@ -123,7 +123,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the n participant statuses
+   * Get all the n participant statuses.
    *
    *
    * @param int $id
@@ -187,7 +187,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the n participant roles
+   * Get all the n participant roles.
    *
    *
    * @param int $id
@@ -219,7 +219,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the participant listings
+   * Get all the participant listings.
    *
    *
    * @param int $id
@@ -262,7 +262,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get event template titles
+   * Get event template titles.
    *
    * @param int $id
    *
@@ -299,7 +299,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Personal campaign pages
+   * Get all the Personal campaign pages.
    *
    *
    * @param int $id

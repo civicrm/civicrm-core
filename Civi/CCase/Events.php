@@ -94,7 +94,7 @@ class Events {
   }
 
   /**
-   * Find any extra listeners declared in XML and pass the event along to them
+   * Find any extra listeners declared in XML and pass the event along to them.
    *
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    */

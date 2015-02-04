@@ -138,7 +138,7 @@ class CRM_Queue_Service {
   }
 
   /**
-   * Convert a queue "type" name to a class name
+   * Convert a queue "type" name to a class name.
    *
    * @param string $type
    *   E.g. "interactive", "immediate", "stomp", "beanstalk".

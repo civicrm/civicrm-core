@@ -38,14 +38,14 @@
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
   /**
-   * Static field for all the activity information that we can potentially export
+   * Static field for all the activity information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Static field for all the activity information that we can potentially import
+   * Static field for all the activity information that we can potentially import.
    *
    * @var array
    */

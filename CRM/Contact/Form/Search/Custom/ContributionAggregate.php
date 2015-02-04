@@ -105,7 +105,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
   }
 
   /**
-   * Construct the search query
+   * Construct the search query.
    *
    * @param int $offset
    * @param int $rowcount
@@ -184,7 +184,7 @@ civicrm_contact AS contact_a
   }
 
   /**
-   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
    *

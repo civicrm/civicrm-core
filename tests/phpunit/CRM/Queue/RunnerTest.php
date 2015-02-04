@@ -86,11 +86,12 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Run a series of tasks; one of the tasks will insert more
-   * TODOs at the start of the list
+   * Run a series of tasks.
+   *
+   * One of the tasks will insert more TODOs at the start of the list.
    */
   public function testRunAll_AddMore() {
-    // prepare a list of tasks with an error in the middle
+    // Prepare a list of tasks with an error in the middle.
     $this->queue->createItem(new CRM_Queue_Task(
       array('CRM_Queue_RunnerTest', '_recordValue'),
       array('a'),

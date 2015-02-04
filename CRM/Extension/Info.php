@@ -31,7 +31,7 @@
 class CRM_Extension_Info {
 
   /**
-   * Extension info file name
+   * Extension info file name.
    */
   const FILENAME = 'info.xml';
 
@@ -42,7 +42,7 @@ class CRM_Extension_Info {
   public $file = NULL;
 
   /**
-   * Load extension info an XML file
+   * Load extension info an XML file.
    *
    * @param $file
    *
@@ -61,7 +61,7 @@ class CRM_Extension_Info {
   }
 
   /**
-   * Load extension info a string
+   * Load extension info a string.
    *
    * @param string $string
    *   XML content.

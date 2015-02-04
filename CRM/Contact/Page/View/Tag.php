@@ -35,7 +35,7 @@
 class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
 
   /**
-   * called when action is browse
+   * called when action is browse.
    *
    * @return void
    */

@@ -46,6 +46,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
+   *
    * This method is called before a test is executed.
    */
   protected function setUp() {
@@ -90,10 +91,10 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     );
   }
 
-  ///////////////// civicrm_domain_get methods
-
   /**
-   * Test civicrm_domain_get. Takes no params.
+   * Test civicrm_domain_get.
+   *
+   * Takes no params.
    * Testing mainly for format.
    */
   public function testGet() {
@@ -173,10 +174,11 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_domain_create with empty params.
+   *
    * Error expected.
    */
   public function testCreateWithEmptyParams() {
-    $result = $this->callAPIFailure('domain', 'create', array());
+    $this->callAPIFailure('domain', 'create', array());
   }
 
 }

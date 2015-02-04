@@ -342,7 +342,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * Add urls for display in the actions menu
+   * Add urls for display in the actions menu.
    * @param CRM_Core_Page $obj
    * @param int $cid
    */

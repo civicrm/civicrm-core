@@ -45,7 +45,7 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Calculate a cumulative digest based on a collection of files
+   * Calculate a cumulative digest based on a collection of files.
    *
    * @param array $files
    *   List of file names (strings).
@@ -62,7 +62,7 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Find the path to the main Civi source tree
+   * Find the path to the main Civi source tree.
    *
    * @return string
    * @throws RuntimeException
@@ -77,7 +77,7 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Find files in several directories using several filename patterns
+   * Find files in several directories using several filename patterns.
    *
    * @param array $pairs
    *   Each item is an array(0 => $searchBaseDir, 1 => $filePattern).

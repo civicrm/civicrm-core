@@ -83,7 +83,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @param CRM_Core_Form $form
@@ -301,7 +301,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * Form rule
+   * Form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -339,7 +339,7 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @param CRM_Core_Form $form

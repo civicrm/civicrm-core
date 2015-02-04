@@ -37,7 +37,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -260,7 +260,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
    *   The ID to check.
@@ -275,7 +275,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * Produces error message and returns from class
+   * Produces error message and returns from class.
    * @param string $errorCode
    * @param string $errorMessage
    * @return CRM_Core_Error
@@ -299,7 +299,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * This public function checks to see if we have the right processor config values set
+   * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *  register any credit card details

@@ -35,7 +35,7 @@
 class CRM_Core_IDS {
 
   /**
-   * Define the threshold for the ids reactions
+   * Define the threshold for the ids reactions.
    */
   private $threshold = array(
     'log' => 25,
@@ -95,7 +95,7 @@ class CRM_Core_IDS {
   }
 
   /**
-   * Create the default config file for the IDS system
+   * Create the default config file for the IDS system.
    *
    * @param bool $force
    *   Should we recreate it irrespective if it exists or not.

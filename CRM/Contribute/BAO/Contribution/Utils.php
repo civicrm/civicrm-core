@@ -34,7 +34,7 @@
 class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
-   * Process payment after confirmation
+   * Process payment after confirmation.
    *
    * @param CRM_Core_Form $form
    *   Form object.
@@ -418,7 +418,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * Get the contribution details by year
+   * Get the contribution details by year.
    *
    * @return array
    *   associated array

@@ -35,20 +35,20 @@
 class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
   /**
-   * Product information
+   * Product information.
    * @var array
    */
   private static $productInfo;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -68,7 +68,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -83,7 +83,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Delete financial Types
+   * Delete financial Types.
    *
    * @param int $premiumID
    *
@@ -98,7 +98,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium Block im Contribution Pages
+   * Build Premium Block im Contribution Pages.
    *
    * @param CRM_Core_Form $form
    * @param int $pageID
@@ -166,7 +166,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium B im Contribution Pages
+   * Build Premium B im Contribution Pages.
    *
    * @param CRM_Core_Form $form
    * @param int $productID
@@ -239,7 +239,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Retrieve premium product and their options
+   * Retrieve premium product and their options.
    *
    * @return array
    *   product and option arrays

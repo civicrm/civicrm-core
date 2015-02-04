@@ -39,7 +39,7 @@
 class CRM_UF_Form_Field extends CRM_Core_Form {
 
   /**
-   * The uf group id saved to the session for an update
+   * The uf group id saved to the session for an update.
    *
    * @var int
    */
@@ -81,7 +81,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_hasLocationTypes;
 
   /**
-   * Is this profile has searchable field
+   * Is this profile has searchable field.
    * or is any field having in selector true.
    *
    * @var boolean.
@@ -89,7 +89,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected $_hasSearchableORInSelector;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -178,7 +178,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -499,7 +499,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */
@@ -757,7 +757,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.

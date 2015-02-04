@@ -67,14 +67,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    */
   protected $_paymentProcessors = array();
   /**
-   * The id of the contribution that we are processing
+   * The id of the contribution that we are processing.
    *
    * @var int
    */
   public $_id;
 
   /**
-   * The id of the premium that we are proceessing
+   * The id of the premium that we are proceessing.
    *
    * @var int
    */
@@ -386,7 +386,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Assign billing type id to bltID
+   * Assign billing type id to bltID.
    *
    * @throws CRM_Core_Exception
    * @return void

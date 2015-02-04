@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Tell a friend id in db
+   * Tell a friend id in db.
    *
    * @var int
    */
@@ -86,7 +86,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -103,7 +103,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

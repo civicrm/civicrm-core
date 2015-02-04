@@ -63,7 +63,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
   }
 
   /**
-   * Takes an associative array and adds phone
+   * Takes an associative array and adds phone.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -263,7 +263,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
    */
   public static function del($id) {
     // Ensure mysql phone function exists

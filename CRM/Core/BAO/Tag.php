@@ -35,14 +35,14 @@
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -181,7 +181,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Function to retrieve tags
+   * Function to retrieve tags.
    *
    * @param string $usedFor
    *   Which type of tag entity.
@@ -314,7 +314,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Delete the tag
+   * Delete the tag.
    *
    * @param int $id
    *   Tag id.
@@ -345,7 +345,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Takes an associative array and creates a contact object
+   * Takes an associative array and creates a contact object.
    *
    * The function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
@@ -403,7 +403,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -421,7 +421,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Get the tag sets for a entity object
+   * Get the tag sets for a entity object.
    *
    * @param string $entityTable
    *   Entity_table.

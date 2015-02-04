@@ -141,7 +141,7 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Print a fatal error
+   * Print a fatal error.
    *
    * @param array $error
    *   The PHP error (with "type", "message", etc).
@@ -162,7 +162,7 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Print an unhandled exception
+   * Print an unhandled exception.
    *
    * @param Exception $e
    *   The unhandled exception.

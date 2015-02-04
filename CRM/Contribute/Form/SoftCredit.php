@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
    *
@@ -67,7 +67,7 @@ class CRM_Contribute_Form_SoftCredit {
 
 
   /**
-   * Function used to build form element for soft credit block
+   * Function used to build form element for soft credit block.
    *
    * @param CRM_Core_Form $form
    *
@@ -160,7 +160,7 @@ class CRM_Contribute_Form_SoftCredit {
   }
 
   /**
-   * Function used to set defaults for soft credit block
+   * Function used to set defaults for soft credit block.
    *
    * @param $defaults
    * @param $form
@@ -194,7 +194,7 @@ class CRM_Contribute_Form_SoftCredit {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

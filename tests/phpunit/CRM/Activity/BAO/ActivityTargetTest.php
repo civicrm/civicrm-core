@@ -45,14 +45,14 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
+   *
    * This method is called after a test is executed.
    */
   protected function tearDown() {
   }
 
   public function testRetrieveTargetIdsByActivityIdZeroID() {
-    $activity = $this->activityCreate();
-
+    $this->activityCreate();
     $target = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId(0);
     $this->assertSame($target, array(), 'No targets returned');
   }

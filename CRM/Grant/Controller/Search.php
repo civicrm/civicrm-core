@@ -47,7 +47,7 @@
 class CRM_Grant_Controller_Search extends CRM_Core_Controller {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 

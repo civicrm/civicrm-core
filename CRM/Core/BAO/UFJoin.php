@@ -39,7 +39,7 @@
 class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
   /**
-   * Takes an associative array and creates a uf join object
+   * Takes an associative array and creates a uf join object.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.

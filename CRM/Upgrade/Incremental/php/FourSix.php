@@ -59,7 +59,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage
    *   alterable.

@@ -38,7 +38,7 @@ class CRM_Core_Key {
   static $_sessionID = NULL;
 
   /**
-   * Generate a private key per session and store in session
+   * Generate a private key per session and store in session.
    *
    * @return string
    *   private key for this session
@@ -95,7 +95,7 @@ class CRM_Core_Key {
   }
 
   /**
-   * Validate a form key based on the form name
+   * Validate a form key based on the form name.
    *
    * @param string $key
    * @param string $name

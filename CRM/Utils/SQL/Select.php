@@ -45,7 +45,7 @@ class CRM_Utils_SQL_Select {
   private $offset = NULL;
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
    * @param string $from
    *   Table-name and optional alias.
@@ -56,7 +56,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
    * @param string $from
    *   Table-name and optional alias.
@@ -66,7 +66,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Add a new JOIN clause
+   * Add a new JOIN clause.
    *
    * @param string $name
    *   The effective alias of the joined table.
@@ -111,7 +111,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Group results by adding extra items to the GROUP BY clause
+   * Group results by adding extra items to the GROUP BY clause.
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
@@ -141,7 +141,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Sort results by adding extra items to the ORDER BY clause
+   * Sort results by adding extra items to the ORDER BY clause.
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
@@ -156,7 +156,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Set a limit on the number of records to return
+   * Set a limit on the number of records to return.
    *
    * @param int $limit
    * @param int $offset

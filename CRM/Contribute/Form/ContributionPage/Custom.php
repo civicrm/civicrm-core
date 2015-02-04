@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -111,7 +111,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */
@@ -164,7 +164,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

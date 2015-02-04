@@ -43,7 +43,7 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * Switch to stop synchronization from CiviCRM
+   * Switch to stop synchronization from CiviCRM.
    * This was always false before, and is always true
    * now.  Most likely, this needs to be a setting.
    */

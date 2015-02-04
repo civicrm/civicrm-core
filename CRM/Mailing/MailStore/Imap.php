@@ -42,7 +42,7 @@ require_once 'ezc/autoload/mail_autoload.php';
 class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
   /**
-   * Connect to the supplied IMAP server and make sure the two mailboxes exist
+   * Connect to the supplied IMAP server and make sure the two mailboxes exist.
    *
    * @param string $host
    *   Host to connect to.
@@ -99,7 +99,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Move the specified message to the ignored folder
+   * Move the specified message to the ignored folder.
    *
    * @param int $nr
    *   Number of the message to move.
@@ -116,7 +116,7 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Move the specified message to the processed folder
+   * Move the specified message to the processed folder.
    *
    * @param int $nr
    *   Number of the message to move.

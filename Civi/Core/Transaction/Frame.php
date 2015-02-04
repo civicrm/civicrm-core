@@ -158,7 +158,7 @@ class Frame {
   }
 
   /**
-   * Add a transaction callback
+   * Add a transaction callback.
    *
    * Pre-condition: isActive()
    *

@@ -35,14 +35,14 @@
 class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -62,7 +62,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -77,7 +77,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
   }
 
   /**
-   * Create and Update mailing component
+   * Create and Update mailing component.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

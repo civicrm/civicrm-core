@@ -46,7 +46,7 @@ class CRM_Extension_System {
   private $downloader = NULL;
 
   /**
-   * The URL of the remote extensions repository
+   * The URL of the remote extensions repository.
    *
    * @var string|FALSE
    */
@@ -108,7 +108,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get a container which represents all available extensions
+   * Get a container which represents all available extensions.
    *
    * @return CRM_Extension_Container_Interface
    */
@@ -151,7 +151,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the container to which new extensions are installed
+   * Get the container to which new extensions are installed.
    *
    * This container should be a particular, writeable directory.
    *
@@ -170,7 +170,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the service which provides runtime information about extensions
+   * Get the service which provides runtime information about extensions.
    *
    * @return CRM_Extension_Mapper
    */
@@ -182,7 +182,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the service for enabling and disabling extensions
+   * Get the service for enabling and disabling extensions.
    *
    * @return CRM_Extension_Manager
    */
@@ -252,7 +252,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Determine the URL which provides a feed of available extensions
+   * Determine the URL which provides a feed of available extensions.
    *
    * @return string|FALSE
    */

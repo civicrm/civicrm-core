@@ -35,7 +35,7 @@
 class CRM_Contact_BAO_Contact_Permission {
 
   /**
-   * Check if the logged in user has permissions for the operation type
+   * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
    *   Contact id.
@@ -81,7 +81,7 @@ WHERE contact_a.id = %1 AND $permission";
   }
 
   /**
-   * Fill the acl contact cache for this contact id if empty
+   * Fill the acl contact cache for this contact id if empty.
    *
    * @param int $userID
    * @param int|string $type the type of operation (view|edit)
@@ -146,7 +146,7 @@ ON DUPLICATE KEY UPDATE
   }
 
   /**
-   * Check if there are any contacts in cache table
+   * Check if there are any contacts in cache table.
    *
    * @param int|string $type the type of operation (view|edit)
    * @param int $contactID
@@ -237,7 +237,7 @@ AND    $operationClause LIMIT 1";
   }
 
   /**
-   * Get the permission base on its relationship
+   * Get the permission base on its relationship.
    *
    * @param int $selectedContactID
    *   Contact id of selected contact.

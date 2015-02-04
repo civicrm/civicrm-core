@@ -91,7 +91,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   }
 
   /**
-   * Confirm email verification
+   * Confirm email verification.
    *
    * @param int $contact_id
    *   The id of the contact.

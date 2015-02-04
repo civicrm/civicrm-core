@@ -435,7 +435,7 @@ class CRM_Core_I18n_Schema {
   }
 
   /**
-   * CREATE INDEX queries for a given locale and table
+   * CREATE INDEX queries for a given locale and table.
    *
    * @param string $locale
    *   locale for which the queries should be created (null to create original indices).
@@ -478,7 +478,7 @@ class CRM_Core_I18n_Schema {
   }
 
   /**
-   * CREATE VIEW query for a given locale and table
+   * CREATE VIEW query for a given locale and table.
    *
    * @param string $locale
    *   locale of the view.

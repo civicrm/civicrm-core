@@ -36,14 +36,14 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
 
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Add the membership Payments
+   * Add the membership Payments.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -85,7 +85,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
   }
 
   /**
-   * Delete membership Payments
+   * Delete membership Payments.
    *
    * @param int $id
    *

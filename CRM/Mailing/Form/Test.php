@@ -39,7 +39,7 @@
 class CRM_Mailing_Form_Test extends CRM_Core_Form {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -376,7 +376,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
    *
    * @return string

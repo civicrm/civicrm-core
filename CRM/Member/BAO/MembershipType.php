@@ -436,7 +436,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Does this membership start between the rollover date and the start of the next period
+   * Does this membership start between the rollover date and the start of the next period.
    * (in which case they will get an extra membership period)
    *  ie if annual memberships run June - May & the rollover is in May memberships between
    * May and June will return TRUE and between June and May will return FALSE
@@ -486,7 +486,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Calculate start date and end date for renewal membership
+   * Calculate start date and end date for renewal membership.
    *
    * @param int $membershipId
    * @param $changeToday
@@ -598,7 +598,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Retrieve all Membership Types associated
+   * Retrieve all Membership Types associated.
    * with an Organization
    *
    * @param int $orgID
@@ -620,7 +620,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Retrieve all Membership Types with Member of Contact id
+   * Retrieve all Membership Types with Member of Contact id.
    *
    * @param array $membershipTypes
    *   array of membership type ids

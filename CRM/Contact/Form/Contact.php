@@ -44,14 +44,14 @@
 class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
-   * The contact type of the form
+   * The contact type of the form.
    *
    * @var string
    */
   public $_contactType;
 
   /**
-   * The contact type of the form
+   * The contact type of the form.
    *
    * @var string
    */
@@ -65,14 +65,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_contactId;
 
   /**
-   * The default group id passed in via the url
+   * The default group id passed in via the url.
    *
    * @var int
    */
   public $_gid;
 
   /**
-   * The default tag id passed in via the url
+   * The default tag id passed in via the url.
    *
    * @var int
    */
@@ -86,7 +86,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   protected $_dedupeButtonName;
 
   /**
-   * Name of optional save duplicate button
+   * Name of optional save duplicate button.
    *
    * @var string
    */
@@ -104,7 +104,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   public $_customValueCount;
   /**
-   * The array of greetings with option group and filed names
+   * The array of greetings with option group and filed names.
    *
    * @var array
    */
@@ -116,7 +116,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_parseStreetAddress;
 
   /**
-   * Check contact has a subtype or not
+   * Check contact has a subtype or not.
    */
   public $_isContactSubType;
 
@@ -128,7 +128,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_preEditValues;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -578,7 +578,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -717,7 +717,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -1060,7 +1060,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Is there any real significant data in the hierarchical location array
+   * Is there any real significant data in the hierarchical location array.
    *
    * @param array $fields
    *   The hierarchical value representation of this location.
@@ -1112,7 +1112,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * That checks for duplicate contacts
+   * That checks for duplicate contacts.
    *
    * @param array $fields
    *   Fields array which are submitted.
@@ -1190,7 +1190,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -1373,7 +1373,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Update membership status to deceased
+   * Update membership status to deceased.
    * function return the status message for updated membership.
    *
    * @param array $deceasedParams

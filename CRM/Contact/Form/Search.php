@@ -44,35 +44,35 @@
 class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * list of valid contexts
+   * list of valid contexts.
    *
    * @var array
    */
   static $_validContext = NULL;
 
   /**
-   * List of values used when we want to display other objects
+   * List of values used when we want to display other objects.
    *
    * @var array
    */
   static $_modeValues = NULL;
 
   /**
-   * The contextMenu
+   * The contextMenu.
    *
    * @var array
    */
   protected $_contextMenu;
 
   /**
-   * The groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars.
    *
    * @var int
    */
   public $_groupID;
 
   /**
-   * The Group ID belonging to Add Member to group ID
+   * The Group ID belonging to Add Member to group ID.
    * retrieved from the GET vars
    *
    * @var int
@@ -80,14 +80,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_amtgID;
 
   /**
-   * The saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars.
    *
    * @var int
    */
   protected $_ssID;
 
   /**
-   * The group elements
+   * The group elements.
    *
    * @var array
    */
@@ -96,7 +96,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public $_groupIterator;
 
   /**
-   * The tag elements
+   * The tag elements.
    *
    * @var array
    */
@@ -104,28 +104,28 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public $_tagElement;
 
   /**
-   * The params used for search
+   * The params used for search.
    *
    * @var array
    */
   protected $_params;
 
   /**
-   * The return properties used for search
+   * The return properties used for search.
    *
    * @var array
    */
   protected $_returnProperties;
 
   /**
-   * The sort by character
+   * The sort by character.
    *
    * @var string
    */
   protected $_sortByCharacter;
 
   /**
-   * The profile group id used for display
+   * The profile group id used for display.
    *
    * @var integer
    */
@@ -152,7 +152,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_modeValue;
 
   /**
-   * Name of the selector to use
+   * Name of the selector to use.
    */
   static $_selectorName = 'CRM_Contact_Selector';
   protected $_customSearchID = NULL;
@@ -161,7 +161,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_openedPanes = array();
 
   /**
-   * Define the set of valid contexts that the search form operates on
+   * Define the set of valid contexts that the search form operates on.
    *
    * @return array
    *   the valid context set and the titles
@@ -462,7 +462,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -723,7 +723,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Common post processing
+   * Common post processing.
    *
    * @return void
    */

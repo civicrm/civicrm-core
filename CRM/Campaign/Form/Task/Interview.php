@@ -69,7 +69,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
   private $_allowAjaxReleaseButton;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -280,7 +280,7 @@ WHERE {$clause}
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -441,7 +441,7 @@ WHERE {$clause}
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

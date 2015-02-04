@@ -99,7 +99,7 @@ class CRM_Core_Resources {
   public $ajaxPopupsEnabled;
 
   /**
-   * Get or set the single instance of CRM_Core_Resources
+   * Get or set the single instance of CRM_Core_Resources.
    *
    * @param CRM_Core_Resources $instance
    *   New copy of the manager.

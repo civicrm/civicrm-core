@@ -39,7 +39,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_gid;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -49,7 +49,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return void
    *   (reference) of action links
@@ -58,7 +58,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all rule groups
+   * Browse all rule groups.
    *
    * @return void
    */
@@ -314,7 +314,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all rule groups
+   * Browse all rule groups.
    *
    * @return void
    */
@@ -331,7 +331,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
    * @return string
    *   classname of edit form
@@ -341,7 +341,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
    * @return string
    *   name of this page
@@ -351,7 +351,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get user context
+   * Get user context.
    *
    * @param null $mode
    *

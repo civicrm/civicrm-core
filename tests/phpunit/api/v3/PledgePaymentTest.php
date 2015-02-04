@@ -35,7 +35,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   /**
-   * Assume empty database with just civicrm_data
+   * Assume empty database with just civicrm_data.
    */
   protected $_individualId;
   protected $_pledgeID;
@@ -195,8 +195,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that creating a payment will add the contribution ID where only one pledge payment.
-   * in schedule
+   * Test that creating a payment adds the contribution ID where only one pledge payment is in schedule.
    */
   public function testCreatePledgePaymentWhereOnlyOnePayment() {
     $pledgeParams = array(

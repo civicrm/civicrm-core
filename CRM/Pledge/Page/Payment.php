@@ -77,7 +77,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
   }
 
   /**
-   * called when action is update or new
+   * called when action is update or new.
    *
    * @return null
    */

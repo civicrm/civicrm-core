@@ -91,7 +91,7 @@ abstract class CRM_Core_Component_Info {
   public $info;
 
   /**
-   * Stores component keyword
+   * Stores component keyword.
    * @var string name of component keyword
    */
   protected $keyword;
@@ -133,7 +133,7 @@ abstract class CRM_Core_Component_Info {
   abstract public function getInfo();
 
   /**
-   * Get a list of entities to register via API
+   * Get a list of entities to register via API.
    *
    * @return array
    *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
@@ -144,7 +144,7 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides permissions that are unwise for Anonymous Roles to have
+   * Provides permissions that are unwise for Anonymous Roles to have.
    *
    * @return array
    *   list of permissions
@@ -170,7 +170,7 @@ abstract class CRM_Core_Component_Info {
   abstract public function getPermissions($getAllUnconditionally = FALSE);
 
   /**
-   * Determine how many other records refer to a given record
+   * Determine how many other records refer to a given record.
    *
    * @param CRM_Core_DAO $dao
    *   The item for which we want a reference count.
@@ -330,7 +330,7 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides the xml menu files
+   * Provides the xml menu files.
    *
    * @return array
    *   array of menu files

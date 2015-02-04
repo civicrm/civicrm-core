@@ -1,6 +1,7 @@
 <?php
 /**
- *  File for the TestCase class
+ * @file
+ * File for the TestCase class
  *
  *  (PHP 5)
  *
@@ -45,7 +46,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   protected $followup_activity_type_value;
 
   /**
-   * Test setup for every test
+   * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
@@ -71,14 +72,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testCaseCreateEmpty() {
-    $result = $this->callAPIFailure('case', 'create', array());
+    $this->callAPIFailure('case', 'create', array());
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testCaseCreateWithoutRequired() {
     $params = array(
@@ -90,7 +91,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test create function with valid parameters
+   * Test create function with valid parameters.
    */
   public function testCaseCreate() {
     // Create Case
@@ -133,7 +134,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test delete function with valid parameters
+   * Test delete function with valid parameters.
    */
   public function testCaseDelete() {
     // Create Case
@@ -156,7 +157,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test get function based on activity
+   * Test get function based on activity.
    */
   public function testCaseGetByActivity() {
     // Create Case
@@ -178,7 +179,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test get function based on contact id
+   * Test get function based on contact id.
    */
   public function testCaseGetByContact() {
     // Create Case
@@ -197,7 +198,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test get function based on subject
+   * Test get function based on subject.
    */
   public function testCaseGetBySubject() {
     // Create Case
@@ -216,7 +217,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test get function based on wrong subject
+   * Test get function based on wrong subject.
    */
   public function testCaseGetByWrongSubject() {
     // Create Case
@@ -232,7 +233,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test get function with no criteria
+   * Test get function with no criteria.
    */
   public function testCaseGetNoCriteria() {
     // Create Case
@@ -247,7 +248,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test activity api create for case activities
+   * Test activity api create for case activities.
    */
   public function testCaseActivityCreate() {
     // Create a case first
@@ -285,7 +286,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test activity api update for case activities
+   * Test activity api update for case activities.
    */
   public function testCaseActivityUpdate() {
     // Need to create the case and activity before we can update it

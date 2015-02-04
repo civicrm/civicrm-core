@@ -60,7 +60,7 @@ class CRM_Utils_Migrate_ExportJSON {
   }
 
   /**
-   * Split a large array of contactIDs into more manageable smaller chunks
+   * Split a large array of contactIDs into more manageable smaller chunks.
    */
   public function &splitContactIDs(&$contactIDs) {
     // contactIDs could be a real large array, so we split it up into
@@ -89,7 +89,7 @@ class CRM_Utils_Migrate_ExportJSON {
   }
 
   /**
-   * Given a set of contact IDs get the values
+   * Given a set of contact IDs get the values.
    */
   public function getValues(&$contactIDs, &$additionalContactIDs) {
 

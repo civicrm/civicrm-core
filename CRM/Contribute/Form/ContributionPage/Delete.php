@@ -39,19 +39,19 @@
 class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Page title
+   * Page title.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Check if there are any related contributions
+   * Check if there are any related contributions.
    */
   protected $_relatedContributions;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -75,7 +75,7 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -103,7 +103,7 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

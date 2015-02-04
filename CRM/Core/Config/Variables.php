@@ -38,21 +38,21 @@
 class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
   /**
-   * The debug level for civicrm
+   * The debug level for civicrm.
    * @var int
    */
   public $debug = 0;
   public $backtrace = 0;
 
   /**
-   * The directory where Smarty and plugins are installed
+   * The directory where Smarty and plugins are installed.
    * @var string
    */
   public $smartyDir = NULL;
   public $pluginsDir = NULL;
 
   /**
-   * The root directory of our template tree
+   * The root directory of our template tree.
    * @var string
    */
   public $templateDir = NULL;
@@ -474,7 +474,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $wpBasePage = NULL;
 
   /**
-   * Provide addressSequence
+   * Provide addressSequence.
    *
    * @param
    *
@@ -489,7 +489,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default currency symbol
+   * Provide cached default currency symbol.
    *
    * @param
    *
@@ -514,7 +514,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default currency symbol
+   * Provide cached default currency symbol.
    *
    * @param
    *
@@ -535,7 +535,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default country name
+   * Provide cached default country name.
    *
    * @param
    *
@@ -551,7 +551,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached country limit translated to names
+   * Provide cached country limit translated to names.
    *
    * @param
    *
@@ -581,7 +581,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached province limit translated to names
+   * Provide cached province limit translated to names.
    *
    * @param
    *

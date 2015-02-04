@@ -39,7 +39,7 @@
 class CRM_UF_Page_AJAX {
 
   /**
-   * Function the check whether the field belongs
+   * Function the check whether the field belongs.
    * to multi-record custom set
    */
   public function checkIsMultiRecord() {

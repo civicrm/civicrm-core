@@ -44,7 +44,7 @@
 class CRM_Price_Page_Set extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -194,7 +194,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * Edit price set
+   * Edit price set.
    *
    * @param int $sid
    *   Price set id.
@@ -217,7 +217,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * Preview price set
+   * Preview price set.
    *
    * @param int $sid
    *   Price set id.
@@ -241,7 +241,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * Browse all price sets
+   * Browse all price sets.
    *
    * @param string $action
    *   The action to be invoked.

@@ -48,7 +48,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected $_formattedFieldNames;
 
   /**
-   * On duplicate
+   * On duplicate.
    *
    * @var int
    */
@@ -59,7 +59,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected static $customFields;
 
   /**
-   * Attempt to match header labels with our mapper fields
+   * Attempt to match header labels with our mapper fields.
    * FIXME: This is essentially the same function as parent::defaultFromHeader
    *
    * @param $columnName name of column header
@@ -91,7 +91,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -199,7 +199,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -621,7 +621,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.

@@ -41,7 +41,7 @@
 class CRM_Contact_Form_Edit_Household {
 
   /**
-   * This function provides the HTML form elements that are specific
+   * This function provides the HTML form elements that are specific.
    * to the Household Contact Type
    *
    * @param CRM_Core_Form $form
@@ -79,7 +79,7 @@ class CRM_Contact_Form_Edit_Household {
   }
 
   /**
-   * Add rule for household
+   * Add rule for household.
    *
    * @param array $fields
    *   Array of form values.

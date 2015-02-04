@@ -42,14 +42,14 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_Menu {
 
   /**
-   * The list of menu items
+   * The list of menu items.
    *
    * @var array
    */
   static $_items = NULL;
 
   /**
-   * The list of permissioned menu items
+   * The list of permissioned menu items.
    *
    * @var array
    */
@@ -67,7 +67,7 @@ class CRM_Core_Menu {
   const MENU_ITEM = 1;
 
   /**
-   * This function fetches the menu items from xml and xmlMenu hooks
+   * This function fetches the menu items from xml and xmlMenu hooks.
    *
    * @param boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
@@ -159,7 +159,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * This function defines information for various menu items
+   * This function defines information for various menu items.
    *
    * @param boolen $fetchFromXML
    *   Fetch the menu items from xml and not from cache.
@@ -235,7 +235,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * We use this function to
+   * We use this function to.
    *
    * 1. Compute the breadcrumb
    * 2. Compute local tasks value if any
@@ -259,7 +259,7 @@ class CRM_Core_Menu {
   }
 
   /**
-   * This function recomputes menu from xml and populates civicrm_menu
+   * This function recomputes menu from xml and populates civicrm_menu.
    * @param bool $truncate
    */
   public static function store($truncate = TRUE) {

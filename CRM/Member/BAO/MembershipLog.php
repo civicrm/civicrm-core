@@ -35,7 +35,7 @@
 class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
 
   /**
-   * Add the membership log record
+   * Add the membership log record.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -56,7 +56,7 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   }
 
   /**
-   * Delete membership log record
+   * Delete membership log record.
    *
    * @param int $membershipID
    *

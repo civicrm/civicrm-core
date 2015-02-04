@@ -42,7 +42,7 @@
 class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
   /**
-   * The contact type of the form
+   * The contact type of the form.
    *
    * @var string
    */
@@ -56,7 +56,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   public $_contactId;
 
   /**
-   * Form defaults
+   * Form defaults.
    *
    * @var array
    */

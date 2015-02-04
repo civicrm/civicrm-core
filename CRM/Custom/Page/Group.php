@@ -150,7 +150,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Edit custom group
+   * Edit custom group.
    *
    * @param int $id
    *   Custom group id.
@@ -173,7 +173,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Preview custom group
+   * Preview custom group.
    *
    * @param int $id
    *   Custom group id.
