@@ -73,7 +73,7 @@ class CRM_Exception extends PEAR_Exception {
 class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
-   * Status code of various types of errors
+   * Status code of various types of errors.
    */
   const FATAL_ERROR = 2;
   const DUPLICATE_CONTACT = 8001;
@@ -117,7 +117,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Constructor
+   * Constructor.
    */
   public function __construct() {
     parent::__construct('CiviCRM');
@@ -149,7 +149,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Status display function specific to payment processor errors
+   * Status display function specific to payment processor errors.
    * @param $error
    * @param string $separator
    */
@@ -292,7 +292,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Display an error page with an error message describing what happened
+   * Display an error page with an error message describing what happened.
    *
    * @param string $message
    *   The error message.
@@ -381,7 +381,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Display an error page with an error message describing what happened
+   * Display an error page with an error message describing what happened.
    *
    * This function is evil -- it largely replicates fatal(). Hopefully the
    * entire CRM_Core_Error system can be hollowed out and replaced with
@@ -560,7 +560,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Display the error message on terminal
+   * Display the error message on terminal.
    *
    * @param $message
    * @param bool $out
@@ -623,7 +623,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Obtain a reference to the error log
+   * Obtain a reference to the error log.
    *
    * @param string $comp
    *
@@ -673,7 +673,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Render a backtrace array as a string
+   * Render a backtrace array as a string.
    *
    * @param array $backTrace
    *   Array of stack frames.
@@ -694,7 +694,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Render a backtrace array as an array
+   * Render a backtrace array as an array.
    *
    * @param array $backTrace
    *   Array of stack frames.
@@ -772,7 +772,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Render an exception as HTML string
+   * Render an exception as HTML string.
    *
    * @param Exception $e
    * @return string
@@ -808,7 +808,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Write details of an exception to the log
+   * Write details of an exception to the log.
    *
    * @param Exception $e
    * @return string
@@ -870,7 +870,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Reset the error stack
+   * Reset the error stack.
    *
    */
   public static function reset() {
@@ -944,7 +944,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Terminate execution abnormally
+   * Terminate execution abnormally.
    */
   protected static function abend($code) {
     // do a hard rollback of any pending transactions

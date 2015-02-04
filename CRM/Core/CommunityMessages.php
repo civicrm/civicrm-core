@@ -34,7 +34,7 @@ class CRM_Core_CommunityMessages {
   const DEFAULT_PERMISSION = 'administer CiviCRM';
 
   /**
-   * Default time to wait before retrying
+   * Default time to wait before retrying.
    */
   const DEFAULT_RETRY = 7200; // 2 hours
 
@@ -54,7 +54,7 @@ class CRM_Core_CommunityMessages {
   protected $messagesUrl;
 
   /**
-   * Create default instance
+   * Create default instance.
    *
    * @return CRM_Core_CommunityMessages
    */
@@ -127,7 +127,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Download document from URL and parse as JSON
+   * Download document from URL and parse as JSON.
    *
    * @return NULL|array
    *   parsed JSON
@@ -161,7 +161,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Pick a message to display
+   * Pick a message to display.
    *
    * @return NULL|array
    */

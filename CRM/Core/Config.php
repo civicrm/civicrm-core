@@ -91,7 +91,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   public $userPermissionClass;
 
   /**
-   * The root directory where Smarty should store compiled files
+   * The root directory where Smarty should store compiled files.
    *
    * @var string
    */
@@ -667,7 +667,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Verify that the needed parameters are not null in the config
+   * Verify that the needed parameters are not null in the config.
    *
    * @param CRM_Core_Config $config (reference) the system config object
    * @param array $required (reference) the parameters that need a value
@@ -684,7 +684,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Reset the serialized array and recompute
+   * Reset the serialized array and recompute.
    * use with care
    */
   public function reset() {
@@ -693,7 +693,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * This method should initialize auth sources
+   * This method should initialize auth sources.
    */
   public function initAuthSrc() {
     $session = CRM_Core_Session::singleton();
@@ -706,7 +706,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * One function to get domain ID
+   * One function to get domain ID.
    */
   public static function domainID($domainID = NULL, $reset = FALSE) {
     static $domain;
@@ -768,7 +768,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Flush information about loaded modules
+   * Flush information about loaded modules.
    */
   public function clearModuleList() {
     CRM_Extension_System::singleton()->getCache()->flush();
@@ -778,7 +778,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Clear db cache
+   * Clear db cache.
    */
   public static function clearDBCache() {
     $queries = array(
@@ -802,7 +802,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Clear leftover temporary tables
+   * Clear leftover temporary tables.
    */
   public static function clearTempTables() {
     // CRM-5645
@@ -833,7 +833,7 @@ AND
   }
 
   /**
-   * Check if running in upgrade mode
+   * Check if running in upgrade mode.
    */
   public static function isUpgradeMode($path = NULL) {
     if (defined('CIVICRM_UPGRADE_ACTIVE')) {
@@ -859,7 +859,7 @@ AND
   }
 
   /**
-   * Wrapper function to allow unit tests to switch user framework on the fly
+   * Wrapper function to allow unit tests to switch user framework on the fly.
    */
   public function setUserFramework($userFramework = NULL) {
     $this->userFramework = $userFramework;
