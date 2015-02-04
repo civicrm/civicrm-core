@@ -2551,6 +2551,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             // For custom fields referenced in $this->_customGroupExtends
             $fields = CRM_Utils_Array::value('fields', $table, array());
           }
+          else {
+            continue;
+          }
           if (!empty($fields) && is_array($fields)) {
             foreach ($fields as $fieldName => $field) {
               if ($fieldName == $orderBy['column']) {
