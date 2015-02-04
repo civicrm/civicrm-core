@@ -398,8 +398,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       }
       CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
-      // make sure that credit card number and cvv are valid
-      CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
+      // validate payment instrument values (e.g. credit card number)
+      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
     }
 
     return empty($errors) ? TRUE : $errors;
