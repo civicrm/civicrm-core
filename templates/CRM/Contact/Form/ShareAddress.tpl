@@ -99,7 +99,7 @@
               }
               var name = 'selected_shared_address-'+ blockNo,
                 id = name + '-' + val.id;
-              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>&nbsp('+val.address_location_type+')<br/>';
+              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>&nbsp('+val.location_type+')<br/>';
             });
 
             if (!addressHTML) {
