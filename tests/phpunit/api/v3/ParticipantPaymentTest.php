@@ -105,7 +105,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid array
+   * Check with valid array.
    */
   public function testPaymentCreate() {
     //Create Contribution & get contribution ID
@@ -137,7 +137,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testPaymentUpdateEmpty() {
     $params = array();
@@ -167,7 +167,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check financial records for offline Participants
+   * Check financial records for offline Participants.
    */
   public function testPaymentOffline() {
 
@@ -194,7 +194,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check financial records for online Participant
+   * Check financial records for online Participant.
    */
   public function testPaymentOnline() {
 
@@ -228,7 +228,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check financial records for online Participant pay later scenario
+   * Check financial records for online Participant pay later scenario.
    */
   public function testPaymentPayLaterOnline() {
 
@@ -274,7 +274,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testPaymentDeleteWithEmptyParams() {
     $params = array();
@@ -283,7 +283,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with wrong id
+   * Check with wrong id.
    */
   public function testPaymentDeleteWithWrongID() {
     $params = array(
@@ -294,7 +294,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid array
+   * Check with valid array.
    */
   public function testPaymentDelete() {
 

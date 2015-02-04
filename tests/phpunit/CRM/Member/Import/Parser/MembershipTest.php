@@ -35,13 +35,13 @@ require_once 'CiviTest/Membership.php';
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
-   * Membership type name used in test function
+   * Membership type name used in test function.
    * @var String
    */
   protected $_membershipTypeName = NULL;
 
   /**
-   * Membership type id used in test function
+   * Membership type id used in test function.
    * @var String
    */
   protected $_membershipTypeID = NULL;
@@ -102,7 +102,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Import
+   *  Test Import.
    */
   public function testImport() {
     $contactId = $this->individualCreate();

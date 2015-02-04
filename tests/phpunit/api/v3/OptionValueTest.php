@@ -56,7 +56,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test limit param
+   * Test limit param.
    */
   public function testGetOptionValueLimit() {
     $params = array();
@@ -68,7 +68,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test offset param
+   * Test offset param.
    */
   public function testGetOptionValueOffSet() {
 
@@ -85,7 +85,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test offset param
+   * Test offset param.
    */
   public function testGetSingleValueOptionValueSort() {
     $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";
@@ -190,7 +190,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that component  continues to be honoured
+   * Check that component  continues to be honoured.
    */
   public function testCreateOptionSpecifyComponent() {
     $result = $this->callAPISuccess('option_group', 'get', array(
@@ -212,7 +212,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that component string is honoured
+   * Check that component string is honoured.
    */
   public function testCreateOptionSpecifyComponentString() {
     $result = $this->callAPISuccess('option_group', 'get', array(

@@ -36,7 +36,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
 
   /**
-   *  Constructor
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of

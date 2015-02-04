@@ -39,7 +39,7 @@ require_once 'PHPUnit/Framework/TestSuite.php';
 class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
   /**
-   * Simple name based constructor
+   * Simple name based constructor.
    * @param string $theClass
    * @param string $name
    */
@@ -61,21 +61,21 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   }
 
   /**
-   *  Test suite setup
+   *  Test suite setup.
    */
   protected function setUp() {
     //print __METHOD__ . "\n";
   }
 
   /**
-   *  Test suite teardown
+   *  Test suite teardown.
    */
   protected function tearDown() {
     //print __METHOD__ . "\n";
   }
 
   /**
-   *  suppress failed test error issued by phpunit when it finds
+   *  suppress failed test error issued by phpunit when it finds.
    *  a test suite with no tests
    */
   public function testNothing() {

@@ -193,7 +193,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create a single post dated payment as a recurring transaction
+   * Create a single post dated payment as a recurring transaction.
    */
   public function testCreateSinglePostDated() {
     $start_date = date('Ymd', strtotime("+ 1 week"));

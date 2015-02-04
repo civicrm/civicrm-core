@@ -87,7 +87,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test retrieval of metadata
+   * Test retrieval of metadata.
    */
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
@@ -99,7 +99,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test retrieval of label metadata
+   * Test retrieval of label metadata.
    */
   public function testGetFields() {
     $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);

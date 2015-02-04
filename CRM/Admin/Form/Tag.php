@@ -41,7 +41,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -129,7 +129,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

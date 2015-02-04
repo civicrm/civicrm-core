@@ -49,7 +49,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   ///////////////// civicrm_domain_get methods
 
   /**
-   * Test system flush
+   * Test system flush.
    */
   public function testFlush() {
     // Note: this operation actually flushes several different caches; we don't
@@ -70,7 +70,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test system log function
+   * Test system log function.
    */
   public function testSystemLog() {
     $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
@@ -83,7 +83,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test system log function
+   * Test system log function.
    */
   public function testSystemLogNoLevel() {
     $this->callAPISuccess('system', 'log', array('message' => 'We wish you a merry Christmas', 'level' => 'alert'));

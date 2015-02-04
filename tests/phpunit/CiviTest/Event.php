@@ -34,7 +34,7 @@ class Event extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete an Event
+   * Helper function to delete an Event.
    *
    * @param int $eventId
    * @return bool

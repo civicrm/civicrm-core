@@ -35,14 +35,14 @@
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
+   * Takes a bunch of params that are needed to match certain criteria and.
    * retrieves the relevant objects. It also stores all the retrieved
    * values in the default array
    *
@@ -81,7 +81,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Add a name label
+   * Add a name label.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -122,7 +122,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Delete name labels
+   * Delete name labels.
    *
    * @param int $printLabelId
    *   ID of the name label to be deleted.
@@ -135,7 +135,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   *  get the list of print labels
+   *  get the list of print labels.
    *
    * @return array
    *   list of labels
@@ -152,7 +152,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Build layout structure
+   * Build layout structure.
    *
    * @param array $params
    *   Associated array of submitted values.
@@ -171,7 +171,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Decode encoded data and return as an array
+   * Decode encoded data and return as an array.
    *
    * @param json $jsonData
    *   Json object.

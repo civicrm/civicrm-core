@@ -43,7 +43,7 @@ class CRM_Badge_BAO_Badge {
   public $border = 0;
 
   /**
-   *  This function is called to create name label pdf
+   *  This function is called to create name label pdf.
    *
    * @param array $participants
    *   Associated array with participant info.
@@ -75,7 +75,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * Funtion to create structure and add meta data according to layout
+   * Funtion to create structure and add meta data according to layout.
    *
    * @param array $row
    *   Row element that needs to be formatted.
@@ -356,7 +356,7 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * Helper function to print images
+   * Helper function to print images.
    *
    * @param string $img
    *   Image url.

@@ -12,7 +12,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   protected $_permissionedGroup;
   /**
-   * AS disabled group the contact has permission to
+   * AS disabled group the contact has permission to.
    * @var unknown
    */
   protected $_permissionedDisabledGroup;
@@ -328,7 +328,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookDisabled() {
     $this->_params['status'] = 2;
@@ -340,7 +340,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookDisabledFound() {
     $this->_params['status'] = 2;
@@ -353,7 +353,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookDisabledNotFound() {
     $this->_params['status'] = 2;
@@ -366,7 +366,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHook() {
     $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
@@ -377,7 +377,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookTitleNotFound() {
     $this->_params['title'] = 'n';
@@ -388,7 +388,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookTitleFound() {
     $this->_params['title'] = 'p';
@@ -401,7 +401,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookAll() {
     $this->_params['status'] = 3;
@@ -414,7 +414,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * ACL Group hook
+   * ACL Group hook.
    */
   public function testGroupListAclGroupHookEnabled() {
     $this->_params['status'] = 1;
@@ -426,7 +426,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * Implements ACLGroup hook
+   * Implements ACLGroup hook.
    * aclGroup function returns a list of permitted groups
    * @param string $type
    * @param int $contactID

@@ -46,7 +46,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Good to test option group as a representative on the Camel Case
+   * Good to test option group as a representative on the Camel Case.
    */
   public function testGetOptionGroupGetFields() {
     $result = $this->callAPISuccess('option_group', 'getfields', array());
@@ -104,7 +104,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the error message when a failure is due to a key duplication issue
+   * Test the error message when a failure is due to a key duplication issue.
    */
   public function testGetOptionCreateFailOnDuplicate() {
     $params = array(
@@ -153,7 +153,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Success test for updating an existing Option Group
+   * Success test for updating an existing Option Group.
    */
   public function testCreateUpdateOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -163,7 +163,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Success test for deleting an existing Option Group
+   * Success test for deleting an existing Option Group.
    */
   public function testDeleteOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);

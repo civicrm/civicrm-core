@@ -52,7 +52,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test creation
+   * Test creation.
    */
   public function testCreateMailSettings() {
     $this->callAPISuccessGetCount('mail_settings', array(), 1);
@@ -64,7 +64,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test caches cleared adequately
+   * Test caches cleared adequately.
    */
   public function testCreateUpdateMailSettings() {
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
@@ -76,7 +76,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get method
+   * Test get method.
    */
   public function testGetMailSettings() {
     $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -97,7 +97,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test chained delete
+   * Test chained delete.
    */
   public function testGetMailSettingsChainDelete() {
     $description = "demonstrates get + delete in the same call";

@@ -44,7 +44,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with an invalid type name
+   * Install an extension with an invalid type name.
    *
    * @expectedException CRM_Extension_Exception
    */
@@ -59,7 +59,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    *
    * Note: We initially install two extensions but then toggle only
    * the second. This controls for bad SQL queries which hit either
@@ -144,7 +144,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
   public function testInstall_Disable_Enable() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
@@ -224,7 +224,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
   public function testEnableBare() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
@@ -250,7 +250,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get the status of an unknown extension
+   * Get the status of an unknown extension.
    */
   public function testStatusUnknownKey() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
@@ -317,7 +317,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install a module and then replace it with new code
+   * Install a module and then replace it with new code.
    *
    * Note that some metadata changes between versions -- the original has
    * file="oddball", and the upgrade has file="newextension".

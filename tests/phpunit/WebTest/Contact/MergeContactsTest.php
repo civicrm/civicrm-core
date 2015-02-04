@@ -639,7 +639,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Helper FN
+   * Helper FN.
    * @param null $firstName
    * @param null $lastName
    * @param null $organizationName
@@ -734,7 +734,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Helper FN
+   * Helper FN.
    * to create new membership type
    * @param $membershipOrganization
    */

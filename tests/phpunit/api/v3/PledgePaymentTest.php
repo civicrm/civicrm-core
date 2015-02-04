@@ -71,7 +71,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that passing in a single variable works
+   * Test that passing in a single variable works.
    */
   public function testGetSinglePledgePayment() {
     $createparams = array(
@@ -108,7 +108,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that creating a payment will add the contribution ID
+   * Test that creating a payment will add the contribution ID.
    */
   public function testCreatePledgePayment() {
     //check that 5 pledge payments exist at the start
@@ -153,7 +153,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test checks behaviour when more payments are created than should be possible
+   * Test checks behaviour when more payments are created than should be possible.
    */
   public function testCreatePledgePaymentAllCreated() {
     $params = array(
@@ -195,7 +195,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that creating a payment will add the contribution ID where only one pledge payment
+   * Test that creating a payment will add the contribution ID where only one pledge payment.
    * in schedule
    */
   public function testCreatePledgePaymentWhereOnlyOnePayment() {

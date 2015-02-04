@@ -39,22 +39,22 @@
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
-   * Maximum profile fields that will be displayed
+   * Maximum profile fields that will be displayed.
    */
   protected $_rowCount = 1;
 
   /**
-   * Batch id
+   * Batch id.
    */
   protected $_batchId;
 
   /**
-   * Batch information
+   * Batch information.
    */
   protected $_batchInfo = array();
 
   /**
-   * Store the profile id associated with the batch type
+   * Store the profile id associated with the batch type.
    */
   protected $_profileId;
 
@@ -86,7 +86,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public $_fields = array();
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -114,7 +114,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -265,7 +265,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Form validations
+   * Form validations.
    *
    * @param array $params
    *   Posted values of the form.
@@ -328,7 +328,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Override default cancel action
+   * Override default cancel action.
    */
   public function cancelAction() {
     // redirect to batch listing
@@ -378,7 +378,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void
@@ -413,7 +413,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Process contribution records
+   * Process contribution records.
    *
    * @param array $params
    *   Associated array of submitted values.
@@ -583,7 +583,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Process membership records
+   * Process membership records.
    *
    * @param array $params
    *   Associated array of submitted values.
@@ -826,7 +826,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Update contact information
+   * Update contact information.
    *
    * @param array $value
    *   Associated array of submitted values.

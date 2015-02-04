@@ -97,7 +97,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Updating group
+   * Updating group.
    */
   public function testUpdateUFGroup() {
     $params = array(

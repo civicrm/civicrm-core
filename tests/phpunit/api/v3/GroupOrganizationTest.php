@@ -119,7 +119,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   ///////////////// civicrm_group_organization_create methods
 
   /**
-   * Check with valid params
+   * Check with valid params.
    */
   public function testGroupOrganizationCreate() {
     $params = array(
@@ -143,7 +143,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty params array
+   * Check with empty params array.
    */
   public function testGroupOrganizationCreateWithEmptyParams() {
     $params = array();
@@ -152,7 +152,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with invalid params
+   * Check with invalid params.
    */
   public function testGroupOrganizationCreateParamsNotArray() {
     $params = 'group_org';
@@ -161,7 +161,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with invalid params keys
+   * Check with invalid params keys.
    */
   public function testGroupOrganizationCreateWithInvalidKeys() {
     $params = array(

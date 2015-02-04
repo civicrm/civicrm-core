@@ -307,7 +307,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * common function for doing offline contribution
+   * common function for doing offline contribution.
    * @param array $params
    * @param string $firstName
    * @param string $lastName

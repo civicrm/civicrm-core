@@ -39,7 +39,7 @@
 class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
-   * Cache for the current batch object
+   * Cache for the current batch object.
    */
   static $_batch = NULL;
 
@@ -50,7 +50,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   static $_exportFormat = NULL;
 
   /**
-   * Create a new batch
+   * Create a new batch.
    *
    * @param array $params
    * @param array $ids
@@ -77,7 +77,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Retrieve the information about the batch
+   * Retrieve the information about the batch.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -98,7 +98,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get profile id associated with the batch type
+   * Get profile id associated with the batch type.
    *
    * @param int $batchTypeId
    *   Batch type id.
@@ -126,7 +126,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Generate batch name
+   * Generate batch name.
    *
    * @return string
    *   batch name
@@ -138,7 +138,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Create entity batch entry
+   * Create entity batch entry.
    *
    * @param array $params
    * @return array
@@ -151,7 +151,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Remove entries from entity batch
+   * Remove entries from entity batch.
    * @param array $params
    * @return CRM_Batch_DAO_EntityBatch
    */
@@ -163,7 +163,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Delete batch entry
+   * Delete batch entry.
    *
    * @param int $batchId
    *   Batch id.
@@ -179,7 +179,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * wrapper for ajax batch selector
+   * wrapper for ajax batch selector.
    *
    * @param array $params
    *   Associated array for params record id.
@@ -246,7 +246,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get list of batches
+   * Get list of batches.
    *
    * @param array $params
    *   Associated array for params.
@@ -353,7 +353,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get count of batches
+   * Get count of batches.
    *
    * @param array $params
    *   Associated array for params.
@@ -370,7 +370,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Format where clause for getting lists of batches
+   * Format where clause for getting lists of batches.
    *
    * @param array $params
    *   Associated array for params.
@@ -418,7 +418,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Define action links
+   * Define action links.
    *
    * @param null $context
    *
@@ -498,7 +498,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get batch list
+   * Get batch list.
    *
    * @return array
    *   all batches excluding batches with data entry in progress
@@ -521,7 +521,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
 
   /**
-   * Calculate sum of all entries in a batch
+   * Calculate sum of all entries in a batch.
    * Used to validate and update item_count and total when closing an accounting batch
    *
    * @param array $batchIds
@@ -545,7 +545,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Format markup for comparing two totals
+   * Format markup for comparing two totals.
    *
    * @param $actual
    *   calculated total
@@ -634,7 +634,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Retrieve financial items assigned for a batch
+   * Retrieve financial items assigned for a batch.
    *
    * @param int $entityID
    * @param array $returnValues
@@ -771,7 +771,7 @@ WHERE  {$where}
   }
 
   /**
-   * Get batch names
+   * Get batch names.
    * @param string $batchIds
    *
    * @return array
@@ -791,7 +791,7 @@ WHERE  {$where}
   }
 
   /**
-   * Function get batch statuses
+   * Function get batch statuses.
    *
    * @param string $batchIds
    *

@@ -269,7 +269,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
   public function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -298,7 +298,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
   public function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -328,7 +328,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
   public function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -357,7 +357,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
   public function testGetActivitiesCountforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -385,7 +385,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivities BAO method
+   * Test getActivities BAO method.
    */
   public function testGetActivitiesforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -420,7 +420,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivities BAO method
+   * Test getActivities BAO method.
    */
   public function testGetActivitiesforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -463,7 +463,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivities BAO method
+   * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -518,7 +518,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivities BAO method
+   * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();

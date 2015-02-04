@@ -85,7 +85,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check mailing is sent
+   * Check mailing is sent.
    */
   public function testProcessMailing() {
     $this->createContactsInGroup(10, $this->_groupID);

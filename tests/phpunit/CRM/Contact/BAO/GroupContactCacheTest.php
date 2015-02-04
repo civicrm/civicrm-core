@@ -37,7 +37,7 @@ require_once 'CiviTest/Contact.php';
 class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
   /**
-   * Manually add and remove contacts from a smart group
+   * Manually add and remove contacts from a smart group.
    */
   public function testManualAddRemove() {
     // Create smart group $g
@@ -169,7 +169,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
-   * Assert that the cache for a group contains exactly the listed contacts
+   * Assert that the cache for a group contains exactly the listed contacts.
    *
    * @param array $expectedContactIds
    *   Array(int).

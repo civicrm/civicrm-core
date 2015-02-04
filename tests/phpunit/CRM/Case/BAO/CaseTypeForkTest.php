@@ -19,7 +19,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
 
 
   /**
-   * Edit the definition of ForkableCaseType
+   * Edit the definition of ForkableCaseType.
    */
   public function testForkable() {
     $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name');

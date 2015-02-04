@@ -38,7 +38,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
   }
 
   /**
-   * Test that option to create a cms user is present on a contact who
+   * Test that option to create a cms user is present on a contact who.
    * does not have a cms account already (in this case, a new
    * contact).
    */

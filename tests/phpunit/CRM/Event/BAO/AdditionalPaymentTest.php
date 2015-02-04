@@ -60,7 +60,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * helper function to record participant with paid contribution
+   * helper function to record participant with paid contribution.
    * @param $feeTotal
    * @param $actualPaidAmt
    *

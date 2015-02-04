@@ -6,7 +6,7 @@ require_once 'Contact.php';
  */
 class Membership extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create membership type
+   * Helper function to create membership type.
    */
   public function createMembershipType() {
     $orgId = Contact::createOrganisation();
@@ -39,7 +39,7 @@ class Membership extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to create membership block for contribution page
+   * Helper function to create membership block for contribution page.
    * @param $membershipType
    * @param $contributionPageId
    * @return $this
@@ -69,7 +69,7 @@ class Membership extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete the membership block
+   * Helper function to delete the membership block.
    * @param $blcokId
    */
   public function deleteMembershipBlock($blcokId) {

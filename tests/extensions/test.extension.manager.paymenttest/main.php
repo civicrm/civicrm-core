@@ -7,7 +7,7 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @param string $mode
    *   The mode of operation: live or test.

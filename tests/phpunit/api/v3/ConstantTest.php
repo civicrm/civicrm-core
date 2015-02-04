@@ -44,7 +44,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
-   * Test setup for every test
+   * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
