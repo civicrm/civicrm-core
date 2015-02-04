@@ -42,21 +42,21 @@ class CRM_Core_ShowHideBlocks {
   static $_showIcon, $_hideIcon;
 
   /**
-   * The array of ids of blocks that will be shown
+   * The array of ids of blocks that will be shown.
    *
    * @var array
    */
   protected $_show;
 
   /**
-   * The array of ids of blocks that will be hidden
+   * The array of ids of blocks that will be hidden.
    *
    * @var array
    */
   protected $_hide;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $show
    *   Initial value of show array.
@@ -82,7 +82,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Load icon vars used in hide and show links
+   * Load icon vars used in hide and show links.
    *
    * @return void
    */
@@ -95,7 +95,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Add the values from this class to the template
+   * Add the values from this class to the template.
    *
    * @return void
    */
@@ -126,7 +126,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Add a value to the show array
+   * Add a value to the show array.
    *
    * @param string $name
    *   Id to be added.
@@ -141,7 +141,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Add a value to the hide array
+   * Add a value to the hide array.
    *
    * @param string $name
    *   Id to be added.
@@ -156,7 +156,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Create a well formatted html link from the smaller pieces
+   * Create a well formatted html link from the smaller pieces.
    *
    * @param string $name
    *   Name of the link.
@@ -172,7 +172,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Create links that we can use in the form
+   * Create links that we can use in the form.
    *
    * @param CRM_Core_Form $form
    *   The form object.
@@ -206,7 +206,7 @@ class CRM_Core_ShowHideBlocks {
   }
 
   /**
-   * Create html link elements that we can use in the form
+   * Create html link elements that we can use in the form.
    *
    * @param CRM_Core_Form $form
    *   The form object.
