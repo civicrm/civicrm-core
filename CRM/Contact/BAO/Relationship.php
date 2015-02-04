@@ -263,7 +263,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $relationship->free();
 
-    CRM_Utils_Hook::post($hook, 'Relationship', $relationshipId, $relationship);
+    CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship);
 
     return $relationship;
   }
@@ -490,7 +490,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->delete();
     CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
-    CRM_Utils_Hook::post('delete', 'Relationship', $relationship->id, $relationship);
+    CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
 
     // delete the recently created Relationship
     $relationshipRecent = array(
