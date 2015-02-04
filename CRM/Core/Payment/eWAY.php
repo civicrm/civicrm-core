@@ -409,7 +409,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
    *   The ID to check.

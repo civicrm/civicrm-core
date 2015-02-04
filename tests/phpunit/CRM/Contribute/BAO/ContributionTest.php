@@ -413,7 +413,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check duplicate contribution id
+   * Check duplicate contribution id.
    * during the contribution import
    * checkDuplicateIds();
    */

@@ -215,7 +215,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Register all the standard rules that most forms potentially use
+   * Register all the standard rules that most forms potentially use.
    *
    * @return void
    */
@@ -407,7 +407,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Performs the server side validation
+   * Performs the server side validation.
    * @since     1.0
    * @return bool
    *   true if no error found
@@ -575,7 +575,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for Name
+   * Getter function for Name.
    *
    * @return string
    */
@@ -584,7 +584,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for State
+   * Getter function for State.
    *
    * @return object
    */
@@ -593,7 +593,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for StateType
+   * Getter function for StateType.
    *
    * @return int
    */
@@ -623,7 +623,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Setter function for options
+   * Setter function for options.
    *
    * @param mixed $options
    *
@@ -646,7 +646,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Boolean function to determine if this is a one form page
+   * Boolean function to determine if this is a one form page.
    *
    * @return bool
    */
@@ -655,7 +655,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for Form Action
+   * Getter function for Form Action.
    *
    * @return string
    */
@@ -664,7 +664,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Setter function for Form Action
+   * Setter function for Form Action.
    *
    * @param string $action
    *
@@ -675,7 +675,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Render form and return contents
+   * Render form and return contents.
    *
    * @return string
    */
@@ -704,7 +704,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -747,7 +747,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Error reporting mechanism
+   * Error reporting mechanism.
    *
    * @param string $message
    *   Error Message.
@@ -769,7 +769,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Store the variable with the value in the form scope
+   * Store the variable with the value in the form scope.
    *
    * @param string $name
    *   Name of the variable.
@@ -783,7 +783,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Get the variable from the form scope
+   * Get the variable from the form scope.
    *
    * @param string $name
    *   Name of the variable
@@ -795,7 +795,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter for action
+   * Getter for action.
    *
    * @return int
    */
@@ -804,7 +804,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Setter for action
+   * Setter for action.
    *
    * @param int $action
    *   The mode we want to set the form.
@@ -816,7 +816,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Assign value to name in template
+   * Assign value to name in template.
    *
    * @param string $var
    *   Name of variable.
@@ -830,7 +830,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Assign value to name in template by reference
+   * Assign value to name in template by reference.
    *
    * @param string $var
    *   Name of variable.
@@ -844,7 +844,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Appends values to template variables
+   * Appends values to template variables.
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value
@@ -856,7 +856,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Returns an array containing template variables
+   * Returns an array containing template variables.
    *
    * @param string $name
    *
@@ -1032,7 +1032,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Adds a select based on field metadata
+   * Adds a select based on field metadata.
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
    * @param $name
@@ -1285,7 +1285,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add date
+   * Add date.
    *
    * @code
    * // if you need time
@@ -1383,7 +1383,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   *  Function that will add date and time
+   *  Function that will add date and time.
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
     $addTime = array('addTime' => TRUE);
@@ -1398,7 +1398,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add a currency and money element to the form
+   * Add a currency and money element to the form.
    */
   public function addMoney(
     $name,
@@ -1421,7 +1421,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add currency element to the form
+   * Add currency element to the form.
    */
   public function addCurrency(
     $name = 'currency',
@@ -1448,7 +1448,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Create a single or multiple entity ref field
+   * Create a single or multiple entity ref field.
    * @param string $name
    * @param string $label
    * @param array $props
@@ -1552,14 +1552,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Function that can be defined in Form to override or
+   * Function that can be defined in Form to override or.
    * perform specific action on cancel action
    */
   public function cancelAction() {
   }
 
   /**
-   * Helper function to verify that required fields have been filled
+   * Helper function to verify that required fields have been filled.
    * Typically called within the scope of a FormRule function
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
@@ -1625,7 +1625,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Get the contact id of the logged in user
+   * Get the contact id of the logged in user.
    */
   public function getLoggedInUserContactID() {
     // check if the user is logged in and has a contact ID
@@ -1741,7 +1741,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Sets form attribute
+   * Sets form attribute.
    * @see CRM.loadForm
    */
   public function preventAjaxSubmit() {
@@ -1749,7 +1749,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Sets form attribute
+   * Sets form attribute.
    * @see CRM.loadForm
    */
   public function allowAjaxSubmit() {
@@ -1757,7 +1757,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Sets page title based on entity and action
+   * Sets page title based on entity and action.
    * @param string $entityLabel
    */
   public function setPageTitle($entityLabel) {

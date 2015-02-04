@@ -156,7 +156,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in query generate the required
+   * Given a list of conditions in query generate the required.
    * where clause
    *
    * @param $query
@@ -176,7 +176,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Where clause for a single field
+   * Where clause for a single field.
    *
    * @param $values
    * @param $query
@@ -402,7 +402,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
    */
@@ -411,7 +411,7 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between case activity search and advanced search
+   * Add all the elements shared between case activity search and advanced search.
    *
    *
    * @param CRM_Core_Form $form

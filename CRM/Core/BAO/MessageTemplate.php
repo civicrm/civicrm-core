@@ -41,7 +41,7 @@ require_once 'Mail/mime.php';
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -61,7 +61,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -76,7 +76,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Add the Message Templates
+   * Add the Message Templates.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -97,7 +97,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Delete the Message Templates
+   * Delete the Message Templates.
    *
    * @param int $messageTemplatesID
    * @return void
@@ -123,7 +123,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Get the Message Templates
+   * Get the Message Templates.
    *
    *
    * @param bool $all
@@ -302,7 +302,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Send an email from the specified template based on an array of params
+   * Send an email from the specified template based on an array of params.
    *
    * @param array $params
    *   A string-keyed array of function params, see function body for details.

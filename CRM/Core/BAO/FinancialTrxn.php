@@ -34,7 +34,7 @@
  */
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
@@ -45,7 +45,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * Takes an associative array and creates a financial transaction object
+   * Takes an associative array and creates a financial transaction object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -117,7 +117,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -289,7 +289,7 @@ WHERE lt.entity_id = %1 ";
   }
 
   /**
-   * Delete financial transaction
+   * Delete financial transaction.
    *
    * @param int $entity_id
    * @return bool
@@ -309,7 +309,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * Create financial transaction for premium
+   * Create financial transaction for premium.
    *
    */
   public static function createPremiumTrxn($params) {
@@ -355,7 +355,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * Create financial trxn and items when fee is charged
+   * Create financial trxn and items when fee is charged.
    *
    * @param array $params
    *   To create trxn entries.
@@ -411,7 +411,7 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * get partial payment amount and type of it
+   * get partial payment amount and type of it.
    *
    * @param int $entityId
    * @param string $entityName

@@ -408,7 +408,7 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * Retrieve a contact ID and if not present
+   * Retrieve a contact ID and if not present.
    * create one with this email
    */
   public static function getContactID($email, $name = NULL, $create = TRUE, &$mail) {

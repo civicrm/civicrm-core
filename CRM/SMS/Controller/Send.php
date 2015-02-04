@@ -35,7 +35,7 @@
 class CRM_SMS_Controller_Send extends CRM_Core_Controller {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param string $title
    * @param bool|int $action

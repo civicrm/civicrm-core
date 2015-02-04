@@ -67,7 +67,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   }
 
   /**
-   * Add log to civicrm_log table
+   * Add log to civicrm_log table.
    *
    * @param array $params
    *   Array of name-value pairs of log table.
@@ -152,7 +152,7 @@ UPDATE civicrm_log
   }
 
   /**
-   * Get log record count for a Contact
+   * Get log record count for a Contact.
    *
    * @param int $contactID
    *
@@ -166,7 +166,7 @@ UPDATE civicrm_log
   }
 
   /**
-   * Function for find out whether to use logging schema entries for contact
+   * Function for find out whether to use logging schema entries for contact.
    * summary, instead of normal log entries.
    *
    * @return int

@@ -84,7 +84,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -99,7 +99,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Validation
+   * Validation.
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
@@ -141,7 +141,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

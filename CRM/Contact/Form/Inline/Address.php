@@ -76,7 +76,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -120,7 +120,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for an address object
+   * Build the form object elements for an address object.
    *
    * @return void
    */
@@ -130,7 +130,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -159,7 +159,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

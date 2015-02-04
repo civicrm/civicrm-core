@@ -35,14 +35,14 @@
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Queue a new recipient
+   * Queue a new recipient.
    *
    * @param array $params
    *   Values of the new EventQueue.
@@ -131,7 +131,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Count up events given a mailing id and optional job id
+   * Count up events given a mailing id and optional job id.
    *
    * @param int $mailing_id
    *   ID of the mailing to count.
@@ -166,7 +166,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -251,7 +251,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Get the mailing object for this queue event instance
+   * Get the mailing object for this queue event instance.
    *
    * @param
    *

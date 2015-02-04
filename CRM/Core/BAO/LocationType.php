@@ -35,20 +35,20 @@
 class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /**
-   * Static holder for the default LT
+   * Static holder for the default LT.
    */
   static $_defaultLocationType = NULL;
   static $_billingLocationType = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -69,7 +69,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -85,7 +85,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * Retrieve the default location_type
+   * Retrieve the default location_type.
    *
    * @return object
    *   The default location type object on success,
@@ -101,7 +101,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * Get ID of billing location type
+   * Get ID of billing location type.
    *
    * @return int
    */
@@ -114,7 +114,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * Add a Location Type
+   * Add a Location Type.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -141,7 +141,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
   }
 
   /**
-   * Delete location Types
+   * Delete location Types.
    *
    * @param int $locationTypeId
    *   ID of the location type to be deleted.

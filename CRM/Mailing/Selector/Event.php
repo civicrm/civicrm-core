@@ -81,7 +81,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   public $_columnHeaders;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param string $event
    *   The event type (queue/delivered/open...).
@@ -338,7 +338,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.

@@ -817,7 +817,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid data with contact_b
+   * Check with valid data with contact_b.
    */
   public function testGetRelationshipWithContactB() {
     $relParams = array(
@@ -1000,6 +1000,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test relationship get by membership type.
+   *
    * Checks that passing in 'contact_id_b' + a relationship type
    * will filter by relationship type for contact b
    *

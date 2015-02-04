@@ -40,14 +40,14 @@
 class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
   /**
-   * Batch entry fields
+   * Batch entry fields.
    */
   private static $_contriBatchEntryFields = NULL;
   private static $_memberBatchEntryFields = NULL;
 
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -75,7 +75,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -118,7 +118,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Check duplicate for duplicate field in a group
+   * Check duplicate for duplicate field in a group.
    *
    * @param array $params
    *   An associative array with field and values.
@@ -191,7 +191,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Add the UF Field
+   * Add the UF Field.
    *
    * @param array $params
    *   (reference) array containing the values submitted by the form.
@@ -247,7 +247,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Automatically determine one weight and modify others
+   * Automatically determine one weight and modify others.
    *
    * @param array $params
    *   UFField record, e.g. with 'weight', 'uf_group_id', and 'field_id'.
@@ -310,7 +310,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Delete profile field given a custom field
+   * Delete profile field given a custom field.
    *
    * @param int $customFieldId
    *   ID of the custom field to be deleted.
@@ -356,7 +356,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Check the status of custom field used in uf fields
+   * Check the status of custom field used in uf fields.
    *
    * @param int $UFFieldId
    *
@@ -853,7 +853,7 @@ SELECT  id
   }
 
   /**
-   * Get a list of fields which can be added to profiles
+   * Get a list of fields which can be added to profiles.
    *
    * @param int $gid : UF group ID
    * @param array $defaults : Form defaults
@@ -1043,7 +1043,7 @@ SELECT  id
   }
 
   /**
-   * Get a list of fields which can be added to profiles
+   * Get a list of fields which can be added to profiles.
    *
    * @param bool $force
    *
@@ -1068,7 +1068,7 @@ SELECT  id
   }
 
   /**
-   * Determine whether the given field_name is valid
+   * Determine whether the given field_name is valid.
    *
    * @param string $fieldName
    * @return bool

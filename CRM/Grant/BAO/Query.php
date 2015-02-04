@@ -43,7 +43,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * Build select for CiviGrant
+   * Build select for CiviGrant.
    *
    * @param $query
    *
@@ -98,7 +98,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in params generate the required
+   * Given a list of conditions in params generate the required.
    * where clause
    *
    * @param $query
@@ -317,7 +317,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
    */
@@ -356,7 +356,7 @@ class CRM_Grant_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between grant search and advanaced search
+   * Add all the elements shared between grant search and advanaced search.
    *
    *
    * @param CRM_Core_Form $form

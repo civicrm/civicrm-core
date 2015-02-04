@@ -40,14 +40,14 @@
 class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes an associative array and creates a custom group object
+   * Takes an associative array and creates a custom group object.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
@@ -222,7 +222,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -236,7 +236,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -1532,7 +1532,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Generic function to build all the form elements for a specific group tree
+   * Generic function to build all the form elements for a specific group tree.
    *
    * @param CRM_Core_Form $form
    *   The form object.
@@ -1859,7 +1859,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   }
 
   /**
-   * Build custom data view
+   * Build custom data view.
    *
    * @param CRM_Core_Form $form
    *   Page object.

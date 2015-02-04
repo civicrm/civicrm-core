@@ -114,7 +114,7 @@ class CRM_Utils_HttpClient {
   }
 
   /**
-   * Send an HTTP GET for a remote resource
+   * Send an HTTP GET for a remote resource.
    *
    * @param string $remoteFile
    *   URL of remote file.
@@ -152,7 +152,7 @@ class CRM_Utils_HttpClient {
   }
 
   /**
-   * Send an HTTP POST for a remote resource
+   * Send an HTTP POST for a remote resource.
    *
    * @param string $remoteFile
    *   URL of a .zip file.

@@ -77,7 +77,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Common form elements
+   * Common form elements.
    *
    * @return void
    */
@@ -99,7 +99,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Override default cancel action
+   * Override default cancel action.
    *
    * @return void
    */
@@ -109,7 +109,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -123,7 +123,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Add entry to log table
+   * Add entry to log table.
    *
    * @return void
    */
@@ -135,7 +135,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Common function for all inline contact edit forms
+   * Common function for all inline contact edit forms.
    * Prepares ajaxResponse
    *
    * @return void
@@ -150,15 +150,16 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Render changelog footer markup for a contact and supply count
+   * Render change log footer markup for a contact and supply count.
+   *
    * Needed for refreshing the contact summary screen
    *
    * @param int $cid
    * @param bool $includeCount
    * @return array
    */
-  static function renderFooter($cid, $includeCount = TRUE) {
-    // Load changelog footer from template
+  public static function renderFooter($cid, $includeCount = TRUE) {
+    // Load change log footer from template.
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('contactId', $cid);
     $smarty->assign('external_identifier', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'external_identifier'));

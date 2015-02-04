@@ -6,7 +6,7 @@
 class CRM_Contact_Form_Task_Unhold extends CRM_Contact_Form_Task {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */

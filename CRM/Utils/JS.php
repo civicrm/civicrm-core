@@ -35,7 +35,7 @@
  */
 class CRM_Utils_JS {
   /**
-   * Parse a javascript file for translatable strings
+   * Parse a javascript file for translatable strings.
    *
    * @param string $jsCode
    *   Raw Javascript code.

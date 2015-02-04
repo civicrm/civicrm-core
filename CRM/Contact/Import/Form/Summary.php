@@ -39,7 +39,7 @@
 class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -124,7 +124,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
   /**
-   * Clean up the import table we used
+   * Clean up the import table we used.
    *
    * @return void
    */

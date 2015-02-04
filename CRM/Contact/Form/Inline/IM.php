@@ -39,17 +39,17 @@
 class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
-   * Ims of the contact that is been viewed
+   * Ims of the contact that is been viewed.
    */
   private $_ims = array();
 
   /**
-   * No of im blocks for inline edit
+   * No of im blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * Call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,7 +62,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for im object
+   * Build the form object elements for im object.
    *
    * @return void
    */
@@ -96,7 +96,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -134,7 +134,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -154,7 +154,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

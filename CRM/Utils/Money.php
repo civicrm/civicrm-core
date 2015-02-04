@@ -40,7 +40,7 @@ class CRM_Utils_Money {
   static $_currencySymbols = NULL;
 
   /**
-   * Format a monetary string
+   * Format a monetary string.
    *
    * Format a monetary string basing on the amount provided,
    * ISO currency code provided and a format string consisting of:

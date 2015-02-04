@@ -72,14 +72,14 @@ class CRM_Utils_Cache_Memcached {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * The actual memcache object
+   * The actual memcache object.
    *
    * @var resource
    */
   protected $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

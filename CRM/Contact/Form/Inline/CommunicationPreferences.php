@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_Inline {
 
   /**
-   * Build the form object elements for communication preferences
+   * Build the form object elements for communication preferences.
    *
    * @return void
    */
@@ -50,7 +50,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -80,7 +80,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

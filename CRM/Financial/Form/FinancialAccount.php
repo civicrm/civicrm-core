@@ -40,7 +40,7 @@
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
-   * Flag if its a AR account type
+   * Flag if its a AR account type.
    *
    * @var boolean
    */
@@ -48,7 +48,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -75,7 +75,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -131,7 +131,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   posted values of the form
@@ -189,7 +189,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    * @return void
    */

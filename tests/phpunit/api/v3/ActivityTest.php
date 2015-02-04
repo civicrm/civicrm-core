@@ -184,8 +184,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Ensure that an invalid activity type causes failure
-   * oddly enough this test was failing because the creation of the invalid type
+   * Ensure that an invalid activity type causes failure.
+   *
+   * Oddly enough this test was failing because the creation of the invalid type
    * got added to the set up routine. Probably a mis-fix on a test
    */
   public function testActivityCreateWithNonNumericActivityTypeId() {

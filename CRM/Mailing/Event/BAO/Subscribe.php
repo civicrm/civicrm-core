@@ -42,7 +42,7 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -176,7 +176,7 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * Verify the hash of a subscription event
+   * Verify the hash of a subscription event.
    *
    * @param int $contact_id
    *   ID of the contact.
@@ -301,7 +301,7 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * Get the domain object given a subscribe event
+   * Get the domain object given a subscribe event.
    *
    * @param int $subscribe_id
    *   ID of the subscribe event.
@@ -314,7 +314,7 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * Get the group details to which given email belongs
+   * Get the group details to which given email belongs.
    *
    * @param string $email
    *   Email of the contact.
@@ -365,7 +365,7 @@ SELECT     civicrm_email.id as email_id
   }
 
   /**
-   * Send subscribe mail
+   * Send subscribe mail.
    *
    * @param array $groups
    *   The list of group ids for subscribe.

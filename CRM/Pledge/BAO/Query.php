@@ -42,7 +42,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * Build select for Pledge
+   * Build select for Pledge.
    *
    * @param $query
    *
@@ -460,7 +460,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
    */
@@ -469,7 +469,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * Ideally this function should include fields that are displayed in the selector
+   * Ideally this function should include fields that are displayed in the selector.
    */
   public static function defaultReturnProperties(
     $mode,
@@ -504,7 +504,7 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * This includes any extra fields that might need for export etc
+   * This includes any extra fields that might need for export etc.
    */
   public static function extraReturnProperties($mode) {
     $properties = NULL;

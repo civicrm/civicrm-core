@@ -38,7 +38,7 @@
 class CRM_Core_BAO_Block {
 
   /**
-   * Fields that are required for a valid block
+   * Fields that are required for a valid block.
    */
   static $requiredBlockFields = array(
     'email' => array('email'),
@@ -126,7 +126,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Check if the current block object has any valid data
+   * Check if the current block object has any valid data.
    *
    * @param array $blockFields
    *   Array of fields that are of interest for this object.
@@ -146,7 +146,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Check if the current block exits
+   * Check if the current block exits.
    *
    * @param string $blockName
    *   Bloack name.
@@ -166,7 +166,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Get all block ids for a contact
+   * Get all block ids for a contact.
    *
    * @param string $blockName
    *   Block name.
@@ -210,7 +210,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Takes an associative array and creates a block
+   * Takes an associative array and creates a block.
    *
    * @param string $blockName
    *   Block name.
@@ -392,7 +392,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Delete block
+   * Delete block.
    *
    * @param string $blockName
    *   Block name.
@@ -505,7 +505,7 @@ class CRM_Core_BAO_Block {
   }
 
   /**
-   * Sort location array so primary element is first
+   * Sort location array so primary element is first.
    *
    * @param array $locations
    */

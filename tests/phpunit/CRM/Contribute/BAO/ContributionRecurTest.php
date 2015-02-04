@@ -71,8 +71,9 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that an object can be retrieved & saved (per CRM-14986)
-   * this has been causing a DB error so we are checking for absence of error
+   * Test that an object can be retrieved & saved (per CRM-14986).
+   *
+   * This has been causing a DB error so we are checking for absence of error
    */
   public function testFindSave() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
@@ -84,8 +85,9 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test cancellation works per CRM-14986
-   * we are checking for absence of error
+   * Test cancellation works per CRM-14986.
+   *
+   * We are checking for absence of error.
    */
   public function testCancelRecur() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);

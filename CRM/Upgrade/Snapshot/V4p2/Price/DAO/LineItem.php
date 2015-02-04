@@ -139,7 +139,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   public $price_field_value_id;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem
    */
@@ -149,7 +149,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * return foreign links
+   * Return foreign links.
    *
    * @return array
    */
@@ -164,7 +164,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns all the column names of this table
+   * Returns all the column names of this table.
    *
    * @return array
    */
@@ -239,7 +239,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns the names of this table
+   * returns the names of this table.
    *
    * @return string
    */
@@ -248,7 +248,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns if this table needs to be logged
+   * returns if this table needs to be logged.
    *
    * @return boolean
    */
@@ -257,7 +257,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be imported
+   * returns the list of fields that can be imported.
    *
    * @return array
    */
@@ -280,7 +280,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be exported
+   * returns the list of fields that can be exported.
    *
    * @return array
    */

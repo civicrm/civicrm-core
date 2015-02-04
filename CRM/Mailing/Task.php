@@ -103,7 +103,7 @@ class CRM_Mailing_Task {
   }
 
   /**
-   * These tasks are the core set of tasks that the user can perform
+   * These tasks are the core set of tasks that the user can perform.
    * on mailing recipients
    *
    * @param int $value

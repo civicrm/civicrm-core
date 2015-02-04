@@ -47,7 +47,7 @@ class CRM_Utils_Geocode_Yahoo {
   static protected $_server = 'query.yahooapis.com';
 
   /**
-   * Uri of service
+   * Uri of service.
    *
    * @var string
    */

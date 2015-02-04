@@ -61,7 +61,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_create
+   * Test civicrm_mailing_create.
    */
   public function testMailerCreateSuccess() {
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -434,7 +434,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
   }
 
   /**
-   * Test civicrm_mailing_delete
+   * Test civicrm_mailing_delete.
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);

@@ -39,10 +39,12 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
+  /**
+   * Set up for class.
+   */
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-      #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accessories',
       'is_active' => 1,
@@ -59,6 +61,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create price set.
    */
   public function testCreatePriceSet() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -91,12 +94,12 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that no name doesn't cause failure
+   * Check that no name doesn't cause failure.
    */
   public function testCreatePriceSetNoName() {
     $params = $this->_params;
     unset($params['name']);
-    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccess($this->_entity, 'create', $params);
   }
 
   /**

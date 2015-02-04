@@ -62,7 +62,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   protected $_viewOptions;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param int $contactId
    *   Contact whose activities we want to display.
@@ -359,7 +359,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -504,7 +504,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * Get colunmn headers for search selector
+   * Get colunmn headers for search selector.
    *
    *
    * @return array

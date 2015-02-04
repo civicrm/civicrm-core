@@ -46,7 +46,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -372,7 +372,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @return string
    *   the error message if any

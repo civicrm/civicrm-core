@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Inline_Lock {
 
   /**
-   * This function provides the HTML form elements
+   * This function provides the HTML form elements.
    *
    * @param CRM_Core_Form $form
    *   Form object.

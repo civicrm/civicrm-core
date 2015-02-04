@@ -40,14 +40,14 @@
 class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
-   * Saved search id if any
+   * Saved search id if any.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -142,7 +142,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

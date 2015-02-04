@@ -35,14 +35,14 @@
 class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Create a new delivery event
+   * Create a new delivery event.
    *
    * @param array $params
    *   Associative array of delivery event values.
@@ -81,7 +81,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -140,7 +140,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.

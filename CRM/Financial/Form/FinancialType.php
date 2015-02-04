@@ -40,7 +40,7 @@
 class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -76,7 +76,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    * @return void
    */

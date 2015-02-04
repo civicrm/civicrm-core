@@ -131,7 +131,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     );
   }
 
-  public function testGuessBaseDir_twodir() {
+  public function testGuessBaseDirTwoDir() {
     $this->_doGuessBaseDir(FALSE,
       array('dir-1', 'dir-2'),
       array('dir-1/README.txt' => 'hello'),
@@ -139,7 +139,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     );
   }
 
-  public function testGuessBaseDir_weird() {
+  public function testGuessBaseDirWeird() {
     $this->_doGuessBaseDir(FALSE,
       array('foo/../'),
       array('foo/../README.txt' => 'hello'),

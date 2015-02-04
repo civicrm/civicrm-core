@@ -84,7 +84,7 @@ class CRM_Mailing_MailStore {
   }
 
   /**
-   * Return all emails in the mail store
+   * Return all emails in the mail store.
    *
    * @return array
    *   array of ezcMail objects
@@ -100,7 +100,7 @@ class CRM_Mailing_MailStore {
   }
 
   /**
-   * Return the next X messages from the mail store
+   * Return the next X messages from the mail store.
    *
    * @param int $count
    *   Number of messages to fetch (0 to fetch all).

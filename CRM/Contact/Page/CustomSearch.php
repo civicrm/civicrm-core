@@ -40,7 +40,7 @@
 class CRM_Contact_Page_CustomSearch extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */

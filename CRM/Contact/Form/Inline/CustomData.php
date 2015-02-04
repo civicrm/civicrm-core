@@ -39,21 +39,21 @@
 class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
-   * Custom group id
+   * Custom group id.
    *
    * @int
    */
   public $_groupID;
 
   /**
-   * Entity type of the table id
+   * Entity type of the table id.
    *
    * @var string
    */
   protected $_entityType;
 
   /**
-   * Call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -68,7 +68,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Build the form object elements for custom data
+   * Build the form object elements for custom data.
    *
    * @return void
    */
@@ -78,7 +78,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
    */
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

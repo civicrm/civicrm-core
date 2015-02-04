@@ -57,7 +57,7 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   public $_report = NULL;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -119,7 +119,7 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

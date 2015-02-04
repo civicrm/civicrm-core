@@ -41,26 +41,26 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_action;
 
   /**
-   * The id of the pledge that we are proceessing
+   * The id of the pledge that we are proceessing.
    *
    * @var int
    */
   public $_id;
 
   /**
-   * The id of the contact associated with this pledge
+   * The id of the contact associated with this pledge.
    *
    * @var int
    */
   public $_contactID;
 
   /**
-   * The Pledge values if an existing pledge
+   * The Pledge values if an existing pledge.
    */
   public $_values;
 
   /**
-   * The Pledge frequency Units
+   * The Pledge frequency Units.
    */
   public $_freqUnits;
 
@@ -70,7 +70,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_isPending = FALSE;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -212,7 +212,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -444,7 +444,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -480,7 +480,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

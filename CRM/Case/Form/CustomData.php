@@ -51,14 +51,14 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   protected $_entityID;
 
   /**
-   * The custom data type
+   * The custom data type.
    *
    * @var int
    */
   protected $_cdType;
 
   /**
-   * Entity sub type of the table id
+   * Entity sub type of the table id.
    *
    * @var string
    */
@@ -107,7 +107,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

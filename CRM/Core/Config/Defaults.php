@@ -75,7 +75,7 @@ class CRM_Core_Config_Defaults {
   }
 
   /**
-   * Format size
+   * Format size.
    *
    */
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
@@ -109,7 +109,7 @@ class CRM_Core_Config_Defaults {
   }
 
   /**
-   * Set the default values
+   * Set the default values.
    * in an empty db, also called when setting component using GUI
    *
    * @param array $defaults

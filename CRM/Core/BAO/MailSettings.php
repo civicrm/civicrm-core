@@ -35,7 +35,7 @@
 class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -64,7 +64,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Return the domain from the default set of settings
+   * Return the domain from the default set of settings.
    *
    * @return string
    *   default domain
@@ -74,7 +74,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Return the localpart from the default set of settings
+   * Return the localpart from the default set of settings.
    *
    * @return string
    *   default localpart
@@ -84,7 +84,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Return the return path from the default set of settings
+   * Return the return path from the default set of settings.
    *
    * @return string
    *   default return path
@@ -108,10 +108,9 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * mail settings id. It also stores all the retrieved
-   * values in the default array
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -168,7 +167,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Takes an associative array and creates a mail settings object
+   * Takes an associative array and creates a mail settings object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

@@ -42,7 +42,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
   protected $_contactID;
 
   /**
-   * Lets do permission checking here
+   * Lets do permission checking here.
    * First check for valid mailing, if false return fatal
    * Second check for visibility
    * Call a hook to see if hook wants to override visibility setting

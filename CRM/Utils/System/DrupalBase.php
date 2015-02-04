@@ -84,7 +84,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately
+   * Check if a resource url is within the drupal directory and format appropriately.
    *
    * @param $url (reference)
    *
@@ -281,7 +281,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append Drupal js to coreResourcesList
+   * Append Drupal js to coreResourcesList.
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';

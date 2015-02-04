@@ -51,7 +51,7 @@ class CRM_Core_Selector_Controller {
     TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**
-   * A CRM Object that implements CRM_Core_Selector_API
+   * A CRM Object that implements CRM_Core_Selector_API.
    * @var object
    */
   protected $_object;
@@ -174,7 +174,7 @@ class CRM_Core_Selector_Controller {
   protected $_dynamicAction = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param CRM_Core_Selector_API $object
    *   An object that implements the selector API.
@@ -423,7 +423,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Getter for pager
+   * Getter for pager.
    *
    * @return CRM_Utils_Pager
    */
@@ -432,7 +432,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Getter for sort
+   * Getter for sort.
    *
    * @return CRM_Utils_Sort
    */
@@ -441,7 +441,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Move the variables from the session to the template
+   * Move the variables from the session to the template.
    *
    * @return void
    */
@@ -483,7 +483,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Setter for embedded
+   * Setter for embedded.
    *
    * @param bool $embedded
    *
@@ -494,7 +494,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Getter for embedded
+   * Getter for embedded.
    *
    * @return bool
    *   return the embedded value
@@ -504,7 +504,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Setter for print
+   * Setter for print.
    *
    * @param bool $print
    *
@@ -515,7 +515,7 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * Getter for print
+   * Getter for print.
    *
    * @return bool
    *   return the print value

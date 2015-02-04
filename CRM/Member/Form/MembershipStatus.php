@@ -57,7 +57,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -105,7 +105,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig 
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

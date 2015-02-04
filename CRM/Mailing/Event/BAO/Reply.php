@@ -44,7 +44,7 @@ require_once 'ezc/autoload/mail_autoload.php';
 class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -103,7 +103,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   }
 
   /**
-   * Forward a mailing reply
+   * Forward a mailing reply.
    *
    * @param int $queue_id
    *   Queue event ID of the sender.
@@ -211,7 +211,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   }
 
   /**
-   * Send an automated response
+   * Send an automated response.
    *
    * @param object $mailing
    *   The mailing object.
@@ -302,7 +302,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -356,7 +356,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.

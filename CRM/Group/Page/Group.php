@@ -43,7 +43,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Define action links
+   * Define action links.
    *
    *   self::$_links array of action links
    */
@@ -51,7 +51,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Return class name of edit form
+   * Return class name of edit form.
    *
    * @return string
    */
@@ -60,7 +60,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Return name of edit form
+   * Return name of edit form.
    *
    * @return string
    */
@@ -69,7 +69,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Return name of delete form
+   * Return name of delete form.
    *
    * @return string
    */
@@ -78,7 +78,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Return user context uri to return to
+   * Return user context uri to return to.
    *
    * @param null $mode
    *
@@ -89,7 +89,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Return user context uri params
+   * Return user context uri params.
    *
    * @param null $mode
    *
@@ -100,7 +100,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Make sure that the user has permission to access this group
+   * Make sure that the user has permission to access this group.
    *
    * @param int $id
    *   The id of the object.

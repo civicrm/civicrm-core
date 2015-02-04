@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
    *
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @var CRM_Core_Form $form
    *
@@ -194,7 +194,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Set default values
+   * Set default values.
    */
   public static function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
@@ -203,7 +203,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Form rule
+   * Form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -238,7 +238,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Part of the post process which prepare and extract information from the template
+   * Part of the post process which prepare and extract information from the template.
    *
    *
    * @param CRM_Core_Form $form
@@ -313,7 +313,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @param CRM_Core_Form $form

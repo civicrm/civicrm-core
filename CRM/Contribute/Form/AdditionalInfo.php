@@ -191,7 +191,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Process the Premium Information
+   * Process the Premium Information.
    *
    *
    * @param array $params
@@ -250,7 +250,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Process the Note
+   * Process the Note.
    *
    *
    * @param array $params
@@ -277,7 +277,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
-   * Process the Common data
+   * Process the Common data.
    *
    *
    * @param array $params

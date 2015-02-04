@@ -51,7 +51,7 @@ class CRM_Core_Page {
   protected $_name;
 
   /**
-   * The title associated with this page
+   * The title associated with this page.
    *
    * @var object
    */
@@ -116,7 +116,7 @@ class CRM_Core_Page {
   public $useLivePageJS;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param string $title
    *   Title of the page.
@@ -245,7 +245,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Store the variable with the value in the form scope
+   * Store the variable with the value in the form scope.
    *
    * @param string|array $name name of the variable or an assoc array of name/value pairs
    * @param mixed $value
@@ -259,7 +259,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Get the variable from the form scope
+   * Get the variable from the form scope.
    *
    * @param string $name name of the variable
    *
@@ -270,7 +270,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Assign value to name in template
+   * Assign value to name in template.
    *
    * @param string $var
    * @param mixed $value
@@ -283,7 +283,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Assign value to name in template by reference
+   * Assign value to name in template by reference.
    *
    * @param string $var
    * @param mixed $value
@@ -296,7 +296,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Appends values to template variables
+   * Appends values to template variables.
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value
@@ -308,7 +308,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Returns an array containing template variables
+   * Returns an array containing template variables.
    *
    * @param string $name
    *
@@ -329,7 +329,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -364,7 +364,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Setter for embedded
+   * Setter for embedded.
    *
    * @param bool $embedded
    *
@@ -375,7 +375,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Getter for embedded
+   * Getter for embedded.
    *
    * @return bool
    *   return the embedded value
@@ -385,7 +385,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Setter for print
+   * Setter for print.
    *
    * @param bool $print
    *
@@ -396,7 +396,7 @@ class CRM_Core_Page {
   }
 
   /**
-   * Getter for print
+   * Getter for print.
    *
    * @return bool
    *   return the print value

@@ -46,7 +46,7 @@ interface CRM_Extension_Container_Interface {
   public function checkRequirements();
 
   /**
-   * Get a list of extensions available in this container
+   * Get a list of extensions available in this container.
    *
    * @return array
    *   List of keys (strings).
@@ -65,7 +65,7 @@ interface CRM_Extension_Container_Interface {
   public function getPath($key);
 
   /**
-   * Determine the base URL for resources provided by the extension
+   * Determine the base URL for resources provided by the extension.
    *
    * @param string $key
    *   Fully-qualified extension name.

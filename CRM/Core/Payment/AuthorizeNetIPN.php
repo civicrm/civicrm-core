@@ -35,7 +35,7 @@
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
-   * Constructor function
+   * Constructor function.
    *
    * @param array $inputData
    *   contents of HTTP REQUEST.

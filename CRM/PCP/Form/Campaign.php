@@ -96,7 +96,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -160,7 +160,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -184,7 +184,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

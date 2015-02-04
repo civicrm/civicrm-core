@@ -265,7 +265,7 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Verify that a variable is of a given type
+   * Verify that a variable is of a given type.
    *
    * @param mixed $data
    *   The value to validate.

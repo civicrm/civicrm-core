@@ -89,7 +89,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

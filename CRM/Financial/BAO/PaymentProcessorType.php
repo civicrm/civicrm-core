@@ -35,19 +35,19 @@
 class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
 
   /**
-   * Static holder for the default payment processor
+   * Static holder for the default payment processor.
    */
   static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -68,7 +68,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -84,7 +84,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Retrieve the default payment processor
+   * Retrieve the default payment processor.
    *
    * @return object
    *   The default payment processor object on success,
@@ -168,7 +168,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Delete payment processor
+   * Delete payment processor.
    *
    * @param int $paymentProcessorTypeId
    *   ID of the processor to be deleted.

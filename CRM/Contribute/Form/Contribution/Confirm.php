@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_ContributionBase {
 
   /**
-   * The id of the contact associated with this contribution
+   * The id of the contact associated with this contribution.
    *
    * @var int
    */
@@ -47,14 +47,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
 
   /**
-   * The id of the contribution object that is created when the form is submitted
+   * The id of the contribution object that is created when the form is submitted.
    *
    * @var int
    */
   public $_contributionID;
 
   /**
-   * Set the parameters to be passed to contribution create function
+   * Set the parameters to be passed to contribution create function.
    *
    * @param array $params
    * @param int $contactID
@@ -148,7 +148,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -441,7 +441,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -672,7 +672,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

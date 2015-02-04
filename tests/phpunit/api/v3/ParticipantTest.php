@@ -133,14 +133,14 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_participant_get with empty params
+   * Test civicrm_participant_get with empty params.
    */
   public function testGetEmptyParams() {
     $this->callAPISuccess('participant', 'get', array());
   }
 
   /**
-   * Check with participant_id
+   * Check with participant_id.
    */
   public function testGetParticipantIdOnly() {
     $params = array(
@@ -221,7 +221,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with contact_id
+   * Check with contact_id.
    */
   public function testGetContactIdOnly() {
     $params = array(
@@ -247,7 +247,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with event_id
+   * Check with event_id.
    * fetch first record
    */
   public function testGetMultiMatchReturnFirst() {
@@ -261,7 +261,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with event_id
+   * Check with event_id.
    * in v3 this should return all participants
    */
   public function testGetMultiMatchNoReturnFirst() {
@@ -275,7 +275,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_get methods
 
   /**
-   * Test civicrm_participant_get with empty params
+   * Test civicrm_participant_get with empty params.
    * In this case all the participant records are returned.
    */
   public function testSearchEmptyParams() {
@@ -285,7 +285,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with participant_id
+   * Check with participant_id.
    */
   public function testSearchParticipantIdOnly() {
     $params = array(
@@ -298,7 +298,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with contact_id
+   * Check with contact_id.
    */
   public function testSearchContactIdOnly() {
     // Should get 2 participant records for this contact.
@@ -311,7 +311,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with event_id
+   * Check with event_id.
    */
   public function testSearchByEvent() {
     // Should get >= 3 participant records for this event. Also testing that last_name and event_title are returned.
@@ -330,7 +330,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with event_id
+   * Check with event_id.
    * fetch with limit
    */
   public function testSearchByEventWithLimit() {
@@ -347,7 +347,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_create methods
 
   /**
-   * Test civicrm_participant_create with empty params
+   * Test civicrm_participant_create with empty params.
    */
   public function testCreateEmptyParams() {
     $params = array();
@@ -355,7 +355,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with event_id
+   * Check with event_id.
    */
   public function testCreateMissingContactID() {
     $params = array(
@@ -365,7 +365,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with contact_id
+   * Check with contact_id.
    * without event_id
    */
   public function testCreateMissingEventID() {
@@ -569,7 +569,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_update methods
 
   /**
-   * Test civicrm_participant_update with wrong params type
+   * Test civicrm_participant_update with wrong params type.
    */
   public function testUpdateWrongParamsType() {
     $params = 'a string';
@@ -587,7 +587,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without event_id
+   * Check without event_id.
    */
   public function testUpdateWithoutEventId() {
     $participantId = $this->participantCreate(array('contactID' => $this->_individualId, 'eventID' => $this->_eventID));
@@ -644,7 +644,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_delete methods
 
   /**
-   * Test civicrm_participant_delete with wrong params type
+   * Test civicrm_participant_delete with wrong params type.
    */
   public function testDeleteWrongParamsType() {
     $params = 'a string';
@@ -652,7 +652,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_participant_delete with empty params
+   * Test civicrm_participant_delete with empty params.
    */
   public function testDeleteEmptyParams() {
     $params = array();
@@ -660,7 +660,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with participant_id
+   * Check with participant_id.
    */
   public function testParticipantDelete() {
     $params = array(
@@ -672,7 +672,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without participant_id
+   * Check without participant_id.
    * and with event_id
    * This should return an error because required param is missing..
    */

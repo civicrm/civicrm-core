@@ -244,7 +244,7 @@ AND    g.refresh_date IS NULL
   }
 
   /**
-   * Change the cache_date
+   * Change the cache_date.
    *
    * @param array $groupID
    * @param bool $processed
@@ -273,7 +273,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * Removes all the cache entries pertaining to a specific group
+   * Removes all the cache entries pertaining to a specific group.
    * If no groupID is passed in, removes cache entries for all groups
    * Has an optimization to bypass repeated invocations of this function.
    * Note that this function is an advisory, i.e. the removal respects the
@@ -394,7 +394,7 @@ WHERE  id = %1
   }
 
   /**
-   * Removes one or more contacts from the smart group cache
+   * Removes one or more contacts from the smart group cache.
    * @param int|array $cid
    * @param int $groupId
    * @return bool
@@ -419,7 +419,7 @@ WHERE  id = %1
   }
 
   /**
-   * Load the smart group cache for a saved search
+   * Load the smart group cache for a saved search.
    *
    * @param object $group
    *   The smart group that needs to be loaded.
@@ -600,7 +600,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
   }
 
   /**
-   * Get all the smart groups that this contact belongs to
+   * Get all the smart groups that this contact belongs to.
    * Note that this could potentially be a super slow function since
    * it ensure that all contact groups are loaded in the cache
    *

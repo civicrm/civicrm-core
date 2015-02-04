@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * Create recurring contribution
+   * Create recurring contribution.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -48,7 +48,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * Takes an associative array and creates a contribution object
+   * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a
    * contribution object. the params array could contain additional unused name/value
@@ -104,7 +104,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * Check if there is a recurring contribution with the same trxn_id or invoice_id
+   * Check if there is a recurring contribution with the same trxn_id or invoice_id.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -321,7 +321,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * Get list of recurring contribution of contact Ids
+   * Get list of recurring contribution of contact Ids.
    *
    * @param int $contactId
    *   Contact ID.

@@ -41,14 +41,14 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Unsubscribe a contact from the domain
+   * Unsubscribe a contact from the domain.
    *
    * @param int $job_id
    *   The job ID.
@@ -114,7 +114,7 @@ WHERE  email = %2
   }
 
   /**
-   * Unsubscribe a contact from all groups that received this mailing
+   * Unsubscribe a contact from all groups that received this mailing.
    *
    * @param int $job_id
    *   The job ID.
@@ -288,7 +288,7 @@ WHERE  email = %2
   }
 
   /**
-   * Send a reponse email informing the contact of the groups from which he
+   * Send a reponse email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
    * @param string $queue_id
@@ -412,7 +412,7 @@ WHERE  email = %2
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
    * @param int $mailing_id
    *   ID of the mailing.
@@ -479,7 +479,7 @@ WHERE  email = %2
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
    * @param int $mailing_id
    *   ID of the mailing.

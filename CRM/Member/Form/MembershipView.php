@@ -40,14 +40,14 @@
 class CRM_Member_Form_MembershipView extends CRM_Core_Form {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * Add context information at the end of a link
+   * Add context information at the end of a link.
    *
    * @return string
    *   extra query parameters
@@ -63,7 +63,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -89,7 +89,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Perform create or delete action on related memberships
+   * Perform create or delete action on related memberships.
    *
    * @param string $action
    *   Create or delete.
@@ -143,7 +143,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -393,7 +393,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

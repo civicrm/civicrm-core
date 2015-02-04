@@ -39,7 +39,7 @@
 class CRM_Contact_BAO_Query {
 
   /**
-   * The various search modes
+   * The various search modes.
    *
    * @var int
    */
@@ -58,21 +58,21 @@ class CRM_Contact_BAO_Query {
     MODE_MAILING = 16384;
 
   /**
-   * The default set of return properties
+   * The default set of return properties.
    *
    * @var array
    */
   static $_defaultReturnProperties = NULL;
 
   /**
-   * The default set of hier return properties
+   * The default set of hier return properties.
    *
    * @var array
    */
   static $_defaultHierReturnProperties;
 
   /**
-   * The set of input params
+   * The set of input params.
    *
    * @var array
    */
@@ -185,28 +185,28 @@ class CRM_Contact_BAO_Query {
   public $_fields;
 
   /**
-   * The cache to translate the option values into labels
+   * The cache to translate the option values into labels.
    *
    * @var array
    */
   public $_options;
 
   /**
-   * Are we in search mode
+   * Are we in search mode.
    *
    * @var boolean
    */
   public $_search = TRUE;
 
   /**
-   * Should we skip permission checking
+   * Should we skip permission checking.
    *
    * @var boolean
    */
   public $_skipPermission = FALSE;
 
   /**
-   * Should we skip adding of delete clause
+   * Should we skip adding of delete clause.
    *
    * @var boolean
    */
@@ -220,7 +220,7 @@ class CRM_Contact_BAO_Query {
   public $_strict = FALSE;
 
   /**
-   * What operator to use to group the clauses
+   * What operator to use to group the clauses.
    *
    * @var string
    */
@@ -229,35 +229,35 @@ class CRM_Contact_BAO_Query {
   public $_mode = 1;
 
   /**
-   * Should we only search on primary location
+   * Should we only search on primary location.
    *
    * @var boolean
    */
   public $_primaryLocation = TRUE;
 
   /**
-   * Are contact ids part of the query
+   * Are contact ids part of the query.
    *
    * @var boolean
    */
   public $_includeContactIds = FALSE;
 
   /**
-   * Should we use the smart group cache
+   * Should we use the smart group cache.
    *
    * @var boolean
    */
   public $_smartGroupCache = TRUE;
 
   /**
-   * Should we display contacts with a specific relationship type
+   * Should we display contacts with a specific relationship type.
    *
    * @var string
    */
   public $_displayRelationshipType = NULL;
 
   /**
-   * Reference to the query object for custom values
+   * Reference to the query object for custom values.
    *
    * @var Object
    */
@@ -349,7 +349,7 @@ class CRM_Contact_BAO_Query {
   );
 
   /**
-   * List of location specific fields
+   * List of location specific fields.
    */
   static $_locationSpecificFields = array(
     'street_address',
@@ -392,7 +392,7 @@ class CRM_Contact_BAO_Query {
   public $_pseudoConstantsSelect = array();
 
   /**
-   * Class constructor which also does all the work
+   * Class constructor which also does all the work.
    *
    * @param array $params
    * @param array $returnProperties
@@ -462,7 +462,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Function which actually does all the work for the constructor
+   * Function which actually does all the work for the constructor.
    *
    * @return void
    */
@@ -1284,7 +1284,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Generate the query based on what type of query we need
+   * Generate the query based on what type of query we need.
    *
    * @param bool $count
    * @param bool $sortByChar
@@ -1843,7 +1843,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in params generate the required
+   * Given a list of conditions in params generate the required.
    * where clause
    *
    * @return string
@@ -2360,7 +2360,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Getter for tables array
+   * Getter for tables array.
    *
    * @return array
    */
@@ -2401,7 +2401,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Create the from clause
+   * Create the from clause.
    *
    * @param array $tables
    *   Tables that need to be included in this from clause.
@@ -2883,7 +2883,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Function translates selection of group type into a list of groups
+   * Function translates selection of group type into a list of groups.
    * @param $value
    *
    * @return array
@@ -2986,7 +2986,7 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * All tag search specific
+   * All tag search specific.
    *
    * @param $values
    *
@@ -4213,7 +4213,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * Default set of return properties
+   * Default set of return properties.
    *
    * @param int $mode
    *
@@ -4295,7 +4295,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * Get primary condition for a sql clause
+   * Get primary condition for a sql clause.
    *
    * @param int $value
    *
@@ -4310,7 +4310,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * Wrapper for a simple search query
+   * Wrapper for a simple search query.
    *
    * @param array $params
    * @param array $returnProperties
@@ -4428,7 +4428,7 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
-   * Create and query the db for an contact search
+   * Create and query the db for an contact search.
    *
    * @param int $offset
    *   The offset for the query.
@@ -4849,7 +4849,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
    */
@@ -4858,7 +4858,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * Default set of return default hier return properties
+   * Default set of return default hier return properties.
    *
    * @return array
    */
@@ -5366,7 +5366,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * Builds the necessary structures for all fields that are similar to option value lookups
+   * Builds the necessary structures for all fields that are similar to option value lookups.
    *
    * @param string $name
    *   the name of the field.
@@ -5585,7 +5585,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * Include pseudo fields LEFT JOIN
+   * Include pseudo fields LEFT JOIN.
    * @param string|array $sort can be a object or string
    *
    * @return array|NULL

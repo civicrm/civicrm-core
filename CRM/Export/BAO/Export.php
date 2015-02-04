@@ -44,7 +44,7 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 10000;
 
   /**
-   * Get the list the export fields
+   * Get the list the export fields.
    *
    * @param int $selectAll
    *   User preference while export.
@@ -1191,7 +1191,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * Name of the export file based on mode
+   * Name of the export file based on mode.
    *
    * @param string $output
    *   Type of output.
@@ -1963,7 +1963,7 @@ LIMIT $offset, $limit
   }
 
   /**
-   * Manipulate header rows for relationship fields
+   * Manipulate header rows for relationship fields.
    *
    * @param $headerRows
    * @param $contactRelationshipTypes

@@ -45,21 +45,21 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   protected $_config;
 
   /**
-   * Upgrade for multilingual
+   * Upgrade for multilingual.
    *
    * @var boolean
    */
   public $multilingual = FALSE;
 
   /**
-   * Locales available for multilingual upgrade
+   * Locales available for multilingual upgrade.
    *
    * @var array
    */
   public $locales;
 
   /**
-   * Number to string mapper
+   * Number to string mapper.
    *
    * @var array
    */
@@ -77,7 +77,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   );
 
   /**
-   * Constructor for the basic form page
+   * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
    * of default convenient functions, rules and buttons
@@ -243,7 +243,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
    */
@@ -436,7 +436,7 @@ SET    version = '$version'
   }
 
   /**
-   * Determine the start and end version of the upgrade process
+   * Determine the start and end version of the upgrade process.
    *
    * @return array(0=>$currentVer, 1=>$latestVer)
    */
@@ -547,7 +547,7 @@ SET    version = '$version'
   }
 
   /**
-   * Fill the queue with upgrade tasks
+   * Fill the queue with upgrade tasks.
    *
    * @param string $currentVer
    *   the original revision.
@@ -614,7 +614,7 @@ SET    version = '$version'
   }
 
   /**
-   * Perform an incremental version update
+   * Perform an incremental version update.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $rev
@@ -633,7 +633,7 @@ SET    version = '$version'
   }
 
   /**
-   * Perform an incremental version update
+   * Perform an incremental version update.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $rev
@@ -705,7 +705,7 @@ SET    version = '$version'
   }
 
   /**
-   * Perform an incremental version update
+   * Perform an incremental version update.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $rev

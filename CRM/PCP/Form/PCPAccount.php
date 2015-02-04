@@ -39,7 +39,7 @@
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
-   * Variable defined for Contribution Page Id
+   * Variable defined for Contribution Page Id.
    */
   public $_pageId = NULL;
   public $_id = NULL;
@@ -53,7 +53,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   public $_single;
 
   /**
-   * The default values for the form
+   * The default values for the form.
    *
    * @var array
    */
@@ -137,7 +137,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -217,7 +217,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -243,7 +243,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

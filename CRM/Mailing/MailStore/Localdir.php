@@ -42,7 +42,7 @@ require_once 'ezc/autoload/mail_autoload.php';
 class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
 
   /**
-   * Connect to the supplied dir and make sure the two mail dirs exist
+   * Connect to the supplied dir and make sure the two mail dirs exist.
    *
    * @param string $dir
    *   Dir to operate upon.
@@ -67,7 +67,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Return the next X messages from the mail store
+   * Return the next X messages from the mail store.
    * FIXME: in CiviCRM 2.2 this always returns all the emails
    *
    * @param int $count
@@ -125,7 +125,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local ignore folder
+   * Fetch the specified message to the local ignore folder.
    *
    * @param int $file
    *   File location of the message to fetch.
@@ -144,7 +144,7 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local processed folder
+   * Fetch the specified message to the local processed folder.
    *
    * @param int $file
    *   File location of the message to fetch.

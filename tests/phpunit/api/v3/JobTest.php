@@ -75,7 +75,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create job with an invalid "run_frequency" value
+   * Create job with an invalid "run_frequency" value.
    */
   public function testCreateWithInvalidFrequency() {
     $params = array(
@@ -181,7 +181,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the call reminder success sends more than 25 reminders & is not incorrectly limited
+   * Test the call reminder success sends more than 25 reminders & is not incorrectly limited.
+   *
    * Note that this particular test sends the reminders to the additional recipients only
    * as no real reminder person is configured
    *
@@ -220,7 +221,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test scheduled reminders respect limit to (since above identified addition_to handling issue)
+   * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
+   *
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
    * & check that only the chosen one got the reminder
    */

@@ -63,7 +63,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   protected $_surveyActivities;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -136,7 +136,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void

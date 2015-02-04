@@ -171,7 +171,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * Determine the relative path of an extension directory
+   * Determine the relative path of an extension directory.
    *
    * @param string $key
    *   Extension name.
@@ -224,7 +224,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * Determine the relative path of an extension directory
+   * Determine the relative path of an extension directory.
    *
    * @param string $key
    *   Extension name.

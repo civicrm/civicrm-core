@@ -39,14 +39,14 @@
 class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
 
   /**
-   * Are we forced to run a search
+   * Are we forced to run a search.
    *
    * @var int
    */
   protected $_force;
 
   /**
-   * Processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
    */
@@ -69,7 +69,7 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void

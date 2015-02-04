@@ -58,7 +58,7 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Add civicrm settings
+   * Add civicrm settings.
    *
    * @param array $params
    *   Associated array of civicrm variables.
@@ -139,7 +139,7 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Fix civicrm setting variables
+   * Fix civicrm setting variables.
    *
    * @param array $params
    *   Associated array of civicrm variables.
@@ -171,7 +171,7 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Format the array containing before inserting in db
+   * Format the array containing before inserting in db.
    *
    * @param array $params
    *   Associated array of civicrm variables(submitted).
@@ -197,7 +197,7 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Retrieve the settings values from db
+   * Retrieve the settings values from db.
    *
    * @param $defaults
    *
@@ -478,7 +478,7 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Return likely default settings
+   * Return likely default settings.
    * @return array
    *   site settings
    *   - $url
@@ -649,7 +649,7 @@ WHERE  option_group_id = (
   }
 
   /**
-   * Takes a componentName and enables it in the config
+   * Takes a componentName and enables it in the config.
    * Primarily used during unit testing
    *
    * @param string $componentName

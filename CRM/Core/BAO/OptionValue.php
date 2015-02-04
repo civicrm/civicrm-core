@@ -35,7 +35,7 @@
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -62,7 +62,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Set default Parameters
+   * Set default Parameters.
    * This functions sets default parameters if not set:
    * - name & label are set to each other as required (it might make more sense for one
    * to be required but this would mean a change to the api level)
@@ -90,7 +90,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get next available value
+   * Get next available value.
    * We will take the highest numeric value (or 0 if no numeric values exist)
    * and add one. The calling function is responsible for any
    * more complex decision making
@@ -125,7 +125,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -145,7 +145,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -160,7 +160,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Add an Option Value
+   * Add an Option Value.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -227,7 +227,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Delete Option Value
+   * Delete Option Value.
    *
    * @param int $optionValueId
    *
@@ -245,7 +245,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Retrieve activity type label and description
+   * Retrieve activity type label and description.
    *
    * @param int $activityTypeId
    *   Activity type id.

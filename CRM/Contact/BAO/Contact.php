@@ -59,7 +59,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     END";
 
   /**
-   * The types of communication preferences
+   * The types of communication preferences.
    *
    * @var array
    */
@@ -72,7 +72,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   );
 
   /**
-   * Types of greetings
+   * Types of greetings.
    *
    * @var array
    */
@@ -83,14 +83,14 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   );
 
   /**
-   * Static field for all the contact information that we can potentially import
+   * Static field for all the contact information that we can potentially import.
    *
    * @var array
    */
   static $_importableFields = array();
 
   /**
-   * Static field for all the contact information that we can potentially export
+   * Static field for all the contact information that we can potentially export.
    *
    * @var array
    */

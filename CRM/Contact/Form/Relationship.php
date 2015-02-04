@@ -290,7 +290,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -399,7 +399,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   *  This function is called when the form is submitted
+   *  This function is called when the form is submitted.
    *
    *
    * @return void
@@ -554,7 +554,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Date validation
+   * Date validation.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

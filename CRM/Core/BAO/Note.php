@@ -125,7 +125,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * Takes an associative array and creates a note object
+   * Takes an associative array and creates a note object.
    *
    * the function extract all the params it needs to initialize the create a
    * note object. the params array could contain additional unused name/value
@@ -218,7 +218,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -281,7 +281,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * Delete the notes
+   * Delete the notes.
    *
    * @param int $id
    *   Note id.
@@ -332,7 +332,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   }
 
   /**
-   * Delete all records for this contact id
+   * Delete all records for this contact id.
    *
    * @param int $id
    *   ID of the contact for which note needs to be deleted.
@@ -388,7 +388,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get log record count for a Contact
+   * Get log record count for a Contact.
    *
    * @param int $contactID
    *
@@ -411,7 +411,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get all descendent notes of the note with given ID
+   * Get all descendent notes of the note with given ID.
    *
    * @param int $parentId
    *   ID of the note to start from.
@@ -429,7 +429,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Get total count of direct children visible to the current user
+   * Get total count of direct children visible to the current user.
    *
    * @param int $id
    *   Note ID.
@@ -453,7 +453,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Recursive function to get all descendent notes of the note with given ID
+   * Recursive function to get all descendent notes of the note with given ID.
    *
    * @param int $parentId
    *   ID of the note to start from.
@@ -548,7 +548,7 @@ ORDER BY  modified_date desc";
   }
 
   /**
-   * Delete all note related to contact when contact is deleted
+   * Delete all note related to contact when contact is deleted.
    *
    * @param int $contactID
    *   Contact id whose notes to be deleted.

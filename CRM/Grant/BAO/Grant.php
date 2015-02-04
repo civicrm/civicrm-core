@@ -35,20 +35,20 @@
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
   /**
-   * Static field for all the grant information that we can potentially export
+   * Static field for all the grant information that we can potentially export.
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Get events Summary
+   * Get events Summary.
    *
    *
    * @param bool $admin
@@ -88,7 +88,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Get events Summary
+   * Get events Summary.
    *
    *
    * @return array
@@ -110,7 +110,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -130,7 +130,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Add grant
+   * Add grant.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -231,7 +231,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Create the event
+   * Create the event.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -293,7 +293,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Delete the Contact
+   * Delete the Contact.
    *
    * @param int $id
    *   Contact id.
@@ -309,7 +309,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Delete the grant
+   * Delete the grant.
    *
    * @param int $id
    *   Grant id.
@@ -340,7 +340,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Combine all the exportable fields from the lower levels object
+   * Combine all the exportable fields from the lower levels object.
    *
    * @return array
    *   array of exportable Fields
@@ -397,7 +397,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Get grant record count for a Contact
+   * Get grant record count for a Contact.
    *
    * @param int $contactID
    *

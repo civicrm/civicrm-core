@@ -42,7 +42,7 @@ require_once 'ezc/autoload/mail_autoload.php';
 class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
 
   /**
-   * Connect to and lock the supplied file and make sure the two mail dirs exist
+   * Connect to and lock the supplied file and make sure the two mail dirs exist.
    *
    * @param string $file
    *   Mbox to operate upon.
@@ -86,7 +86,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local ignore folder
+   * Fetch the specified message to the local ignore folder.
    *
    * @param int $nr
    *   Number of the message to fetch.
@@ -104,7 +104,7 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Fetch the specified message to the local processed folder
+   * Fetch the specified message to the local processed folder.
    *
    * @param int $nr
    *   Number of the message to fetch.

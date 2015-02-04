@@ -49,12 +49,12 @@
 class CRM_Extension_Mapper {
 
   /**
-   * An URL for public extensions repository
+   * An URL for public extensions repository.
    */
   //const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
-   * Extension info file name
+   * Extension info file name.
    */
   const EXT_TEMPLATES_DIRNAME = 'templates';
 
@@ -325,7 +325,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Get a list of base URLs for all active modules
+   * Get a list of base URLs for all active modules.
    *
    * @return array
    *   (string $extKey => string $baseUrl)

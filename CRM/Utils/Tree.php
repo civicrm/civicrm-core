@@ -80,7 +80,7 @@
 class CRM_Utils_Tree {
 
   /**
-   * Store the tree information as a string or array
+   * Store the tree information as a string or array.
    * @var string|array
    */
   private $tree;
@@ -103,7 +103,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Find a node that matches the given string
+   * Find a node that matches the given string.
    *
    * @param string $name
    *   Name of the node we are searching for.
@@ -153,7 +153,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Create a node
+   * Create a node.
    *
    * @param string $name
    *
@@ -169,7 +169,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Add node
+   * Add node.
    *
    * @param string $parentName
    *   Name of the parent ?.
@@ -185,7 +185,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Add Data
+   * Add Data.
    *
    * @param string $parentName Name of the parent ?.
    * @param string $childName - key to be used (optional)
@@ -206,7 +206,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Get Tree
+   * Get Tree.
    *
    * @return tree
    */
@@ -215,7 +215,7 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Print the tree
+   * Print the tree.
    *
    * @return void
    */

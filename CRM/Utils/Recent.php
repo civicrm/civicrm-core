@@ -39,21 +39,21 @@
 class CRM_Utils_Recent {
 
   /**
-   * Max number of items in queue
+   * Max number of items in queue.
    *
    * @int
    */
   const MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
 
   /**
-   * The list of recently viewed items
+   * The list of recently viewed items.
    *
    * @var array
    */
   static private $_recent = NULL;
 
   /**
-   * Initialize this class and set the static variables
+   * Initialize this class and set the static variables.
    *
    * @return void
    */
@@ -68,7 +68,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Return the recently viewed array
+   * Return the recently viewed array.
    *
    * @return array
    *   the recently viewed array
@@ -79,7 +79,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Add an item to the recent stack
+   * Add an item to the recent stack.
    *
    * @param string $title
    *   The title to display.
@@ -144,7 +144,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Delete an item from the recent stack
+   * Delete an item from the recent stack.
    *
    * @param array $recentItem
    *   Array of the recent Item to be removed.
@@ -172,7 +172,7 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Delete an item from the recent stack
+   * Delete an item from the recent stack.
    *
    * @param string $id
    *   Contact id that had to be removed.

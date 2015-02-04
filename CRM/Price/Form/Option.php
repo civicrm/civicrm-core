@@ -39,7 +39,7 @@
 class CRM_Price_Form_Option extends CRM_Core_Form {
 
   /**
-   * The price field id saved to the session for an update
+   * The price field id saved to the session for an update.
    *
    * @var int
    */
@@ -53,7 +53,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_oid;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -108,7 +108,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -261,7 +261,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -285,7 +285,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

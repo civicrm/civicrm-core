@@ -294,7 +294,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create an attachment using "content" and then "get" the attachment
+   * Create an attachment using "content" and then "get" the attachment.
    *
    * @param string $testEntityClass
    *   E.g. "CRM_Core_DAO_Activity".

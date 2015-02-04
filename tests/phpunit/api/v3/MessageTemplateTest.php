@@ -34,7 +34,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   /**
-   * Assume empty database with just civicrm_data
+   * Assume empty database with just civicrm_data.
    */
   protected $entity = 'MessageTemplate';
   protected $params;
@@ -65,8 +65,11 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get function succeeds (this is actually largely tested in the get
-   * action on create. Add extra checks for any 'special' return values or
+   * Test get function succeeds.
+   *
+   * This is actually largely tested in the get action on create.
+   *
+   * Add extra checks for any 'special' return values or
    * behaviours
    */
   public function testGet() {

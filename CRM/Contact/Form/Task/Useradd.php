@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   public $_displayName;
 
   /**
-   * Primary email of contact for whom we are adding user
+   * Primary email of contact for whom we are adding user.
    *
    * @var int
    */
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -130,7 +130,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Validation Rule
+   * Validation Rule.
    *
    */
   public static function usernameRule($params) {

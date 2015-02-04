@@ -59,7 +59,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
   }
 
   /**
-   * Takes an associative array and adds email
+   * Takes an associative array and adds email.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -326,7 +326,7 @@ AND    reset_date IS NULL
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);

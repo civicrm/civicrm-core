@@ -56,63 +56,63 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   static $_columnHeaders;
 
   /**
-   * The sql params we use to get the list of contacts
+   * The sql params we use to get the list of contacts.
    *
    * @var string
    */
   protected $_params;
 
   /**
-   * The public visible fields to be shown to the user
+   * The public visible fields to be shown to the user.
    *
    * @var array
    */
   protected $_fields;
 
   /**
-   * The custom fields for this domain
+   * The custom fields for this domain.
    *
    * @var array
    */
   protected $_customFields;
 
   /**
-   * Cache the query object
+   * Cache the query object.
    *
    * @var object
    */
   protected $_query;
 
   /**
-   * Cache the expanded options list if any
+   * Cache the expanded options list if any.
    *
    * @var object
    */
   protected $_options;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * Do we enable mapping of users
+   * Do we enable mapping of users.
    *
    * @var boolean
    */
   protected $_map;
 
   /**
-   * Do we enable edit link
+   * Do we enable edit link.
    *
    * @var boolean
    */
   protected $_editLink;
 
   /**
-   * Should we link to the UF Profile
+   * Should we link to the UF Profile.
    *
    * @var boolean
    */
@@ -127,7 +127,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_multiRecordTableName = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $params the params for the where clause
    * @param array $customFields
@@ -416,7 +416,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * Return the qill for this selector
+   * Return the qill for this selector.
    *
    * @return string
    */
@@ -425,7 +425,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
    * @param string $action
    *   The action being performed.
@@ -743,7 +743,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   }
 
   /**
-   *  set the _multiRecordTableName to display the result set
+   *  set the _multiRecordTableName to display the result set.
    *  according to multi record custom field values
    */
   public function setMultiRecordTableName($fields) {

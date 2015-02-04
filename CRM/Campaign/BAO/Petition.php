@@ -172,7 +172,7 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * Takes an associative array and creates a petition signature activity
+   * Takes an associative array and creates a petition signature activity.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -279,7 +279,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Get Petition Signature Total
+   * Get Petition Signature Total.
    *
    * @param int $surveyId
    *
@@ -321,7 +321,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Get Petition Signature Total
+   * Get Petition Signature Total.
    *
    * @param int $surveyId
    *
@@ -381,7 +381,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Get Petition Signature Details
+   * Get Petition Signature Details.
    *
    * @param int $surveyId
    * @param int $status_id
@@ -458,7 +458,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * This function returns all entities assigned to a specific tag
+   * This function returns all entities assigned to a specific tag.
    *
    * @param object $tag
    *   An object of a tag.
@@ -479,7 +479,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Check if contact has signed this petition
+   * Check if contact has signed this petition.
    *
    * @param int $surveyId
    * @param int $contactId
@@ -531,7 +531,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Takes an associative array and sends a thank you or email verification email
+   * Takes an associative array and sends a thank you or email verification email.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

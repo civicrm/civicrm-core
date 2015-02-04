@@ -40,7 +40,7 @@
 class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param CRM_Contribute_Controller_ContributionPage $controller
    * @param const|int $action

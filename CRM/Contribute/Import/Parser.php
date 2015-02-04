@@ -442,7 +442,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api
+   * Format the field values for input to the api.
    *
    * @return array
    *   (reference ) associative array of name/value pairs
@@ -496,7 +496,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values
+   * Store parser values.
    *
    * @param CRM_Core_Session $store
    *
@@ -562,7 +562,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Export data to a CSV file
+   * Export data to a CSV file.
    *
    * @param string $fileName
    * @param array $header
@@ -601,7 +601,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Determines the file extension based on error code
+   * Determines the file extension based on error code.
    *
    * @param int $type
    *   Error code constant.
@@ -635,7 +635,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Determines the file name based on error code
+   * Determines the file name based on error code.
    *
    * @param int $type
    *   Error code constant.

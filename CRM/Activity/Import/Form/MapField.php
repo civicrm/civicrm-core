@@ -40,7 +40,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -81,7 +81,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -268,7 +268,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -370,7 +370,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
+   * Process the mapped fields and map it into the uploaded file.
    * preview the file and extract some summary statistics
    *
    * @return void

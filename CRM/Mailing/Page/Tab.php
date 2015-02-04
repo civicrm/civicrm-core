@@ -37,7 +37,7 @@
  */
 class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */

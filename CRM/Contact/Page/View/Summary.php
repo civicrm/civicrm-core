@@ -104,7 +104,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * Edit name and address of a contact
+   * Edit name and address of a contact.
    *
    * @return void
    */
@@ -121,7 +121,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * View summary details of a contact
+   * View summary details of a contact.
    *
    * @return void
    */

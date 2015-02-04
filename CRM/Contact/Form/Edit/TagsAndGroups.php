@@ -35,14 +35,14 @@
 class CRM_Contact_Form_Edit_TagsAndGroups {
 
   /**
-   * Constant to determine which forms we are generating
+   * Constant to determine which forms we are generating.
    *
    * Used by both profile and edit contact
    */
   const GROUP = 1, TAG = 2, ALL = 3;
 
   /**
-   * build form elements
+   * build form elements.
    * params object $form object of the form
    *
    * @param CRM_Core_Form $form
@@ -210,7 +210,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   }
 
   /**
-   * Set defaults for relevant form elements
+   * Set defaults for relevant form elements.
    *
    * @param int $id
    *   The contact id.

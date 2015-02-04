@@ -144,7 +144,7 @@ class CRM_Contact_Form_Edit_Individual {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

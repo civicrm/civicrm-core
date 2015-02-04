@@ -79,7 +79,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   protected $_newContacts;
 
   /**
-   * Line count id
+   * Line count id.
    *
    * @var int
    */
@@ -93,14 +93,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   protected $_newRelatedContacts;
 
   /**
-   * Array of all the contacts whose street addresses are not parsed
+   * Array of all the contacts whose street addresses are not parsed.
    * of this import process
    * @var array
    */
   protected $_unparsedStreetAddressContacts;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct(
     &$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL, $mapperImProvider = NULL, $mapperRelated = NULL, $mapperRelatedContactType = NULL, $mapperRelatedContactDetails = NULL, $mapperRelatedContactLocType = NULL, $mapperRelatedContactPhoneType = NULL, $mapperRelatedContactImProvider = NULL,
@@ -245,7 +245,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -257,7 +257,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Handle the values in preview mode
+   * Handle the values in preview mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -270,7 +270,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Handle the values in summary mode
+   * Handle the values in summary mode.
    *
    * @param array $values
    *   The array of values belonging to this line.
@@ -440,7 +440,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Handle the values in import mode
+   * Handle the values in import mode.
    *
    * @param int $onDuplicate
    *   The code for what action to take on duplicates.
@@ -1100,7 +1100,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Check if an error in custom data
+   * Check if an error in custom data.
    *
    * @param array $params
    * @param string $errorMessage
@@ -1285,7 +1285,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Check if value present in all genders or
+   * Check if value present in all genders or.
    * as a substring of any gender value, if yes than return corresponding gender.
    * eg value might be  m/M, ma/MA, mal/MAL, male return 'Male'
    * but if value is 'maleabc' than return false
@@ -1592,7 +1592,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Ckeck a value present or not in a array
+   * Ckeck a value present or not in a array.
    *
    * @param $value
    * @param $valueArray
@@ -1628,7 +1628,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Method for creating contact
+   * Method for creating contact.
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;
@@ -1688,7 +1688,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
-   * Format params for update and fill mode
+   * Format params for update and fill mode.
    *
    * @param array $params
    *   reference to an array containing all the.

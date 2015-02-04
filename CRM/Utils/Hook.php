@@ -70,7 +70,7 @@ abstract class CRM_Utils_Hook {
   private $commonCiviModules = array();
 
   /**
-   * Constructor and getter for the singleton instance
+   * Constructor and getter for the singleton instance.
    *
    * @param bool $fresh
    *
@@ -88,7 +88,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Invoke hooks
+   * Invoke hooks.
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
@@ -307,7 +307,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook retrieves links from other modules and injects it into
+   * This hook retrieves links from other modules and injects it into.
    * the view contact tabs
    *
    * @param string $op
@@ -424,7 +424,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called before a db write on a custom table
+   * This hook is called before a db write on a custom table.
    *
    * @param string $op
    *   The type of operation being performed.
@@ -490,7 +490,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when building the menu table
+   * This hook is called when building the menu table.
    *
    * @param array $files
    *   The current set of files to process.
@@ -578,7 +578,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Determine how many other records refer to a given record
+   * Determine how many other records refer to a given record.
    *
    * @param CRM_Core_DAO $dao
    *   The item for which we want a reference count.
@@ -597,7 +597,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when building the amount structure for a Contribution or Event Page
+   * This hook is called when building the amount structure for a Contribution or Event Page.
    *
    * @param int $pageType
    *   Is this a contribution or event page.
@@ -870,7 +870,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when rendering the contact summary
+   * This hook is called when rendering the contact summary.
    *
    * @param int $contactID
    *   The contactID for whom the summary is being rendered
@@ -967,7 +967,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when membership status is being calculated
+   * This hook is called when membership status is being calculated.
    *
    * @param array $membershipStatus
    *   Membership status details as determined - alter if required.
@@ -992,7 +992,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when rendering the Manage Case screen
+   * This hook is called when rendering the Manage Case screen.
    *
    * @param int $caseID
    *   The case ID.
@@ -1051,7 +1051,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hooks allows to change option values
+   * This hooks allows to change option values.
    *
    * @param array $options
    *   Associated array of option values / id
@@ -1118,7 +1118,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called before record is exported as CSV
+   * This hook is called before record is exported as CSV.
    *
    * @param string $exportTempTable
    *   Name of the temporary export table used during export.
@@ -1325,7 +1325,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Hook definition for altering the generation of Mailing Labels
+   * Hook definition for altering the generation of Mailing Labels.
    *
    * @param array $args
    *   An array of the args in the order defined for the tcpdf multiCell api call.
@@ -1366,7 +1366,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hooks allows alteration of generated page content
+   * This hooks allows alteration of generated page content.
    *
    * @param $content
    *   Previously generated content.
@@ -1409,7 +1409,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook collects the trigger definition from all components
+   * This hook collects the trigger definition from all components.
    *
    * @param $info
    * @param string $tableName
@@ -1541,7 +1541,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when Settings specifications are loaded
+   * This hook is called when Settings specifications are loaded.
    *
    * @param array $settingsFolders
    *   List of paths from which to derive metadata
@@ -1644,7 +1644,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called for declaring managed entities via API
+   * This hook is called for declaring managed entities via API.
    *
    * @param array[] $entityTypes
    *   List of entity types; each entity-type is an array with keys:
@@ -1662,7 +1662,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called while preparing a profile form
+   * This hook is called while preparing a profile form.
    *
    * @param string $name
    * @return mixed
@@ -1673,7 +1673,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called while validating a profile form submission
+   * This hook is called while validating a profile form submission.
    *
    * @param string $name
    * @return mixed
@@ -1684,7 +1684,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called processing a valid profile form submission
+   * This hook is called processing a valid profile form submission.
    *
    * @param string $name
    * @return mixed
@@ -1738,7 +1738,7 @@ abstract class CRM_Utils_Hook {
 
 
   /**
-   * This hook is called before encoding data in barcode
+   * This hook is called before encoding data in barcode.
    *
    * @param array $data
    *   Associated array of values available for encoding.
@@ -1787,7 +1787,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called while viewing contact dashboard
+   * This hook is called while viewing contact dashboard.
    *
    * @param array $availableDashlets
    *   List of dashlets; each is formatted per api/v3/Dashboard
@@ -1899,7 +1899,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Generate a default CRUD URL for an entity
+   * Generate a default CRUD URL for an entity.
    *
    * @param array $spec
    *   With keys:.

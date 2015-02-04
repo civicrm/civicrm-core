@@ -53,7 +53,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $mode
    *   The mode of operation: live or test.
@@ -113,7 +113,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a payment using Advanced Integration Method
+   * Submit a payment using Advanced Integration Method.
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -428,7 +428,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
    *   The ID to check.
@@ -443,7 +443,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * Get the value of a field if set
+   * Get the value of a field if set.
    *
    * @param string $field
    *   The field.
@@ -514,7 +514,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @return string
    *   the error message if any

@@ -40,19 +40,19 @@
 class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * Membership types
+   * Membership types.
    * @var array
    */
   private static $membershipType;
 
   /**
-   * Membership types
+   * Membership types.
    * @var array
    */
   private static $membershipStatus;
 
   /**
-   * Get all the membership types
+   * Get all the membership types.
    *
    *
    * @param int $id
@@ -81,7 +81,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the membership statuss
+   * Get all the membership statuss.
    *
    *
    * @param int $id

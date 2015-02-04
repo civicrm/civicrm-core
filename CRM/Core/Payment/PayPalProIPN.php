@@ -44,13 +44,13 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   protected $_inputParameters = array();
 
   /**
-   * Store for the variables from the invoice string
+   * Store for the variables from the invoice string.
    * @var array
    */
   protected $_invoiceData = array();
 
   /**
-   * Is this a payment express transaction
+   * Is this a payment express transaction.
    */
   protected $_isPaymentExpress = FALSE;
 
@@ -61,7 +61,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   protected $_component = 'contribute';
 
   /**
-   * Constructor function
+   * Constructor function.
    *
    * @param array $inputData
    *   Contents of HTTP REQUEST.
@@ -75,7 +75,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * get the values from the rp_invoice_id string
+   * get the values from the rp_invoice_id string.
    *
    * @param string $name
    *   E.g. i, values are stored in the string with letter codes.
@@ -158,7 +158,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Process recurring contributions
+   * Process recurring contributions.
    * @param array $input
    * @param array $ids
    * @param array $objects
@@ -513,7 +513,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * Handle payment express IPNs
+   * Handle payment express IPNs.
    * For one off IPNS no actual response is required
    * Recurring is more difficult as we have limited confirmation material
    * lets look up invoice id in recur_contribution & rely on the unique transaction id to ensure no
@@ -578,7 +578,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * Function check if transaction already exists
+   * Function check if transaction already exists.
    * @param string $trxn_id
    * @return bool|void
    */

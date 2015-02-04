@@ -586,7 +586,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * If is_overide is passed in status must also be passed in
+   * If is_overide is passed in status must also be passed in.
    */
   public function testCreateOverrideNoStatus() {
     $params = $this->_params;
@@ -864,7 +864,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_contact_memberships_create Invalid membership data
+   * Test civicrm_contact_memberships_create Invalid membership data.
    * Error expected.
    */
   public function testMembershipCreateInvalidMemData() {
@@ -973,7 +973,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that if membership start date is not set it defaults to correct end date
+   * Test that if membership start date is not set it defaults to correct end date.
    *  - fixed
    */
   public function testEmptyStartDateFixed() {

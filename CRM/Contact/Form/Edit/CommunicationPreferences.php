@@ -45,7 +45,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   static $greetings = array();
 
   /**
-   * Build the form object elements for Communication Preferences object
+   * Build the form object elements for Communication Preferences object.
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
@@ -129,7 +129,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -202,7 +202,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   *  set array of greeting fields
+   *  set array of greeting fields.
    *
    * @param $contactType
    *

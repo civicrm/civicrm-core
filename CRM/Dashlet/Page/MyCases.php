@@ -40,7 +40,7 @@
 class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
 
   /**
-   * List activities as dashlet
+   * List activities as dashlet.
    *
    * @return void
    */

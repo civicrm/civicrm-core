@@ -84,10 +84,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.  Typically, the valid params are only
-   * price_field_id.  This is the inverse function of create.  It also
-   * stores all of the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -123,7 +122,7 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Wrapper for line item retrieval when contribution ID is known
+   * Wrapper for line item retrieval when contribution ID is known.
    * @param int $contributionID
    *
    * @return array
@@ -530,7 +529,7 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Calculate tax rate in percentage
+   * Calculate tax rate in percentage.
    *
    * @param array $lineItemId
    *   An assoc array of lineItem.

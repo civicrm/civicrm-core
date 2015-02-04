@@ -40,14 +40,14 @@
 class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * The mailing ID of the mailing if we are resuming a mailing
+   * The mailing ID of the mailing if we are resuming a mailing.
    *
    * @var integer
    */
   protected $_mailingID;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -183,7 +183,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -541,7 +541,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
    *
    * @return string
@@ -551,7 +551,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.

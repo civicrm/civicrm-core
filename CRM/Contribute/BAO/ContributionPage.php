@@ -39,7 +39,7 @@
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
 
   /**
-   * Takes an associative array and creates a contribution page object
+   * Takes an associative array and creates a contribution page object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -64,7 +64,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
    * @param int $id
    *   Id of the database record.
@@ -110,7 +110,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Send the emails
+   * Send the emails.
    *
    * @param int $contactID
    *   Contact id.
@@ -431,7 +431,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Construct the message to be sent by the send function
+   * Construct the message to be sent by the send function.
    *
    * @param array $tplParams
    * @param int $contactID
@@ -460,7 +460,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Send the emails for Recurring Contribution Notication
+   * Send the emails for Recurring Contribution Notication.
    *
    * @param string $type
    *   TxnType.
@@ -904,7 +904,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Generate html for pdf in confirmation receipt email  attachment
+   * Generate html for pdf in confirmation receipt email  attachment.
    * @param int $contributionId
    *   Contribution Page Id.
    * @param int $userID

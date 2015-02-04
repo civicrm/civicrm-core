@@ -30,7 +30,7 @@
  */
 class CRM_Utils_PseudoConstant {
   /**
-   * CiviCRM pseudoconstant classes for wrapper functions
+   * CiviCRM pseudoconstant classes for wrapper functions.
    */
   private static $constantClasses = array(
     'CRM_Core_PseudoConstant',
@@ -45,7 +45,7 @@ class CRM_Utils_PseudoConstant {
   private static $constants = NULL;
 
   /**
-   * Get constant
+   * Get constant.
    *
    * Wrapper for Pseudoconstant methods. We use this so the calling function
    * doesn't need to know which class the Pseudoconstant is on
@@ -65,7 +65,7 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Flush constant
+   * Flush constant.
    *
    * Wrapper for Pseudoconstant methods. We use this so the calling function
    * doesn't need to know which class the Pseudoconstant is on
@@ -90,7 +90,7 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Determine where a constant lives
+   * Determine where a constant lives.
    *
    * If there's a full, preloaded map, use it. Otherwise, use search
    * class space.

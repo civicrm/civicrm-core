@@ -910,7 +910,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   }
 
   /**
-   * Generate an event queue for a test job
+   * Generate an event queue for a test job.
    *
    * @param array $testParams
    *   Contains form values.
@@ -1020,7 +1020,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Static wrapper for getting verp and urls
+   * Static wrapper for getting verp and urls.
    *
    * @param int $job_id
    *   ID of the Job associated with this message.
@@ -1144,7 +1144,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Compose a message
+   * Compose a message.
    *
    * @param int $job_id
    *   ID of the Job associated with this message.
@@ -1532,7 +1532,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Add the mailings
+   * Add the mailings.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -1757,7 +1757,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Replace the list of recipients on a given mailing
+   * Replace the list of recipients on a given mailing.
    *
    * @param int $mailingId
    * @param string $type
@@ -1781,7 +1781,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Get hash value of the mailing
+   * Get hash value of the mailing.
    *
    * @param $id
    *
@@ -2287,7 +2287,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Get the count of mailings
+   * Get the count of mailings.
    *
    * @param
    *
@@ -2394,7 +2394,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Get the rows for a browse operation
+   * Get the rows for a browse operation.
    *
    * @param int $offset
    *   The row number to start from.
@@ -2491,7 +2491,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Show detail Mailing report
+   * Show detail Mailing report.
    *
    * @param int $id
    *
@@ -2502,7 +2502,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Delete Mails and all its associated records
+   * Delete Mails and all its associated records.
    *
    * @param int $id
    *   Id of the mail to delete.
@@ -2585,7 +2585,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Build the  compose mail form
+   * Build the  compose mail form.
    *
    * @param CRM_Core_Form $form
    *
@@ -2679,7 +2679,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Build the  compose PDF letter form
+   * Build the  compose PDF letter form.
    *
    * @param CRM_Core_Form $form
    *
@@ -2736,7 +2736,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Get the search based mailing Ids
+   * Get the search based mailing Ids.
    *
    * @return array
    *   , searched base mailing ids.
@@ -2972,7 +2972,7 @@ AND        m.id = %1
   }
 
   /**
-   * wrapper for ajax activity selector
+   * wrapper for ajax activity selector.
    *
    * @param array $params
    *   Associated array for params record id.
@@ -3059,7 +3059,7 @@ AND        m.id = %1
   }
 
   /**
-   * Retrieve contact mailing
+   * Retrieve contact mailing.
    *
    * @param array $params
    *
@@ -3078,7 +3078,7 @@ AND        m.id = %1
   }
 
   /**
-   * Retrieve contact mailing count
+   * Retrieve contact mailing count.
    *
    * @param array $params
    *

@@ -39,14 +39,14 @@
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   /**
-   * The id of the contribution that we are processing
+   * The id of the contribution that we are processing.
    *
    * @var int
    */
   public $_id;
 
   /**
-   * The id of the premium that we are processing
+   * The id of the premium that we are processing.
    *
    * @var int
    */
@@ -58,35 +58,35 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_productDAO = NULL;
 
   /**
-   * The id of the note
+   * The id of the note.
    *
    * @var int
    */
   public $_noteID;
 
   /**
-   * The id of the contact associated with this contribution
+   * The id of the contact associated with this contribution.
    *
    * @var int
    */
   public $_contactID;
 
   /**
-   * The id of the pledge payment that we are processing
+   * The id of the pledge payment that we are processing.
    *
    * @var int
    */
   public $_ppID;
 
   /**
-   * The id of the pledge that we are processing
+   * The id of the pledge that we are processing.
    *
    * @var int
    */
   public $_pledgeID;
 
   /**
-   * Is this contribution associated with an online
+   * Is this contribution associated with an online.
    * financial transaction
    *
    * @var boolean
@@ -129,7 +129,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_context;
 
   /**
-   * Parameter with confusing name
+   * Parameter with confusing name.
    * @todo what is it?
    * @var string
    */
@@ -479,7 +479,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -931,7 +931,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -997,7 +997,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

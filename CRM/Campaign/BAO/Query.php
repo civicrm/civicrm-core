@@ -40,7 +40,7 @@ class CRM_Campaign_BAO_Query {
     CIVICRM_ACTIVITY_ASSIGNMENT = 'civicrm_survey_activity_assignment';
 
   /**
-   * Static field for all the campaign fields
+   * Static field for all the campaign fields.
    *
    * @var array
    */

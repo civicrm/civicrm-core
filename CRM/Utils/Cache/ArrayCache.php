@@ -11,7 +11,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   private $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param array $config
    *   An array of configuration params.

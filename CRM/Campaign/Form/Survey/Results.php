@@ -96,7 +96,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -203,7 +203,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();
@@ -338,7 +338,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

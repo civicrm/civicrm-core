@@ -39,7 +39,7 @@
 class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -78,7 +78,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -162,7 +162,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Process the uploaded file
+   * Process the uploaded file.
    *
    * @return void
    */

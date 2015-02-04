@@ -52,7 +52,7 @@ class CRM_Utils_GlobalStack {
   private $backups = array();
 
   /**
-   * Get or set the single instance of CRM_Utils_GlobalStack
+   * Get or set the single instance of CRM_Utils_GlobalStack.
    *
    * @return CRM_Utils_GlobalStack
    */

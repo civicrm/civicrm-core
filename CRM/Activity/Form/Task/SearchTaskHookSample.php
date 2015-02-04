@@ -39,7 +39,7 @@
 class CRM_Activity_Form_Task_SearchTaskHookSample extends CRM_Activity_Form_Task {
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -79,7 +79,7 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

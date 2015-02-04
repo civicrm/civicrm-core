@@ -44,7 +44,7 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_Base {
 
   /**
-   * Constructor
+   * Constructor.
    */
   public function __construct() {
   }

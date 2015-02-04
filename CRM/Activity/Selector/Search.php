@@ -79,35 +79,35 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   );
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * Are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * What context are we being invoked from
+   * What context are we being invoked from.
    *
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * What component context are we being invoked from
+   * What component context are we being invoked from.
    *
    * @var string
    */
   protected $_compContext = NULL;
 
   /**
-   * QueryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on.
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
@@ -115,28 +115,28 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
   public $_queryParams;
 
   /**
-   * Represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_activityClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param array $queryParams
    *   Array of parameters for query.

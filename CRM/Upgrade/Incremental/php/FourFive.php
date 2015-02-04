@@ -44,7 +44,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
   }
 
   /**
-   * Compute any messages which should be displayed beforeupgrade
+   * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
@@ -60,7 +60,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage
    *   alterable.

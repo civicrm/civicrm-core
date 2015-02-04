@@ -47,35 +47,35 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_activityId;
 
   /**
-   * Store activity ids when multiple activities are created
+   * Store activity ids when multiple activities are created.
    *
    * @var int
    */
   public $_activityIds = array();
 
   /**
-   * The id of activity type
+   * The id of activity type.
    *
    * @var int
    */
   public $_activityTypeId;
 
   /**
-   * The name of activity type
+   * The name of activity type.
    *
    * @var string
    */
   public $_activityTypeName;
 
   /**
-   * The id of currently viewed contact
+   * The id of currently viewed contact.
    *
    * @var int
    */
   public $_currentlyViewedContactId;
 
   /**
-   * The id of source contact and target contact
+   * The id of source contact and target contact.
    *
    * @var int
    */
@@ -98,7 +98,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $_currentUserId;
 
   /**
-   * The array of form field attributes
+   * The array of form field attributes.
    *
    * @var array
    */
@@ -112,7 +112,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $_crmDir = 'Activity';
 
   /**
-   * Survey activity
+   * Survey activity.
    *
    * @var boolean
    */
@@ -214,7 +214,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -819,7 +819,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -867,7 +867,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @param array $params
@@ -1005,7 +1005,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Process activity creation
+   * Process activity creation.
    *
    * @param array $params
    *   Associated array of submitted values.
@@ -1174,7 +1174,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Let injecting activity type file do any processing
+   * Let injecting activity type file do any processing.
    * needed, before the activity is added/updated
    *
    * @param array $params

@@ -216,7 +216,7 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Make sure the checksum is valid for the passed in contactID
+   * Make sure the checksum is valid for the passed in contactID.
    *
    * @param int $contactID
    * @param string $inputCheck
@@ -250,7 +250,7 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Get the count of  contact loctions
+   * Get the count of  contact loctions.
    *
    * @param int $contactId
    *   Contact id.
@@ -277,7 +277,7 @@ UNION
   }
 
   /**
-   * Create Current employer relationship for a individual
+   * Create Current employer relationship for a individual.
    *
    * @param int $contactID
    *   Contact id of the individual.
@@ -352,7 +352,7 @@ UNION
   }
 
   /**
-   * Create related memberships for current employer
+   * Create related memberships for current employer.
    *
    * @param int $contactID
    *   Contact id of the individual.
@@ -394,7 +394,7 @@ UNION
   }
 
   /**
-   * Set current employer id and organization name
+   * Set current employer id and organization name.
    *
    * @param array $currentEmployerParams
    *   Associated array of contact id and its employer id.
@@ -412,7 +412,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
   }
 
   /**
-   * Update cached current employer name
+   * Update cached current employer name.
    *
    * @param int $organizationId
    *   Current employer id.
@@ -426,7 +426,7 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
   }
 
   /**
-   * Clear cached current employer name
+   * Clear cached current employer name.
    *
    * @param int $contactId
    *   Contact id ( mostly individual contact id).
@@ -565,7 +565,7 @@ UPDATE civicrm_contact
   }
 
   /**
-   * Given an array of contact ids this function will return array with links to view contact page
+   * Given an array of contact ids this function will return array with links to view contact page.
    *
    * @param array $contactIDs
    *   Associated contact id's.
@@ -804,7 +804,7 @@ Group By  componentId";
   }
 
   /**
-   * Function handles shared contact address processing
+   * Function handles shared contact address processing.
    * In this function we just modify submitted values so that new address created for the user
    * has same address as shared contact address. We copy the address so that search etc will be
    * much efficient.
@@ -858,7 +858,7 @@ Group By  componentId";
   }
 
   /**
-   * Get the list of contact name give address associated array
+   * Get the list of contact name give address associated array.
    *
    * @param array $addresses
    *   Associated array of.
@@ -1070,7 +1070,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
   }
 
   /**
-   * Fetch the default greeting for a given contact type
+   * Fetch the default greeting for a given contact type.
    *
    * @param string $contactType
    *   Contact type.
