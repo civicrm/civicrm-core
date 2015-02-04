@@ -82,7 +82,7 @@ function job_create_expectedresult() {
 * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
 * Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api/explorer
+* http://MYSITE.ORG/path/to/civicrm/api
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing
