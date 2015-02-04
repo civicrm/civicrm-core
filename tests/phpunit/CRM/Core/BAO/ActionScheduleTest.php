@@ -951,11 +951,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => array(array('member@example.com')),
       ),
     ));
-
-    //To check whether the reference date is being changed to new join_date
-    $this->assertEquals('2012-03-29',
-      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership->contact_id, 'reference_date', 'contact_id', TRUE)
-    );
   }
 
   public function testMembershipOnMultipleReminder() {
