@@ -105,7 +105,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get next available value
+   * Get next available value.
    * We will take the highest numeric value (or 0 if no numeric values exist)
    * and add one. The calling function is responsible for any
    * more complex decision making

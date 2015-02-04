@@ -83,7 +83,7 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
-   * Clear the smarty cache and assign default values
+   * Clear the smarty cache and assign default values.
    * FIXME: unused cos we no longer do evil singleton magick
    */
   protected function reset() {

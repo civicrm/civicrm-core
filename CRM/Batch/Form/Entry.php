@@ -71,12 +71,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_preserveDefault = TRUE;
 
   /**
-   * Contact fields
+   * Contact fields.
    */
   protected $_contactFields = array();
 
   /**
-   * Fields array of fields in the batch profile
+   * Fields array of fields in the batch profile.
    * (based on the uf_field table data)
    * (this can't be protected as it is passed into the CRM_Contact_Form_Task_Batch::parseStreetAddress function
    * (although a future refactoring might hopefully change that so it uses the api & the function is not

@@ -408,7 +408,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Getter method for stateMachine
+   * Getter method for stateMachine.
    *
    * @return CRM_Core_StateMachine
    */
@@ -417,7 +417,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Setter method for stateMachine
+   * Setter method for stateMachine.
    *
    * @param CRM_Core_StateMachine $stateMachine
    *
@@ -515,7 +515,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Store the variable with the value in the form scope
+   * Store the variable with the value in the form scope.
    *
    * @param string|array $name name of the variable or an assoc array of name/value pairs
    * @param mixed $value
@@ -529,7 +529,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Get the variable from the form scope
+   * Get the variable from the form scope.
    *
    * @param string $name
    *   name of the variable.
@@ -542,7 +542,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Create the header for the wizard from the list of pages
+   * Create the header for the wizard from the list of pages.
    * Store the created header in smarty
    *
    * @param string $currentPageName
@@ -599,7 +599,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Assign value to name in template
+   * Assign value to name in template.
    *
    * @param string $var
    * @param mixed $value
@@ -612,7 +612,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Assign value to name in template by reference
+   * Assign value to name in template by reference.
    *
    * @param string $var
    * @param mixed $value
@@ -625,7 +625,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Appends values to template variables
+   * Appends values to template variables.
    *
    * @param array|string $tpl_var the template variable name(s)
    * @param mixed $value
@@ -637,7 +637,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Returns an array containing template variables
+   * Returns an array containing template variables.
    *
    * @param string $name
    *
@@ -648,7 +648,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Setter for embedded
+   * Setter for embedded.
    *
    * @param bool $embedded
    *
@@ -659,7 +659,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Getter for embedded
+   * Getter for embedded.
    *
    * @return bool
    *   return the embedded value
@@ -669,7 +669,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Setter for skipRedirection
+   * Setter for skipRedirection.
    *
    * @param bool $skipRedirection
    *
@@ -680,7 +680,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Getter for skipRedirection
+   * Getter for skipRedirection.
    *
    * @return bool
    *   return the skipRedirection value
@@ -719,7 +719,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Setter for print
+   * Setter for print.
    *
    * @param bool $print
    *
@@ -736,7 +736,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Getter for print
+   * Getter for print.
    *
    * @return bool
    *   return the print value
