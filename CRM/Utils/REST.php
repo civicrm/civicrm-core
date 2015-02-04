@@ -456,24 +456,6 @@ class CRM_Utils_REST {
   }
 
   /**
-   * Return smarty-generated API Documentation.
-   *
-   * @return string
-   */
-  public static function APIDoc() {
-
-    CRM_Utils_System::setTitle("API Parameters");
-    $template = CRM_Core_Smarty::singleton();
-    return CRM_Utils_System::theme(
-      $template->fetch('CRM/Core/APIDoc.tpl')
-    );
-  }
-
-  public static function ajaxDoc() {
-    return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/api/explorer'));
-  }
-
-  /**
    * used to load a template "inline", eg. for ajax, without having to build a menu for each template
    */
   public static function loadTemplate() {
