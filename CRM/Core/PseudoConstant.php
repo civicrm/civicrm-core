@@ -50,7 +50,7 @@
 class CRM_Core_PseudoConstant {
 
   /**
-   * Static cache for pseudoconstant arrays
+   * Static cache for pseudoconstant arrays.
    * @var array
    */
   private static $cache;
@@ -70,7 +70,7 @@ class CRM_Core_PseudoConstant {
   private static $stateProvince;
 
   /**
-   * Counties
+   * Counties.
    * @var array
    */
   private static $county;
@@ -82,13 +82,13 @@ class CRM_Core_PseudoConstant {
   private static $stateProvinceAbbreviation;
 
   /**
-   * Country
+   * Country.
    * @var array
    */
   private static $country;
 
   /**
-   * CountryIsoCode
+   * CountryIsoCode.
    * @var array
    */
   private static $countryIsoCode;
@@ -419,7 +419,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Fetch the translated label for a field given its key
+   * Fetch the translated label for a field given its key.
    *
    * @param string $baoName
    * @param string $fieldName
@@ -441,7 +441,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Fetch the machine name for a field given its key
+   * Fetch the machine name for a field given its key.
    *
    * @param string $baoName
    * @param string $fieldName
@@ -461,7 +461,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Fetch the key for a field option given its name
+   * Fetch the key for a field option given its name.
    *
    * @param string $baoName
    * @param string $fieldName
@@ -508,7 +508,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED generic populate method
+   * DEPRECATED generic populate method.
    * All pseudoconstant functions that use this method are also @deprecated
    *
    * The static array $var is populated from the db
@@ -582,7 +582,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * Flush given pseudoconstant so it can be reread from db
+   * Flush given pseudoconstant so it can be reread from db.
    * nex time it's requested.
    *
    *
@@ -957,7 +957,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all permissioned groups from database
+   * Get all permissioned groups from database.
    *
    * The static array group is returned, and if it's
    * called the first time, the <b>Group DAO</b> is used
@@ -979,7 +979,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Fetch groups in a nested format suitable for use in select form element
+   * Fetch groups in a nested format suitable for use in select form element.
    * @param bool $checkPermissions
    * @param string|null $groupType
    * @param bool $excludeHidden
@@ -991,7 +991,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all permissioned groups from database
+   * Get all permissioned groups from database.
    *
    * The static array group is returned, and if it's
    * called the first time, the <b>Group DAO</b> is used
@@ -1457,7 +1457,7 @@ WHERE  id = %1";
   }
 
   /**
-   * Get all the World Regions from Database
+   * Get all the World Regions from Database.
    *
    *
    * @param bool $id
@@ -1724,7 +1724,7 @@ WHERE  id = %1
   }
 
   /**
-   * Construct array of default greeting values for contact type
+   * Construct array of default greeting values for contact type.
    *
    *
    * @return array
@@ -1754,7 +1754,7 @@ WHERE  id = %1
   }
 
   /**
-   * Get all extensions
+   * Get all extensions.
    *
    * The static array extensions
    *
@@ -1783,7 +1783,7 @@ WHERE  id = %1
   }
 
   /**
-   * Get all options values
+   * Get all options values.
    *
    * The static array option values is returned
    *
@@ -1824,7 +1824,7 @@ WHERE  id = %1
 
 
   /**
-   * Get all tax rates
+   * Get all tax rates.
    *
    * The static array tax rates is returned
    *

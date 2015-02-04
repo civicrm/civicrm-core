@@ -88,7 +88,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   private static $_singleton = NULL;
 
   /**
-   * The logger object for this application
+   * The logger object for this application.
    * @var object
    */
   private static $_log = NULL;

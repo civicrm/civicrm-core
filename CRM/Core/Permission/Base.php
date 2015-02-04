@@ -42,7 +42,7 @@ class CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
-   * Translate permission
+   * Translate permission.
    *
    * @param string $perm
    *   Permission string e.g "administer CiviCRM", "cms:access user record", "Drupal:administer content",
@@ -74,7 +74,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the current permission of this user
+   * Get the current permission of this user.
    *
    * @return string
    *   the permission of the user (edit or view or null)
@@ -84,7 +84,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the permissioned where clause for the user
+   * Get the permissioned where clause for the user.
    *
    * @param int $type
    *   The type of permission needed.
@@ -101,7 +101,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the permissioned where clause for the user when trying to see groups
+   * Get the permissioned where clause for the user when trying to see groups.
    *
    * @param int $type
    *   The type of permission needed.
@@ -136,7 +136,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get group clause for this user
+   * Get group clause for this user.
    *
    * @param int $type
    *   The type of permission needed.
@@ -177,7 +177,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get all the contact emails for users that have a specific permission
+   * Get all the contact emails for users that have a specific permission.
    *
    * @param string $permissionName
    *   Name of the permission we are interested in.
@@ -188,7 +188,7 @@ class CRM_Core_Permission_Base {
   }
 
   /**
-   * Get all the contact emails for users that have a specific role
+   * Get all the contact emails for users that have a specific role.
    *
    * @param string $roleName
    *   Name of the role we are interested in.

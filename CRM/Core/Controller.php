@@ -52,28 +52,28 @@ require_once 'HTML/QuickForm/Action/Direct.php';
 class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   /**
-   * The title associated with this controller
+   * The title associated with this controller.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * The key associated with this controller
+   * The key associated with this controller.
    *
    * @var string
    */
   public $_key;
 
   /**
-   * The name of the session scope where values are stored
+   * The name of the session scope where values are stored.
    *
    * @var object
    */
   protected $_scope;
 
   /**
-   * The state machine associated with this controller
+   * The state machine associated with this controller.
    *
    * @var object
    */
@@ -116,35 +116,35 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public $_generateQFKey = TRUE;
 
   /**
-   * QF response type
+   * QF response type.
    *
    * @var string
    */
   public $_QFResponseType = 'html';
 
   /**
-   * Cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons.
    *
    * @var CRM_Core_Smarty
    */
   static protected $_template;
 
   /**
-   * Cache the session for efficiency reasons
+   * Cache the session for efficiency reasons.
    *
    * @var CRM_Core_Session
    */
   static protected $_session;
 
   /**
-   * The parent of this form if embedded
+   * The parent of this form if embedded.
    *
    * @var object
    */
   protected $_parent = NULL;
 
   /**
-   * The destination if set will override the destination the code wants to send it to
+   * The destination if set will override the destination the code wants to send it to.
    *
    * @var string;
    */

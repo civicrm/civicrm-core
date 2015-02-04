@@ -7,7 +7,7 @@ class CRM_Core_Region {
   static private $_instances = NULL;
 
   /**
-   * Obtain the content for a given region
+   * Obtain the content for a given region.
    *
    * @param string $name
    * @param bool $autocreate
@@ -64,7 +64,7 @@ class CRM_Core_Region {
   }
 
   /**
-   * Add a snippet of content to a region
+   * Add a snippet of content to a region.
    *
    * @code
    * CRM_Core_Region::instance('page-header')->add(array(
@@ -146,7 +146,7 @@ class CRM_Core_Region {
   }
 
   /**
-   * Render all the snippets in a region
+   * Render all the snippets in a region.
    *
    * @param string $default
    *   HTML, the initial content of the region.
@@ -250,7 +250,7 @@ class CRM_Core_Region {
   }
 
   /**
-   * Add block of static HTML to a region
+   * Add block of static HTML to a region.
    *
    * @param string $markup
    *   HTML.
@@ -263,7 +263,7 @@ class CRM_Core_Region {
    * }
    *
    * /**
-   * Add a Smarty template file to a region
+   * Add a Smarty template file to a region.
    *
    * Note: File is not evaluated until the page is rendered
    *
@@ -278,7 +278,7 @@ class CRM_Core_Region {
    * }
    *
    * /**
-   * Use a callback function to extend a region
+   * Use a callback function to extend a region.
    *
    * @param mixed $callback
    * @param array $arguments
