@@ -49,21 +49,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   const LOCATION_BLOCKS = 1;
 
   /**
-   * The id of the event we are proceessing
+   * The id of the event we are proceessing.
    *
    * @var int
    */
   public $_eventId;
 
   /**
-   * The array of ids of all the participant we are proceessing
+   * The array of ids of all the participant we are proceessing.
    *
    * @var int
    */
   protected $_participantIDS = NULL;
 
   /**
-   * The id of the participant we are proceessing
+   * The id of the participant we are proceessing.
    *
    * @var int
    */
@@ -77,7 +77,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowConfirmation;
 
   /**
-   * Is participant requires approval
+   * Is participant requires approval.
    *
    * @var Boolean
    */
@@ -91,7 +91,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_allowWaitlist;
 
   /**
-   * Store additional participant ids
+   * Store additional participant ids.
    * when there are pre-registered.
    *
    * @var array
@@ -99,7 +99,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_additionalParticipantIds;
 
   /**
-   * The mode that we are in
+   * The mode that we are in.
    *
    * @var string
    * @protect
@@ -107,35 +107,35 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_mode;
 
   /**
-   * The values for the contribution db object
+   * The values for the contribution db object.
    *
    * @var array
    */
   public $_values;
 
   /**
-   * The paymentProcessor attributes for this page
+   * The paymentProcessor attributes for this page.
    *
    * @var array
    */
   public $_paymentProcessor;
 
   /**
-   * The params submitted by the form and computed by the app
+   * The params submitted by the form and computed by the app.
    *
    * @var array
    */
   protected $_params;
 
   /**
-   * The fields involved in this contribution page
+   * The fields involved in this contribution page.
    *
    * @var array
    */
   public $_fields;
 
   /**
-   * The billing location id for this contribiution page
+   * The billing location id for this contribiution page.
    *
    * @var int
    */
@@ -149,7 +149,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_priceSetId = NULL;
 
   /**
-   * Array of fields for the price set
+   * Array of fields for the price set.
    *
    * @var array
    */
@@ -175,7 +175,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -459,7 +459,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template.
    *
    * @return void
    */
@@ -558,7 +558,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Add the custom fields
+   * Add the custom fields.
    *
    * @param int $id
    * @param string $name
@@ -720,7 +720,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Handle process after the confirmation of payment by User
+   * Handle process after the confirmation of payment by User.
    *
    * @param int $contactID
    * @param null $contribution
@@ -824,7 +824,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Process the participant
+   * Process the participant.
    *
    * @param CRM_Core_Form $form
    * @param int $contactID

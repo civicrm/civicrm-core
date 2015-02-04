@@ -54,7 +54,7 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Return menu tree as json data for editing
+   * Return menu tree as json data for editing.
    */
   public static function getNavigationList() {
     echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
@@ -69,7 +69,7 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Build status message while
+   * Build status message while.
    * enabling/ disabling various objects
    */
   public static function getStatusMsg() {

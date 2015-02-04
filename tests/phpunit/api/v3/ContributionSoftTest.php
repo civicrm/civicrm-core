@@ -84,7 +84,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get methods
+   * Test get methods.
    * @todo - this might be better broken down into more smaller tests
    */
   public function testGetContributionSoft() {
@@ -197,7 +197,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when fee amount is recorded
+   * Function tests that additional financial records are created when fee amount is recorded.
    */
   public function testCreateContributionSoft() {
     $params = array(
@@ -217,7 +217,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   }
 
   /**
-   * To Update Soft Contribution
+   * To Update Soft Contribution.
    *
    */
   public function testCreateUpdateContributionSoft() {

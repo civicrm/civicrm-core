@@ -40,17 +40,17 @@
 class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
   /**
-   * The parent id of the navigation menu
+   * The parent id of the navigation menu.
    */
   protected $_currentParentID = NULL;
 
   /**
-   * Default values
+   * Default values.
    */
   protected $_defaults = array();
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -142,7 +142,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

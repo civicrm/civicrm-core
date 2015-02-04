@@ -41,7 +41,7 @@
 class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */

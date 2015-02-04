@@ -52,7 +52,7 @@ class CRM_Core_Exception extends PEAR_Exception {
   }
 
   /**
-   * custom string representation of object
+   * custom string representation of object.
    * @return string
    */
   public function __toString() {

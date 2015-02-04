@@ -63,12 +63,12 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   protected $_oldLocBlockId = 0;
 
   /**
-   * Get the db values for this form
+   * Get the db values for this form.
    */
   public $_values = array();
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -125,7 +125,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -135,7 +135,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.
@@ -151,7 +151,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   *  function to build location block
+   *  function to build location block.
    *
    * @return void
    */
@@ -213,7 +213,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

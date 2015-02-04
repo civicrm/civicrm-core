@@ -242,7 +242,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Enter values in an inline edit block and save
+   * Enter values in an inline edit block and save.
    *
    * @param string $block
    *   selector.

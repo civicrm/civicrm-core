@@ -54,7 +54,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no array
+   * Check with no array.
    */
   public function testCustomFieldCreateNoArray() {
     $fieldParams = NULL;
@@ -64,7 +64,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no label
+   * Check with no label.
    */
   public function testCustomFieldCreateWithoutLabel() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'text_test_group'));
@@ -85,7 +85,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with edit
+   * Check with edit.
    */
   public function testCustomFieldCreateWithEdit() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'text_test_group'));
@@ -110,7 +110,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without groupId
+   * Check without groupId.
    */
   public function testCustomFieldCreateWithoutGroupID() {
     $fieldParams = array(
@@ -204,7 +204,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code
+   * Test  using example code.
    */
   /*function testCustomFieldCreateExample( )
   {
@@ -252,7 +252,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test custom field with existing option group
+   * Test custom field with existing option group.
    */
   public function testCustomFieldExistingOptionGroup() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Organization', 'title' => 'test_group'));
@@ -383,7 +383,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   ///////////////// civicrm_custom_field_delete methods
 
   /**
-   * Check with no array
+   * Check with no array.
    */
   public function testCustomFieldDeleteNoArray() {
     $params = NULL;
@@ -392,7 +392,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without Field ID
+   * Check without Field ID.
    */
   public function testCustomFieldDeleteWithoutFieldID() {
     $params = array();
@@ -401,7 +401,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without valid array
+   * Check without valid array.
    */
   public function testCustomFieldDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
@@ -417,7 +417,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check for Option Value
+   * Check for Option Value.
    */
   public function testCustomFieldOptionValueDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'ABC'));

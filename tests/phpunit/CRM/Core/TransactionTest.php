@@ -73,7 +73,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test in which an outer function makes multiple calls to inner functions
+   * Test in which an outer function makes multiple calls to inner functions.
    * but then rolls back the entire set.
    *
    * @param string $createStyle
@@ -391,7 +391,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Perform a series of operations within smaller transactions
+   * Perform a series of operations within smaller transactions.
    *
    * @param string $nesting
    *   'reuse-tx'|'nest-tx' how to construct transaction.

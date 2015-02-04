@@ -140,7 +140,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -203,7 +203,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

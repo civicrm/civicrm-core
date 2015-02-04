@@ -44,7 +44,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   protected $_cc = NULL;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -90,7 +90,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -167,7 +167,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

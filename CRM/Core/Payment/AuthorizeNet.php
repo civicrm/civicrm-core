@@ -65,7 +65,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * Should the first payment date be configurable when setting up back office recurring payments
+   * Should the first payment date be configurable when setting up back office recurring payments.
    * In the case of Authorize.net this is an option
    * @return bool
    */

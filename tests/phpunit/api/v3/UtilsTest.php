@@ -202,7 +202,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
 
   /**
-   * Test GET DAO function returns DAO
+   * Test GET DAO function returns DAO.
    */
   public function testGetDAO() {
     $params = array(
@@ -222,7 +222,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test GET BAO function returns BAO when it exists
+   * Test GET BAO function returns BAO when it exists.
    */
   public function testGetBAO() {
     $params = array(

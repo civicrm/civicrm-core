@@ -125,7 +125,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   ///////////////// civicrm_participant_get methods
 
   /**
-   * Check with wrong params type
+   * Check with wrong params type.
    */
   public function testGetWrongParamsType() {
     $params = 'a string';
@@ -169,7 +169,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with params id
+   * Check with params id.
    */
   public function testGetParamsAsIdOnly() {
     $params = array(
@@ -183,7 +183,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with params id
+   * Check with params id.
    */
   public function testGetNestedEventGet() {
     //create a second event & add participant to it.
@@ -207,7 +207,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check Participant Get respects return properties
+   * Check Participant Get respects return properties.
    */
   public function testGetWithReturnProperties() {
     $params = array(
@@ -388,7 +388,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array
+   * Check with complete array.
    */
   public function testCreateAllParams() {
     $params = $this->_params;
@@ -525,7 +525,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array
+   * Check with complete array.
    */
   public function testUpdate() {
     $participantId = $this->participantCreate(array(
@@ -578,7 +578,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testUpdateEmptyParams() {
     $params = array();
@@ -606,7 +606,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with Invalid participantId
+   * Check with Invalid participantId.
    */
   public function testUpdateWithWrongParticipantId() {
     $params = array(
@@ -621,7 +621,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with Invalid ContactId
+   * Check with Invalid ContactId.
    */
   public function testUpdateWithWrongContactId() {
     $participantId = $this->participantCreate(array(
@@ -699,7 +699,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test creation of a participant with an associated contribution
+   * Test creation of a participant with an associated contribution.
    */
   public function testCreateParticipantWithPayment() {
     $description = "single function to create contact w partipation & contribution. Note that in the

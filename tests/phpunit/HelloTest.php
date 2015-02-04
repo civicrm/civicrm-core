@@ -54,7 +54,7 @@ class HelloTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Called before the test functions will be executed
+   * Called before the test functions will be executed.
    * this function is defined in PHPUnit_TestCase and overwritten
    * here
    */
@@ -65,7 +65,7 @@ class HelloTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Called after the test functions are executed
+   * Called after the test functions are executed.
    * this function is defined in PHPUnit_TestCase and overwritten
    * here.
    */
@@ -75,7 +75,7 @@ class HelloTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * test the toString function
+   * test the toString function.
    */
   public function testHello() {
     $result = $this->abc;

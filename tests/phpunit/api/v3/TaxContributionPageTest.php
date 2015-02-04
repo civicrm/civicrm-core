@@ -236,7 +236,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Online and offline contrbution from above created contrbution page
+   * Online and offline contrbution from above created contrbution page.
    */
   public function testCreateContributionOnline() {
     $this->setUpContributionPage();
@@ -362,7 +362,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Updation of contrbution
+   * Updation of contrbution.
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
   public function testCreateUpdateContributionChangeTotal() {

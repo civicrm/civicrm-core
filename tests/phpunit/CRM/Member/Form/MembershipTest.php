@@ -43,7 +43,7 @@ require_once 'HTML/QuickForm/Page.php';
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
-   *  Test setup for every test
+   *  Test setup for every test.
    *
    *  Connect to the database, truncate the tables that will be used
    *  and redirect stdin to a temporary file

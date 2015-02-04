@@ -70,28 +70,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   protected $_apiversion = API_LATEST_VERSION;
   /**
-   *  Database has been initialized
+   *  Database has been initialized.
    *
    * @var boolean
    */
   private static $dbInit = FALSE;
 
   /**
-   *  Database connection
+   *  Database connection.
    *
    * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
    */
   protected $_dbconn;
 
   /**
-   * The database name
+   * The database name.
    *
    * @var string
    */
   static protected $_dbName;
 
   /**
-   * Track tables we have modified during a test
+   * Track tables we have modified during a test.
    */
   protected $_tablesToTruncate = array();
 
@@ -155,7 +155,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $origExtensionSystem;
 
   /**
-   *  Constructor
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of
@@ -230,7 +230,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Create database connection for this instance
+   *  Create database connection for this instance.
    *
    *  Initialize the test database if it hasn't been initialized
    *
@@ -252,7 +252,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Required implementation of abstract method
+   *  Required implementation of abstract method.
    */
   protected function getDataSet() {
   }
@@ -381,7 +381,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Common setup functions for all unit tests
+   *  Common setup functions for all unit tests.
    */
   protected function setUp() {
     $session = CRM_Core_Session::singleton();
@@ -441,7 +441,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Read everything from the datasets directory and insert into the db
+   * Read everything from the datasets directory and insert into the db.
    */
   public function loadAllFixtures() {
     $fixturesDir = __DIR__ . '/../../fixtures';
@@ -468,7 +468,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Emulate a logged in user since certain functions use that
+   * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    * CRM-8180
    */
@@ -494,7 +494,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create default domain contacts for the two domains added during test class
+   * Create default domain contacts for the two domains added during test class.
    * database population.
    */
   public function createDomainContacts() {
@@ -503,7 +503,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Common teardown functions for all unit tests
+   *  Common teardown functions for all unit tests.
    */
   protected function tearDown() {
     error_reporting(E_ALL & ~E_NOTICE);
@@ -557,7 +557,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Generic function to compare expected values after an api call to retrieved
+   * Generic function to compare expected values after an api call to retrieved.
    * DB values.
    *
    * @daoName  string   DAO Name of object we're evaluating.
@@ -674,7 +674,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Compare a single column value in a retrieved DB record to an expected value
+   * Compare a single column value in a retrieved DB record to an expected value.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -691,7 +691,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Compare all values in a single retrieved DB record to an array of expected values
+   * Compare all values in a single retrieved DB record to an array of expected values.
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues
@@ -706,7 +706,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Assert that a SQL query returns a given value
+   * Assert that a SQL query returns a given value.
    *
    * The first argument is an expected value. The remaining arguments are passed
    * to CRM_Core_DAO::singleValueQuery
@@ -907,7 +907,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * wrap api functions
+   * wrap api functions.
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    *
    * @param string $entity
@@ -1039,7 +1039,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * This function exists to wrap api functions
+   * This function exists to wrap api functions.
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
    *
    * @param string $entity
@@ -1062,7 +1062,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * This function exists to wrap api functions
+   * This function exists to wrap api functions.
    * so we can ensure they fail where expected & throw exceptions without litterering the test with checks
    * @param string $entity
    * @param string $action
@@ -1148,7 +1148,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Helper function for getting sample contact properties
+   * Helper function for getting sample contact properties.
    *
    * @param string $contact_type
    *   enum contact type: Individual, Organization
@@ -1295,7 +1295,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Membership Type
+   * Delete Membership Type.
    *
    * @param array $params
    */
@@ -1362,7 +1362,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Relatinship Type
+   * Delete Relatinship Type.
    *
    * @param int $relationshipTypeID
    */
@@ -1396,7 +1396,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Participant
+   * Create Participant.
    *
    * @param array $params
    *   Array of contact id and event id values.
@@ -1427,7 +1427,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Payment Processor
+   * Create Payment Processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor
    *   instance of Payment Processsor
@@ -1449,7 +1449,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution page
+   * Create contribution page.
    *
    * @param array $params
    * @return array
@@ -1472,7 +1472,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Tag
+   * Create Tag.
    *
    * @param array $params
    * @return array
@@ -1490,7 +1490,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Tag
+   * Delete Tag.
    *
    * @param int $tagId
    *   Id of the tag to be deleted.
@@ -1519,7 +1519,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution
+   * Create contribution.
    *
    * @param int $cID
    *   Contact_id.
@@ -1548,7 +1548,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete contribution
+   * Delete contribution.
    *
    * @param int $pledgeId
    */
@@ -1560,7 +1560,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution
+   * Create contribution.
    *
    * @param int $cID
    *   Contact_id.
@@ -1600,7 +1600,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create online contribution
+   * Create online contribution.
    *
    * @param array $params
    * @param int $financialType
@@ -1629,7 +1629,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete contribution
+   * Delete contribution.
    *
    * @param int $contributionId
    *
@@ -1644,7 +1644,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create an Event
+   * Create an Event.
    *
    * @param array $params
    *   Name-value pair for an event.
@@ -1684,7 +1684,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete event
+   * Delete event.
    *
    * @param int $id
    *   ID of the event.
@@ -1699,7 +1699,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete participant
+   * Delete participant.
    *
    * @param int $participantID
    *
@@ -1713,7 +1713,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create participant payment
+   * Create participant payment.
    *
    * @param int $participantID
    * @param int $contributionID
@@ -1732,7 +1732,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete participant payment
+   * Delete participant payment.
    *
    * @param int $paymentID
    */
@@ -1744,7 +1744,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a Location
+   * Add a Location.
    *
    * @param int $contactID
    * @return int
@@ -1776,7 +1776,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Locations of contact
+   * Delete Locations of contact.
    *
    * @param array $params
    *   Parameters.
@@ -1786,7 +1786,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a Location Type
+   * Add a Location Type.
    *
    * @param array $params
    * @return CRM_Core_DAO_LocationType
@@ -1812,7 +1812,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a Location Type
+   * Delete a Location Type.
    *
    * @param int $locationTypeId
    */
@@ -1823,7 +1823,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a Group
+   * Add a Group.
    *
    * @param array $params
    * @return int
@@ -1849,7 +1849,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
 
   /**
-   * Function to add a Group
+   * Function to add a Group.
    *
    * @params array to add group
    *
@@ -1875,7 +1875,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a Group
+   * Delete a Group.
    *
    * @param int $gid
    */
@@ -1889,7 +1889,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create a UFField
+   * Create a UFField.
    * @param array $params
    */
   public function uFFieldCreate($params = array()) {
@@ -1908,7 +1908,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a UF Join Entry
+   * Add a UF Join Entry.
    *
    * @param array $params
    * @return int
@@ -1930,7 +1930,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a UF Join Entry
+   * Delete a UF Join Entry.
    *
    * @param array $params
    *   with missing uf_group_id
@@ -1951,7 +1951,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Group for a contact
+   * Create Group for a contact.
    *
    * @param int $contactId
    */
@@ -1965,7 +1965,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Group for a contact
+   * Delete Group for a contact.
    *
    * @param int $contactId
    */
@@ -1978,7 +1978,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Activity
+   * Create Activity.
    *
    * @param array $params
    * @return array|int
@@ -2021,7 +2021,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create an activity type
+   * Create an activity type.
    *
    * @param array $params
    *   Parameters.
@@ -2032,7 +2032,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete activity type
+   * Delete activity type.
    *
    * @param int $activityTypeId
    *   Id of the activity type.
@@ -2044,7 +2044,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom group
+   * Create custom group.
    *
    * @param array $params
    * @return array|int
@@ -2092,7 +2092,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom group with multi fields
+   * Create custom group with multi fields.
    * @param array $params
    * @return array|int
    */
@@ -2106,7 +2106,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom group with multi fields
+   * Create custom group with multi fields.
    * @param array $params
    * @return array
    */
@@ -2164,7 +2164,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete custom group
+   * Delete custom group.
    *
    * @param int $customGroupID
    *
@@ -2176,7 +2176,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom field
+   * Create custom field.
    *
    * @param array $params
    *   (custom_group_id) is required.
@@ -2200,7 +2200,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete custom field
+   * Delete custom field.
    *
    * @param int $customFieldID
    *
@@ -2213,7 +2213,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create note
+   * Create note.
    *
    * @param int $cId
    * @return array
@@ -2232,7 +2232,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Enable CiviCampaign Component
+   * Enable CiviCampaign Component.
    */
   public function enableCiviCampaign() {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -2446,7 +2446,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete note
+   * Delete note.
    *
    * @param array $params
    *
@@ -2457,7 +2457,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom field with Option Values
+   * Create custom field with Option Values.
    *
    * @param array $customGroup
    * @param string $name
@@ -2678,7 +2678,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Get formatted values in  the actual and expected result
+   * Get formatted values in  the actual and expected result.
    * @param array $actual
    *   Actual calculated values.
    * @param array $expected
@@ -2752,7 +2752,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Generate a temporary folder
+   * Generate a temporary folder.
    *
    * @param string $prefix
    * @return string
@@ -2776,7 +2776,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Temporarily replace the singleton extension with a different one
+   * Temporarily replace the singleton extension with a different one.
    * @param \CRM_Extension_System $system
    */
   public function setExtensionSystem(CRM_Extension_System $system) {
@@ -3101,7 +3101,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Create an instance of the paypal processor
+   * Create an instance of the paypal processor.
    * @todo this isn't a great place to put it - but really it belongs on a class that extends
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
@@ -3141,7 +3141,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Set up initial recurring payment allowing subsequent IPN payments
+   * Set up initial recurring payment allowing subsequent IPN payments.
    */
   public function setupRecurringPaymentProcessorTransaction() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
@@ -3220,7 +3220,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Helper function to create new mailing
+   * Helper function to create new mailing.
    * @return mixed
    */
   public function createMailing() {
@@ -3237,7 +3237,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Helper function to delete mailing
+   * Helper function to delete mailing.
    * @param $id
    */
   public function deleteMailing($id) {
@@ -3249,7 +3249,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Wrap the entire test case in a transaction
+   * Wrap the entire test case in a transaction.
    *
    * Only subsequent DB statements will be wrapped in TX -- this cannot
    * retroactively wrap old DB statements. Therefore, it makes sense to

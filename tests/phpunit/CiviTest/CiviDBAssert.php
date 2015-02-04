@@ -140,7 +140,7 @@ class CiviDBAssert {
   }
 
   /**
-   * Compare a single column value in a retrieved DB record to an expected value
+   * Compare a single column value in a retrieved DB record to an expected value.
    *
    * @param $testCase
    * @param string $daoName
@@ -159,7 +159,7 @@ class CiviDBAssert {
   }
 
   /**
-   * Compare all values in a single retrieved DB record to an array of expected values
+   * Compare all values in a single retrieved DB record to an array of expected values.
    * @param $testCase
    * @param $daoName
    * @param $searchParams

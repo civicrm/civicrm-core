@@ -39,14 +39,14 @@
 class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
    * @return string
    *   Classname of BAO.
@@ -56,7 +56,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
    * @return array
    *   (reference) of action links
@@ -169,7 +169,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
    * @return string
    *   Classname of edit form.
@@ -179,7 +179,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
    * @return string
    *   name of this page.

@@ -70,7 +70,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that an empty where hook returns no results
+   * Function tests that an empty where hook returns no results.
    */
   public function testContactGetNoResultsHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
@@ -82,7 +82,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests all results are returned
+   * Function tests all results are returned.
    */
   public function testContactGetAllResultsHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
@@ -95,7 +95,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that deleted contacts are not returned
+   * Function tests that deleted contacts are not returned.
    */
   public function testContactGetPermissionHookNoDeleted() {
     $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
@@ -108,7 +108,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test permissions limited by hook
+   * Test permissions limited by hook.
    */
   public function testContactGetHookLimitingHook() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
@@ -132,7 +132,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that id works as a filter
+   * Check that id works as a filter.
    */
   public function testContactGetIDFilter() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
@@ -147,7 +147,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that address IS returned
+   * Check that address IS returned.
    */
   public function testContactGetAddressReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
@@ -181,7 +181,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that pledge IS not returned
+   * Check that pledge IS not returned.
    */
   public function testContactGetPledgeIDNotReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
@@ -197,7 +197,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that pledge IS not an allowable filter
+   * Check that pledge IS not an allowable filter.
    */
   public function testContactGetPledgeIDNotFiltered() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
@@ -335,7 +335,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * No results returned
+   * No results returned.
    * @param $type
    * @param $tables
    * @param $whereTables
@@ -346,7 +346,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * All results returned
+   * All results returned.
    * @implements CRM_Utils_Hook::aclWhereClause
    * @param $type
    * @param $tables
@@ -359,7 +359,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Full results returned
+   * Full results returned.
    * @implements CRM_Utils_Hook::aclWhereClause
    * @param $type
    * @param $tables

@@ -41,14 +41,14 @@
 class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
   /**
-   * Scheduled Reminder ID
+   * Scheduled Reminder ID.
    */
   protected $_id = NULL;
 
   public $_freqUnits;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -262,7 +262,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -374,7 +374,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

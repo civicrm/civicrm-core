@@ -347,7 +347,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test checks that passing in line items suppresses the create mechanism
+   * Test checks that passing in line items suppresses the create mechanism.
    */
   public function testCreateContributionChainedLineItems() {
     $params = array(
@@ -427,7 +427,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create with valid payment instument
+   * Test create with valid payment instument.
    */
   public function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
@@ -492,7 +492,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create test with unique field name on source
+   * Create test with unique field name on source.
    */
   public function testCreateContributionSource() {
 
@@ -517,7 +517,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create test with unique field name on source
+   * Create test with unique field name on source.
    */
   public function testCreateDefaultNow() {
 
@@ -858,7 +858,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when online contribution with pending option
+   * Function tests that additional financial records are created when online contribution with pending option.
    * is created
    */
   public function testCreateContributionPendingOnline() {
@@ -970,7 +970,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that financial records are updated when Payment Instrument is changed
+   * Function tests that financial records are updated when Payment Instrument is changed.
    */
   public function testCreateUpdateContributionPaymentInstrument() {
     $instrumentId = $this->_addPaymentInstrument();
@@ -995,7 +995,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that financial records are added when Contribution is Refunded
+   * Function tests that financial records are added when Contribution is Refunded.
    */
   public function testCreateUpdateContributionRefund() {
     $contribParams = array(
@@ -1020,7 +1020,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests invalid contribution status change
+   * Function tests invalid contribution status change.
    */
   public function testCreateUpdateContributionInValidStatusChange() {
     $contribParams = array(
@@ -1042,7 +1042,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that financial records are added when Pending Contribution is Canceled
+   * Function tests that financial records are added when Pending Contribution is Canceled.
    */
   public function testCreateUpdateContributionCancelPending() {
     $contribParams = array(
@@ -1067,7 +1067,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that financial records are added when Financial Type is Changed
+   * Function tests that financial records are added when Financial Type is Changed.
    */
   public function testCreateUpdateContributionChangeFinancialType() {
     $contribParams = array(
@@ -1104,7 +1104,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * To Update Contribution
+   * To Update Contribution.
    * CHANGE: we require the API to do an incremental update
    */
   public function testCreateUpdateContribution() {
@@ -1302,7 +1302,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test completing a transaction via the API
+   * Test completing a transaction via the API.
    *
    * Note that we are creating a logged in user because email goes out from
    * that person
@@ -1346,7 +1346,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test completing a transaction with an event via the API
+   * Test completing a transaction with an event via the API.
    *
    * Note that we are creating a logged in user because email goes out from
    * that person
@@ -1374,7 +1374,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership is renewed when transaction completed
+   * Test membership is renewed when transaction completed.
    */
   public function testCompleteTransactionMembershipPriceSet() {
     $this->createPriceSetWithPage('membership');
@@ -1386,7 +1386,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership is renewed when transaction completed
+   * Test membership is renewed when transaction completed.
    */
   public function testCompleteTransactionMembershipPriceSetTwoTerms() {
     $this->createPriceSetWithPage('membership');
@@ -1463,7 +1463,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Set up a pending transaction with a specific price field id
+   * Set up a pending transaction with a specific price field id.
    * @param int $priceFieldValueID
    */
   public function setUpPendingContribution($priceFieldValueID) {
@@ -1507,7 +1507,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test sending a mail via the API
+   * Test sending a mail via the API.
    */
   public function testSendMail() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -1529,7 +1529,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test sending a mail via the API
+   * Test sending a mail via the API.
    */
   public function testSendMailEvent() {
     $mut = new CiviMailUtils($this, TRUE);

@@ -39,7 +39,7 @@
 class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
   /**
-   * Is this user someone with access for the entire system
+   * Is this user someone with access for the entire system.
    *
    * @var boolean
    */
@@ -54,7 +54,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   protected $_editPermission = FALSE;
 
   /**
-   * The current set of permissioned groups for the user
+   * The current set of permissioned groups for the user.
    *
    * @var array
    */
@@ -206,7 +206,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the current permission of this user
+   * Get the current permission of this user.
    *
    * @return string
    *   the permission of the user (edit or view or null)
@@ -283,7 +283,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
   }
 
   /**
-   * Get all the contact emails for users that have a specific permission
+   * Get all the contact emails for users that have a specific permission.
    *
    * @param string $permissionName
    *   Name of the permission we are interested in.

@@ -42,13 +42,13 @@ require_once 'HTML/QuickForm/Action.php';
 class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
 
   /**
-   * Reference to the state machine i belong to
+   * Reference to the state machine i belong to.
    * @var object
    */
   protected $_stateMachine;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param object $stateMachine
    *   Reference to state machine object.

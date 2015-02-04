@@ -40,7 +40,7 @@
 class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Page action
+   * Page action.
    */
   public $_action;
 
@@ -70,7 +70,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

@@ -38,7 +38,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   /* Define a list of queue providers which should be tested */
 
   /**
-   * Return a list of persistent and transient queue providers
+   * Return a list of persistent and transient queue providers.
    */
   public function getQueueSpecs() {
     $queueSpecs = array();
@@ -120,7 +120,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Claim an item from the queue and release it back for subsequent processing
+   * Claim an item from the queue and release it back for subsequent processing.
    *
    * @dataProvider getQueueSpecs
    * @param $queueSpec
@@ -147,7 +147,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that item leases expire at the expected time
+   * Test that item leases expire at the expected time.
    *
    * @dataProvider getQueueSpecs
    * @param $queueSpec
@@ -182,7 +182,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that item leases can be ignored
+   * Test that item leases can be ignored.
    *
    * @dataProvider getQueueSpecs
    * @param $queueSpec
@@ -240,7 +240,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that queue content is not reset when reset is omitted
+   * Test that queue content is not reset when reset is omitted.
    *
    * @dataProvider getQueueSpecs
    * @param $queueSpec

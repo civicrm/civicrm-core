@@ -52,7 +52,7 @@ class CRM_Core_JobManager {
 
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return void
    */
@@ -88,7 +88,7 @@ class CRM_Core_JobManager {
   }
 
   /**
-   * Class destructor
+   * Class destructor.
    */
   public function __destruct() {
   }
@@ -159,7 +159,7 @@ class CRM_Core_JobManager {
   }
 
   /**
-   * Retrieves specific job from the database by id
+   * Retrieves specific job from the database by id.
    * and creates ScheduledJob object.
    *
    * @param int $id

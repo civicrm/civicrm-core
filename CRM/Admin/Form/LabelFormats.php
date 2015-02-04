@@ -41,7 +41,7 @@
 class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
 
   /**
-   * Label Format ID
+   * Label Format ID.
    */
   protected $_id = NULL;
 
@@ -61,7 +61,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -179,7 +179,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

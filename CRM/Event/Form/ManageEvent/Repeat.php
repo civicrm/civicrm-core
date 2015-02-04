@@ -13,12 +13,12 @@
 class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Parent Event Start Date
+   * Parent Event Start Date.
    */
   protected $_parentEventStartDate = NULL;
 
   /**
-   * Parent Event End Date
+   * Parent Event End Date.
    */
   protected $_parentEventEndDate = NULL;
 
@@ -159,7 +159,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function gets the number of participant count for the list of related event ids
+   * This function gets the number of participant count for the list of related event ids.
    *
    * @param array $listOfRelatedEntities
    *   List of related event ids .

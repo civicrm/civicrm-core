@@ -167,7 +167,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Normalize the whitespace in an XML document
+   * Normalize the whitespace in an XML document.
    *
    * @param string $xml
    * @return string

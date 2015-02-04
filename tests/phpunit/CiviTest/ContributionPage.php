@@ -5,7 +5,7 @@
  */
 class ContributionPage extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create
+   * Helper function to create.
    * a Contribution Page
    *
    * @param int $id
@@ -40,7 +40,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete a Contribution Page
+   * Helper function to delete a Contribution Page.
    *
    * @param int $contributionPageId
    *   Id of the Contribution Page.

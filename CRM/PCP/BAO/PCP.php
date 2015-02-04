@@ -35,7 +35,7 @@
 class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -48,7 +48,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * Add or update either a Personal Campaign Page OR a PCP Block
+   * Add or update either a Personal Campaign Page OR a PCP Block.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -87,7 +87,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   }
 
   /**
-   * Get the Display  name of a contact for a PCP
+   * Get the Display  name of a contact for a PCP.
    *
    * @param int $id
    *   Id for the PCP.
@@ -108,7 +108,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   }
 
   /**
-   * Return PCP  Block info for dashboard
+   * Return PCP  Block info for dashboard.
    *
    * @param int $contactId
    *
@@ -226,7 +226,7 @@ ORDER BY target_entity_type, target_entity_id
   }
 
   /**
-   * Show the total amount for Personal Campaign Page on thermometer
+   * Show the total amount for Personal Campaign Page on thermometer.
    *
    * @param array $pcpId
    *   Contains the pcp ID.
@@ -277,7 +277,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
    * @return array
    *   (reference) of action links
@@ -345,7 +345,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Delete the campaign page
+   * Delete the campaign page.
    *
    * @param int $id
    *   Campaign page id.
@@ -368,7 +368,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @param CRM_Core_Form $form
    *   Form object.
@@ -425,7 +425,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
 
   /**
-   * Add PCP form elements to a form
+   * Add PCP form elements to a form.
    *
    * @param int $pcpId
    * @param CRM_Core_Page $page
@@ -477,7 +477,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Process a PCP contribution
+   * Process a PCP contribution.
    *
    * @param int $pcpId
    * @param $component
@@ -733,7 +733,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Get pcp block is active
+   * Get pcp block is active.
    *
    * @param int $pcpId
    * @param $component
@@ -755,7 +755,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Get pcp block is enabled for component page
+   * Get pcp block is enabled for component page.
    *
    * @param int $pageId
    * @param $component
@@ -777,7 +777,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   }
 
   /**
-   * Find out if the PCP block is in use by one or more PCP page
+   * Find out if the PCP block is in use by one or more PCP page.
    *
    * @param int $id
    *   Pcp block id.
@@ -818,7 +818,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   }
 
   /**
-   * Obtain the title of page associated with a pcp
+   * Obtain the title of page associated with a pcp.
    *
    * @param int $pcpId
    * @param $component
@@ -889,7 +889,7 @@ WHERE pcp.id = %1";
   }
 
   /**
-   * Get supporter profile id
+   * Get supporter profile id.
    *
    * @param int $component_id
    * @param string $component
@@ -918,7 +918,7 @@ INNER JOIN civicrm_uf_group ufgroup
   }
 
   /**
-   * Get owner notification id
+   * Get owner notification id.
    *
    * @param int $component_id
    * @param $component
@@ -939,4 +939,5 @@ INNER JOIN civicrm_uf_group ufgroup
       return $ownerNotificationId;
     }
   }
+
 }

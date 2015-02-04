@@ -105,7 +105,7 @@ class CRM_Core_Action {
   static $_description;
 
   /**
-   * Called by the request object to translate a string into a mask
+   * Called by the request object to translate a string into a mask.
    *
    * @param string $str
    *   The action to be resolved.
@@ -147,7 +147,7 @@ class CRM_Core_Action {
   }
 
   /**
-   * Given a string determine the bitmask for this specific string
+   * Given a string determine the bitmask for this specific string.
    *
    * @param string $item
    *   The input action to process.

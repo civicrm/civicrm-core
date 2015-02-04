@@ -41,7 +41,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -74,7 +74,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -203,7 +203,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $fields
    *   Posted values of the form.

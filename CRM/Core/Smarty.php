@@ -78,7 +78,7 @@ class CRM_Core_Smarty extends Smarty {
   private $backupFrames = array();
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return CRM_Core_Smarty
    */

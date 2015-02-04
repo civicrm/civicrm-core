@@ -66,7 +66,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that we get a successful result querying for home address
+   * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
    */
   public function testSearchProfileHomeCityCRM14263() {
@@ -108,7 +108,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that we get a successful result querying for home address
+   * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
    */
   public function testSearchProfileHomeCityNoResultsCRM14263() {

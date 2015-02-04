@@ -749,7 +749,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Look for any missing settings and convert them from config or load default as appropriate
+   * Look for any missing settings and convert them from config or load default as appropriate.
    * This should be run from GenCode & also from upgrades to add any new defaults.
    *
    * Multisites have often been overlooked in upgrade scripts so can be expected to be missing

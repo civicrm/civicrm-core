@@ -39,14 +39,14 @@
 class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Page title
+   * Page title.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -66,7 +66,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -88,7 +88,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
    */

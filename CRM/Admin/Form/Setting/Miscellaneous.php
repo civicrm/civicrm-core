@@ -56,7 +56,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   public $_uploadMaxSize;
 
   /**
-   * Basic setup
+   * Basic setup.
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -66,7 +66,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -116,7 +116,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

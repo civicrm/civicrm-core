@@ -51,7 +51,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass zero as an id and make sure no Assignees are retrieved
+   *  Pass zero as an id and make sure no Assignees are retrieved.
    */
   public function testRetrieveAssigneeIdsByActivityIdNoId() {
     $activity = $this->activityCreate();
@@ -61,7 +61,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass null as an id and make sure no Assignees are retrieved
+   *  Pass null as an id and make sure no Assignees are retrieved.
    */
   public function testRetrieveAssigneeIdsByActivityIdNullId() {
     $activity = $this->activityCreate();
@@ -71,7 +71,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass a string as an id and make sure no Assignees are retrieved
+   *  Pass a string as an id and make sure no Assignees are retrieved.
    */
   public function testRetrieveAssigneeIdsByActivityIdString() {
     $activity = $this->activityCreate();
@@ -91,7 +91,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass zero as an id and make sure no Assignees are retrieved
+   *  Pass zero as an id and make sure no Assignees are retrieved.
    */
   public function testGetAssigneeNamesNoId() {
     $activity = $this->activityCreate();
@@ -101,7 +101,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass Null as an id and make sure no Assignees are retrieved
+   *  Pass Null as an id and make sure no Assignees are retrieved.
    */
   public function testGetAssigneeNamesNullId() {
     $activity = $this->activityCreate();

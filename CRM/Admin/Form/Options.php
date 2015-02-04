@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
-   * The option group name
+   * The option group name.
    *
    * @var array
    */
@@ -144,7 +144,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -331,7 +331,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -385,7 +385,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

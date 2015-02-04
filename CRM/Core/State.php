@@ -39,7 +39,7 @@
 class CRM_Core_State {
 
   /**
-   * State name
+   * State name.
    * @var string
    */
   protected $_name;
@@ -51,19 +51,19 @@ class CRM_Core_State {
   protected $_type;
 
   /**
-   * The state that precedes this state
+   * The state that precedes this state.
    * @var CRM_Core_State
    */
   protected $_back;
 
   /**
-   * The state that succeeds this state
+   * The state that succeeds this state.
    * @var CRM_Core_State
    */
   protected $_next;
 
   /**
-   * The state machine that this state is part of
+   * The state machine that this state is part of.
    * @var CRM_Core_StateMachine
    */
   protected $_stateMachine;
@@ -77,7 +77,7 @@ class CRM_Core_State {
   const START = 1, FINISH = 2, SIMPLE = 4;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param string $name
    *   Internal name of the state.
@@ -174,7 +174,7 @@ class CRM_Core_State {
   }
 
   /**
-   * Getter for name
+   * Getter for name.
    *
    * @return string
    */
@@ -183,7 +183,7 @@ class CRM_Core_State {
   }
 
   /**
-   * Setter for name
+   * Setter for name.
    *
    * @return void
    */
@@ -192,7 +192,7 @@ class CRM_Core_State {
   }
 
   /**
-   * Getter for type
+   * Getter for type.
    *
    * @return int
    */

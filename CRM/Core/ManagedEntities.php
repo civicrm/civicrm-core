@@ -34,7 +34,7 @@ class CRM_Core_ManagedEntities {
   protected $declarations;
 
   /**
-   * Get an instance
+   * Get an instance.
    * @param bool $fresh
    * @return \CRM_Core_ManagedEntities
    */

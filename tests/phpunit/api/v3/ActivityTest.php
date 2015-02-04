@@ -117,7 +117,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testActivityCreateWithoutRequired() {
     $params = array(
@@ -538,7 +538,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that get functioning does filtering
+   * test that get functioning does filtering.
    */
   public function testGetFilter() {
     $params = array(
@@ -611,7 +611,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that get functioning does filtering
+   * test that get functioning does filtering.
    */
   public function testGetStatusID() {
     $params = array(
@@ -643,7 +643,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * test that get functioning does filtering
+   * test that get functioning does filtering.
    */
   public function testGetFilterMaxDate() {
     $params = array(
@@ -765,7 +765,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check activity deletion without activity type
+   * Check activity deletion without activity type.
    */
   public function testDeleteActivityWithoutActivityType() {
     $params = array('id' => 1);
@@ -773,7 +773,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check activity deletion with incorrect data
+   * Check activity deletion with incorrect data.
    */
   public function testDeleteActivityWithIncorrectActivityType() {
     $params = array(
@@ -785,7 +785,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check activity deletion with correct data
+   * Check activity deletion with correct data.
    */
   public function testDeleteActivity() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
@@ -799,7 +799,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check if required fields are not passed
+   * Check if required fields are not passed.
    */
   public function testActivityUpdateWithoutRequired() {
     $params = array(
@@ -825,7 +825,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with incorrect required fields
+   * Check with incorrect required fields.
    */
   public function testActivityUpdateWithIncorrectContactActivityType() {
     $params = array(
@@ -1055,7 +1055,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check activity update with status
+   * Check activity update with status.
    */
   public function testActivityUpdateWithStatus() {
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);

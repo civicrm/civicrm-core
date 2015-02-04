@@ -316,7 +316,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Randomly pick among two options
+   * Randomly pick among two options.
    */
   public function testPick_rand() {
     $communityMessages = new CRM_Core_CommunityMessages(

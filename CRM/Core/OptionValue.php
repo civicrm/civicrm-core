@@ -35,21 +35,21 @@
 class CRM_Core_OptionValue {
 
   /**
-   * Static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export.
    *
    * @var array
    */
   static $_exportableFields = NULL;
 
   /**
-   * Static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export.
    *
    * @var array
    */
   static $_importableFields = NULL;
 
   /**
-   * Static field for all the option value information that we can potentially export
+   * Static field for all the option value information that we can potentially export.
    *
    * @var array
    */
@@ -237,7 +237,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * Check if there is a record with the same name in the db
+   * Check if there is a record with the same name in the db.
    *
    * @param string $value
    *   The value of the field we are checking.
@@ -267,7 +267,7 @@ class CRM_Core_OptionValue {
   }
 
   /**
-   * Check if there is a record with the same name in the db
+   * Check if there is a record with the same name in the db.
    *
    * @param string $mode
    * @param string $contactType

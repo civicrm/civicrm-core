@@ -14,7 +14,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
 
   /**
-   * Test store function for country
+   * Test store function for country.
    */
   public function testStoreCountry() {
     $params = array();
@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test store function for file
+   * Test store function for file.
    */
   public function atestStoreFile() {
     $params = array();
@@ -84,7 +84,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test store function for state province
+   * Test store function for state province.
    */
   public function testStoreStateProvince() {
     $params = array();
@@ -118,7 +118,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test store function for date
+   * Test store function for date.
    */
   public function testStoreDate() {
     $params = array();
@@ -153,7 +153,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test store function for rich text editor
+   * Test store function for rich text editor.
    */
   public function testStoreRichTextEditor() {
     $params = array();
@@ -188,7 +188,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getEntityValues function for stored value
+   * Test getEntityValues function for stored value.
    */
   public function testgetEntityValues() {
 

@@ -39,7 +39,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_groupId1;
 
   /**
-   * Set up for group contact tests
+   * Set up for group contact tests.
    *
    * @todo set up calls function that doesn't work @ the moment
    */
