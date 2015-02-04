@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using contribution create API.
  *
  * Demonstrates creating contribution with Soft Credit by passing in honor_contact_id

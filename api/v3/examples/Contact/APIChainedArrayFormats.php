@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using contact get API.
  *
  * /*this demonstrates the usage of chained api functions. A variety of return formats are used. Note that no notes

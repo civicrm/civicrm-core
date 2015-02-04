@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using setting getdefaults API.
  *
  * gets defaults setting a variable for a given domain - if no domain is set current is assumed

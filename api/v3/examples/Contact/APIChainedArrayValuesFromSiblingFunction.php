@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using contact create API.
  *
  * /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
