@@ -303,7 +303,7 @@ class CRM_Core_Form_RecurringEntity {
         }
         if ($values['repeats_by'] == 2) {
           if (CRM_Utils_Array::value('entity_status_1', $values)) {
-            $dayOfTheWeekNo = array(first, second, third, fourth, last);
+            $dayOfTheWeekNo = array('first', 'second', 'third', 'fourth', 'last');
             if (!in_array($values['entity_status_1'], $dayOfTheWeekNo)) {
               $errors['entity_status_1'] = ts('Invalid option');
             }

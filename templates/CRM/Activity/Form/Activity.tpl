@@ -216,19 +216,19 @@
           <script type="text/javascript">
             CRM.$(function($) {
               if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
-                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+                $('#repetition_start_date, input[id^="repetition_start_date_display_"]').val($('#activity_date_time').val());
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               }
 
-              $('#activity_date_time_display').change(function() {
-                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
+              $('input[id^="activity_date_time_display_"]').change(function() {
+                $('#repetition_start_date, input[id^="repetition_start_date_display_"]').val($('#activity_date_time').val());
               });
 
               $('#activity_date_time_time').change(function() {
                 $('#repetition_start_date_time').val($('#activity_date_time_time').val());
               });
 
-              if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
+              if ($('#start_action_offset').val() == "" && $('input[id^="repeat_absolute_date_display_"]').val() == "") {
                 $('#recurring-entity-block').addClass('collapsed');
               }
             });
