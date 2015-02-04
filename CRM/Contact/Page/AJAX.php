@@ -1058,6 +1058,7 @@ LIMIT {$offset}, {$rowCount}
 
   public static function getAddressDisplay() {
     $contactId = CRM_Utils_Array::value('contact_id', $_REQUEST);
+    $locationType = CRM_Utils_Array::value('address_location_type', $_REQUEST);
     if (!$contactId) {
       $addressVal["error_message"] = "no contact id found";
     }
@@ -1069,6 +1070,11 @@ LIMIT {$offset}, {$rowCount}
       $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
     }
 
+    foreach ($addressVal as $key => $values) {
+      if ($values['location_type_id']) {
+        $addressVal[$key]['address_location_type'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $values['location_type_id'], 'display_name');
+      }
+    }
     CRM_Utils_JSON::output($addressVal);
   }
 
