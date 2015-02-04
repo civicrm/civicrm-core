@@ -39,7 +39,7 @@
 class CRM_Core_Permission {
 
   /**
-   * Static strings used to compose permissions
+   * Static strings used to compose permissions.
    *
    * @const
    * @var string
@@ -47,31 +47,31 @@ class CRM_Core_Permission {
   const EDIT_GROUPS = 'edit contacts in ', VIEW_GROUPS = 'view contacts in ';
 
   /**
-   * The various type of permissions
+   * The various type of permissions.
    *
    * @var int
    */
   const EDIT = 1, VIEW = 2, DELETE = 3, CREATE = 4, SEARCH = 5, ALL = 6, ADMIN = 7;
 
   /**
-   * A placeholder permission which always fails
+   * A placeholder permission which always fails.
    */
   const ALWAYS_DENY_PERMISSION = "*always deny*";
 
   /**
-   * A placeholder permission which always fails
+   * A placeholder permission which always fails.
    */
   const ALWAYS_ALLOW_PERMISSION = "*always allow*";
 
   /**
-   * Various authentication sources
+   * Various authentication sources.
    *
    * @var int
    */
   const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * Get the current permission of this user
+   * Get the current permission of this user.
    *
    * @return string
    *   the permission of the user (edit or view or null)
@@ -142,7 +142,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Determine if any one of the permissions strings applies to current user
+   * Determine if any one of the permissions strings applies to current user.
    *
    * @param array $perms
    * @return bool
@@ -171,7 +171,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Get the permissioned where clause for the user
+   * Get the permissioned where clause for the user.
    *
    * @param int $type
    *   The type of permission needed.
@@ -431,7 +431,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Check permissions for delete and edit actions
+   * Check permissions for delete and edit actions.
    *
    * @param string $module
    *   Component name.
@@ -671,7 +671,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Validate user permission across
+   * Validate user permission across.
    * edit or view or with supportable acls.
    *
    * @return bool
@@ -745,7 +745,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Get all the contact emails for users that have a specific permission
+   * Get all the contact emails for users that have a specific permission.
    *
    * @param string $permissionName
    *   Name of the permission we are interested in.
@@ -759,7 +759,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Get all the contact emails for users that have a specific role
+   * Get all the contact emails for users that have a specific role.
    *
    * @param string $roleName
    *   Name of the role we are interested in.

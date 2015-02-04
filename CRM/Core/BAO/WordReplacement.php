@@ -30,26 +30,23 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
- *
+ * Class CRM_Core_BAO_WordReplacement.
  */
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
-   * Class constructor
-   *
-   * @return \CRM_Core_DAO_WordReplacement
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
   }
 
   /**
+   * Function that must have never worked & should be removed.
+   *
    * Takes a bunch of params that are needed to match certain criteria and
    * retrieves the relevant objects.
    *
@@ -65,11 +62,11 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Get the domain BAO
+   * Get the domain BAO.
    *
    * @param null $reset
    *
-   * @return null|CRM_Core_BAO_WordRepalcement
+   * @return null|CRM_Core_BAO_WordReplacement
    */
   public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
@@ -85,7 +82,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
 
   /**
-   * Save the values of a WordReplacement
+   * Save the values of a WordReplacement.
    *
    * @param array $params
    * @param int $id
@@ -104,7 +101,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Create a new WordReplacement
+   * Create a new WordReplacement.
    *
    * @param array $params
    *
@@ -124,7 +121,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Delete website
+   * Delete website.
    *
    * @param int $id
    *   WordReplacement id.
@@ -142,10 +139,11 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Get all word-replacements in the form of an array
+   * Get all word-replacements in the form of an array.
    *
    * @param int $id
    *   Domain ID.
+   *
    * @return array
    * @see civicrm_domain.locale_custom_strings
    */
@@ -188,7 +186,11 @@ WHERE  domain_id = %1
   }
 
   /**
-   * Rebuild
+   * Rebuild.
+   *
+   * @param bool $clearCaches
+   *
+   * @return bool
    */
   public static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
@@ -213,6 +215,8 @@ WHERE  domain_id = %1
   }
 
   /**
+   * Get word replacements for the api.
+   *
    * Get all the word-replacements stored in config-arrays
    * and convert them to params for the WordReplacement.create API.
    *
@@ -220,10 +224,11 @@ WHERE  domain_id = %1
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
-   * bugfix in both places.
+   * bug-fix in both places.
    *
    * @param bool $rebuildEach
    *   Whether to perform rebuild after each individual API call.
+   *
    * @return array
    *   Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
@@ -239,7 +244,7 @@ WHERE  domain_id = %1
         $params = array();
         $params["domain_id"] = $value["id"];
         $params["options"] = array('wp-rebuild' => $rebuildEach);
-        // unserialize word match string
+        // Unserialize word match string.
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
           $wordMatchArray = array();
@@ -266,6 +271,8 @@ WHERE  domain_id = %1
   }
 
   /**
+   * Rebuild word replacements.
+   *
    * Get all the word-replacements stored in config-arrays
    * and write them out as records in civicrm_word_replacement.
    *
@@ -273,7 +280,7 @@ WHERE  domain_id = %1
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
-   * bugfix in both places.
+   * bug-fix in both places.
    */
   public static function rebuildWordReplacementTable() {
     civicrm_api3('word_replacement', 'replace', array(

@@ -125,7 +125,7 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Perform general setup
+   * Perform general setup.
    *
    * @param array $args
    *   List of path parts.
@@ -327,7 +327,7 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * This function contains the default action
+   * This function contains the default action.
    *
    * @param $action
    *
@@ -349,7 +349,7 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Show the message about CiviCRM versions
+   * Show the message about CiviCRM versions.
    *
    * @param CRM_Core_Smarty $template
    */

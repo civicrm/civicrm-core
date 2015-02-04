@@ -402,7 +402,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Initialize the DataObject framework
+   * Initialize the DataObject framework.
    *
    * @return void
    */
@@ -418,7 +418,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Returns the singleton logger for the application
+   * Returns the singleton logger for the application.
    *
    * @param
    *
@@ -433,7 +433,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Initialize the config variables
+   * Initialize the config variables.
    *
    * @return void
    */
@@ -533,7 +533,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Retrieve a mailer to send any mail from the application
+   * Retrieve a mailer to send any mail from the application.
    *
    * @param bool $persist
    *   Open a persistent smtp connection, should speed up mailings.
@@ -612,7 +612,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Create a new instance of a PEAR Mail driver
+   * Create a new instance of a PEAR Mail driver.
    *
    * @param string $driver
    *   'CRM_Mailing_BAO_Spool' or a name suitable for Mail::factory().
@@ -632,7 +632,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Deletes the web server writable directories
+   * Deletes the web server writable directories.
    *
    * @param int $value
    *   1: clean templates_c, 2: clean upload, 3: clean both
