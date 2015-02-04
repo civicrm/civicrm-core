@@ -744,7 +744,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Provide a list of available entityRef filters
+   * Provide a list of available entityRef filters.
    * FIXME: This function doesn't really belong in this class
    * @TODO: Provide a sane way to extend this list for other entities - a hook or??
    * @return array

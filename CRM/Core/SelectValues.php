@@ -38,7 +38,7 @@
 class CRM_Core_SelectValues {
 
   /**
-   * Preferred mail format
+   * Preferred mail format.
    *
    * @return array
    */
@@ -51,7 +51,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Privacy options
+   * Privacy options.
    *
    * @return array
    */
@@ -67,7 +67,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined contact super types
+   * Various pre defined contact super types.
    *
    * @return array
    */
@@ -80,7 +80,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined unit list
+   * Various pre defined unit list.
    *
    * @param string $unitType
    * @return array
@@ -98,7 +98,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Membership type unit
+   * Membership type unit.
    *
    * @return array
    */
@@ -107,7 +107,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined period types
+   * Various pre defined period types.
    *
    * @return array
    */
@@ -119,7 +119,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined email selection methods
+   * Various pre defined email selection methods.
    *
    * @return array
    */
@@ -133,7 +133,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined member visibility options
+   * Various pre defined member visibility options.
    *
    * @return array
    */
@@ -158,7 +158,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined event dates
+   * Various pre defined event dates.
    *
    * @return array
    */
@@ -171,7 +171,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Custom form field types
+   * Custom form field types.
    *
    * @return array
    */
@@ -198,7 +198,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Various pre defined extensions for dynamic properties and groups
+   * Various pre defined extensions for dynamic properties and groups.
    *
    * @return array
    *
@@ -228,7 +228,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Styles for displaying the custom data group
+   * Styles for displaying the custom data group.
    *
    * @return array
    *
@@ -242,7 +242,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * For displaying the uf group types
+   * For displaying the uf group types.
    *
    * @return array
    */
@@ -262,7 +262,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * The status of a contact within a group
+   * The status of a contact within a group.
    *
    * @return array
    *
@@ -276,7 +276,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * List of Group Types
+   * List of Group Types.
    *
    * @return array
    */
@@ -288,7 +288,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Compose the parameters for a date select object
+   * Compose the parameters for a date select object.
    *
    * @param string|NULL $type
    *   the type of date
@@ -340,7 +340,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Values for UF form visibility options
+   * Values for UF form visibility options.
    *
    * @return array
    */
@@ -353,7 +353,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Values for group form visibility options
+   * Values for group form visibility options.
    *
    * @return array
    */
@@ -365,7 +365,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Mailing Components
+   * Different type of Mailing Components.
    *
    * @return array
    */
@@ -383,7 +383,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get hours
+   * Get hours.
    *
    * @return array
    */
@@ -396,7 +396,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get minutes
+   * Get minutes.
    *
    * @return array
    */
@@ -409,7 +409,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get the Map Provider
+   * Get the Map Provider.
    *
    * @return array
    *   array of map providers
@@ -423,7 +423,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get the Geocoding Providers from available plugins
+   * Get the Geocoding Providers from available plugins.
    *
    * @return array
    *   array of geocoder providers
@@ -437,7 +437,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get the Address Standardization Providers from available plugins
+   * Get the Address Standardization Providers from available plugins.
    *
    * @return array
    *   array of address standardization providers
@@ -451,7 +451,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Mailing Tokens
+   * Different type of Mailing Tokens.
    *
    * @return array
    */
@@ -477,7 +477,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Activity Tokens
+   * Different type of Activity Tokens.
    *
    * @return array
    */
@@ -491,7 +491,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Membership Tokens
+   * Different type of Membership Tokens.
    *
    * @return array
    */
@@ -508,7 +508,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Event Tokens
+   * Different type of Event Tokens.
    *
    * @return array
    */
@@ -532,7 +532,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Event Tokens
+   * Different type of Event Tokens.
    *
    * @return array
    */
@@ -565,7 +565,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Contact Tokens
+   * Different type of Contact Tokens.
    *
    * @return array
    */
@@ -640,7 +640,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Participant Tokens
+   * Different type of Participant Tokens.
    *
    * @return array
    */
@@ -683,7 +683,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * CiviCRM supported date input formats
+   * CiviCRM supported date input formats.
    *
    * @return array
    */
@@ -723,7 +723,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Map date plugin and actual format that is used by PHP
+   * Map date plugin and actual format that is used by PHP.
    *
    * @return array
    */
@@ -749,7 +749,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Time formats
+   * Time formats.
    *
    * @return array
    */
@@ -761,7 +761,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Get numeric options
+   * Get numeric options.
    *
    * @param int $start
    * @param int $end
@@ -777,7 +777,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Barcode types
+   * Barcode types.
    *
    * @return array
    */
@@ -789,7 +789,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Dedupe rule types
+   * Dedupe rule types.
    *
    * @return array
    */
@@ -802,7 +802,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Campaign group types
+   * Campaign group types.
    *
    * @return array
    */
@@ -814,7 +814,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Subscription history method
+   * Subscription history method.
    *
    * @return array
    */
@@ -828,7 +828,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Premium units
+   * Premium units.
    *
    * @return array
    */
@@ -842,7 +842,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Extension types
+   * Extension types.
    *
    * @return array
    */
@@ -857,7 +857,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Job frequency
+   * Job frequency.
    *
    * @return array
    */
@@ -870,7 +870,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Search builder operators
+   * Search builder operators.
    *
    * @return array
    */
@@ -895,7 +895,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Profile group types
+   * Profile group types.
    *
    * @return array
    */
@@ -915,7 +915,7 @@ class CRM_Core_SelectValues {
 
 
   /**
-   * Word replacement match type
+   * Word replacement match type.
    *
    * @return array
    */
@@ -927,7 +927,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Mailing group types
+   * Mailing group types.
    *
    * @return array
    */
@@ -940,7 +940,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Mailing Job Status
+   * Mailing Job Status.
    *
    * @return array
    */
@@ -966,7 +966,7 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Frequency unit for schedule reminders
+   * Frequency unit for schedule reminders.
    *
    * @return array
    */
