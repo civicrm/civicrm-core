@@ -142,6 +142,10 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
 
   foreach ($metadata as $fieldname => $fieldSpec) {
+    // Ensure 'name' is set
+    if (!isset($fieldSpec['name'])) {
+      $metadata[$fieldname]['name'] = $fieldname;
+    }
     _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve);
   }
 
