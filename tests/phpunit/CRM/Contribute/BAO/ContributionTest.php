@@ -283,7 +283,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Display sort name during
+   * Display sort name during.
    * contribution batch update through profile
    * sortName();
    */
@@ -339,7 +339,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add premium during online Contribution
+   * Add premium during online Contribution.
    *
    * AddPremium();
    */

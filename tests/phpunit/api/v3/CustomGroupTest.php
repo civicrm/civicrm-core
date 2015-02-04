@@ -66,7 +66,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   ///////////////// civicrm_custom_group_create methods
 
   /**
-   * Check with empty array
+   * Check with empty array.
    * note that these tests are of marginal value so should not be included in copy & paste
    * code. The SyntaxConformance is capable of testing this for all entities on create
    * & delete (& it would be easy to add if not there)
@@ -78,7 +78,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testCustomGroupCreateNoExtends() {
     $params = array(
@@ -99,7 +99,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array
+   * Check with empty array.
    */
   public function testCustomGroupCreateInvalidExtends() {
     $params = array(
@@ -120,7 +120,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with a string instead of array for extends
+   * Check with a string instead of array for extends.
    */
   public function testCustomGroupCreateExtendsString() {
     $params = array(
@@ -140,7 +140,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid array
+   * Check with valid array.
    */
   public function testCustomGroupCreate() {
     $params = array(
@@ -161,7 +161,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid array
+   * Check with valid array.
    */
   public function testCustomGroupGetFields() {
     $params = array(
@@ -198,7 +198,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with style missing from params array
+   * Check with style missing from params array.
    */
   public function testCustomGroupCreateNoStyle() {
     $params = array(
@@ -218,7 +218,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with not array
+   * Check with not array.
    */
   public function testCustomGroupCreateNotArray() {
     $params = NULL;
@@ -227,7 +227,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check without title
+   * Check without title.
    */
   public function testCustomGroupCreateNoTitle() {
     $params = array(
@@ -244,7 +244,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check for household without weight
+   * Check for household without weight.
    */
   public function testCustomGroupCreateHouseholdNoWeight() {
     $params = array(
@@ -265,7 +265,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check for Contribution Donation
+   * Check for Contribution Donation.
    */
   public function testCustomGroupCreateContributionDonation() {
     $params = array(
@@ -286,7 +286,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid array
+   * Check with valid array.
    */
   public function testCustomGroupCreateGroup() {
     $params = array(
@@ -330,7 +330,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   ///////////////// civicrm_custom_group_delete methods
 
   /**
-   * Check without GroupID
+   * Check without GroupID.
    */
   public function testCustomGroupDeleteWithoutGroupID() {
     $customGroup = $this->callAPIFailure('custom_group', 'delete', array());
@@ -338,7 +338,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no array
+   * Check with no array.
    */
   public function testCustomGroupDeleteNoArray() {
     $params = NULL;
@@ -347,7 +347,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with valid custom group id
+   * Check with valid custom group id.
    */
   public function testCustomGroupDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
@@ -359,7 +359,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Main success get function
+   * Main success get function.
    */
   public function testGetCustomGroupSuccess() {
 

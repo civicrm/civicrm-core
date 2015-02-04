@@ -5,7 +5,7 @@
  */
 class Custom extends CiviUnitTestCase {
   /**
-   * Helper function to create Custom Group
+   * Helper function to create Custom Group.
    *
    * @deprecated - use functions on test case parent class
    *
@@ -60,7 +60,7 @@ class Custom extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to create Custom Field
+   * Helper function to create Custom Field.
    * @deprecated use parent object create fn
    * @param array $params
    * @param null $fields
@@ -99,7 +99,7 @@ class Custom extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to delete custom field
+   * Helper function to delete custom field.
    *
    * @deprecated use function on parent class
    *
@@ -110,7 +110,7 @@ class Custom extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to delete custom group
+   * Helper function to delete custom group.
    *
    * @deprecated use function on parent class
    *

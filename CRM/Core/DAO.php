@@ -637,7 +637,7 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Get the size and maxLength attributes for this text field
+   * Get the size and maxLength attributes for this text field.
    * (or for all text fields) in the DAO object.
    *
    * @param string $class
@@ -1314,7 +1314,7 @@ FROM   civicrm_domain
   }
 
   /**
-   * make a shallow copy of an object
+   * make a shallow copy of an object.
    * and all the fields in the object
    *
    * @param string $daoName

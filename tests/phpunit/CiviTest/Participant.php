@@ -5,7 +5,7 @@
  */
 class Participant extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create a Participant
+   * Helper function to create a Participant.
    *
    * @param int $contactId
    * @param int $eventId
@@ -32,7 +32,7 @@ class Participant extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete a participant
+   * Helper function to delete a participant.
    *
    * @param int $participantId
    * @return bool

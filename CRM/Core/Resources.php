@@ -125,7 +125,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Construct a resource manager
+   * Construct a resource manager.
    *
    * @param CRM_Extension_Mapper $extMapper
    *   Map extension names to their base path or URLs.
@@ -286,7 +286,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Helper fn for addSettingsFactory
+   * Helper fn for addSettingsFactory.
    */
   public function getSettings() {
     $result = $this->settings;
@@ -313,7 +313,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Helper fn for addSetting
+   * Helper fn for addSetting.
    * Render JavaScript variables for the global CRM object.
    *
    * @return string
@@ -439,7 +439,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Determine file path of a resource provided by an extension
+   * Determine file path of a resource provided by an extension.
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
@@ -462,7 +462,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Determine public URL of a resource provided by an extension
+   * Determine public URL of a resource provided by an extension.
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
@@ -624,7 +624,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Flushes cached translated strings
+   * Flushes cached translated strings.
    * @return CRM_Core_Resources
    */
   public function flushStrings() {
@@ -659,7 +659,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * List of core resources we add to every CiviCRM page
+   * List of core resources we add to every CiviCRM page.
    *
    * @return array
    */
@@ -744,7 +744,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Provide a list of available entityRef filters
+   * Provide a list of available entityRef filters.
    * FIXME: This function doesn't really belong in this class
    * @TODO: Provide a sane way to extend this list for other entities - a hook or??
    * @return array

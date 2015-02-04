@@ -35,13 +35,13 @@
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 
   /**
-   * The array of uploaded file names
+   * The array of uploaded file names.
    * @var array
    */
   protected $_uploadNames;
 
   /**
-   * The directory to store the uploaded files
+   * The directory to store the uploaded files.
    * @var string
    */
   protected $_uploadDir;

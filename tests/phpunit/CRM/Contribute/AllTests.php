@@ -53,7 +53,7 @@ class CRM_Contribute_AllTests extends CiviTestSuite {
   }
 
   /**
-   *  Build test suite dynamically
+   *  Build test suite dynamically.
    */
   public static function suite() {
     $inst = self::getInstance();

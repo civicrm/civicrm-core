@@ -1298,7 +1298,7 @@ LIMIT 0,1
  SET reminder.reference_date = {$dateField}
  WHERE reminder.action_schedule_id = %1 AND reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField}
 ";
-        }
+      }
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 

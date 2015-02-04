@@ -63,7 +63,7 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   }
 
   /**
-   * Get the permissioned where clause for the user
+   * Get the permissioned where clause for the user.
    *
    * @param int $type
    *   The type of permission needed.

@@ -70,7 +70,7 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
    * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
    * to remove this function all together
@@ -118,7 +118,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Check if capability is supported
+   * Check if capability is supported.
    * @param string $capability
    *   E.g BackOffice, LiveMode, FutureRecurStartDate.
    *
@@ -155,7 +155,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Are test payments supported
+   * Are test payments supported.
    * @return bool
    */
   protected function supportsTestMode() {
@@ -163,7 +163,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Should the first payment date be configurable when setting up back office recurring payments
+   * Should the first payment date be configurable when setting up back office recurring payments.
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
    * @return bool
    */
@@ -172,7 +172,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Setter for the payment form that wants to use the processor
+   * Setter for the payment form that wants to use the processor.
    * @deprecated
    * @param CRM_Core_Form $paymentForm
    */
@@ -181,7 +181,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Getter for payment form that is using the processor
+   * Getter for payment form that is using the processor.
    * @deprecated
    * @return CRM_Core_Form
    *   A form object
@@ -191,7 +191,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Getter for accessing member vars
+   * Getter for accessing member vars.
    * @todo believe this is unused
    * @param string $name
    *
@@ -202,7 +202,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get name for the payment information type
+   * Get name for the payment information type.
    * @todo - use option group + name field (like Omnipay does)
    * @return string
    */
@@ -211,7 +211,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get label for the payment information type
+   * Get label for the payment information type.
    * @todo - use option group + labels (like Omnipay does)
    * @return string
    */
@@ -220,7 +220,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get array of fields that should be displayed on the payment form
+   * Get array of fields that should be displayed on the payment form.
    * @todo make payment type an option value & use it in the function name - currently on debit & credit card work
    * @return array
    * @throws CiviCRM_API3_Exception
@@ -233,7 +233,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get array of fields that should be displayed on the payment form for credit cards
+   * Get array of fields that should be displayed on the payment form for credit cards.
    *
    * @return array
    */
@@ -247,7 +247,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get array of fields that should be displayed on the payment form for direct debits
+   * Get array of fields that should be displayed on the payment form for direct debits.
    *
    * @return array
    */
@@ -261,7 +261,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Return an array of all the details about the fields potentially required for payment fields
+   * Return an array of all the details about the fields potentially required for payment fields.
    * Only those determined by getPaymentFormFields will actually be assigned to the form
    *
    * @return array
@@ -440,7 +440,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @return string
    *   the error message if any

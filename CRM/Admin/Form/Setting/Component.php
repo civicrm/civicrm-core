@@ -40,7 +40,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   protected $_components;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -65,7 +65,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

@@ -92,7 +92,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
   /**
    * /**
-   * Check getfields works
+   * Check getfields works.
    */
   public function testGetFields() {
     $description = 'Demonstrate return from getfields - see subfolder for variants';
@@ -125,7 +125,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that getfields will filter on group
+   * Test that getfields will filter on group.
    */
   public function testGetFieldsGroupFilters() {
     $params = array('filters' => array('group' => 'multisite'));
@@ -210,7 +210,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check getfields works
+   * Check getfields works.
    */
   public function testCreateSetting() {
     $description = "shows setting a variable for a given domain - if no domain is set current is assumed";
@@ -228,7 +228,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check getfields works
+   * Check getfields works.
    */
   public function testCreateInvalidSettings() {
     $params = array(
@@ -255,7 +255,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check getfields works
+   * Check getfields works.
    */
   public function testCreateInvalidBooleanSettings() {
     $params = array(
@@ -290,7 +290,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check getfields works
+   * Check getfields works.
    */
   public function testCreateSettingMultipleDomains() {
     $description = "shows setting a variable for all domains";
@@ -356,7 +356,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that setting defined in extension can be retrieved
+   * Check that setting defined in extension can be retrieved.
    */
   public function testGetExtensionSetting() {
     $this->hookClass->setHook('civicrm_alterSettingsFolders', array($this, 'setExtensionMetadata'));
@@ -431,7 +431,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Use getValue against a config setting
+   * Use getValue against a config setting.
    */
   public function testGetValueConfigSetting() {
     $params = array(
@@ -468,7 +468,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests reverting a specific parameter
+   * Function tests reverting a specific parameter.
    */
   public function testRevert() {
     $params = array(
@@ -518,7 +518,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tests filling missing params
+   * Tests filling missing params.
    */
   public function testFill() {
     $domparams = array(

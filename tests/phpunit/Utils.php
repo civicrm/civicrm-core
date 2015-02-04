@@ -37,13 +37,13 @@
 class Utils {
 
   /**
-   *  PDO for the database
+   *  PDO for the database.
    * @var PDO
    */
   public $pdo;
 
   /**
-   *  Construct an object for this database
+   *  Construct an object for this database.
    * @param $host
    * @param $port
    * @param $user
@@ -63,7 +63,7 @@ class Utils {
   }
 
   /**
-   * Prepare and execute a query
+   * Prepare and execute a query.
    *
    * If the query fails, output a diagnostic message
    * @param string $query

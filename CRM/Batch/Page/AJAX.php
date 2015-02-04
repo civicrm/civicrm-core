@@ -39,7 +39,7 @@
 class CRM_Batch_Page_AJAX {
 
   /**
-   * Save record
+   * Save record.
    */
   public function batchSave() {
     // save the entered information in 'data' column
@@ -52,7 +52,7 @@ class CRM_Batch_Page_AJAX {
   }
 
   /**
-   * Retrieve records
+   * Retrieve records.
    */
   public static function getBatchList() {
     $sortMapper = array(

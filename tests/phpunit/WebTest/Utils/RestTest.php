@@ -205,7 +205,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Submit a request with an API key that exists but does not correspond to
+   * Submit a request with an API key that exists but does not correspond to.
    * a real user. Submit in "?entity=X&action=X" notation
    */
   public function testNotCMSUser_entityAction() {

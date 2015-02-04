@@ -185,7 +185,7 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides information about user dashboard element
+   * Provides information about user dashboard element.
    * offered by this component.
    *
    * @return array|null
@@ -195,7 +195,7 @@ abstract class CRM_Core_Component_Info {
   abstract public function getUserDashboardElement();
 
   /**
-   * Provides information about user dashboard element
+   * Provides information about user dashboard element.
    * offered by this component.
    *
    * @return array|null

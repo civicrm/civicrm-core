@@ -34,7 +34,7 @@ require_once "PEAR.php";
 class CRM_Core_Session {
 
   /**
-   * Cache of all the session names that we manage
+   * Cache of all the session names that we manage.
    */
   static $_managedNames = NULL;
 
@@ -68,7 +68,7 @@ class CRM_Core_Session {
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * The CMS takes care of initiating the php session handler session_start().
    *
@@ -89,7 +89,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return CRM_Core_Session
    */
@@ -148,7 +148,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Resets the session store
+   * Resets the session store.
    *
    *
    * @param int $all
@@ -171,7 +171,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Creates a session local scope
+   * Creates a session local scope.
    *
    * @param string $prefix
    *   Local scope name.
@@ -194,7 +194,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Resets the session local scope
+   * Resets the session local scope.
    *
    * @param string $prefix
    *   Local scope name.
@@ -214,7 +214,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Store the variable with the value in the session scope
+   * Store the variable with the value in the session scope.
    *
    * This function takes a name, value pair and stores this
    * in the session scope. Not sure what happens if we try
@@ -253,7 +253,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Gets the value of the named variable in the session scope
+   * Gets the value of the named variable in the session scope.
    *
    * This function takes a name and retrieves the value of this
    * variable from the session scope.
@@ -341,7 +341,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Adds a userContext to the stack
+   * Adds a userContext to the stack.
    *
    * @param string $userContext
    *   The url to return to when done.
@@ -380,7 +380,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Replace the userContext of the stack with the passed one
+   * Replace the userContext of the stack with the passed one.
    *
    * @param string $userContext
    *   The url to return to when done.
@@ -399,7 +399,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Pops the top userContext stack
+   * Pops the top userContext stack.
    *
    * @return string
    *   the top of the userContext stack (also pops the top element)
@@ -411,7 +411,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Reads the top userContext stack
+   * Reads the top userContext stack.
    *
    * @return string
    *   the top of the userContext stack
@@ -425,7 +425,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Dumps the session to the log
+   * Dumps the session to the log.
    * @param int $all
    */
   public function debug($all = 1) {
@@ -439,7 +439,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Fetches status messages
+   * Fetches status messages.
    *
    * @param bool $reset
    *   Should we reset the status variable?.
@@ -553,7 +553,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Retrieve contact id of the logged in user
+   * Retrieve contact id of the logged in user.
    * @return int|NULL
    *   contact ID of logged in user
    */

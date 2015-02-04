@@ -17,7 +17,7 @@ interface CRM_Core_Reference_Interface {
   public function matchesTargetTable($tableName);
 
   /**
-   * Create a query to find references to a particular record
+   * Create a query to find references to a particular record.
    *
    * @param CRM_Core_DAO $targetDao
    *   The instance for which we want references.
@@ -26,7 +26,7 @@ interface CRM_Core_Reference_Interface {
   public function findReferences($targetDao);
 
   /**
-   * Create a query to find references to a particular record
+   * Create a query to find references to a particular record.
    *
    * @param CRM_Core_DAO $targetDao
    *   The instance for which we want references.

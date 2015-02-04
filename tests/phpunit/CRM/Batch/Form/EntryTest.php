@@ -139,7 +139,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Import
+   *  Test Import.
    */
   public function testProcessMembership() {
     $form = new CRM_Batch_Form_Entry();
@@ -172,7 +172,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Contribution Import
+   *  Test Contribution Import.
    */
   public function testProcessContribution() {
     $this->offsetDefaultPriceSet();
@@ -191,7 +191,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
-   * Data provider for test process membership
+   * Data provider for test process membership.
    * @return array
    */
   public function getMembershipData() {

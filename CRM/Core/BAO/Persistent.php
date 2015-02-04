@@ -35,7 +35,7 @@
 class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
 
   /**
-   * Fetch object based on array of properties
+   * Fetch object based on array of properties.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

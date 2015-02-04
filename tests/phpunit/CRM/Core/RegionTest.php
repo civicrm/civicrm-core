@@ -56,7 +56,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that each of the major content formats are correctly evaluated
+   * Test that each of the major content formats are correctly evaluated.
    */
   public function testAllTypes() {
     CRM_Core_Region::instance('testAllTypes')->add(array(

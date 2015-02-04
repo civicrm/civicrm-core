@@ -15,7 +15,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add and remove two items from the same cache instance
+   * Add and remove two items from the same cache instance.
    */
   public function testSameInstance() {
     $a = new CRM_Utils_Cache_SqlGroup(array(
@@ -40,7 +40,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add item to one cache instance then read with another
+   * Add item to one cache instance then read with another.
    */
   public function testTwoInstance() {
     $a = new CRM_Utils_Cache_SqlGroup(array(

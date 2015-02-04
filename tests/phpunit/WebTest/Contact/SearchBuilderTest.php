@@ -237,7 +237,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Enter form values in a Search Builder row
+   * Enter form values in a Search Builder row.
    * @param $set
    * @param $row
    * @param $entity

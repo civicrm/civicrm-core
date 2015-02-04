@@ -804,7 +804,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Change custom field using update
+   * Change custom field using update.
    */
   public function testUpdateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -961,7 +961,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that if membership join date is not set it defaults to today
+   * Test that if membership join date is not set it defaults to today.
    */
   public function testEmptyJoinDate() {
     unset($this->_params['join_date'], $this->_params['is_override']);
@@ -1273,7 +1273,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that if membership end date is not set it defaults to correct end date
+   * Test that if membership end date is not set it defaults to correct end date.
    *  - rolling
    */
   public function testEmptyEndDateFixed() {
@@ -1287,7 +1287,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that if membership end date is not set it defaults to correct end date
+   * Test that if membership end date is not set it defaults to correct end date.
    *  - rolling
    */
   public function testEmptyEndDateRolling() {

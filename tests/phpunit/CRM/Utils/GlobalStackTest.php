@@ -8,7 +8,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
 
   /**
-   * Temporarily override global variables and ensure that the variable data
+   * Temporarily override global variables and ensure that the variable data.
    * is set as expected (before/during/after the override).
    */
   public function testPushPop() {

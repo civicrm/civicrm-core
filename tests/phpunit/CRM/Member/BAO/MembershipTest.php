@@ -327,7 +327,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
 
   /**
-   * Get the contribution
+   * Get the contribution.
    * page id from the membership record
    */
   public function testgetContributionPageId() {
@@ -455,7 +455,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Delete related memberships
+   * Delete related memberships.
    */
   public function testdeleteRelatedMemberships() {
     $contactId = Contact::createIndividual();
@@ -485,7 +485,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Renew membership with change in membership type
+   * Renew membership with change in membership type.
    */
   public function testRenewMembership() {
     $contactId = Contact::createIndividual();
@@ -546,7 +546,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Renew stale membership
+   * Renew stale membership.
    */
   public function testStaleMembership() {
     $statusId = 3;

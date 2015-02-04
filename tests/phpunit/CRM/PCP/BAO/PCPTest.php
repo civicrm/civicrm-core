@@ -129,7 +129,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
-   * Build params
+   * Build params.
    */
   private function pcpBlockParams() {
     $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
@@ -153,7 +153,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
-   * Build params
+   * Build params.
    */
   private function pcpParams() {
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');

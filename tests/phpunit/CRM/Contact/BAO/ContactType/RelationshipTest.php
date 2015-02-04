@@ -90,7 +90,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipType with valid data
+   * Methods create relationshipType with valid data.
    * success expected
    */
   public function testRelationshipTypeAddIndiviParent() {
@@ -150,7 +150,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within same contact type with invalid Relationships
+   * Methods create relationshipe within same contact type with invalid Relationships.
    */
   public function testRelationshipCreateInvalidWithinSameType() {
     //check for Individual to Parent
@@ -177,7 +177,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within diff contact type with invalid Relationships
+   * Methods create relationshipe within diff contact type with invalid Relationships.
    */
   public function testRelCreateInvalidWithinDiffTypeSpocorIndivi() {
     //check for Sponcer to Individual
@@ -229,7 +229,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within same contact type with valid data
+   * Methods create relationshipe within same contact type with valid data.
    * success expected
    */
   public function testRelationshipCreateWithinSameType() {
@@ -257,7 +257,7 @@ DELETE FROM civicrm_contact_type
   }
 
   /**
-   * Methods create relationshipe within different contact type with valid data
+   * Methods create relationshipe within different contact type with valid data.
    * success expected
    */
   public function testRelCreateWithinDiffTypeSponsorIndivi() {

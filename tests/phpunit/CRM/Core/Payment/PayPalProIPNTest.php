@@ -182,7 +182,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get PaymentExpress IPN for a single transaction
+   * Get PaymentExpress IPN for a single transaction.
    * @return array
    *   array representing a Paypal IPN POST
    */
@@ -232,7 +232,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get IPN results from follow on IPN transactions
+   * Get IPN results from follow on IPN transactions.
    * @return array
    *   array representing a Paypal IPN POST
    */

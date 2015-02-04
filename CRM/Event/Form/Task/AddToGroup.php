@@ -41,28 +41,28 @@
 class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
   /**
-   * The context that we are working on
+   * The context that we are working on.
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * The groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
    */
@@ -76,7 +76,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    *
    * @return void
@@ -148,7 +148,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
    *
    * @return array
@@ -166,7 +166,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -176,7 +176,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $params
    *   Posted values of the form.
@@ -198,7 +198,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
    *
    * @return void

@@ -357,7 +357,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Generate list of entities to test for get by id functions
+   * Generate list of entities to test for get by id functions.
    * @param bool $sequential
    * @return array
    *   Entities to be skipped
@@ -751,7 +751,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create two entities and make sure we can fetch them individually by ID
+   * Create two entities and make sure we can fetch them individually by ID.
    *
    * @dataProvider entities_get
    *
@@ -889,7 +889,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that get fetches an appropriate number of results
+   * Check that get fetches an appropriate number of results.
    *
    * @param string $entityName
    *   Name of entity to test.

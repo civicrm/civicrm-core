@@ -796,7 +796,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify that attempt to create individual contact with first
+   * Verify that attempt to create individual contact with first.
    * and last names and email succeeds
    */
   public function testCreateIndividualWithNameEmail() {
@@ -815,7 +815,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify that attempt to create individual contact with no data fails
+   * Verify that attempt to create individual contact with no data fails.
    */
   public function testCreateIndividualWithOutNameEmail() {
     $params = array(
@@ -825,7 +825,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify that attempt to create individual contact with first
+   * Verify that attempt to create individual contact with first.
    * and last names, email and location type succeeds
    */
   public function testCreateIndividualWithNameEmailLocationType() {
@@ -970,7 +970,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify successful update of organization contact
+   * Verify successful update of organization contact.
    */
   public function testUpdateOrganizationWithAll() {
     // Insert a row in civicrm_contact creating organization contact
@@ -1347,7 +1347,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test to check return works OK
+   * Test to check return works OK.
    */
   public function testContactGetReturnValues() {
     $extraParams = array('nick_name' => 'Bob', 'phone' => '456', 'email' => 'e@mail.com');
@@ -1413,7 +1413,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify attempt to create individual with chained arrays
+   * Verify attempt to create individual with chained arrays.
    */
   public function testGetIndividualWithChainedArrays() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -1663,7 +1663,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test TrueFalse format
+   * test TrueFalse format.
    */
   public function testContactCreateFormatIsSuccessFalse() {
 
@@ -1676,7 +1676,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test Single Entity format
+   * test Single Entity format.
    */
   public function testContactGetSingle_entity_array() {
     $this->createContactFromXML();

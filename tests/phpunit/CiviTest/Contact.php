@@ -5,7 +5,7 @@
  */
 class Contact extends CiviUnitTestCase {
   /**
-   * Helper function to create
+   * Helper function to create.
    * a contact
    *
    * @param array $params
@@ -87,7 +87,7 @@ class Contact extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to delete a contact
+   * Helper function to delete a contact.
    *
    * @param int $contactID
    *   Id of the contact to delete.

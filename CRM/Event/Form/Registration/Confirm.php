@@ -41,21 +41,21 @@
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
-   * The values for the contribution db object
+   * The values for the contribution db object.
    *
    * @var array
    */
   public $_values;
 
   /**
-   * The total amount
+   * The total amount.
    *
    * @var float
    */
   public $_totalAmount;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -220,7 +220,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -427,7 +427,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -953,7 +953,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the contribution
+   * Process the contribution.
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -1073,7 +1073,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Fix the Location Fields
+   * Fix the Location Fields.
    *
    * @param array $params
    * @param $fields
@@ -1121,7 +1121,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Update contact fields
+   * Update contact fields.
    *
    * @param int $contactID
    * @param array $params

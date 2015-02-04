@@ -49,7 +49,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testing Activity Generation through Entity Recursion
+   * Testing Activity Generation through Entity Recursion.
    */
   public function testActivityGeneration() {
     //Activity set initial params
@@ -108,7 +108,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Testing Event Generation through Entity Recursion
+   * Testing Event Generation through Entity Recursion.
    */
   public function testEventGeneration() {
     //Event set initial params

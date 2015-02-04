@@ -42,13 +42,13 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   static $_requiredTemplate = NULL;
 
   /**
-   * The template to display error messages inline with the form element
+   * The template to display error messages inline with the form element.
    * @var string
    */
   static $_errorTemplate = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $stateMachine
    *   Reference to state machine object.
@@ -102,7 +102,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * Render the page using a custom templating system
+   * Render the page using a custom templating system.
    *
    * @param CRM_Core_Form $page
    *   The CRM_Core_Form page.
@@ -187,7 +187,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * Set the various rendering templates
+   * Set the various rendering templates.
    *
    * @param CRM_Core_Form $page
    *   The CRM_Core_Form page.
@@ -206,7 +206,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * Initialize the various templates
+   * Initialize the various templates.
    *
    * @return void
    */

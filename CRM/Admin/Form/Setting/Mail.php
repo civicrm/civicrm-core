@@ -39,7 +39,7 @@
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

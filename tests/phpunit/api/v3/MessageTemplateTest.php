@@ -57,7 +57,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create function succeeds
+   * Test create function succeeds.
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -76,7 +76,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check the delete function succeeds
+   * Check the delete function succeeds.
    */
   public function testDelete() {
     $entity = $this->createTestEntity();

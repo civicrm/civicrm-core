@@ -49,7 +49,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
   }
 
   /**
-   * Helper function to provide data for multiple relationship import
+   * Helper function to provide data for multiple relationship import.
    * for Individuals.
    *
    * @return array

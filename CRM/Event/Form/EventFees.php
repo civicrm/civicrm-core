@@ -40,7 +40,7 @@
 class CRM_Event_Form_EventFees {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
    *
@@ -340,7 +340,7 @@ SELECT  id, html_type
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @param CRM_Core_Form $form
    *

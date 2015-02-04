@@ -40,7 +40,7 @@
 class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
-   * The id of the event we are proceessing
+   * The id of the event we are proceessing.
    *
    * @var int
    */
@@ -83,12 +83,12 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   protected $_campaignID = NULL;
 
   /**
-   * Check if repeating event
+   * Check if repeating event.
    */
   protected $_isRepeatingEvent;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -257,7 +257,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */

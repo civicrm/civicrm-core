@@ -40,7 +40,7 @@
 class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -58,7 +58,7 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.

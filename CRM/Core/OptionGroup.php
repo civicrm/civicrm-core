@@ -442,7 +442,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Creates a new option group with the passed in values
+   * Creates a new option group with the passed in values.
    * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
    * not messed up. Currently deletes the old group
    *
@@ -635,7 +635,7 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Wrapper for calling values with fresh set to true to empty the given value
+   * Wrapper for calling values with fresh set to true to empty the given value.
    *
    * Since there appears to be some inconsistency
    * (@todo remove inconsistency) around the pseudoconstant operations

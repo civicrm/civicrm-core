@@ -23,14 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   protected $_numStrings = 10;
@@ -41,6 +40,9 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
   public $unsavedChangesWarn = TRUE;
 
+  /**
+   * Pre process function.
+   */
   public function preProcess() {
     // This controller was originally written to CRUD $config->locale_custom_strings,
     // but that's no longer the canonical store. Re-sync from canonical store to ensure
@@ -53,6 +55,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
+   * Set default values.
+   *
    * @return array
    */
   public function setDefaultValues() {
@@ -106,9 +110,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
@@ -169,7 +171,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   Posted values of the form.
@@ -204,10 +206,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   }
 
   /**
-   * Process the form submission
-   *
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -273,4 +272,5 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
       ));
     }
   }
+
 }
