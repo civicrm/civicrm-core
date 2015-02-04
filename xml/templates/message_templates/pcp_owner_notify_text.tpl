@@ -8,7 +8,7 @@
 {ts}Your fundraising total has been updated.{/ts}
 {ts}The donor's information is listed below.  You can choose to contact them and convey your thanks if you wish.{/ts}
 {if $is_honor_roll_enabled}
-    {ts}The donor's name has been added to your honor roll unless they asked not to be included.{/ts}
+    {ts}Their name has been added to your honor roll unless they asked not to be included.{/ts}
 {/if}
 
 {ts}Receive Date{/ts}: {$receive_date|crmDate}
