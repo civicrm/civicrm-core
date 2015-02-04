@@ -51,7 +51,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultipleAdd = array();
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -221,7 +221,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -308,7 +308,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Build Registration Block
+   * Build Registration Block.
    *
    * @param CRM_Core_Form $form
    *
@@ -336,7 +336,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Subroutine to insert a Profile Editor widget
+   * Subroutine to insert a Profile Editor widget.
    * depends on getProfileSelectorTypes
    *
    * @param array &$form
@@ -357,7 +357,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Create initializers for addprofileSelector
+   * Create initializers for addprofileSelector.
    *
    * @return array
    *   ['allowCoreTypes' => array, 'allowSubTypes' => array, 'profileEntities' => array]
@@ -394,7 +394,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Build Confirmation Block
+   * Build Confirmation Block.
    *
    * @param CRM_Core_Form $form
    *
@@ -421,7 +421,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Build Email Block
+   * Build Email Block.
    *
    * @param CRM_Core_Form $form
    *
@@ -459,7 +459,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -472,7 +472,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    * @param $files
@@ -663,7 +663,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Collect all email fields for an array of profile ids
+   * Collect all email fields for an array of profile ids.
    *
    * @param $profileIds
    * @return bool
@@ -684,7 +684,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Check if a profile contains required fields
+   * Check if a profile contains required fields.
    *
    * @param $profileIds
    * @return bool
@@ -718,7 +718,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Check if the profiles collect enough information to dedupe
+   * Check if the profiles collect enough information to dedupe.
    *
    * @param $profileIds
    * @param int $rgId
@@ -810,7 +810,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

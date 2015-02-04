@@ -50,17 +50,17 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   const NUM_DISCOUNT = 6;
 
   /**
-   * Page action
+   * Page action.
    */
   public $_action;
 
   /**
-   * In Date
+   * In Date.
    */
   private $_inDate;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -246,7 +246,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -392,7 +392,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
    *
    * @return void
@@ -402,7 +402,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *   Posted values of the form.
@@ -549,7 +549,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
    */

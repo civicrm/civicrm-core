@@ -55,7 +55,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * Build select for CiviEvent
+   * Build select for CiviEvent.
    *
    * @param $query
    *
@@ -457,7 +457,7 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
    */

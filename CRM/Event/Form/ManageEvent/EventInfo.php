@@ -41,12 +41,12 @@
 class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Event type
+   * Event type.
    */
   protected $_eventType = NULL;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -148,7 +148,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -236,7 +236,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *
@@ -268,7 +268,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -343,7 +343,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Retrieve event template custom data values
+   * Retrieve event template custom data values.
    * and set as default values for current new event.
    *
    * @param int $templateId

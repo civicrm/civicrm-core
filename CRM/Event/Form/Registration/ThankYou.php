@@ -41,7 +41,7 @@
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -82,7 +82,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -236,7 +236,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void

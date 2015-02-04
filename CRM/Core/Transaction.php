@@ -85,7 +85,7 @@
 class CRM_Core_Transaction {
 
   /**
-   * These constants represent phases at which callbacks can be invoked
+   * These constants represent phases at which callbacks can be invoked.
    */
   const PHASE_PRE_COMMIT = 1;
   const PHASE_POST_COMMIT = 2;
@@ -99,7 +99,7 @@ class CRM_Core_Transaction {
   private $_pseudoCommitted = FALSE;
 
   /**
-   * Ensure that an SQL transaction is started
+   * Ensure that an SQL transaction is started.
    *
    * This is a thin wrapper around __construct() which allows more fluent coding.
    *
@@ -114,7 +114,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Ensure that an SQL transaction is started
+   * Ensure that an SQL transaction is started.
    *
    * @param bool $nest
    *   Determines what to do if there's currently an active transaction:.
@@ -130,7 +130,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Immediately commit or rollback
+   * Immediately commit or rollback.
    *
    * (Note: Prior to 4.6, return void)
    *
@@ -218,7 +218,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Determine whether there is a pending transaction
+   * Determine whether there is a pending transaction.
    */
   static public function isActive() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
@@ -226,7 +226,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Add a transaction callback
+   * Add a transaction callback.
    *
    * Note: It's conceivable to add callbacks to the main/overall transaction
    * (aka $manager->getBaseFrame()) or to the innermost nested transaction

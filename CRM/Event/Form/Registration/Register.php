@@ -41,12 +41,12 @@
 class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
-   * The fields involved in this page
+   * The fields involved in this page.
    */
   public $_fields;
 
   /**
-   * The defaults involved in this page
+   * The defaults involved in this page.
    */
   public $_defaults;
 
@@ -80,7 +80,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentFields = array();
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
    */
@@ -306,7 +306,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
    */
@@ -798,7 +798,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
    * @param array $fields
    *   The input form values.
@@ -966,7 +966,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
    *
    * @return void
@@ -1207,7 +1207,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process Registration of free event
+   * Process Registration of free event.
    *
    * @param array $params
    *   Form values.
@@ -1387,7 +1387,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Method to check if the user is already registered for the event
+   * Method to check if the user is already registered for the event.
    * and if result found redirect to the event info page
    *
    * @param array $fields
