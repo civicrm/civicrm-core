@@ -403,7 +403,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     //CRM-15821 - To add new option for PCP "Owner" notification
     $ownerNotifications = CRM_Core_OptionGroup::values('pcp_owner_notify');
-    $form->addRadio('owner_notify_id', ts('Owner Notification'), $ownerNotifications, NULL, '<br/>', TRUE);
+    $form->addRadio('owner_notify_id', ts('Owner Email Notification'), $ownerNotifications, NULL, '<br/>', TRUE);
 
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
