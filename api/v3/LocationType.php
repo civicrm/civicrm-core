@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 location type functions
+ * This api exposes CiviCRM location type.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_LocationType
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: LocationType.php 2012-11-02 Jon Goldberg $
  */
 
 /**

@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 relationship functions
+ * This api exposes CiviCRM relationships.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Relationship
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Relationship.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**

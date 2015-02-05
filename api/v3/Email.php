@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 email functions
+ * This api exposes CiviCRM email.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Email
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Email.php 2011-02-16 ErikHommel $
  */
 
 /**

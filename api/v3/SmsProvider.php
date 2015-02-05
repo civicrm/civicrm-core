@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 sms_provider functions
+ * This api exposes CiviCRM sms_provider.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_sms_provider

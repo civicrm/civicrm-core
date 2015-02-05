@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 note functions
+ * This api exposes CiviCRM note.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Note
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Note.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**

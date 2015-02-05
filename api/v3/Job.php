@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -28,13 +26,10 @@
  */
 
 /**
- * new version of civicrm APIs. See blog post at
- * http://civicrm.org/node/131
+ * This api is used for triggering scheduled "cron" jobs.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Job
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**

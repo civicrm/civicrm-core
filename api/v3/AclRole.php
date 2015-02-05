@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 acl_role functions
+ * This api exposes CiviCRM acl_role.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_acl_role

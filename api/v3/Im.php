@@ -26,12 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 IM functions
+ * This api exposes CiviCRM IM.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_IM
  *
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**

@@ -26,21 +26,19 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Pledge functions
+ * This api exposes CiviCRM Pledge payment.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Pledge_Payment
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: PledgePayment.php
  */
 
 /**
  * Add or update a pledge payment.
  *
- * Pledge Payment API doesn't actually add a pledge
- *  if the request is to 'create' and 'id' is not passed in
- * the oldest pledge with no associated contribution is updated
+ * Pledge Payment API doesn't actually add a pledge.
+ * If the request is to 'create' and 'id' is not passed in
+ * the oldest pledge with no associated contribution is updated.
  *
  * @todo possibly add ability to add payment if there are less payments than pledge installments
  * @todo possibly add ability to recalculate dates if the schedule is changed

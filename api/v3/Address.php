@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 address functions
+ * This api exposes CiviCRM address.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Address
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Address.php 2011-02-16 ErikHommel $
  */
 
 /**

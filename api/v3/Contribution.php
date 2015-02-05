@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Contribution functions
+ * This api exposes CiviCRM Contribution.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contribute
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Contribution.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**

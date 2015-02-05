@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM grant.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Grant
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -60,7 +59,7 @@ function _civicrm_api3_grant_create_spec(&$params) {
 }
 
 /**
- * Returns array of grants matching a set of one or more group properties.
+ * Returns array of grants matching a set of one or more properties.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -75,7 +74,7 @@ function civicrm_api3_grant_get($params) {
 /**
  * Delete an existing grant.
  *
- * This method is used to delete any existing grant. id of the group
+ * This method is used to delete any existing grant. id of the grant
  * to be deleted is required field in $params array
  *
  * @param array $params

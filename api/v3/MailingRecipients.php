@@ -26,13 +26,10 @@
  */
 
 /**
- *
- * APIv3 functions for registering/processing mailing events.
+ * APIv3 functions for registering/processing mailing recipients.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Mailing
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
  */
 
 

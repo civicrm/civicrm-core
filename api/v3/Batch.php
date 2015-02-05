@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 batch functions
+ * This api exposes CiviCRM batch.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Batch

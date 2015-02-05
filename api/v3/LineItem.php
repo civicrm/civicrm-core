@@ -27,11 +27,10 @@
 
 
 /**
- * File for the CiviCRM APIv3 line item functions
+ * This api exposes CiviCRM line item.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_LineItem
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**

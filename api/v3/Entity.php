@@ -3,8 +3,6 @@
 /**
  * Get list of deprecated entities.
  *
- * @deprecated api notice
- *
  * @param array $entities
  *
  * @return array

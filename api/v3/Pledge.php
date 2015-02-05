@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Pledge functions
+ * This api exposes CiviCRM Pledge.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Pledge
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Pledge.php
  */
 
 /**

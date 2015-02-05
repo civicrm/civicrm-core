@@ -25,7 +25,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 message_template functions
+ * This api exposes CiviCRM message_template.
  *
  * @package CiviCRM_SEPA
  */

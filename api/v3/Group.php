@@ -26,20 +26,17 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM group.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Group
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Group.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**
  * Create/update group.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'group'
+ *   name/value pairs to insert in new 'group'
  *
  * @return array
  *   API result array
@@ -89,8 +86,7 @@ function civicrm_api3_group_get($params) {
  * Delete an existing group.
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   API result array

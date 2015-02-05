@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 custom group functions
+ * This api exposes CiviCRM custom group.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_CustomGroup
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: CustomGroup.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**

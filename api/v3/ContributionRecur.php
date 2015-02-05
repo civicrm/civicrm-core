@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM recurring contributions.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionRecur
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -97,8 +96,7 @@ function civicrm_api3_contribution_recur_cancel($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   API result array
