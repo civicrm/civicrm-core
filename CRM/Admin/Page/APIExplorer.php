@@ -111,6 +111,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       $result = array(
         'doc' => $doc ? self::formatDocBlock($doc[0]) : 'Not found.',
         'code' => $doc ? $doc[1] : NULL,
+        'file' => $doc ? $doc[2] : NULL,
       );
       if (!$action) {
         $actions = civicrm_api3($entity, 'getactions');
@@ -131,7 +132,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     if (!$entity) {
       return FALSE;
     }
-    $contents = file_get_contents("api/v3/$entity.php", FILE_USE_INCLUDE_PATH);
+    $file = "api/v3/$entity.php";
+    $contents = file_get_contents($file, FILE_USE_INCLUDE_PATH);
     if (!$contents) {
       // Api does not exist
       return FALSE;
@@ -140,7 +142,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     // Fetch docblock for the api file
     if (!$action) {
       if (preg_match('#/\*\*\n.*?\n \*/\n#s', $contents, $docblock)) {
-        return array($docblock[0], NULL);
+        return array($docblock[0], NULL, $file);
       }
     }
     // Fetch block for a specific action
@@ -148,22 +150,26 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       $action = strtolower($action);
       $fnName = 'civicrm_api3_' . _civicrm_api_get_entity_name_from_camel($entity) . '_' . $action;
       // Support the alternate "1 file per action" structure
-      $actionFile = file_get_contents("api/v3/$entity/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);
-      if ($actionFile) {
-        $contents = $actionFile;
+      $actionFile = "api/v3/$entity/" . ucfirst($action) . '.php';
+      $actionFileContents = file_get_contents("api/v3/$entity/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);
+      if ($actionFileContents) {
+        $file = $actionFile;
+        $contents = $actionFileContents;
       }
       // If action isn't in this file, try generic
       if (strpos($contents, $fnName) === FALSE) {
         $fnName = "civicrm_api3_generic_$action";
-        $contents = file_get_contents("api/v3/Generic/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);
+        $file = "api/v3/Generic/" . ucfirst($action) . '.php';
+        $contents = file_get_contents($file, FILE_USE_INCLUDE_PATH);
         if (!$contents) {
-          $contents = file_get_contents("api/v3/Generic.php", FILE_USE_INCLUDE_PATH);
+          $file = "api/v3/Generic.php";
+          $contents = file_get_contents($file, FILE_USE_INCLUDE_PATH);
         }
       }
       if (preg_match('#(/\*\*(\n \*.*)*\n \*/\n)function[ ]+' . $fnName . '#i', $contents, $docblock)) {
         // Fetch the code in a separate regex to preserve sanity
         preg_match("#^function[ ]+$fnName.*?^}#ism", $contents, $code);
-        return array($docblock[1], $code[0]);
+        return array($docblock[1], $code[0], $file);
       }
     }
   }

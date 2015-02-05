@@ -100,6 +100,10 @@
     font-weight: bold;
     margin-top: .5em;
   }
+  .doc-filename {
+    text-align: right;
+    font-style: italic;
+  }
   {/literal}
 </style>
 
@@ -299,7 +303,10 @@
 <script type="text/template" id="doc-code-tpl">
   <div class="crm-collapsible collapsed api-doc-code">
     <div class="collapsible-title">{ts}Source Code{/ts}</div>
-    <pre class="prettyprint lang-php linenums"><%- code %></pre>
+    <div>
+      <div class="doc-filename"><%- file %></div>
+      <pre class="prettyprint lang-php linenums"><%- code %></pre>
+    </div>
   </div>
 </script>
 {/strip}
