@@ -157,7 +157,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
         $contents = $actionFileContents;
       }
       // If action isn't in this file, try generic
-      if (strpos($contents, $fnName) === FALSE) {
+      if (strpos($contents, "function $fnName") === FALSE) {
         $fnName = "civicrm_api3_generic_$action";
         $file = "api/v3/Generic/" . ucfirst($action) . '.php';
         $contents = file_get_contents($file, FILE_USE_INCLUDE_PATH);
