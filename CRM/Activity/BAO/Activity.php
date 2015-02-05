@@ -270,7 +270,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     if ($recordTypeID) {
       $activityContact->record_type_id = $recordTypeID;
     }
-    $activityContact->delete();
+
+    //let's check if activity contact record exits and then delete.
+    //looks like delete leads to deadlock when multiple simultaneous
+    //requests are done. CRM-15470
+    if ($activityContact->find()) {
+      $activityContact->delete();
+    }
   }
 
   /**
