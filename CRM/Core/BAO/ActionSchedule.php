@@ -1280,31 +1280,16 @@ INSERT INTO civicrm_action_log ({$selectColumns})
  LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} {$notINClause} AND {$dateClause} AND
  reminder.action_date_time IS NOT NULL AND
- (reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField})
-LIMIT 0,1
-";
-
-        // As per the usage of UNION clause above we always INSERT a new reminder if reference_date (RD)
-        // got outdated or mismatches to start_action_date criteria so we need to update RD with actual
-        // start_action_date of already sent reminder, so to prevent redeundancy in sending new reminder
-        // due to above INSERT-UNION query
-        $updateQuery = "UPDATE civicrm_action_log reminder
- INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id AND
- reminder.reference_date IS NOT NULL AND reminder.action_date_time IS NOT NULL
- INNER JOIN civicrm_action_log new_reminder ON
-   new_reminder.action_schedule_id = reminder.action_schedule_id AND
-   new_reminder.reference_date = {$dateField} AND
-   new_reminder.action_date_time IS NULL
- SET reminder.reference_date = {$dateField}
- WHERE reminder.action_schedule_id = %1 AND reminder.reference_date IS NOT NULL AND reminder.reference_date != {$dateField}
+ reminder.reference_date IS NOT NULL
+GROUP BY reminder.id, reminder.reference_date
+HAVING reminder.id = MAX(reminder.id) AND reminder.reference_date <> {$dateField}
 ";
       }
 
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
-      if (!empty($updateQuery)) {
+      if (!empty($referenceQuery)) {
         CRM_Core_DAO::executeQuery($referenceQuery, array(1 => array($actionSchedule->id, 'Integer')));
-        CRM_Core_DAO::executeQuery($updateQuery, array(1 => array($actionSchedule->id, 'Integer')));
       }
 
       $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) ? TRUE : FALSE;
