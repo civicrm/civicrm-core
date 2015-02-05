@@ -40,6 +40,7 @@
     margin-bottom: .6em;
   }
   pre#api-result,
+  div#doc-result,
   pre#example-result {
     padding:1em;
     max-height: 50em;
@@ -91,13 +92,28 @@
   pre ol.linenums li:hover {
     color: #9c9c9c;
   }
+  .api-doc-code {
+    margin-top: 1em;
+    border-top: 1px solid #d3d3d3;
+  }
+  .api-doc-code .collapsible-title {
+    font-weight: bold;
+    margin-top: .5em;
+  }
   {/literal}
 </style>
 
 <div id="mainTabContainer">
   <ul>
-    <li class="ui-corner-all"><a href="#explorer-tab">{ts}Explorer{/ts}</a></li>
-    <li class="ui-corner-all"><a href="#examples-tab">{ts}Examples{/ts}</a></li>
+    <li class="ui-corner-all" title="GUI to build and execute API calls">
+      <a href="#explorer-tab">{ts}Explorer{/ts}</a>
+    </li>
+    <li class="ui-corner-all" title="Auto-generated examples from the test suite">
+      <a href="#examples-tab">{ts}Examples{/ts}</a>
+    </li>
+    <li class="ui-corner-all" title="API source-code and code-level documentation">
+      <a href="#docs-tab">{ts}Code Docs{/ts}</a>
+    </li>
   </ul>
 
   <div id="explorer-tab">
@@ -189,6 +205,28 @@
 </pre>
     </form>
   </div>
+
+  <div id="docs-tab">
+    <form id="api-docs">
+      <label for="doc-entity">{ts}Entity{/ts}:</label>
+      <select class="crm-form-select big required" id="doc-entity" name="entity">
+        <option value="" selected="selected">{ts}Choose{/ts}...</option>
+        {foreach from=$entities.values item=entity}
+          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
+            {$entity}
+          </option>
+        {/foreach}
+      </select>
+      &nbsp;&nbsp;
+      <label for="doc-action">{ts}Action{/ts}:</label>
+      <select class="crm-form-select big crm-select2" id="doc-action" name="action">
+        <option value="" selected="selected">{ts}Choose{/ts}...</option>
+      </select>
+      <div id="doc-result" title="{ts escape='html'}Results are displayed here.{/ts}">
+        {ts}Results are displayed here.{/ts}
+      </div>
+    </form>
+  </div>
 </div>
 
 {strip}
@@ -256,5 +294,12 @@
       <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
     </td>
   </tr>
+</script>
+
+<script type="text/template" id="doc-code-tpl">
+  <div class="crm-collapsible collapsed api-doc-code">
+    <div class="collapsible-title">{ts}Source Code{/ts}</div>
+    <pre class="prettyprint lang-php linenums"><%- code %></pre>
+  </div>
 </script>
 {/strip}

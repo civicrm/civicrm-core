@@ -42,7 +42,6 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    * @return string
    */
   public function run() {
-    CRM_Utils_System::setTitle('CiviCRM API');
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
       ->addScriptUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js', 99)
@@ -98,6 +97,117 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       }
       CRM_Utils_System::civiExit();
     }
+    CRM_Utils_System::permissionDenied();
+  }
+
+  /**
+   * Ajax callback to display code docs
+   */
+  public static function getDoc() {
+    if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
+      $entity = _civicrm_api_get_camel_name($_GET['entity']);
+      $action = CRM_Utils_Array::value('action', $_GET);
+      $doc = self::getDocblock($entity, $action);
+      $result = array(
+        'doc' => $doc ? self::formatDocBlock($doc[0]) : 'Not found.',
+        'code' => $doc ? $doc[1] : NULL,
+      );
+      if (!$action) {
+        $actions = civicrm_api3($entity, 'getactions');
+        $result['actions'] = CRM_Utils_Array::makeNonAssociative(array_combine($actions['values'], $actions['values']));
+      }
+      CRM_Utils_JSON::output($result);
+    }
+    CRM_Utils_System::permissionDenied();
+  }
+
+  /**
+   * @param string $entity
+   * @param string|null $action
+   * @return array|bool
+   *   [docblock, code]
+   */
+  private static function getDocBlock($entity, $action) {
+    if (!$entity) {
+      return FALSE;
+    }
+    $contents = file_get_contents("api/v3/$entity.php", FILE_USE_INCLUDE_PATH);
+    if (!$contents) {
+      // Api does not exist
+      return FALSE;
+    }
+    $docblock = $code = array();
+    // Fetch docblock for the api file
+    if (!$action) {
+      if (preg_match('#/\*\*\n.*?\n \*/\n#s', $contents, $docblock)) {
+        return array($docblock[0], NULL);
+      }
+    }
+    // Fetch block for a specific action
+    else {
+      $action = strtolower($action);
+      $fnName = 'civicrm_api3_' . _civicrm_api_get_entity_name_from_camel($entity) . '_' . $action;
+      // Support the alternate "1 file per action" structure
+      $actionFile = file_get_contents("api/v3/$entity/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);
+      if ($actionFile) {
+        $contents = $actionFile;
+      }
+      // If action isn't in this file, try generic
+      if (strpos($contents, $fnName) === FALSE) {
+        $fnName = "civicrm_api3_generic_$action";
+        $contents = file_get_contents("api/v3/Generic/" . ucfirst($action) . '.php', FILE_USE_INCLUDE_PATH);
+        if (!$contents) {
+          $contents = file_get_contents("api/v3/Generic.php", FILE_USE_INCLUDE_PATH);
+        }
+      }
+      if (preg_match('#(/\*\*(\n \*.*)*\n \*/\n)function[ ]+' . $fnName . '#i', $contents, $docblock)) {
+        // Fetch the code in a separate regex to preserve sanity
+        preg_match("#^function[ ]+$fnName.*?^}#ism", $contents, $code);
+        return array($docblock[1], $code[0]);
+      }
+    }
+  }
+
+  /**
+   * Format a docblock to be a bit more readable
+   * Not a proper doc parser... patches welcome :)
+   *
+   * @param string $text
+   * @return string
+   */
+  private static function formatDocBlock($text) {
+    // Get rid of comment stars
+    $text = str_replace(array("\n * ", "\n *\n", "\n */\n", "/**\n"), array("\n", "\n\n", '', ''), $text);
+
+    // Format for html
+    $text = htmlspecialchars($text);
+
+    // Extract code blocks - save for later to skip html conversion
+    $code = array();
+    preg_match_all('#@code(.*?)@endcode#is', $text, $code);
+    $text = preg_replace('#@code.*?@endcode#is', '<pre></pre>', $text);
+
+    // Convert @annotations to titles
+    $text = preg_replace_callback(
+      '#^[ ]*@(\w+)([ ]*)#m',
+      function($matches) {
+        return "<strong>" . ucfirst($matches[1]) . "</strong>" . (empty($matches[2]) ? '' : ': ');
+      },
+      $text);
+
+    // Preserve indentation
+    $text = str_replace("\n ", "\n&nbsp;&nbsp;&nbsp;&nbsp;", $text);
+
+    // Convert newlines
+    $text = nl2br($text);
+
+    // Add unformatted code blocks back in
+    if ($code && !empty($code[1])) {
+      foreach ($code[1] as $block) {
+        $text = preg_replace('#<pre></pre>#', "<pre class='prettyprint'>$block</pre>", $text, 1);
+      }
+    }
+    return $text;
   }
 
 }

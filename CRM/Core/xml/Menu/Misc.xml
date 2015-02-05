@@ -97,6 +97,11 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+     <path>civicrm/ajax/apidoc</path>
+     <page_callback>CRM_Admin_Page_APIExplorer::getDoc</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/ajax/rest</path>
      <page_callback>CRM_Utils_REST::ajax</page_callback>
      <access_arguments>access CiviCRM;access AJAX API</access_arguments>
