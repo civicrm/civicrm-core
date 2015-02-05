@@ -699,7 +699,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     else {
       $form->assign('one_frequency_unit', FALSE);
       $units = array();
-      $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
+      $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
       foreach ($unitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $units[$val] = $frequencyUnits[$val];
