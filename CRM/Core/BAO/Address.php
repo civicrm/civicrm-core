@@ -498,6 +498,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
     $address->find();
 
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $count = 1;
     while ($address->fetch()) {
       // deprecate reference.
@@ -519,7 +520,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       // add state and country information: CRM-369
       if (!empty($address->location_type_id)) {
-        $values['location_type'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $address->location_type_id, 'display_name');
+        $values['location_type'] = CRM_Utils_Array::value($address->location_type_id, $locationTypes);
       }
       if (!empty($address->state_province_id)) {
         $address->state = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address->state_province_id, FALSE);

@@ -36,7 +36,7 @@
             {assign var="sa_name" value="selected_shared_address-`$blockId`"}
             {assign var="sa_id" value="`$sa_name`-`$sa.id`"}
             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
-            <label for="{$sa_id}">{$sa.display_text}</label>({$sa.location_type})<br/>
+            <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type }({$sa.location_type}){/if}<br/>
           {/foreach}
         {/if}
       </div>
