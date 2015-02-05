@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM survey.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 
@@ -81,8 +80,7 @@ function civicrm_api3_survey_get($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   api result array

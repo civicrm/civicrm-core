@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group contact functions
+ * This api exposes the relationships between organizations and CiviCRM groups.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Group
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: GroupContact.php 21624 2009-06-04 22:02:55Z mover $
  */
 
 

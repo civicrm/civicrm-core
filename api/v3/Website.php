@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 website functions
+ * This api exposes CiviCRM website.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Website
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Website.php 2011-03-16 ErikHommel $
  */
 
 /**

@@ -26,20 +26,18 @@
  */
 
 /**
- * File for the CiviCRM APIv3 participant functions
+ * This api exposes CiviCRM participant payments.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**
  * Create a Event Participant Payment.
  *
  * This API is used for creating a Participant Payment of Event.
- * Required parameters : participant_id, contribution_id.
+ * Required parameters: participant_id, contribution_id.
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_participant_payment.

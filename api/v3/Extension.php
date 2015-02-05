@@ -29,13 +29,11 @@ define('API_V3_EXTENSION_DELIMITER', ',');
 
 
 /**
- * File for the CiviCRM APIv3 extension functions
+ * This api exposes CiviCRM extension.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Extension
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id$
  */
 
 /**
@@ -43,9 +41,9 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *
  * @param array $params
  *   Input parameters.
- *                          - key: string, eg "com.example.myextension"
- *                          - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
- *                            using 'keys' should be more performant than making multiple API calls with 'key'
+ *   - key: string, eg "com.example.myextension"
+ *   - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
+ *   Using 'keys' should be more performant than making multiple API calls with 'key'.
  *
  * @return array
  *   API result

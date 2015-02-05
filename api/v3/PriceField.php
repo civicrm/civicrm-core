@@ -27,19 +27,17 @@
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM price set fields.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_PriceField
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
  * Create or update a price_field.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'price_field'
+ *   name/value pairs to insert in new 'price_field'
  *
  * @return array
  *   api result array

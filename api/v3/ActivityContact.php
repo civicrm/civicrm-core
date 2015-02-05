@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 activity contact functions
+ * This api exposes CiviCRM activity contact.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActivityContact
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: ActivityContact.php 2014-04-01 elcapo $
  */
 
 /**

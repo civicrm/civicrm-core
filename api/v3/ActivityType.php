@@ -26,13 +26,12 @@
  */
 
 /**
+ * The activity_type api is deprecated. Please use the option_value api instead.
+ *
  * @deprecated
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: ActivityType.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

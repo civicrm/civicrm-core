@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group nesting functions
+ * This api exposes CiviCRM group nesting.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Group
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: GroupNesting.php 21624 2009-08-07 22:02:55Z wmorgan $
  */
 
 /**

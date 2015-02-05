@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 mailing_component functions
+ * This api exposes CiviCRM mailing_component.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_mailing_component

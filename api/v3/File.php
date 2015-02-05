@@ -26,20 +26,19 @@
  */
 
 /**
+ * This api allows minimal handling with the CiviCRM file DAO.
+ * Creating and updating files is a complex process and this api is usually insufficient.
+ * Use the "Attachment" api instead for more robust file handling.
  *
- * Definition of the Tag of the CRM API.
- * More detailed documentation can be found
- * {@link http://objectledge.org/confluence/display/CRM/CRM+v1.0+Public+APIs
- * here}
- *
+ * @fixme no unit tests
  * @package CiviCRM_APIv3
  * @subpackage API_File
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: $
  */
 
 /**
- * Create a file.
+ * Create a file record.
+ * Note: This is only one of several steps needed to create a file in CiviCRM.
+ * Use the "Attachment" api to better handle all steps.
  *
  * @param array $params
  *   Array per getfields metadata.

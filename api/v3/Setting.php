@@ -26,12 +26,10 @@
  */
 
 /**
- * File for CiviCRM APIv3 settings
+ * This api exposes CiviCRM configuration settings.
  *
  * @package CiviCRM_APIv3_Core
  * @subpackage API_Settings
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Settings.php
  */
 
 /**

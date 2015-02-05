@@ -27,19 +27,17 @@
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM price sets.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_PriceSet
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
  * Create or update a price_set.
  *
  * @param array $params
- *   array of property.
- *                       name/value pairs to insert in new 'price_set'
+ *   name/value pairs to insert in new 'price_set'
  *
  * @return array
  *   api result array

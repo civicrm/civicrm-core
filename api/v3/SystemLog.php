@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 SystemLog functions
+ * This api exposes CiviCRM SystemLog.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_SystemLog
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: SystemLog.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

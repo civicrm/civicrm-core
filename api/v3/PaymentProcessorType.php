@@ -26,13 +26,10 @@
  */
 
 /**
- * new version of civicrm apis. See blog post at
- * http://civicrm.org/node/131
+ * This api exposes CiviCRM payment processor types.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: PaymentProcessorType.php 30415 2010-10-29 12:02:47Z shot $
  */
 
 /**
