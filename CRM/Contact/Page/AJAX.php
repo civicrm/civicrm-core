@@ -1068,7 +1068,6 @@ LIMIT {$offset}, {$rowCount}
       );
       $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
     }
-
     CRM_Utils_JSON::output($addressVal);
   }
 
