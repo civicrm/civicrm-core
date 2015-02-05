@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM participant status options.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Event
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -41,8 +40,7 @@
  * be in $params array.
  *
  * @param array $params
- *   Array of property.
- *                       name/value pairs to insert in new 'participant_status'
+ *   name/value pairs to insert in new 'participant_status'
  *
  * @return array
  *   participant_status array
@@ -73,8 +71,7 @@ function civicrm_api3_participant_status_type_get($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   api result array

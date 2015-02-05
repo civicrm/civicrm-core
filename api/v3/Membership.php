@@ -27,13 +27,11 @@
 
 /**
  *
- * File for the CiviCRM APIv3 membership contact functions
+ * This api exposes CiviCRM membership contact.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Membership
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: MembershipContact.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

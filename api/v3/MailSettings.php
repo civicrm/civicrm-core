@@ -26,19 +26,17 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM mail settings.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_mail_settings
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
  * Create or update a mail_settings.
  *
  * @param array $params
- *   Array of property.
- *                       name/value pairs to insert in new 'mail_settings'
+ *   name/value pairs to insert in new 'mail_settings'
  *
  * @return array
  *   API result array.
@@ -63,9 +61,8 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
  * Returns array of mail_settings  matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all mail_settings will be returned
+ *   Array of one or more property_name=>value pairs.
+ *   If $params is set as null, all mail_settings will be returned
  *
  * @return array
  *   API result array.
@@ -78,8 +75,7 @@ function civicrm_api3_mail_settings_get($params) {
  * Delete an existing mail_settings.
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   API result array.

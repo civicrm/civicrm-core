@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 membership contribution link functions
+ * This api exposes CiviCRM membership contribution link.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Membership
  * @todo delete function doesn't exist
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: MembershipContributionLink.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

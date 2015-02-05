@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 tag functions
+ * This api exposes CiviCRM tag.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Tag
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Tag.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**

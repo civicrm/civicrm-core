@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 custom group functions
+ * This api exposes CiviCRM custom field.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_CustomField
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**
@@ -94,7 +92,7 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
 }
 
 /**
- * Use this API to delete an existing custom group field.
+ * Use this API to delete an existing custom field.
  *
  * @param array $params
  *   Array id of the field to be deleted.

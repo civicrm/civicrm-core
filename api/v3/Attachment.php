@@ -80,8 +80,6 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Attachment
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: $
  */
 
 /**

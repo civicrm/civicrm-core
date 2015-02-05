@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 domain functions
+ * This api exposes CiviCRM system.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Domain
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**
@@ -40,8 +38,8 @@
  *
  * @param array $params
  *   Input parameters.
- *                          - triggers: bool, whether to drop/create SQL triggers; default: FALSE
- *                          - session:  bool, whether to reset the CiviCRM session data; defaul: FALSE
+ *   - triggers: bool, whether to drop/create SQL triggers; default: FALSE
+ *   - session:  bool, whether to reset the CiviCRM session data; default: FALSE
  *
  * @return array
  */

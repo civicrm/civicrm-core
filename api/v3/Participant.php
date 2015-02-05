@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 participant functions
+ * This api exposes CiviCRM participant.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**

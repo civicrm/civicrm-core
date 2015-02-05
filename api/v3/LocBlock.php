@@ -27,19 +27,17 @@
 
 
 /**
- * File for the CiviCRM APIv3 loc_block functions
+ * This api exposes CiviCRM loc_block.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_LocBlock
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
  * Create or update a loc_block.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'loc_block'
+ *   name/value pairs to insert in new 'loc_block'
  *
  * @return array
  *   API result array.

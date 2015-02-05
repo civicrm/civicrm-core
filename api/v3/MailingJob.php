@@ -27,12 +27,10 @@
 
 /**
  *
- * APIv3 functions for registering/processing mailing events.
+ * APIv3 functions for registering/processing mailing jobs.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Mailing
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
  */
 
 /**
@@ -65,7 +63,6 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
  * Returns array of Mailing Jobs matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
  *
  * @return array
  *   API return Array of matching mailing jobs.

@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 user framework group functions
+ * This api exposes CiviCRM user framework match.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_UF
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: UFGroup.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

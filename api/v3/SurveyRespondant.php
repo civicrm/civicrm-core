@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Survey Respondant functions
+ * This api exposes CiviCRM Survey Respondant.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey

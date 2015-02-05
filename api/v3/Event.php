@@ -27,13 +27,11 @@
 
 /**
  *
- * File for the CiviCRM APIv3 event functions
+ * This api exposes CiviCRM event.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Event
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Event.php 30964 2010-11-29 09:41:54Z shot $
  */
 
 /**
