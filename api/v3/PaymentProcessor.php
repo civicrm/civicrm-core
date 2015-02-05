@@ -26,12 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 PaymentProcessor functions
+ * This api exposes CiviCRM PaymentProcessor.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_PaymentProcessor
  *
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**

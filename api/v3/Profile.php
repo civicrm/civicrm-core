@@ -26,12 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 activity profile functions
+ * This api exposes CiviCRM activity profile.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActivityProfile
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Profile.php 30486 2011-05-20 16:12:09Z rajan $
  */
 
 /**

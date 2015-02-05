@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 domain functions
+ * This api exposes CiviCRM word replacement.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_WordReplacement
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

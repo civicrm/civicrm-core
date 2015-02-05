@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 phone functions
+ * This api exposes CiviCRM phone.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Phone
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Phone.php 2011-03-16 ErikHommel $
  */
 
 /**

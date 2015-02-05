@@ -26,12 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Case functions
+ * This api exposes CiviCRM Case.
  * Developed by woolman.org
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Case
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 

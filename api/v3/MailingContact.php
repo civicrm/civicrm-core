@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 contact and mailing functions
+ * This api exposes CiviCRM contact and mailing.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailingContact
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id$
  */
 
 /**

@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Test Generated API Example.
- * See bottom of this file for more detail.
- */
-
-/**
  * Test Generated example of using setting getdefaults API.
  *
  * gets defaults setting a variable for a given domain - if no domain is set current is assumed
@@ -78,7 +72,7 @@ function setting_getdefaults_expectedresult() {
 * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
 * Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api/explorer
+* http://MYSITE.ORG/path/to/civicrm/api
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

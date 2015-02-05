@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -28,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 country functions
+ * This api exposes CiviCRM country.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Country
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Country.php 2011-02-16 ErikHommel $
  */
 
 /**

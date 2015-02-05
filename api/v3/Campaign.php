@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM campaign.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Campaign
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**

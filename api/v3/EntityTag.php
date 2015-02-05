@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 entity tag functions
+ * This api exposes CiviCRM entity tag.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_EntityTag
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: EntityTag.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**

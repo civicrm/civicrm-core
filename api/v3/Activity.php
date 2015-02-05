@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -28,12 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 activity functions
+ * This api exposes CiviCRM activity.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 
@@ -41,7 +37,7 @@
  * Creates or updates an Activity.
  *
  * @param array $params
- *  Array per getfields documentation.
+ *   Array per getfields documentation.
  *
  * @throws API_Exception
  * @return array
@@ -181,7 +177,7 @@ function civicrm_api3_activity_create($params) {
  * ensuring mandatory requirements are met.
  *
  * @param array $params
- *  Array of parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 

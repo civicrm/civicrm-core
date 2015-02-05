@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
@@ -28,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group contact functions
+ * This api exposes CiviCRM group contact.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Group
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: GroupContact.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 

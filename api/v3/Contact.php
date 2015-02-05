@@ -26,18 +26,19 @@
  */
 
 /**
- * new version of civicrm apis. See blog post at
- * http://civicrm.org/node/131
- * @todo Write sth
+ * This api exposes CiviCRM contacts.
+ * Contacts are the main entity in CiviCRM and this api is more robust than most.
+ *   - Get action allows all params supported by advanced search.
+ *   - Create action allows creating several other entities at once (e.g. email).
+ *   - Create allows checking for duplicate contacts.
+ * Use getfields to list the full range of parameters and options supported by each action.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 /**
- * Create or update a contact (note you should always call this via civicrm_api() & never directly).
+ * Create or update a contact.
  *
  * @param array $params
  *   Input parameters.

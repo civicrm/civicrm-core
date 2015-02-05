@@ -31,16 +31,13 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
  */
 
 /**
  * Handle a confirm event.
  *
  * @param array $params
- *   Associative array of property.
- *                       name/value pairs to insert in new 'survey'
+ *   name/value pairs to insert in new 'survey'
  *
  * @throws Exception
  * @return array

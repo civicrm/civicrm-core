@@ -26,23 +26,21 @@
  */
 
 /**
- * File for the CiviCRM APIv3 membership type functions
+ * This api exposes CiviCRM membership block.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Membership
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: MembershipBlock.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**
- * API to Create or update a Membership Type.
+ * API to Create or update a Membership Block.
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_block.
  *
  * @return array
- *   newly created or updated membership type property values.
+ *   newly created or updated membership block property values.
  */
 function civicrm_api3_membership_block_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -63,9 +61,9 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
 }
 
 /**
- * Get a Membership Type.
+ * Get a Membership Block.
  *
- * This api is used for finding an existing membership type.
+ * This api is used for finding an existing membership block.
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_membership_block.
@@ -79,10 +77,10 @@ function civicrm_api3_membership_block_get($params) {
 }
 
 /**
- * Deletes an existing membership type.
+ * Deletes an existing membership block.
  *
- * This API is used for deleting a membership type
- * Required parameters : id of a membership type
+ * This API is used for deleting a membership block
+ * Required parameters : id of a membership block
  *
  * @param array $params
  *

@@ -1,4 +1,6 @@
 (function($, _, undefined) {
+  "use strict";
+  /* jshint validthis: true */
   var
     entity,
     action,
@@ -12,6 +14,7 @@
     optionsTpl = _.template($('#api-options-tpl').html()),
     returnTpl = _.template($('#api-return-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html()),
+    docCodeTpl = _.template($('#doc-code-tpl').html()),
 
     // These types of entityRef don't require any input to open
     OPEN_IMMEDIATELY = ['RelationshipType', 'Event', 'Group', 'Tag'],
@@ -523,8 +526,89 @@
     });
   }
 
+  /**
+   * Fetch list of example files for a given entity
+   */
+  function getExamples() {
+    CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
+    $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
+      .done(function(result) {
+        CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
+      });
+  }
+
+  /**
+   * Fetch and display an example file
+   */
+  function getExample() {
+    var
+      entity = $('#example-entity').val(),
+      action = $('#example-action').val();
+    if (entity && action) {
+      $('#example-result').block();
+      $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
+        .done(function(result) {
+          $('#example-result').unblock().addClass('prettyprint').removeClass('prettyprinted').text(result);
+          prettyPrint();
+        });
+    } else {
+      $('#example-result').text($('#example-result').attr('title'));
+    }
+  }
+
+  /**
+   * Fetch entity docs & actions
+   */
+  function getDocEntity() {
+    CRM.utils.setOptions($('#doc-action').prop('disabled', true).addClass('loading'), []);
+    $.getJSON(CRM.url('civicrm/ajax/apidoc', {entity: $(this).val()}))
+      .done(function(result) {
+        CRM.utils.setOptions($('#doc-action').prop('disabled', false).removeClass('loading'), result.actions);
+        $('#doc-result').html(result.doc);
+        prettyPrint();
+      });
+  }
+
+  /**
+   * Fetch entity+action docs & code
+   */
+  function getDocAction() {
+    var
+      entity = $('#doc-entity').val(),
+      action = $('#doc-action').val();
+    if (entity && action) {
+      $('#doc-result').block();
+      $.get(CRM.url('civicrm/ajax/apidoc', {entity: entity, action: action}))
+        .done(function(result) {
+          $('#doc-result').unblock().html(result.doc);
+          if (result.code) {
+            $('#doc-result').append(docCodeTpl(result));
+          }
+          prettyPrint();
+        });
+    } else {
+      $('#doc-result').html($('#doc-result').attr('title'));
+    }
+  }
+
   $(document).ready(function() {
-    $('#api-entity').crmSelect2({
+    // Set up tabs - bind active tab to document hash because... it's cool?
+    document.location.hash = document.location.hash || 'explorer';
+      $('#mainTabContainer')
+      .tabs({
+          active: $(document.location.hash + '-tab').index() - 1
+        })
+      .on('tabsactivate', function(e, ui) {
+        if (ui.newPanel) {
+          document.location.hash = ui.newPanel.attr('id').replace('-tab', '');
+        }
+      });
+    $(window).on('hashchange', function() {
+      $('#mainTabContainer').tabs('option', 'active', $(document.location.hash + '-tab').index() - 1);
+    });
+
+    // Initialize widgets
+    $('#api-entity, #example-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
@@ -565,6 +649,10 @@
         buildParams();
       })
       .on('change', 'select.api-chain-entity', getChainedAction);
+    $('#example-entity').on('change', getExamples);
+    $('#example-action').on('change', getExample);
+    $('#doc-entity').on('change', getDocEntity);
+    $('#doc-action').on('change', getDocAction);
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();

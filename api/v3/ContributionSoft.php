@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 soft credit functions.
+ * This api exposes CiviCRM soft credit.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionSoft
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: ContributionSoft.php 2013-05-01 Jon Goldberg $
  */
 
 /**

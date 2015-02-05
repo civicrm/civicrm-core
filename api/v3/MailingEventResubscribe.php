@@ -31,8 +31,6 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
  */
 
 /**

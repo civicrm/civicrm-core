@@ -29,10 +29,9 @@
  * CiviCRM APIv3 pseudoconstants
  *
  * @deprecated
+ *   The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.
  * @package CiviCRM_APIv3
  * @subpackage API_Constant
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Constant.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**

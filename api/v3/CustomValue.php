@@ -26,13 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 custom value functions
+ * This api exposes CiviCRM custom value.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_CustomField
  *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
  */
 
 
@@ -42,7 +40,8 @@
  * @param array $params
  *   Expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID.
  *
- * @example
+ * @example:
+ * @code
  *   // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
  *   'entity_id' => 123,
  *   // (omitting :id) inserts or updates a field in a single-valued group
@@ -56,10 +55,10 @@
  *   // inserts another new record in multi-valued group
  *   'custom_33:-2' => value,
  *   // you can use group_name:field_name instead of ID
- *   'custom_some_group:my_field => 'myinfo',
+ *   'custom_some_group:my_field' => 'myinfo',
  *   // updates record ID 8 in my_other_field in multi-valued some_big_group
- *   'custom_some_big_group:my_other_field:8 => 'myinfo',
- *
+ *   'custom_some_big_group:my_other_field:8' => 'myinfo',
+ * @endcode
  *
  * @throws Exception
  * @return array

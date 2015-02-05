@@ -27,11 +27,10 @@
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM contribution pages.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ContributionPage
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**

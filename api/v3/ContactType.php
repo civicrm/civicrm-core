@@ -26,11 +26,10 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM contact type.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -63,12 +62,11 @@ function civicrm_api3_contact_type_create($params) {
 }
 
 /**
- * Returns array of contact_types  matching a set of one or more group properties.
+ * Returns array of contact_types matching a set of one or more properties.
  *
  * @param array $params
- *   One or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all contact_types will be returned
+ *   One or more valid property_name=>value pairs.
+ *   If $params is set as null, all contact_types will be returned
  *
  * @return array
  *   Array of matching contact_types
@@ -85,8 +83,7 @@ function civicrm_api3_contact_type_get($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *                       to be deleted
+ *   [id]
  *
  * @return array
  *   API Result Array

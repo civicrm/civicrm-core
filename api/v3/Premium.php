@@ -26,7 +26,7 @@
  */
 
 /**
- * File for the CiviCRM APIv3 premium functions
+ * This api exposes CiviCRM premium.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_premium

@@ -26,12 +26,11 @@
  */
 
 /**
- * File for the CiviCRM APIv3 for Dashboard Contact
+ * This api exposes CiviCRM dashboard contacts.
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
  *
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
