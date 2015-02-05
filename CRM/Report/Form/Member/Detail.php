@@ -148,6 +148,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'options' => CRM_Member_PseudoConstant::membershipType(),
           ),
         ),
+        'order_bys' => array(
+          'membership_type_id' => array(
+            'title' => ts('Membership Type'),
+            'default' => '0',
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
+        ),
         'grouping' => 'member-fields',
       ),
       'civicrm_membership_status' => array(
@@ -248,6 +256,13 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' => array('title' => ts('Contribution Amount')),
+        ),
+        'order_bys' => array(
+          'receive_date' => array(
+            'title' => ts('Receive Date'),
+            'default_weight' => '2',
+            'default_order' => 'DESC',
+          ),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -357,14 +372,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
-
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-
-    if ($this->_contribField) {
-      $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date DESC";
-    }
   }
 
   public function postProcess() {
