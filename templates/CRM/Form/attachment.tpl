@@ -81,7 +81,7 @@
           {assign var=attachName value="attachFile_"|cat:$index}
           {assign var=attachDesc value="attachDesc_"|cat:$index}
           {assign var=tagElement value="tag_"|cat:$index}
-            <tr class="attachment-fieldset"><td colspan="2"></td></tr>
+            <tr class="attachment-fieldset solid-border-top"><td colspan="2"></td></tr>
             <tr>
                 <td class="label">{$form.attachFile_1.label}</td>
                 <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a></td>
@@ -97,7 +97,7 @@
 
       {/if}
       {if $currentAttachmentInfo}
-        <tr class="attachment-fieldset"><td colspan="2"></td></tr>
+        <tr class="attachment-fieldset solid-border-top"><td colspan="2"></td></tr>
         <tr>
             <td class="label">{ts}Current Attachment(s){/ts}</td>
             <td class="view-value">

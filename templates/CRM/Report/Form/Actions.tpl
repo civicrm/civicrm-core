@@ -90,16 +90,14 @@
 
 {literal}
   <script type="text/javascript">
-    var flashChartType = {/literal}{if $chartType}'{$chartType}'{else}''{/if}{literal};
-    function disablePrintPDFButtons( viewtype ) {
-      if (viewtype && flashChartType != viewtype) {
-        cj('#_qf_Summary_submit_pdf').prop('disabled', true).addClass('button-disabled');
-        cj('#_qf_Summary_submit_print').prop('disabled', true).addClass('button-disabled');
-      } else {
-        cj('#_qf_Summary_submit_pdf').prop('disabled', false).removeClass('button-disabled');
-        cj('#_qf_Summary_submit_print').prop('disabled', false).removeClass('button-disabled');
-      }
-    }
+    CRM.$(function($) {
+      // Disable print/pdf output of charts
+      $('select[name=charts]', 'form.crm-report-form').change(function() {
+        var viewType = $(this).val(),
+          flashChartType = '{/literal}{if $chartType}{$chartType}{else}{/if}{literal}';
+        $('#_qf_Summary_submit_pdf, #_qf_Summary_submit_print').prop('disabled', (viewType && flashChartType != viewType));
+      });
+    });
   </script>
 {/literal}
 {/if} {* NO print section ends *}

@@ -377,6 +377,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function __construct() {
     parent::__construct();
 
+    $this->addClass('crm-report-form');
+
     // build tag filter
     if ($this->_tagFilter) {
       $this->buildTagFilter();
@@ -1124,7 +1126,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   public function addChartOptions() {
     if (!empty($this->_charts)) {
-      $this->addElement('select', "charts", ts('Chart'), $this->_charts, array('onchange' => 'disablePrintPDFButtons(this.value);'));
+      $this->addElement('select', "charts", ts('Chart'), $this->_charts);
       $this->assign('charts', $this->_charts);
       $this->addElement('submit', $this->_chartButtonName, ts('View'));
     }
