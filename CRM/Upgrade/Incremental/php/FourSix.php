@@ -172,7 +172,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
    reminder.entity_table = 'civicrm_membership' AND
    ( m.is_override IS NULL OR m.is_override = 0 )
  INNER JOIN civicrm_contact c
-   ON c.id = e.contact_id AND
+   ON c.id = m.contact_id AND
    c.is_deleted = 0 AND c.is_deceased = 0
  SET reminder.reference_date = {$referenceColumn}
  WHERE " . implode(" AND ", $where);
