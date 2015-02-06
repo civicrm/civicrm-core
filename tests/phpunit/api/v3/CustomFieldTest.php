@@ -46,10 +46,11 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $tablesToTruncate = array(
-      'civicrm_custom_group',
-      'civicrm_custom_field',
+      'civicrm_contact',
+      'civicrm_file',
+      'civicrm_entity_file',
     );
-    // true tells quickCleanup to drop any tables that might have been created in the test
+    // true tells quickCleanup to drop custom_value tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
@@ -489,6 +490,43 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
         "Custom fields for $entity should be empty"
       );
     }
+  }
+
+  /**
+   * Test setting and getting a custom file field value.
+   *
+   * Uses the "attachment" api for setting value.
+   */
+  public function testCustomFileField() {
+    $customGroup = $this->customGroupCreate(array('title' => 'attachment_test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'test_file_attachment',
+      'label' => 'test_file_attachment',
+      'html_type' => 'File',
+      'data_type' => 'File',
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $cfId = 'custom_' . $customField['id'];
+
+    $cid = $this->individualCreate();
+
+    $attachment = $this->callAPISuccess('attachment', 'create', array(
+      'name' => CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC) . '_testCustomFileField.txt',
+      'mime_type' => 'text/plain',
+      'content' => 'My test content',
+      'field_name' => $cfId,
+      'entity_id' => $cid,
+    ));
+    $this->assertAttachmentExistence(TRUE, $attachment);
+
+    $result = $this->callAPISuccess('contact', 'getsingle', array(
+      'id' => $cid,
+      'return' => $cfId,
+    ));
+
+    $this->assertEquals($attachment['id'], $result[$cfId]);
   }
 
   /**
