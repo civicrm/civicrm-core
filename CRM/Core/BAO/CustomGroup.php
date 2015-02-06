@@ -1345,7 +1345,10 @@ ORDER BY civicrm_custom_group.weight,
                       $defaults[$elementName][$val['value']] = 1;
                     }
                     else {
-                      $defaults[$elementName][$val['value']] = $val['value'];
+                      // I use an ordinary array instead of a key-value array
+                      // for the selected custom values.
+                      // See CRM-15915.
+                      $defaults[$elementName][] = $val['value'];
                     }
                   }
                 }
