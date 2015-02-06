@@ -10,7 +10,7 @@
   //
   //  - crm-autosave="callback" -- A function to handle saving. Should return a promise.
   //                               If it's not a promise, then we'll assume that it completes successfully.
-  //  - crm-autosave-interval="object" -- Interval spec. Default: {poll: 250, save: 3000}
+  //  - crm-autosave-interval="object" -- Interval spec. Default: {poll: 250, save: 5000}
   //  - crm-autosave-if="conditional" -- Only allow autosave when conditional returns true. Default: !form.$invalid
   //  - crm-autosave-model="object" -- (Re)schedule saves based on observed changes to object.
   //    We perform deep ispection on the model object. This could be a performance issue you had many concurrent
@@ -22,7 +22,7 @@
       restrict: 'AE',
       require: '^form',
       link: function(scope, element, attrs, form) {
-        var intervals = angular.extend({poll: 250, save: 3000}, scope.$eval(attrs.crmAutosaveInterval));
+        var intervals = angular.extend({poll: 250, save: 5000}, scope.$eval(attrs.crmAutosaveInterval));
         var jobs = {poll: null, save: null}; // job handles used ot cancel/reschedule timeouts/intervals
         var lastSeenModel = null;
         var saving = false;
