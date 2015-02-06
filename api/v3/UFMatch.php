@@ -29,8 +29,6 @@
  * This api exposes CiviCRM user framework match.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
  */
 
 /**
@@ -63,7 +61,7 @@ function civicrm_api3_uf_match_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_uf_match_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;

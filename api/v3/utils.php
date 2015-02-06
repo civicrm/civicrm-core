@@ -26,11 +26,9 @@
  */
 
 /**
- * File for CiviCRM APIv3 utilitity functions
+ * CiviCRM APIv3 utility functions.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_utils
- *
  */
 
 /**
@@ -1635,7 +1633,7 @@ function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
  * Replace the old set of entities (matching some given keys) with a new set of
  * entities (matching the same keys).
  *
- * Note: This will verify that 'values' is present, but it does not directly verify
+ * @note This will verify that 'values' is present, but it does not directly verify
  * any other parameters.
  *
  * @param string $entity

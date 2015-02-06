@@ -29,8 +29,6 @@
  * This api exposes CiviCRM domain.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Domain
- *
  */
 
 /**
@@ -116,7 +114,7 @@ function civicrm_api3_domain_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_get_spec(&$params) {
   $params['current_domain'] = array('title' => "get loaded domain");
@@ -140,7 +138,7 @@ function civicrm_api3_domain_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
   $params['domain_version'] = $params['version'];

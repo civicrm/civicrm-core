@@ -26,18 +26,18 @@
  */
 
 /**
- * This api allows minimal handling with the CiviCRM file DAO.
+ * This api is a simple wrapper of the CiviCRM file DAO.
+ *
  * Creating and updating files is a complex process and this api is usually insufficient.
  * Use the "Attachment" api instead for more robust file handling.
  *
  * @fixme no unit tests
  * @package CiviCRM_APIv3
- * @subpackage API_File
  */
 
 /**
  * Create a file record.
- * Note: This is only one of several steps needed to create a file in CiviCRM.
+ * @note This is only one of several steps needed to create a file in CiviCRM.
  * Use the "Attachment" api to better handle all steps.
  *
  * @param array $params

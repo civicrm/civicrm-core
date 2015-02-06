@@ -30,7 +30,6 @@
  * This api exposes CiviCRM loc_block.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_LocBlock
  */
 
 /**

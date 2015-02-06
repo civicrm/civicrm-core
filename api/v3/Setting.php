@@ -28,8 +28,7 @@
 /**
  * This api exposes CiviCRM configuration settings.
  *
- * @package CiviCRM_APIv3_Core
- * @subpackage API_Settings
+ * @package CiviCRM_APIv3
  */
 
 /**

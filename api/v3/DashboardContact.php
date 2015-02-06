@@ -29,8 +29,6 @@
  * This api exposes CiviCRM dashboard contacts.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_ActionSchedule
- *
  */
 
 /**
@@ -74,7 +72,7 @@ function civicrm_api3_dashboard_contact_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);

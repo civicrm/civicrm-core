@@ -29,8 +29,6 @@
  * This api exposes CiviCRM phone.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Phone
- *
  */
 
 /**
@@ -52,7 +50,7 @@ function civicrm_api3_phone_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_phone_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -78,5 +76,4 @@ function civicrm_api3_phone_delete($params) {
  *  civicrm_api('Phone','Get') to retrieve one or more phones is implemented by
  *  function civicrm_api3_phone_get ($params) into the file Phone/Get.php
  *  Could have been implemented here in this file too, but we moved it to illustrate the feature with a real usage.
- *
  */

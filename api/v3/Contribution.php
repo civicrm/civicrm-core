@@ -26,11 +26,9 @@
  */
 
 /**
- * This api exposes CiviCRM Contribution.
+ * This api exposes CiviCRM Contribution records.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Contribute
- *
  */
 
 /**
@@ -73,7 +71,7 @@ function civicrm_api3_contribution_create(&$params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -245,7 +243,7 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_get_spec(&$params) {
   $params['contribution_test']['api.default'] = 0;
@@ -281,7 +279,7 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_transact_spec(&$params) {
   $fields = civicrm_api3('contribution', 'getfields', array('action' => 'create'));
@@ -360,7 +358,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   $params['id'] = array(

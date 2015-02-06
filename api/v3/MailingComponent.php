@@ -29,7 +29,6 @@
  * This api exposes CiviCRM mailing_component.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_mailing_component
  */
 
 /**

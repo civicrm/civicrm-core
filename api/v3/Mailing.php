@@ -30,7 +30,6 @@
  * APIv3 functions for registering/processing mailing events.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Mailing
  */
 
 /**
@@ -101,7 +100,7 @@ function civicrm_api3_mailing_get_token($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.required'] = 1;
@@ -223,7 +222,7 @@ function civicrm_api3_mailing_event_bounce($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_bounce_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -293,7 +292,7 @@ function civicrm_api3_mailing_event_reply($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -336,7 +335,7 @@ function civicrm_api3_mailing_event_forward($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
@@ -561,7 +560,7 @@ function civicrm_api3_mailing_send_test($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_stats_spec(&$params) {
   $params['date']['api.default'] = 'now';

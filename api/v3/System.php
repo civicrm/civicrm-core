@@ -26,11 +26,11 @@
  */
 
 /**
- * This api exposes CiviCRM system.
+ * This api exposes CiviCRM system functionality.
+ *
+ * Includes caching, logging, and checking system functionality.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Domain
- *
  */
 
 /**
@@ -57,7 +57,7 @@ function civicrm_api3_system_flush($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_system_flush_spec(&$params) {
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
@@ -79,7 +79,7 @@ function _civicrm_api3_system_check_spec(&$spec) {
 }
 
 /**
- * System.Check API.
+ * System Check API.
  *
  * @param array $params
  *

@@ -26,6 +26,10 @@
  */
 
 /**
+ * @package CiviCRM_APIv3
+ */
+
+/**
  * Update function is basically a hack.
  *
  * We want to remove it but must resolve issues in

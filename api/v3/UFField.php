@@ -29,8 +29,6 @@
  * This api exposes CiviCRM profile field.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
  */
 
 /**
