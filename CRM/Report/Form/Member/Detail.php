@@ -401,23 +401,33 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
+    CRM_Core_Error::debug('noRepeats',$this->_noRepeats);
     foreach ($rows as $rowNum => $row) {
 
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // not repeat contact display names if it matches with the one
         // in previous row
         $repeatFound = FALSE;
+        CRM_Core_Error::debug('checklist',$checkList);
         foreach ($row as $colName => $colVal) {
-          if (!empty($checkList[$colName]) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
+          if ($repeatFound == FALSE) {
+            unset($checkList);
+            $checkList = array();
+          }
+          if (in_array($colName, $this->_noRepeats) &&
+            $rowNum > 0
           ) {
-            $rows[$rowNum][$colName] = "";
-            // CRM-15917: Don't blank the name if it's a different contact
-            if($colName == 'civicrm_contact_exposed_id') {
-              $rows[$rowNum]['civicrm_contact_sort_name'] = "";
+            if ($rows[$rowNum][$colName] == $rows[$rowNum - 1][$colName] ||
+              (!empty($checkList[$colName]) &&
+              in_array($colVal, $checkList[$colName]))
+              ) {
+              $rows[$rowNum][$colName] = "";
+              // CRM-15917: Don't blank the name if it's a different contact
+              if($colName == 'civicrm_contact_exposed_id') {
+                $rows[$rowNum]['civicrm_contact_sort_name'] = "";
+              }
+              $repeatFound = TRUE;
             }
-            $repeatFound = TRUE;
           }
           if (in_array($colName, $this->_noRepeats)) {
             $checkList[$colName][] = $colVal;
