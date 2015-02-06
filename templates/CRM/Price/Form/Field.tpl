@@ -90,7 +90,7 @@
   </table>
 
   <div class="spacer"></div>
-  <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hide-block" {/if}>
+  <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
         <td class="label">{$form.price.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
@@ -130,7 +130,7 @@
 
 {if $action eq 1}
 {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}
-  <div id='showoption' class="hide-block">{ include file="CRM/Price/Form/OptionFields.tpl"}</div>
+  <div id='showoption' class="hiddenElement">{ include file="CRM/Price/Form/OptionFields.tpl"}</div>
 {/if}
   <table class="form-layout">
     <tr id="optionsPerLine" class="crm-price-field-form-block-options_per_line">

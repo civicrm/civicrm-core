@@ -100,7 +100,7 @@
                 </tr>
 
                 {if $action eq 1 or $action eq 2}
-                  <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
+                  <tr class="crm-case-activity-form-block-target_contact_id hiddenElement" id="with-contacts-widget">
                     <td class="label font-size10pt">{ts}With Contact{/ts}</td>
                     <td class="view-value">
                       {$form.target_contact_id.html}

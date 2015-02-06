@@ -90,7 +90,7 @@
       </div>
     </div>
 </div>
-<div id="preview-dialog" class="hide-block">
+<div id="preview-dialog" class="hiddenElement">
     <div id="generated_dates" class="show-block"></div>
 </div>
 {literal}

@@ -33,7 +33,7 @@
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
       <a href="{crmURL p="civicrm/admin/menu" q="action=add&reset=1"}" class="button" style="margin-left: 6px;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Menu Item{/ts}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <span id="reset-menu" class="success-status" style="display:none">
+        <span id="reset-menu" class="status" style="display:none">
         {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
           {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
         </span><br/><br/>
