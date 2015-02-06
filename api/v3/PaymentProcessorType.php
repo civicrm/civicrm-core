@@ -29,7 +29,6 @@
  * This api exposes CiviCRM payment processor types.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Contact
  */
 
 /**
@@ -60,7 +59,7 @@ function civicrm_api3_payment_processor_type_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_processor_type_create_spec(&$params) {
   $params['billing_mode']['api.required'] = 1;

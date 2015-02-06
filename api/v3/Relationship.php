@@ -29,8 +29,6 @@
  * This api exposes CiviCRM relationships.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Relationship
- *
  */
 
 /**
@@ -53,7 +51,7 @@ function civicrm_api3_relationship_create($params) {
  * Adjust Metadata for Create action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_a']['api.required'] = 1;

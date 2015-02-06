@@ -32,8 +32,6 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  * This api exposes CiviCRM extension.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Extension
- *
  */
 
 /**
@@ -173,7 +171,6 @@ function civicrm_api3_extension_uninstall($params) {
  * @throws API_Exception
  * @return array
  *   API result
- * @example ExtensionDownload.php
  */
 function civicrm_api3_extension_download($params) {
   if (!array_key_exists('key', $params)) {

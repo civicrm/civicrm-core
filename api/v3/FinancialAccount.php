@@ -29,7 +29,6 @@
  * This api exposes CiviCRM financial_account.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_financial_account
  */
 
 /**

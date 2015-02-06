@@ -26,10 +26,12 @@
  */
 
 /**
- * This api exposes CiviCRM group.
+ * This api exposes CiviCRM groups.
+ *
+ * This api is for creating/deleting groups or fetching a list of existing groups.
+ * To add/remove contacts to a group, use the groupContact api instead.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Group
  */
 
 /**
@@ -51,7 +53,7 @@ function civicrm_api3_group_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_group_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -62,9 +64,7 @@ function _civicrm_api3_group_create_spec(&$params) {
  * Returns array of groups matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all groups will be returned
+ *   Array of properties. If empty, all records will be returned.
  *
  * @return array
  *   Array of matching groups

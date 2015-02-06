@@ -29,7 +29,6 @@
  * This api exposes CiviCRM activity profile.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_ActivityProfile
  */
 
 /**

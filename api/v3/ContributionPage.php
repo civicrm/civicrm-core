@@ -30,7 +30,6 @@
  * This api exposes CiviCRM contribution pages.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_ContributionPage
  */
 
 /**

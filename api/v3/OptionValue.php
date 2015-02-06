@@ -30,8 +30,6 @@
  * Values are grouped by "OptionGroup"
  *
  * @package CiviCRM_APIv3
- * @subpackage API_OptionValue
- *
  */
 
 /**
@@ -86,7 +84,7 @@ function civicrm_api3_option_value_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;

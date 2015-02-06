@@ -29,7 +29,6 @@
  * This api exposes CiviCRM recurring contributions.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_ContributionRecur
  */
 
 /**
@@ -51,7 +50,7 @@ function civicrm_api3_contribution_recur_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_recur_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -64,9 +63,7 @@ function _civicrm_api3_contribution_recur_create_spec(&$params) {
  * Returns array of contribution_recurs matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all contribution_recurs will be returned
+ *   Array of properties. If empty, all records will be returned.
  *
  * @return array
  *   API result Array of matching contribution_recurs

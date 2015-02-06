@@ -27,7 +27,7 @@
 /**
  * This api exposes CiviCRM message_template.
  *
- * @package CiviCRM_SEPA
+ * @package CiviCRM_APIv3
  */
 
 /**
@@ -48,7 +48,7 @@ function civicrm_api3_message_template_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_create_spec(&$params) {
   $params['msg_title']['api.required'] = 1;
@@ -108,7 +108,7 @@ function civicrm_api3_message_template_send($params) {
  * validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_send_spec(&$params) {
   $params['messageTemplateID']['api.required'] = 1;

@@ -29,7 +29,6 @@
  * APIv3 functions for registering/processing mailing recipients.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Mailing
  */
 
 

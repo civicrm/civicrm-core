@@ -29,14 +29,10 @@
  * This api exposes CiviCRM acl.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_acl
  */
 
 /**
  * Save an acl.
- *
- * {@getfields acl_create}
- * @example aclCreate.php
  *
  * @param array $params
  *

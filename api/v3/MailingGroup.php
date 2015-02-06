@@ -30,7 +30,6 @@
  *
  * @deprecated
  * @package CiviCRM_APIv3
- * @subpackage API_MailerGroup
  */
 
 /**

@@ -28,8 +28,7 @@
 /**
  * This api exposes CiviCRM report templates.
  *
- * @package CiviCRM_APIv3_Core
- * @subpackage API_Report
+ * @package CiviCRM_APIv3
  */
 
 /**
@@ -78,7 +77,7 @@ function civicrm_api3_report_template_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';

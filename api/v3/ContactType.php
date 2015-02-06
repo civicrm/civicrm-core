@@ -26,10 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM contact type.
+ * This api exposes CiviCRM contact types and sub-types.
+ *
+ * CiviCRM comes with 3 primary contact types - Individual, Organization & Household.
+ * Changing these is not advised, but sub_types can be created with this api.
+ * Pass 'parent_id' param to specify which base type a new sub_type extends.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Survey
  */
 
 /**
