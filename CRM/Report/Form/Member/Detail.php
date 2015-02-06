@@ -413,7 +413,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             in_array($colVal, $checkList[$colName])
           ) {
             $rows[$rowNum][$colName] = "";
-            // CRM-15918: Don't blank the name if it's a different contact
+            // CRM-15917: Don't blank the name if it's a different contact
             if($colName == 'civicrm_contact_exposed_id') {
               $rows[$rowNum]['civicrm_contact_sort_name'] = "";
             }
