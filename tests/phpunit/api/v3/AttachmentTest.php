@@ -553,57 +553,6 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *
-   */
-  public function testCustomFileField() {
-    $customGroup = $this->customGroupCreate(array('title' => 'attachment_test_group'));
-    $params = array(
-      'custom_group_id' => $customGroup['id'],
-      'name' => 'test_file_attachment',
-      'label' => 'test_file_attachment',
-      'html_type' => 'File',
-      'data_type' => 'File',
-      'is_active' => 1,
-    );
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    $cfId = 'custom_' . $customField['id'];
-
-    $cid = $this->individualCreate();
-
-    $attachment = $this->callAPISuccess('attachment', 'create', array(
-      'name' => self::getFilePrefix() . 'testCustomFileField.txt',
-      'mime_type' => 'text/plain',
-      'content' => 'My test content',
-      'field_name' => $cfId,
-      'entity_id' => $cid,
-    ));
-    $this->assertAttachmentExistence(TRUE, $attachment);
-
-    $result = $this->callAPISuccess('contact', 'getsingle', array(
-      'id' => $cid,
-      'return' => $cfId,
-    ));
-
-    $this->assertEquals($attachment['id'], $result[$cfId]);
-  }
-
-  /**
-   * @param $exists
-   * @param array $apiResult
-   */
-  protected function assertAttachmentExistence($exists, $apiResult) {
-    $fileId = $apiResult['id'];
-    $this->assertTrue(is_numeric($fileId));
-    $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', array(
-      1 => array($fileId, 'Int'),
-    ));
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
-      1 => array($fileId, 'Int'),
-    ));
-  }
-
-  /**
    * @param $name
    * @return string
    */

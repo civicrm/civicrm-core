@@ -3277,4 +3277,20 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * @param $exists
+   * @param array $apiResult
+   */
+  protected function assertAttachmentExistence($exists, $apiResult) {
+    $fileId = $apiResult['id'];
+    $this->assertTrue(is_numeric($fileId));
+    $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
+    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', array(
+      1 => array($fileId, 'Int'),
+    ));
+    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
+      1 => array($fileId, 'Int'),
+    ));
+  }
+
 }
