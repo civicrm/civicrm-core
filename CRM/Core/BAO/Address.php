@@ -1270,8 +1270,15 @@ SELECT is_primary,
             $props['country_id'] = $config->defaultContactCountry;
           }
         }
+        $conditions = array();
         if (!empty($props['country_id']) && $context !== 'validate') {
-          $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
+          $conditions[] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
+        }
+        if (!empty($props['abbreviation']) && $context !== 'validate') {
+          $conditions[] = "abbreviation LIKE '{$props['abbreviation']}'";
+        }
+        if (count($conditions)) {
+          $params['condition'] = implode(' AND ', $conditions);
         }
         break;
 
