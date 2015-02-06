@@ -2376,6 +2376,7 @@ div.grippie {
 .crm-container a.button:visited {
   display: block;
   float: left;
+  line-height: 135%;
 }
 
 .crm-container a.button .crm-container a.crm-invoiceButton span {
@@ -2559,6 +2560,19 @@ div.grippie {
 
 .crm-container .crm-button .icon {
   margin-top: 3px;
+}
+
+.crm-container .button .icon {
+  float: left;
+  display: block;
+  margin-right: 3px;
+  top: -1px;
+}
+
+.crm-container .button .icon.css_right {
+  float: right;
+  margin-right: 0;
+  margin-left: 3px;
 }
 
 .crm-container input.crm-button.crm-icon-button {
