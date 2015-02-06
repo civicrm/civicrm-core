@@ -123,7 +123,7 @@ SELECT id
         array('onclick' => "showHideByValue('is_recur',true,'recurFields','table-row','radio',false);")
       );
       $this->addCheckBox('recur_frequency_unit', ts('Supported recurring units'),
-        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'name'),
+        CRM_Core_OptionGroup::values('recur_frequency_units', TRUE)
         NULL, NULL, NULL, NULL,
         array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
       );
