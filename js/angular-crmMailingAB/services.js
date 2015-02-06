@@ -50,6 +50,15 @@
     }
 
     angular.extend(CrmMailingAB.prototype, {
+      getAutosaveSignature: function() {
+        return [
+          this.ab,
+          this.mailings,
+          this.attachments.a.getAutosaveSignature(),
+          this.attachments.b.getAutosaveSignature(),
+          this.attachments.c.getAutosaveSignature()
+        ];
+      },
       // @return Promise CrmMailingAB
       load: function load() {
         var crmMailingAB = this;

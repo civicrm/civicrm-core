@@ -13,6 +13,18 @@
           }
         }
       });
+      $routeProvider.when('/abtest/new', {
+        template: '<p>' + ts('Initializing...') + '</p>',
+        controller: 'CrmMailingABNewCtrl',
+        resolve: {
+          abtest: function ($route, CrmMailingAB) {
+            var abtest = new CrmMailingAB(null);
+            return abtest.load().then(function(){
+              return abtest.save();
+            });
+          }
+        }
+      });
       $routeProvider.when('/abtest/:id', {
         templateUrl: '~/crmMailingAB/edit.html',
         controller: 'CrmMailingABEditCtrl',
@@ -43,9 +55,18 @@
     $scope.crmMailingABStatus = crmMailingABStatus;
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location) {
+  angular.module('crmMailingAB').controller('CrmMailingABNewCtrl', function ($scope, abtest, $location) {
+    // Transition URL "/abtest/new/foo" => "/abtest/123/foo"
+    var parts = $location.path().split('/'); // e.g. "/mailing/new" or "/mailing/123/wizard"
+    parts[2] = abtest.id;
+    $location.path(parts.join('/'));
+    $location.replace();
+  });
+
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
+    var block = $scope.block = crmBlocker();
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
 
@@ -102,7 +123,7 @@
     // @return Promise
     $scope.save = function save() {
       $scope.sync();
-      return crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save().then(updateUrl));
+      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save().then(updateUrl)));
     };
 
     // @return Promise
@@ -114,33 +135,36 @@
     // @return Promise
     $scope.sendTest = function sendTest(mailingName, recipient) {
       $scope.sync();
-      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
+      return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
         .then(function () {
           crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
-        });
+        }));
     };
 
     // @return Promise
     $scope.delete = function () {
-      return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, abtest.delete().then(leave));
+      return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, abtest.delete().then($scope.leave)));
     };
 
     // @return Promise
     $scope.submit = function submit() {
       $scope.sync();
-      return crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
-        .then(function () {
-          return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submitTest());
-          // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
-          // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
-        })
-        .then(leave);
+      if (block.check() || $scope.crmMailing.$invalid) {
+        return;
+      }
+      return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
+          .then(function() {
+            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submitTest());
+            // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
+            // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
+          })
+      .then($scope.leave));
     };
 
-    function leave() {
+    $scope.leave = function leave() {
       $location.path('abtest');
       $location.replace();
-    }
+    };
 
     function updateCriteriaName() {
       var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id);
