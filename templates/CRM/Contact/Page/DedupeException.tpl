@@ -44,7 +44,7 @@
 </table>
 <div class="clear"><br /></div>
 <div class="action-link">
-    <a href="{crmURL p="civicrm/contact/deduperules" q="reset=1"}" class="button"><span>{ts}Done{/ts}</span></a>
+    {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
 </div>
 
 

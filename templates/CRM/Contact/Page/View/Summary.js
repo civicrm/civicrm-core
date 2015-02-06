@@ -116,7 +116,7 @@
       var errorTag = o.find('.update_oplock_ts');
       if (errorTag.length > 0) {
         $('<span>')
-          .addClass('crm-lock-button')
+          .addClass('crm-lock-button css_right')
           .appendTo(errorTag);
 
         var buttonContainer = o.find('.crm-lock-button');

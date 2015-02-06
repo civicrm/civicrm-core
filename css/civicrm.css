@@ -197,7 +197,6 @@ input.crm-form-entityref {
   height: 12em;
 }
 
-
 /* Override line-height from style.css */
 #crm-container,
 .crm-container {
@@ -217,12 +216,6 @@ input.crm-form-entityref {
   color: #3E3E3E;
 }
 
-/*
-** class for hiding the text box;
-  it is used in the OtherActivity template
-** for showing the descrition of activity type element.
-*/
-.crm-container .texttolabel,
 .crm-container .no-border {
   border-style: none;
 }
@@ -235,8 +228,7 @@ input.crm-form-entityref {
   border-bottom: 2px solid #777;
 }
 
-.crm-container div.solid-border-top,
-.crm-container .attachment-fieldset {
+.crm-container .solid-border-top {
   margin-top: 15px;
   border-top: 1px solid #696969;
 }
@@ -246,9 +238,7 @@ input.crm-form-entityref {
   height: 1em;
 }
 
-.crm-container .add-remove-link,
-.crm-container .map-link,
-.crm-container .font-small {
+.crm-container .add-remove-link {
   font-size: .9em;
 }
 
@@ -323,10 +313,6 @@ input.crm-form-entityref {
   padding-left: 6px;
   padding-top: 6px;
   margin-bottom: 28px;
-}
-
-.crm-container span.crm-lock-button {
-  float: right;
 }
 
 .crm-container fieldset {
@@ -547,11 +533,6 @@ input.crm-form-entityref {
   vertical-align: top;
 }
 
-.crm-container td.op-checkbox label {
-  font-weight: normal;
-  font-style: italic;
-}
-
 .crm-container .form-layout td.label-left,
 .crm-container .form-layout-compressed td.label-left {
   text-align: left;
@@ -580,10 +561,6 @@ input.crm-form-entityref {
 .crm-container .form-layout .buttons,
 .crm-container .form-layout-compressed .buttons {
   padding-top: 10px;
-}
-
-.crm-container .button-disabled {
-  color: #CFCEC3!important;
 }
 
 .crm-container .form-layout-compressed td.describe-image {
@@ -790,16 +767,12 @@ input.crm-form-entityref {
   padding-left: 1em;
 }
 
-/*
-** CSS for links from Drupal Blocks.
-*/
 /* Following styles are used to remove the white bullets from the Garland Theme */
 .crm-container ul li {
   background-image: none;
 }
 
-/* But allow them for the help at the top of forms
-*/
+/* But allow them for the help at the top of forms */
 .crm-container #help ul li {
   background-image: url(menu-leaf.png);
 }
@@ -853,11 +826,6 @@ input.crm-form-entityref {
 
 .crm-container .help p {
   margin: 4px;
-}
-
-/* Set display: inline to over-ride drupal.css which sets label tags to display: block */
-#crm-container .notorg {
-  font-weight: normal;
 }
 
 .crm-container .font-light {
@@ -969,27 +937,6 @@ input.crm-form-entityref {
 
 #crm-container .chart td {
   border: 2px solid #999999;
-}
-
-#crm-container td.yes-no {
-  text-align: center;
-}
-
-#crm-container .horizontal-position {
-  margin-right: 30px;
-  margin-left: 30px;
-}
-
-#crm-container .horizontal-center {
-  text-align: center;
-  margin: 0 auto;
-  width: 80%;
-}
-
-#crm-container .place-left {
-  float: left;
-  margin-left: 30px;
-  margin-right: 30px;
 }
 
 #crm-container .float-left {
@@ -1250,10 +1197,9 @@ input.crm-form-entityref {
   margin: -24px 30px 0px 0px;
 }
 
-/*
-** Boxes of checkbox elements (e.g. Advanced Search page)
-*/
-.crm-container .listing-box {
+/* Boxes of checkbox elements (e.g. Advanced Search page) */
+.crm-container .listing-box,
+.crm-container .listing-box-tall {
   width: auto;
   max-width: 30em;
   height: 7.25em;
@@ -1265,16 +1211,10 @@ input.crm-form-entityref {
   color: black;
 }
 
-/*
-** To allow for taller boxes of groups/tags.
-*/
+/* To allow for taller boxes of groups/tags. */
 .crm-container .listing-box-tall {
-  margin: 0.25em 2.0em 0.5em 0em;
-  width: auto;
-  max-width: 30em;
+  margin: 0.25em 2.0em 0.5em 0;
   height: 15em;
-  overflow: auto;
-  border: 1px solid #999999;
 }
 
 /* Image Styles */
@@ -1283,26 +1223,6 @@ input.crm-form-entityref {
   padding: 2px 2px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
-  cursor: hand;
-}
-
-/*
-** Style for hiding blocks or table rows
-*/
-.crm-container .hide-block,
-.crm-container .hide-row {
-  display: none;
-}
-
-/*
-** Styles for showing blocks and table rows
-*/
-#crm-container .show-block {
-  display: block;
-}
-
-#crm-container .show-row {
-  display: table-row;
 }
 
 #crm-container input.submit-link {
@@ -1340,31 +1260,7 @@ input.crm-form-entityref {
   border: 1px solid #DDDDDD;
 }
 
-.crm-container #main {
-  height: 95%;
-  width: 95%;
-  left: 1%;
-  top: 1%;
-  position: relative;
-}
-
-#crm-container .label-pane {
-  margin: 0.25em 0em 0em;
-  padding: 0.25em;
-  background-color: #6AA8EE;
-  cursor: pointer;
-  color: #213245;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#crm-container .content-pane {
-  overflow: auto;
-}
-
-/*
-editor specific classes
-*/
+/* editor specific classes */
 #crm-container dd.editor {
   margin-top: 0.7em;
   margin-left: 0em;
@@ -1478,14 +1374,6 @@ editor specific classes
 
 #crm-container .pcp-image img {
   max-width: 360px;
-}
-
-#crm-container .ui-draggable {
-  background: url("../i/draggable.png") no-repeat left 1px;
-  float: left;
-  height: 16px;
-  text-indent: -10000px;
-  width: 16px;
 }
 
 #crm-container .pcp-widgets {
@@ -1612,13 +1500,6 @@ editor specific classes
 #crm-container #activities-selector tr.trOver td.sorted,
 #crm-container #activities-selector tr.trOver td {
   background: transparent;
-}
-
-#crm-container span.success-status {
-  margin-left: 6px;
-  background-color: #ffff99;
-  padding: .25em .5em .25em .5em;
-  border: 1px solid #696969;
 }
 
 /* Styles for Config Task List */
@@ -2343,12 +2224,6 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
-.crm-container input.crm-form-submit[disabled],
-.crm-container input[type=button][disabled],
-.crm-container .crm-button[disabled] {
-    color: #999;
-}
-
 .crm-container .crm-button {
   padding: 1px;
 }
@@ -2376,6 +2251,7 @@ div.grippie {
 .crm-container a.button:visited {
   display: block;
   float: left;
+  line-height: 135%;
 }
 
 .crm-container a.button .crm-container a.crm-invoiceButton span {
@@ -2405,6 +2281,14 @@ div.grippie {
 .crm-container a.crm-invoiceButton:focus,
 .crm-container a.button:focus {
   background-position: 0 -25px;
+}
+
+.crm-container input.crm-form-submit[disabled],
+.crm-container input[type=button][disabled],
+.crm-container .crm-button[disabled] {
+  opacity: .6;
+  cursor: default;
+  background-position: top left;
 }
 
 .crm-container .ui-dialog-buttonpane {
@@ -2559,6 +2443,19 @@ div.grippie {
 
 .crm-container .crm-button .icon {
   margin-top: 3px;
+}
+
+.crm-container .button .icon {
+  float: left;
+  display: block;
+  margin-right: 3px;
+  top: -1px;
+}
+
+.crm-container .button .icon.css_right {
+  float: right;
+  margin-right: 0;
+  margin-left: 3px;
 }
 
 .crm-container input.crm-button.crm-icon-button {
@@ -3019,14 +2916,12 @@ div.crm-container form {
 .crm-container .paging_two_button .ui-button {
   float: left;
   cursor: pointer;
-  * cursor: hand;
 }
 
 .crm-container .paging_full_numbers .ui-button {
   padding: 2px 6px;
   margin: 0;
   cursor: pointer;
-  * cursor: hand;
 }
 
 .crm-container .dataTables_paginate .ui-button {
@@ -3152,7 +3047,7 @@ div.crm-container form {
   padding: 3px 10px;
 }
 
-.crm-container table.display td.center {
+.crm-container table td.center {
   text-align: center;
 }
 /* Fix weird color added to some datatables' sort column */
@@ -3214,12 +3109,6 @@ div.crm-container form {
   overflow: visible;
 }
 
-/* Help text in Send Mail*/
-#crm-container div.messageHelp {
-  z-index: 1;
-  position: absolute;
-  margin: 6px 0px 0px 115px;
-}
 /*chart */
 #chartData {
   overflow: auto;
@@ -3532,7 +3421,6 @@ div.m ul#civicrm-menu,
 
 /* loader autocomplete */
 
-#civicrm-menu .ui-autocomplete-loading,
 .crm-container .ui-autocomplete-loading {
   background: white url('../i/loading.gif') no-repeat right center;
 }

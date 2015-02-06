@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="recurring-dialog" class="hide-block">
+<div id="recurring-dialog" class="hiddenElement">
     {ts}How would you like this change to affect other entities in the repetition set?{/ts}<br/><br/>
     <div class="show-block">
         <div class="recurring-dialog-inner-wrapper">

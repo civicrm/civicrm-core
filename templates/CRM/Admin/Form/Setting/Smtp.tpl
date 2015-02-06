@@ -91,7 +91,7 @@
         <div class="spacer"></div>
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
-            <span class="place-left">&nbsp;</span>
+            <span class="float-left">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="crm-button crm-button-type-next crm-button_qf_Smtp_refresh_test">{$form._qf_Smtp_refresh_test.html}</span>
         </div>
 </div>

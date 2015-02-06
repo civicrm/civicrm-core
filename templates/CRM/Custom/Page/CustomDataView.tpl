@@ -42,9 +42,6 @@
         </tr>
       {/if}
       {assign var="showEdit" value=0}
-        <tr id="statusmessg_{$index}" class="hiddenElement">
-          <td><span class="success-status"></span></td>
-        </tr>
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
           <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
