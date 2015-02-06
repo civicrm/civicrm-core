@@ -29,12 +29,11 @@
  * This api exposes CiviCRM contacts.
  * Contacts are the main entity in CiviCRM and this api is more robust than most.
  *   - Get action allows all params supported by advanced search.
- *   - Create action allows creating several other entities at once (e.g. email).
+ *   - Create action allows creating several related entities at once (e.g. email).
  *   - Create allows checking for duplicate contacts.
  * Use getfields to list the full range of parameters and options supported by each action.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Contact
  */
 
 /**
@@ -114,7 +113,7 @@ function civicrm_api3_contact_create($params) {
  * Adjust Metadata for Create action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contact_create_spec(&$params) {
   $params['contact_type']['api.required'] = 1;
@@ -165,7 +164,7 @@ function civicrm_api3_contact_getcount($params) {
  * Adjust Metadata for Get action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contact_get_spec(&$params) {
   $params['contact_is_deleted']['api.default'] = 0;
@@ -852,14 +851,11 @@ function _civicrm_api3_contact_deprecation() {
  * Merges given pair of duplicate contacts.
  *
  * @param array $params
- *   Input parameters.
- *
- * Allowed @params array keys are:
- * {int     main_id     main contact id with whom merge has to happen}
- * {int     other_id    duplicate contact which would be deleted after merge operation}
- * {string  mode        helps decide how to behave when there are conflicts.
- *                      A 'safe' value skips the merge if there are no conflicts. Does a force merge otherwise.}
- * {boolean auto_flip   wether to let api decide which contact to retain and which to delete.}
+ *   Allowed array keys are:
+ *   -int main_id: main contact id with whom merge has to happen
+ *   -int other_id: duplicate contact which would be deleted after merge operation
+ *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
+ *   -boolean auto_flip: whether to let api decide which contact to retain and which to delete.
  *
  * @return array
  *   API Result Array

@@ -29,8 +29,6 @@
  * This api exposes CiviCRM profile group.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
  */
 
 /**
@@ -67,9 +65,7 @@ function civicrm_api3_uf_group_create($params) {
  * Returns array of uf groups (profiles) matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all surveys will be returned
+ *   Array of properties. If empty, all records will be returned.
  *
  * @return array
  *   Array of matching profiles

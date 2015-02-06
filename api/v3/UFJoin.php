@@ -29,8 +29,6 @@
  * This api exposes CiviCRM user framework join.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
  */
 
 /**
@@ -53,7 +51,7 @@ function civicrm_api3_uf_join_create($params) {
  * Adjust Metadata for Create action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  *
  * @todo - suspect module, weight don't need to be required - need to test
  */

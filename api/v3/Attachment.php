@@ -79,7 +79,6 @@
  *    "check_permissions"==false)
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Attachment
  */
 
 /**

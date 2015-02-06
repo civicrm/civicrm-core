@@ -29,8 +29,6 @@
  * This api exposes CiviCRM membership status.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Membership
- *
  */
 
 /**
@@ -56,7 +54,6 @@ function civicrm_api3_membership_status_create($params) {
  *
  * @return array
  *   Array of all found membership status property values.
- *   {@getfields MembershipStatus_get}
  */
 function civicrm_api3_membership_status_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_BAO_MembershipStatus', $params);
@@ -66,7 +63,7 @@ function civicrm_api3_membership_status_get($params) {
  * Update an existing membership status.
  *
  * This api is used for updating an existing membership status.
- * Required parameters : id of a membership status
+ * Required parameters: id of a membership status
  *
  * @param array $params
  *   Array of name/value property values of civicrm_membership_status.

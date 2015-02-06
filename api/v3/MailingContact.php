@@ -29,8 +29,6 @@
  * This api exposes CiviCRM contact and mailing.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_MailingContact
- *
  */
 
 /**
@@ -73,7 +71,7 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
  * Adjust Metadata for Get action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_contact_get_spec(&$params) {
   $params['contact_id']['api.required'] = 1;

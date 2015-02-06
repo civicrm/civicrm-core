@@ -26,11 +26,18 @@
  */
 
 /**
- * This api exposes CiviCRM group contact.
+ * This api exposes CiviCRM group contacts.
+ *
+ * This api is for adding/removing contacts from a group,
+ * or fetching a list of groups for a contact.
+ *
+ * Important note: This api does not fetch smart groups for a contact.
+ * To fetch all contacts in a smart group, use the contact api
+ * passing a contact_id and group_id.
+ *
+ * To create/delete groups, use the group api instead.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Group
- *
  */
 
 
@@ -68,21 +75,10 @@ function civicrm_api3_group_contact_get($params) {
 /**
  * Add contact(s) to group(s).
  *
- * @param array $params
- *   Input parameters.
- *
- * Allowed @params array keys are:<br>
- * "contact_id" (required) : first contact to add<br>
- * "group_id" (required): first group to add contact(s) to<br>
- * "contact_id.1" etc. (optional) : another contact to add<br>
- * "group_id.1" etc. (optional) : additional group to add contact(s) to<br>
- * "status" (optional) : one of "Added", "Pending" or "Removed" (default is "Added")
- *
- * @return array
- *   Information about operation results
- *
- *   On success, the return array will be structured as follows:
- *   <code>array(
+ * This api has a legacy/nonstandard signature.
+ * On success, the return array will be structured as follows:
+ * @code
+ * array(
  *   "is_error" => 0,
  *   "version"  => 3,
  *   "count"    => 3,
@@ -91,15 +87,28 @@ function civicrm_api3_group_contact_get($params) {
  *     "added"       => integer,
  *     "total_count" => integer
  *   )
- *   )</code>
+ * )
+ * @endcode
  *
- *   On failure, the return array will be structured as follows:
- *   <code>array(
+ * On failure, the return array will be structured as follows:
+ * @code
+ * array(
  *   'is_error' => 1,
  *   'error_message' = string,
  *   'error_data' = mixed or undefined
- *   )</code>
- *   {@getfields GroupContact_create}
+ * )
+ * @endcode
+ *
+ * @param array $params
+ *   Input parameters.
+ *   - "contact_id" (required) : first contact to add
+ *   - "group_id" (required): first group to add contact(s) to
+ *   - "contact_id.1" etc. (optional) : another contact to add
+ *   - "group_id.1" etc. (optional) : additional group to add contact(s) to
+ *   - "status" (optional) : one of "Added", "Pending" or "Removed" (default is "Added")
+ *
+ * @return array
+ *   Information about operation results
  */
 function civicrm_api3_group_contact_create($params) {
   // Nonstandard bao - doesn't accept ID as a param, so convert id to group_id + contact_id
@@ -157,12 +166,13 @@ function civicrm_api3_group_contact_pending($params) {
 /**
  * Group contact helper function.
  *
+ * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
+ *   & at the very least return IDs & details of the groups created / changed
+ *
  * @param array $params
  * @param string $op
  *
  * @return array
- * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
- * & at the very least return IDs & details of the groups created / changed
  */
 function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 

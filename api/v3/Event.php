@@ -30,8 +30,6 @@
  * This api exposes CiviCRM event.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Event
- *
  */
 
 /**
@@ -63,7 +61,7 @@ function civicrm_api3_event_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_create_spec(&$params) {
   $params['start_date']['api.required'] = 1;
@@ -152,7 +150,7 @@ function civicrm_api3_event_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_get_spec(&$params) {
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');

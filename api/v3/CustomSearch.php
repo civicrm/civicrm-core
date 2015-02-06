@@ -29,8 +29,6 @@
  * This api exposes CiviCRM custom search.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_CustomSearch
- *
  */
 
 /**
@@ -77,7 +75,7 @@ function civicrm_api3_custom_search_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_search_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';

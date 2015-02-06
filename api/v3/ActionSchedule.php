@@ -26,11 +26,9 @@
  */
 
 /**
- * File for the CiviCRM APIv3 for Scheduled Reminders
+ * This api exposes CiviCRM Scheduled Reminders.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_ActionSchedule
- *
  */
 
 /**
@@ -66,7 +64,7 @@ function civicrm_api3_action_schedule_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
@@ -78,8 +76,7 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
  * Delete an existing action_schedule.
  *
  * @param array $params
- *   Array containing id of the action_schedule.
- *   to be deleted
+ *   Array containing id of the action_schedule to be deleted.
  *
  * @return array
  *   API result array

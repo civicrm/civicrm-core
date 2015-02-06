@@ -28,9 +28,9 @@
 /**
  * This api exposes CiviCRM group nesting.
  *
- * @package CiviCRM_APIv3
- * @subpackage API_Group
+ * This defines parent/child relationships between nested groups.
  *
+ * @package CiviCRM_APIv3
  */
 
 /**
@@ -74,7 +74,7 @@ function civicrm_api3_group_nesting_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_group_nesting_create_spec(&$params) {
   $params['child_group_id']['api.required'] = 1;
@@ -85,8 +85,6 @@ function _civicrm_api3_group_nesting_create_spec(&$params) {
  * Removes specific nesting records.
  *
  * @param array $params
- *   Parameters array - allowed array keys include:.
- * {@getfields GroupNesting_delete}
  *
  * @return array
  *   API Success or fail array

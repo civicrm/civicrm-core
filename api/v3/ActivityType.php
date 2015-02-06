@@ -31,7 +31,6 @@
  * @deprecated
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Activity
  */
 
 /**
@@ -68,7 +67,7 @@ function civicrm_api3_activity_type_get($params) {
  * @return array
  *   created / updated activity type
  *
- * @deprecated - use option_value create
+ * @deprecated use option_value api
  */
 function civicrm_api3_activity_type_create($params) {
 
@@ -91,7 +90,7 @@ function civicrm_api3_activity_type_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
   $params['label']['api.required'] = 1;
@@ -109,7 +108,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @return array
  *   API result array
  *
- * @deprecated - we will introduce OptionValue Delete- plse consider helping with this if not done
+ * @deprecated use option_value api
  */
 function civicrm_api3_activity_type_delete($params) {
   return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);

@@ -26,10 +26,9 @@
  */
 
 /**
- * This api exposes CiviCRM sms_provider.
+ * This api exposes CiviCRM sms_provider records.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_sms_provider
  */
 
 /**

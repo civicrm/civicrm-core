@@ -29,8 +29,6 @@
  * This api exposes CiviCRM participant.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Participant
- *
  */
 
 /**
@@ -137,7 +135,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_create_spec(&$params) {
   $params['status_id']['api.default'] = "1";
@@ -180,7 +178,7 @@ function civicrm_api3_participant_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_get_spec(&$params) {
   $params['participant_test']['api.default'] = 0;

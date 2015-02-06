@@ -29,7 +29,6 @@
  * This api exposes CiviCRM batch.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Batch
  */
 
 /**
@@ -50,7 +49,7 @@ function civicrm_api3_batch_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_batch_create_spec(&$params) {
   //@todo - the entity table field looks like it is not actually required & should probably be removed (or a description added if

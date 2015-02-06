@@ -29,8 +29,6 @@
  * This api exposes CiviCRM Pledge.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Pledge
- *
  */
 
 /**
@@ -121,8 +119,6 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  *
  * @return array
  *   array of pledges, if error an array with an error id and error message
- *   {@getfields pledge_get}
- * @example PledgeGet.php
  */
 function civicrm_api3_pledge_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;

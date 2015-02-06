@@ -29,7 +29,6 @@
  * This api exposes CiviCRM membership contribution link.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Membership
  * @todo delete function doesn't exist
  */
 
@@ -52,7 +51,7 @@ function civicrm_api3_membership_payment_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_payment_create_spec(&$params) {
   $params['membership_id']['api.required'] = 1;

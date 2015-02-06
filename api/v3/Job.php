@@ -29,7 +29,6 @@
  * This api is used for triggering scheduled "cron" jobs.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Job
  */
 
 /**
@@ -38,7 +37,7 @@
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_create_spec(&$params) {
   $params['run_frequency']['api.required'] = 1;
@@ -107,7 +106,7 @@ function civicrm_api3_job_execute($params) {
  * Adjust Metadata for Execute action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_execute_spec(&$params) {
 }
@@ -184,7 +183,7 @@ function civicrm_api3_job_send_reminder($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_send_reminder(&$params) {
   //@todo this function will now take all fields in action_schedule as params
@@ -253,7 +252,7 @@ function civicrm_api3_job_update_greeting($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_update_greeting_spec(&$params) {
   $params['ct'] = array(

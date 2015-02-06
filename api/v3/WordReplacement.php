@@ -28,9 +28,10 @@
 /**
  * This api exposes CiviCRM word replacement.
  *
- * @package CiviCRM_APIv3
- * @subpackage API_WordReplacement
+ * Word-replacements are used to globally alter strings in the CiviCRM UI.
+ * Note that the original source string is always English, regardless of language settings.
  *
+ * @package CiviCRM_APIv3
  */
 
 /**
@@ -67,7 +68,7 @@ function civicrm_api3_word_replacement_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_word_replacement_create_spec(&$params) {
   unset($params['version']);

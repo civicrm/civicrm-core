@@ -30,7 +30,6 @@
  * This api exposes CiviCRM price sets.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_PriceFieldValue
  */
 
 /**
@@ -62,7 +61,7 @@ function civicrm_api3_price_field_value_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_price_field_value_create_spec(&$params) {
   $params['price_field_id']['api.required'] = TRUE;
@@ -92,8 +91,7 @@ function civicrm_api3_price_field_value_get($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *   to be deleted
+ *   Array containing id of the group to be deleted.
  *
  * @return array
  *   API result array.

@@ -26,10 +26,11 @@
  */
 
 /**
- * This api exposes CiviCRM grant.
+ * This api exposes CiviCRM grant records.
+ *
+ * @note Grant component must be enabled.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Grant
  */
 
 /**
@@ -51,7 +52,7 @@ function civicrm_api3_grant_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_grant_create_spec(&$params) {
   $params['grant_type_id']['api.required'] = 1;
@@ -72,13 +73,10 @@ function civicrm_api3_grant_get($params) {
 }
 
 /**
- * Delete an existing grant.
- *
- * This method is used to delete any existing grant. id of the grant
- * to be deleted is required field in $params array
+ * This method is used to delete an existing grant.
  *
  * @param array $params
- *   Array per getfields metadata.
+ *   Id of the grant to be deleted is required.
  *
  * @return array
  *   API Result Array
