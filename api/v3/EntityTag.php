@@ -29,8 +29,6 @@
  * This api exposes CiviCRM entity tag.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_EntityTag
- *
  */
 
 /**
@@ -66,7 +64,7 @@ function civicrm_api3_entity_tag_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
   $params['entity_id']['api.aliases'] = array('contact_id');

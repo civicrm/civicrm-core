@@ -29,8 +29,6 @@
  * This api exposes CiviCRM custom field.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_CustomField
- *
  */
 
 /**
@@ -76,7 +74,7 @@ function _civicrm_api3_custom_field_flush_static_caches() {
  * Adjust Metadata for Create action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;

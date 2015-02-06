@@ -29,7 +29,6 @@
  * This api exposes CiviCRM activity.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Activity
  */
 
 
@@ -242,7 +241,7 @@ function civicrm_api3_activity_get($params) {
 /**
  * Given a list of activities, append any extra data requested about the activities.
  *
- * NOTE: Called by civicrm-core and CiviHR
+ * @note Called by civicrm-core and CiviHR
  *
  * @param array $params
  *   API request parameters.

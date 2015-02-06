@@ -29,7 +29,6 @@
  * This api exposes CiviCRM print_label.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_print_label
  */
 
 /**

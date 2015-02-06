@@ -29,8 +29,6 @@
  * This api exposes CiviCRM SystemLog.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_SystemLog
- *
  */
 
 /**

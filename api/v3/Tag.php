@@ -26,15 +26,18 @@
  */
 
 /**
- * This api exposes CiviCRM tag.
+ * This api exposes CiviCRM tags.
+ *
+ * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
+ *
+ * @note this api is for working with tags themselves. To add/remove tags from
+ * a contact or other entity, use the EntityTag api.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Tag
- *
  */
 
 /**
- * Add a Tag.
+ * Create or update a tag.
  *
  * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *

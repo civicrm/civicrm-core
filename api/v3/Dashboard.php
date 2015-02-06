@@ -29,7 +29,6 @@
  * This api exposes CiviCRM Dashboard.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Activity
  */
 
 

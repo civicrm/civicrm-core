@@ -29,8 +29,6 @@
  * This api exposes CiviCRM note.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Note
- *
  */
 
 /**
@@ -41,7 +39,6 @@
  *
  * @param array $params
  *   An associative array of name/value property values of civicrm_note.
- * {@getfields note_create}
  *
  * @return array
  *   API result array
@@ -56,7 +53,7 @@ function civicrm_api3_note_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_note_create_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";
@@ -102,7 +99,7 @@ function civicrm_api3_note_get($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_note_get_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";

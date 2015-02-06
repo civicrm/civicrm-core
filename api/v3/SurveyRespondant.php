@@ -28,8 +28,9 @@
 /**
  * This api exposes CiviCRM Survey Respondant.
  *
+ * @deprecated - api currently not supported
+ *
  * @package CiviCRM_APIv3
- * @subpackage API_Survey
  */
 
 /**

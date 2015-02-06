@@ -29,8 +29,6 @@
  * This api exposes CiviCRM custom group.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_CustomGroup
- *
  */
 
 /**
@@ -69,7 +67,7 @@ function civicrm_api3_custom_group_create($params) {
  * Adjust Metadata for Create action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_group_create_spec(&$params) {
   $params['extends']['api.required'] = 1;

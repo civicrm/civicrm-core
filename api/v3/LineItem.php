@@ -30,7 +30,6 @@
  * This api exposes CiviCRM line item.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_LineItem
  */
 
 /**
@@ -53,7 +52,7 @@ function civicrm_api3_line_item_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_line_item_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
@@ -84,8 +83,7 @@ function civicrm_api3_line_item_get($params) {
  * to be deleted is required field in $params array
  *
  * @param array $params
- *   Array containing id of the group.
- *   to be deleted
+ *   Array containing id of the group to be deleted.
  *
  * @return array
  *   API result array

@@ -26,11 +26,9 @@
  */
 
 /**
- * This api exposes CiviCRM website.
+ * This api exposes CiviCRM website records.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Website
- *
  */
 
 /**
@@ -57,7 +55,7 @@ function civicrm_api3_website_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_website_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;

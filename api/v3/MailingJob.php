@@ -30,7 +30,6 @@
  * APIv3 functions for registering/processing mailing jobs.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Mailing
  */
 
 /**
@@ -51,7 +50,7 @@ function civicrm_api3_mailing_job_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_job_create_spec(&$params) {
   $params['status']['api.default'] = 'Scheduled';

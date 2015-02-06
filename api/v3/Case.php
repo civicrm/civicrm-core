@@ -26,11 +26,10 @@
  */
 
 /**
- * This api exposes CiviCRM Case.
+ * This api exposes CiviCRM Case objects.
  * Developed by woolman.org
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Case
  */
 
 
@@ -38,6 +37,7 @@
  * Open a new case, add client and manager roles, and add standard timeline.
  *
  * @param array $params
+ * @code
  * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -52,6 +52,7 @@
  * 'start_date' => str datestamp // defaults to: date('YmdHis')
  * 'duration' => int // in minutes
  * 'details' => str // html format
+ * @endcode
  *
  * @throws API_Exception
  * @return array
@@ -141,7 +142,7 @@ function _civicrm_api3_case_get_spec(&$params) {
  * Adjust Metadata for Create Action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
@@ -163,7 +164,7 @@ function _civicrm_api3_case_create_spec(&$params) {
  * Adjust Metadata for Update action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_update_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -173,7 +174,7 @@ function _civicrm_api3_case_update_spec(&$params) {
  * Adjust Metadata for Delete action.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_delete_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -386,12 +387,6 @@ function civicrm_api3_case_delete($params) {
     throw new API_Exception('Could not delete case.');
   }
 }
-
-/***********************************/
-/*                                 */
-/*     INTERNAL FUNCTIONS          */
-/*                                 */
-/***********************************/
 
 /**
  * Internal function to retrieve a case.

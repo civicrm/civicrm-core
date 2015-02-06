@@ -29,7 +29,6 @@
  * This api exposes CiviCRM participant status options.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Event
  */
 
 /**
@@ -53,9 +52,7 @@ function civicrm_api3_participant_status_type_create($params) {
  * Returns array of participant_statuses matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all participant_statuses will be returned
+ *   Array of properties. If empty, all records will be returned.
  *
  * @return array
  *   Array of matching participant_statuses

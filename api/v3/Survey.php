@@ -26,10 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM survey.
+ * This api exposes CiviCRM survey/petition records.
+ *
+ * @note Campaign component must be enabled.
+ * @note There is no "petition" api.
+ * Surveys and petitions are the same basic object and this api is used for both.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Survey
  */
 
 
@@ -52,7 +55,7 @@ function civicrm_api3_survey_create($params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_survey_create_spec(&$params) {
   $params['title']['api.required'] = 1;
@@ -62,9 +65,7 @@ function _civicrm_api3_survey_create_spec(&$params) {
  * Returns array of surveys  matching a set of one or more group properties.
  *
  * @param array $params
- *   Array of one or more valid.
- *                       property_name=>value pairs. If $params is set
- *                       as null, all surveys will be returned
+ *   Array of properties. If empty, all records will be returned.
  *
  * @return array
  *   API result Array of matching surveys
