@@ -292,9 +292,11 @@ class CRM_Core_PseudoConstant {
           case 'state_province_id':
             $params['labelColumn'] = 'abbreviation';
             break;
+
           case 'country_id':
             $params['labelColumn'] = 'iso_code';
             break;
+
           default:
         }
       }
