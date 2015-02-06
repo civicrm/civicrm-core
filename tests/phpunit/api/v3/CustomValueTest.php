@@ -126,7 +126,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   /**
    * Unit test for CRM-15915.
    *
-   * The values for a multi-select custom field on a contact are returned as a 
+   * The values for a multi-select custom field on a contact are returned as a
    * list. This unit test should pass.
    */
   public function testMultiSelectCustomValuesContact() {
@@ -168,19 +168,19 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'sequential' => 1,
     ));
-    
+
     $contact_create_result = $this->CallApiSuccess('Contact', 'Create', array(
       'contact_type' => 'Individual',
       'first_name' => 'Joe',
       'last_name' => 'Schmoe',
-      'custom_'.$custom_field_result['id'] => array('B'),
+      'custom_' . $custom_field_result['id'] => array('B'),
       'sequential' => 1,
     ));
 
     $contact_get_result = $this->CallApiSuccess('Contact', 'GetSingle', array(
       'id' => $contact_create_result['id'],
-      'return' => 'custom_'.$custom_field_result['id'],
-      'sequential' => 1, 
+      'return' => 'custom_' . $custom_field_result['id'],
+      'sequential' => 1,
     ));
 
     // Clean up first, then assert.
@@ -197,7 +197,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'id' => $custom_group_result['id'],
     ));
 
-    $this->AssertEquals('B',$contact_get_result['custom_'.$custom_field_result['id']][0]);
+    $this->AssertEquals('B', $contact_get_result['custom_' . $custom_field_result['id']][0]);
   }
 
   /**
@@ -252,7 +252,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'organization_name' => 'Schmoe inc.',
       'sequential' => 1,
     ));
-    
+
     $contact_create_result = $this->CallApiSuccess('Contact', 'Create', array(
       'contact_type' => 'Individual',
       'first_name' => 'Joe',
@@ -260,18 +260,18 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'api.relationship.create' => array(
         'contact_id_a' => '$value.id',
         'contact_id_b' => $organization_create_result['id'],
-        'relationship_type_id' => 5,  // works for
-        'custom_'.$custom_field_result['id'] => array('B'),
+        'relationship_type_id' => 5, // works for
+        'custom_' . $custom_field_result['id'] => array('B'),
       ),
       'sequential' => 1,
     ));
-    
-    $relationship_id=$contact_create_result['values'][0]['api.relationship.create']['id'];
+
+    $relationship_id = $contact_create_result['values'][0]['api.relationship.create']['id'];
 
     $relationship_get_result = $this->CallApiSuccess('Relationship', 'GetSingle', array(
       'id' => $relationship_id,
-      'return' => 'custom_'.$custom_field_result['id'],
-      'sequential' => 1, 
+      'return' => 'custom_' . $custom_field_result['id'],
+      'sequential' => 1,
     ));
 
     // Clean up first, then assert.
@@ -279,7 +279,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->CallApiSuccess('Contact', 'Delete', array(
       'id' => $contact_create_result['id'],
     ));
-    
+
     $this->CallApiSuccess('Contact', 'Delete', array(
       'id' => $organization_create_result['id'],
     ));
@@ -292,7 +292,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'id' => $custom_group_result['id'],
     ));
 
-    $this->AssertEquals('B',$relationship_get_result['custom_'.$custom_field_result['id']][0]);
+    $this->AssertEquals('B', $relationship_get_result['custom_' . $custom_field_result['id']][0]);
   }
 
   public function testMultipleCustomValues() {
