@@ -401,10 +401,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
-    CRM_Core_Error::debug('noRepeats',$this->_noRepeats);
     $repeatFound = FALSE;
     foreach ($rows as $rowNum => $row) {
-      CRM_Core_Error::debug('repeatFound',$repeatFound . " " . $rowNum);
       if ($repeatFound == FALSE ||
         $repeatFound < $rowNum - 1
       ) {
@@ -414,7 +412,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // not repeat contact display names if it matches with the one
         // in previous row
-        CRM_Core_Error::debug('checklist',$checkList);
         foreach ($row as $colName => $colVal) {
           if (in_array($colName, $this->_noRepeats) &&
             $rowNum > 0
