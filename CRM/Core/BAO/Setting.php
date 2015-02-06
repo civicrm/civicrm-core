@@ -222,7 +222,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
       if ( isset($name) ) {
         return $override;
-      } else {
+      }
+      else {
         $override_group = $override;
       }
     }
@@ -1132,9 +1133,11 @@ AND domain_id = %3
     global $civicrm_setting;
     if ($group && $name && isset($civicrm_setting[$group][$name])) {
       return $civicrm_setting[$group][$name];
-    } else if ($group && !isset($name) && isset($civicrm_setting[$group])) {
+    }
+    else if ($group && !isset($name) && isset($civicrm_setting[$group])) {
       return $civicrm_setting[$group];
-    } else {
+    }
+    else {
       return $default;
     }
   }
