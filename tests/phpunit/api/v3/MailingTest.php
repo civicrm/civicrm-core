@@ -52,6 +52,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'body_html' => "<p>This is {contact.display_name}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
+      'header_id' => '',
+      'footer_id' => '',
     );
   }
 
