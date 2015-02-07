@@ -15,3 +15,11 @@ UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'disk(space)?|over the a
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail|in)(box|folder) ((for user \w+ )?is )?full' WHERE `id` = 92;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'mailbox (has exceeded|is over) the limit' WHERE `id` = 93;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'quota ?(usage|violation|exceeded)' WHERE `id` = 98;
+
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Inactive';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, 'account that you tried to reach is disabled'),
+      (@bounceTypeID, 'User banned');
+
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'not accepting (mail|messages)' WHERE `id` = 37;
