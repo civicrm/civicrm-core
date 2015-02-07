@@ -1281,7 +1281,12 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'misconfigured forwarding address'),
     (@bounceTypeID, 'account is not allowed'),
     (@bounceTypeID, 'Address .<[^>]*>. not known here'),
-    (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}');
+    (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}'),
+    (@bounceTypeID, 'Non sono riuscito a trovare l.indirizzo e-mail'),
+    (@bounceTypeID, 'nadie con esta direcci..?n'),
+    (@bounceTypeID, 'ni bilo mogo..?e najti prejemnikovega e-po..?tnega naslova'),
+    (@bounceTypeID, 'Elektronski naslov (je ukinjen|ne obstaja)'),
+    (@bounceTypeID, 'nepravilno nastavljen predal');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
