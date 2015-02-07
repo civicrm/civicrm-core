@@ -1294,20 +1294,23 @@ SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Q
 INSERT INTO civicrm_mailing_bounce_pattern
         (bounce_type_id, pattern)
         VALUES
-    (@bounceTypeID, '(disk|over the allowed|exceed(ed|s)?|storage) quota'),
+    (@bounceTypeID, '(disk(space)?|over the allowed|exceed(ed|s)?|storage) quota'),
     (@bounceTypeID, '522_mailbox_full'),
     (@bounceTypeID, 'exceeds allowed message count'),
     (@bounceTypeID, 'file too large'),
     (@bounceTypeID, 'full mailbox'),
-    (@bounceTypeID, 'mailbox ((for user \w+ )?is )?full'),
-    (@bounceTypeID, 'mailbox has exceeded the limit'),
+    (@bounceTypeID, '(mail|in)(box|folder) ((for user \w+ )?is )?full'),
+    (@bounceTypeID, 'mailbox (has exceeded|is over) the limit'),
     (@bounceTypeID, 'mailbox( exceeds allowed)? size'),
     (@bounceTypeID, 'no space left for this user'),
     (@bounceTypeID, 'over\\s?quota'),
     (@bounceTypeID, 'quota (for the mailbox )?has been exceeded'),
-    (@bounceTypeID, 'quota (usage|violation|exceeded)'),
+    (@bounceTypeID, 'quota ?(usage|violation|exceeded)'),
     (@bounceTypeID, 'recipient storage full'),
-    (@bounceTypeID, 'not able to receive more mail');
+    (@bounceTypeID, 'not able to receive more mail'),
+    (@bounceTypeID, 'doesn.t have enough disk space left'),
+    (@bounceTypeID, 'exceeded storage allocation'),
+    (@bounceTypeID, 'running out of disk space');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
