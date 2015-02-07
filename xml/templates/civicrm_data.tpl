@@ -1346,12 +1346,17 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'cannot find your hostname'),
     (@bounceTypeID, 'ip name lookup'),
     (@bounceTypeID, 'not configured to relay mail'),
-    (@bounceTypeID, 'relay (not permitted|access denied)'),
+    (@bounceTypeID, 'relay(ing)? (not permitted|(access )?denied)'),
     (@bounceTypeID, 'relayed mail to .+? not allowed'),
     (@bounceTypeID, 'sender ip must resolve'),
     (@bounceTypeID, 'unable to relay'),
     (@bounceTypeID, 'No route to host'),
-    (@bounceTypeID, 'Network is unreachable');
+    (@bounceTypeID, 'Network is unreachable'),
+    (@bounceTypeID, 'unrouteable address'),
+    (@bounceTypeID, 'We don.t handle mail for'),
+    (@bounceTypeID, 'we do not relay'),
+    (@bounceTypeID, 'Rejected by next-hop'),
+    (@bounceTypeID, 'not permitted to( *550)? relay through this server');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)

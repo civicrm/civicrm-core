@@ -27,3 +27,14 @@ UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'not accepting (mail|mes
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Loop';
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail( forwarding)?|routing).loop' WHERE `id` = 81;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'too many (hops|recursive forwards)' WHERE `id` = 86;
+
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Relay';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, 'unrouteable address'),
+      (@bounceTypeID, 'We don.t handle mail for'),
+      (@bounceTypeID, 'we do not relay'),
+      (@bounceTypeID, 'Rejected by next-hop'),
+      (@bounceTypeID, 'not permitted to( *550)? relay through this server');
+
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'relay(ing)? (not permitted|(access )?denied)' WHERE `id` = 104;
