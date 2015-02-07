@@ -137,7 +137,7 @@
             _.each(groupResult.values, function (mailingGroup) {
               var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
               var entityId = parseInt(mailingGroup.entity_id);
-              mailing[bucket][mailingGroup.group_type].push(entityId);
+              mailing[bucket][mailingGroup.group_type.toLowerCase()].push(entityId);
             });
           });
       },
