@@ -1,5 +1,8 @@
 // https://civicrm.org/licensing
-(function($) {
+(function($, _) {
+  "use strict";
+  /* jshint validthis: true */
+
   // TODO: We'll need a way to clear this cache if options are edited.
   // Maybe it should be stored in the CRM object so other parts of the app can use it.
   // Note that if we do move it, we should also change the format of option lists to our standard sequential arrays
@@ -68,7 +71,7 @@
             if ($i.data('refresh')) {
               CRM.refreshParent($i);
             } else {
-              value = value === '' ? settings.placeholder : value;
+              value = value === '' ? settings.placeholder : _.escape(value);
               $i.html(value);
             }
           }
@@ -210,9 +213,9 @@
             });
           }
           return formatOptions(optionsCache[hash]);
-
         }
-        return value.replace(/<(?:.|\n)*?>/gm, '');
+        // Unwrap contents then replace html special characters with plain text
+        return _.unescape(value.replace(/<(?:.|\n)*?>/gm, ''));
       }
 
       function formatOptions(options) {
@@ -224,7 +227,7 @@
       }
 
       function restoreContainer() {
-        errorMsg && errorMsg.close && errorMsg.close();
+        if (errorMsg && errorMsg.close) errorMsg.close();
         $i.removeClass('crm-editable-saving crm-editable-editing');
       }
 
@@ -235,4 +238,4 @@
     $('.crm-editable', e.target).crmEditable();
   });
 
-})(jQuery);
+})(jQuery, CRM._);
