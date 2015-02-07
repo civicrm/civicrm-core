@@ -56,7 +56,8 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'no one at this address'),
       (@bounceTypeID, 'misconfigured forwarding address'),
       (@bounceTypeID, 'account is not allowed'),
-      (@bounceTypeID, 'Address .<[^>]*>. not known here');
+      (@bounceTypeID, 'Address .<[^>]*>. not known here'),
+      (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}');
 
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(es)?( you (entered|specified))? (could|was)( not|n.t)( be)? found' WHERE `id` = 44;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(ee)? (unknown|invalid)' WHERE `id` = 45;

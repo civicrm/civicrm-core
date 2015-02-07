@@ -1301,7 +1301,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'no one at this address'),
     (@bounceTypeID, 'misconfigured forwarding address'),
     (@bounceTypeID, 'account is not allowed'),
-    (@bounceTypeID, 'Address .<[^>]*>. not known here');
+    (@bounceTypeID, 'Address .<[^>]*>. not known here'),
+    (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
