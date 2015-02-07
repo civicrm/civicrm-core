@@ -1191,11 +1191,13 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'isn\'t in my control/locals file'),
     (@bounceTypeID, 'local configuration error'),
     (@bounceTypeID, 'not a gateway'),
-    (@bounceTypeID, 'server is down or unreachable'),
+    (@bounceTypeID, 'server is (down or unreachable|not responding)'),
     (@bounceTypeID, 'too many connections'),
     (@bounceTypeID, 'unable to connect'),
     (@bounceTypeID, 'lost connection'),
-    (@bounceTypeID, 'conversation with [^ ]* timed out while');
+    (@bounceTypeID, 'conversation with [^ ]* timed out while'),
+    (@bounceTypeID, 'server requires authentication'),
+    (@bounceTypeID, 'authentication (is )?required');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
