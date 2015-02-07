@@ -1217,10 +1217,12 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'mail( ?)address is administrative?ly disabled'),
     (@bounceTypeID, 'mailbox (temporarily disabled|currently suspended)'),
     (@bounceTypeID, 'no longer (accepting mail|on server|in use|with|employed|on staff|works for|using this account)'),
-    (@bounceTypeID, 'not accepting mail'),
+    (@bounceTypeID, 'not accepting (mail|messages)'),
     (@bounceTypeID, 'please use my new e-?mail address'),
     (@bounceTypeID, 'this address no longer accepts mail'),
-    (@bounceTypeID, 'user account suspended');
+    (@bounceTypeID, 'user account suspended'),
+    (@bounceTypeID, 'account that you tried to reach is disabled'),
+    (@bounceTypeID, 'User banned');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
