@@ -38,3 +38,11 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'not permitted to( *550)? relay through this server');
 
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'relay(ing)? (not permitted|(access )?denied)' WHERE `id` = 104;
+
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Host';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, 'server requires authentication'),
+      (@bounceTypeID, 'authentication (is )?required');
+
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'server is (down or unreachable|not responding)' WHERE `id` = 20;
