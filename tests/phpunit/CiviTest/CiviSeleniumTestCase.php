@@ -552,7 +552,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $mon = date('n', $timeStamp) - 1;
     $day = date('j', $timeStamp);
 
-    $this->click("{$dateElement}_display");
+    $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
     $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
     $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
     $this->select("css=div#ui-datepicker-div div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-year", "value=$year");
