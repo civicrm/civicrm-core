@@ -1302,12 +1302,12 @@ SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'L
 INSERT INTO civicrm_mailing_bounce_pattern
         (bounce_type_id, pattern)
         VALUES
-    (@bounceTypeID, '(mail|routing) loop'),
+    (@bounceTypeID, '(mail( forwarding)?|routing).loop'),
     (@bounceTypeID, 'excessive recursion'),
     (@bounceTypeID, 'loop detected'),
     (@bounceTypeID, 'maximum hop count exceeded'),
     (@bounceTypeID, 'message was forwarded more than the maximum allowed times'),
-    (@bounceTypeID, 'too many hops');
+    (@bounceTypeID, 'too many (hops|recursive forwards)');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
