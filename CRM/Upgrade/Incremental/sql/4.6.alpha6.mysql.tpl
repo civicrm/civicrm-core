@@ -46,3 +46,22 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'authentication (is )?required');
 
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'server is (down or unreachable|not responding)' WHERE `id` = 20;
+
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Invalid';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, '5.1.0 Address rejected'),
+      (@bounceTypeID, 'no valid recipients?'),
+      (@bounceTypeID, 'RecipNotFound'),
+      (@bounceTypeID, 'no one at this address'),
+      (@bounceTypeID, 'misconfigured forwarding address'),
+      (@bounceTypeID, 'account is not allowed'),
+      (@bounceTypeID, 'Address .<[^>]*>. not known here');
+
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(es)?( you (entered|specified))? (could|was)( not|n.t)( be)? found' WHERE `id` = 44;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(ee)? (unknown|invalid)' WHERE `id` = 45;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail )?delivery (to this user )?is not allowed' WHERE `id` = 59;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no such (mail drop|mailbox( \w+)?|(e-?mail )?address|recipient|(local )?user|person)( here)?' WHERE `id` = 64;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no mailbox (here )?by that name' WHERE `id` = 65;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'recipient (does not exist|(is )?unknown|rejected|denied|not found)' WHERE `id` = 69;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'unknown (local( |-)part|recipient|address error)' WHERE `id` = 73;
