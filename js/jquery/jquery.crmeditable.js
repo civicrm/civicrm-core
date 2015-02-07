@@ -1,5 +1,8 @@
 // https://civicrm.org/licensing
 (function($, _) {
+  "use strict";
+  /* jshint validthis: true */
+
   // TODO: We'll need a way to clear this cache if options are edited.
   // Maybe it should be stored in the CRM object so other parts of the app can use it.
   // Note that if we do move it, we should also change the format of option lists to our standard sequential arrays
@@ -224,7 +227,7 @@
       }
 
       function restoreContainer() {
-        errorMsg && errorMsg.close && errorMsg.close();
+        if (errorMsg && errorMsg.close) errorMsg.close();
         $i.removeClass('crm-editable-saving crm-editable-editing');
       }
 
