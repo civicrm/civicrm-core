@@ -16,7 +16,6 @@ TRG=$DM_TMPDIR/civicrm
 
 # copy all the rest of the stuff
 dm_reset_dirs "$TRG" "$DM_TMPDIR/com_civicrm"
-cp $SRC/civicrm.config.php $TRG
 dm_generate_version "$TRG/civicrm-version.php" Joomla
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"

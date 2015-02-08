@@ -16,7 +16,6 @@ TRG=$DM_TMPDIR/civicrm
 
 # copy all the stuff
 dm_reset_dirs "$TRG"
-cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
 dm_generate_version "$TRG/civicrm-version.php" Drupal
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
