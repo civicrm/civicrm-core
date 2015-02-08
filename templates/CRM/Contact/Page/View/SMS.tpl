@@ -33,7 +33,7 @@
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
 <dt>&nbsp;</dt>
   <dd class="crm-submit-buttons">
-    <a class="button cancel" href="{crmURL p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}</a>
+   {crmButton class="cancel" icon="close" p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}{/crmButton}
   </dd>
 </dl>
 </fieldset>

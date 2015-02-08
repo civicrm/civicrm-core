@@ -29,9 +29,9 @@
 </div>
 
 <div class="crm-submit-buttons">
-  {if $prev}<a href="{$prev}" class="button"><span><div class="icon ui-icon-triangle-1-w"></div> {ts}Prev{/ts}</span></a>{/if}
   {include file="CRM/common/formButtons.tpl" location="top"}
-  {if $next}<a href="{$next}" class="button"><span><div class="icon ui-icon-triangle-1-e"></div> {ts}Next{/ts}</span></a>{/if}
+  {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><span class="icon ui-icon-triangle-1-w"></span> {ts}Previous{/ts}</a>{/if}
+  {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <span class="icon ui-icon-triangle-1-e"></span></a>{/if}
 </div>
 
 <div class="action-link">
@@ -42,7 +42,7 @@
 </div>
 
 <div class="action-link">
-  <a id='notDuplicate' href="#" class="action-item crm-hover-button" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
+  <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
     <span class="icon ui-icon-circle-close"></span>
     {ts}Mark this pair as not a duplicate.{/ts}
   </a>
@@ -148,9 +148,7 @@ You will need to manually delete that user (click on the link to open Drupal Use
 </div>
 
 <div class="crm-submit-buttons">
-  {if $prev}<a href="{$prev}" class="button"><span><div class="icon ui-icon-triangle-1-w"></div> {ts}Prev{/ts}</span></a>{/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
-  {if $next}<a href="{$next}" class="button"><span><div class="icon ui-icon-triangle-1-e"></div> {ts}Next{/ts}</span></a>{/if}
 </div>
 
 {literal}

@@ -32,7 +32,7 @@
 <dt>{ts}To{/ts}</dt><dd>{$toName|escape}</dd>
 <dt>{ts}Subject{/ts}</dt><dd>{$subject}</dd>
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
-<dt>&nbsp;</dt><dd><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q="history=1&show=1&selectedChild=activity"}">{ts}Done{/ts}</a></dd>
+<dt>&nbsp;</dt><dd>{crmButton class="cancel" icon="close" p='civicrm/contact/view' q="history=1&show=1&selectedChild=activity"}">{ts}Done{/ts}{/crmButton}</dd>
 </dl>
 </fieldset>
 </div>
