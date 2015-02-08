@@ -31,10 +31,9 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  */
-require_once '../civicrm.config.php';
-require_once 'CRM/Core/Config.php';
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 
-$config = CRM_Core_Config::singleton();
 $template = CRM_Core_Smarty::singleton();
 
 require_once 'CRM/Utils/Request.php';

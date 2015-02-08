@@ -35,7 +35,10 @@ if (phpversion() == "5.2.2" &&
 
 session_start();
 
-require_once '../civicrm.config.php';
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot(array(
+  'prefetch' => FALSE,
+));
 require_once 'CRM/Core/Config.php';
 
 $server = new SoapServer(NULL,

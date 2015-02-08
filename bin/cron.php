@@ -25,12 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once '../civicrm.config.php';
-require_once 'CRM/Core/Config.php';
-require_once 'CRM/Utils/Request.php';
-$config = CRM_Core_Config::singleton();
-
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 CRM_Utils_System::authenticateScript(TRUE);
 
 $job = CRM_Utils_Request::retrieve('job', 'String', CRM_Core_DAO::$_nullArray, FALSE, NULL, 'REQUEST');

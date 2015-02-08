@@ -215,13 +215,9 @@ class civicrm_cli {
 
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
-    require_once 'civicrm.config.php';
-    // autoload
-    if (!class_exists('CRM_Core_ClassLoader')) {
-      require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
-    }
-    CRM_Core_ClassLoader::singleton()->register();
 
+    require_once __DIR__ . '/../Civi/Bootstrap.php';
+    Civi\Bootstrap::singleton()->boot();
     $this->_config = CRM_Core_Config::singleton();
 
     // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.

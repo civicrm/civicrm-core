@@ -33,8 +33,8 @@
 
 session_start();
 
-require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 $log = new CRM_Utils_SystemLogger();
 $log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 

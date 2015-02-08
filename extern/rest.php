@@ -25,8 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
-require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 
 session_start();
 $rest = new CRM_Utils_REST();
