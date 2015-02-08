@@ -41,7 +41,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
       <td>{$link}</td>
       <td style="text-align: right">{$merge}</td>
-      <td style="text-align: right"><a id='notDuplicate' href="#" title={ts}not a duplicate{/ts} onClick="processDupes( {$main.srcID}, {$main.dstID}, 'dupe-nondupe' );return false;">{ts}not a duplicate{/ts}</a></td>
+      <td style="text-align: right"><a class='crm-notDuplicate' href="#" title={ts}not a duplicate{/ts} onClick="processDupes( {$main.srcID}, {$main.dstID}, 'dupe-nondupe' );return false;">{ts}not a duplicate{/ts}</a></td>
       </tr>
         {/if}
       {/foreach}
@@ -50,7 +50,7 @@
 </div>
 
 {if $context eq 'search'}
-   <a href="{$backURL}" class="button"><span>{ts}Done{/ts}</span></a>
+   {crmButton href=$backURL icon="close"}{ts}Done{/ts}{/crmButton}
 {else}
    {if $gid}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=renew" a=1}{/capture}
@@ -58,7 +58,7 @@
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&action=renew" a=1}{/capture}
    {/if}
    <a href="{$backURL}" title="{ts}Refresh List of Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will refresh the duplicates list. Click OK to proceed.{/ts}');" class="button">
-     <span><div class="icon ui-icon-refresh"></div> {ts}Refresh Duplicates{/ts}</span>
+     <span><span class="icon ui-icon-refresh"></span> {ts}Refresh Duplicates{/ts}</span>
    </a>
 
    {if $gid}

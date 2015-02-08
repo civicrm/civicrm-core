@@ -48,7 +48,9 @@
  */
 function smarty_block_crmButton($params, $text, &$smarty) {
   // Generate url (pass 'html' param as false to avoid double-encode by htmlAttributes)
-  $params['href'] = CRM_Utils_System::crmURL($params + array('h' => FALSE));
+  if (empty($params['href'])) {
+    $params['href'] = CRM_Utils_System::crmURL($params + array('h' => FALSE));
+  }
   // Always add class 'button' - fixme probably should be crm-button
   $params['class'] = 'button ' . CRM_Utils_Array::value('class', $params, '');
   // Any jQuery-UI icon works

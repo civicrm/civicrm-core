@@ -67,10 +67,11 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
-    $this->add('submit', $this->_testButtonName, ts('Save & Send Test Email'));
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Smtp', 'formRule'));
     parent::buildQuickForm();
+    $buttons = $this->getElement('buttons')->getElements();
+    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), array('crm-icon' => 'mail-closed'));
+    $this->getElement('buttons')->setElements($buttons);
   }
 
   /**

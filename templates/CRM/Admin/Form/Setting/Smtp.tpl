@@ -91,8 +91,6 @@
         <div class="spacer"></div>
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
-            <span class="float-left">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span class="crm-button crm-button-type-next crm-button_qf_Smtp_refresh_test">{$form._qf_Smtp_refresh_test.html}</span>
         </div>
 </div>
 
@@ -110,7 +108,7 @@
               case "0":
                 $("#bySMTP").show( );
                 $("#bySendmail").hide( );
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
@@ -118,14 +116,14 @@
               case "1":
                 $("#bySMTP").hide( );
                 $("#bySendmail").show( );
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
               break;
               case "3":
                 $('.mailoption').hide();
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
@@ -133,7 +131,7 @@
               default:
                 $("#bySMTP").hide( );
                 $("#bySendmail").hide( );
-                $("#_qf_Smtp_refresh_test").hide( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', true);
             }
         }
 
