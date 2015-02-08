@@ -36,7 +36,8 @@
           {assign var='html' value=$form.buttons.$key.html}
         {/if}
         {crmGetAttribute html=$html attr='crm-icon' assign='icon'}
-        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $icon} crm-icon-button{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
+        {crmGetAttribute html=$html attr='disabled' assign='disabled'}
+        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $icon} crm-icon-button{/if}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
           {if $icon}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/if}
           {$html}
         </span>
