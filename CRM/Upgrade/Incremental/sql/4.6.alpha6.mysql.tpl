@@ -71,3 +71,17 @@ UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no such (mail drop|mail
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no mailbox (here )?by that name' WHERE `id` = 65;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'recipient (does not exist|(is )?unknown|rejected|denied|not found)' WHERE `id` = 69;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'unknown (local( |-)part|recipient|address error)' WHERE `id` = 73;
+
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
+    VALUES
+      (@bounceTypeID, 'Client host \[[^]]*\] blocked'),
+      (@bounceTypeID, 'automatic(ally-generated)? messages are not accepted'),
+      (@bounceTypeID, 'denied by policy'),
+      (@bounceTypeID, 'has no corresponding reverse \(PTR\) address'),
+      (@bounceTypeID, 'has a policy that( [^ ]*)? prohibited the mail that you sent'),
+      (@bounceTypeID, 'is likely unsolicited mail'),
+      (@bounceTypeID, 'Local Policy Violation'),
+      (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
+
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(detected|rejected) as spam' WHERE `id` = 126;

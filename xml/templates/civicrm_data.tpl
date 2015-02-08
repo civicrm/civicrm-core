@@ -1397,8 +1397,16 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'sender was rejected'),
     (@bounceTypeID, 'spam(check| reduction software| filters?)'),
     (@bounceTypeID, 'blocked by a user configured filter'),
-    (@bounceTypeID, 'detected as spam'),
-    (@bounceTypeID, 'X-HmXmrOriginalRecipient');
+    (@bounceTypeID, '(detected|rejected) as spam'),
+    (@bounceTypeID, 'X-HmXmrOriginalRecipient'),
+    (@bounceTypeID, 'Client host \[[^]]*\] blocked'),
+    (@bounceTypeID, 'automatic(ally-generated)? messages are not accepted'),
+    (@bounceTypeID, 'denied by policy'),
+    (@bounceTypeID, 'has no corresponding reverse (PTR) address'),
+    (@bounceTypeID, 'has a policy that( [^ ]*)? prohibited the mail that you sent'),
+    (@bounceTypeID, 'is likely unsolicited mail'),
+    (@bounceTypeID, 'Local Policy Violation'),
+    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
