@@ -241,7 +241,7 @@ class CRM_Report_Form_Instance {
       $defaults['report_footer'] = CRM_Utils_Array::value('footer', $defaults);
 
       if (!empty($defaults['navigation_id'])) {
-        //get the default navigation parent id
+        // Get the default navigation parent id.
         $params = array('id' => $defaults['navigation_id']);
         CRM_Core_BAO_Navigation::retrieve($params, $navigationDefaults);
         $defaults['is_navigation'] = 1;
@@ -253,7 +253,8 @@ class CRM_Report_Form_Instance {
 
         if (!empty($navigationDefaults['id'])) {
           $form->_navigation['id'] = $navigationDefaults['id'];
-          $form->_navigation['parent_id'] = $navigationDefaults['parent_id'];
+          $form->_navigation['parent_id'] = !empty($navigationDefaults['parent_id']) ?
+          $navigationDefaults['parent_id'] : NULL;
         }
       }
 
