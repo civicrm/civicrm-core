@@ -194,6 +194,12 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
    * array of participant role custom data
    */
   public $_participantRoleIds = array();
+  
+  /**
+   * @todo add explanatory note about this
+   * @var null
+   */
+  public $_onlinePendingContributionId = NULL;
 
   /**
    * Function to set variables up before form is built

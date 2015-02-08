@@ -2072,9 +2072,21 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     else {
-      // sometime the value is an array, need to investigate and fix
       if (is_array($value)) {
-        CRM_Core_Error::fatal();
+        // traditionally an array being passed has been a fatal error. We can take advantage of this to add support
+        // for api style operators for functions that hit this point without worrying about regression
+        // (the previous comments indicated the condition for hitting this point were unknown
+        // per CRM-14743 we are adding modified_date & created_date operator support
+        $operations = array_keys($value);
+        foreach ($operations as $operator) {
+          if(!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+            // we don't know when this might happen
+            CRM_Core_Error::fatal();
+          }
+        }
+        $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($name, $value, NULL);
+        //since this is not currently being called by the form layer we can skip worrying about the 'qill' for now
+        return;
       }
 
       if (!empty($field['where'])) {
