@@ -113,7 +113,6 @@ CRM/Standalone/OpenID/DAO
 bin/setup.conf
 civicrm-version.php
 civicrm-version.txt
-civicrm.config.php
 install/langs.php
 node_modules
 packages/.channels
