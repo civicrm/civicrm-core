@@ -127,7 +127,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $lookupCustomFieldSql, $allowedDelegates = NULL) {
     $this->kernel = $kernel;
-    $this->entityName = $entityName;
+    $this->entityName = \CRM_Utils_String::convertStringToCamel($entityName);
     $this->actions = $actions;
     $this->lookupDelegateSql = $lookupDelegateSql;
     $this->lookupCustomFieldSql = $lookupCustomFieldSql;
@@ -142,7 +142,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
-    if ($apiRequest['version'] == 3 && strtolower($apiRequest['entity']) == strtolower($this->entityName) && in_array(strtolower($apiRequest['action']), $this->actions)) {
+    if ($apiRequest['version'] == 3 && \CRM_Utils_String::convertStringToCamel($apiRequest['entity']) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
       if (isset($apiRequest['params']['field_name'])) {
         $fldIdx = \CRM_Utils_Array::index(array('field_name'), $this->getCustomFields());
         if (empty($fldIdx[$apiRequest['params']['field_name']])) {
