@@ -95,6 +95,8 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
         else null
       end as entity_id
       ",
+      // Get a list of custom fields (field_name,table_name,extends)
+      "select",
       array('fake_widget', 'fake_forbidden')
     ));
   }
@@ -120,7 +122,6 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'create',
       array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID),
     );
-    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'));
 
     return $cases;
   }
@@ -168,6 +169,9 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
 
     $cases[] = array('FakeFile', 'create', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
     $cases[] = array('FakeFile', 'get', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
+
+    // We should be allowed to lookup files for fake_widgets, but we need an ID.
+    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'), '/Missing entity_id/');
 
     return $cases;
   }
