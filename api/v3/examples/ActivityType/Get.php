@@ -2,6 +2,8 @@
 /**
  * Test Generated example of using activity_type get API.
  *
+ * @deprecated
+ * The activity_type api is deprecated. Please use the option_value api instead.
  *
  * @return array
  *   API result array

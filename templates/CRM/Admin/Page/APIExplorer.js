@@ -481,7 +481,7 @@
       q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
-      $('#api-' + type).removeClass('prettyprinted').text(val);
+      $('#api-' + type).addClass('prettyprint').removeClass('prettyprinted').text(val);
     });
     prettyPrint();
   }

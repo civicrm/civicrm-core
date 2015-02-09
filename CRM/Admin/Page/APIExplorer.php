@@ -45,7 +45,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js', 99)
-      ->addStyleFile('civicrm', 'bower_components/google-code-prettify/styles/sunburst.css', 99);
+      ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css', 99);
 
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
 
