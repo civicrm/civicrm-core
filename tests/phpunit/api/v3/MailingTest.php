@@ -48,8 +48,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'Hello {contact.display_name}',
-      'body_text' => "This is {contact.display_name}",
-      'body_html' => "<p>This is {contact.display_name}</p>",
+      'body_text' => "This is {contact.display_name}.\n{domain.address}{action.optOutUrl}",
+      'body_html' => "<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -171,8 +171,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
-    $this->assertEquals("This is $displayName", $previewResult['values']['body_text']);
-    $this->assertContains("<p>This is $displayName</p>", $previewResult['values']['body_html']);
+    $this->assertContains("This is $displayName", $previewResult['values']['body_text']);
+    $this->assertContains("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
   }
 
   public function testMailerPreviewRecipients() {
@@ -348,9 +348,31 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       TRUE, //useLogin
       array('name' => ''), // createParams
       array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Mailing cannot be sent. There are missing fields \\(name\\)./", // expectedFailure
+      "/Mailing cannot be sent. There are missing or invalid fields \\(name\\)./", // expectedFailure
       0, // expectedJobCount
     );
+    $cases[] = array(
+      TRUE, //useLogin
+      array('body_html' => '', 'body_text' => ''), // createParams
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      "/Mailing cannot be sent. There are missing or invalid fields \\(body\\)./", // expectedFailure
+      0, // expectedJobCount
+    );
+    $cases[] = array(
+      TRUE, //useLogin
+      array('body_html' => 'Oops, did I leave my tokens at home?'), // createParams
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_html.*optOut.*\\)./", // expectedFailure
+      0, // expectedJobCount
+    );
+    $cases[] = array(
+      TRUE, //useLogin
+      array('body_text' => 'Oops, did I leave my tokens at home?'), // createParams
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_text.*optOut.*\\)./", // expectedFailure
+      0, // expectedJobCount
+    );
+
     return $cases;
   }
 

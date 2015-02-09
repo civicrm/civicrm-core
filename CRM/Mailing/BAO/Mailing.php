@@ -1708,7 +1708,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $errors = static::checkSendable($mailing);
       if (!empty($errors)) {
         $fields = implode(',', array_keys($errors));
-        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing fields ($fields).", 'cannot-send', $errors);
+        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
       }
     }
 
@@ -1754,6 +1754,26 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (empty($mailing->body_html) && empty($mailing->body_text)) {
       $errors['body'] = ts('Field "body_html" or "body_text" is required.');
     }
+
+    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'disable_mandatory_tokens_check')) {
+      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+      foreach (array('body_html', 'body_text') as $field) {
+        if (empty($mailing->{$field})) {
+          continue;
+        }
+        $str = ($header ? $header->{$field} : '') . $mailing->{$field} . ($footer ? $footer->{$field} : '');
+        $err = CRM_Utils_Token::requiredTokens($str);
+        if ($err !== TRUE) {
+          foreach ($err as $token => $desc) {
+            $errors["{$field}:{$token}"] = ts('This message is missing a required token - {%1}: %2',
+              array(1 => $token, 2 => $desc)
+            );
+          }
+        }
+      }
+    }
+
     return $errors;
   }
 

@@ -3226,7 +3226,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function createMailing() {
     $params = array(
       'subject' => 'maild' . rand(),
-      'body_text' => 'bdkfhdskfhduew',
+      'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
     );
