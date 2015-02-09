@@ -123,9 +123,9 @@ SELECT id
         array('onclick' => "showHideByValue('is_recur',true,'recurFields','table-row','radio',false);")
       );
       $this->addCheckBox('recur_frequency_unit', ts('Supported recurring units'),
-        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'name'),
+        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE),
         NULL, NULL, NULL, NULL,
-        array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
+        array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>'), TRUE
       );
       $this->addElement('checkbox', 'is_recur_interval', ts('Support recurring intervals'));
       $this->addElement('checkbox', 'is_recur_installments', ts('Offer installments'));
@@ -164,9 +164,9 @@ SELECT id
         NULL, array('onclick' => "showHideAmountBlock( this, 'is_pledge_active' ); return showHideByValue('is_pledge_active',true,'pledgeFields','table-row','radio',false);")
       );
       $this->addCheckBox('pledge_frequency_unit', ts('Supported pledge frequencies'),
-        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'name'),
+        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE),
         NULL, NULL, NULL, NULL,
-        array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
+        array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>'), TRUE
       );
       $this->addElement('checkbox', 'is_pledge_interval', ts('Allow frequency intervals'));
       $this->addElement('text', 'initial_reminder_day', ts('Send payment reminder'), array('size' => 3));
