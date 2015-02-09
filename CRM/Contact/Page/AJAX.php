@@ -975,7 +975,7 @@ LIMIT {$offset}, {$rowCount}
           $mergeParams .= "&gid={$gid}";
         }
 
-        $searchRows[$mainId]['actions'] = '<a class="action-item crm-hover-button" href="'. CRM_Utils_System::url('civicrm/contact/merge', $mergeParams) . '">' . ts('merge') . '</a>';
+        $searchRows[$mainId]['actions'] = '<a class="action-item crm-hover-button" href="' . CRM_Utils_System::url('civicrm/contact/merge', $mergeParams) . '">' . ts('merge') . '</a>';
         $searchRows[$mainId]['actions'] .= "<a class='action-item crm-hover-button crm-notDuplicate' href='#' onClick=\"processDupes( {$main['srcID']}, {$main['dstID']}, 'dupe-nondupe', 'dupe-listing'); return false;\">" . ts('not a duplicate') . "</a>";
       }
       else {
