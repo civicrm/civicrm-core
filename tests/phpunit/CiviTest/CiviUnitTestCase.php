@@ -3229,7 +3229,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'body_text' => 'bdkfhdskfhduew',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-      'api.mailing_job.create' => 0,
     );
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);

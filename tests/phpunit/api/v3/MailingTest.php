@@ -52,6 +52,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'body_html' => "<p>This is {contact.display_name}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
+      'header_id' => '',
+      'footer_id' => '',
     );
   }
 
@@ -64,7 +66,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Test civicrm_mailing_create.
    */
   public function testMailerCreateSuccess() {
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
     unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
@@ -104,6 +106,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $createParams['groups']['exclude'] = array();
     $createParams['mailings']['include'] = array();
     $createParams['mailings']['exclude'] = array();
+    $createParams['api.mailing_job.create'] = 1;
     $createResult = $this->callAPISuccess('Mailing', 'create', $createParams);
     $getGroup1 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup1_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup1['values']));
@@ -204,6 +207,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['mailings']['include'] = array();
     $params['mailings']['exclude'] = array();
     $params['options']['force_rollback'] = 1;
+    $params['api.mailing_job.create'] = 1;
     $params['api.MailingRecipients.get'] = array(
       'mailing_id' => '$value.id',
       'api.contact.getvalue' => array(
@@ -538,7 +542,6 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
    */
   public function createDraftMailing($params = array()) {
     $createParams = array_merge($this->_params, $params);
-    $createParams['api.mailing_job.create'] = 0; // note: exact match to API default
     $createResult = $this->callAPISuccess('mailing', 'create', $createParams, __FUNCTION__, __FILE__);
     $this->assertTrue(is_numeric($createResult['id']));
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(

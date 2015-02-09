@@ -105,8 +105,32 @@ function civicrm_api3_mailing_get_token($params) {
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
-  $params['api.mailing_job.create']['api.default'] = 1;
-  $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
+
+  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'track_civimail_replies', NULL, FALSE
+  );
+  $params['visibility']['api.default'] = 'Public Pages';
+  $params['dedupe_email']['api.default'] = TRUE;
+
+  $params['forward_replies']['api.default'] = FALSE;
+  $params['auto_responder']['api.default'] = FALSE;
+  $params['open_tracking']['api.default'] = TRUE;
+  $params['url_tracking']['api.default'] = TRUE;
+
+  $params['header_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+  $params['footer_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+  $params['optout_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
+  $params['reply_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
+  $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
+  $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+
+  $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+  foreach ($defaultAddress as $id => $value) {
+    if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
+      $params['from_email']['api.default'] = $match[2];
+      $params['from_name']['api.default'] = $match[1];
+    }
+  }
 }
 
 /**
@@ -167,9 +191,6 @@ function civicrm_api3_mailing_submit($params) {
 
   $updateParams = array();
   $updateParams['id'] = $params['id'];
-
-  // The BAO will auto-create the job - note: exact match to API default.
-  $updateParams['api.mailing_job.create'] = 0;
 
   // Note: we'll pass along scheduling/approval fields, but they may get ignored
   // if we don't have permission.
