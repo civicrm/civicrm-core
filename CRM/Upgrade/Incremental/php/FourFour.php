@@ -378,13 +378,17 @@ ALTER TABLE civicrm_dashboard
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
     $dao = self::findContactImageUrls($startId, $endId);
     $failures = array();
+    $config = CRM_Core_Config::singleton();
     while ($dao->fetch()){
       $imageURL = $dao->image_url;
       $baseurl = CIVICRM_UF_BASEURL;
+      //CRM-15897 - gross hack for joomla we need to remove the administrator/
+      if ($config->userFramework == 'Joomla') {
+        $baseurl = str_replace("/administrator/", "/", $baseurl);
+      }
       $baselen = strlen($baseurl);
       if (substr($imageURL, 0, $baselen)==$baseurl){
         $photo = basename($dao->image_url);
-        $config = CRM_Core_Config::singleton();
         $fullpath = $config->customFileUploadDir.$photo;
           if (file_exists($fullpath)){
             // For anyone who upgraded 4.4.6 release (eg 4.4.0=>4.4.6), the $newImageUrl incorrectly used backend URLs.
