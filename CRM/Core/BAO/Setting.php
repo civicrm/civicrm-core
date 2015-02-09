@@ -220,7 +220,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     $override_group = array();
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
-      if ( isset($name) ) {
+      if (isset($name)) {
         return $override;
       }
       else {
@@ -233,10 +233,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     $cacheKey = self::inCache($group, $name, $componentID, $contactID, TRUE, $domainID);
 
-    if ( $group && !isset($name) && $cacheKey) {
+    if ($group && !isset($name) && $cacheKey) {
       // check value against the cache, and unset key if values are different
-      $valueDifference = array_diff($override_group, self::$_cache[$cacheKey] );
-      if ( !empty($valueDifference)) {
+      $valueDifference = array_diff($override_group, self::$_cache[$cacheKey]);
+      if (!empty($valueDifference)) {
         $cacheKey = '';
       }
     }
@@ -259,13 +259,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       }
       $dao->free();
 
-      if ( ! isset($name) ) {
+      if (!isset($name)) {
         // merge db and override group values
-        /* When no $name is present, the getItem() function should return an array
-           consisting of the sum of all override settings + all settings present in
-           the database for the given $group (with the overrides taking precedence,
-           and applying even if the setting is not defined in the database).
-        */
+        // When no $name is present, the getItem() function should return an array
+        // consisting of the sum of all override settings + all settings present in
+        // the database for the given $group (with the overrides taking precedence,
+        // and applying even if the setting is not defined in the database).
+        //
         $values = array_merge($values, $override_group);
       }
 
@@ -1134,7 +1134,7 @@ AND domain_id = %3
     if ($group && $name && isset($civicrm_setting[$group][$name])) {
       return $civicrm_setting[$group][$name];
     }
-    else if ($group && !isset($name) && isset($civicrm_setting[$group])) {
+    elseif ($group && !isset($name) && isset($civicrm_setting[$group])) {
       return $civicrm_setting[$group];
     }
     else {
