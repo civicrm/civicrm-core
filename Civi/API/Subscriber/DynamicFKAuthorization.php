@@ -123,7 +123,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
-    if ($apiRequest['version'] == 3 && $apiRequest['entity'] == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
+    if ($apiRequest['version'] == 3 && strtolower($apiRequest['entity']) == strtolower($this->entityName) && in_array(strtolower($apiRequest['action']), $this->actions)) {
       if (/*!$isTrusted */
         empty($apiRequest['params']['id']) && empty($apiRequest['params']['entity_table'])
       ) {
