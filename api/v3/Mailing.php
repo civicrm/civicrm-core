@@ -105,8 +105,6 @@ function civicrm_api3_mailing_get_token($params) {
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
-  $params['api.mailing_job.create']['api.default'] = 1;
-  $params['api.mailing_job.create']['title'] = 'Schedule Mailing?';
 
   $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'track_civimail_replies', NULL, FALSE
@@ -193,9 +191,6 @@ function civicrm_api3_mailing_submit($params) {
 
   $updateParams = array();
   $updateParams['id'] = $params['id'];
-
-  // The BAO will auto-create the job - note: exact match to API default.
-  $updateParams['api.mailing_job.create'] = 0;
 
   // Note: we'll pass along scheduling/approval fields, but they may get ignored
   // if we don't have permission.

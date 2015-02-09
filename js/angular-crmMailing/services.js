@@ -261,9 +261,7 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function(mailing) {
-        var params = angular.extend({}, mailing, {
-          'api.mailing_job.create': 0 // note: exact match to API default
-        });
+        var params = angular.extend({}, mailing);
 
         // Angular ngModel sometimes treats blank fields as undefined.
         angular.forEach(mailing, function(value, key) {
