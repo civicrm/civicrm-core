@@ -979,6 +979,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
 
     CRM_Utils_System::civiExit();
@@ -1129,6 +1130,7 @@ LIMIT {$offset}, {$rowCount}
       'is_active',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
