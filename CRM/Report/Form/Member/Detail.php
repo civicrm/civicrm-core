@@ -70,7 +70,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Contact Name'),
             'required' => TRUE,
             'default' => TRUE,
-            'no_repeat' => TRUE,
           ),
           'id' => array(
             'no_display' => TRUE,
@@ -146,6 +145,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipType(),
+          ),
+        ),
+        'order_bys' => array(
+          'membership_type_id' => array(
+            'title' => ts('Membership Type'),
+            'default' => '0',
+            'default_weight' => '1',
+            'default_order' => 'ASC',
           ),
         ),
         'grouping' => 'member-fields',
@@ -248,6 +255,13 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' => array('title' => ts('Contribution Amount')),
+        ),
+        'order_bys' => array(
+          'receive_date' => array(
+            'title' => ts('Receive Date'),
+            'default_weight' => '2',
+            'default_order' => 'DESC',
+          ),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -359,14 +373,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
   }
 
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-
-    if ($this->_contribField) {
-      $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date DESC";
-    }
-  }
-
   public function postProcess() {
 
     $this->beginPostProcess();
@@ -400,19 +406,32 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
+    $repeatFound = FALSE;
     foreach ($rows as $rowNum => $row) {
-
+      if ($repeatFound == FALSE ||
+        $repeatFound < $rowNum - 1
+      ) {
+        unset($checkList);
+        $checkList = array();
+      }
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // not repeat contact display names if it matches with the one
         // in previous row
-        $repeatFound = FALSE;
         foreach ($row as $colName => $colVal) {
-          if (!empty($checkList[$colName]) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
+          if (in_array($colName, $this->_noRepeats) &&
+            $rowNum > 0
           ) {
-            $rows[$rowNum][$colName] = "";
-            $repeatFound = TRUE;
+            if ($rows[$rowNum][$colName] == $rows[$rowNum - 1][$colName] ||
+              (!empty($checkList[$colName]) &&
+              in_array($colVal, $checkList[$colName]))
+              ) {
+              $rows[$rowNum][$colName] = "";
+              // CRM-15917: Don't blank the name if it's a different contact
+              if ($colName == 'civicrm_contact_exposed_id') {
+                $rows[$rowNum]['civicrm_contact_sort_name'] = "";
+              }
+              $repeatFound = $rowNum;
+            }
           }
           if (in_array($colName, $this->_noRepeats)) {
             $checkList[$colName][] = $colVal;
