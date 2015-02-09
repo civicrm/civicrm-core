@@ -2,6 +2,8 @@
 /**
  * Test Generated example of using activity_type create API.
  *
+ * @deprecated
+ * The activity_type api is deprecated. Please use the option_value api instead.
  *
  * @return array
  *   API result array
@@ -46,10 +48,10 @@ function activity_type_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 780,
+    'id' => 784,
     'values' => array(
-      '780' => array(
-        'id' => '780',
+      '784' => array(
+        'id' => '784',
         'option_group_id' => '2',
         'label' => 'send out letters',
         'value' => '51',

@@ -2,6 +2,8 @@
 /**
  * Test Generated example of using survey_respondant get API.
  *
+ * @deprecated
+ * The survey_respondant api is not currently supported.
  *
  * @return array
  *   API result array
@@ -43,6 +45,7 @@ function survey_respondant_get_expectedresult() {
     'version' => 3,
     'count' => 0,
     'values' => array(),
+    'deprecated' => 'The survey_respondant api is not currently supported.',
   );
 
   return $expectedResult;
