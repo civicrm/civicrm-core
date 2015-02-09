@@ -24,13 +24,15 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   protected $fixtures;
 
   public function setUp() {
+    $this->useTransaction(TRUE);
     parent::setUp();
     $this->modules = array(
       'one' => new CRM_Core_Module('com.example.one', TRUE),
       'two' => new CRM_Core_Module('com.example.two', TRUE),
     );
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+
+    // Testing on drupal-demo fails because some extensions have mgd ents.
+    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
 
     $this->fixtures['com.example.one-foo'] = array(
       'module' => 'com.example.one',
@@ -60,8 +62,6 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
   public function tearDown() {
     parent::tearDown();
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_option_value WHERE name like "CRM_Example_%"');
     \Civi\Core\Container::singleton(TRUE);
   }
 
