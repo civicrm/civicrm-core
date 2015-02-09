@@ -94,7 +94,7 @@
         <th> {ts}Page Break{/ts}</th>
       </tr>
 
-      {section name=rowLoop start=1 loop=6}
+      {section name=rowLoop start=1 loop=10}
         {assign var=index value=$smarty.section.rowLoop.index}
         <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
           <td>

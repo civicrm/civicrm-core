@@ -71,7 +71,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     else {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
       if (empty($templateInfo)) {
-        CRM_Core_Error::statusBounce('You have tried to access a report that does not exist.'); 
+        CRM_Core_Error::statusBounce('You have tried to access a report that does not exist.');
       }
 
       $extKey = strpos($templateInfo['name'], '.');
