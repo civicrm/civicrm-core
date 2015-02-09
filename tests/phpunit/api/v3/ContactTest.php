@@ -1710,9 +1710,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetFormatIDOnly() {
     $this->createContactFromXML();
-    $description = "This demonstrates use of the 'format.id_only' param.
-    /* This param causes the id of the only entity to be returned as an integer.
-    /* it will be ignored if there is not exactly 1 result";
+    $description = "This demonstrates use of the 'format.id_only' param.\n" .
+    "  /* This param causes the id of the only entity to be returned as an integer." .
+    "  /* it will be ignored if there is not exactly 1 result";
     $subfile = "FormatOnlyID";
     $params = array('id' => 17, 'format.only_id' => 1);
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);

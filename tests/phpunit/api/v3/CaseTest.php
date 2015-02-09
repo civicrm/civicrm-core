@@ -30,7 +30,7 @@
  */
 
 /**
- *  Include class definitions
+ * Include class definitions
  */
 require_once 'CiviTest/CiviCaseTestCase.php';
 
@@ -44,12 +44,18 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   protected $_entity;
   protected $_apiversion = 3;
   protected $followup_activity_type_value;
+  /**
+   * Activity ID of created case.
+   *
+   * @var int
+   */
+  protected $_caseActivityId;
 
   /**
    * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
-   * and redirect stdin to a temporary file
+   * and redirect stdin to a temporary file.
    */
   public function setUp() {
     $this->_entity = 'case';
@@ -94,9 +100,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test create function with valid parameters.
    */
   public function testCaseCreate() {
-    // Create Case
     $params = $this->_params;
-    // Test using label instead of value
+    // Test using label instead of value.
     unset($params['case_type_id']);
     $params['case_type'] = $this->caseType;
     $result = $this->callAPIAndDocument('case', 'create', $params, __FUNCTION__, __FILE__);
@@ -104,16 +109,15 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Check result
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
-    $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$id]['case_type_id'], $this->caseTypeId, 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$id]['subject'], $params['subject'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['id'], $id);
+    $this->assertEquals($result['values'][$id]['case_type_id'], $this->caseTypeId);
+    $this->assertEquals($result['values'][$id]['subject'], $params['subject']);
   }
 
   /**
-   * Test update (create with id) function with valid parameters
+   * Test update (create with id) function with valid parameters.
    */
   public function testCaseUpdate() {
-    // Create Case
     $params = $this->_params;
     // Test using name instead of value
     unset($params['case_type_id']);
@@ -123,14 +127,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
     $case = $result['values'][$id];
 
-    // Update Case
+    // Update Case.
     $params = array('id' => $id);
     $params['subject'] = $case['subject'] = 'Something Else';
-    $result = $this->callAPISuccess('case', 'create', $params);
+    $this->callAPISuccess('case', 'create', $params);
 
-    // Verify that updated case is exactly equal to the original with new subject
+    // Verify that updated case is exactly equal to the original with new subject.
     $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
-    $this->assertEquals($result['values'][$id], $case, 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id], $case);
   }
 
   /**
@@ -146,7 +150,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Check result - also check that 'case_id' works as well as 'id'
     $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
-    $this->assertEquals(1, $result['values'][$id]['is_deleted'], 'in line ' . __LINE__);
+    $this->assertEquals(1, $result['values'][$id]['is_deleted']);
 
     // Delete Case Permanently - also check that 'case_id' works as well as 'id'
     $result = $this->callAPISuccess('case', 'delete', array('case_id' => $id));
@@ -174,8 +178,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
         'activity_id' => $activity,
         'return' => 'activities,contacts',
       ));
-    $this->assertEquals(FALSE, empty($result['values'][$id]), 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$id], $case, 'in line ' . __LINE__);
+    $this->assertEquals(FALSE, empty($result['values'][$id]));
+    $this->assertEquals($result['values'][$id], $case);
   }
 
   /**
@@ -220,23 +224,20 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test get function based on wrong subject.
    */
   public function testCaseGetByWrongSubject() {
-    // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
-    $id = $result['id'];
 
-    // Append 'wrong' to subject so that it is no longer the same
+    // Append 'wrong' to subject so that it is no longer the same.
     $result = $this->callAPISuccess('case', 'get', array(
         'subject' => $this->_params['subject'] . 'wrong',
         'return' => array('activities', 'contacts'),
       ));
-    $this->assertEquals(0, $result['count'], 'in line ' . __LINE__);
+    $this->assertEquals(0, $result['count']);
   }
 
   /**
    * Test get function with no criteria.
    */
   public function testCaseGetNoCriteria() {
-    // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
 
@@ -251,9 +252,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test activity api create for case activities.
    */
   public function testCaseActivityCreate() {
-    // Create a case first
     $params = $this->_params;
-    $result = $this->callAPISuccess('case', 'create', $params);
+    $this->callAPISuccess('case', 'create', $params);
     $params = array(
       'case_id' => 1,
       // follow up
@@ -263,7 +263,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'target_contact_id' => $this->_params['contact_id'],
     );
     $result = $this->callAPISuccess('activity', 'create', $params);
-    $this->assertEquals($result['values'][$result['id']]['activity_type_id'], $params['activity_type_id'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$result['id']]['activity_type_id'], $params['activity_type_id']);
 
     // might need this for other tests that piggyback on this one
     $this->_caseActivityId = $result['values'][$result['id']]['id'];
@@ -301,7 +301,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     );
     $result = $this->callAPISuccess('activity', 'create', $params);
 
-    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
 
     // id should be one greater, since this is a new revision
     $this->assertEquals($result['values'][$result['id']]['id'],
@@ -357,9 +357,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'source_contact_id' => $this->_loggedInUser,
       'subject' => 'New subject',
     );
-    $revAct = $this->callAPISuccess('activity', 'create', $params);
+    $this->callAPISuccess('activity', 'create', $params);
 
-    // Retrieve revision and check custom fields got copied
+    // Retrieve revision and check custom fields got copied.
     $revParams = array(
       'activity_id' => $aid + 1,
       'return.custom_' . $custom_ids['custom_field_id'] => 1,
@@ -367,8 +367,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $revAct = $this->callAPISuccess('activity', 'get', $revParams);
 
     $this->assertEquals($revAct['values'][$aid + 1]['custom_' . $custom_ids['custom_field_id']], "custom string",
-      "Error message: " . CRM_Utils_Array::value('error_message', $revAct) . ' in line ' . __LINE__
-    );
+      "Error message: " . CRM_Utils_Array::value('error_message', $revAct));
 
     $this->customFieldDelete($custom_ids['custom_field_id']);
     $this->customGroupDelete($custom_ids['custom_group_id']);
