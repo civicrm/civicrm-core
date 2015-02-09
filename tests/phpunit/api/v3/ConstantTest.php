@@ -84,12 +84,9 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
    * Test civicrm_constant_get( 'activityType' )
    */
   public function testActivityType() {
-
-    $parameters = array(TRUE, FALSE, TRUE);
-
-    $result = $this->callAPISuccess('constant', 'get', array(
+    $result = $this->callAPIAndDocument('constant', 'get', array(
       'name' => 'activityType',
-    ));
+    ), __FUNCTION__, __FILE__, NULL, NULL, 'get');
     $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
     $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
   }
@@ -104,7 +101,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $params = array(
       'field' => 'location_type_id',
     );
-    $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('address', 'getoptions', $params);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
     $this->assertContains('Work', $result['values'], "In line " . __LINE__);

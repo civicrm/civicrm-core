@@ -2,6 +2,13 @@
 /**
  * Test Generated example of using {$fnPrefix} {$action} API.
  *
+{if !empty($result.deprecated) && is_string($result.deprecated)}
+ * @deprecated
+ * {$result.deprecated}
+{if !$description}
+ *
+{/if}
+{/if}
 {if $description}
  * {$description}
  *

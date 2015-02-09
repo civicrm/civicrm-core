@@ -77,7 +77,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
 
   $respondants = CRM_Campaign_BAO_Survey::getSurveyActivities($surveyID, $interviewerID, $statusIds);
 
-  return (civicrm_api3_create_success($respondants, $params));
+  return (civicrm_api3_create_success($respondants, $params, 'SurveyRespondant', 'get'));
 }
 
 /**
