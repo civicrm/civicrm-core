@@ -38,6 +38,7 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
 
   static private $tables = null;
   static private $daoToClass = null;
+  static private $entityTypes = null;
 
   static public function init($fresh = FALSE) {ldelim}
     static $init = FALSE;
@@ -55,6 +56,7 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
 
     CRM_Utils_Hook::entityTypes($entityTypes);
 
+    self::$entityTypes = array();
     self::$tables = array();
     self::$daoToClass = array();
     foreach ($entityTypes as $entityType) {ldelim}
@@ -70,6 +72,16 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
   static public function registerEntityType($daoName, $className, $tableName) {ldelim}
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
+    self::$entityTypes[$className] = array(
+      'name' => $daoName,
+      'class' => $className,
+      'table' => $tableName,
+    );
+  {rdelim}
+
+  static public function get() {ldelim}
+    self::init();
+    return self::$entityTypes;
   {rdelim}
 
   static public function tables() {ldelim}
