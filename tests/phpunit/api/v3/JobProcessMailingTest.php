@@ -68,6 +68,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'name' => 'mailing name',
       'created_id' => 1,
       'groups' => array('include' => array($this->_groupID)),
+      'scheduled_date' => 'now',
     );
     $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get', array('api.mail_settings.create' => array('domain' => 'chaos.org')));
