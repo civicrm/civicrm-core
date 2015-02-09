@@ -162,6 +162,7 @@ class Container {
       $kernel,
       'Attachment',
       array('create', 'get', 'delete'),
+      // Given a file ID, determine the entity+table it's attached to.
       'SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
          FROM civicrm_file cf
          LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id
