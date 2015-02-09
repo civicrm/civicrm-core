@@ -110,7 +110,9 @@ function _civicrm_api3_mailing_create_spec(&$params) {
     'track_civimail_replies', NULL, FALSE
   );
   $params['visibility']['api.default'] = 'Public Pages';
-  $params['dedupe_email']['api.default'] = TRUE;
+  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'dedupe_email_default', NULL, FALSE
+  );
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
