@@ -150,33 +150,19 @@
           });
       },
       // @return Object Mailing (per APIv3)
-      create: function create() {
-        return {
+      create: function create(params) {
+        var defaults = {
           jobs: {}, // {jobId: JobRecord}
-          name: "",
-          campaign_id: null,
-          from_name: crmFromAddresses.getDefault().author,
-          from_email: crmFromAddresses.getDefault().email,
-          replyto_email: "",
-          subject: "",
           groups: {include: [], exclude: []},
           mailings: {include: [], exclude: []},
+          name: "",
+          campaign_id: null,
+          replyto_email: "",
+          subject: "",
           body_html: "",
-          body_text: "",
-          footer_id: null, // pickDefaultMailComponent('Footer'),
-          header_id: null, // pickDefaultMailComponent('Header'),
-          visibility: "Public Pages",
-          url_tracking: "1",
-          dedupe_email: "1",
-          forward_replies: "0",
-          auto_responder: "0",
-          open_tracking: "1",
-          override_verp: "1",
-          optout_id: pickDefaultMailComponent('OptOut'),
-          reply_id: pickDefaultMailComponent('Reply'),
-          resubscribe_id: pickDefaultMailComponent('Resubscribe'),
-          unsubscribe_id: pickDefaultMailComponent('Unsubscribe')
+          body_text: ""
         };
+        return angular.extend({}, defaults, params);
       },
 
       // @param mailing Object (per APIv3)
@@ -275,9 +261,7 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function(mailing) {
-        var params = angular.extend({}, mailing, {
-          'api.mailing_job.create': 0 // note: exact match to API default
-        });
+        var params = angular.extend({}, mailing);
 
         // Angular ngModel sometimes treats blank fields as undefined.
         angular.forEach(mailing, function(value, key) {

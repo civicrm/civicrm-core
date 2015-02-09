@@ -50,6 +50,15 @@
     }
 
     angular.extend(CrmMailingAB.prototype, {
+      getAutosaveSignature: function() {
+        return [
+          this.ab,
+          this.mailings,
+          this.attachments.a.getAutosaveSignature(),
+          this.attachments.b.getAutosaveSignature(),
+          this.attachments.c.getAutosaveSignature()
+        ];
+      },
       // @return Promise CrmMailingAB
       load: function load() {
         var crmMailingAB = this;
@@ -67,9 +76,15 @@
             declare_winning_time: null,
             group_percentage: 10
           };
-          crmMailingAB.mailings.a = crmMailingMgr.create();
-          crmMailingAB.mailings.b = crmMailingMgr.create();
-          crmMailingAB.mailings.c = crmMailingMgr.create();
+          var mailingDefaults = {
+            // Most defaults provided by Mailing.create API, but we
+            // want to force-enable tracking.
+            open_tracking: "1",
+            url_tracking: "1"
+          };
+          crmMailingAB.mailings.a = crmMailingMgr.create(mailingDefaults);
+          crmMailingAB.mailings.b = crmMailingMgr.create(mailingDefaults);
+          crmMailingAB.mailings.c = crmMailingMgr.create(mailingDefaults);
           crmMailingAB.attachments.a = new CrmAttachments(function () {
             return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab.mailing_id_a};
           });

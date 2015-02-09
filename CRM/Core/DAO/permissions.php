@@ -66,8 +66,11 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     'default' => array('administer CiviCRM'),
   );
 
+  // Note: Additional permissions in DynamicFKAuthorization
   $permissions['attachment'] = array(
-    'default' => array('access CiviCRM', 'access AJAX API'),
+    'default' => array(
+      array('access CiviCRM', 'access AJAX API'),
+    ),
   );
 
   // Contact permissions
@@ -249,6 +252,10 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access CiviMail',
     ),
   );
+  $permissions['mailing_a_b'] = $permissions['mailing'];
+  $permissions['mailing_group'] = $permissions['mailing'];
+  $permissions['mailing_job'] = $permissions['mailing'];
+  $permissions['mailing_recipients'] = $permissions['mailing'];
 
   // Membership permissions
   $permissions['membership'] = array(

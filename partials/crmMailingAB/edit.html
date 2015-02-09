@@ -13,7 +13,7 @@
   {{ts('This mailing has been submitted.')}}
 </div>
 
-<form name="crmMailingAB" novalidate ng-hide="isSubmitted()">
+<form name="crmMailingAB" novalidate ng-hide="isSubmitted()" crm-autosave="save()" crm-autosave-model="abtest.getAutosaveSignature()" crm-autosave-if="true">
   <div class="crm-block crm-form-block crmMailing">
     <div crm-ui-wizard>
       <div crm-ui-wizard-step="10" crm-title="ts('Setup')" ng-form="setupForm">
@@ -167,17 +167,18 @@
           }"
           crm-abtest="abtest"></div>
         <center>
-          <a class="crmMailing-submit-button" ng-click="submit()" ng-class="{disabled: crmMailing.$invalid}">
+          <a class="crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
             <div>{{ts('Submit Mailing')}}</div>
           </a>
         </center>
       </div>
       <span crm-ui-wizard-buttons style="float:right;">
         <button
+          ng-disabled="block.check()"
           crm-confirm="{title:ts('Delete Draft?'), message:ts('Are you sure you want to delete the draft mailing?')}"
           on-yes="delete()">{{ts('Delete Draft')}}
         </button>
-        <button ng-click="save()">{{ts('Save Draft')}}</button>
+        <button ng-disabled="block.check()" ng-click="save().then(leave) ">{{ts('Save Draft')}}</button>
       </span>
     </div>
 </form>
