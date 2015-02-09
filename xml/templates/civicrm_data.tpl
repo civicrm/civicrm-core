@@ -1212,11 +1212,13 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'isn\'t in my control/locals file'),
     (@bounceTypeID, 'local configuration error'),
     (@bounceTypeID, 'not a gateway'),
-    (@bounceTypeID, 'server is down or unreachable'),
+    (@bounceTypeID, 'server is (down or unreachable|not responding)'),
     (@bounceTypeID, 'too many connections'),
     (@bounceTypeID, 'unable to connect'),
     (@bounceTypeID, 'lost connection'),
-    (@bounceTypeID, 'conversation with [^ ]* timed out while');
+    (@bounceTypeID, 'conversation with [^ ]* timed out while'),
+    (@bounceTypeID, 'server requires authentication'),
+    (@bounceTypeID, 'authentication (is )?required');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1238,10 +1240,12 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'mail( ?)address is administrative?ly disabled'),
     (@bounceTypeID, 'mailbox (temporarily disabled|currently suspended)'),
     (@bounceTypeID, 'no longer (accepting mail|on server|in use|with|employed|on staff|works for|using this account)'),
-    (@bounceTypeID, 'not accepting mail'),
+    (@bounceTypeID, 'not accepting (mail|messages)'),
     (@bounceTypeID, 'please use my new e-?mail address'),
     (@bounceTypeID, 'this address no longer accepts mail'),
-    (@bounceTypeID, 'user account suspended');
+    (@bounceTypeID, 'user account suspended'),
+    (@bounceTypeID, 'account that you tried to reach is disabled'),
+    (@bounceTypeID, 'User banned');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1254,8 +1258,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, '(user|recipient( name)?) is not recognized'),
     (@bounceTypeID, '554 delivery error'),
     (@bounceTypeID, 'address does not exist'),
-    (@bounceTypeID, 'address(es)? could not be found'),
-    (@bounceTypeID, 'addressee unknown'),
+    (@bounceTypeID, 'address(es)?( you (entered|specified))? (could|was)( not|n.t)( be)? found'),
+    (@bounceTypeID, 'address(ee)? (unknown|invalid)'),
     (@bounceTypeID, 'bad destination'),
     (@bounceTypeID, 'badly formatted address'),
     (@bounceTypeID, 'can\'t open mailbox for'),
@@ -1269,28 +1273,41 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'illegal alias'),
     (@bounceTypeID, 'invalid (mailbox|(e-?mail )?address|recipient|final delivery)'),
     (@bounceTypeID, 'invalid( or unknown)?( virtual)? user'),
-    (@bounceTypeID, 'mail delivery to this user is not allowed'),
+    (@bounceTypeID, '(mail )?delivery (to this user )?is not allowed'),
     (@bounceTypeID, 'mailbox (not found|unavailable|name not allowed)'),
     (@bounceTypeID, 'message could not be forwarded'),
     (@bounceTypeID, 'missing or malformed local(-| )part'),
     (@bounceTypeID, 'no e-?mail address registered'),
-    (@bounceTypeID, 'no such (mail drop|mailbox( \w+)?|(e-?mail )?address|recipient|(local )?user)( here)?'),
-    (@bounceTypeID, 'no mailbox here by that name'),
+    (@bounceTypeID, 'no such (mail drop|mailbox( \w+)?|(e-?mail )?address|recipient|(local )?user|person)( here)?'),
+    (@bounceTypeID, 'no mailbox (here )?by that name'),
     (@bounceTypeID, 'not (listed in|found in directory|known at this site|our customer)'),
     (@bounceTypeID, 'not a valid( (user|mailbox))?'),
     (@bounceTypeID, 'not present in directory entry'),
-    (@bounceTypeID, 'recipient (does not exist|(is )?unknown)'),
+    (@bounceTypeID, 'recipient (does not exist|(is )?unknown|rejected|denied|not found)'),
     (@bounceTypeID, 'this user doesn\'t have a yahoo.com address'),
     (@bounceTypeID, 'unavailable to take delivery of the message'),
     (@bounceTypeID, 'unavailable mailbox'),
-    (@bounceTypeID, 'unknown (local( |-)part|recipient)'),
+    (@bounceTypeID, 'unknown (local( |-)part|recipient|address error)'),
     (@bounceTypeID, 'unknown( or illegal)? user( account)?'),
     (@bounceTypeID, 'unrecognized recipient'),
     (@bounceTypeID, 'unregistered address'),
     (@bounceTypeID, 'user (unknown|does not exist)'),
     (@bounceTypeID, 'user doesn\'t have an? \w+ account'),
     (@bounceTypeID, 'user(\'s e-?mail name is)? not found'),
-    (@bounceTypeID, '^Validation failed for:');
+    (@bounceTypeID, '^Validation failed for:'),
+    (@bounceTypeID, '5.1.0 Address rejected'),
+    (@bounceTypeID, 'no valid recipients?'),
+    (@bounceTypeID, 'RecipNotFound'),
+    (@bounceTypeID, 'no one at this address'),
+    (@bounceTypeID, 'misconfigured forwarding address'),
+    (@bounceTypeID, 'account is not allowed'),
+    (@bounceTypeID, 'Address .<[^>]*>. not known here'),
+    (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}'),
+    (@bounceTypeID, 'Non sono riuscito a trovare l.indirizzo e-mail'),
+    (@bounceTypeID, 'nadie con esta direcci..?n'),
+    (@bounceTypeID, 'ni bilo mogo..?e najti prejemnikovega e-po..?tnega naslova'),
+    (@bounceTypeID, 'Elektronski naslov (je ukinjen|ne obstaja)'),
+    (@bounceTypeID, 'nepravilno nastavljen predal');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1300,12 +1317,12 @@ SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'L
 INSERT INTO civicrm_mailing_bounce_pattern
         (bounce_type_id, pattern)
         VALUES
-    (@bounceTypeID, '(mail|routing) loop'),
+    (@bounceTypeID, '(mail( forwarding)?|routing).loop'),
     (@bounceTypeID, 'excessive recursion'),
     (@bounceTypeID, 'loop detected'),
     (@bounceTypeID, 'maximum hop count exceeded'),
     (@bounceTypeID, 'message was forwarded more than the maximum allowed times'),
-    (@bounceTypeID, 'too many hops');
+    (@bounceTypeID, 'too many (hops|recursive forwards)');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1315,20 +1332,23 @@ SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Q
 INSERT INTO civicrm_mailing_bounce_pattern
         (bounce_type_id, pattern)
         VALUES
-    (@bounceTypeID, '(disk|over the allowed|exceed(ed|s)?|storage) quota'),
+    (@bounceTypeID, '(disk(space)?|over the allowed|exceed(ed|s)?|storage) quota'),
     (@bounceTypeID, '522_mailbox_full'),
     (@bounceTypeID, 'exceeds allowed message count'),
     (@bounceTypeID, 'file too large'),
     (@bounceTypeID, 'full mailbox'),
-    (@bounceTypeID, 'mailbox ((for user \w+ )?is )?full'),
-    (@bounceTypeID, 'mailbox has exceeded the limit'),
+    (@bounceTypeID, '(mail|in)(box|folder) ((for user \w+ )?is )?full'),
+    (@bounceTypeID, 'mailbox (has exceeded|is over) the limit'),
     (@bounceTypeID, 'mailbox( exceeds allowed)? size'),
     (@bounceTypeID, 'no space left for this user'),
     (@bounceTypeID, 'over\\s?quota'),
     (@bounceTypeID, 'quota (for the mailbox )?has been exceeded'),
-    (@bounceTypeID, 'quota (usage|violation|exceeded)'),
+    (@bounceTypeID, 'quota ?(usage|violation|exceeded)'),
     (@bounceTypeID, 'recipient storage full'),
-    (@bounceTypeID, 'not able to receive more mail');
+    (@bounceTypeID, 'not able to receive more mail'),
+    (@bounceTypeID, 'doesn.t have enough disk space left'),
+    (@bounceTypeID, 'exceeded storage allocation'),
+    (@bounceTypeID, 'running out of disk space');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1341,12 +1361,17 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'cannot find your hostname'),
     (@bounceTypeID, 'ip name lookup'),
     (@bounceTypeID, 'not configured to relay mail'),
-    (@bounceTypeID, 'relay (not permitted|access denied)'),
+    (@bounceTypeID, 'relay(ing)? (not permitted|(access )?denied)'),
     (@bounceTypeID, 'relayed mail to .+? not allowed'),
     (@bounceTypeID, 'sender ip must resolve'),
     (@bounceTypeID, 'unable to relay'),
     (@bounceTypeID, 'No route to host'),
-    (@bounceTypeID, 'Network is unreachable');
+    (@bounceTypeID, 'Network is unreachable'),
+    (@bounceTypeID, 'unrouteable address'),
+    (@bounceTypeID, 'We don.t handle mail for'),
+    (@bounceTypeID, 'we do not relay'),
+    (@bounceTypeID, 'Rejected by next-hop'),
+    (@bounceTypeID, 'not permitted to( *550)? relay through this server');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -1372,8 +1397,16 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'sender was rejected'),
     (@bounceTypeID, 'spam(check| reduction software| filters?)'),
     (@bounceTypeID, 'blocked by a user configured filter'),
-    (@bounceTypeID, 'detected as spam'),
-    (@bounceTypeID, 'X-HmXmrOriginalRecipient');
+    (@bounceTypeID, '(detected|rejected) as spam'),
+    (@bounceTypeID, 'X-HmXmrOriginalRecipient'),
+    (@bounceTypeID, 'Client host \[[^]]*\] blocked'),
+    (@bounceTypeID, 'automatic(ally-generated)? messages are not accepted'),
+    (@bounceTypeID, 'denied by policy'),
+    (@bounceTypeID, 'has no corresponding reverse (PTR) address'),
+    (@bounceTypeID, 'has a policy that( [^ ]*)? prohibited the mail that you sent'),
+    (@bounceTypeID, 'is likely unsolicited mail'),
+    (@bounceTypeID, 'Local Policy Violation'),
+    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
