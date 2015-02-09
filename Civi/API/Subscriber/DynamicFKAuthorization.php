@@ -73,7 +73,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   protected $actions;
 
   /**
-   * @var string, SQL; a query which looks up the related entity
+   * @var string, SQL. Given a file ID, determine the entity+table it's attached to.
    *
    * ex: "SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
    * FROM civicrm_file cf

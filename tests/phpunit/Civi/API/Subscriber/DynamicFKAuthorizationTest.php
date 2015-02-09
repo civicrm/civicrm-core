@@ -77,6 +77,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       $this->kernel,
       'FakeFile',
       array('create', 'get'),
+      // Given a file ID, determine the entity+table it's attached to.
       "select
       case %1
         when " . self::FILE_WIDGET_ID . " then 1
