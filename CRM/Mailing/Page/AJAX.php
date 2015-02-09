@@ -95,6 +95,7 @@ class CRM_Mailing_Page_AJAX {
       'start_date', 'openstats', 'links',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($mailings, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
