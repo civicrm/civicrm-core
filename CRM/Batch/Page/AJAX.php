@@ -121,6 +121,7 @@ class CRM_Batch_Page_AJAX {
         'links',
       );
     }
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
