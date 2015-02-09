@@ -2283,12 +2283,19 @@ div.grippie {
   background-position: 0 -25px;
 }
 
+.crm-container .crm-button-disabled,
+.crm-container .crm-button.crm-button-disabled,
+.crm-container .ui-dialog-buttonset .ui-button[disabled],
 .crm-container input.crm-form-submit[disabled],
 .crm-container input[type=button][disabled],
 .crm-container .crm-button[disabled] {
   opacity: .6;
   cursor: default;
   background-position: top left;
+}
+
+.crm-container .crm-button-disabled input[disabled] {
+  opacity: 1;
 }
 
 .crm-container .ui-dialog-buttonpane {
