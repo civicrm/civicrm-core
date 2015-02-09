@@ -46,63 +46,6 @@ class CRM_Contact_Page_AJAX {
   const AUTOCOMPLETE_TTL = 21600; // 6hr; 6*60*60
 
   /**
-   * @deprecated
-   */
-  static function getContactList() {
-    // if context is 'customfield'
-    if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
-      return self::contactReference();
-    }
-
-    $params = array('version' => 3, 'check_permissions' => TRUE);
-
-    // String params
-    // FIXME: param keys don't match input keys, using this array to translate
-    $whitelist = array(
-      's' => 'name',
-      'fieldName' => 'field_name',
-      'tableName' => 'table_name',
-      'context' => 'context',
-      'rel' => 'rel',
-      'contact_sub_type' => 'contact_sub_type',
-      'contact_type' => 'contact_type'
-    );
-    foreach ($whitelist as $key => $param) {
-      if (!empty($_GET[$key])) {
-        $params[$param] = $_GET[$key];
-      }
-    }
-
-    //CRM-10687: Allow quicksearch by multiple fields
-    if (!empty($params['field_name'])) {
-      if ($params['field_name'] == 'phone_numeric') {
-        $params['name'] = preg_replace('/[^\d]/', '', $params['name']);
-      }
-      if (!$params['name']) {
-        CRM_Utils_System::civiExit();
-      }
-    }
-
-    // Numeric params
-    $whitelist = array(
-      'limit',
-      'org',
-      'employee_id',
-      'cid',
-      'id',
-      'cmsuser',
-    );
-    foreach ($whitelist as $key) {
-      if (!empty($_GET[$key]) && is_numeric($_GET[$key])) {
-        $params[$key] = $_GET[$key];
-      }
-    }
-
-    $result = civicrm_api('Contact', 'getquick', $params);
-    CRM_Core_Page_AJAX::autocompleteResults(CRM_Utils_Array::value('values', $result), 'data');
-  }
-
-  /**
    * Ajax callback for custom fields of type ContactReference
    *
    * Todo: Migrate contact reference fields to use EntityRef
