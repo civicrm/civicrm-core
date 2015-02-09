@@ -382,7 +382,7 @@ ALTER TABLE civicrm_dashboard
     while ($dao->fetch()){
       $imageURL = $dao->image_url;
       $baseurl = CIVICRM_UF_BASEURL;
-      //CRM-15897 - gross hack for joomla we need to remove the administrator/
+      //CRM-15897 - gross hack for joomla to remove the administrator/
       if ($config->userFramework == 'Joomla') {
         $baseurl = str_replace("/administrator/", "/", $baseurl);
       }
