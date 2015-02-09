@@ -30,7 +30,7 @@
     border: 0 none;
   }
   #mainTabContainer pre {
-    line-height: 1.3em;
+    line-height: 14px;
     font-size: 11px;
     margin: 0;
     border: 0 none;
@@ -90,7 +90,13 @@
     color: #CFCFCF;
   }
   pre ol.linenums li:hover {
-    color: #9c9c9c;
+    color: #828282;
+    background-color: #f2f2f2;
+  }
+  pre li.L1, pre li.L3, pre li.L5, pre li.L7, pre li.L9,
+  #api-generated td + td,
+  #mainTabContainer pre {
+    background-color: #f9f9f9;
   }
   .api-doc-code {
     margin-top: 1em;
@@ -165,15 +171,15 @@
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>
           <caption>{ts}Code{/ts}</caption>
-          <tr><td>Rest</td><td><pre class="prettyprint" id="api-rest"></pre></td></tr>
-          <tr><td>Smarty</td><td><pre class="prettyprint linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
-          <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
-          <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
+          <tr><td>Rest</td><td><pre id="api-rest"></pre></td></tr>
+          <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
+          <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
+          <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
           {if $config->userSystem->is_drupal}
-            <tr><td>Drush</td><td><pre class="prettyprint" id="api-drush" title='drush syntax'></pre></td></tr>
+            <tr><td>Drush</td><td><pre id="api-drush" title='drush syntax'></pre></td></tr>
           {/if}
           {if $config->userSystem->is_wordpress}
-            <tr><td>WP-CLI</td><td><pre class="prettyprint" id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
+            <tr><td>WP-CLI</td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
           {/if}
         </table>
       </div>
