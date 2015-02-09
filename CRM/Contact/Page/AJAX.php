@@ -357,6 +357,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   static function groupTree() {
+    header('Content-Type: application/json');
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
     echo CRM_Contact_BAO_GroupNestingCache::json($gids);
     CRM_Utils_System::civiExit();
@@ -536,7 +537,7 @@ ORDER BY sort_name ";
     }
 
     if ($json) {
-      echo json_encode($elements);
+      CRM_Utils_JSON::output($elements);
     }
     CRM_Utils_System::civiExit();
   }
@@ -638,8 +639,7 @@ WHERE sort_name LIKE '%$name%'";
       || !$signer->validate($_REQUEST['sig'], $_REQUEST)
     ) {
       $user = array('name' => 'error');
-      echo json_encode($user);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($user);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -653,13 +653,15 @@ WHERE sort_name LIKE '%$name%'";
     if (isset($errors['cms_name']) || isset($errors['name'])) {
       //user name is not availble
       $user = array('name' => 'no');
-      echo json_encode($user);
+      CRM_Utils_JSON::output($user);
     }
     else {
       //user name is available
       $user = array('name' => 'yes');
-      echo json_encode($user);
+      CRM_Utils_JSON::output($user);
     }
+
+    // Not reachable: JSON::output() above exits.
     CRM_Utils_System::civiExit();
   }
 
@@ -766,7 +768,7 @@ LIMIT {$offset}, {$rowCount}
         }
 
         if ($result) {
-          echo json_encode($result);
+          CRM_Utils_JSON::output($result);
         }
       }
     }
@@ -833,7 +835,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($result) {
-      echo json_encode($result);
+      CRM_Utils_JSON::output($result);
     }
     CRM_Utils_System::civiExit();
   }
