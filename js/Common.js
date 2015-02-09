@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-var CRM = CRM || {};
+if (!CRM) CRM = {};
 var cj = CRM.$ = jQuery;
 CRM._ = _;
 
@@ -17,8 +17,8 @@ function ts(text, params) {
   if (d && CRM[d] && CRM[d][text]) {
     text = CRM[d][text];
   }
-  else if (CRM['strings'][text]) {
-    text = CRM['strings'][text];
+  else if (CRM.strings[text]) {
+    text = CRM.strings[text];
   }
   if (typeof(params) === 'object') {
     for (var i in params) {
@@ -44,7 +44,7 @@ function ts(text, params) {
  * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
-  if (elementType == null) {
+  if (!elementType) {
     elementType = 'block';
   }
 
@@ -54,7 +54,7 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   for (i = 0; i < showBlocks.length; i++) {
     myElement = document.getElementById(showBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
-    if (myElement != null) {
+    if (myElement) {
       myElement.style.display = elementType;
     }
     else {
@@ -66,7 +66,7 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   for (i = 0; i < hideBlocks.length; i++) {
     myElement = document.getElementById(hideBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
-    if (myElement != null) {
+    if (myElement) {
       myElement.style.display = 'none';
     }
     else {
@@ -200,6 +200,7 @@ CRM.strings = CRM.strings || {};
 
 (function ($, _, undefined) {
   "use strict";
+  /* jshint validthis: true */
 
   // Theme classes for unattached elements
   $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container';
@@ -210,6 +211,20 @@ CRM.strings = CRM.strings || {};
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
     return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog').length;
+  };
+
+  // Implements jQuery hook.prop
+  $.propHooks.disabled = {
+    set: function (el, value, name) {
+      // Sync button enabled status with wrapper css
+      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+        $(el).parent().toggleClass('crm-button-disabled', !!value);
+      }
+      // Sync button enabled status with dialog button
+      if ($(el).is('.ui-dialog input.crm-form-submit')) {
+        $(el).closest('.ui-dialog').find('.ui-dialog-buttonset button[data-identifier='+ $(el).attr('name') +']').prop('disabled', !!value);
+      }
+    }
   };
 
   /**
@@ -1035,12 +1050,12 @@ CRM.strings = CRM.strings || {};
       expires: 0
     };
     if ($(this).length) {
-      if (title == '') {
+      if (title === '') {
         var label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
         if (label.length) {
           label.addClass('crm-error');
           var $label = label.clone();
-          if (text == '' && $('.crm-marker', $label).length > 0) {
+          if (text === '' && $('.crm-marker', $label).length > 0) {
             text = $('.crm-marker', $label).attr('title');
           }
           $('.crm-marker', $label).remove();

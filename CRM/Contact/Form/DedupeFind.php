@@ -72,6 +72,8 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
         //hack to support cancel button functionality
         array(
           'type' => 'submit',
+          'class' => 'cancel',
+          'icon' => 'close',
           'name' => ts('Cancel'),
         ),
       )
