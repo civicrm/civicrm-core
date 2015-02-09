@@ -60,8 +60,10 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
 
   /**
    * @var \Civi\API\Kernel
+   *
+   * Treat as private. Marked public due to PHP 5.3-compatibility issues.
    */
-  protected $kernel;
+  public $kernel;
 
   /**
    * @var string, the entity for which we want to manage permissions
@@ -219,7 +221,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
      * @var \Exception $exception
      */
     $exception = NULL;
-    \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception) {
+    $self = $this;
+    \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception, $self) {
       $tx->rollback(); // Just to be safe.
 
       $params = array(
@@ -228,7 +231,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         'id' => $entityId,
       );
 
-      $result = $this->kernel->run($entity, $this->getDelegatedAction($action), $params);
+      $result = $self->kernel->run($entity, $self->getDelegatedAction($action), $params);
       if ($result['is_error'] || empty($result['values'])) {
         $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", array(
           'cause' => $result,
