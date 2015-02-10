@@ -50,6 +50,7 @@ class Resolver {
    *   A callback expression; any of the following.
    * @return array
    *   A PHP callback. Do not serialize (b/c it may include an object).
+   * @throws \RuntimeException
    */
   public function get($id) {
     if (!is_string($id)) {
@@ -93,6 +94,19 @@ class Resolver {
       // Callback: Function.
       return $id;
     }
+  }
+
+  /**
+   * Invoke a callback expression.
+   *
+   * @param string|callable $id
+   * @param array $args
+   *   Ordered parameters. To call-by-reference, set an array-parameter by reference.
+   * @return mixed
+   */
+  public function call($id, $args) {
+    $cb = $this->get($id);
+    return $cb ? call_user_func_array($cb, $args) : NULL;
   }
 
 }
