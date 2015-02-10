@@ -138,6 +138,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->_dedupeButtonName = $this->getButtonName('refresh', 'dedupe');
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
+    CRM_Core_Resources::singleton()
+      ->addStyleFile('civicrm', 'css/contactSummary.css', 2, 'html-header');
+
     $session = CRM_Core_Session::singleton();
     if ($this->_action == CRM_Core_Action::ADD) {
       // check for add contacts permissions
