@@ -103,6 +103,7 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
  * @return array
  *   Array of newly created file property values.
  * @throws API_Exception validation errors
+ * @see Civi\API\Subscriber\DynamicFKAuthorization
  */
 function civicrm_api3_attachment_create($params) {
 
