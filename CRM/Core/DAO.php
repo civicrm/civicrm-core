@@ -2208,6 +2208,7 @@ SELECT contact_id
       'create' => "Options are filtered appropriately for the object being created/updated. Labels are translated.",
       'search' => "Searchable options are returned. Labels are translated.",
       'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
+      'abbreviate' => "Active options are returned, and labels are replaced with abbreviations.",
     );
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
