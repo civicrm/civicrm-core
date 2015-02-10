@@ -58,6 +58,7 @@ function civicrm_api3_mailing_create($params) {
       unset($params['approval_note']);
     }
   }
+  $params['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
