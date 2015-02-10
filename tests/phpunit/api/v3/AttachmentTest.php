@@ -214,19 +214,24 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     // Activity #123: example_123.txt (text/plain) and example_123.csv (text/csv)
     // Activity #456: example_456.txt (text/plain) and example_456.csv (text/csv)
 
-    $cases[] = array(
-      array('entity_table' => 'civicrm_activity'),
-      array(
-        self::getFilePrefix() . 'example_123.csv',
-        self::getFilePrefix() . 'example_123.txt',
-        self::getFilePrefix() . 'example_456.csv',
-        self::getFilePrefix() . 'example_456.txt',
-      ),
-    );
-    $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'mime_type' => 'text/plain'),
-      array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_456.txt'),
-    );
+    // NOTE: Searching across multiple records (w/o entity_id) is currently
+    // prohibited by DynamicFKAuthorization. The technique used to authorize requests
+    // does not adapt well to such searches.
+
+    //$cases[] = array(
+    //  array('entity_table' => 'civicrm_activity'),
+    //  array(
+    //    self::getFilePrefix() . 'example_123.csv',
+    //    self::getFilePrefix() . 'example_123.txt',
+    //    self::getFilePrefix() . 'example_456.csv',
+    //    self::getFilePrefix() . 'example_456.txt',
+    //  ),
+    //);
+    //$cases[] = array(
+    //  array('entity_table' => 'civicrm_activity', 'mime_type' => 'text/plain'),
+    //  array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_456.txt'),
+    //);
+
     $cases[] = array(
       array('entity_table' => 'civicrm_activity', 'entity_id' => '123'),
       array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_123.csv'),
@@ -274,19 +279,19 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table'/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'name' => 'example_456.csv'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'name' => 'example_456.csv'),
       "/Get by name is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'content' => 'test'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'content' => 'test'),
       "/Get by content is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'path' => '/home/foo'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'path' => '/home/foo'),
       "/Get by path is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'url' => '/index.php'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'url' => '/index.php'),
       "/Get by url is not currently supported/",
     );
 
