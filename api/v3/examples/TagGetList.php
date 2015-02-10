@@ -1,6 +1,7 @@
 <?php
 /**
  * Test Generated example of using tag getlist API
+ * *
  */
 function tag_getlist_example(){
 $params = array(

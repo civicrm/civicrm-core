@@ -132,6 +132,14 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    */
   static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
+    
+    if (!empty($ids['id'])) {
+      CRM_Utils_Hook::pre('edit', 'FinancialItem', $ids['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'FinancialItem', NULL, $params);
+    }
+    
     $financialItem->copyValues($params);
     if (!empty($ids['id'])) {
       $financialItem->id = $ids['id'];
@@ -152,6 +160,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
         $entity_trxn->id = $ids['entityFinancialTrxnId'];
       }
       $entity_trxn->save();
+    }
+    if (!empty($ids['id'])) {
+      CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);
+    }
+    else {      
+      CRM_Utils_Hook::post('create', 'FinancialItem', $financialItem->id, $financialItem);
     }
     return $financialItem;
   }

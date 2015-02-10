@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -37,35 +38,38 @@
  */
 
 /**
+ * Files required for this package
+ */
+
+/**
  * Create an Event Participant
  *
  * This API is used for creating a participants in an event.
  * Required parameters : event_id AND contact_id for new creation
  *                     : participant as name/value with participantid for edit
  *
- * @param array $params
- *   An associative array of name/value property values of civicrm_participant.
+ * @param   array  $params     an associative array of name/value property values of civicrm_participant
  *
- * @return array
- *   apiresult
- *   {@getfields participant_create}
+ * @return array apiresult
+ * {@getfields participant_create}
+ * @access public
  */
 function civicrm_api3_participant_create($params) {
   //check that event id is not an template - should be done @ BAO layer
   if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
-      return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
+      return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
     }
   }
 
-  $values = $participant = array();
+  $value = array();
   _civicrm_api3_custom_format_params($params, $values, 'Participant');
   $params = array_merge($values, $params);
 
   $participantBAO = CRM_Event_BAO_Participant::create($params);
 
-  if (empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])) {
+  if(empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])){
     _civicrm_api3_participant_createlineitem($params, $participantBAO);
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);
@@ -74,20 +78,16 @@ function civicrm_api3_participant_create($params) {
 }
 
 /**
- * @todo this should be done in the BAO not the api
  * Create a default participant line item
- * @param array $params
- * @param $participant
- * @throws \CiviCRM_API3_Exception
  */
-function _civicrm_api3_participant_createlineitem(&$params, $participant) {
+function _civicrm_api3_participant_createlineitem(&$params, $participant){
   // it is possible that a fee level contains information about multiple
   // price field values.
 
   $priceFieldValueDetails = CRM_Utils_Array::explodePadded(
     $params["fee_level"]);
 
-  foreach ($priceFieldValueDetails as $detail) {
+  foreach($priceFieldValueDetails as $detail) {
     if (preg_match('/- ([0-9]+)$/', $detail, $matches)) {
       // it is possible that a price field value is payd for multiple times.
       // (FIXME: if the price field value ends in minus followed by whitespace
@@ -118,7 +118,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
 
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
     if ($dao->fetch()) {
-      $lineItemParams = array(
+      $lineItemparams = array(
         'price_field_id' => $dao->priceFieldID,
         'price_field_value_id' => $dao->priceFieldValueID,
         'entity_table' => 'civicrm_participant',
@@ -127,9 +127,10 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
         'qty' => $qty,
         'participant_count' => 0,
         'unit_price' => $dao->amount,
-        'line_total' => $qty * $dao->amount,
+        'line_total' => $qty*$dao->amount,
+        'version' => 3,
       );
-      civicrm_api3('line_item', 'create', $lineItemParams);
+      civicrm_api('line_item', 'create', $lineItemparams);
     }
 
   }
@@ -140,8 +141,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_participant_create_spec(&$params) {
   $params['status_id']['api.default'] = "1";
@@ -158,12 +158,11 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * If more than one matching participant exists, return an error, unless
  * the client has requested to return the first found contact
  *
- * @param array $params
- *   (reference ) input parameters.
+ * @param  array   $params           (reference ) input parameters
  *
- * @return array
- *   (reference )        array of properties, if error an array with an error id and error message
- *   {@getfields participant_get}
+ * @return array (reference )        array of properties, if error an array with an error id and error message
+ * {@getfields participant_get}
+ * @access public
  */
 function civicrm_api3_participant_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_EVENT;
@@ -185,8 +184,7 @@ function civicrm_api3_participant_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_participant_get_spec(&$params) {
   $params['participant_test']['api.default'] = 0;
@@ -198,12 +196,12 @@ function _civicrm_api3_participant_get_spec(&$params) {
  *
  * This API is used for deleting a contact participant
  *
- * @param array $params
- *   Array containing Id of the contact participant to be deleted.
+ * @param  array $params Array containing  Id of the contact participant to be deleted
  *
  * {@getfields participant_delete}
  * @throws Exception
  * @return array
+ * @access public
  */
 function civicrm_api3_participant_delete($params) {
 
@@ -216,3 +214,4 @@ function civicrm_api3_participant_delete($params) {
     throw new Exception('Error while deleting participant');
   }
 }
+

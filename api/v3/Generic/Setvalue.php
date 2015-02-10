@@ -2,7 +2,7 @@
 /**
  * params must contain at least id=xx & {one of the fields from getfields}=value
  *
- * @param array $apiRequest
+ * @param $apiRequest
  *
  * @throws API_Exception
  * @return array
@@ -22,105 +22,71 @@ function civicrm_api3_generic_setValue($apiRequest) {
 
   $fields = civicrm_api($entity, 'getFields', array('version' => 3, 'action' => 'create', "sequential"));
   // getfields error, shouldn't happen.
-  if ($fields['is_error']) {
-    return $fields;
-  }
+  if ($fields['is_error'])
+  return $fields;
   $fields = $fields['values'];
 
-  $isCustom = strpos($field, 'custom_') === 0;
-  // Trim off the id portion of a multivalued custom field name
-  $fieldKey = $isCustom && substr_count($field, '_') > 1 ? rtrim(rtrim($field, '1234567890'), '_') : $field;
-  if (!array_key_exists($fieldKey, $fields)) {
+  if (!array_key_exists($field, $fields)) {
     return civicrm_api3_create_error("Param 'field' ($field) is invalid. must be an existing field", array("error_code" => "invalid_field", "fields" => array_keys($fields)));
   }
 
-  $def = $fields[$fieldKey];
-  $title = CRM_Utils_Array::value('title', $def, ts('Field'));
+  $def = $fields[$field];
   // Disallow empty values except for the number zero.
   // TODO: create a utility for this since it's needed in many places
-  if (!empty($def['required']) || !empty($def['is_required'])) {
-    if ((empty($value) || $value === 'null') && $value !== '0' && $value !== 0) {
-      return civicrm_api3_create_error(ts('%1 is a required field.', array(1 => $title)), array("error_code" => "required", "field" => $field));
-    }
+  // if (array_key_exists('required', $def) && CRM_Utils_System::isNull($value)) {
+  if (array_key_exists('required', $def) && empty($value) && $value !== '0' && $value !== 0) {
+    return civicrm_api3_create_error(ts("This can't be empty, please provide a value"), array("error_code" => "required", "field" => $field));
   }
 
   switch ($def['type']) {
-    case CRM_Utils_Type::T_FLOAT:
-      if (!is_numeric($value) && !empty($value) && $value !== 'null') {
-        return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
-      }
-      break;
-
     case CRM_Utils_Type::T_INT:
-      if (!CRM_Utils_Rule::integer($value) && !empty($value) && $value !== 'null') {
-        return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
+      if (!is_numeric($value)) {
+        return civicrm_api3_create_error("Param '$field' must be a number", array('error_code' => 'NaN'));
       }
-      break;
 
     case CRM_Utils_Type::T_STRING:
     case CRM_Utils_Type::T_TEXT:
       if (!CRM_Utils_Rule::xssString($value)) {
         return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), array('error_code' => 'XSS'));
       }
-      if (array_key_exists('maxlength', $def)) {
-        $value = substr($value, 0, $def['maxlength']);
-      }
-      break;
+    if (array_key_exists('maxlength', $def)) {
+      $value = substr($value, 0, $def['maxlength']);
+    }
+    break;
 
     case CRM_Utils_Type::T_DATE:
-      $value = CRM_Utils_Type::escape($value, "Date", FALSE);
-      if (!$value) {
+      $value = CRM_Utils_Type::escape($value,"Date",false);
+      if (!$value)
         return civicrm_api3_create_error("Param '$field' is not a date. format YYYYMMDD or YYYYMMDDHHMMSS");
-      }
       break;
 
     case CRM_Utils_Type::T_BOOLEAN:
-      // Allow empty value for non-required fields
-      if ($value === '' || $value === 'null') {
-        $value = '';
-      }
-      else {
-        $value = (boolean) $value;
-      }
+      $value = (boolean) $value;
       break;
 
     default:
-      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (" . $def['type'] . "). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
+      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (".$def['type']."). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);
   $params = array('id' => $id, $field => $value);
-
-  if ((!empty($def['pseudoconstant']) || !empty($def['option_group_id'])) && $value !== '' && $value !== 'null') {
-    _civicrm_api3_api_match_pseudoconstant($params[$field], $entity, $field, $def);
-  }
-
   CRM_Utils_Hook::pre('edit', $entity, $id, $params);
 
   // Custom fields
-  if ($isCustom) {
+  if (strpos($field, 'custom_') === 0) {
     CRM_Utils_Array::crmReplaceKey($params, 'id', 'entityID');
-    // Treat 'null' as empty value. This is awful but the rest of the code supports it.
-    if ($params[$field] === 'null') {
-      $params[$field] = '';
-    }
     CRM_Core_BAO_CustomValueTable::setValues($params);
     CRM_Utils_Hook::post('edit', $entity, $id, CRM_Core_DAO::$_nullObject);
+    return civicrm_api3_create_success($params);
   }
   // Core fields
   elseif (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $params[$field])) {
     $entityDAO = new $dao_name();
     $entityDAO->copyValues($params);
     CRM_Utils_Hook::post('edit', $entity, $entityDAO->id, $entityDAO);
+    return civicrm_api3_create_success($params);
   }
   else {
     return civicrm_api3_create_error("error assigning $field=$value for $entity (id=$id)");
   }
-
-  // Add changelog entry - TODO: Should we do this for other entities as well?
-  if (strtolower($entity) === 'contact') {
-    CRM_Core_BAO_Log::register($id, 'civicrm_contact', $id);
-  }
-
-  return civicrm_api3_create_success($params);
 }

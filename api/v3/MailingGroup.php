@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -38,8 +39,7 @@
 
 /**
  * @deprecated api notice
- * @return string
- *   to indicate this entire api entity is deprecated
+ * @return string to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_mailing_group_deprecation() {
   return 'The mailing_group api is deprecated. Use the mailing_event apis instead.';
@@ -95,34 +95,8 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
 }
 
 /**
- * @param array $params
- * @return array
- * @throws \API_Exception
- */
-function civicrm_api3_mailing_group_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * @param array $params
+ * @param $params
  *
- * @return array
- */
-function civicrm_api3_mailing_group_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * @param array $params
- * @return array
- * @throws \API_Exception
- */
-function civicrm_api3_mailing_group_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-/**
- * @param array $params
  * @return array
  */
 function civicrm_api3_mailing_group_getfields($params) {
@@ -144,3 +118,4 @@ function civicrm_api3_mailing_group_getfields($params) {
 
   return civicrm_api3_create_success($fields, $params, 'mailing_group', 'getfields');
 }
+

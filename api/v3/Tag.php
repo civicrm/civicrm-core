@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 tag functions
@@ -42,11 +42,11 @@
  *
  * {@example TagCreate.php}
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   Array of newly created tag property values.
- *   {@getfields tag_create}
+ * @return array of newly created tag property values.
+ * {@getfields tag_create}
+ * @access public
  */
 function civicrm_api3_tag_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -67,13 +67,13 @@ function _civicrm_api3_tag_create_spec(&$params) {
 /**
  * Deletes an existing Tag
  *
- * @param array $params
+ * @param  array  $params
  *
  * @example TagDelete.ph
  *
- * @return array
- *   API result array
- *   {@getfields tag_delete}
+ * @return array API result array
+ * {@getfields tag_delete}
+ * @access public
  */
 function civicrm_api3_tag_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -87,14 +87,14 @@ function civicrm_api3_tag_delete($params) {
  *
  * @example TagGet.php
  *
- * @param array $params
- *   An associative array of name/value pairs.
+ * @param  array $params  an associative array of name/value pairs.
  *
- * @return array
- *   details of found tags else error
- *   {@getfields tag_get}
+ * @return  array details of found tags else error
+ * {@getfields tag_get}
+ * @access public
  */
 function civicrm_api3_tag_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

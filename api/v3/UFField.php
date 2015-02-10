@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -39,13 +40,16 @@
 /**
  * Defines 'uf field' within a group.
  *
- * @param array $params
- *   Array Associative array of property name/value pairs to create new uf field.
+ * @param $params  array  Associative array of property name/value pairs to create new uf field.
  *
  * @throws API_Exception
+ * @internal param int $groupId Valid uf_group id
  *
- * @return array
- *   Newly created $ufFieldArray
+ * @return Newly created $ufFieldArray array
+ *
+ * @access public
+ * {@getfields UFField_create}
+ * @example UFFieldCreate.php
  */
 function civicrm_api3_uf_field_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('field_name', 'uf_group_id'));
@@ -59,7 +63,7 @@ function civicrm_api3_uf_field_create($params) {
   $location_type_id = CRM_Utils_Array::value('location_type_id', $params);
   $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
 
-  if (!CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+  if (! CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
     throw new API_Exception('The field_name is not valid');
   }
   $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
@@ -108,10 +112,9 @@ function civicrm_api3_uf_field_create($params) {
 /**
  * Gets field for civicrm_uf_field create
  *
- * @param array $params
+ * @param $params
  *
- * @return void
- *   fields valid for other functions
+ * @return array fields valid for other functions
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
@@ -127,15 +130,14 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
 /**
  * Returns array of uf groups (profiles)  matching a set of one or more group properties
  *
- * @param array $params
- *   (reference) Array of one or more valid.
+ * @param array $params  (reference) Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array
- *   (reference) Array
- *   {@getfields UFField_get
+ * @return array  (reference) Array
+ * {@getfields UFField_get
  * @example UFFieldGet.php
+ * @access public
  */
 function civicrm_api3_uf_field_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFField', $params);
@@ -144,11 +146,16 @@ function civicrm_api3_uf_field_get($params) {
 /**
  * Delete uf field
  *
- * @param array $params
+ * @param $params
  *
  * @throws API_Exception
+ * @internal param int $fieldId Valid uf_field id that to be deleted
  *
- * @return array
+ * @return true on successful delete or return error
+ *
+ * @access public
+ * {@getfields UFField_delete}
+ * @example UFFieldDelete.php
  */
 function civicrm_api3_uf_field_delete($params) {
   $fieldId = $params['id'];
@@ -165,12 +172,11 @@ function civicrm_api3_uf_field_delete($params) {
 
   return civicrm_api3_create_success($result, $params);
 }
-
 /**
  * field id accepted for backward compatibility - unset required on id
- * @param array $params
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {
   // legacy support for field_id
   $params['id']['api.aliases'] = array('field_id');
 }
+

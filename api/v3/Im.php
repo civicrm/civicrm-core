@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 IM functions
@@ -40,10 +40,10 @@
  * Allowed @params array keys are:
  * {@getfields im_create}
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   Array of newly created IM property values.
+ * @return array of newly created IM property values.
+ * @access public
  */
 function civicrm_api3_im_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -53,8 +53,7 @@ function civicrm_api3_im_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_im_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -63,10 +62,12 @@ function _civicrm_api3_im_create_spec(&$params) {
 /**
  * Deletes an existing IM
  *
- * @param array $params
+ * @param  array  $params
+ * {@getfields im_delete}
  *
- * @return array
- *   API result Array
+ * @return array API result Array
+ * @access public
+ * @todo convert to using Basic delete - BAO function non standard
  */
 function civicrm_api3_im_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -75,13 +76,15 @@ function civicrm_api3_im_delete($params) {
 /**
  * Retrieve one or more IM
  *
- * @param array $params
- *   An associative array of name/value pairs.
+ * @param  mixed[]  (reference ) input parameters
+ * {@getfields im_get}
+ * @param  array $params  an associative array of name/value pairs.
  *
- * @return array
- *   details of found IM
+ * @return  array details of found IM
  *
+ * @access public
  */
 function civicrm_api3_im_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

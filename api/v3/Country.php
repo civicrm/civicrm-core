@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.3                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 country functions
@@ -33,7 +33,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Country
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Country.php 2011-02-16 ErikHommel $
  */
 
@@ -46,10 +46,9 @@ require_once 'CRM/Core/DAO/Country.php';
  *
  * @example CountryCreate.php Standard Create Example
  *
- * @param array $params
- * @return array
- *   API result array
- * @throws \API_Exception
+ * @return array API result array
+ * {@getfields country_create}
+ * @access public
  */
 function civicrm_api3_country_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params);
@@ -57,10 +56,9 @@ function civicrm_api3_country_create($params) {
 
 /**
  * Adjust Metadata for Create action
- *
+ * 
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_country_create_spec(&$params) {
   $params['name']['api.required'] = 1;
@@ -69,13 +67,13 @@ function _civicrm_api3_country_create_spec(&$params) {
 /**
  * Deletes an existing Country
  *
- * @param array $params
+ * @param  array  $params
  *
  * @example CountryDelete.php Standard Delete Example
  *
- * @return bool
- *   | error  true if successfull, error otherwise
- *   {@getfields country_delete}
+ * @return boolean | error  true if successfull, error otherwise
+ * {@getfields country_delete}
+ * @access public
  */
 function civicrm_api3_country_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
@@ -84,16 +82,19 @@ function civicrm_api3_country_delete($params) {
 /**
  * Retrieve one or more countrys
  *
+ * @param  array input parameters
+ *
+ *
  * @example CountryGet.php Standard Get Example
  *
- * @param array $params
- *   An associative array of name/value pairs.
+ * @param  array $params  an associative array of name/value pairs.
  *
- * @return array
- *   api result array
- *   {@getfields country_get}
+ * @return  array api result array
+ * {@getfields country_get}
+ * @access public
  */
 function civicrm_api3_country_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }
+

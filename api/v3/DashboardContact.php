@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 for Dashboard Contact
@@ -62,8 +63,7 @@ function civicrm_api3_dashboard_contact_create($params) {
 /**
  * Gets a CiviCRM Dashlets of Contacts according to parameters
  *
- * @param array $params
- *   Associative array of property name/value.
+ * @param array  $params       Associative array of property name/value
  *                             pairs for the activity.
  *
  * @return array
@@ -77,15 +77,14 @@ function civicrm_api3_dashboard_contact_get($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);
 }
 
 /**
- * @param array $params
+ * @param $params
  *
  * @return array|null
  */
@@ -106,9 +105,8 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
  * This method is used to delete any existing dashboard-board. the id of the dashboard-contact
  * is required field in $params array
  *
- * @param array $params
- * @return array
- * @throws \API_Exception
+ * {@getfields dashboard_contact_delete}
+ * @access public
  */
 function civicrm_api3_dashboard_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

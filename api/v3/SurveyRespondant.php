@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People (c) 2010                              |
  +--------------------------------------------------------------------+
@@ -34,8 +35,7 @@
 
 /**
  * @deprecated api notice
- * @return string
- *   to indicate this entire api entity is deprecated
+ * @return string to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_survey_respondant_deprecation() {
   return 'The survey_respondant api is not currently supported.';
@@ -43,11 +43,13 @@ function _civicrm_api3_survey_respondant_deprecation() {
 
 /**
  * Get the list of signatories
- * @deprecated - api currently not supported
- * @param array $params
- *   (reference ) input parameters.
  *
- * @return array
+ * @param  array   $params           (reference ) input parameters
+ *
+ * @return array (reference )        contribution_id of created or updated record
+ * @static void
+ * @access public
+ * @deprecated - api currently not supported
  */
 function civicrm_api3_survey_respondant_get(&$params) {
 
@@ -63,7 +65,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
   $interviewerID = NULL;
   if (array_key_exists('interviewer_id', $params)) {
     $interviewerID = $params['interviewer_id'];
-  }
+}
 
   $statusIds = array();
   if (array_key_exists('status_id', $params)) {
@@ -77,8 +79,6 @@ function civicrm_api3_survey_respondant_get(&$params) {
 
 /**
  * @deprecated - api currently not supported
- * @param array $params
- * @return array
  */
 function &civicrm_api3_survey_respondant_count($params) {
 
@@ -93,3 +93,4 @@ function &civicrm_api3_survey_respondant_count($params) {
   }
   return ($signaturesCount);
 }
+

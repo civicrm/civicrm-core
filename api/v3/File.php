@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -44,11 +45,10 @@
  *
  * This API is used for creating a file
  *
- * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ * @param   array  $params  an associative array of name/value property values of civicrm_file
  *
- * @return array
- *   Array of newly created file property values.
+ * @return array of newly created file property values.
+ * @access public
  */
 function civicrm_api3_file_create($params) {
 
@@ -81,11 +81,10 @@ function civicrm_api3_file_create($params) {
  * This api is used for finding an existing file.
  * Required parameters : id OR file_type_id of a file
  *
- * @param array $params
- *   An associative array of name/value property values of civicrm_file.
+ * @param  array $params  an associative array of name/value property values of civicrm_file
  *
- * @return array
- *   Array of all found file object property values.
+ * @return  Array of all found file object property values.
+ * @access public
  */
 function civicrm_api3_file_get($params) {
   civicrm_api3_verify_one_mandatory($params);
@@ -98,8 +97,10 @@ function civicrm_api3_file_get($params) {
  * This api is used for updating an existing file.
  * Required parameters : id of a file
  *
- * @param array $params
- * @return array
+ * @param  Array   $params an array of name/value property values of civicrm_file
+ *
+ * @return array of updated file object property values
+ * @access public
  */
 function civicrm_api3_file_update($params) {
 
@@ -127,10 +128,10 @@ function civicrm_api3_file_update($params) {
  * This API is used for deleting a file
  * Required parameters : id of a file
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   API result array
+ * @return array API result array
+ * @access public
  */
 function civicrm_api3_file_delete($params) {
 

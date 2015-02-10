@@ -42,7 +42,7 @@ function setting_getfields_expectedresult(){
           'is_domain' => 1,
           'is_contact' => 0,
           'description' => '',
-          'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/web-tools-apis/address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
+          'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/webtools-address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
         ),
       'address_standardization_userid' => array(
           'group_name' => 'Address Preferences',
@@ -66,11 +66,11 @@ function setting_getfields_expectedresult(){
           'html_type' => 'Text',
           'default' => '',
           'add' => '4.1',
-          'title' => 'Web Service URL',
+          'title' => 'Web service url',
           'is_domain' => 1,
           'is_contact' => 0,
           'description' => '',
-          'help_text' => 'Web Service URL',
+          'help_text' => 'Web service URL.',
           'validate_callback' => 'CRM_Utils_Rule::url',
         ),
       'tag_unconfirmed' => array(

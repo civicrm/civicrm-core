@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -41,7 +42,11 @@
  *
  * @param array $params
  *
- * @return array
+ * @return array $result
+ * @access public
+ * {@getfields UFMatch_get}
+ * @example UFMatchGet.php
+ * @todo this class is missing delete & create functions (do after exisitng functions upgraded to v3)
  */
 function civicrm_api3_uf_match_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFMatch', $params);
@@ -50,14 +55,13 @@ function civicrm_api3_uf_match_get($params) {
 /**
  * Create or update a UF Match record
  *
- * @param array $params
- *   Associative array of property.
+ * @param array $params  Associative array of property
  *                       name/value pairs to insert in new 'survey'
  * @example UFMatch.php Std Create example
  *
- * @return array
- *   api result array
- *   {@getfields uf_match_create}
+ * @return array api result array
+ * {@getfields uf_match_create}
+ * @access public
  */
 function civicrm_api3_uf_match_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -67,8 +71,7 @@ function civicrm_api3_uf_match_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_uf_match_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -79,15 +82,15 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
 /**
  * Create or update a survey
  *
- * @param array $params
- *   Associative array of property.
+ * @param array $params  Associative array of property
  *                       name/value pairs to insert in new 'survey'
  * @example UFMatch.php Std Create example
  *
- * @return array
- *   api result array
- *   {@getfields uf_match_create}
+ * @return array api result array
+ * {@getfields uf_match_create}
+ * @access public
  */
 function civicrm_api3_uf_match_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 user framework group functions
@@ -37,7 +38,7 @@
  */
 
 /**
- * @param array $params
+ * Files required for this package
  */
 function _civicrm_api3_uf_group_create_spec(&$params) {
   $session = CRM_Core_Session::singleton();
@@ -50,13 +51,12 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
 /**
  * Use this API to create a new group. See the CRM Data Model for uf_group property definitions
  *
- * @param array $params
- *   Array Associative array of property name/value pairs to insert in group.
+ * @param $params  array   Associative array of property name/value pairs to insert in group.
  *
- * @return array
- *   API result array
- *   {@getfields UFGroup_create}
+ * @return array API result array
+ * {@getfields UFGroup_create}
  * @example UFGroupCreate.php
+ * @access public
  */
 function civicrm_api3_uf_group_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -65,15 +65,14 @@ function civicrm_api3_uf_group_create($params) {
 /**
  * Returns array of uf groups (profiles)  matching a set of one or more group properties
  *
- * @param array $params
- *   (reference) Array of one or more valid.
+ * @param array $params  (reference) Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all surveys will be returned
  *
- * @return array
- *   Array of matching profiles
- *   {@getfields UFGroup_get}
+ * @return array   Array of matching profiles
+ * {@getfields UFGroup_get}
  * @example UFGroupGet.php
+ * @access public
  */
 function civicrm_api3_uf_group_get($params) {
 
@@ -83,11 +82,18 @@ function civicrm_api3_uf_group_get($params) {
 /**
  * Delete uf group
  *
- * @param array $params
+ * @param $params
  *
+ * @internal param int $groupId Valid uf_group id that to be deleted
  *
- * @return array
+ * @return true on successful delete or return error
+ * @todo doesnt rtn success or error properly
+ * @access public
+ * {@getfields UFGroup_delete}
+ * @example UFGroupDelete.php
  */
 function civicrm_api3_uf_group_delete($params) {
+
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

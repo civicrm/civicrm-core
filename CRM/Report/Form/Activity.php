@@ -229,6 +229,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           array('title' => ts('Duration'),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'location' =>
+          array('title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'details' => array(
             'title' => ts('Activity Details'),
           )
@@ -240,6 +244,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
           'activity_subject' =>
           array('title' => ts('Activity Subject')),
+          'location' =>
+            array('title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_TEXT,
+          ),
           'activity_type_id' =>
           array('title' => ts('Activity Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -308,6 +316,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
+    $this->_tagFilterTable = 'civicrm_activity';
     parent::__construct();
   }
 

@@ -199,7 +199,7 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   static function getPCPList() {
-    $name  = CRM_Utils_Array::value('s', $_GET);
+    $name  = CRM_Utils_Array::value('term', $_GET);
     $name  = CRM_Utils_Type::escape($name, 'String');
     $limit = '10';
 
@@ -1070,6 +1070,10 @@ LIMIT {$offset}, {$rowCount}
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+
+    if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
+      return CRM_Utils_System::permissionDenied();
+    }
 
     $sortMapper = array(
       0 => 'relation',

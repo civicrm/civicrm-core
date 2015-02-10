@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -37,17 +38,23 @@
  */
 
 /**
+ * Files required for this package
+ */
+
+/**
  * Create Note
  *
  * This API is used for creating a note.
  * Required parameters : entity_id AND note
  *
- * @param array $params
- *   An associative array of name/value property values of civicrm_note.
+ * @param   array  $params  an associative array of name/value property values of civicrm_note
  * {@getfields note_create}
  *
- * @return array
- *   API result array
+ * @return array API result array
+ * @access public
+ * @example NoteCreate.php Create example
+ *
+ *
  */
 function civicrm_api3_note_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,8 +64,7 @@ function civicrm_api3_note_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_note_create_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";
@@ -72,11 +78,13 @@ function _civicrm_api3_note_create_spec(&$params) {
  *
  * This API is used for deleting a note
  *
- * @param array $params
- *   Including id of the note to be deleted.
+ * @params  array  $paramsarray including id of the note to be deleted
  * {@getfields note_delete}
  *
+ * @param $params
+ *
  * @return null
+ * @access public
  */
 function civicrm_api3_note_delete($params) {
 
@@ -87,14 +95,13 @@ function civicrm_api3_note_delete($params) {
 /**
  * Retrieve a specific note, given a set of input params
  *
- * @param array $params
- *   Input parameters.
+ * @param  array   $params  input parameters
  *
- * @return array
- *   array of properties,
- *   if error an array with an error id and error message
- *
- *   {@getfields note_get}
+ * @return array  array of properties,
+ * if error an array with an error id and error message
+ * {@getfields note_get}
+ * @static void
+ * @access public
  */
 function civicrm_api3_note_get($params) {
 
@@ -105,8 +112,7 @@ function civicrm_api3_note_get($params) {
  * Adjust Metadata for Get action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_note_get_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_contact";
@@ -115,11 +121,9 @@ function _civicrm_api3_note_get_spec(&$params) {
 /**
  * Get all descendents of given note
  *
- * @param array $params
- *   Associative array; only required 'id' parameter is used.
+ * @param array $params Associative array; only required 'id' parameter is used
  *
- * @return array
- *   Nested associative array beginning with direct children of given note.
+ * @return array Nested associative array beginning with direct children of given note.
  */
 function &civicrm_api3_note_tree_get($params) {
 
@@ -137,3 +141,4 @@ function &civicrm_api3_note_tree_get($params) {
   $noteTree = CRM_Core_BAO_Note::getNoteTree($params['id'], $params['max_depth'], $params['snippet']);
   return civicrm_api3_create_success($noteTree, $params);
 }
+

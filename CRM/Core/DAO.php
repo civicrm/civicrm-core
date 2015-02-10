@@ -363,24 +363,9 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   function initialize() {
     $this->_connect();
-    $query_string = "SET NAMES utf8"; // default query string
-    if (defined('CIVICRM_DB_TIMEZONE_SYNC'))
-    {
-        if (CIVICRM_DB_TIMEZONE_SYNC)
-        {
-            /*
-             * Set the database timezone to PHP timezone as per
-             * http://stackoverflow.com/questions/3451847/mysql-timezone-change
-             */
-            $n = new \DateTime();
-            $h = $n->getOffset()/3600;
-            $i = 60*($h-floor($h));
-            $offset = sprintf('%+d:%02d', $h, $i);
-            $query_string = "SET time_zone='$offset', NAMES utf8";
+    $this->query("SET NAMES utf8");
   }
-    }
-    $this->query($query_string);  // perform the database setup
-  }
+
   /**
    * Defines the default key as 'id'.
    *

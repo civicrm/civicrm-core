@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -36,16 +37,31 @@
  */
 
 /**
+ * Most API functions take in associative arrays ( name => value pairs
+ * as parameters. Some of the most commonly used parameters are
+ * described below
+ *
+ * @param array $params           an associative array used in construction
+ * retrieval of the object
+ *
+ */
+
+/**
  * Create a 'custom field' within a custom field group.
  * We also empty the static var in the getfields
  * function after deletion so that the field is available for us (getfields manages date conversion
  * among other things
  *
- * @param array $params
- *   Array Associative array of property name/value pairs to create new custom field.
+ * @param $params array  Associative array of property name/value pairs to create new custom field.
  *
- * @return array
- *   API success array
+ * @return Newly API success object
+ *
+ * @access public
+ *
+ * @example CustomFieldCreate.php
+ * {@getfields CustomField_create}
+ * {@example CustomFieldCreate.php 0}
+ *
  */
 function civicrm_api3_custom_field_create($params) {
 
@@ -68,16 +84,14 @@ function civicrm_api3_custom_field_create($params) {
 /**
  * Flush static caches in functions that might have stored available custom fields
  */
-function _civicrm_api3_custom_field_flush_static_caches() {
+function _civicrm_api3_custom_field_flush_static_caches(){
   civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
-
 /**
  * Adjust Metadata for Create action
  *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
@@ -95,12 +109,17 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
 /**
  * Use this API to delete an existing custom group field.
  *
- * @param array $params
- *   Array id of the field to be deleted.
+ * @param $params     Array id of the field to be deleted
  *
  * @return array
- */
+ * @example CustomFieldDelete.php
+ *
+ * {@example CustomFieldDelete.php 0}
+ * {@getfields CustomField_delete}
+ * @access public
+ **/
 function civicrm_api3_custom_field_delete($params) {
+
   $field = new CRM_Core_BAO_CustomField();
   $field->id = $params['id'];
   $field->find(TRUE);
@@ -112,36 +131,51 @@ function civicrm_api3_custom_field_delete($params) {
 /**
  * Use this API to get existing custom fields.
  *
- * @param array $params
- *   Array to search on.
+ * @param array $params Array to search on
+ *{*
  *
  * @return array
- */
+@getfields CustomField_get}
+ * @access public
+ *
+ **/
 function civicrm_api3_custom_field_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/*
+ * Helper function to validate custom field values
+ *
+ * @params Array   $params             Custom fields with values
+ * @params Array   $errors             Reference fields to be check with
+ * @params Boolean $checkForDisallowed Check for disallowed elements
+ *                                     in params
+ * @params Boolean $checkForRequired   Check for non present required elements
+ *                                     in params
+ * @return Array  Validation errors
+ */
+
 /**
  * Helper function to validate custom field value
- * @deprecated
  *
- * @param string $fieldName
- *   Custom field name (eg: custom_8 ).
- * @param mixed $value
- *   Field value to be validate.
- * @param array $fieldDetails
- *   Field Details.
+ * @params String $fieldName    Custom field name (eg: custom_8 )
+ * @params Mixed  $value        Field value to be validate
+ * @params Array  $fieldDetails Field Details
+ * @params Array  $errors       Collect validation  errors
+ *
+ * @param $fieldName
+ * @param $value
+ * @param $fieldDetails
  * @param array $errors
- *   Collect validation errors.
  *
- * @return array|NULL
- *   Validation errors
+ * @return Array  Validation errors
  * @todo remove this function - not in use but need to review functionality before
  * removing as it might be useful in wrapper layer
  */
-function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array()) {
-  return NULL;
-  //see comment block
+function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array(
+  )) {
+    return;
+    //see comment block
   if (!$value) {
     return $errors;
   }
@@ -247,8 +281,6 @@ SELECT count(*)
 
 /**
  * CRM-15191 - Hack to ensure the cache gets cleared after updating a custom field
- * @param array $params
- * @return array
  */
 function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';

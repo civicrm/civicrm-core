@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -37,10 +38,11 @@
  */
 
 /**
+ * Files required for this package
+ */
+
+/**
  * Handle creation of a Mailing Job for a Mailing.
- * @param array $params
- * @return array
- * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -50,8 +52,7 @@ function civicrm_api3_mailing_job_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_mailing_job_create_spec(&$params) {
   $params['status']['api.default'] = 'Scheduled';
@@ -62,23 +63,21 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
 /**
  * Returns array of Mailing Jobs  matching a set of one or more group properties
  *
- * @param array $params
- *   Array of one or more valid.
+ * @param array $params Array of one or more valid
+ * @param array $ids
  *
- * @return array
- *   API return Array of matching mailing jobs.
- *   {@getfields mailing_job_get}
+ * @return array API return Array of matching mailing jobs
+ * {@getfields mailing_job_get}
+ * @access public
  */
-function civicrm_api3_mailing_job_get($params) {
+function civicrm_api3_mailing_job_get($params, $ids = array()) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
  * Handle deletion of a Mailing Job for a Mailing.
- * @param array $params
- * @return array
- * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

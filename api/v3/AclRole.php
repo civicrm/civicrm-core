@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 acl_role functions
@@ -40,10 +41,10 @@
  * {@getfields acl_role_create}
  * @example acl_roleCreate.php
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   Array of newly created acl_role property values.
+ * @return array of newly created acl_role property values.
+ * @access public
  */
 function civicrm_api3_acl_role_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -56,10 +57,10 @@ function civicrm_api3_acl_role_create($params) {
  * {@getfields acl_role_get}
  * @example acl_roleCreate.php
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   Array of retrieved acl_role property values.
+ * @return array of retrieved acl_role property values.
+ * @access public
  */
 function civicrm_api3_acl_role_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -72,10 +73,10 @@ function civicrm_api3_acl_role_get($params) {
  * {@getfields acl_role_delete}
  * @example acl_roleCreate.php
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   Array of deleted values.
+ * @return array of deleted values.
+ * @access public
  */
 function civicrm_api3_acl_role_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -146,8 +146,8 @@ class CRM_Utils_File {
       throw new Exception("Overly broad deletion");
     }
 
-    if ($sourcedir = @opendir($target)) {
-      while (FALSE !== ($sibling = readdir($sourcedir))) {
+    if ($dh = @opendir($target)) {
+      while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
 
@@ -161,7 +161,7 @@ class CRM_Utils_File {
         }
       }
       }
-      closedir($sourcedir);
+      closedir($dh);
 
       if ($rmdir) {
         if (rmdir($target)) {
@@ -182,19 +182,20 @@ class CRM_Utils_File {
    * @param $destination
    */
   static function copyDir($source, $destination) {
-    $dir = opendir($source);
-    @mkdir($destination);
-    while (FALSE !== ($file = readdir($dir))) {
-      if (($file != '.') && ($file != '..')) {
-        if (is_dir($source . DIRECTORY_SEPARATOR . $file)) {
-          CRM_Utils_File::copyDir($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file);
-        }
-        else {
-          copy($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file);
+    if ($dh = opendir($source)) {
+      @mkdir($destination);
+      while (FALSE !== ($file = readdir($dh))) {
+        if (($file != '.') && ($file != '..')) {
+          if (is_dir($source . DIRECTORY_SEPARATOR . $file)) {
+            CRM_Utils_File::copyDir($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file);
+          }
+          else {
+            copy($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file);
+          }
         }
       }
+      closedir($dh);
     }
-    closedir($dir);
   }
 
   /**
@@ -400,14 +401,15 @@ class CRM_Utils_File {
    */
   static function getFilesByExtension($path, $ext) {
     $path  = self::addTrailingSlash($path);
-    $dh    = opendir($path);
     $files = array();
-    while (FALSE !== ($elem = readdir($dh))) {
-      if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
-        $files[] .= $path . $elem;
+    if ($dh = opendir($path)) {
+      while (FALSE !== ($elem = readdir($dh))) {
+        if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
+          $files[] .= $path . $elem;
+        }
       }
+      closedir($dh);
     }
-    closedir($dh);
     return $files;
   }
 
@@ -618,8 +620,7 @@ HTACCESS;
           }
         }
       }
-      $dh = opendir($subdir);
-      if ($dh) {
+      if ($dh = opendir($subdir)) {
         while (FALSE !== ($entry = readdir($dh))) {
           $path = $subdir . DIRECTORY_SEPARATOR . $entry;
           if ($entry{0} == '.') {

@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 Case functions
@@ -36,18 +36,18 @@
  */
 
 /**
- * create or update case type
+ * Function to create or update case type
  *
- * @param array $params
- *   Input parameters.
+ * @param  array $params   input parameters
  *
  * Allowed @params array keys are:
  * {@getfields case_type_create}
  *
  * @throws API_Exception
- * @return array
- *   API result array
+ * @return array API result array
  *
+ * @static void
+ * @access public
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
@@ -68,12 +68,12 @@ function civicrm_api3_case_type_create($params) {
 }
 
 /**
- * retrieve case types
+ * Function to retrieve case types
  *
- * @param array $params
+ * @param $params
  *
- * @return array
- *   case types keyed by id
+ * @return array $caseTypes case types keyed by id
+ * @access public
  */
 function civicrm_api3_case_type_get($params) {
   if (!empty($params['options']) && !empty($params['options']['is_count'])) {
@@ -85,11 +85,10 @@ function civicrm_api3_case_type_get($params) {
 }
 
 /**
- * format definition
+ * Function to format definition
  *
- * @param array $result
- * @return array
- * @throws \CRM_Core_Exception
+ * @param $caseTypes
+ * @return mixed
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
   foreach ($result['values'] as $key => $caseType) {
@@ -97,8 +96,7 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
     $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
     if ($xml) {
       $result['values'][$key]['definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
-    }
-    else {
+    } else {
       $result['values'][$key]['definition'] = array();
     }
     $result['values'][$key]['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($result['values'][$key]['id']);
@@ -110,11 +108,12 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
 /**
  * Function to delete case type
  *
- * @param array $params
- *   Array including id of case_type to delete.
+ * @param array $params array including id of case_type to delete
+
+ * @return array API result array
  *
- * @return array
- *   API result array
+ * @access public
+ *
  */
 function civicrm_api3_case_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

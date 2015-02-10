@@ -99,7 +99,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         else
           CRM_Core_Error::fatal($paymentObjError);
 
-        $params['payer'] = $expressParams['payer'];
+        $params['payer'] = CRM_Utils_Array::value('payer', $expressParams);
         $params['payer_id'] = $expressParams['payer_id'];
         $params['payer_status'] = $expressParams['payer_status'];
 
@@ -120,6 +120,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $params['discount'] = $this->_params[0]['discount'];
           $params['discountAmount'] = $this->_params[0]['discountAmount'];
           $params['discountMessage'] = $this->_params[0]['discountMessage'];
+        }
+        if (!empty($this->_params[0]['amount_priceset_level_radio'])) {
+          $params['amount_priceset_level_radio'] = $this->_params[0]['amount_priceset_level_radio'];
         }
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];

@@ -100,13 +100,11 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
     $this->addMoney('scheduled_amount',
       ts('Scheduled Amount'), TRUE,
-      array(
-        'READONLY' => TRUE,
-        'style' => "background-color:#EBECE4",
-      ),
+      array('readonly' => TRUE),
       TRUE,
       'currency',
-      NULL, TRUE
+      NULL,
+      TRUE
     );
 
     $optionTypes = array('1' => ts('Adjust Pledge Payment Schedule?'),
@@ -124,7 +122,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'js' => array('onclick' => "return verify( );"),
           'isDefault' => TRUE,
         ),
         array(

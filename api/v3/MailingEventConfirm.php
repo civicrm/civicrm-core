@@ -1,7 +1,8 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -33,18 +34,19 @@
  * @subpackage API_MailerGroup
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
+ *
  */
 
 /**
- * Handle a confirm event.
+ * Handle a confirm event
  *
- * @param array $params
- *   Associative array of property.
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'survey'
  *
  * @throws Exception
- * @return array
- *   api result array
+ * @return array api result array
+ * {@getfields mailing_event_confirm_create}
+ * @access public
  */
 function civicrm_api3_mailing_event_confirm_create($params) {
 
@@ -61,12 +63,10 @@ function civicrm_api3_mailing_event_confirm_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action.
+ * Adjust Metadata for Create action
  *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_mailing_event_confirm_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -76,3 +76,4 @@ function _civicrm_api3_mailing_event_confirm_create_spec(&$params) {
   $params['hash']['api.required'] = 1;
   $params['hash']['title'] = 'Hash';
 }
+

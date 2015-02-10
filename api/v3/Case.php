@@ -1,7 +1,8 @@
 <?php
+
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -23,7 +24,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
- */
+*/
 
 /**
  * File for the CiviCRM APIv3 Case functions
@@ -39,7 +40,7 @@
 /**
  * Open a new case, add client and manager roles, and add standard timeline
  *
- * @param array $params
+ * @param  array (
  * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -56,8 +57,10 @@
  * 'details' => str // html format
  *
  * @throws API_Exception
- * @return array
- *   api result array
+ * @return array api result array
+ *
+ * @access public
+ * {@getfields case_create}
  */
 function civicrm_api3_case_create($params) {
 
@@ -127,8 +130,7 @@ function civicrm_api3_case_create($params) {
 /**
  * Adjust Metadata for Get Action
  *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
@@ -138,15 +140,13 @@ function _civicrm_api3_case_get_spec(&$params) {
 /**
  * Adjust Metadata for Create Action
  *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
   $params['contact_id']['title'] = 'Case Client';
   $params['contact_id']['api.required'] = 1;
   $params['status_id']['api.default'] = 1;
-  $params['status_id']['api.aliases'] = array('case_status');
   $params['creator_id']['api.default'] = 'user_contact_id';
   $params['creator_id']['type'] = CRM_Utils_Type::T_INT;
   $params['creator_id']['title'] = 'Case Created By';
@@ -160,8 +160,7 @@ function _civicrm_api3_case_create_spec(&$params) {
 /**
  * Adjust Metadata for Update action
  *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_case_update_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -170,8 +169,7 @@ function _civicrm_api3_case_update_spec(&$params) {
 /**
  * Adjust Metadata for Delete action
  *
- * @param array $params
- *   Array or parameters determined by getfields.
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_case_delete_spec(&$params) {
   $params['id']['api.required'] = 1;
@@ -182,17 +180,19 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * Please provide one (and only one) of the four get/search parameters:
  *
- * @param array $params
- *   'id' => if set, will get all available info about a case, including contacts and activities
+ * @param array (
+ * 'id' => if set, will get all available info about a case, including contacts and activities
  *
- *   // if no case_id provided, this function will use one of the following search parameters:
- *   'client_id' => finds all cases with a specific client
- *   'activity_id' => returns the case containing a specific activity
- *   'contact_id' => finds all cases associated with a contact (in any role, not just client)
+ * // if no case_id provided, this function will use one of the following search parameters:
+ * 'client_id' => finds all cases with a specific client
+ * 'activity_id' => returns the case containing a specific activity
+ * 'contact_id' => finds all cases associated with a contact (in any role, not just client)
+ *
+ * {@getfields case_get}
  *
  * @throws API_Exception
- * @return array
- *   (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
+ * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found@access public
+ * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
@@ -227,7 +227,7 @@ function civicrm_api3_case_get($params) {
   }
 
   //search by contacts
-  if (($contact = CRM_Utils_Array::value('contact_id', $params)) != FALSE) {
+  if ($contact = CRM_Utils_Array::value('contact_id', $params)) {
     if (!is_numeric($contact)) {
       throw new API_Exception('Invalid parameter: contact_id.  Must provide a numeric value.');
     }
@@ -253,13 +253,13 @@ SELECT DISTINCT case_id
     $options['return'] = array('contacts' => 1, 'activities' => 1);
   }
 
-  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
   $cases = array();
   foreach ($foundcases['values'] as $foundcase) {
-    if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
-      $cases[$foundcase['id']] = $case;
+      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+        $cases[$foundcase['id']] = $case;
+      }
     }
-  }
 
   return civicrm_api3_create_success($cases, $params, 'case', 'get');
 }
@@ -281,8 +281,7 @@ function civicrm_api3_case_activity_create($params) {
 
 /**
  * @deprecated api notice
- * @return array
- *   Array of deprecated actions
+ * @return array of deprecated actions
  */
 function _civicrm_api3_case_deprecation() {
   return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');
@@ -291,19 +290,19 @@ function _civicrm_api3_case_deprecation() {
 /**
  * Update a specified case.
  *
- * @param array $params
- *   //REQUIRED:
- *   'case_id' => int
+ * @param  array (
+ * //REQUIRED:
+ * 'case_id' => int
  *
- *   //OPTIONAL
- *   'status_id' => int
- *   'start_date' => str datestamp
- *   'contact_id' => int // case client
+ * //OPTIONAL
+ * 'status_id' => int
+ * 'start_date' => str datestamp
+ * 'contact_id' => int // case client
  *
  * @throws API_Exception
- * @return array
- *   api result array
+ * @return array api result array
  *
+ * @access public
  */
 function civicrm_api3_case_update($params) {
   //check parameters
@@ -359,16 +358,17 @@ function civicrm_api3_case_update($params) {
 /**
  * Delete a specified case.
  *
- * @param array $params
- *   //REQUIRED:
- *   'id' => int
+ * @param  array (
+ * //REQUIRED:
+ * 'id' => int
  *
- *   //OPTIONAL
- *   'move_to_trash' => bool (defaults to false)
+ * //OPTIONAL
+ * 'move_to_trash' => bool (defaults to false)
  *
  * @throws API_Exception
- * @return bool
- *   true if success, else false
+ * @return boolean: true if success, else false
+ * {@getfields case_delete}
+ * @access public
  */
 function civicrm_api3_case_delete($params) {
   //check parameters
@@ -395,8 +395,11 @@ function civicrm_api3_case_delete($params) {
  *
  * @param $options
  *
- * @return array
- *   case object
+ * @internal param $params
+ *
+ * @internal param $options
+ *
+ * @return array (reference) case object
  */
 function _civicrm_api3_case_read($caseId, $options) {
   $return = CRM_Utils_Array::value('return', $options, array());
