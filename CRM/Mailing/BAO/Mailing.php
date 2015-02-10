@@ -1680,10 +1680,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     /* Create the mailing group record */
     $mg = new CRM_Mailing_DAO_MailingGroup();
+    $groupTypes = array('include' => 'Include', 'exclude' => 'Exclude', 'base' => 'Base');
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
         if (isset($params[$entity][$type])) {
-          self::replaceGroups($mailing->id, $type, $entity, $params[$entity][$type]);
+          self::replaceGroups($mailing->id, $groupTypes[$type], $entity, $params[$entity][$type]);
         }
       }
     }
