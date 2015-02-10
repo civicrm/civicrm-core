@@ -284,6 +284,20 @@ class CRM_Core_PseudoConstant {
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
       );
 
+      if ($context == 'abbreviate') {
+        switch ($fieldName) {
+          case 'state_province_id':
+            $params['labelColumn'] = 'abbreviation';
+            break;
+
+          case 'country_id':
+            $params['labelColumn'] = 'iso_code';
+            break;
+
+          default:
+        }
+      }
+
       // Fetch option group from option_value table
       if (!empty($pseudoconstant['optionGroupName'])) {
         if ($context == 'validate') {
