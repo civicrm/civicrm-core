@@ -1037,20 +1037,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param $recordBAO
-   * @param int $recordID
-   * @param $isActive
-   *
-   * @return mixed
-   */
-  public static function enableDisable($recordBAO, $recordID, $isActive) {
-    return self::singleton()->invoke(3, $recordBAO, $recordID, $isActive,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_enableDisable'
-    );
-  }
-
-  /**
    * This hooks allows to change option values.
    *
    * @param array $options

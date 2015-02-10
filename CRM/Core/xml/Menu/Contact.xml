@@ -278,12 +278,6 @@
      <page_type>3</page_type>
 </item>
 <item>
-     <path>civicrm/ajax/ed</path>
-     <page_callback>CRM_Contact_Page_AJAX::enableDisable</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <page_type>3</page_type>
-</item>
-<item>
      <path>civicrm/ajax/cmsuser</path>
      <page_callback>CRM_Contact_Page_AJAX::checkUserName</page_callback>
      <access_callback>1</access_callback>
