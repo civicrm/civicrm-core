@@ -162,11 +162,20 @@ class Container {
       $kernel,
       'Attachment',
       array('create', 'get', 'delete'),
+      // Given a file ID, determine the entity+table it's attached to.
       'SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
          FROM civicrm_file cf
          LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id
          WHERE cf.id = %1',
-      array('civicrm_activity', 'civicrm_mailing')
+      // Get a list of custom fields (field_name,table_name,extends)
+      'SELECT concat("custom_",fld.id) as field_name,
+        grp.table_name as table_name,
+        grp.extends as extends
+       FROM civicrm_custom_field fld
+       INNER JOIN civicrm_custom_group grp ON fld.custom_group_id = grp.id
+       WHERE fld.data_type = "File"
+      ',
+      array('civicrm_activity', 'civicrm_mailing', 'civicrm_contact')
     ));
 
     $kernel->setApiProviders(array(
