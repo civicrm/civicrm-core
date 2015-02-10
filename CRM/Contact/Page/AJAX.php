@@ -551,49 +551,6 @@ ORDER BY sort_name ";
   }
 
   /**
-   * Perform enable / disable actions on record.
-   */
-  public static function enableDisable() {
-    $op = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $recordID = CRM_Utils_Type::escape($_REQUEST['recordID'], 'Positive');
-    $recordBAO = CRM_Utils_Type::escape($_REQUEST['recordBAO'], 'String');
-
-    $isActive = NULL;
-    if ($op == 'disable-enable') {
-      $isActive = TRUE;
-    }
-    elseif ($op == 'enable-disable') {
-      $isActive = FALSE;
-    }
-    $status = array('status' => 'record-updated-fail');
-    if (isset($isActive)) {
-      // first munge and clean the recordBAO and get rid of any non alpha numeric characters
-      $recordBAO = CRM_Utils_String::munge($recordBAO);
-      $recordClass = explode('_', $recordBAO);
-
-      // make sure recordClass is namespaced (we cant check CRM since extensions can also use this)
-      // but it should be at least 3 levels deep
-      if (count($recordClass) >= 3) {
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $recordBAO) . ".php";
-        $method = 'setIsActive';
-
-        if (method_exists($recordBAO, $method)) {
-          $updated = call_user_func_array(array($recordBAO, $method),
-            array($recordID, $isActive)
-          );
-          if ($updated) {
-            $status = array('status' => 'record-updated-success');
-          }
-
-          // call hook enableDisable
-          CRM_Utils_Hook::enableDisable($recordBAO, $recordID, $isActive);
-        }
-      }
-      CRM_Utils_JSON::output($status);
-    }
-  }
-
-  /**
    *  check the CMS username.
    */
   static public function checkUserName() {

@@ -834,9 +834,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
     }
 
-    // call (undocumented possibly deprecated) hook
-    CRM_Utils_Hook::enableDisable('CRM_Contact_BAO_Relationship', $id, $is_active);
-
     return TRUE;
   }
 
