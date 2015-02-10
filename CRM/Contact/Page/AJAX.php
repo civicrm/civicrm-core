@@ -523,6 +523,7 @@ ORDER BY sort_name ";
    *
    */
   static function deleteCustomValue() {
+    header('Content-Type: text/plain');
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
 
@@ -631,6 +632,8 @@ ORDER BY sort_name ";
       list($displayName,
         $userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+
+      header('Content-Type: text/plain');
       if ($userEmail) {
         echo $userEmail;
       }
