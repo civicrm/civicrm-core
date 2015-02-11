@@ -257,6 +257,11 @@ div#crm-contact-thumbnail {
   width: 160px;
 }
 
+.crm-container table.crm-address-element {
+  border: none;
+  margin-bottom: .25em;
+}
+
 #crm-contact-actions-list .icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
