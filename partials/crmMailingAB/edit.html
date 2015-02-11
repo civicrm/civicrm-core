@@ -13,7 +13,7 @@
   {{ts('This mailing has been submitted.')}}
 </div>
 
-<form name="crmMailingAB" novalidate ng-hide="isSubmitted()" crm-autosave="save()" crm-autosave-model="abtest.getAutosaveSignature()" crm-autosave-if="true">
+<form name="crmMailingAB" novalidate ng-hide="isSubmitted()" crm-autosave="save()" crm-autosave-model="abtest.getAutosaveSignature()" crm-autosave-if="sync()">
   <div class="crm-block crm-form-block crmMailing">
     <div crm-ui-wizard>
       <div crm-ui-wizard-step="10" crm-title="ts('Setup')" ng-form="setupForm">
