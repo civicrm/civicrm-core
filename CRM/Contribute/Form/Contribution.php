@@ -869,7 +869,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('text', 'source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
 
-    //CRM-7362 --add campaigns.
+    // CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
 
     CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
@@ -950,14 +950,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public static function formRule($fields, $files, $self) {
     $errors = array();
 
-    //check for Credit Card Contribution.
+    // Check for Credit Card Contribution.
     if ($self->_mode) {
       if (empty($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Payment Processor is a required field.');
       }
     }
 
-    // do the amount validations.
+    // Do the amount validations.
     if (empty($fields['total_amount']) && empty($self->_lineItems)) {
       if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $fields, $errors);
@@ -972,7 +972,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
-    //form rule for status http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
+    // Form rule for status http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
     if ($self->_id && $self->_values['contribution_status_id'] != $fields['contribution_status_id']) {
       CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);
     }
@@ -1015,7 +1015,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    // get the submitted form values.
+    // Get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
     if (!empty($submittedValues['price_set_id']) && $this->_action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
@@ -1027,7 +1027,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // process price set and get total amount and line items.
+    // Process price set and get total amount and line items.
     $lineItem = array();
     $priceSetId = CRM_Utils_Array::value('price_set_id', $submittedValues);
     if (empty($priceSetId) && !$this->_id) {
@@ -1043,7 +1043,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $submittedValues, $lineItem[$priceSetId]);
 
-      // unset tax amount for offline 'is_quick_config' contribution
+      // Unset tax amount for offline 'is_quick_config' contribution.
       if ($this->_priceSet['is_quick_config'] &&
         !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
       ) {
@@ -1080,7 +1080,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
-      // 10117 update th line items for participants
+      // CRM-10117 update the line items for participants.
       if ($pId) {
         $entityTable = 'participant';
         $entityID = $pId;
@@ -1111,7 +1111,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
 
-        // Update line total and total amount with tax on edit
+        // Update line total and total amount with tax on edit.
         $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
         if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
           $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
@@ -1126,7 +1126,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
         }
       }
-      // 10117 update th line items for participants
+      // CRM-10117 update the line items for participants.
       if (!empty($lineItems[$itemId]['price_field_id'])) {
         $lineItem[$this->_priceSetId] = $lineItems;
       }
