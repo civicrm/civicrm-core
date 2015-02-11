@@ -1583,6 +1583,20 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Construct a new mailing object, along with job and mailing_group
    * objects, from the form values of the create mailing wizard.
    *
+   * This function is a bit evil. It not only merges $params and saves
+   * the mailing -- it also schedules the mailing and chooses the recipients.
+   * Since it merges $params, it's also the only place to correctly trigger
+   * multi-field validation. It should be broken up.
+   *
+   * In the mean time, use-cases which break under the weight of this
+   * evil may find reprieve in these extra evil params:
+   *
+   *  - _skip_evil_bao_auto_recipients_: bool
+   *  - _skip_evil_bao_auto_schedule_: bool
+   *  - _evil_bao_validator_: string|callable
+   *
+   * </twowrongsmakesaright>
+   *
    * @params array $params
    *   Form values.
    *
@@ -1591,6 +1605,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return object
    *   $mailing      The new mailing object
+   * @throws \Exception
    */
   public static function create(&$params, $ids = array()) {
 
@@ -1704,11 +1719,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
 
     // If we're going to autosend, then check validity before saving.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
-      $errors = static::checkSendable($mailing);
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && !empty($params['_evil_bao_validator_'])) {
+      $cb = Civi\Core\Resolver::singleton()->get($params['_evil_bao_validator_']);
+      $errors = call_user_func($cb, $mailing);
       if (!empty($errors)) {
         $fields = implode(',', array_keys($errors));
-        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing fields ($fields).", 'cannot-send', $errors);
+        throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
       }
     }
 
@@ -1716,7 +1732,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       $job->status = 'Scheduled';
@@ -1754,6 +1770,26 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (empty($mailing->body_html) && empty($mailing->body_text)) {
       $errors['body'] = ts('Field "body_html" or "body_text" is required.');
     }
+
+    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'disable_mandatory_tokens_check')) {
+      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+      foreach (array('body_html', 'body_text') as $field) {
+        if (empty($mailing->{$field})) {
+          continue;
+        }
+        $str = ($header ? $header->{$field} : '') . $mailing->{$field} . ($footer ? $footer->{$field} : '');
+        $err = CRM_Utils_Token::requiredTokens($str);
+        if ($err !== TRUE) {
+          foreach ($err as $token => $desc) {
+            $errors["{$field}:{$token}"] = ts('This message is missing a required token - {%1}: %2',
+              array(1 => $token, 2 => $desc)
+            );
+          }
+        }
+      }
+    }
+
     return $errors;
   }
 

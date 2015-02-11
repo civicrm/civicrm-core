@@ -64,7 +64,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'Accidents in cars cause children',
-      'body_text' => 'BEWARE children need regular infusions of toys',
+      'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
       'name' => 'mailing name',
       'created_id' => 1,
       'groups' => array('include' => array($this->_groupID)),
