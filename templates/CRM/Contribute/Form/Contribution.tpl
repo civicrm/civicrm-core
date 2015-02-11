@@ -635,7 +635,7 @@ CRM.$(function($) {
           taxRate = 0;
           cj("#totalTaxAmount").hide( );
         } else {
-          cj("#totalTaxAmount").show( );          
+          cj("#totalTaxAmount").show( );
         }
         var totalAmount = $('#total_amount').val();
         var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
