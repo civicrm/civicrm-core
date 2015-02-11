@@ -1184,7 +1184,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->processCreditCard($submittedValues, $lineItem);
     }
     else {
-      //Offline Contribution.
+      // Offline Contribution.
       $submittedValues = $this->unsetCreditCardFields($submittedValues);
 
       // get the required field value only.
@@ -1215,8 +1215,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['soft_credit_ids'] = $softIDs;
       }
 
-      //if priceset is used, no need to cleanup money
-      //CRM-5740
+      // CRM-5740 if priceset is used, no need to cleanup money.
       if ($priceSetId) {
         $params['skipCleanMoney'] = 1;
       }
@@ -1257,7 +1256,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $ids['contribution'] = $params['id'] = $this->_id;
 
-      //Add Additional common information  to formatted params
+      // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
         $params['contribution_mode'] = 'participant';
