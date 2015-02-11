@@ -344,6 +344,16 @@
         scope.$watchCollection(attrs.crmMailing + ".mailings.include", refreshUI);
         scope.$watchCollection(attrs.crmMailing + ".mailings.exclude", refreshUI);
         setTimeout(refreshUI, 50);
+
+        scope.$watch(attrs.crmMailing, function(){
+          scope.mailing = scope.$parent.$eval(attrs.crmMailing);
+        });
+        scope.$watchCollection(attrs.crmAvailGroups, function(){
+          scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
+        });
+        scope.$watchCollection(attrs.crmAvailMailings, function(){
+          scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
+        });
       }
     };
   });
