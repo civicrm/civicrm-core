@@ -42,7 +42,7 @@
       <div crm-mailing-ab-slider ng-model="abtest.ab.group_percentage"></div>
     </div>
     <div crm-ui-field crm-title="ts('Send')" ng-if="fields.scheduled_date">
-      <div crm-mailing-radio-date="schedule" crm-model="abtest.mailings.a.scheduled_date">
+      <div crm-mailing-radio-date="schedule" ng-model="abtest.mailings.a.scheduled_date">
           <div>
             <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
             <label for="schedule-send-now">{{ts('Send A/B test immediately')}}</label>
@@ -50,12 +50,12 @@
           <div>
             <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
             <label for="schedule-send-at">{{ts('Send A/B test at:')}}</label>
-            <span crm-ui-date-time="schedule.datetime"></span>
+            <span crm-ui-date-time ng-model="schedule.datetime"></span>
           </div>
       </div>
     </div>
     <div crm-ui-field crm-title="ts('Assess')" ng-if="fields.declare_winning_time">
-      <div crm-mailing-radio-date="assessSched" crm-model="abtest.ab.declare_winning_time">
+      <div crm-mailing-radio-date="assessSched" ng-model="abtest.ab.declare_winning_time">
         <div>
           <input ng-model="assessSched.mode" type="radio" name="assess" value="now" id="schedule-assess-now"/>
           <label for="schedule-assess-now">{{ts('Assess A/B results on an on-going basis')}}</label>
@@ -63,7 +63,7 @@
         <div>
           <input ng-model="assessSched.mode" type="radio" name="assess" value="at" id="schedule-assess-at"/>
           <label for="schedule-assess-at">{{ts('Assess A/B test at:')}}</label>
-          <span crm-ui-date-time="assessSched.datetime"></span>
+          <span crm-ui-date-time ng-model="assessSched.datetime"></span>
         </div>
       </div>
     </div>
