@@ -218,6 +218,21 @@
     {/if}
 
   </table>
+
+  <div class="accordion ui-accordion ui-widget ui-helper-reset">
+    {* Billing Pane is the only billing pane currently *}
+    {foreach from=$billingPanes key=paneName item=paneValue}
+      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
+        <div class="crm-accordion-header" id="{$paneValue.id}">
+          {$paneName}
+        </div><!-- /.crm-accordion-header -->
+        <div class="crm-accordion-body">
+          <div class="{$paneValue.id}"></div>
+        </div>
+      </div>
+    {/foreach}
+  </div>
+
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">

@@ -573,53 +573,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
+    $billingPanes = array();
     if ($this->_mode) {
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
         $buildRecurBlock = TRUE;
         foreach ($this->billingPane as $name => $label) {
           if (!empty($this->billingFieldSets[$name]['fields'])) {
-            //@todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
-            $paneNames[$label] = CRM_Utils_String::convertStringToCamel($name);
+            // @todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
+            $billingPanes[$label] = $this->generatePane(CRM_Utils_String::convertStringToCamel($name), $defaults);
           }
         }
       }
     }
 
     foreach ($paneNames as $name => $type) {
-      $urlParams = "snippet=4&formType={$type}";
-      if ($this->_mode) {
-        $urlParams .= "&mode={$this->_mode}";
-      }
-
-      $open = 'false';
-      if ($type == 'CreditCard' ||
-        $type == 'DirectDebit'
-      ) {
-        $open = 'true';
-      }
-
-      $allPanes[$name] = array(
-        'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams),
-        'open' => $open,
-        'id' => $type,
-      );
-
-      // see if we need to include this paneName in the current form
-      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-        CRM_Utils_Array::value("hidden_{$type}", $defaults)
-      ) {
-        $showAdditionalInfo = TRUE;
-        $allPanes[$name]['open'] = 'true';
-      }
-
-      if ($type == 'CreditCard' || $type == 'DirectDebit') {
-        //@todo would be good to align tpl name with form name...
-        $this->add('hidden', 'hidden_' . $type, 1);
-      }
-      else {
-        $additionalInfoFormFunction = 'build' . $type;
-        CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
-      }
+      $allPanes[$name] = $this->generatePane($type, $defaults);
     }
     if (empty($this->_recurPaymentProcessors)) {
       $buildRecurBlock = FALSE;
@@ -631,8 +599,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('buildRecurBlock', $buildRecurBlock);
     $qfKey = $this->controller->_key;
     $this->assign('qfKey', $qfKey);
+    $this->assign('billingPanes', $billingPanes);
     $this->assign('allPanes', $allPanes);
-    $this->assign('showAdditionalInfo', $showAdditionalInfo);
 
     if ($this->_formType) {
       $this->assign('formType', $this->_formType);
@@ -1830,6 +1798,62 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Error::debug_log_message($message .
         "contact id={$this->_contactID} (deleting recurring contribution {$paymentParams['contributionRecurID']}");
       CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+    }
+  }
+
+  /**
+   * Generate the data to construct a snippet based pane.
+   *
+   * This form also assigns the showAdditionalInfo var based on historical code.
+   * This appears to mean 'there is a pane to show'.
+   *
+   * @param string $type
+   *   Type of Pane - this is generally used to determine the function name used to build it
+   *   - e.g CreditCard, AdditionalDetail
+   * @param array $defaults
+   *
+   * @return array
+   *   We aim to further refactor & simplify this but currently
+   *   - the panes array
+   *   - should additional info be shown?
+   */
+  protected function generatePane($type, $defaults) {
+    $urlParams = "snippet=4&formType={$type}";
+    if ($this->_mode) {
+      $urlParams .= "&mode={$this->_mode}";
+    }
+
+    $open = 'false';
+    if ($type == 'CreditCard' ||
+      $type == 'DirectDebit'
+    ) {
+      $open = 'true';
+    }
+
+    $pane = array(
+      'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams),
+      'open' => $open,
+      'id' => $type,
+    );
+
+    // See if we need to include this paneName in the current form.
+    if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
+      CRM_Utils_Array::value("hidden_{$type}", $defaults)
+    ) {
+      $this->assign('showAdditionalInfo', TRUE);
+      $pane['open'] = 'true';
+    }
+
+    if ($type == 'CreditCard' || $type == 'DirectDebit') {
+      // @todo would be good to align tpl name with form name...
+      // @todo document why this hidden variable is required.
+      $this->add('hidden', 'hidden_' . $type, 1);
+      return $pane;
+    }
+    else {
+      $additionalInfoFormFunction = 'build' . $type;
+      CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
+      return $pane;
     }
   }
 
