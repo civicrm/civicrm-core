@@ -301,7 +301,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $defaults;
     }
 
-    // set soft credit defaults
+    $defaults['frequency_interval'] = 1;
+    $defaults['frequency_unit'] = 'month';
+
+    // Set soft credit defaults.
     CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults, $this);
 
     if ($this->_mode) {
