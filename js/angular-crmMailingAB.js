@@ -86,16 +86,14 @@
           case 'Subject lines':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'subject'
             ]);
             break;
           case 'From names':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'from_name',
               'from_email'
             ]);
@@ -103,8 +101,7 @@
           case 'Two different emails':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'subject',
               'from_name',
               'from_email',
@@ -241,8 +238,7 @@
       buttons[ts('Select Winner')] = function () {
         crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
           'name',
-          'groups',
-          'mailings',
+          'recipients',
           'scheduled_date'
         ]);
         crmStatus({start: ts('Saving...'), success: ''}, abtest.save())

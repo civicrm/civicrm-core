@@ -191,7 +191,7 @@
     $scope.getIncludesAsString = function () {
       var first = true;
       var names = '';
-      _.each($scope.mailing.groups.include, function (id) {
+      _.each($scope.mailing.recipients.groups.include, function (id) {
         if (!first) {
           names = names + ', ';
         }
@@ -199,7 +199,7 @@
         names = names + group[0].title;
         first = false;
       });
-      _.each($scope.mailing.mailings.include, function (id) {
+      _.each($scope.mailing.recipients.mailings.include, function (id) {
         if (!first) {
           names = names + ', ';
         }
@@ -212,7 +212,7 @@
     $scope.getExcludesAsString = function () {
       var first = true;
       var names = '';
-      _.each($scope.mailing.groups.exclude, function (id) {
+      _.each($scope.mailing.recipients.groups.exclude, function (id) {
         if (!first) {
           names = names + ', ';
         }
@@ -220,7 +220,7 @@
         names = names + group[0].title;
         first = false;
       });
-      _.each($scope.mailing.mailings.exclude, function (id) {
+      _.each($scope.mailing.recipients.mailings.exclude, function (id) {
         if (!first) {
           names = names + ', ';
         }
@@ -241,10 +241,10 @@
         });
       });
     }, RECIPIENTS_DEBOUNCE_MS);
-    $scope.$watchCollection("mailing.groups.include", refreshRecipients);
-    $scope.$watchCollection("mailing.groups.exclude", refreshRecipients);
-    $scope.$watchCollection("mailing.mailings.include", refreshRecipients);
-    $scope.$watchCollection("mailing.mailings.exclude", refreshRecipients);
+    $scope.$watchCollection("mailing.recipients.groups.include", refreshRecipients);
+    $scope.$watchCollection("mailing.recipients.groups.exclude", refreshRecipients);
+    $scope.$watchCollection("mailing.recipients.mailings.include", refreshRecipients);
+    $scope.$watchCollection("mailing.recipients.mailings.exclude", refreshRecipients);
 
     $scope.previewRecipients = function previewRecipients() {
       var model = {
