@@ -143,7 +143,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
 
     //Retrieve schedule reminders for membership entity and is not repeatable and no absolute date chosen.
     $query = "SELECT schedule.* FROM civicrm_action_schedule schedule
- LEFT JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
+ INNER JOIN civicrm_action_mapping mapper ON mapper.id = schedule.mapping_id AND
    mapper.entity = 'civicrm_membership' AND
    schedule.is_repeat = 0 AND
    schedule.start_action_date IS NOT NULL";
