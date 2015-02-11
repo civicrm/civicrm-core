@@ -1926,7 +1926,6 @@ div.grippie {
   border: 0 none;
 }
 
-
 /* Set/alter ICONS */
 
 #crm-container div#printer-friendly {
@@ -2619,25 +2618,6 @@ div a.helpicon:focus {
 /* Override Drupal .2em margin-bottom on forms (we don't want to give up that space) */
 div.crm-container form {
   margin-bottom: 0;
-}
-
-/* This is the style for the trigger icon. The margin-bottom value causes the icon to shift down to center it. */
-.crm-container .ui-datepicker-trigger {
-  margin-top: 4px;
-  margin-bottom: -6px;
-}
-
-.crm-container .ui-datepicker {
-  z-index: 1;
-}
-
-#activity-content table {
-  width: 100%!important;
-}
-
-#Tag .tree .collapsable .hit,
-#Tag .tree .expandable .hit {
-  padding-left: 16px;
 }
 
 /** DATATABLES **/
@@ -3481,7 +3461,6 @@ div.m ul#civicrm-menu,
 }
 
 /* editable placeholder containers - share some styles with crm-editable below */
-
 .crm-container .replace-plain,
 .crm-container textarea,
 .crm-container select.crm-form-multiselect {
