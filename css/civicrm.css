@@ -57,15 +57,6 @@ div.crm-container fieldset label{
   background: none transparent;
 }
 
-.crm-container table.criteria-group {
-  margin-bottom: .1em;
-}
-
-.crm-container table.crm-address-element {
-  border: none;
-  margin-bottom: .25em;
-}
-
 .crm-container th,
 .crm-container table.display thead th,
 .crm-container table thead.sticky th,
@@ -1818,6 +1809,10 @@ div.grippie {
   float: right;
 }
 
+.crm-container table.criteria-group {
+  margin-bottom: .1em;
+}
+
 #crm-container .separator {
   border-bottom: solid 2px #ccc;
 }
@@ -1925,7 +1920,6 @@ div.grippie {
 #crm-container .cke_editor {
   border: 0 none;
 }
-
 
 /* Set/alter ICONS */
 
@@ -2619,25 +2613,6 @@ div a.helpicon:focus {
 /* Override Drupal .2em margin-bottom on forms (we don't want to give up that space) */
 div.crm-container form {
   margin-bottom: 0;
-}
-
-/* This is the style for the trigger icon. The margin-bottom value causes the icon to shift down to center it. */
-.crm-container .ui-datepicker-trigger {
-  margin-top: 4px;
-  margin-bottom: -6px;
-}
-
-.crm-container .ui-datepicker {
-  z-index: 1;
-}
-
-#activity-content table {
-  width: 100%!important;
-}
-
-#Tag .tree .collapsable .hit,
-#Tag .tree .expandable .hit {
-  padding-left: 16px;
 }
 
 /** DATATABLES **/
@@ -3481,7 +3456,6 @@ div.m ul#civicrm-menu,
 }
 
 /* editable placeholder containers - share some styles with crm-editable below */
-
 .crm-container .replace-plain,
 .crm-container textarea,
 .crm-container select.crm-form-multiselect {
