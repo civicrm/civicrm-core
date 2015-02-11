@@ -26,16 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * This class generates form components for processing a contribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   /**
@@ -225,9 +216,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userDisplayName;
 
   /**
-   * Set variables up before form is built
-   *
-   * @return void
+   * Set variables up before form is built.
    */
   public function preProcess() {
 
@@ -445,7 +434,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
 
-    $dates = array('receive_date', 'receipt_date', 'cancel_date', 'thankyou_date');
+    $dates = array(
+      'receive_date',
+      'receipt_date',
+      'cancel_date',
+      'thankyou_date',
+      );
     foreach ($dates as $key) {
       if (!empty($defaults[$key])) {
         list($defaults[$key], $defaults[$key . '_time'])
@@ -480,8 +474,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //@todo document the purpose of cdType (if still in use)
@@ -939,7 +931,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *   The uploaded files if any.
    * @param $self
    *
-   *
    * @return bool|array
    *   true if no errors, else array of errors
    */
@@ -998,9 +989,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $sendReceipt = $pId = $contribution = $isRelatedId = FALSE;
@@ -1511,10 +1499,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * @param $submittedValues
-   * @param $config
+   * Process credit card payment.
+   *
+   * @param array $submittedValues
+   * @param array $config
    * @param CRM_Core_Session $session
-   * @param $lineItem
+   * @param array $lineItem
    *
    * @throws CRM_Core_Exception
    */
@@ -1811,11 +1801,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
+   * Clean up DB after payment fails.
+   *
+   * This function removes related DB entries. Note that it has been agreed in principle,
+   * but not implemented, that contributions should be retained as 'Failed' rather than
+   * deleted.
+   *
+   * @todo it doesn't clean up line items.
+   *
    * @param array $paymentParams
-   * @param $message
+   * @param string $message
    */
   public function cleanupDBAfterPaymentFailure($paymentParams, $message) {
-    //make sure to cleanup db for recurring case.
+    // Make sure to cleanup db for recurring case.
     if (!empty($paymentParams['contributionID'])) {
       CRM_Core_Error::debug_log_message($message .
         "contact id={$this->_contactID} (deleting contribution {$paymentParams['contributionID']}");
