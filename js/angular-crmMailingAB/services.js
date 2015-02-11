@@ -117,7 +117,9 @@
           .then(function () {
             return crmApi('MailingAB', 'create', crmMailingAB.ab)
               .then(function (abResult) {
-                crmMailingAB.id = crmMailingAB.ab.id = abResult.id;
+                if (!crmMailingAB.id) {
+                  crmMailingAB.id = crmMailingAB.ab.id = abResult.id;
+                }
               });
           })
           .then(function () {

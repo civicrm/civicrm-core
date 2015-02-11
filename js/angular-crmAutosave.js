@@ -62,6 +62,7 @@
           }
 
           saving = true;
+          lastSeenModel = angular.copy(scope.$eval(attrs.crmAutosaveModel));
 
           // Set to pristine before saving -- not after saving.
           // If an eager user continues editing concurrent with the
