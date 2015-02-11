@@ -62,7 +62,7 @@ function smarty_function_isValueChange($params, &$smarty) {
 
   $is_changed = FALSE;
 
-  if (!array_key_exists($params['key'], $values) || $params['value'] != $values[$params['key']]) {
+  if (!array_key_exists($params['key'], $values) || strcasecmp($params['value'], $values[$params['key']]) !== 0) {
     // if we have a new value
 
     $is_changed = TRUE;
