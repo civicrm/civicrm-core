@@ -1,4 +1,5 @@
 // https://civicrm.org/licensing
+/* global CRM:true */
 if (!CRM) CRM = {};
 var cj = CRM.$ = jQuery;
 CRM._ = _;
@@ -32,6 +33,9 @@ function ts(text, params) {
   return text;
 }
 
+// Legacy code - ignore warnings
+/* jshint ignore:start */
+
 /**
  *  This function is called by default at the bottom of template files which have forms that have
  *  conditionally displayed/hidden sections and elements. The PHP is responsible for generating
@@ -44,7 +48,7 @@ function ts(text, params) {
  * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
-  if (!elementType) {
+  if (elementType == null) {
     elementType = 'block';
   }
 
@@ -54,7 +58,7 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   for (i = 0; i < showBlocks.length; i++) {
     myElement = document.getElementById(showBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
-    if (myElement) {
+    if (myElement != null) {
       myElement.style.display = elementType;
     }
     else {
@@ -66,7 +70,7 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   for (i = 0; i < hideBlocks.length; i++) {
     myElement = document.getElementById(hideBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
-    if (myElement) {
+    if (myElement != null) {
       myElement.style.display = 'none';
     }
     else {
@@ -194,6 +198,8 @@ function showHideRow(index) {
   }
   return false;
 }
+
+/* jshint ignore:end */
 
 CRM.utils = CRM.utils || {};
 CRM.strings = CRM.strings || {};
@@ -761,7 +767,7 @@ CRM.strings = CRM.strings || {};
       $('#crm-container #mainTabContainer').addClass('narrowpage');
       $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
         if (index > 1) {
-          if (index % 2 == 0) {
+          if (index % 2 === 0) {
             $(this).parent().after('<tr class="narrowadded"></tr>');
           }
           var item = $(this);
@@ -775,7 +781,7 @@ CRM.strings = CRM.strings || {};
         var nitem = $(this);
         var parent = $(this).parent();
         $(this).parent().prev().append(nitem);
-        if (parent.children().size() == 0) {
+        if (parent.children().size() === 0) {
           parent.remove();
         }
       });
@@ -808,7 +814,7 @@ CRM.strings = CRM.strings || {};
         $(this).addClass('crm-processed');
         $(this).addClass('crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
-        if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
+        if (topDistance < 300 || topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
