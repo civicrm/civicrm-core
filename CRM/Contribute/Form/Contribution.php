@@ -1179,12 +1179,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_contactID = $submittedValues['contact_id'];
     }
 
-    $config = CRM_Core_Config::singleton();
-
-    //Credit Card Contribution.
+    // Credit Card Contribution.
     if ($this->_mode) {
-      $session = CRM_Core_Session::singleton();
-      $this->processCreditCard($submittedValues, $config, $session, $lineItem);
+      $this->processCreditCard($submittedValues, $lineItem);
     }
     else {
       //Offline Contribution.
@@ -1510,13 +1507,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Process credit card payment.
    *
    * @param array $submittedValues
-   * @param CRM_Core_Config $config
-   * @param CRM_Core_Session $session
    * @param array $lineItem
    *
    * @throws CRM_Core_Exception
    */
-  public function processCreditCard($submittedValues, $config, $session, $lineItem) {
+  protected function processCreditCard($submittedValues, $lineItem) {
     $sendReceipt = $contribution = FALSE;
 
     $unsetParams = array(
@@ -1738,7 +1733,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Set source if not set
     if (empty($this->_params['source'])) {
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::singleton()->get('userID');
       $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
         'sort_name'
       );
