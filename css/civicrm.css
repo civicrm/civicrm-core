@@ -57,15 +57,6 @@ div.crm-container fieldset label{
   background: none transparent;
 }
 
-.crm-container table.criteria-group {
-  margin-bottom: .1em;
-}
-
-.crm-container table.crm-address-element {
-  border: none;
-  margin-bottom: .25em;
-}
-
 .crm-container th,
 .crm-container table.display thead th,
 .crm-container table thead.sticky th,
@@ -1816,6 +1807,10 @@ div.grippie {
 
 #crm-container div.crm-case-dashboard-switch-view-buttons {
   float: right;
+}
+
+.crm-container table.criteria-group {
+  margin-bottom: .1em;
 }
 
 #crm-container .separator {
