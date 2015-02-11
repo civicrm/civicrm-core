@@ -243,6 +243,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
       $defaults['option_status[' . $i . ']'] = 1;
       $defaults['option_weight[' . $i . ']'] = $i;
+      $defaults['option_value[' . $i . ']'] = $i;
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -577,6 +578,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $errors = array();
 
+    self::clearEmptyOptions($fields);
+
     //validate field label as well as name.
     $title = $fields['label'];
     $name = CRM_Utils_String::munge($title, '_', 64);
@@ -719,7 +722,7 @@ SELECT count(*)
             $nextIndex = $start + 1;
             while ($nextIndex <= self::NUM_OPTION) {
               if ($fields['option_value'][$start] == $fields['option_value'][$nextIndex] &&
-                !empty($fields['option_value'][$nextIndex])
+                strlen($fields['option_value'][$nextIndex])
               ) {
                 $errors['option_value[' . $start . ']'] = ts('Duplicate Option values');
                 $errors['option_value[' . $nextIndex . ']'] = ts('Duplicate Option values');
@@ -900,6 +903,7 @@ AND    option_group_id = %2";
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+    self::clearEmptyOptions($params);
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $dataTypeKey = $this->_defaultDataType[0];
       $params['data_type'] = self::$_dataTypeKeys[$this->_defaultDataType[0]];
@@ -1018,6 +1022,21 @@ SELECT id
 
     // Add data when in ajax contect
     $this->ajaxResponse['customField'] = $customField->toArray();
+  }
+
+  /**
+   * Removes value from fields with no label.
+   *
+   * This allows default values to be set in the form, but ignored in post-processing.
+   *
+   * @param array $fields
+   */
+  public static function clearEmptyOptions(&$fields) {
+    foreach ($fields['option_label'] as $i => $label) {
+      if (!strlen(trim($label))) {
+        $fields['option_value'][$i] = '';
+      }
+    }
   }
 
 }
