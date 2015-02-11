@@ -815,8 +815,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       if (
-        array_key_exists('order_bys', $table) &&
-        is_array($table['order_bys'])
+        empty($this->_formValues['order_bys']) &&
+        (array_key_exists('order_bys', $table) &&
+        is_array($table['order_bys']))
       ) {
         if (!array_key_exists('order_bys', $this->_defaults)) {
           $this->_defaults['order_bys'] = array();
