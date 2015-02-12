@@ -63,7 +63,7 @@
     $location.replace();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
@@ -86,16 +86,14 @@
           case 'Subject lines':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'subject'
             ]);
             break;
           case 'From names':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'from_name',
               'from_email'
             ]);
@@ -103,8 +101,7 @@
           case 'Two different emails':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
-              'groups',
-              'mailings',
+              'recipients',
               'subject',
               'from_name',
               'from_email',
@@ -117,24 +114,21 @@
         }
       }
       crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings.a, ['name']);
-      return $q.when(true);
+      return true;
     };
 
     // @return Promise
     $scope.save = function save() {
-      $scope.sync();
       return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save().then(updateUrl)));
     };
 
     // @return Promise
     $scope.previewMailing = function previewMailing(mailingName, mode) {
-      $scope.sync();
       return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
     };
 
     // @return Promise
     $scope.sendTest = function sendTest(mailingName, recipient) {
-      $scope.sync();
       return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
         .then(function () {
           crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
@@ -148,8 +142,7 @@
 
     // @return Promise
     $scope.submit = function submit() {
-      $scope.sync();
-      if (block.check() || $scope.crmMailing.$invalid) {
+      if (block.check() || $scope.crmMailingAB.$invalid) {
         return;
       }
       return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
@@ -158,7 +151,7 @@
             // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
             // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
           })
-      .then($scope.leave));
+      ).then($scope.leave);
     };
 
     $scope.leave = function leave() {
@@ -186,8 +179,11 @@
 
     // initialize
     updateCriteriaName();
-    $scope.sync();
     $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
+    var syncJob = $interval($scope.sync, 333);
+    $scope.$on('$destroy', function(){
+      $interval.cancel(syncJob);
+    });
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmApi, crmMailingPreviewMgr, dialogService) {
@@ -242,8 +238,7 @@
       buttons[ts('Select Winner')] = function () {
         crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
           'name',
-          'groups',
-          'mailings',
+          'recipients',
           'scheduled_date'
         ]);
         crmStatus({start: ts('Saving...'), success: ''}, abtest.save())

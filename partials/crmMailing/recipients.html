@@ -17,12 +17,12 @@
   </div>
   <select
     crm-mailing-recipients
-    crm-mailing="mailing"
+    ng-model="mailing.recipients"
     crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
     crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
     crm-ui-id="{{crmMailingBlockRecipients.id}}"
     name="{{crmMailingBlockRecipients.name}}"
-    required
+    ng-required="true"
     multiple>
   </select>
 </div>

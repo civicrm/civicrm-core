@@ -152,10 +152,11 @@ processed by Angular; if false, the field will be hidden and completely ignored 
 
     <div crm-ui-field="subform.subject" crm-title="ts('Subject')" ng-if="fields.subject">
       <div style="float: right;">
-        <input crm-mailing-token crm-for="subform.subject" />
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" />
       </div>
       <input
         crm-ui-id="subform.subject"
+        crm-ui-insert-rx="insert:subject"
         type="text"
         class="crm-form-text"
         ng-model="abtest.mailings.a.subject"
@@ -165,10 +166,11 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
     <div crm-ui-field="subform.subjectA" crm-title="ts('Subject (A)')" ng-if="fields.subjectA">
       <div style="float: right;">
-        <input crm-mailing-token crm-for="subform.subjectA" />
+        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" />
       </div>
       <input
         crm-ui-id="subform.subjectA"
+        crm-ui-insert-rx="insert:subjectA"
         type="text"
         class="crm-form-text"
         ng-model="abtest.mailings.a.subject"
@@ -178,10 +180,11 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
     <div crm-ui-field="subform.subjectB" crm-title="ts('Subject (B)')" ng-if="fields.subjectB">
       <div style="float: right;">
-        <input crm-mailing-token crm-for="subform.subjectB" />
+        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" />
       </div>
       <input
         crm-ui-id="subform.subjectB"
+        crm-ui-insert-rx="insert:subjectB"
         type="text"
         class="crm-form-text"
         ng-model="abtest.mailings.b.subject"

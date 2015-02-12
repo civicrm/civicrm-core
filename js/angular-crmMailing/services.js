@@ -132,12 +132,13 @@
       _loadGroups: function (mailing) {
         return crmApi('MailingGroup', 'get', {mailing_id: mailing.id})
           .then(function (groupResult) {
-            mailing.groups = {include: [], exclude: []};
-            mailing.mailings = {include: [], exclude: []};
+            mailing.recipients = {};
+            mailing.recipients.groups = {include: [], exclude: []};
+            mailing.recipients.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function (mailingGroup) {
               var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
               var entityId = parseInt(mailingGroup.entity_id);
-              mailing[bucket][mailingGroup.group_type.toLowerCase()].push(entityId);
+              mailing.recipients[bucket][mailingGroup.group_type.toLowerCase()].push(entityId);
             });
           });
       },
@@ -153,8 +154,10 @@
       create: function create(params) {
         var defaults = {
           jobs: {}, // {jobId: JobRecord}
-          groups: {include: [], exclude: []},
-          mailings: {include: [], exclude: []},
+          recipients: {
+            groups: {include: [], exclude: []},
+            mailings: {include: [], exclude: []},
+          },
           name: "",
           campaign_id: null,
           replyto_email: "",
@@ -178,6 +181,45 @@
         }
       },
 
+      // Search the body, header, and footer for required tokens.
+      // ex: var msgs = findMissingTokens(mailing, 'body_html');
+      findMissingTokens: function(mailing, field) {
+        var missing = {};
+        if (!_.isEmpty(mailing[field])) {
+          var body = '';
+          if (mailing.footer_id) {
+            var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
+            body = body + footer[0][field];
+
+          }
+          body = body + mailing[field];
+          if (mailing.header_id) {
+            var header = _.where(CRM.crmMailing.headerfooterList, {id: mailing.header_id});
+            body = body + header[0][field];
+          }
+
+          angular.forEach(CRM.crmMailing.requiredTokens, function(value, token) {
+            if (!_.isObject(value)) {
+              if (body.indexOf('{' + token + '}') < 0) {
+                missing[token] = value;
+              }
+            }
+            else {
+              var count = 0;
+              angular.forEach(value, function(nestedValue, nestedToken) {
+                if (body.indexOf('{' + nestedToken + '}') >= 0) {
+                  count++;
+                }
+              });
+              if (count === 0) {
+                angular.extend(missing, value);
+              }
+            }
+          });
+        }
+        return missing;
+      },
+
       // Copy all data fields in (mailingFrom) to (mailingTgt) -- except for (excludes)
       // ex: crmMailingMgr.mergeInto(newMailing, mailingTemplate, ['subject']);
       mergeInto: function mergeInto(mailingTgt, mailingFrom, excludes) {
@@ -190,8 +232,7 @@
           'replyto_email',
           'subject',
           'dedupe_email',
-          'groups',
-          'mailings',
+          'recipients',
           'body_html',
           'body_text',
           'footer_id',
@@ -221,12 +262,13 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
-        var params = angular.extend({}, mailing, {
+        var params = angular.extend({}, mailing, mailing.recipients, {
           options: {force_rollback: 1},
           'api.Mailing.preview': {
             id: '$value.id'
           }
         });
+        delete params.recipients; // the content was merged in
         return crmApi('Mailing', 'create', params).then(function (result) {
           // changes rolled back, so we don't care about updating mailing
           return result.values[result.id]['api.Mailing.preview'].values;
@@ -239,7 +281,7 @@
       previewRecipients: function previewRecipients(mailing, previewLimit) {
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
-        var params = angular.extend({}, mailing, {
+        var params = angular.extend({}, mailing, mailing.recipients, {
           name: 'placeholder', // for previewing recipients on new, incomplete mailing
           subject: 'placeholder', // for previewing recipients on new, incomplete mailing
           options: {force_rollback: 1},
@@ -251,6 +293,7 @@
             'api.email.getvalue': {'return': 'email'}
           }
         });
+        delete params.recipients; // the content was merged in
         return crmApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
           return recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
@@ -261,11 +304,11 @@
       // @param mailing Object (per APIv3)
       // @return Promise
       save: function(mailing) {
-        var params = angular.extend({}, mailing);
+        var params = angular.extend({}, mailing, mailing.recipients);
 
         // Angular ngModel sometimes treats blank fields as undefined.
         angular.forEach(mailing, function(value, key) {
-          if (value === undefined) {
+          if (value === undefined || value === null) {
             mailing[key] = '';
           }
         });
@@ -276,6 +319,8 @@
         delete params.scheduled_date;
 
         delete params.jobs;
+
+        delete params.recipients; // the content was merged in
 
         return crmApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
@@ -311,7 +356,7 @@
       // @param to Object with either key "email" (string) or "gid" (int)
       // @return Promise for a list of delivery reports
       sendTest: function (mailing, recipient) {
-        var params = angular.extend({}, mailing, {
+        var params = angular.extend({}, mailing, mailing.recipients, {
           // options:  {force_rollback: 1}, // Test mailings include tracking features, so the mailing must be persistent
           'api.Mailing.send_test': {
             mailing_id: '$value.id',
@@ -326,6 +371,8 @@
         delete params.scheduled_date;
 
         delete params.jobs;
+
+        delete params.recipients; // the content was merged in
 
         return crmApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
