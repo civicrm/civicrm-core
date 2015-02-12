@@ -13,7 +13,8 @@ Required vars: mailing
         crm-ui-richtext name="body_html"
         crm-ui-insert-rx="insert:body_html"
         ng-model="mailing.body_html"
-        ng-blur="checkTokens(mailing)"></textarea>
+        ng-blur="checkTokens(mailing, 'body_html', 'insert:body_html')"
+        ></textarea>
       <span ng-model="body_html_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_html')"></span>
     </div>
   </div>

@@ -433,32 +433,49 @@
   });
 
   var lastEmailTokenAlert = null;
-  angular.module('crmMailing').controller('EmailBodyCtrl', function EmailBodyCtrl($scope, crmMailingMgr) {
+  angular.module('crmMailing').controller('EmailBodyCtrl', function EmailBodyCtrl($scope, crmMailingMgr, crmUiAlert, $timeout) {
     var ts = CRM.ts(null);
 
-    $scope.hasAllTokens = function hasMissingTokens(mailing, field) {
+    // ex: if (!hasAllTokens(myMailing, 'body_text)) alert('Oh noes!');
+    $scope.hasAllTokens = function hasAllTokens(mailing, field) {
       return _.isEmpty(crmMailingMgr.findMissingTokens(mailing, field));
     };
 
-    $scope.checkTokens = function checkTokens(mailing) {
+    // ex: checkTokens(myMailing, 'body_text', 'insert:body_text')
+    // ex: checkTokens(myMailing, '*')
+    $scope.checkTokens = function checkTokens(mailing, field, insertEvent) {
       if (lastEmailTokenAlert) {
         lastEmailTokenAlert.close();
       }
-      var missing = angular.extend(
-        {},
-        crmMailingMgr.findMissingTokens(mailing, 'body_html'),
-        crmMailingMgr.findMissingTokens(mailing, 'body_text')
-      );
-      if (! _.isEmpty(missing)) {
-        var buf = '<p>' +
-          ts('Before submitting this mailing, you must include an address token and an action token as part of the mailing body, mailing header, or mailing footer.') +
-          '</p><ul>';
-        angular.forEach(missing, function(msg, token) {
-          // FIXME LTR RTL
-          buf = buf + '<li>{' + token + '} - <em>' + msg + '</em></li>';
+      var missing, insertable;
+      if (field == '*') {
+        insertable = false;
+        missing = angular.extend({},
+          crmMailingMgr.findMissingTokens(mailing, 'body_html'),
+          crmMailingMgr.findMissingTokens(mailing, 'body_text')
+        );
+      } else {
+        insertable = !_.isEmpty(insertEvent);
+        missing = crmMailingMgr.findMissingTokens(mailing, field);
+      }
+      if (!_.isEmpty(missing)) {
+        lastEmailTokenAlert = crmUiAlert({
+          type: 'error',
+          title: ts('Required tokens'),
+          templateUrl: '~/crmMailing/dialog/tokenAlert.html',
+          scope: angular.extend($scope.$new(), {
+            insertable: insertable,
+            insertToken: function(token) {
+              $timeout(function(){
+                $scope.$broadcast(insertEvent, '{' + token + '}');
+                $timeout(function(){
+                  checkTokens(mailing, field, insertEvent);
+                });
+              });
+            },
+            missing: missing
+          })
         });
-        buf += '</ul>';
-        lastEmailTokenAlert = CRM.alert(buf, undefined, 'error');
       }
     };
   });
