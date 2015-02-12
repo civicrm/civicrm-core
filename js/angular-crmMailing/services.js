@@ -308,7 +308,7 @@
 
         // Angular ngModel sometimes treats blank fields as undefined.
         angular.forEach(mailing, function(value, key) {
-          if (value === undefined) {
+          if (value === undefined || value === null) {
             mailing[key] = '';
           }
         });
