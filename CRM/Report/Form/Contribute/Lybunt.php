@@ -267,12 +267,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if ($fieldName == 'yid') {
-            $clause = "contribution_civireport.contact_id NOT IN
-(SELECT distinct contri.contact_id FROM civicrm_contribution contri
- WHERE contri.is_test = 0 AND " .
-              self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
- WHERE " . self::fiscalYearOffset('contri.receive_date') .
-              " = $previous_year AND contri.is_test = 0)";
+            $clause = self::fiscalYearOffset('contribution_civireport.receive_date') ." = $previous_year";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
