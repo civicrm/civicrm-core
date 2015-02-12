@@ -1106,7 +1106,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'options' => array(
         'sort' => 'id DESC',
         'limit' => 2,
-      ));
+      )
+    );
     $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(2, $result['count']);
     // Please note that assertGreaterThan($expected, $actual)
