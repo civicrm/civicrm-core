@@ -353,7 +353,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         // CRM-6902 - Add "max" option for a price set field
         if (in_array($optionKey, $freezeOptions)) {
-          self::freezeIfEnabled($element, $freezeOptions);
+          self::freezeIfEnabled($element, $fieldOptions[$optionKey]);
           // CRM-14696 - Improve display for sold out price set options
           $element->setLabel($label . '&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>');
         }
@@ -488,7 +488,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
           }
 
-          $selectOption[$opt['id']] = $opt['label'];
           $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
 
           if (!in_array($opt['id'], $freezeOptions)) {
@@ -496,6 +495,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           // CRM-14696 - Improve display for sold out price set options
           else {
+            $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
             $opt['label'] = $opt['label'] . ' (' . ts('Sold out') . ')';
           }
 
@@ -511,7 +511,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             '' => ts('- select -'),
           ) + $selectOption,
           $useRequired && $field->is_required,
-          array('price' => json_encode($priceVal))
+          array('price' => json_encode($priceVal), 'class' => 'crm-select2')
         );
 
         // CRM-6902 - Add "max" option for a price set field

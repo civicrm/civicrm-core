@@ -260,6 +260,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     if ($this->_priceSetId && !empty($this->_feeBlock)) {
       foreach ($this->_feeBlock as $key => $val) {
+        if (empty($val['options'])) {
+          continue;
+        }
+        $optionFullIds = CRM_Utils_Array::value('option_full_ids', $val, array());
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && empty($values['is_full'])) {
 
@@ -271,7 +275,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
           }
         }
+        $unsetSubmittedOptions[$val['id']] = $optionFullIds;
       }
+      //reset values for all options those are full.
+      CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
     }
 
     //set default participant fields, CRM-4320.
@@ -737,7 +744,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $currentOptionsCount = self::getPriceSetOptionCount($form);
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
     $optionFullTotalAmount = 0;
-
+    $currentParticipantNo = (int) substr($form->_name, 12);
     foreach ($form->_feeBlock as & $field) {
       $optionFullIds = array();
       $fieldId = $field['id'];
@@ -754,7 +761,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $totalCount = $currentTotalCount + $dbTotalCount;
         $isFull = FALSE;
         if ($maxValue &&
-          (($totalCount > $maxValue) || ($totalCount + $count > $maxValue))
+          (($totalCount >= $maxValue) &&
+          (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
         ) {
           $isFull = TRUE;
           $optionFullIds[$optId] = $optId;
@@ -850,7 +858,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // priceset validations
-    if (!empty($fields['priceSetId'])) {
+    if (!empty($fields['priceSetId']) &&
+     !$self->_requireApproval && !$self->_allowWaitlist
+     ) {
       //format params.
       $formatted = self::formatPriceSetParams($self, $fields);
       $ppParams = array($formatted);
@@ -1081,7 +1091,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         if ($params['tax_amount']) {
           $this->set('tax_amount', $params['tax_amount']);
         }
-        $this->set('lineItem', array($lineItem));
+        $submittedLineItems = $this->get('lineItem');
+        if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
+          $submittedLineItems[0] = $lineItem;
+        }
+        else {
+          $submittedLineItems = array($lineItem);
+        }
+        $this->set('lineItem', $submittedLineItems);
         $this->set('lineItemParticipantsCount', array($primaryParticipantCount));
       }
 
@@ -1119,9 +1136,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['payment_action'] = 'Sale';
         $params['invoiceID'] = $invoiceID;
       }
-
-      $this->_params = array();
-      $this->_params[] = $params;
+      $this->_params = $this->get('params');
+      if (!empty($this->_params) && is_array($this->_params)) {
+        $this->_params[0] = $params;
+      }
+      else {
+        $this->_params = array();
+        $this->_params[] = $params;
+      }
       $this->set('params', $this->_params);
 
       if ($this->_paymentProcessor &&
