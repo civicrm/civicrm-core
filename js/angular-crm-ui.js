@@ -23,6 +23,37 @@
       };
     })
 
+    // Examples:
+    //   crmUiAlert({text: 'My text', title: 'My title', type: 'error'});
+    //   crmUiAlert({template: '<a ng-click="ok()">Hello</a>', scope: $scope.$new()});
+    //   var h = crmUiAlert({templateUrl: '~/crmFoo/alert.html', scope: $scope.$new()});
+    //   ... h.close(); ...
+    .service('crmUiAlert', function($compile, $rootScope, $templateRequest, $q) {
+      var count = 0;
+      return function crmUiAlert(params) {
+        var id = 'crmUiAlert_' + (++count);
+        var tpl = null;
+        if (params.templateUrl) {
+          tpl = $templateRequest(params.templateUrl);
+        }
+        else if (params.template) {
+          tpl = params.template;
+        }
+        if (tpl) {
+          params.text = '<div id="' + id + '"></div>'; // temporary stub
+        }
+        var result = CRM.alert(params.text, params.title, params.type, params.options);
+        if (tpl) {
+          $q.when(tpl, function(html) {
+            var scope = params.scope || $rootScope.$new();
+            var linker = $compile(html);
+            $('#' + id).append($(linker(scope)));
+          });
+        }
+        return result;
+      };
+    })
+
     // Display a date widget.
     // example: <input crm-ui-date ng-model="myobj.datefield" />
     // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
