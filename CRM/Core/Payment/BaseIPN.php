@@ -182,9 +182,11 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Set contribution to failed.
+   *
    * @param array $objects
    * @param object $transaction
    * @param array $input
+   *
    * @return bool
    */
   public function failed(&$objects, &$transaction, $input = array()) {
@@ -214,7 +216,7 @@ class CRM_Core_Payment_BaseIPN {
     $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->save();
 
-    //add lineitems for recurring payments
+    // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
@@ -602,7 +604,7 @@ LIMIT 1;";
     }
     $contribution->save();
 
-    //add new soft credit against current $contribution and
+    // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
