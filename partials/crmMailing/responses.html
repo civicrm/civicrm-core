@@ -6,7 +6,16 @@ Required vars: mailing, crmMailingConst
   <div class="crm-group">
     <div crm-ui-field crm-title="ts('Track Replies')" crm-layout="checkbox">
       <!-- Comparing data-model and UI of "override_verp", note that true/false are inverted (enabled==0,disabled==1) -->
-      <input name="override_verp" type="checkbox" ng-model="mailing.override_verp" ng-true-value="'0'" ng-false-value="'1'" />
+      <span ng-controller="EmailAddrCtrl">
+        <input
+          name="override_verp"
+          type="checkbox"
+          ng-change="checkVerpChange(mailing)"
+          ng-model="mailing.override_verp"
+          ng-true-value="'0'"
+          ng-false-value="'1'"
+          />
+      </span>
     </div>
     <div class="crm-section" id="help">
       {{ts('Recipients\' replies are sent to a CiviMail specific address instead of the sender\'s address so they can be stored within CiviCRM.')}}
