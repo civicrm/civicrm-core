@@ -444,7 +444,7 @@
     $scope.checkReplyToChange = function checkReplyToChange(mailing) {
       if (!_.isEmpty(mailing.replyto_email) && mailing.override_verp == '0') {
         mailing.override_verp = '1';
-        changeAlert(ts('Reply-To'), ts('Track Replies'))
+        changeAlert(ts('Reply-To'), ts('Track Replies'));
       }
     };
     $scope.checkVerpChange = function checkVerpChange(mailing) {
