@@ -85,7 +85,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_online = FALSE;
 
   /**
-   * Stores all product option
+   * Stores all product options.
    *
    * @var array
    */
@@ -227,8 +227,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
-    //@todo - if anyone ever figures out what this _cdType subroutine is about (or even if it still applies) please
-    // add comments
+    // @todo - if anyone ever figures out what this _cdType subroutine is about
+    // (or even if it still applies) please add comments!!!!!!!!!!
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
@@ -289,7 +289,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->_values = array();
 
-    // current contribution id
+    // Current contribution id.
     if ($this->_id) {
       $this->assignPremiumProduct($this->_id);
       $this->buildValuesAndAssignOnline_Note_Type($this->_id, $this->_values);
@@ -334,12 +334,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
+      // @todo document when this function would be called in this way
+      // (and whether it is valid or an overloading of this form).
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
     $defaults = $this->_values;
 
-    //set defaults for pledge payment.
+    // Set defaults for pledge payment.
     if ($this->_ppID) {
       $defaults['total_amount'] = CRM_Utils_Array::value('scheduled_amount', $this->_pledgeValues['pledgePayment']);
       $defaults['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_pledgeValues);
@@ -351,12 +353,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $defaults;
     }
 
-    // set soft credit defaults
+    $defaults['frequency_interval'] = 1;
+    $defaults['frequency_unit'] = 'month';
+
+    // Set soft credit defaults.
     CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults, $this);
 
     if ($this->_mode) {
       $config = CRM_Core_Config::singleton();
-      // set default country from config if no country set
+      // Set default country from config if no country set.
       if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
         $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
       }
@@ -373,10 +378,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_contactID = $defaults['contact_id'];
     }
 
-    // Set $newCredit variable in template to control whether link to credit card mode is included
+    // Set $newCredit variable in template to control whether link to credit card mode is included.
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
-    // fix the display of the monetary value, CRM-4038
+    // Fix the display of the monetary value, CRM-4038.
     if (isset($defaults['total_amount'])) {
       if (!empty($defaults['tax_amount'])) {
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
@@ -414,7 +419,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->assign('showOption', TRUE);
-    // for Premium section
+    // For Premium section.
     if ($this->_premiumID) {
       $this->assign('showOption', FALSE);
       $options = isset($this->_options[$this->_productDAO->product_id]) ? $this->_options[$this->_productDAO->product_id] : "";
@@ -466,12 +471,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     ));
     $currency = CRM_Utils_Array::value('currency', $defaults);
     $this->assign('currency', $currency);
-    // Hack to get currency info to the js layer. CRM-11440
+    // Hack to get currency info to the js layer. CRM-11440.
     CRM_Utils_Money::format(1);
     $this->assign('currencySymbol', CRM_Utils_Array::value($currency, CRM_Utils_Money::$_currencySymbols));
     $this->assign('totalAmount', CRM_Utils_Array::value('total_amount', $defaults));
 
-    //inherit campaign from pledge.
+    // Inherit campaign from pledge.
     if ($this->_ppID && !empty($this->_pledgeValues['campaign_id'])) {
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
@@ -1179,15 +1184,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_contactID = $submittedValues['contact_id'];
     }
 
-    $config = CRM_Core_Config::singleton();
-
-    //Credit Card Contribution.
+    // Credit Card Contribution.
     if ($this->_mode) {
-      $session = CRM_Core_Session::singleton();
-      $this->processCreditCard($submittedValues, $config, $session, $lineItem);
+      $this->processCreditCard($submittedValues, $lineItem);
     }
     else {
-      //Offline Contribution.
+      // Offline Contribution.
       $submittedValues = $this->unsetCreditCardFields($submittedValues);
 
       // get the required field value only.
@@ -1218,8 +1220,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['soft_credit_ids'] = $softIDs;
       }
 
-      //if priceset is used, no need to cleanup money
-      //CRM-5740
+      // CRM-5740 if priceset is used, no need to cleanup money.
       if ($priceSetId) {
         $params['skipCleanMoney'] = 1;
       }
@@ -1260,7 +1261,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $ids['contribution'] = $params['id'] = $this->_id;
 
-      //Add Additional common information  to formatted params
+      // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
         $params['contribution_mode'] = 'participant';
@@ -1510,13 +1511,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Process credit card payment.
    *
    * @param array $submittedValues
-   * @param CRM_Core_Config $config
-   * @param CRM_Core_Session $session
    * @param array $lineItem
    *
    * @throws CRM_Core_Exception
    */
-  public function processCreditCard($submittedValues, $config, $session, $lineItem) {
+  protected function processCreditCard($submittedValues, $lineItem) {
     $sendReceipt = $contribution = FALSE;
 
     $unsetParams = array(
@@ -1738,7 +1737,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Set source if not set
     if (empty($this->_params['source'])) {
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::singleton()->get('userID');
       $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
         'sort_name'
       );
