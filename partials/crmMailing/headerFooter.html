@@ -10,7 +10,7 @@ Required vars: mailing, crmMailingConst
         name="header_id"
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true, allowClear: true}"
-        ng-change="checkTokens(mailing)"
+        ng-change="checkTokens(mailing, '*')"
         ng-model="mailing.header_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Header'}">
         <option value=""></option>
@@ -22,7 +22,7 @@ Required vars: mailing, crmMailingConst
         name="footer_id"
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true, allowClear: true}"
-        ng-change="checkTokens(mailing)"
+        ng-change="checkTokens(mailing, '*')"
         ng-model="mailing.footer_id"
         ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Footer'}">
         <option value=""></option>
