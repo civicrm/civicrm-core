@@ -108,11 +108,15 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     return $this->_formValues;
   }
 
+  /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * @return array
+   */
   function buildTaskList() {
-    if (method_exists($this->_customSearchClass, 'buildTaskList')) {
-      return $this->_customClass->buildTaskList();
-    }
-    return parent::buildTaskList();
+    // call the parent method to populate $this->_taskList for the custom search
+    parent::buildTaskList();
+    return $this->_customClass->buildTaskList($this);
   }
 
   function buildQuickForm() {

@@ -331,31 +331,28 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
-   * The result is passed to $this->addTaskList, which is responsible for building
-   * the menu and adding it to the form.
-   *
-   * @access public
    * @return array
    */
-  public function buildTaskList() {
-    $tasks = array();
-    $permission = CRM_Core_Permission::getPermission();
+  function buildTaskList() {
+    if ($this->_context !== 'amtg') {
+      $permission = CRM_Core_Permission::getPermission();
 
-    if ($this->_componentMode == 1 || $this->_componentMode == 7) {
-      $tasks += CRM_Contact_Task::permissionedTaskTitles($permission,
-        CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
-      );
-    } else {
-      $className = $this->_modeValue['taskClassName'];
-      $tasks += $className::permissionedTaskTitles($permission, false);
+      if ($this->_componentMode == 1 || $this->_componentMode == 7) {
+        $this->_taskList += CRM_Contact_Task::permissionedTaskTitles($permission,
+          CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
+        );
+      } else {
+        $className = $this->_modeValue['taskClassName'];
+        $this->_taskList += $className::permissionedTaskTitles($permission, false);
+      }
+
+      // Only offer the "Update Smart Group" task if a smart group/saved search is already in play
+      if (isset($this->_ssID) && $permission == CRM_Core_Permission::EDIT) {
+        $this->_taskList += CRM_Contact_Task::optionalTaskTitle();
+      }
     }
 
-    // Only offer the "Update Smart Group" task if a smart group/saved search is already in play
-    if (isset($this->_ssID) && $permission == CRM_Core_Permission::EDIT) {
-      $tasks = $tasks + CRM_Contact_Task::optionalTaskTitle();
-    }
-
-    return $tasks;
+    return $this->_taskList;
   }
 
   /**
@@ -465,10 +462,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
       $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
-    }
-    else {
-      $tasks = $this->buildTaskList();
-      $this->addTaskMenu($tasks);
     }
 
     $selectedContactIds = array();

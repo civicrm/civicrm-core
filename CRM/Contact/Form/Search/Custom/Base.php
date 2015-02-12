@@ -48,6 +48,19 @@ class CRM_Contact_Form_Search_Custom_Base {
   }
 
   /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * The returned array completely replaces the task list, so a child class that
+   * wants to modify the existing list should manipulate the result of this method.
+   *
+   * @param CRM_Core_Form_Search $form
+   * @return array
+   */
+  function buildTaskList(CRM_Core_Form_Search $form) {
+    return $form->getVar('_taskList');
+  }
+
+  /**
    * @return null|string
    */
   function count() {
