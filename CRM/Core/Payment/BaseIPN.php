@@ -516,8 +516,15 @@ LIMIT 1;";
 
     $contribution->contribution_status_id = 1;
     $contribution->is_test = $input['is_test'];
-    $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
-    $contribution->net_amount = CRM_Utils_Array::value('net_amount', $input, 0);
+
+    // CRM-15960 If we don't have a value we 'want' for the amounts, leave it to the BAO to sort out.
+    if (isset($input['net_amount'])) {
+      $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
+    }
+    if (isset($input['net_amount'])) {
+      $contribution->net_amount = $input['net_amount'];
+    }
+
     $contribution->trxn_id = $input['trxn_id'];
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
