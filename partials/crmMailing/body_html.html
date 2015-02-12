@@ -6,5 +6,8 @@ Required vars: mailing
     <input crm-mailing-token crm-for="htmlForm.body_html"/>
   </div>
 
-  <textarea crm-ui-id="htmlForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
+  <div ng-controller="EmailBodyCtrl">
+    <textarea crm-ui-id="htmlForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html" ng-blur="checkTokens(mailing)"></textarea>
+    <span ng-model="body_html_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_html')"></span>
+  </div>
 </div>

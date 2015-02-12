@@ -431,4 +431,35 @@
   angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses) {
     $scope.crmFromAddresses = crmFromAddresses;
   });
+
+  var lastEmailTokenAlert = null;
+  angular.module('crmMailing').controller('EmailBodyCtrl', function EmailBodyCtrl($scope, crmMailingMgr) {
+    var ts = CRM.ts(null);
+
+    $scope.hasAllTokens = function hasMissingTokens(mailing, field) {
+      return _.isEmpty(crmMailingMgr.findMissingTokens(mailing, field));
+    };
+
+    $scope.checkTokens = function checkTokens(mailing) {
+      if (lastEmailTokenAlert) {
+        lastEmailTokenAlert.close();
+      }
+      var missing = angular.extend(
+        {},
+        crmMailingMgr.findMissingTokens(mailing, 'body_html'),
+        crmMailingMgr.findMissingTokens(mailing, 'body_text')
+      );
+      if (!_.isEmpty(missing) > 0) {
+        var buf = '<p>'
+          + ts('Before submitting this mailing, you must include an address token and an action token as part of the mailing body, mailing header, or mailing footer.')
+          + '</p><ul>';
+        angular.forEach(missing, function(msg, token) {
+          // FIXME LTR RTL
+          buf = buf + '<li>{' + token + '} - <em>' + msg + '</em></li>'
+        });
+        buf += '</ul>';
+        lastEmailTokenAlert = CRM.alert(buf, undefined, 'error');
+      }
+    }
+  });
 })(angular, CRM.$, CRM._);

@@ -181,6 +181,45 @@
         }
       },
 
+      // Search the body, header, and footer for required tokens.
+      // ex: var msgs = findMissingTokens(mailing, 'body_html');
+      findMissingTokens: function(mailing, field) {
+        var missing = {};
+        if (!_.isEmpty(mailing[field])) {
+          var body = '';
+          if (mailing.footer_id) {
+            var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
+            body = body + footer[0][field];
+
+          }
+          body = body + mailing[field];
+          if (mailing.header_id) {
+            var header = _.where(CRM.crmMailing.headerfooterList, {id: mailing.header_id});
+            body = body + header[0][field];
+          }
+
+          angular.forEach(CRM.crmMailing.requiredTokens, function(value, token) {
+            if (!_.isObject(value)) {
+              if (body.indexOf('{' + token + '}') < 0) {
+                missing[token] = value;
+              }
+            }
+            else {
+              var count = 0;
+              angular.forEach(value, function(nestedValue, nestedToken) {
+                if (body.indexOf('{' + nestedToken + '}') >= 0) {
+                  count++;
+                }
+              });
+              if (count == 0) {
+                angular.extend(missing, value);
+              }
+            }
+          });
+        }
+        return missing;
+      },
+
       // Copy all data fields in (mailingFrom) to (mailingTgt) -- except for (excludes)
       // ex: crmMailingMgr.mergeInto(newMailing, mailingTemplate, ['subject']);
       mergeInto: function mergeInto(mailingTgt, mailingFrom, excludes) {
