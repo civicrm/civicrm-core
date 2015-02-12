@@ -1324,6 +1324,22 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing a transaction does not 'mess' with net amount (CRM-15960).
+   */
+  public function testCompleteTransactionNetAmountOK() {
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    unset($params['net_amount']);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertTrue(($contribution['total_amount'] - $contribution['net_amount']) == $contribution['fee_amount']);
+  }
+
+  /**
    * CRM-14151
    * Test completing a transaction via the API
    *
