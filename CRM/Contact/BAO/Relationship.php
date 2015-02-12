@@ -1754,7 +1754,7 @@ AND cc.sort_name LIKE '%$name%'";
     if ($params['context'] == 'past') {
       $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
     }
-    else if ($params['context'] == 'all') {
+    elseif ($params['context'] == 'all') {
       $relationshipStatus = CRM_Contact_BAO_Relationship::ALL;
     }
     else {
