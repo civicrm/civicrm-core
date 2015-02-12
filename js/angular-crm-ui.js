@@ -279,7 +279,6 @@
 
     // Define a rich text editor.
     // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
-    // WISHLIST: use ngModel
     .directive('crmUiRichtext', function ($timeout) {
       return {
         require: '?ngModel',
@@ -288,6 +287,14 @@
 
           if (!ngModel) {
             return;
+          }
+
+          if (attr.ngBlur) {
+            ck.on('blur', function(){
+              $timeout(function(){
+                scope.$eval(attr.ngBlur);
+              })
+            });
           }
 
           ck.on('pasteState', function () {
