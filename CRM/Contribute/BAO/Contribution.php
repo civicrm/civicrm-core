@@ -118,7 +118,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (CRM_Utils_Array::value('skipCleanMoney', $params)) {
       unset($moneyFields[0]);
     }
-
+    if (!$contributionID) {
+      self::calculateMissingAmountParams($params);
+    }
     foreach ($moneyFields as $field) {
       if (isset($params[$field])) {
         $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
@@ -216,6 +218,27 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return $contribution;
     }
     return NULL;
+  }
+
+  /**
+   * Calculate net_amount & fee_amount if they are not set.
+   *
+   * Net amount should be total - fee.
+   *
+   * @param array $params
+   */
+  public static function calculateMissingAmountParams(&$params) {
+    if (!isset($params['fee_amount'])) {
+      if (isset($params['total_amount']) && isset($params['net_amount'])) {
+        $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
+      }
+      else {
+        $params['fee_amount'] = 0;
+      }
+    }
+    if (!isset($params['net_amount'])) {
+      $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+    }
   }
 
   /**
