@@ -65,6 +65,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   public $_component = NULL;
 
   /**
+   * Possibly obsolete variable.
+   *
+   * If you use it please explain why it is set in the create function here.
+   *
+   * @var string
+   */
+  public $trxn_result_code;
+
+  /**
    * Class constructor.
    *
    * @return \CRM_Contribute_DAO_Contribution
@@ -241,9 +250,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * @param array $params
+   * Calculate net_amount & fee_amount if they are not set.
    *
-   * @return mixed
+   * Net amount should be total - fee.
+   * This should only be called for new contributions.
+   *
+   * @param array $params
+   *   Params for a new contribution before they are saved.
    */
   public static function calculateMissingAmountParams(&$params) {
     if (!isset($params['fee_amount'])) {
