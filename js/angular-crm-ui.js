@@ -277,6 +277,39 @@
       };
     })
 
+    // Example:
+    //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
+    //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
+    // TODO Consider ways to separate the plain-text/rich-text implementations
+    .directive('crmUiInsertRx', function() {
+      return {
+        link: function(scope, element, attrs) {
+          scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
+            var id = element.attr('id');
+            if (CKEDITOR.instances[id]) {
+              CKEDITOR.instances[id].insertText(tokenName);
+              $(element).select2('close').select2('val', '');
+              CKEDITOR.instances[id].focus();
+            }
+            else {
+              var crmForEl = $('#' + id);
+              var origVal = crmForEl.val();
+              var origPos = crmForEl[0].selectionStart;
+              var newVal = origVal.substring(0, origPos) + tokenName + origVal.substring(origPos, origVal.length);
+              crmForEl.val(newVal);
+              var newPos = (origPos + tokenName.length);
+              crmForEl[0].selectionStart = newPos;
+              crmForEl[0].selectionEnd = newPos;
+
+              $(element).select2('close').select2('val', '');
+              crmForEl.triggerHandler('change');
+              crmForEl.focus();
+            }
+          });
+        }
+      };
+    })
+
     // Define a rich text editor.
     // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
     .directive('crmUiRichtext', function ($timeout) {
