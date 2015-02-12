@@ -4,7 +4,7 @@ Required vars: mailing, crmMailingConst
 <div ng-form="textForm" crm-ui-id-scope>
   <div ng-controller="EmailBodyCtrl">
     <div style="float: right;">
-      <input crm-mailing-token on-select="$broadcast('insert:body_text', token.name)" />
+      <input crm-mailing-token on-select="$broadcast('insert:body_text', token.name)" tabindex="-1"/>
     </div>
 
     <div>

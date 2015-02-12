@@ -53,7 +53,7 @@ It could perhaps be thinned by 30-60% by making more directives.
     </div>
     <div crm-ui-field="subform.subject" crm-title="ts('Subject')">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" />
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
       </div>
       <input
         crm-ui-id="subform.subject"
