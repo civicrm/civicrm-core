@@ -395,11 +395,11 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              $(element).select2('val', ngModel.$viewValue);
+              element.select2('val', ngModel.$viewValue);
             });
           };
           function refreshModel() {
-            var oldValue = ngModel.$viewValue, newValue = $(element).select2('val');
+            var oldValue = ngModel.$viewValue, newValue = element.select2('val');
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);
@@ -410,8 +410,8 @@
           function init() {
             // TODO watch select2-options
             var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
-            $(element).select2(options);
-            $(element).on('change', refreshModel);
+            element.select2(options);
+            element.on('change', refreshModel);
             $timeout(ngModel.$render);
           }
 
