@@ -1091,8 +1091,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         if ($params['tax_amount']) {
           $this->set('tax_amount', $params['tax_amount']);
         }
-        if (!empty($this->get('lineItem')) && is_array($this->get('lineItem'))) {
-          $submittedLineItems = $this->get('lineItem');
+        $submittedLineItems = $this->get('lineItem');
+        if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
           $submittedLineItems[0] = $lineItem;
         }
         else {

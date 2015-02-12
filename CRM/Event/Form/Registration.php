@@ -1242,7 +1242,8 @@ WHERE  v.option_group_id = g.id
           break;
 
         case 'select':
-          if (in_array($element->getValue()[0], $optIds)) {
+          $value = $element->getValue();
+          if (in_array($value[0], $optIds)) {
             foreach ($element->_options as $option) {
               if ($option['attr']['value'] === "crm_disabled_opt-{$element->getValue()[0]}") {
                 $placeholder = html_entity_decode($option['text']);
