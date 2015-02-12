@@ -1136,9 +1136,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['payment_action'] = 'Sale';
         $params['invoiceID'] = $invoiceID;
       }
-
-      if (!empty($this->get('params')) && is_array($this->get('params'))) {
-        $this->_params = $this->get('params');
+      $this->_params = $this->get('params');
+      if (!empty($this->_params) && is_array($this->_params)) {
         $this->_params[0] = $params;
       }
       else {
