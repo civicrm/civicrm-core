@@ -23,6 +23,37 @@
       };
     })
 
+    // Examples:
+    //   crmUiAlert({text: 'My text', title: 'My title', type: 'error'});
+    //   crmUiAlert({template: '<a ng-click="ok()">Hello</a>', scope: $scope.$new()});
+    //   var h = crmUiAlert({templateUrl: '~/crmFoo/alert.html', scope: $scope.$new()});
+    //   ... h.close(); ...
+    .service('crmUiAlert', function($compile, $rootScope, $templateRequest, $q) {
+      var count = 0;
+      return function crmUiAlert(params) {
+        var id = 'crmUiAlert_' + (++count);
+        var tpl = null;
+        if (params.templateUrl) {
+          tpl = $templateRequest(params.templateUrl);
+        }
+        else if (params.template) {
+          tpl = params.template;
+        }
+        if (tpl) {
+          params.text = '<div id="' + id + '"></div>'; // temporary stub
+        }
+        var result = CRM.alert(params.text, params.title, params.type, params.options);
+        if (tpl) {
+          $q.when(tpl, function(html) {
+            var scope = params.scope || $rootScope.$new();
+            var linker = $compile(html);
+            $('#' + id).append($(linker(scope)));
+          });
+        }
+        return result;
+      };
+    })
+
     // Display a date widget.
     // example: <input crm-ui-date ng-model="myobj.datefield" />
     // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
@@ -277,9 +308,41 @@
       };
     })
 
+    // Example:
+    //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
+    //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
+    // TODO Consider ways to separate the plain-text/rich-text implementations
+    .directive('crmUiInsertRx', function() {
+      return {
+        link: function(scope, element, attrs) {
+          scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
+            var id = element.attr('id');
+            if (CKEDITOR.instances[id]) {
+              CKEDITOR.instances[id].insertText(tokenName);
+              $(element).select2('close').select2('val', '');
+              CKEDITOR.instances[id].focus();
+            }
+            else {
+              var crmForEl = $('#' + id);
+              var origVal = crmForEl.val();
+              var origPos = crmForEl[0].selectionStart;
+              var newVal = origVal.substring(0, origPos) + tokenName + origVal.substring(origPos, origVal.length);
+              crmForEl.val(newVal);
+              var newPos = (origPos + tokenName.length);
+              crmForEl[0].selectionStart = newPos;
+              crmForEl[0].selectionEnd = newPos;
+
+              $(element).select2('close').select2('val', '');
+              crmForEl.triggerHandler('change');
+              crmForEl.focus();
+            }
+          });
+        }
+      };
+    })
+
     // Define a rich text editor.
     // example: <textarea crm-ui-id="myForm.body_html" crm-ui-richtext name="body_html" ng-model="mailing.body_html"></textarea>
-    // WISHLIST: use ngModel
     .directive('crmUiRichtext', function ($timeout) {
       return {
         require: '?ngModel',
@@ -288,6 +351,14 @@
 
           if (!ngModel) {
             return;
+          }
+
+          if (attr.ngBlur) {
+            ck.on('blur', function(){
+              $timeout(function(){
+                scope.$eval(attr.ngBlur);
+              });
+            });
           }
 
           ck.on('pasteState', function () {
@@ -388,11 +459,11 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              $(element).select2('val', ngModel.$viewValue);
+              element.select2('val', ngModel.$viewValue);
             });
           };
           function refreshModel() {
-            var oldValue = ngModel.$viewValue, newValue = $(element).select2('val');
+            var oldValue = ngModel.$viewValue, newValue = element.select2('val');
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);
@@ -403,8 +474,8 @@
           function init() {
             // TODO watch select2-options
             var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
-            $(element).select2(options);
-            $(element).on('change', refreshModel);
+            element.select2(options);
+            element.on('change', refreshModel);
             $timeout(ngModel.$render);
           }
 

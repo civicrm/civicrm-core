@@ -180,13 +180,13 @@
     };
   });
 
-  // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
+  // example: <input name="subject" /> <input crm-mailing-token on-select="doSomething(token.name)" />
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
   angular.module('crmMailing').directive('crmMailingToken', function () {
     return {
       require: '^crmUiIdScope',
       scope: {
-        crmFor: '@'
+        onSelect: '@'
       },
       template: '<input type="text" class="crmMailingToken" />',
       link: function (scope, element, attrs, crmUiIdCtrl) {
@@ -197,28 +197,11 @@
           placeholder: ts('Tokens')
         });
         $(element).on('select2-selecting', function (e) {
-          var id = crmUiIdCtrl.get(attrs.crmFor);
-          if (CKEDITOR.instances[id]) {
-            CKEDITOR.instances[id].insertText(e.val);
-            $(element).select2('close').select2('val', '');
-            CKEDITOR.instances[id].focus();
-          }
-          else {
-            var crmForEl = $('#' + id);
-            var origVal = crmForEl.val();
-            var origPos = crmForEl[0].selectionStart;
-            var newVal = origVal.substring(0, origPos) + e.val + origVal.substring(origPos, origVal.length);
-            crmForEl.val(newVal);
-            var newPos = (origPos + e.val.length);
-            crmForEl[0].selectionStart = newPos;
-            crmForEl[0].selectionEnd = newPos;
-
-            $(element).select2('close').select2('val', '');
-            crmForEl.triggerHandler('change');
-            crmForEl.focus();
-          }
-
           e.preventDefault();
+          $(element).select2('close').select2('val', '');
+          scope.$parent.$eval(attrs.onSelect, {
+            token: {name: e.val}
+          });
         });
       }
     };
@@ -229,14 +212,15 @@
   angular.module('crmMailing').directive('crmMailingRecipients', function () {
     return {
       restrict: 'AE',
+      require: 'ngModel',
       scope: {
         crmAvailGroups: '@', // available groups
         crmAvailMailings: '@', // available mailings
-        crmMailing: '@' // the mailing for which we are choosing recipients
+        ngRequired: '@'
       },
       templateUrl: '~/crmMailing/directive/recipients.html',
-      link: function (scope, element, attrs) {
-        scope.mailing = scope.$parent.$eval(attrs.crmMailing);
+      link: function (scope, element, attrs, ngModel) {
+        scope.recips = ngModel.$viewValue;
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
         scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
 
@@ -268,29 +252,30 @@
 
         // @param Object mailing
         // @return array list of values like "4 civicrm_mailing include"
-        function convertMailingToValues(mailing) {
+        function convertMailingToValues(recipients) {
           var r = [];
-          angular.forEach(mailing.groups.include, function (v) {
+          angular.forEach(recipients.groups.include, function (v) {
             r.push(v + " civicrm_group include");
           });
-          angular.forEach(mailing.groups.exclude, function (v) {
+          angular.forEach(recipients.groups.exclude, function (v) {
             r.push(v + " civicrm_group exclude");
           });
-          angular.forEach(mailing.mailings.include, function (v) {
+          angular.forEach(recipients.mailings.include, function (v) {
             r.push(v + " civicrm_mailing include");
           });
-          angular.forEach(mailing.mailings.exclude, function (v) {
+          angular.forEach(recipients.mailings.exclude, function (v) {
             r.push(v + " civicrm_mailing exclude");
           });
           return r;
         }
 
-        // Update $(element) view based on latest data
-        function refreshUI() {
-          if (scope.mailing) {
-            $(element).select2('val', convertMailingToValues(scope.mailing));
+        var refreshUI = ngModel.$render = function refresuhUI() {
+          scope.recips = ngModel.$viewValue;
+          if (ngModel.$viewValue) {
+            $(element).select2('val', convertMailingToValues(ngModel.$viewValue));
+            validate();
           }
-        }
+        };
 
         /// @return string HTML representingn an option
         function formatItem(item) {
@@ -304,6 +289,15 @@
           return "<img src='../../sites/all/modules/civicrm/i/" + icon + "' height=12 width=12 /> <span class='" + spanClass + "'>" + item.text + "</span>";
         }
 
+        function validate() {
+          if (scope.$parent.$eval(attrs.ngRequired)) {
+            var empty = (_.isEmpty(ngModel.$viewValue.groups.include) && _.isEmpty(ngModel.$viewValue.mailings.include));
+            ngModel.$setValidity('empty', !empty);
+          } else {
+            ngModel.$setValidity('empty', true);
+          }
+        }
+
         $(element).select2({
           dropdownAutoWidth: true,
           placeholder: "Groups or Past Recipients",
@@ -311,22 +305,23 @@
           formatSelection: formatItem,
           escapeMarkup: function (m) {
             return m;
-          },
+          }
         });
 
         $(element).on('select2-selecting', function (e) {
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
           if (option.mode == 'exclude') {
-            scope.mailing[typeKey].exclude.push(option.entity_id);
-            arrayRemove(scope.mailing[typeKey].include, option.entity_id);
+            ngModel.$viewValue[typeKey].exclude.push(option.entity_id);
+            arrayRemove(ngModel.$viewValue[typeKey].include, option.entity_id);
           }
           else {
-            scope.mailing[typeKey].include.push(option.entity_id);
-            arrayRemove(scope.mailing[typeKey].exclude, option.entity_id);
+            ngModel.$viewValue[typeKey].include.push(option.entity_id);
+            arrayRemove(ngModel.$viewValue[typeKey].exclude, option.entity_id);
           }
           scope.$apply();
           $(element).select2('close');
+          validate();
           e.preventDefault();
         });
 
@@ -334,20 +329,18 @@
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
           scope.$parent.$apply(function () {
-            arrayRemove(scope.mailing[typeKey][option.mode], option.entity_id);
+            arrayRemove(ngModel.$viewValue[typeKey][option.mode], option.entity_id);
           });
+          validate();
           e.preventDefault();
         });
 
-        scope.$watchCollection(attrs.crmMailing + ".groups.include", refreshUI);
-        scope.$watchCollection(attrs.crmMailing + ".groups.exclude", refreshUI);
-        scope.$watchCollection(attrs.crmMailing + ".mailings.include", refreshUI);
-        scope.$watchCollection(attrs.crmMailing + ".mailings.exclude", refreshUI);
+        scope.$watchCollection("recips.groups.include", refreshUI);
+        scope.$watchCollection("recips.groups.exclude", refreshUI);
+        scope.$watchCollection("recips.mailings.include", refreshUI);
+        scope.$watchCollection("recips.mailings.exclude", refreshUI);
         setTimeout(refreshUI, 50);
 
-        scope.$watch(attrs.crmMailing, function(){
-          scope.mailing = scope.$parent.$eval(attrs.crmMailing);
-        });
         scope.$watchCollection(attrs.crmAvailGroups, function(){
           scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
         });

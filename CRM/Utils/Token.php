@@ -90,17 +90,11 @@ class CRM_Utils_Token {
     'welcome' => array('group'),
   );
 
+
   /**
-   * Check a string (mailing body) for required tokens.
-   *
-   * @param string $str
-   *   The message.
-   *
-   * @return bool|array
-   *    true if all required tokens are found,
-   *    else an array of the missing tokens
+   * @return array
    */
-  public static function requiredTokens(&$str) {
+  public static function getRequiredTokens() {
     if (self::$_requiredTokens == NULL) {
       self::$_requiredTokens = array(
         'domain.address' => ts("Domain address - displays your organization's postal address."),
@@ -112,9 +106,24 @@ class CRM_Utils_Token {
         ),
       );
     }
+    return self::$_requiredTokens;
+  }
+
+  /**
+   * Check a string (mailing body) for required tokens.
+   *
+   * @param string $str
+   *   The message.
+   *
+   * @return bool|array
+   *    true if all required tokens are found,
+   *    else an array of the missing tokens
+   */
+  public static function requiredTokens(&$str) {
+    $requiredTokens = self::getRequiredTokens();
 
     $missing = array();
-    foreach (self::$_requiredTokens as $token => $value) {
+    foreach ($requiredTokens as $token => $value) {
       if (!is_array($value)) {
         if (!preg_match('/(^|[^\{])' . preg_quote('{' . $token . '}') . '/', $str)) {
           $missing[$token] = $value;
