@@ -233,6 +233,7 @@
       scope: {
         crmAvailGroups: '@', // available groups
         crmAvailMailings: '@', // available mailings
+        ngRequired: '@'
       },
       templateUrl: '~/crmMailing/directive/recipients.html',
       link: function (scope, element, attrs, ngModel) {
@@ -289,6 +290,7 @@
           scope.recips = ngModel.$viewValue;
           if (ngModel.$viewValue) {
             $(element).select2('val', convertMailingToValues(ngModel.$viewValue));
+            validate();
           }
         };
 
@@ -304,6 +306,15 @@
           return "<img src='../../sites/all/modules/civicrm/i/" + icon + "' height=12 width=12 /> <span class='" + spanClass + "'>" + item.text + "</span>";
         }
 
+        function validate() {
+          if (scope.$parent.$eval(attrs.ngRequired)) {
+            var empty = (_.isEmpty(ngModel.$viewValue.groups.include) && _.isEmpty(ngModel.$viewValue.mailings.include));
+            ngModel.$setValidity('empty', !empty);
+          } else {
+            ngModel.$setValidity('empty', true);
+          }
+        }
+
         $(element).select2({
           dropdownAutoWidth: true,
           placeholder: "Groups or Past Recipients",
@@ -311,7 +322,7 @@
           formatSelection: formatItem,
           escapeMarkup: function (m) {
             return m;
-          },
+          }
         });
 
         $(element).on('select2-selecting', function (e) {
@@ -327,6 +338,7 @@
           }
           scope.$apply();
           $(element).select2('close');
+          validate();
           e.preventDefault();
         });
 
@@ -336,6 +348,7 @@
           scope.$parent.$apply(function () {
             arrayRemove(ngModel.$viewValue[typeKey][option.mode], option.entity_id);
           });
+          validate();
           e.preventDefault();
         });
 
