@@ -121,3 +121,6 @@ a.crmMailing-submit-button.disabled div:hover, a.crmMailing-submit-button.blocki
   background: none;
 }
 
+.crmMailing-error-link {
+  color: red;
+}
