@@ -180,13 +180,13 @@
     };
   });
 
-  // example: <input name="subject" /> <input crm-mailing-token crm-for="subject"/>
+  // example: <input name="subject" /> <input crm-mailing-token on-select="doSomething(token.name)" />
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
   angular.module('crmMailing').directive('crmMailingToken', function () {
     return {
       require: '^crmUiIdScope',
       scope: {
-        crmFor: '@'
+        onSelect: '@'
       },
       template: '<input type="text" class="crmMailingToken" />',
       link: function (scope, element, attrs, crmUiIdCtrl) {
@@ -197,28 +197,11 @@
           placeholder: ts('Tokens')
         });
         $(element).on('select2-selecting', function (e) {
-          var id = crmUiIdCtrl.get(attrs.crmFor);
-          if (CKEDITOR.instances[id]) {
-            CKEDITOR.instances[id].insertText(e.val);
-            $(element).select2('close').select2('val', '');
-            CKEDITOR.instances[id].focus();
-          }
-          else {
-            var crmForEl = $('#' + id);
-            var origVal = crmForEl.val();
-            var origPos = crmForEl[0].selectionStart;
-            var newVal = origVal.substring(0, origPos) + e.val + origVal.substring(origPos, origVal.length);
-            crmForEl.val(newVal);
-            var newPos = (origPos + e.val.length);
-            crmForEl[0].selectionStart = newPos;
-            crmForEl[0].selectionEnd = newPos;
-
-            $(element).select2('close').select2('val', '');
-            crmForEl.triggerHandler('change');
-            crmForEl.focus();
-          }
-
           e.preventDefault();
+          $(element).select2('close').select2('val', '');
+          scope.$parent.$eval(attrs.onSelect, {
+            token: {name: e.val}
+          });
         });
       }
     };
