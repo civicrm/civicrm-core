@@ -39,11 +39,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @var int
    */
-<<<<<<< HEAD
-  const PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
-=======
-  CONST ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
->>>>>>> add context all, to get all relations of contact in ajax call
+  const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
    * Create function. (Use the API instead)
