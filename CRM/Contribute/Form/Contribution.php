@@ -301,7 +301,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $defaults;
     }
 
-    // set soft credit defaults
+    $defaults['frequency_interval'] = 1;
+    $defaults['frequency_unit'] = 'month';
+
+    // Set soft credit defaults.
     CRM_Contribute_Form_SoftCredit::setDefaultValues($defaults, $this);
 
     if ($this->_mode) {
@@ -349,7 +352,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_contributionType) {
       $defaults['financial_type_id'] = $this->_contributionType;
     }
-    
+
     if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
@@ -698,7 +701,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
       }
     }
-    
+
     if ($this->_id) {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
@@ -950,11 +953,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-     if (CRM_Utils_Array::value('fee_amount', $fields) 
+     if (CRM_Utils_Array::value('fee_amount', $fields)
       && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
-      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
-    
+
     // $trxn_id must be unique CRM-13919
     if (!empty($fields['trxn_id'])) {
       $queryParams = array(1 => array($fields['trxn_id'], 'String'));
@@ -966,7 +969,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       if ($tCnt) {
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
-      }      
+      }
     }
 
     $errors = array_merge($errors, $softErrors);
