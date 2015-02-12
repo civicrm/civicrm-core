@@ -39,7 +39,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @var int
    */
+<<<<<<< HEAD
   const PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
+=======
+  CONST ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
+>>>>>>> add context all, to get all relations of contact in ajax call
 
   /**
    * Create function. (Use the API instead)
@@ -1753,6 +1757,9 @@ AND cc.sort_name LIKE '%$name%'";
 
     if ($params['context'] == 'past') {
       $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
+    }
+    else if ($params['context'] == 'all') {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::ALL;
     }
     else {
       $relationshipStatus = CRM_Contact_BAO_Relationship::CURRENT;
