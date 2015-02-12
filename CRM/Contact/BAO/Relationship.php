@@ -39,7 +39,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @var int
    */
-  const PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
+  const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
    * Create function. (Use the API instead)
@@ -1753,6 +1753,9 @@ AND cc.sort_name LIKE '%$name%'";
 
     if ($params['context'] == 'past') {
       $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
+    }
+    elseif ($params['context'] == 'all') {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::ALL;
     }
     else {
       $relationshipStatus = CRM_Contact_BAO_Relationship::CURRENT;
