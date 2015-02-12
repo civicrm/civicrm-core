@@ -449,17 +449,17 @@
         crmMailingMgr.findMissingTokens(mailing, 'body_html'),
         crmMailingMgr.findMissingTokens(mailing, 'body_text')
       );
-      if (!_.isEmpty(missing) > 0) {
-        var buf = '<p>'
-          + ts('Before submitting this mailing, you must include an address token and an action token as part of the mailing body, mailing header, or mailing footer.')
-          + '</p><ul>';
+      if (! _.isEmpty(missing)) {
+        var buf = '<p>' +
+          ts('Before submitting this mailing, you must include an address token and an action token as part of the mailing body, mailing header, or mailing footer.') +
+          '</p><ul>';
         angular.forEach(missing, function(msg, token) {
           // FIXME LTR RTL
-          buf = buf + '<li>{' + token + '} - <em>' + msg + '</em></li>'
+          buf = buf + '<li>{' + token + '} - <em>' + msg + '</em></li>';
         });
         buf += '</ul>';
         lastEmailTokenAlert = CRM.alert(buf, undefined, 'error');
       }
-    }
+    };
   });
 })(angular, CRM.$, CRM._);
