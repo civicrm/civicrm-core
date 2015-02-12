@@ -108,6 +108,13 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     return $this->_formValues;
   }
 
+  function buildTaskList() {
+    if (method_exists($this->_customSearchClass, 'buildTaskList')) {
+      return $this->_customClass->buildTaskList();
+    }
+    return parent::buildTaskList();
+  }
+
   function buildQuickForm() {
     $this->_customClass->buildForm($this);
 
