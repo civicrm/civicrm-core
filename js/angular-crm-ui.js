@@ -293,7 +293,7 @@
             ck.on('blur', function(){
               $timeout(function(){
                 scope.$eval(attr.ngBlur);
-              })
+              });
             });
           }
 
