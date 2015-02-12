@@ -261,8 +261,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
   }
 
-  ///////////////// civicrm_contribution_
-
   /**
    * Create an contribution_id=FALSE and financial_type_id=Donation.
    */
@@ -427,7 +425,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create with valid payment instument.
+   * Test create with valid payment instrument.
    */
   public function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
@@ -935,10 +933,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals('125.00', $lineItems);
     $trxnAmount = $this->_getFinancialTrxnAmount($contribution['id']);
-    $fitemAmount = $this->_getFinancialItemAmount($contribution['id']);
-    // Financial trxn SUM = 125 + 5 (fee)
+
+    // Financial trxn SUM = 125 + 5 (fee).
     $this->assertEquals('130.00', $trxnAmount);
-    $this->assertEquals('125.00', $fitemAmount);
+    $this->assertEquals('125.00', $this->_getFinancialItemAmount($contribution['id']));
   }
 
   /**
@@ -1104,7 +1102,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * To Update Contribution.
+   * Test Updating a Contribution.
+   *
    * CHANGE: we require the API to do an incremental update
    */
   public function testCreateUpdateContribution() {
@@ -1115,7 +1114,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     );
     $original = $this->callAPISuccess('contribution', 'get', $old_params);
-    //Make sure it came back
+    // Make sure it came back.
     $this->assertAPISuccess($original);
     $this->assertEquals($original['id'], $contributionID);
     //set up list of old params, verify
@@ -1325,6 +1324,22 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing a transaction does not 'mess' with net amount (CRM-15960).
+   */
+  public function testCompleteTransactionNetAmountOK() {
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    unset($params['net_amount']);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertTrue(($contribution['total_amount'] - $contribution['net_amount']) == $contribution['fee_amount']);
+  }
+
+  /**
    * CRM-14151
    * Test completing a transaction via the API
    *
@@ -1406,7 +1421,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
-   * on parent class at some point (fn is not in 4.4)
+   * on parent class at some point (fn is not in 4.4).
    * @param $entity
    * @param array $params
    */

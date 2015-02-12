@@ -182,9 +182,11 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Set contribution to failed.
+   *
    * @param array $objects
    * @param object $transaction
    * @param array $input
+   *
    * @return bool
    */
   public function failed(&$objects, &$transaction, $input = array()) {
@@ -214,7 +216,7 @@ class CRM_Core_Payment_BaseIPN {
     $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->save();
 
-    //add lineitems for recurring payments
+    // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
@@ -578,10 +580,21 @@ LIMIT 1;";
         'labelColumn' => 'name',
         'flip' => 1,
       ));
+
+    // @todo this section should call the api  in order to have hooks called &
+    // because all this 'messiness' setting variables could be avoided
+    // by letting the api resolve pseudoconstants & copy set values and format dates.
     $contribution->contribution_status_id = $contributionStatuses['Completed'];
     $contribution->is_test = $input['is_test'];
-    $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
-    $contribution->net_amount = CRM_Utils_Array::value('net_amount', $input, 0);
+
+    // CRM-15960 If we don't have a value we 'want' for the amounts, leave it to the BAO to sort out.
+    if (isset($input['net_amount'])) {
+      $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
+    }
+    if (isset($input['net_amount'])) {
+      $contribution->net_amount = $input['net_amount'];
+    }
+
     $contribution->trxn_id = $input['trxn_id'];
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
@@ -602,7 +615,7 @@ LIMIT 1;";
     }
     $contribution->save();
 
-    //add new soft credit against current $contribution and
+    // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
