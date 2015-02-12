@@ -1245,7 +1245,7 @@ WHERE  v.option_group_id = g.id
           $value = $element->getValue();
           if (in_array($value[0], $optIds)) {
             foreach ($element->_options as $option) {
-              if ($option['attr']['value'] === "crm_disabled_opt-{$element->getValue()[0]}") {
+              if ($option['attr']['value'] === "crm_disabled_opt-{$value[0]}") {
                 $placeholder = html_entity_decode($option['text']);
                 $element->updateAttributes(array('placeholder' => $placeholder));
                 break;
