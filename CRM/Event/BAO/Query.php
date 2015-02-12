@@ -260,6 +260,13 @@ class CRM_Event_BAO_Query {
         );
         return;
 
+      case 'event_title':
+        $query->_where[$grouping][] = "civicrm_event.title $op {$value}";
+        $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $value, 'title');
+        $query->_qill[$grouping][] = ts('Event') . " $op {$eventTitle}";
+        $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
+        return;
+
       case 'event_include_repeating_events':
         /**
          * Include Repeating Events
