@@ -1,4 +1,4 @@
-/* CiviCRM contact summary page styles */
+/* Styles specific to contact Summary/Edit/Inline-Edit pages */
 
 .crm-container .primary {
   font-weight: bold;
@@ -207,6 +207,12 @@ div#crm-contact-thumbnail {
 #crm-record-log {
   padding: 0.8em 0.8em 0 0;
   text-align: right;
+}
+
+#crm-container .geotag {
+  padding: 2px 0 2px 20px !important;
+  background: url('../i/geotag_16.png') left center no-repeat;
+  font-size: .9em;
 }
 
 /* contact actions */
