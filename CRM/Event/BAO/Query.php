@@ -378,10 +378,11 @@ class CRM_Event_BAO_Query {
         $name = str_replace('participant_', '', $name);
       case 'event_is_public':
       case 'event_type_id':
-
+      case 'event_title':
         $qillName = $name;
         if (in_array($name, array(
               'event_id',
+              'event_title',
               'event_is_public',
             )
           )) {
