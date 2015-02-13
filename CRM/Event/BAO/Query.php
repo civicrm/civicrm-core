@@ -260,12 +260,6 @@ class CRM_Event_BAO_Query {
         );
         return;
 
-      case 'event_title':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_event.title', $op, $value, 'String');
-        $query->_qill[$grouping][] = ts('Event Title') . " $op '{$value}'";
-        $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
-        return;
-
       case 'event_include_repeating_events':
         /**
          * Include Repeating Events
@@ -384,10 +378,11 @@ class CRM_Event_BAO_Query {
         $name = str_replace('participant_', '', $name);
       case 'event_is_public':
       case 'event_type_id':
-
+      case 'event_title':
         $qillName = $name;
         if (in_array($name, array(
               'event_id',
+              'event_title',
               'event_is_public',
             )
           )) {
