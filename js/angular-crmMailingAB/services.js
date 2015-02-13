@@ -64,7 +64,7 @@
         var crmMailingAB = this;
         if (!crmMailingAB.id) {
           crmMailingAB.ab = {
-            name: 'Example', // FIXME
+            name: '',
             status: 'Draft',
             mailing_id_a: null,
             mailing_id_b: null,
