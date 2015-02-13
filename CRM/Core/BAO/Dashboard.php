@@ -141,7 +141,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     // If empty, then initialize contact dashboard for this user.
     if (!$hasDashlets) {
-      return self::initializeDashlets();
+      return self::initializeDashlets($flatFormat);
     }
     return $dashlets;
   }
@@ -155,7 +155,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * @return array
    *   Array of dashboard_id's
    */
-  public static function initializeDashlets() {
+  public static function initializeDashlets($flatFormat = FALSE) {
     $dashlets = array();
     $getDashlets = civicrm_api3("Dashboard", "get", array(
         'domain_id' => CRM_Core_Config::domainID(),
@@ -183,7 +183,13 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
         else {
           $assignDashlets = civicrm_api3("dashboard_contact", "create", $defaultDashlet);
-          $dashlets[$dashboard_id] = $defaultDashlet['dashboard_id'];
+          if (!$flatFormat) {
+            $values = $assignDashlets['values'][$assignDashlets['id']];
+            $dashlets[$values['column_no']][$values['weight']-$values['dashboard_id']] = $values['is_minimized'];
+          }
+          else {
+            $dashlets[$dashboard_id] = $defaultDashlet['dashboard_id'];
+          }
         }
       }
     }
