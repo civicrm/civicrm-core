@@ -66,13 +66,12 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddress"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           name="fromAddress"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           ng-model="fromPlaceholder.label"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           required>
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -80,13 +79,12 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddressA"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           name="fromAddressA"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           ng-model="fromPlaceholder.label"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           required>
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -94,13 +92,12 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.b">
         <select
           crm-ui-id="subform.fromAddressB"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           name="fromAddressB"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
           ng-model="fromPlaceholder.label"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           required>
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -110,13 +107,13 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyTo"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
           name="replyTo"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-change="checkReplyToChange(abtest.mailings.a)"
           ng-model="abtest.mailings.a.replyto_email"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           >
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -124,13 +121,13 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyToA"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
           name="replyToA"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-change="checkReplyToChange(abtest.mailings.a)"
           ng-model="abtest.mailings.a.replyto_email"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           >
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -138,13 +135,13 @@ processed by Angular; if false, the field will be hidden and completely ignored 
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyToB"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
           name="replyToB"
-          ui-jq="select2"
-          ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          ng-change="checkReplyToChange(abtest.mailings.b)"
           ng-model="abtest.mailings.b.replyto_email"
-          ng-options="frm.label as frm.label for frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'"
           >
           <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
         </select>
       </span>
     </div>
@@ -152,7 +149,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
 
     <div crm-ui-field="subform.subject" crm-title="ts('Subject')" ng-if="fields.subject">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" />
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
       </div>
       <input
         crm-ui-id="subform.subject"
@@ -166,7 +163,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
     <div crm-ui-field="subform.subjectA" crm-title="ts('Subject (A)')" ng-if="fields.subjectA">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" />
+        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" tabindex="-1"/>
       </div>
       <input
         crm-ui-id="subform.subjectA"
@@ -180,7 +177,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
     <div crm-ui-field="subform.subjectB" crm-title="ts('Subject (B)')" ng-if="fields.subjectB">
       <div style="float: right;">
-        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" />
+        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" tabindex="-1"/>
       </div>
       <input
         crm-ui-id="subform.subjectB"

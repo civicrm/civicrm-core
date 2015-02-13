@@ -43,8 +43,6 @@
                 msg_template_id: 1,
                 fromAddressA: 1,
                 fromAddressB: 1,
-                replyToA: 1,
-                replyToB: 1,
                 subject: 1
                 }"
               crm-abtest="abtest"></div>
@@ -61,7 +59,7 @@
             <div crm-ui-accordion crm-title="ts('HTML')">
               <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.a.body_text'>
               <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
             </div>
           </div>
@@ -103,7 +101,7 @@
             <div crm-ui-accordion crm-title="ts('HTML')">
               <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.a.body_text'>
               <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
             </div>
           </div>
@@ -138,7 +136,7 @@
             <div crm-ui-accordion crm-title="ts('HTML')">
               <div crm-mailing-body-html crm-mailing="abtest.mailings.b"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='true'>
+            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.b.body_text'>
               <div crm-mailing-body-text crm-mailing="abtest.mailings.b"/>
             </div>
           </div>
