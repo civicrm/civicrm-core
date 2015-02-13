@@ -401,6 +401,11 @@
     <type>int unsigned</type>
     <default>0</default>
     <comment>With email_selection_method, determines which email address to use</comment>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
     <add>4.6</add>
   </field>
 <field>
@@ -409,6 +414,9 @@
     <length>20</length>
     <default>'automatic'</default>
     <comment>With location_type_id, determine how to choose the email address to use.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::emailSelectMethods</callback>
+    </pseudoconstant>
     <add>4.6</add>
   </field>
 </table>
