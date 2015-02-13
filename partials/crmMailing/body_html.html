@@ -4,7 +4,7 @@ Required vars: mailing
 <div ng-form="htmlForm" crm-ui-id-scope>
   <div ng-controller="EmailBodyCtrl">
     <div style="float: right;">
-      <input crm-mailing-token on-select="$broadcast('insert:body_html', token.name)"/>
+      <input crm-mailing-token on-select="$broadcast('insert:body_html', token.name)" tabindex="-1"/>
     </div>
 
     <div>
@@ -16,6 +16,9 @@ Required vars: mailing
         ng-blur="checkTokens(mailing, 'body_html', 'insert:body_html')"
         ></textarea>
       <span ng-model="body_html_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_html')"></span>
+      <div ng-show="htmlForm.$error.crmUiValidate" class="crmMailing-error-link">
+        {{ts('Required tokens are missing.')}} <a class="helpicon" ng-click="checkTokens(mailing, 'body_html', 'insert:body_html')"></a>
+      </div>
     </div>
   </div>
 </div>

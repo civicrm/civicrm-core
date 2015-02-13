@@ -105,6 +105,8 @@
               'subject',
               'from_name',
               'from_email',
+              'replyto_email',
+              'override_verp', // keep override_verp and replyto_Email linked
               'body_html',
               'body_text'
             ]);
