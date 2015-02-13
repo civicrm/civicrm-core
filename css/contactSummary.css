@@ -238,13 +238,6 @@ div#crm-contact-thumbnail {
 
 #crm-contact-actions-wrapper {
   position: relative;
-  float: left;
-  width: 85px;
-  /* fixes ie bug where button is toooooo long */
-}
-#crm-contact-actions-list {
-  width: 495px;
-  /* fixes ie bug  caused by above*/
 }
 
 #crm-contact-actions-list .crm-contact_activities-list select {
