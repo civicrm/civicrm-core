@@ -259,6 +259,16 @@
       };
       dialogService.open('recipDialog', '~/crmMailing/dialog/recipients.html', model, options);
     };
+
+    // Open a dialog for editing the advanced recipient options.
+    $scope.editOptions = function editOptions(mailing) {
+      var options = {
+        autoOpen: false,
+        modal: true,
+        title: ts('Edit Options')
+      };
+      dialogService.open('previewComponentDialog', '~/crmMailing/dialog/recipientOptions.html', mailing, options);
+    };
   });
 
   // Controller for the "Preview Recipients" dialog
@@ -274,6 +284,12 @@
   //   - "body_html"
   //   - "body_text"
   angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope) {
+    $scope.ts = CRM.ts(null);
+  });
+
+  // Controller for the "Recipients: Edit Options" dialog
+  // Note: Expects $scope.model to be a mailing object.
+  angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope) {
     $scope.ts = CRM.ts(null);
   });
 
