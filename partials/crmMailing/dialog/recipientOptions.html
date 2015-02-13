@@ -1,0 +1,20 @@
+<div ng-controller="EditRecipOptionsDialogCtrl">
+  <div class="crm-block" ng-form="responseForm" crm-ui-id-scope>
+    <div class="crm-group">
+      <!-- FIXME: ts is not working here. -->
+      <div crm-ui-field crm-title="'Dedupe by email'" crm-layout="checkbox">
+        <input
+          type='checkbox'
+          ng-model='model.dedupe_email'
+          ng-true-value="'1'"
+          ng-false-value="'0'"
+          />
+      </div>
+      <div class="crm-section" id="help">
+        <p>{{ts('Multiple people -- such as spouses, parents, or children -- may sometimes share the same email address.')}}</p>
+        <p>{{ts('To send only one message to the shared address, enable this option. Mail-merge tokens will be filled for only one person.')}}</p>
+        <p>{{ts('To send separate messages for each person, disable this option. Mail-merge tokens will be filled separately for each person.')}}</p>
+      </div>
+    </div>
+  </div>
+</div>
