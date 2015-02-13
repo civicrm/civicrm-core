@@ -422,7 +422,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       }
     }
 
-    //Get the rquire fields value only.
+    // Get the required fields value only.
     $params = $this->_params = $submittedValues;
 
     //get the payment processor id as per mode.
@@ -478,7 +478,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $ctype
     );
 
-    // add all the additioanl payment params we need
+    // Add all the additional payment params we need.
     $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
     $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
