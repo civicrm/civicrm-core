@@ -185,7 +185,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           $assignDashlets = civicrm_api3("dashboard_contact", "create", $defaultDashlet);
           if (!$flatFormat) {
             $values = $assignDashlets['values'][$assignDashlets['id']];
-            $dashlets[$values['column_no']][$values['weight']-$values['dashboard_id']] = $values['is_minimized'];
+            $dashlets[$values['column_no']][$values['weight'] - $values['dashboard_id']] = $values['is_minimized'];
           }
           else {
             $dashlets[$dashboard_id] = $defaultDashlet['dashboard_id'];
