@@ -3,17 +3,6 @@
     <div class='crmMailing-recip-est'>
       <a href="" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a>
     </div>
-    <div>
-      <input
-        type='checkbox'
-        ng-model='mailing.dedupe_email'
-        ng-true-value="'1'"
-        ng-false-value="'0'"
-        id="recipients-dedupe-email"/>
-      <label for="recipients-dedupe-email">
-        {{ts('Dedupe')}}
-      </label>
-    </div>
   </div>
   <select
     crm-mailing-recipients
@@ -25,4 +14,7 @@
     ng-required="true"
     multiple>
   </select>
+  <a ng-click="editOptions(mailing)" class="crm-hover-button" title="{{ts('Edit Options')}}">
+    <span class="icon ui-icon-wrench"></span>
+  </a>
 </div>

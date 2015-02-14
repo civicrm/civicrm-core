@@ -1,6 +1,6 @@
 // https://civicrm.org/licensing
 /* global CRM:true */
-if (!CRM) CRM = {};
+var CRM = CRM || {};
 var cj = CRM.$ = jQuery;
 CRM._ = _;
 

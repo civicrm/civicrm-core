@@ -27,7 +27,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
           <option value=""></option>
           <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
         </select>
-        <a ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button action-item" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
+        <a ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
       </div>
     </div>
     <div crm-ui-field="subform.msg_template_idA" crm-title="ts('Template (A)')" style="background: #bbf; width:100%; padding: 0.1em;" ng-if="fields.msg_template_idA">
@@ -42,7 +42,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
           <option value=""></option>
           <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
         </select>
-        <a ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button action-item" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
+        <a ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
       </div>
     </div>
     <div crm-ui-field="subform.msg_template_idB" crm-title="ts('Template (B)')" style="background: #bbf; width:100%; padding: 0.1em;" ng-if="fields.msg_template_idB">
@@ -57,7 +57,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
           <option value=""></option>
           <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
         </select>
-        <a ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button action-item" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
+        <a ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button" title="{{ts('Save As')}}"><span class="icon ui-icon-disk"></span></a>
       </div>
     </div>
 

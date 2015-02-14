@@ -2,19 +2,27 @@
 (function (angular, $, _) {
   angular.module('crmUtil', []);
 
+  // usage:
+  //   crmApi('Entity', 'action', {...}).then(function(apiResult){...})
+
+  // Note: To mock API results in unit-tests, override crmApi.backend, e.g.
+  //   crmApi.backend = apiSpy.and.returnValue(crmApi.val({
+  //     is_error: 1
+  //   }));
   angular.module('crmUtil').factory('crmApi', function($q) {
-    return function(entity, action, params, message) {
+    var crmApi = function(entity, action, params, message) {
       // JSON serialization in CRM.api3 is not aware of Angular metadata like $$hash, so use angular.toJson()
       var deferred = $q.defer();
       var p;
+      var backend = crmApi.backend || CRM.api3;
       if (_.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */
-        p = CRM.api3(eval('('+angular.toJson(entity)+')'), message);
+        p = backend(eval('('+angular.toJson(entity)+')'), message);
       } else {
         // eval content is locally generated.
         /*jshint -W061 */
-        p = CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+        p = backend(entity, action, eval('('+angular.toJson(params)+')'), message);
       }
       // CRM.api3 returns a promise, but the promise doesn't really represent errors as errors, so we
       // convert them
@@ -32,6 +40,78 @@
       );
       return deferred.promise;
     };
+    crmApi.backend = null;
+    crmApi.val = function(value) {
+      var d = $.Deferred();
+      d.resolve(value);
+      return d.promise();
+    };
+    return crmApi;
+  });
+
+  // Get and cache the metadata for an API entity.
+  // usage:
+  //   $q.when(crmMetadata.getFields('MyEntity'), function(fields){
+  //     console.log('The fields are:', options);
+  //   });
+  angular.module('crmUtil').factory('crmMetadata', function($q, crmApi) {
+    var cache = {}; // cache[entityName+'::'+action][fieldName].title
+    var deferreds = {}; // deferreds[cacheKey].push($q.defer())
+    var crmMetadata = {
+      // usage: $q.when(crmMetadata.getField('MyEntity', 'my_field')).then(...);
+      getField: function getField(entity, field) {
+        return $q.when(crmMetadata.getFields(entity)).then(function(fields){
+          return fields[field];
+        });
+      },
+      // usage: $q.when(crmMetadata.getFields('MyEntity')).then(...);
+      // usage: $q.when(crmMetadata.getFields(['MyEntity', 'myaction'])).then(...);
+      getFields: function getFields(entity) {
+        var action = '', cacheKey;
+        if (_.isArray(entity)) {
+          action = entity[1];
+          entity = entity[0];
+          cacheKey = entity + '::' + action;
+        } else {
+          cacheKey = entity;
+        }
+
+        if (_.isObject(cache[cacheKey])) {
+          return cache[cacheKey];
+        }
+
+        var needFetch = _.isEmpty(deferreds[cacheKey]);
+        deferreds[cacheKey] = deferreds[cacheKey] || [];
+        var deferred = $q.defer();
+        deferreds[cacheKey].push(deferred);
+
+        if (needFetch) {
+          crmApi(entity, 'getfields', {action: action, options: {get_options: 'all'}})
+            .then(
+            // on success:
+            function(fields) {
+              cache[cacheKey] = fields.values;
+              angular.forEach(deferreds[cacheKey], function(dfr) {
+                dfr.resolve(fields.values);
+              });
+              delete deferreds[cacheKey];
+            },
+            // on error:
+            function() {
+              cache[cacheKey] = {}; // cache nack
+              angular.forEach(deferreds[cacheKey], function(dfr) {
+                dfr.reject();
+              });
+              delete deferreds[cacheKey];
+            }
+          );
+        }
+
+        return deferred.promise;
+      }
+    };
+
+    return crmMetadata;
   });
 
   // usage:
