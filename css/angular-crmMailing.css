@@ -72,45 +72,25 @@ input[name=preview_test_email]:-ms-input-placeholder {
 .crmMailing-inactive {
   text-decoration: line-through;
 }
-a.crmMailing-submit-button div {
-  color: black;
-  background: #bfb;
-  border: 1px solid #8a8;
-  padding: 1em;
-  margin: 1em;
-  width: 15em;
+.crm-container a.crmMailing-submit-button {
+  display: inline-block;
+  padding: .2em .4em;
+  margin: 1em auto;
+  border-radius: 5px;
+  font-size: 1.2em;
+  float: none;
 }
-a.crmMailing-submit-button div:hover {
-  background: #afa;
-  border: 1px solid #7a7;
-  cursor: pointer;
+.crm-container a.crmMailing-submit-button div {
+  background: url(../i/check.gif) no-repeat left center;
+  padding-left: 20px;
 }
-a.crmMailing-submit-button:hover {
-  text-decoration: none;
+.crm-container a.crmMailing-submit-button.disabled,
+.crm-container a.crmMailing-submit-button.blocking {
+  opacity: .6;
+  cursor: default;
 }
-a.crmMailing-submit-button.disabled div {
-  color: black;
-  background: #aaa;
-  border: 1px solid #8a8;
-}
-a.crmMailing-submit-button.blocking div {
-  -webkit-animation: crmMailingPulse 2s infinite !important; /* Chrome, Safari, Opera */
-  animation: crmMailingPulse 2s infinite !important;
-}
-@-webkit-keyframes crmMailingPulse {
-  0% {background: #bfb;}
-  50% {background: #aaa;}
-  100% {background: #bfb;}
-}
-@keyframes crmMailingPulse {
-  0% {background: #bfb;}
-  50% {background: #aaa;}
-  100% {background: #bfb;}
-}
-a.crmMailing-submit-button.disabled div:hover, a.crmMailing-submit-button.blocking div:hover {
-  background: #aaa;
-  border: 1px solid #7a7;
-  cursor: not-allowed;
+.crm-container a.crmMailing-submit-button.blocking div {
+  background: url(../i/loading-2f2f2e.gif) no-repeat left center;
 }
 
 .crm-container .crm-form-block label {
