@@ -782,10 +782,12 @@
         }
       };
       return {
-        template: '',
         link: function (scope, element, attrs) {
           $(element).click(function () {
             var options = scope.$eval(attrs.crmConfirm);
+            if (attrs.title && !options.title) {
+              options.title = attrs.title;
+            }
             var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
             CRM.confirm(_.extend(defaults, options))
               .on('crmConfirm:yes', function () { scope.$apply(attrs.onYes); })
