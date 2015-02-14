@@ -4,8 +4,9 @@
 
   // usage:
   //   crmApi('Entity', 'action', {...}).then(function(apiResult){...})
-
+  //
   // Note: To mock API results in unit-tests, override crmApi.backend, e.g.
+  //   var apiSpy = jasmine.createSpy('crmApi');
   //   crmApi.backend = apiSpy.and.returnValue(crmApi.val({
   //     is_error: 1
   //   }));

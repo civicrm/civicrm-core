@@ -294,7 +294,9 @@
   });
 
   // Controller for the "Recipients: Edit Options" dialog
-  // Note: Expects $scope.model to be a mailing object.
+  // Note: Expects $scope.model to be an object with properties:
+  //   - "mailing" (APIv3 mailing object)
+  //   - "fields" (list of fields)
   angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope) {
     $scope.ts = CRM.ts(null);
   });
