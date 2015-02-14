@@ -35,7 +35,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
         placeholder="example@example.org"
         />
     </div>
-    <button ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
+    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
   </div>
   <div class="preview-group" ng-form>
     <div>
@@ -52,7 +52,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
         <option value=""></option>
       </select>
     </div>
-    <button ng-disabled="crmMailing.$invalid || !testGroup.gid" ng-click="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
+    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !testGroup.gid" ng-click="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
   </div>
   <div class="clear"></div>
 </div>

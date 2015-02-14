@@ -1957,16 +1957,6 @@ div.grippie {
   margin-left: .5em;
 }
 
-.crm-container .crm-button {
-  border: medium none;
-  cursor: pointer;
-  display: block;
-  float: left !important;
-  overflow: hidden;
-  text-shadow: 0 1px 0 black;
-  margin: 0 12px 0 0;
-}
-
 .crm-container .crm-button input {
   background: none;
   _background: #6C6C6C;
@@ -1995,7 +1985,6 @@ div.grippie {
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.crm-form-submit,
-.crm-container .crm-button,
 .crm-container .ui-dialog-buttonset .ui-button,
 .crm-container input[type=button],
 .crm-container .crm-button {
@@ -2011,8 +2000,19 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
-.crm-container .crm-button {
+.crm-container span.crm-button {
+  display: block;
+  float: left !important;
+  overflow: hidden;
   padding: 1px;
+}
+
+.crm-container button.crm-button {
+  padding: 3px 6px;
+}
+
+.crm-container button.crm-button .icon {
+  margin-bottom: -4px;
 }
 
 .crm-container input.crm-form-submit,
@@ -2184,7 +2184,7 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-2786C2.png");
 }
 
-.crm-container .crm-button .icon {
+.crm-container span.crm-button .icon {
   margin-top: 3px;
 }
 
@@ -2201,8 +2201,8 @@ div.grippie {
   margin-left: 3px;
 }
 
-.crm-container input.crm-button.crm-icon-button {
-  position: relative;
+.crm-container .crm-button.crm-icon-button {
+  padding: 2px 2px 1px 4px;
 }
 
 .crm-container .crm-button.crm-icon-button input {
@@ -2226,6 +2226,7 @@ div.grippie {
 }
 .crm-container .red-icon,
 .crm-container a:hover .icon.delete-icon,
+.crm-container .crm-button:hover .icon.ui-icon-trash,
 .crm-container span:hover > .icon.delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
