@@ -25,6 +25,7 @@ module.exports = function(config) {
       'tests/karma/modules.js',
       'js/crm.ajax.js',
       'js/angular-*.js',
+      'js/angular-crmMailing/*.js',
       'tests/karma/lib/*.js',
       'tests/karma/**/*.js',
       'partials/**/*.html'
