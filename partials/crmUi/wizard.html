@@ -9,7 +9,7 @@
   </ul>
   <div class="crm-wizard-body" ng-transclude/>
   <div class="crm-wizard-buttons">
-    <button ng-click="crmUiWizardCtrl.previous()" ng-show="!crmUiWizardCtrl.$first()">Previous</button>
-    <button ng-click="crmUiWizardCtrl.next()" ng-show="!crmUiWizardCtrl.$last()" ng-disabled="!crmUiWizardCtrl.$validStep()">Next</button>
+    <button crm-icon="triangle-1-w" ng-click="crmUiWizardCtrl.previous()" ng-show="!crmUiWizardCtrl.$first()"></button>
+    <button crm-icon="triangle-1-e" ng-click="crmUiWizardCtrl.next()" ng-show="!crmUiWizardCtrl.$last()" ng-disabled="!crmUiWizardCtrl.$validStep()"></button>
   </div>
 </div>

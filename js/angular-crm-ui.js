@@ -699,6 +699,20 @@
       };
     })
 
+    // Example: <button crm-icon="check">Save</button>
+    .directive('crmIcon', function() {
+      return {
+        restrict: 'EA',
+        scope: {},
+        link: function (scope, element, attrs) {
+          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if ($(element).is('button')) {
+            $(element).addClass('crm-button');
+          }
+        }
+      };
+    })
+
     // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
