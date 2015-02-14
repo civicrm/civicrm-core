@@ -169,7 +169,7 @@
   // Scope members:
   //  - [input] mailing: object
   //  - [output] recipients: array of recipient records
-  angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr) {
+  angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr, $q, crmMetadata) {
     var ts = $scope.ts = CRM.ts(null);
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
@@ -267,7 +267,13 @@
         modal: true,
         title: ts('Edit Options')
       };
-      dialogService.open('previewComponentDialog', '~/crmMailing/dialog/recipientOptions.html', mailing, options);
+      $q.when(crmMetadata.getFields('Mailing')).then(function(fields) {
+        var model = {
+          fields: fields,
+          mailing: mailing
+        };
+        dialogService.open('previewComponentDialog', '~/crmMailing/dialog/recipientOptions.html', model, options);
+      });
     };
   });
 
