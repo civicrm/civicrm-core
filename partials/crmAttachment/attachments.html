@@ -12,7 +12,8 @@
       <td>
         <a
           crm-icon="trash"
-          crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.'), title: ts('Delete Attachment?')}" on-yes="att.deleteFile(file)"
+          crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.')}" on-yes="att.deleteFile(file)"
+          title="{{ts('Delete attachment')}}"
           class="crm-hover-button">
         </a>
       </td>
