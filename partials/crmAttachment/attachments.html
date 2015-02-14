@@ -10,8 +10,10 @@
         <input ng-model="file.description" class="crm-form-text" placeholder="{{ts('Description')}}"/>
       </td>
       <td>
-        <a crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.'), title: ts('Delete Attachment?')}" on-yes="att.deleteFile(file)" class="crm-hover-button">
-          <span class="icon delete-icon" title="{{ts('Delete attachment')}}"></span>
+        <a
+          crm-icon="trash"
+          crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.'), title: ts('Delete Attachment?')}" on-yes="att.deleteFile(file)"
+          class="crm-hover-button">
         </a>
       </td>
     </tr>
@@ -24,7 +26,7 @@
         <!-- item.isReady item.isUploading item.isUploaded item.isSuccess item.isCancel item.isError -->
       </td>
       <td>
-        <a ng-click="item.remove()" class="crm-hover-button"><span class="icon ui-icon-close" title="{{ts('Remove unsaved attachment')}}"></span></a>
+        <a crm-icon="close" ng-click="item.remove()" class="crm-hover-button" title="{{ts('Remove unsaved attachment')}}"></a>
       </td>
     </tr>
     </tbody>

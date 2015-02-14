@@ -11,8 +11,9 @@
   ng-class="{incomplete: !dtparts.time && (required||dtparts.date)}"
   placeholder="{{timeLabel}}"/>
 <a
+  crm-icon="close"
   class="crm-hover-button"
   ng-click="reset()"
   ng-show="dtparts.date || dtparts.time"
   title="Clear"
-  ><span class="icon ui-icon-close"></span></a>
+  ></a>

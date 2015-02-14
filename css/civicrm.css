@@ -1551,6 +1551,7 @@ input.crm-form-entityref {
   color: #000;
   padding: 1px 2px 1px 0;
   opacity: .7;
+  cursor: pointer;
 }
 .crm-container a.crm-hover-button.action-item,
 .crm-container .crm-hover-button.btn-slide {
@@ -2227,6 +2228,7 @@ div.grippie {
 .crm-container .red-icon,
 .crm-container a:hover .icon.delete-icon,
 .crm-container .crm-button:hover .icon.ui-icon-trash,
+.crm-container .crm-hover-button:hover .icon.ui-icon-trash,
 .crm-container span:hover > .icon.delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }

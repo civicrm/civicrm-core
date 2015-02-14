@@ -21,9 +21,7 @@ Required vars: caseType
       <input class="number" type="text" ng-pattern="/^[0-9]*$/" ng-model="activityType.max_instances" />
     </td>
     <td>
-      <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)">
-        <span class="icon delete-icon" title="Remove"></span>
-      </a>
+      <a crm-icon="trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)" title="Remove"></a>
     </td>
   </tr>
   </tbody>
