@@ -121,7 +121,7 @@
 
     // @return Promise
     $scope.save = function save() {
-      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save().then(updateUrl)));
+      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, abtest.save()));
     };
 
     // @return Promise
@@ -131,7 +131,7 @@
 
     // @return Promise
     $scope.sendTest = function sendTest(mailingName, recipient) {
-      return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save().then(updateUrl))
+      return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
         .then(function () {
           crmMailingPreviewMgr.sendTest(abtest.mailings[mailingName], recipient);
         }));
@@ -164,19 +164,6 @@
     function updateCriteriaName() {
       var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id);
       $scope.criteriaName = criteria ? criteria.name : null;
-    }
-
-    // Transition URL "/abtest/new" => "/abtest/123"
-    function updateUrl() {
-      var parts = $location.path().split('/'); // e.g. "/abtest/new" or "/abtest/123/wizard"
-      if (parts[2] != $scope.abtest.ab.id) {
-        parts[2] = $scope.abtest.ab.id;
-        $location.path(parts.join('/'));
-        $location.replace();
-        // FIXME: Angular unnecessarily refreshes UI
-        // WARNING: Changing the URL triggers a full reload. Any pending AJAX operations
-        // could be inconsistently applied. Run updateUrl() after other changes complete.
-      }
     }
 
     // initialize

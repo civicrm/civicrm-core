@@ -110,11 +110,11 @@
             else {
               scope.dtparts = {date: '', time: ''};
             }
+            validate();
           };
 
           function updateParent() {
-            var incompleteDateTime = _.isEmpty(scope.dtparts.date) ^ _.isEmpty(scope.dtparts.time);
-            ngModel.$setValidity('incompleteDateTime', !incompleteDateTime);
+            validate();
 
             if (_.isEmpty(scope.dtparts.date) && _.isEmpty(scope.dtparts.time)) {
               ngModel.$setViewValue(' ');
@@ -127,6 +127,11 @@
 
           scope.$watch('dtparts.date', updateParent);
           scope.$watch('dtparts.time', updateParent);
+
+          function validate() {
+            var incompleteDateTime = _.isEmpty(scope.dtparts.date) ^ _.isEmpty(scope.dtparts.time);
+            ngModel.$setValidity('incompleteDateTime', !incompleteDateTime);
+          }
 
           function updateRequired() {
             scope.required = scope.$parent.$eval(attrs.ngRequired);

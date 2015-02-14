@@ -121,12 +121,14 @@
           else {
             schedule.mode = 'now';
           }
+          validate();
         };
 
         var updateParent = (function () {
           switch (schedule.mode) {
             case 'now':
               ngModel.$setViewValue(null);
+              schedule.datetime = ' ';
               break;
             case 'at':
               ngModel.$setViewValue(schedule.datetime);
@@ -134,7 +136,21 @@
             default:
               throw 'Unrecognized schedule mode: ' + schedule.mode;
           }
+          validate();
         });
+
+        function validate() {
+          switch (schedule.mode) {
+            case 'now':
+              ngModel.$setValidity('empty', true);
+              break;
+            case 'at':
+              ngModel.$setValidity('empty', !_.isEmpty(schedule.datetime) && schedule.datetime !== ' ');
+              break;
+            default:
+              throw 'Unrecognized schedule mode: ' + schedule.mode;
+          }
+        }
 
         $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
         $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {
