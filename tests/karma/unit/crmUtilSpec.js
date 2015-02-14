@@ -55,13 +55,13 @@ describe('crmUtil', function() {
           expect(fields.id.title).toBe('My entity ID');
           expect(apiSpy.calls.count()).toBe(1);
 
-          // call a second time, but now the data is cached cached
+          // call a second time, but now the data is cached
           $q.when(crmMetadata.getFields('MyEntity')).then(
             function(fields) {
               expect(fields.id.title).toBe('My entity ID');
               expect(apiSpy.calls.count()).toBe(1);
 
-              // third call
+              // call a third time using a diff interface; data is still cached!
               $q.when(crmMetadata.getField('MyEntity', 'id')).then(
                 function(field) {
                   expect(field.title).toBe('My entity ID');
