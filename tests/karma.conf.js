@@ -12,6 +12,7 @@ module.exports = function(config) {
       'packages/jquery/plugins/select2/select2.min.js',
       'packages/jquery/plugins/jquery.blockUI.js',
       'packages/jquery/plugins/jquery.validate.js',
+      'packages/jquery/plugins/jquery.timeentry.js',
       'js/Common.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-file-upload/angular-file-upload.js',
@@ -26,7 +27,17 @@ module.exports = function(config) {
       'js/angular-*.js',
       'tests/karma/lib/*.js',
       'tests/karma/**/*.js',
+      'partials/**/*.html'
     ],
+    preprocessors : {
+      'partials/**/*.html' : ['ng-html2js']
+    },
+
+    ngHtml2JsPreprocessor: {
+      stripPrefix: 'partials/',
+      prependPrefix: '~/',
+      moduleName: 'crmResource'
+    },
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,
