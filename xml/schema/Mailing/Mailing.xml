@@ -399,7 +399,6 @@
     <name>location_type_id</name>
     <title>Location Type</title>
     <type>int unsigned</type>
-    <default>0</default>
     <comment>With email_selection_method, determines which email address to use</comment>
     <pseudoconstant>
       <table>civicrm_location_type</table>
