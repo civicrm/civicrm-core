@@ -127,7 +127,6 @@ $('#civicrm-menu').ready(function() {
       $.Menu.closeAll();
     });
   $('.crm-hidemenu').click(function(e) {
-    $.Menu.closeAll();
     $('#civicrm-menu').slideUp();
     if ($('#crm-notification-container').length) {
       var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu" style="text-align: center; margin-top: -8px;">{ts escape='js'}Restore CiviCRM Menu{/ts}</a>'{literal}, '', 'none', {expires: 10000});
@@ -161,6 +160,8 @@ $('#civicrm-menu').ready(function() {
       return false;
     }
   });
+  // Close menu after selecting an item
+  $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
 })(CRM.$);{/literal}
