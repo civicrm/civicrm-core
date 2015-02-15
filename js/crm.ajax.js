@@ -304,35 +304,13 @@
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
-      dialog: false
+      dialog: (options && options.target) ? false : {}
     };
-    if (!options || !options.target) {
-      settings.dialog = {
-        modal: true,
-        width: '65%',
-        height: '75%'
-      };
-    }
     if (options) $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
     if (settings.dialog) {
-      // HACK: jQuery UI doesn't support relative height
-      if (typeof settings.dialog.height === 'string' && settings.dialog.height.indexOf('%') > 0) {
-        settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
-      }
-      // Increase percent width on small screens
-      if (typeof settings.dialog.width === 'string' && settings.dialog.width.indexOf('%') > 0) {
-        var screenWidth = $(window).width(),
-          percentage = parseInt(settings.dialog.width.replace('%', ''), 10),
-          gap = 100-percentage;
-        if (screenWidth < 701) {
-          settings.dialog.width = '100%';
-        }
-        else if (screenWidth < 1400) {
-          settings.dialog.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
-        }
-      }
+      settings.dialog = CRM.utils.adjustDialogDefaults(settings.dialog);
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target)
         .on('dialogclose', function() {
@@ -586,7 +564,7 @@
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
       })
       // Auto-resize dialogs when loading content
-      .on('crmLoad', 'div.ui-dialog.ui-resizable.crm-container', function(e) {
+      .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {
         var
           $wrapper = $(this),
           $dialog = $wrapper.children('.ui-dialog-content');

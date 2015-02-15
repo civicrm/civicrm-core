@@ -308,6 +308,12 @@
             doc.close();
           };
 
+          // If the iframe is in a dialog, respond to resize events
+          $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
+            $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
+            iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
         }
       };
@@ -699,6 +705,20 @@
       };
     })
 
+    // Example: <button crm-icon="check">Save</button>
+    .directive('crmIcon', function() {
+      return {
+        restrict: 'EA',
+        scope: {},
+        link: function (scope, element, attrs) {
+          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if ($(element).is('button')) {
+            $(element).addClass('crm-button');
+          }
+        }
+      };
+    })
+
     // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
@@ -768,10 +788,12 @@
         }
       };
       return {
-        template: '',
         link: function (scope, element, attrs) {
           $(element).click(function () {
             var options = scope.$eval(attrs.crmConfirm);
+            if (attrs.title && !options.title) {
+              options.title = attrs.title;
+            }
             var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
             CRM.confirm(_.extend(defaults, options))
               .on('crmConfirm:yes', function () { scope.$apply(attrs.onYes); })
