@@ -267,40 +267,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
 
     if ($this->_mode) {
-      $fields = array();
-
-      foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
+      // set default country from config if no country set
+      $config = CRM_Core_Config::singleton();
+      if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $defaults)) {
+        $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
       }
 
-      $names = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}",
-        "city-{$this->_bltID}", "postal_code-{$this->_bltID}", "country_id-{$this->_bltID}",
-        "state_province_id-{$this->_bltID}",
-      );
-      foreach ($names as $name) {
-        $fields[$name] = 1;
+      if (!CRM_Utils_Array::value("billing_state_province_id-{$this->_bltID}", $defaults)) {
+        $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
       }
 
-      $fields["state_province-{$this->_bltID}"] = 1;
-      $fields["country-{$this->_bltID}"] = 1;
-      $fields["email-{$this->_bltID}"] = 1;
-      $fields['email-Primary'] = 1;
-
-      CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
-
-      // use primary email address if billing email address is empty
-      if (empty($this->_defaults["email-{$this->_bltID}"]) &&
-        !empty($this->_defaults['email-Primary'])
-      ) {
-        $defaults["email-{$this->_bltID}"] = $this->_defaults['email-Primary'];
-      }
-
-      foreach ($names as $name) {
-        if (!empty($this->_defaults[$name])) {
-          $defaults['billing_' . $name] = $this->_defaults[$name];
-        }
-      }
+      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+      $defaults = array_merge($defaults, $billingDefaults);
+ 
+      // now fix all state country selectors, set correct state based on country
+      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
     return $defaults;
