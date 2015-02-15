@@ -64,9 +64,10 @@ Required vars: activitySet
     </td>
     <td>
       <a class="crm-hover-button"
+         crm-icon="trash"
          ng-show="isActivityRemovable(activitySet, activity)"
-         ng-click="removeItem(activitySet.activityTypes, activity)">
-        <span class="icon delete-icon" title="Remove"></span>
+         ng-click="removeItem(activitySet.activityTypes, activity)"
+         title="Remove">
       </a>
     </td>
   </tr>

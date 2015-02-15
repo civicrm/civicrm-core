@@ -324,7 +324,34 @@ CRM.strings = CRM.strings || {};
     });
     return isDirty;
   };
-
+  
+  /**
+   * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
+   *
+   * @param settings
+   * @returns {*}
+   */
+  CRM.utils.adjustDialogDefaults = function(settings) {
+    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    // Support relative height
+    if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
+      settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
+    }
+    // Responsive adjustment - increase percent width on small screens
+    if (typeof settings.width === 'string' && settings.width.indexOf('%') > 0) {
+      var screenWidth = $(window).width(),
+        percentage = parseInt(settings.width.replace('%', ''), 10),
+        gap = 100-percentage;
+      if (screenWidth < 701) {
+        settings.width = '100%';
+      }
+      else if (screenWidth < 1400) {
+        settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
+      }
+    }
+    return settings;
+  };
+  
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -728,6 +755,7 @@ CRM.strings = CRM.strings || {};
             });
             $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
           }
+          $el.trigger('dialogresize');
           e.preventDefault();
         });
       }
