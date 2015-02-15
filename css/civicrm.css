@@ -3296,7 +3296,7 @@ div.m ul#civicrm-menu,
   color: #F5F6F1;
 }
 .crm-container .ui-dialog-title {
-  background: url("../i/logo16px.png") no-repeat scroll 0 center;
+  background: url("../i/item_sprites.png") no-repeat scroll -79px -47px;
   margin-left: -5px;
   padding-left: 25px;
 }
