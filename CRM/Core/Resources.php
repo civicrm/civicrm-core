@@ -695,7 +695,7 @@ class CRM_Core_Resources {
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
       $items[] = "packages/jquery/plugins/jquery.menu$min.js";
-      $items[] = "packages/jquery/css/menu.css";
+      $items[] = "css/navigation.css";
       $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
       $items[] = "packages/jquery/plugins/jquery.notify$min.js";
       $items[] = "js/jquery/jquery.crmeditable.js";
