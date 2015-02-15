@@ -109,13 +109,6 @@ div.crm-container fieldset label{
   vertical-align: top;
 }
 
-.crm-container tr.even-row td,
-.crm-container tr.odd-row td,
-.crm-container table.display td,
-.crm-container table.pagerDisplay td {
-  border-collapse: collapse;
-}
-
 .crm-container .crm-row-child {
   margin: 0;
   padding: 3px 0 3px 0;
@@ -532,10 +525,6 @@ input.crm-form-entityref {
   vertical-align: top;
 }
 
-.crm-container table.selector td {
-  border-right: 1px solid #dddddd;
-}
-
 .crm-container .form-layout td.view-value,
 .crm-container .form-layout-compressed td.view-value {
   text-align: left;
@@ -577,7 +566,7 @@ input.crm-form-entityref {
 
 /* messages and status */
 .crm-container .messages {
-  margin: 1.0 0 1.0;
+  margin: 1em 0 1em;
   border: none;
   font-weight: normal;
 }
@@ -701,7 +690,7 @@ input.crm-form-entityref {
 
 .crm-container div.display-block {
   font-weight: normal;
-  margin: 1.0 2.0 1.0 2.0;
+  margin: 1em 2em 1em 2em;
 }
 
 /* Data display layouts */
@@ -984,7 +973,7 @@ input.crm-form-entityref {
 .crm-container #search-status ul li,
 #crm-container ul.left-alignment li {
   display: list-item;
-  margin-left: 2.0;
+  margin-left: 2em;
   list-style-position: inside;
 }
 
@@ -1074,8 +1063,6 @@ input.crm-form-entityref {
 #crm-recently-viewed ul {
   list-style-image: none;
   font-size: .9em;
-  margin: 0;
-  padding: 0;
 }
 
 #crm-recently-viewed li.crm-recently-viewed {
@@ -1192,7 +1179,7 @@ input.crm-form-entityref {
 
 /* To allow for taller boxes of groups/tags. */
 .crm-container .listing-box-tall {
-  margin: 0.25em 2.0 0.5em 0;
+  margin: .25em 2em .5em 0;
   height: 15em;
 }
 
@@ -1404,11 +1391,6 @@ input.crm-form-entityref {
 
 #crm-container table.caseSelector tr {
   border-bottom: 1px solid #999999;
-}
-
-#crm-container table.caseSelector td.status-urgent {
-  font-weight: bold;
-  text-transform: uppercase;
 }
 
 #crm-container table.caseSelector td {
@@ -2858,6 +2840,7 @@ div.crm-container form {
 .crm-container table.pagerDisplay td {
   border-color: #efefef;
   border-right: 1px solid #efefef;
+  border-collapse: collapse;
 }
 .crm-container .odd-row,
 .crm-container .odd,
