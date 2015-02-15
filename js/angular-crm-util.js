@@ -87,13 +87,13 @@
         deferreds[cacheKey].push(deferred);
 
         if (needFetch) {
-          crmApi(entity, 'getfields', {action: action, options: {get_options: 'all'}})
+          crmApi(entity, 'getfields', {action: action, sequential: 1, options: {get_options: 'all'}})
             .then(
             // on success:
             function(fields) {
-              cache[cacheKey] = fields.values;
+              cache[cacheKey] = _.indexBy(fields.values, 'name');
               angular.forEach(deferreds[cacheKey], function(dfr) {
-                dfr.resolve(fields.values);
+                dfr.resolve(cache[cacheKey]);
               });
               delete deferreds[cacheKey];
             },
