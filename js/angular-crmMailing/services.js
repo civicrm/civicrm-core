@@ -399,13 +399,12 @@
         var p = crmMailingMgr
           .preview(mailing)
           .then(function (content) {
-            var options = {
+            var options = CRM.utils.adjustDialogDefaults({
               autoOpen: false,
-              modal: true,
               title: ts('Subject: %1', {
                 1: content.subject
               })
-            };
+            });
             result = dialogService.open('previewDialog', templates[mode], content, options);
           });
         crmStatus({start: ts('Previewing'), success: ''}, p);
