@@ -599,7 +599,7 @@ ORDER BY parent_id, weight";
       // get home menu from db
       $homeParams = array('name' => 'Home');
       $homeNav = array();
-      $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" style="vertical-align:middle;" />';
+      $homeIcon = '<span class="crm-logo-sm" ></span>';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
         list($path, $q) = explode('?', $homeNav['url']);
