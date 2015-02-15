@@ -369,10 +369,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
   }
 
-  public function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
-
   public function postProcess() {
 
     $this->beginPostProcess();
