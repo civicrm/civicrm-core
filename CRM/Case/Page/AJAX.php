@@ -194,8 +194,7 @@ class CRM_Case_Page_AJAX {
     );
 
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
-    echo json_encode(TRUE);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(TRUE);
   }
 
   /**
