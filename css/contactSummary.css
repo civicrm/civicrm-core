@@ -217,6 +217,14 @@ div#crm-contact-thumbnail {
 
 /* contact actions */
 
+#crm-contact-actions-wrapper {
+  position: relative;
+}
+
+#crm-contact-actions-list {
+  width: 495px;
+}
+
 #crm-contact-actions-list ul {
   width: auto;
 }
@@ -240,10 +248,6 @@ div#crm-contact-thumbnail {
   margin-right: 161px;
   border-left: 1px solid #a7a7a7;
   border-right: 1px solid #a7a7a7;
-}
-
-#crm-contact-actions-wrapper {
-  position: relative;
 }
 
 #crm-contact-actions-list .crm-contact_activities-list select {
