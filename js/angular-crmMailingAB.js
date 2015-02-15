@@ -199,13 +199,12 @@
         abtest: abtest,
         mailingName: mailingName
       };
-      var options = {
+      var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        modal: true,
         title: ts('Select Winner (%1)', {
           1: mailingName.toUpperCase()
         })
-      };
+      });
       return dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options);
     };
   });

@@ -250,23 +250,21 @@
       var model = {
         recipients: $scope.recipients
       };
-      var options = {
+      var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        modal: true,
         title: ts('Preview (%1)', {
           1: $scope.getRecipientsEstimate()
         })
-      };
+      });
       dialogService.open('recipDialog', '~/crmMailing/dialog/recipients.html', model, options);
     };
 
     // Open a dialog for editing the advanced recipient options.
     $scope.editOptions = function editOptions(mailing) {
-      var options = {
+      var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        modal: true,
         title: ts('Edit Options')
-      };
+      });
       $q.when(crmMetadata.getFields('Mailing')).then(function(fields) {
         var model = {
           fields: fields,
@@ -314,11 +312,10 @@
         }));
         return;
       }
-      var options = {
+      var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        modal: true,
         title: title // component[0].name
-      };
+      });
       dialogService.open('previewComponentDialog', '~/crmMailing/dialog/previewComponent.html', component[0], options);
     };
   });
@@ -349,11 +346,10 @@
           msg_html: mailing.body_html
         }
       };
-      var options = {
+      var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        modal: true,
         title: ts('Save Template')
-      };
+      });
       return dialogService.open('saveTemplateDialog', '~/crmMailing/dialog/saveTemplate.html', model, options)
         .then(function (item) {
           mailing.msg_template_id = item.id;
