@@ -755,6 +755,7 @@ CRM.strings = CRM.strings || {};
             });
             $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
           }
+          $el.trigger('dialogresize');
           e.preventDefault();
         });
       }

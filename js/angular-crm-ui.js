@@ -308,6 +308,12 @@
             doc.close();
           };
 
+          // If the iframe is in a dialog, respond to resize events
+          $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
+            $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
+            iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
         }
       };
