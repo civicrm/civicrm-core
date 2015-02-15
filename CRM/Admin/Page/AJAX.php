@@ -420,8 +420,7 @@ LIMIT $limit";
       );
     }
 
-    echo json_encode($tagInfo);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($tagInfo);
   }
 
   function mappingList() {
@@ -431,8 +430,7 @@ LIMIT $limit";
     }
 
     if (!$mappingID) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
     }
 
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
@@ -446,8 +444,7 @@ LIMIT $limit";
       );
     }
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   function mappingList1() {
@@ -457,8 +454,7 @@ LIMIT $limit";
     }
 
     if (!$mappingID) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
     }
 
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
@@ -473,8 +469,7 @@ LIMIT $limit";
     }
     $elements['recipientMapping'] = $recipientMapping;
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   static function mergeTags() {
@@ -491,8 +486,8 @@ LIMIT $limit";
       $result['tagB_used_for'] = implode(', ', $result['tagB_used_for']);
     }
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+
+    CRM_Utils_JSON::output($result);
   }
 
   function recipient() {
@@ -502,8 +497,7 @@ LIMIT $limit";
     }
 
     if (!$recipient) {
-      echo json_encode(array('error_msg' => 'required params missing.'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
     }
 
     switch ($recipient) {
@@ -527,8 +521,7 @@ LIMIT $limit";
       );
     }
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 }
 
