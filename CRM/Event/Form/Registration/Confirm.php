@@ -553,6 +553,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['event']
       );
 
+      $pending = FALSE;
       if ($this->_allowWaitlist || $this->_requireApproval) {
         //get the participant statuses.
         $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
@@ -573,7 +574,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (is_array($this->_paymentProcessor)) {
           $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
         }
-        $pending = FALSE;
         $result = NULL;
 
         if (!empty($value['is_pay_later']) ||
