@@ -309,6 +309,13 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      if (array_key_exists('civicrm_address_country_id', $row)) {
+        if ($value = $row['civicrm_address_country_id']) {
+          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
+        }
+        $entryFound = TRUE;
+      }
+
       // handle gender id
       $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
 
