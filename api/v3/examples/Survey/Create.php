@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using survey create API.
  *
- *
  * @return array
  *   API result array
  */

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using setting create API.
  *
- *
  * @return array
  *   API result array
  */

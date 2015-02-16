@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using tax_contribution_page create API.
  *
- * Create Contribution with Nested Line Items
+ * Create Contribution with Nested Line Items.
  *
  * @return array
  *   API result array

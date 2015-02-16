@@ -193,7 +193,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
         'contact_id' => $this->_contactID,
       ));
 
-    $description = "use nested get to get an event";
+    $description = "Demonstrates use of nested get to fetch event data with participant records.";
     $subfile = "NestedEventGet";
     $params = array(
       'id' => $this->_participantID,
@@ -688,7 +688,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Delete with a get - a 'criteria delete'
    */
   public function testNestedDelete() {
-    $description = "Criteria delete by nesting a GET & a DELETE";
+    $description = "Criteria delete by nesting a GET & a DELETE.";
     $subfile = "NestedDelete";
     $participants = $this->callAPISuccess('Participant', 'Get', array());
     $this->assertEquals($participants['count'], 3);
@@ -702,8 +702,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Test creation of a participant with an associated contribution.
    */
   public function testCreateParticipantWithPayment() {
-    $description = "single function to create contact w partipation & contribution. Note that in the
-      case of 'contribution' the 'create' is implied (api.contribution.create)";
+    $description = "Single function to create contact with partipation & contribution.
+      Note that in the case of 'contribution' the 'create' is implied (api.contribution.create)";
     $subfile = "CreateParticipantPayment";
     $params = array(
       'contact_type' => 'Individual',

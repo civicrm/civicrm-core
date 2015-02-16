@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using report_template getrows API.
  *
- * Retrieve rows from a report template (optionally providing the instance_id)
+ * Retrieve rows from a report template (optionally providing the instance_id).
  *
  * @return array
  *   API result array

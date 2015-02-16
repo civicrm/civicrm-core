@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using case create API.
  *
- *
  * @return array
  *   API result array
  */

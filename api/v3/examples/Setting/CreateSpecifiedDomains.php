@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using setting create API.
  *
- * shows setting a variable for specified domains
+ * Shows setting a variable for specified domains.
  *
  * @return array
  *   API result array

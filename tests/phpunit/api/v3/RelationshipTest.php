@@ -695,7 +695,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $getParams = array(
       'filters' => array('is_current' => 1),
     );
-    $description = "demonstrates is_current filter";
+    $description = "Demonstrates is_current filter.";
     $subfile = 'filterIsCurrent';
     //no relationship has been created
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
@@ -765,14 +765,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => array('IN' => array($relationType2, $relationType3)),
     );
 
-    $description = "demonstrates use of IN filter";
+    $description = "Demonstrates use of IN filter.";
     $subfile = 'INRelationshipType';
 
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 2);
     $this->AssertEquals(array($rel2['id'], $rel3['id']), array_keys($result['values']));
 
-    $description = "demonstrates use of NOT IN filter";
+    $description = "Demonstrates use of NOT IN filter.";
     $subfile = 'NotInRelationshipType';
     $getParams = array(
       'relationship_type_id' => array('NOT IN' => array($relationType2, $relationType3)),
@@ -781,7 +781,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($result['count'], 2);
     $this->AssertEquals(array($rel1['id'], $rel4['id']), array_keys($result['values']));
 
-    $description = "demonstrates use of BETWEEN filter";
+    $description = "Demonstrates use of BETWEEN filter.";
     $subfile = 'BetweenRelationshipType';
     $getParams = array(
       'relationship_type_id' => array('BETWEEN' => array($relationType2, $relationType4)),
@@ -790,7 +790,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($result['count'], 3);
     $this->AssertEquals(array($rel2['id'], $rel3['id'], $rel4['id']), array_keys($result['values']));
 
-    $description = "demonstrates use of Not BETWEEN filter";
+    $description = "Demonstrates use of Not BETWEEN filter.";
     $subfile = 'NotBetweenRelationshipType';
     $getParams = array(
       'relationship_type_id' => array('NOT BETWEEN' => array($relationType2, $relationType4)),

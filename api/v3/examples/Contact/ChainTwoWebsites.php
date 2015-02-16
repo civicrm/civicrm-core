@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact create API.
  *
- * test demonstrates the syntax to create 2 chained entities
+ * This demonstrates the syntax to create 2 chained entities.
  *
  * @return array
  *   API result array

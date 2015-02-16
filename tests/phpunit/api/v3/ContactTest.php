@@ -332,7 +332,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $description = "/*this demonstrates setting a custom field through the API ";
+    $description = "This demonstrates setting a custom field through the API.";
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
 
     $check = $this->callAPISuccess($this->_entity, 'get', array(
@@ -586,7 +586,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $description = "/*this demonstrates setting a custom field through the API ";
+    $description = "This demonstrates setting a custom field through the API.";
     $subfile = "CustomFieldGet";
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
@@ -614,7 +614,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $description = "/*this demonstrates setting a custom field through the API ";
+    $description = "This demonstrates setting a custom field through the API.";
     $subfile = "CustomFieldGetReturnSyntaxVariation";
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $params = array('return' => 'custom_' . $ids['custom_field_id'], 'id' => $result['id']);
@@ -647,7 +647,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   public function testGetGroupIDFromContact() {
     $groupId = $this->groupCreate();
-    $description = "Get all from group and display contacts";
+    $description = "Get all from group and display contacts.";
     $subFile = "GroupFilterUsingContactAPI";
     $params = array(
       'email' => 'man2@yahoo.com',
@@ -709,7 +709,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify that attempt to create individual contact with two chained websites succeeds.
    */
   public function testCreateIndividualWithContributionDottedSyntax() {
-    $description = "test demonstrates the syntax to create 2 chained entities";
+    $description = "This demonstrates the syntax to create 2 chained entities.";
     $subFile = "ChainTwoWebsites";
     $params = array(
       'first_name' => 'abc3',
@@ -782,7 +782,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "demonstrates creating two websites as an array";
+    $description = "Demonstrates creating two websites as an array.";
     $subfile = "ChainTwoWebsitesSyntax2";
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
@@ -1419,7 +1419,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
     $moreIDs = $this->CustomGroupMultipleCreateWithFields();
-    $description = "/*this demonstrates the usage of chained api functions. In this case no notes or custom fields have been created ";
+    $description = "This demonstrates the usage of chained api functions.\nIn this case no notes or custom fields have been created.";
     $subfile = "APIChainedArray";
     $params = array(
       'first_name' => 'abc3',
@@ -1480,8 +1480,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   public function testGetIndividualWithChainedArraysFormats() {
-    $description = "/*this demonstrates the usage of chained api functions. A variety of return formats are used. Note that no notes
-    *custom fields or memberships exist";
+    $description = "This demonstrates the usage of chained api functions.\nIn this case no notes or custom fields have been created.";
     $subfile = "APIChainedArrayFormats";
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = "custom string";
@@ -1552,7 +1551,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'title' => "another group",
       'name' => 'another name',
     ));
-    $description = "/*this demonstrates the usage of chained api functions. A variety of techniques are used";
+    $description = "This demonstrates the usage of chained api functions with multiple custom fields.";
     $subfile = "APIChainedArrayMultipleCustom";
     $params = array(
       'first_name' => 'abc3',
@@ -1626,8 +1625,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test checks usage of $values to pick & choose inputs.
    */
   public function testChainingValuesCreate() {
-    $description = "/*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
-    2 child functions - one receives values from the parent (Contact) and the other child (Tag). ";
+    $description = "This demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
+      2 child functions - one receives values from the parent (Contact) and the other child (Tag).";
     $subfile = "APIChainedArrayValuesFromSiblingFunction";
     $params = array(
       'display_name' => 'batman',
@@ -1680,8 +1679,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetSingleEntityArray() {
     $this->createContactFromXML();
     $description = "This demonstrates use of the 'format.single_entity_array' param.
-    /* This param causes the only contact to be returned as an array without the other levels.
-    /* it will be ignored if there is not exactly 1 result";
+      This param causes the only contact to be returned as an array without the other levels.
+      It will be ignored if there is not exactly 1 result";
     $subfile = "GetSingleContact";
     $params = array('id' => 17);
     $result = $this->callAPIAndDocument('Contact', 'GetSingle', $params, __FUNCTION__, __FILE__, $description, $subfile);
@@ -1694,9 +1693,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetFormatCountOnly() {
     $this->createContactFromXML();
-    $description = "This demonstrates use of the 'getCount' action.\n"
-    . " *\n"
-    . " * This param causes the count of the only function to be returned as an integer.";
+    $description = "This demonstrates use of the 'getCount' action.
+      This param causes the count of the only function to be returned as an integer.";
     $subfile = "GetCountContact";
     $params = array('id' => 17);
     $result = $this->callAPIAndDocument('Contact', 'GetCount', $params, __FUNCTION__, __FILE__, $description,
@@ -1710,9 +1708,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetFormatIDOnly() {
     $this->createContactFromXML();
-    $description = "This demonstrates use of the 'format.id_only' param.\n" .
-    "  /* This param causes the id of the only entity to be returned as an integer." .
-    "  /* it will be ignored if there is not exactly 1 result";
+    $description = "This demonstrates use of the 'format.id_only' param.
+      This param causes the id of the only entity to be returned as an integer.
+      It will be ignored if there is not exactly 1 result";
     $subfile = "FormatOnlyID";
     $params = array('id' => 17, 'format.only_id' => 1);
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
@@ -1726,8 +1724,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetFormatSingleValue() {
     $this->createContactFromXML();
     $description = "This demonstrates use of the 'format.single_value' param.
-    /* This param causes only a single value of the only entity to be returned as an string.
-    /* it will be ignored if there is not exactly 1 result";
+      This param causes only a single value of the only entity to be returned as an string.
+      It will be ignored if there is not exactly 1 result";
     $subFile = "FormatSingleValue";
     $params = array('id' => 17, 'return' => 'display_name');
     $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile, 'getvalue');

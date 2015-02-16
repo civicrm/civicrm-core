@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using group getfields API.
  *
- * demonstrate use of getfields to interrogate api
+ * Demonstrate use of getfields to interrogate api.
  *
  * @return array
  *   API result array

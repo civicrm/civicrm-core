@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using membership get API.
  *
- * Demonstrates use of 'filter' active_only' param
+ * Demonstrates use of 'filter' active_only' param.
  *
  * @return array
  *   API result array

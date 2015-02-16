@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contact get API.
  *
- *
  * @return array
  *   API result array
  */

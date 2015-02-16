@@ -95,7 +95,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
         'street_address' => '987654321',
       ),
     );
-    $description = "Create entities and locBlock in 1 api call";
+    $description = "Create entities and locBlock in 1 api call.";
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'createEntities');
     $id = $result['id'];
     $this->assertEquals(1, $result['count']);

@@ -10,7 +10,9 @@
 {/if}
 {/if}
 {if $description}
- * {$description}
+{foreach from=$description item='line'}
+ * {$line}
+{/foreach}
  *
 {/if}
  * @return array

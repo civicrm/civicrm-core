@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using note delete API.
  *
- *
  * @return array
  *   API result array
  */

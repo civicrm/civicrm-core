@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using payment_processor_type create API.
  *
- *
  * @return array
  *   API result array
  */

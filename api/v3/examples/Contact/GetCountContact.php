@@ -3,7 +3,6 @@
  * Test Generated example of using contact getcount API.
  *
  * This demonstrates use of the 'getCount' action.
- *
  * This param causes the count of the only function to be returned as an integer.
  *
  * @return array
@@ -48,7 +47,7 @@ function contact_getcount_expectedresult() {
 /**
 * This example has been generated from the API test suite.
 * The test that created it is called
-* testContactGetFormatCount_only
+* testContactGetFormatCountOnly
 * and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *

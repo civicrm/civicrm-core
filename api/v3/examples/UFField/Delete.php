@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using uf_field delete API.
  *
- *
  * @return array
  *   API result array
  */

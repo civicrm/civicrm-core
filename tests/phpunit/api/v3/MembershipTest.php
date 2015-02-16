@@ -338,7 +338,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Memberships expected.
    */
   public function testGetOnlyActive() {
-    $description = "Demonstrates use of 'filter' active_only' param";
+    $description = "Demonstrates use of 'filter' active_only' param.";
     $this->_membershipID = $this->contactMembershipCreate($this->_params);
     $subfile = 'filterIsCurrent';
     $params = array(

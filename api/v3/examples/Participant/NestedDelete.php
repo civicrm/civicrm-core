@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using participant Get API.
  *
- * Criteria delete by nesting a GET & a DELETE
+ * Criteria delete by nesting a GET & a DELETE.
  *
  * @return array
  *   API result array

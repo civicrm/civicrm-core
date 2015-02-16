@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using custom_group create API.
  *
- *
  * @return array
  *   API result array
  */

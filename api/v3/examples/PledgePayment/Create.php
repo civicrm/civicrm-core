@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using pledge_payment create API.
  *
- *
  * @return array
  *   API result array
  */

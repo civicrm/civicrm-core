@@ -82,7 +82,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_get - success expected.
    */
   public function testGetReturnArray() {
-    $description = "demonstrates use of Return as an array";
+    $description = "Demonstrates use of Return as an array.";
     $subfile = "getReturnArray";
 
     $params = array(
@@ -183,14 +183,14 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   public function testTagGetfields() {
-    $description = "demonstrate use of getfields to interrogate api";
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
   public function testTagGetList() {
-    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
+    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications.";
     $params = array(
       'input' => $this->tag['name'],
       'extra' => array('used_for'),

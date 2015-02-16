@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using relationship get API.
  *
- * demonstrates use of IN filter
+ * Demonstrates use of IN filter.
  *
  * @return array
  *   API result array

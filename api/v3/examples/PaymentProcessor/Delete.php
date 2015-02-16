@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using payment_processor delete API.
  *
- *
  * @return array
  *   API result array
  */

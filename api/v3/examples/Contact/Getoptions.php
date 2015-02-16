@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact getoptions API.
  *
- * Demonstrates retrieving options for a custom field
+ * Demonstrates retrieving options for a custom field.
  *
  * @return array
  *   API result array

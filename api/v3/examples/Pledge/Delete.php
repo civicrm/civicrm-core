@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using pledge delete API.
  *
- *
  * @return array
  *   API result array
  */

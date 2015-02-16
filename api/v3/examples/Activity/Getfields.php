@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using activity getfields API.
  *
- *
  * @return array
  *   API result array
  */
@@ -50,11 +49,12 @@ function activity_getfields_expectedresult() {
       'activity_type_id' => array(
         'name' => 'activity_type_id',
         'type' => 1,
-        'title' => 'Activity Type',
+        'title' => 'Activity Type ID',
         'required' => TRUE,
         'import' => TRUE,
         'where' => 'civicrm_activity.activity_type_id',
         'headerPattern' => '/(activity.)?type(.id$)/i',
+        'export' => TRUE,
         'default' => '1',
         'html' => array(
           'type' => 'Select',
@@ -149,7 +149,7 @@ function activity_getfields_expectedresult() {
       'weight' => array(
         'name' => 'weight',
         'type' => 1,
-        'title' => 'Weight',
+        'title' => 'Order',
         'html' => array(
           'type' => 'Text',
         ),

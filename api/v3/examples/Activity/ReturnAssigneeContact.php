@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using activity get API.
  *
- * Function demonstrates getting asignee_contact_id & using it to get the contact
+ * Demonstrates getting asignee_contact_id & using it to get the contact.
  *
  * @return array
  *   API result array

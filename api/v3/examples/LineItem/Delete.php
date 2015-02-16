@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using line_item delete API.
  *
- *
  * @return array
  *   API result array
  */

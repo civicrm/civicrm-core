@@ -2,7 +2,8 @@
 /**
  * Test Generated example of using campaign create API.
  *
- * Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php
+ * Create a campaign - Note use of relative dates here:
+ * @link http://www.php.net/manual/en/datetime.formats.relative.php.
  *
  * @return array
  *   API result array

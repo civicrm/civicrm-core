@@ -2,8 +2,8 @@
 /**
  * Test Generated example of using contact create API.
  *
- * /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
-    2 child functions - one receives values from the parent (Contact) and the other child (Tag). 
+ * This demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
+ * 2 child functions - one receives values from the parent (Contact) and the other child (Tag).
  *
  * @return array
  *   API result array

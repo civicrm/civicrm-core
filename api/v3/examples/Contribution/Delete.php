@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contribution delete API.
  *
- *
  * @return array
  *   API result array
  */

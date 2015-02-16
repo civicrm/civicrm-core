@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact get API.
  *
- * /*this demonstrates setting a custom field through the API 
+ * This demonstrates setting a custom field through the API.
  *
  * @return array
  *   API result array
