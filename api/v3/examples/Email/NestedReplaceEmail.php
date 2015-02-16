@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using email replace API.
  *
- * example demonstrates use of Replace in a nested API call
+ * Demonstrates use of Replace in a nested API call.
  *
  * @return array
  *   API result array

@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact GetFields API.
  *
- * Demonstrate retrieving metadata with custom field options
+ * Demonstrates retrieving metadata with custom field options.
  *
  * @return array
  *   API result array
@@ -194,7 +194,7 @@ function contact_getfields_expectedresult() {
         'name' => 'external_identifier',
         'type' => 2,
         'title' => 'External Identifier',
-        'maxlength' => 32,
+        'maxlength' => 64,
         'size' => 8,
         'import' => TRUE,
         'where' => 'civicrm_contact.external_identifier',
@@ -741,7 +741,7 @@ function contact_getfields_expectedresult() {
         'extends_entity_column_id' => '',
         'is_view' => 0,
         'is_multiple' => 0,
-        'option_group_id' => '105',
+        'option_group_id' => '106',
         'date_format' => '',
         'time_format' => '',
         'is_required' => '1',
@@ -757,10 +757,12 @@ function contact_getfields_expectedresult() {
         'title' => 'Current Employer',
         'description' => 'Name of Current Employer',
         'type' => 2,
+        'name' => 'current_employer',
       ),
       'dupe_check' => array(
         'title' => 'Check for Duplicates',
         'description' => 'Throw error if contact create matches dedupe rule',
+        'name' => 'dupe_check',
       ),
     ),
   );

@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using report_template getstatistics API.
  *
- * Get Statistics from a report (note there isn't much data to get in the test DB :-(
+ * Get Statistics from a report (note there isn't much data to get in the test DB).
  *
  * @return array
  *   API result array

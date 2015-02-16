@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using address delete API.
  *
- *
  * @return array
  *   API result array
  */

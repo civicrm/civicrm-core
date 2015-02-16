@@ -3,7 +3,7 @@
  * Test Generated example of using contact create API.
  *
  * This demonstrates use of the 'format.is_success' param.
-    This param causes only the success or otherwise of the function to be returned as BOOLEAN
+ * This param causes only the success or otherwise of the function to be returned as BOOLEAN
  *
  * @return array
  *   API result array

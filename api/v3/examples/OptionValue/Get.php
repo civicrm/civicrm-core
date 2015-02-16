@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using option_value get API.
  *
- *
  * @return array
  *   API result array
  */

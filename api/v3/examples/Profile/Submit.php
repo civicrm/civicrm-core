@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using profile submit API.
  *
- *
  * @return array
  *   API result array
  */

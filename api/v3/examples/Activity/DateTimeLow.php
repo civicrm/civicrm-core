@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using activity get API.
  *
- * demonstrates _low filter (at time of writing doesn't work if contact_id is set
+ * Demonstrates _low filter (at time of writing doesn't work if contact_id is set.
  *
  * @return array
  *   API result array

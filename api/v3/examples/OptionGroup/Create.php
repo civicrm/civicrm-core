@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using option_group create API.
  *
- *
  * @return array
  *   API result array
  */
@@ -51,17 +50,17 @@ function option_group_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 92,
+    'id' => 93,
     'values' => array(
       '0' => array(
-        'id' => '92',
+        'id' => '93',
         'name' => 'civicrm_event.amount.560',
         'title' => '',
         'description' => '',
         'is_reserved' => '1',
         'is_active' => '1',
         'is_locked' => '',
-        'api.OptionValue.create' => 780,
+        'api.OptionValue.create' => 784,
       ),
     ),
   );

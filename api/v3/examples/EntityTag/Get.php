@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using entity_tag get API.
  *
- *
  * @return array
  *   API result array
  */

@@ -221,6 +221,7 @@ function profile_getfields_expectedresult() {
       'profile_id' => array(
         'api.required' => TRUE,
         'title' => 'Profile ID',
+        'name' => 'profile_id',
       ),
     ),
   );

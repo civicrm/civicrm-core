@@ -100,7 +100,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   public function testGetGroupID() {
-    $description = "Get all from group and display contacts";
+    $description = "Get all from group and display contacts.";
     $subfile = "GetWithGroupID";
     $params = array(
       'group_id' => $this->_groupId1,

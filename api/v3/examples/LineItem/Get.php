@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using line_item get API.
  *
- *
  * @return array
  *   API result array
  */
@@ -50,7 +49,7 @@ function line_item_get_expectedresult() {
         'contribution_id' => '2',
         'price_field_id' => '1',
         'label' => 'Contribution Amount',
-        'qty' => '1',
+        'qty' => '1.00',
         'unit_price' => '100.00',
         'line_total' => '100.00',
         'price_field_value_id' => '1',

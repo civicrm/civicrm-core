@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact get API.
  *
- * /*this demonstrates the usage of chained api functions. A variety of techniques are used
+ * This demonstrates the usage of chained api functions with multiple custom fields.
  *
  * @return array
  *   API result array

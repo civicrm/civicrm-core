@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using campaign delete API.
  *
- *
  * @return array
  *   API result array
  */

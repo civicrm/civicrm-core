@@ -2,14 +2,14 @@
 /**
  * Test Generated example of using contribution create API.
  *
- * Demonstrates creating contribution with Soft Credit by passing in honor_contact_id
+ * Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.
  *
  * @return array
  *   API result array
  */
 function contribution_create_example() {
   $params = array(
-    'contact_id' => 24,
+    'contact_id' => 23,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -18,7 +18,7 @@ function contribution_create_example() {
     'net_amount' => '95',
     'source' => 'SSF',
     'contribution_status_id' => 1,
-    'honor_contact_id' => 25,
+    'honor_contact_id' => 24,
   );
 
   try{
@@ -55,7 +55,7 @@ function contribution_create_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '24',
+        'contact_id' => '23',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',

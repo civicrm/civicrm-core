@@ -110,7 +110,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    * test generated examples. (these are to be found in the api/examples folder).
    */
   public function testGetSurveyChainDelete() {
-    $description = "demonstrates get + delete in the same call";
+    $description = "Demonstrates get + delete in the same call.";
     $subfile = 'ChainedGetDelete';
     $params = array(
       'title' => "survey title",

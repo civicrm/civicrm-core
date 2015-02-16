@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using uf_field get API.
  *
- *
  * @return array
  *   API result array
  */

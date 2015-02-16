@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using participant_status_type create API.
  *
- *
  * @return array
  *   API result array
  */
@@ -54,7 +53,7 @@ function participant_status_type_create_expectedresult() {
         'id' => '16',
         'name' => 'test status',
         'label' => 'I am a test',
-        'class' => '14',
+        'class' => 'Positive',
         'is_reserved' => 0,
         'is_active' => '1',
         'is_counted' => '1',

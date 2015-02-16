@@ -2,8 +2,8 @@
 /**
  * Test Generated example of using participant create API.
  *
- * single function to create contact w partipation & contribution. Note that in the
-      case of 'contribution' the 'create' is implied (api.contribution.create)
+ * Single function to create contact with partipation & contribution.
+ * Note that in the case of 'contribution' the 'create' is implied (api.contribution.create)
  *
  * @return array
  *   API result array

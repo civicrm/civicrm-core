@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using profile get API.
  *
- *
  * @return array
  *   API result array
  */

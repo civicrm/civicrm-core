@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using tax_contribution_page create API.
  *
- *
  * @return array
  *   API result array
  */

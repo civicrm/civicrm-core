@@ -2343,6 +2343,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     else {
       $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)[A-Z]/', '_$0', $entity));
     }
+    // Format multiline description as array
+    $desc = array();
+    if (is_string($description) && strlen($description)) {
+      foreach (explode("\n", $description) as $line) {
+        $desc[] = trim($line);
+      }
+    }
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('testfunction', $function);
     $function = $fnPrefix . "_" . strtolower($action);
@@ -2351,7 +2358,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $smarty->assign('params', $params);
     $smarty->assign('entity', $entity);
     $smarty->assign('filename', basename($filename));
-    $smarty->assign('description', $description);
+    $smarty->assign('description', $desc);
     $smarty->assign('result', $result);
 
     $smarty->assign('action', $action);

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contribution get API.
  *
- *
  * @return array
  *   API result array
  */
@@ -71,8 +70,6 @@ function contribution_get_expectedresult() {
         'contribution_campaign_id' => '',
         'financial_type_id' => '1',
         'financial_type' => 'Donation',
-        'instrument_id' => '89',
-        'payment_instrument' => 'Check',
         'product_id' => '',
         'product_name' => '',
         'sku' => '',
@@ -87,7 +84,9 @@ function contribution_get_expectedresult() {
         'contribution_note' => '',
         'contribution_batch' => '',
         'contribution_status' => 'Completed',
-        'contribution_payment_instrument' => 'Check',
+        'payment_instrument' => 'Check',
+        'payment_instrument_id' => '4',
+        'instrument_id' => '4',
         'contribution_check_number' => '',
         'id' => '1',
         'contribution_type_id' => '1',

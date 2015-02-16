@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using setting getdefaults API.
  *
- * gets defaults setting a variable for a given domain - if no domain is set current is assumed
+ * Gets defaults setting a variable for a given domain - if no domain is set current is assumed.
  *
  * @return array
  *   API result array

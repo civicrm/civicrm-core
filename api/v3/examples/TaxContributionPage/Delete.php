@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using tax_contribution_page delete API.
  *
- *
  * @return array
  *   API result array
  */

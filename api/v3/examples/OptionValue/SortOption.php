@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using option_value getsingle API.
  *
- * demonstrates use of Sort param (available in many api functions). Also, getsingle
+ * Demonstrates use of Sort param (available in many api functions). Also, getsingle.
  *
  * @return array
  *   API result array

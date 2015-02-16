@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using contact create API.
  *
- * demonstrates creating two websites as an array
+ * Demonstrates creating two websites as an array.
  *
  * @return array
  *   API result array

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using uf_group get API.
  *
- *
  * @return array
  *   API result array
  */

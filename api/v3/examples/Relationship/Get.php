@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using relationship get API.
  *
- *
  * @return array
  *   API result array
  */

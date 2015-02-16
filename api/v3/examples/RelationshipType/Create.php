@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using relationship_type create API.
  *
- *
  * @return array
  *   API result array
  */
