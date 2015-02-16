@@ -553,29 +553,30 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['event']
       );
 
+      $pending = FALSE;
+      if ($this->_allowWaitlist || $this->_requireApproval) {
+        //get the participant statuses.
+        $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
+        if ($this->_allowWaitlist) {
+          $value['participant_status_id'] = $value['participant_status'] = array_search('On waitlist', $waitingStatuses);
+        }
+        else {
+          $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
+        }
+
+        //there might be case user seleted pay later and
+        //now becomes part of run time waiting list.
+        $value['is_pay_later'] = FALSE;
+      }
+
       // required only if paid event
-      if ($this->_values['event']['is_monetary']) {
+      if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
         if (is_array($this->_paymentProcessor)) {
           $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
         }
-        $pending = FALSE;
         $result = NULL;
 
-        if ($this->_allowWaitlist || $this->_requireApproval) {
-          //get the participant statuses.
-          $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-          if ($this->_allowWaitlist) {
-            $value['participant_status_id'] = $value['participant_status'] = array_search('On waitlist', $waitingStatuses);
-          }
-          else {
-            $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
-          }
-
-          //there might be case user seleted pay later and
-          //now becomes part of run time waiting list.
-          $value['is_pay_later'] = FALSE;
-        }
-        elseif (!empty($value['is_pay_later']) ||
+        if (!empty($value['is_pay_later']) ||
           $value['amount'] == 0 ||
           $this->_contributeMode == 'checkout' ||
           $this->_contributeMode == 'notify'
