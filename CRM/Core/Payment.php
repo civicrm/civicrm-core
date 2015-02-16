@@ -541,16 +541,11 @@ abstract class CRM_Core_Payment {
     }
     self::logPaymentNotification($params);
 
-    // Query db for processor ..
-    $mode = @$params['mode'];
-
     $sql = "SELECT ppt.class_name, ppt.name as processor_name, pp.id AS processor_id
               FROM civicrm_payment_processor_type ppt
         INNER JOIN civicrm_payment_processor pp
                 ON pp.payment_processor_type_id = ppt.id
-               AND pp.is_active
-               AND pp.is_test = %1";
-    $args[1] = array($mode == 'test' ? 1 : 0, 'Integer');
+               AND pp.is_active";
 
     if (isset($params['processor_id'])) {
       $sql .= " WHERE pp.id = %2";
@@ -558,7 +553,9 @@ abstract class CRM_Core_Payment {
       $notFound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
     }
     else {
-      $sql .= " WHERE ppt.name = %2";
+      // This is called when processor_name is passed - passing processor_id instead is recommended.
+      $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
+      $args[1] = array((CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0, 'Integer');
       $args[2] = array($params['processor_name'], 'String');
       $notFound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
     }
