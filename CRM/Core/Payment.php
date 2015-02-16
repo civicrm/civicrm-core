@@ -519,6 +519,7 @@ abstract class CRM_Core_Payment {
         'mode' => @$_GET['mode'],
       )
     );
+    CRM_Utils_System::civiExit();
   }
 
   /**
@@ -588,15 +589,12 @@ abstract class CRM_Core_Payment {
         }
       }
 
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($dao->processor_id, $mode);
+      $processorInstance = $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
 
       // Should never be empty - we already established this processor_id exists and is active.
-      if (empty($paymentProcessor)) {
+      if (empty($processorInstance)) {
         continue;
       }
-
-      // Instantiate PP
-      $processorInstance = new $paymentClass($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
@@ -617,11 +615,6 @@ abstract class CRM_Core_Payment {
         "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
         "$method method is unsupported in legacy payment processors."
       );
-    }
-
-    // Exit here on web requests, allowing just the plain text response to be echoed
-    if ($method == 'handlePaymentNotification') {
-      CRM_Utils_System::civiExit();
     }
   }
 
