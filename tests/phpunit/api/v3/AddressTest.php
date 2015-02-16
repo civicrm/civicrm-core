@@ -87,7 +87,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     );
     $subfile = "AddressParse";
-    $description = "Demonstrates Use of address parsing param";
+    $description = "Demonstrates Use of address parsing param.";
     $result = $this->callAPIAndDocument('address', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(54, $result['values'][$result['id']]['street_number'], 'In line ' . __LINE__);
     $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix'], 'In line ' . __LINE__);
@@ -255,7 +255,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
     $this->callAPISuccess('address', 'create', array_merge($this->_params, array('street_address' => 'yzy')));
     $subfile = "AddressSort";
-    $description = "Demonstrates Use of sort filter";
+    $description = "Demonstrates Use of sort filter.";
     $params = array(
       'options' => array(
         'sort' => 'street_address DESC',
@@ -275,7 +275,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testGetAddressLikeSuccess() {
     $this->callAPISuccess('address', 'create', $this->_params);
     $subfile = "AddressLike";
-    $description = "Demonstrates Use of Like";
+    $description = "Demonstrates Use of Like.";
     $params = array(
       'street_address' => array('LIKE' => '%mb%'),
       'sequential' => 1,

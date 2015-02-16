@@ -213,7 +213,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    * Check getfields works.
    */
   public function testCreateSetting() {
-    $description = "shows setting a variable for a given domain - if no domain is set current is assumed";
+    $description = "Shows setting a variable for a given domain - if no domain is set current is assumed.";
 
     $params = array(
       'domain_id' => $this->_domainID2,
@@ -222,7 +222,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__);
 
     $params = array('uniq_email_per_site' => 1);
-    $description = "shows setting a variable for a current domain";
+    $description = "Shows setting a variable for a current domain.";
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateSettingCurrentDomain');
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
@@ -293,7 +293,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    * Check getfields works.
    */
   public function testCreateSettingMultipleDomains() {
-    $description = "shows setting a variable for all domains";
+    $description = "Shows setting a variable for all domains.";
 
     $params = array(
       'domain_id' => 'all',
@@ -311,7 +311,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'return' => 'uniq_email_per_site',
     );
     // we'll check it with a 'get'
-    $description = "shows getting a variable for all domains";
+    $description = "Shows getting a variable for all domains.";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetAllDomains', 'Get');
 
     $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
@@ -322,7 +322,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => array(1, 3),
       'uniq_email_per_site' => 0,
     );
-    $description = "shows setting a variable for specified domains";
+    $description = "Shows setting a variable for specified domains.";
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateSpecifiedDomains');
 
     $this->assertEquals(0, $result['values'][3]['uniq_email_per_site']);
@@ -331,7 +331,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => array(1, 2),
       'return' => array('uniq_email_per_site'),
     );
-    $description = "shows getting a variable for specified domains";
+    $description = "Shows getting a variable for specified domains.";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSpecifiedDomains', 'Get');
     $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
     $this->assertEquals(0, $result['values'][1]['uniq_email_per_site']);
@@ -343,14 +343,14 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => $this->_domainID2,
       'return' => 'uniq_email_per_site',
     );
-    $description = "shows get setting a variable for a given domain - if no domain is set current is assumed";
+    $description = "Shows get setting a variable for a given domain - if no domain is set current is assumed.";
 
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__);
 
     $params = array(
       'return' => 'uniq_email_per_site',
     );
-    $description = "shows getting a variable for a current domain";
+    $description = "Shows getting a variable for a current domain.";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSettingCurrentDomain');
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
@@ -447,14 +447,14 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'name' => 'petition_contacts',
       'group' => 'Campaign Preferences',
     );
-    $description = "Demonstrates getvalue action - intended for runtime use as better caching than get";
+    $description = "Demonstrates getvalue action - intended for runtime use as better caching than get.";
 
     $result = $this->callAPIAndDocument('setting', 'getvalue', $params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals('Petition Contacts', $result);
   }
 
   public function testGetDefaults() {
-    $description = "gets defaults setting a variable for a given domain - if no domain is set current is assumed";
+    $description = "Gets defaults setting a variable for a given domain - if no domain is set current is assumed.";
 
     $params = array(
       'name' => 'address_format',
@@ -483,7 +483,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'get', $params);
     //make sure it's set
     $this->assertEquals('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
-    $description = "Demonstrates reverting a parameter to default value";
+    $description = "Demonstrates reverting a parameter to default value.";
     $result = $this->callAPIAndDocument('setting', 'revert', $revertParams, __FUNCTION__, __FILE__, $description, '', 'revert');
     //make sure it's reverted
     $result = $this->callAPISuccess('setting', 'get', $params);

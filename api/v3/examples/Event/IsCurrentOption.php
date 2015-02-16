@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using event get API.
  *
- * demonstrates use of is.Current option
+ * Demonstrates use of is.Current option.
  *
  * @return array
  *   API result array

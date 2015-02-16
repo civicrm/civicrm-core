@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using group_contact get API.
  *
- *
  * @return array
  *   API result array
  */

@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using setting revert API.
  *
- * Demonstrates reverting a parameter to default value
+ * Demonstrates reverting a parameter to default value.
  *
  * @return array
  *   API result array

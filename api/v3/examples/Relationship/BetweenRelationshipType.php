@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using relationship get API.
  *
- * demonstrates use of BETWEEN filter
+ * Demonstrates use of BETWEEN filter.
  *
  * @return array
  *   API result array

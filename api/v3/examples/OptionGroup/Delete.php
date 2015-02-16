@@ -2,13 +2,12 @@
 /**
  * Test Generated example of using option_group delete API.
  *
- *
  * @return array
  *   API result array
  */
 function option_group_delete_example() {
   $params = array(
-    'id' => 97,
+    'id' => 98,
   );
 
   try{

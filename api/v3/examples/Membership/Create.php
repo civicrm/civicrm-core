@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using membership create API.
  *
- *
  * @return array
  *   API result array
  */

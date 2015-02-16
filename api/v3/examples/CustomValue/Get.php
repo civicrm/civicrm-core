@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using custom_value get API.
  *
- * /*this demonstrates the use of CustomValue get
+ * This demonstrates the use of CustomValue get to fetch single and multi-valued custom data.
  *
  * @return array
  *   API result array

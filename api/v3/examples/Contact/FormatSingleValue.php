@@ -3,8 +3,8 @@
  * Test Generated example of using contact getvalue API.
  *
  * This demonstrates use of the 'format.single_value' param.
-    /* This param causes only a single value of the only entity to be returned as an string.
-    /* it will be ignored if there is not exactly 1 result
+ * This param causes only a single value of the only entity to be returned as an string.
+ * It will be ignored if there is not exactly 1 result
  *
  * @return array
  *   API result array

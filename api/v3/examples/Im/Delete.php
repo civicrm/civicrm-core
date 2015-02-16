@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using im delete API.
  *
- *
  * @return array
  *   API result array
  */

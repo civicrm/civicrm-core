@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using group_contact get API.
  *
- * Get all from group and display contacts
+ * Get all from group and display contacts.
  *
  * @return array
  *   API result array

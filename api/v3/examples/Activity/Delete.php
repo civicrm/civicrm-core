@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using activity delete API.
  *
- *
  * @return array
  *   API result array
  */

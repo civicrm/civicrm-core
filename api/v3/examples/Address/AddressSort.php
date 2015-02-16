@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using address get API.
  *
- * Demonstrates Use of sort filter
+ * Demonstrates Use of sort filter.
  *
  * @return array
  *   API result array

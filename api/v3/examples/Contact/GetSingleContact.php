@@ -3,8 +3,8 @@
  * Test Generated example of using contact getsingle API.
  *
  * This demonstrates use of the 'format.single_entity_array' param.
-    /* This param causes the only contact to be returned as an array without the other levels.
-    /* it will be ignored if there is not exactly 1 result
+ * This param causes the only contact to be returned as an array without the other levels.
+ * It will be ignored if there is not exactly 1 result
  *
  * @return array
  *   API result array
@@ -115,7 +115,7 @@ function contact_getsingle_expectedresult() {
 /**
 * This example has been generated from the API test suite.
 * The test that created it is called
-* testContactGetSingle_entity_array
+* testContactGetSingleEntityArray
 * and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *

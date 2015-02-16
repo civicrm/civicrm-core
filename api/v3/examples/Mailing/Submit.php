@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using mailing submit API.
  *
- *
  * @return array
  *   API result array
  */
@@ -49,17 +48,18 @@ function mailing_submit_expectedresult() {
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
-        'reply_id' => '',
-        'unsubscribe_id' => '',
-        'resubscribe_id' => '',
-        'optout_id' => '',
+        'reply_id' => '8',
+        'unsubscribe_id' => '5',
+        'resubscribe_id' => '6',
+        'optout_id' => '7',
         'name' => 'mailing name',
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
         'replyto_email' => 'info@EXAMPLE.ORG',
         'subject' => 'Hello {contact.display_name}',
-        'body_text' => 'This is {contact.display_name}',
-        'body_html' => '<p>This is {contact.display_name}</p>',
+        'body_text' => 'This is {contact.display_name}.
+{domain.address}{action.optOutUrl}',
+        'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => 0,
         'auto_responder' => 0,
@@ -78,11 +78,11 @@ function mailing_submit_expectedresult() {
         'is_archived' => 0,
         'visibility' => 'Public Pages',
         'campaign_id' => '',
-        'dedupe_email' => 0,
+        'dedupe_email' => '1',
         'sms_provider_id' => '',
         'hash' => '67eac7789eaee00',
-        'location_type_id' => '',
-        'email_selection_method' => '',
+        'location_type_id' => 0,
+        'email_selection_method' => 'automatic',
       ),
     ),
   );

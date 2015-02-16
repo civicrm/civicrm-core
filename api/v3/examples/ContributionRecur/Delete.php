@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contribution_recur delete API.
  *
- *
  * @return array
  *   API result array
  */

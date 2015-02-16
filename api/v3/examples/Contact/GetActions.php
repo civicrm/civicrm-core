@@ -39,7 +39,7 @@ function contact_getactions_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 17,
+    'count' => 18,
     'values' => array(
       '0' => 'create',
       '1' => 'delete',
@@ -52,12 +52,13 @@ function contact_getactions_expectedresult() {
       '8' => 'getquick',
       '9' => 'getrefcount',
       '10' => 'getsingle',
-      '11' => 'getvalue',
-      '12' => 'merge',
-      '13' => 'proximity',
-      '14' => 'replace',
-      '15' => 'setvalue',
-      '16' => 'update',
+      '11' => 'getstat',
+      '12' => 'getvalue',
+      '13' => 'merge',
+      '14' => 'proximity',
+      '15' => 'replace',
+      '16' => 'setvalue',
+      '17' => 'update',
     ),
     'deprecated' => array(
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',

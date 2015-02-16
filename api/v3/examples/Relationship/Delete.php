@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using relationship delete API.
  *
- *
  * @return array
  *   API result array
  */

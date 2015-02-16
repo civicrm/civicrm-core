@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using message_template create API.
  *
- *
  * @return array
  *   API result array
  */
@@ -47,10 +46,10 @@ function message_template_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 65,
+    'id' => 67,
     'values' => array(
-      '65' => array(
-        'id' => '65',
+      '67' => array(
+        'id' => '67',
         'msg_title' => 'msg_title_165',
         'msg_subject' => 'msg_subject_165',
         'msg_text' => 'msg_text_165',

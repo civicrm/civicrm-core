@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using tag get API.
  *
- * demonstrates use of Return as an array
+ * Demonstrates use of Return as an array.
  *
  * @return array
  *   API result array

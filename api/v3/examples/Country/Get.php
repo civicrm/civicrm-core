@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using country get API.
  *
- *
  * @return array
  *   API result array
  */

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using price_field_value delete API.
  *
- *
  * @return array
  *   API result array
  */

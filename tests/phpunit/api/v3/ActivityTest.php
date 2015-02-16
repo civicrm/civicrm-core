@@ -331,7 +331,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityReturnTargetAssignee() {
 
-    $description = "Example demonstrates setting & retrieving the target & source";
+    $description = "Demonstrates setting & retrieving activity target & source.";
     $subfile = "GetTargetandAssignee";
     $params = array(
       'source_contact_id' => $this->_contactID,
@@ -394,7 +394,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('contact', 'create', array('id' => $this->_contactID, 'sort_name' => 'Contact, Test'));
     $subfile = 'ContactRefCustomField';
-    $description = "demonstrates create with Contact Reference Custom Field";
+    $description = "Demonstrates create with Contact Reference Custom Field.";
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = array(
       'custom_group_id' => $ids['custom_group_id'],
@@ -500,9 +500,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_get() with a good activity ID
    */
   public function testActivityGetGoodID1() {
-    // Insert rows in civicrm_activity creating activities 4 and
-    // 13
-    $description = "Function demonstrates getting asignee_contact_id & using it to get the contact";
+    // Insert rows in civicrm_activity creating activities 4 and 13
+    $description = "Demonstrates getting asignee_contact_id & using it to get the contact.";
     $subfile = 'ReturnAssigneeContact';
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);
 
@@ -665,7 +664,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Activity', 'Get', array(
       'version' => 3,
     ));
-    $description = "demonstrates _low filter (at time of writing doesn't work if contact_id is set";
+    $description = "Demonstrates _low filter (at time of writing doesn't work if contact_id is set.";
     $subfile = "DateTimeLow";
     $this->assertEquals(2, $result['count']);
     $params = array(
@@ -675,7 +674,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('Activity', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $result['count']);
-    $description = "demonstrates _high filter (at time of writing doesn't work if contact_id is set";
+    $description = "Demonstrates _high filter (at time of writing doesn't work if contact_id is set.";
     $subfile = "DateTimeHigh";
     $this->assertEquals('2012-02-16 00:00:00', $result['values'][0]['activity_date_time']);
     $params = array(

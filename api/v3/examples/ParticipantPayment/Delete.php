@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using participant_payment delete API.
  *
- *
  * @return array
  *   API result array
  */

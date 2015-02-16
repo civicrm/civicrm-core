@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using participant get API.
  *
- * use nested get to get an event
+ * Demonstrates use of nested get to fetch event data with participant records.
  *
  * @return array
  *   API result array

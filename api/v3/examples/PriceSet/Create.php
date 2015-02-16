@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using price_set create API.
  *
- *
  * @return array
  *   API result array
  */

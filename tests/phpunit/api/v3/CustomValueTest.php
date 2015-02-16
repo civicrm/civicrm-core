@@ -73,7 +73,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testGetMultipleCustomValues() {
 
-    $description = "/*this demonstrates the use of CustomValue get";
+    $description = "This demonstrates the use of CustomValue get to fetch single and multi-valued custom data.";
 
     $params = array(
       'first_name' => 'abc3',

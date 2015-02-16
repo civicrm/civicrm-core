@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using activity_contact delete API.
  *
- *
  * @return array
  *   API result array
  */

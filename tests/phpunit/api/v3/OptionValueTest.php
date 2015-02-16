@@ -88,7 +88,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    * Test offset param.
    */
   public function testGetSingleValueOptionValueSort() {
-    $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";
+    $description = "Demonstrates use of Sort param (available in many api functions). Also, getsingle.";
     $subfile = 'SortOption';
     $result = $this->callAPISuccess('option_value', 'getsingle', array(
       'option_group_id' => 1,

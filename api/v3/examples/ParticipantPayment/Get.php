@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using participant_payment get API.
  *
- *
  * @return array
  *   API result array
  */

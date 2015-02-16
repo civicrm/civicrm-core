@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using pledge get API.
  *
- *
  * @return array
  *   API result array
  */
@@ -51,10 +50,10 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '1',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2015-01-15 00:00:00',
+        'pledge_create_date' => '2015-02-16 00:00:00',
         'pledge_status' => 'Pending',
         'pledge_total_paid' => '',
-        'pledge_next_pay_date' => '2015-01-17 00:00:00',
+        'pledge_next_pay_date' => '2015-02-18 00:00:00',
         'pledge_next_pay_amount' => '20.00',
         'pledge_outstanding_amount' => '',
         'pledge_financial_type' => 'Donation',

@@ -2,13 +2,12 @@
 /**
  * Test Generated example of using message_template delete API.
  *
- *
  * @return array
  *   API result array
  */
 function message_template_delete_example() {
   $params = array(
-    'id' => 68,
+    'id' => 70,
   );
 
   try{

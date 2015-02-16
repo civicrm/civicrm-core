@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using event get API.
  *
- *
  * @return array
  *   API result array
  */

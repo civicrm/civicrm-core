@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using group_nesting delete API.
  *
- *
  * @return array
  *   API result array
  */

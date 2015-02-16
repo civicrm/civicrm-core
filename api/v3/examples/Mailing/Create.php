@@ -2,17 +2,20 @@
 /**
  * Test Generated example of using mailing create API.
  *
- *
  * @return array
  *   API result array
  */
 function mailing_create_example() {
   $params = array(
     'subject' => 'Hello {contact.display_name}',
-    'body_text' => 'This is {contact.display_name}',
-    'body_html' => '<p>This is {contact.display_name}</p>',
+    'body_text' => 'This is {contact.display_name}.
+{domain.address}{action.optOutUrl}',
+    'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
     'created_id' => 3,
+    'header_id' => '',
+    'footer_id' => '',
+    'scheduled_date' => 'now',
   );
 
   try{
@@ -52,20 +55,21 @@ function mailing_create_expectedresult() {
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
-        'reply_id' => '',
-        'unsubscribe_id' => '',
-        'resubscribe_id' => '',
-        'optout_id' => '',
+        'reply_id' => '8',
+        'unsubscribe_id' => '5',
+        'resubscribe_id' => '6',
+        'optout_id' => '7',
         'name' => 'mailing name',
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
         'replyto_email' => 'info@EXAMPLE.ORG',
         'subject' => 'Hello {contact.display_name}',
-        'body_text' => 'This is {contact.display_name}',
-        'body_html' => '<p>This is {contact.display_name}</p>',
+        'body_text' => 'This is {contact.display_name}.
+{domain.address}{action.optOutUrl}',
+        'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => '',
-        'auto_responder' => 0,
+        'auto_responder' => '',
         'open_tracking' => '1',
         'is_completed' => '',
         'msg_template_id' => '',
@@ -73,7 +77,7 @@ function mailing_create_expectedresult() {
         'created_id' => '3',
         'created_date' => '2013-07-28 08:49:19',
         'scheduled_id' => '',
-        'scheduled_date' => '',
+        'scheduled_date' => '20130728085413',
         'approver_id' => '',
         'approval_date' => '',
         'approval_status_id' => '',
@@ -81,32 +85,11 @@ function mailing_create_expectedresult() {
         'is_archived' => '',
         'visibility' => 'Public Pages',
         'campaign_id' => '',
-        'dedupe_email' => '',
+        'dedupe_email' => '1',
         'sms_provider_id' => '',
         'hash' => '',
         'location_type_id' => '',
         'email_selection_method' => '',
-        'api.mailing_job.create' => array(
-          'is_error' => 0,
-          'version' => 3,
-          'count' => 1,
-          'id' => 1,
-          'values' => array(
-            '0' => array(
-              'id' => '1',
-              'mailing_id' => '1',
-              'scheduled_date' => '20130728085413',
-              'start_date' => '',
-              'end_date' => '',
-              'status' => 'Scheduled',
-              'is_test' => 0,
-              'job_type' => '',
-              'parent_id' => '',
-              'job_offset' => '',
-              'job_limit' => '',
-            ),
-          ),
-        ),
       ),
     ),
   );
