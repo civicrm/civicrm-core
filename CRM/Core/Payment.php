@@ -589,15 +589,12 @@ abstract class CRM_Core_Payment {
         }
       }
 
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($dao->processor_id, $mode);
+      $processorInstance = $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
 
       // Should never be empty - we already established this processor_id exists and is active.
-      if (empty($paymentProcessor)) {
+      if (empty($processorInstance)) {
         continue;
       }
-
-      // Instantiate PP
-      $processorInstance = new $paymentClass($mode, $paymentProcessor);
 
       // Does PP implement this method, and can we call it?
       if (!method_exists($processorInstance, $method) ||
