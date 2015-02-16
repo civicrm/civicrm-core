@@ -43,6 +43,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
+    $this->createLoggedInUser();
     $this->_mailingID_A = $this->createMailing();
     $this->_mailingID_B = $this->createMailing();
     $this->_mailingID_C = $this->createMailing();

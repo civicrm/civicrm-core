@@ -103,5 +103,28 @@
     <title>Group Percentage</title>
     <add>4.6</add>
   </field>
-
+  <field>
+    <name>created_id</name>
+    <title>AB Test Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <title>AB Test Created Date</title>
+    <type>datetime</type>
+    <comment>When was this item created</comment>
+    <add>4.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
 </table>
