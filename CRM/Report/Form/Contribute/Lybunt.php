@@ -267,7 +267,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if ($fieldName == 'yid') {
-            $clause = self::fiscalYearOffset('contribution_civireport.receive_date') ." = $previous_year";
+            $clause = self::fiscalYearOffset('contribution_civireport.receive_date') . " = $previous_year";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
