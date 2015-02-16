@@ -28,11 +28,12 @@
 use Civi\Payment\System;
 
 /**
+ * Class CRM_Core_Payment.
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
+ * This class is the main class for the payment processor subsystem.
  *
+ * It is the parent class for payment processors. It also holds some IPN related functions
+ * that need to be moved. In particular handlePaymentMethod should be moved to a factory class.
  */
 abstract class CRM_Core_Payment {
 
@@ -71,6 +72,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Singleton function used to manage this object.
+   *
    * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
    * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
    * to remove this function all together
@@ -100,8 +102,12 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
+   * Log payment notification message to forensic system log.
+   *
    * @todo move to factory class \Civi\Payment\System (or similar)
+   *
+   * @param array $params
+   *
    * @return mixed
    */
   public static function logPaymentNotification($params) {
@@ -119,6 +125,11 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check if capability is supported.
+   *
+   * Capabilities have a one to one relationship with capability-related functions on this class.
+   *
+   * Payment processor classes should over-ride the capability-specific function rather than this one.
+   *
    * @param string $capability
    *   E.g BackOffice, LiveMode, FutureRecurStartDate.
    *
@@ -133,8 +144,13 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
-   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to reach a 'stable' point we disable
+   * Are back office payments supported.
+   *
+   * e.g paypal standard won't permit you to enter a credit card associated
+   * with someone else's login.
+   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to
+   * reach a 'stable' point we disable.
+   *
    * @return bool
    */
   protected function supportsBackOffice() {
@@ -147,7 +163,8 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Are live payments supported - e.g dummy doesn't support this
+   * Are live payments supported - e.g dummy doesn't support this.
+   *
    * @return bool
    */
   protected function supportsLiveMode() {
@@ -156,6 +173,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Are test payments supported.
+   *
    * @return bool
    */
   protected function supportsTestMode() {
@@ -164,7 +182,9 @@ abstract class CRM_Core_Payment {
 
   /**
    * Should the first payment date be configurable when setting up back office recurring payments.
+   *
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
+   *
    * @return bool
    */
   protected function supportsFutureRecurStartDate() {
@@ -172,9 +192,13 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Default payment instrument validation
+   * Default payment instrument validation.
+   *
    * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
-   * Not a static function, because I need to check for payment_type
+   * Not a static function, because I need to check for payment_type.
+   *
+   * @param array $values
+   * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
     if ($this->_paymentProcessor['payment_type'] == 1) {
@@ -183,8 +207,10 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Setter for the payment form that wants to use the processor
+   * Setter for the payment form that wants to use the processor.
+   *
    * @deprecated
+   *
    * @param CRM_Core_Form $paymentForm
    */
   public function setForm(&$paymentForm) {
@@ -273,6 +299,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Return an array of all the details about the fields potentially required for payment fields.
+   *
    * Only those determined by getPaymentFormFields will actually be assigned to the form
    *
    * @return array
@@ -495,13 +522,17 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Payment callback handler. The processor_name or processor_id is passed in.
+   * Payment callback handler.
+   *
+   * The processor_name or processor_id is passed in.
    * Note that processor_id is more reliable as one site may have more than one instance of a
    * processor & ideally the processor will be validating the results
    * Load requested payment processor and call that processor's handle<$method> method
-   * @todo move to0 \Civi\Payment\System factory method
    *
-   * @param $method
+   * @todo move to \Civi\Payment\System factory method
+   *
+   * @param string $method
+   *   'PaymentNotification' or 'PaymentCron'
    * @param array $params
    */
   public static function handlePaymentMethod($method, $params = array()) {
@@ -524,19 +555,19 @@ abstract class CRM_Core_Payment {
     if (isset($params['processor_id'])) {
       $sql .= " WHERE pp.id = %2";
       $args[2] = array($params['processor_id'], 'Integer');
-      $notfound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
+      $notFound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
     }
     else {
       $sql .= " WHERE ppt.name = %2";
       $args[2] = array($params['processor_name'], 'String');
-      $notfound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
+      $notFound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $args);
 
-    // Check whether we found anything at all ..
+    // Check whether we found anything at all.
     if (!$dao->N) {
-      CRM_Core_Error::fatal($notfound);
+      CRM_Core_Error::fatal($notFound);
     }
 
     $method = 'handle' . $method;
@@ -610,6 +641,8 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get url for users to manage this recurring contribution for this processor.
+   *
    * @param int $entityID
    * @param null $entity
    * @param string $action
