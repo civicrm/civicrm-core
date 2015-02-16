@@ -8,7 +8,7 @@
 function payment_processor_create_example() {
   $params = array(
     'name' => 'API Test PP',
-    'payment_processor_type_id' => 18,
+    'payment_processor_type_id' => 1,
     'class_name' => 'CRM_Core_Payment_APITest',
     'is_recur' => 0,
     'domain_id' => 1,
