@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using mail_settings create API.
  *
- *
  * @return array
  *   API result array
  */

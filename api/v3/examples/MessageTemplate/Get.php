@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using message_template get API.
  *
- *
  * @return array
  *   API result array
  */
@@ -47,10 +46,10 @@ function message_template_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 66,
+    'id' => 68,
     'values' => array(
-      '66' => array(
-        'id' => '66',
+      '68' => array(
+        'id' => '68',
         'msg_title' => 'msg_title_166',
         'msg_subject' => 'msg_subject_166',
         'msg_text' => 'msg_text_166',

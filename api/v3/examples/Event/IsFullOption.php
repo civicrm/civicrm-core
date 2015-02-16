@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using event getsingle API.
  *
- * demonstrates use of return is_full 
+ * Demonstrates use of return is_full .
  *
  * @return array
  *   API result array
@@ -61,7 +61,7 @@ function event_getsingle_expectedresult() {
     'is_multiple_registrations' => 0,
     'allow_same_participant_emails' => 0,
     'is_template' => 0,
-    'created_date' => '2015-01-15 02:10:12',
+    'created_date' => '2015-02-16 11:40:40',
     'is_share' => '1',
     'is_confirm_enabled' => '1',
     'is_billing_required' => 0,

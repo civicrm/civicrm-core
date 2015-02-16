@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using activity  API.
  *
- * Example demonstrates setting & retrieving the target & source
+ * Demonstrates setting & retrieving activity target & source.
  *
  * @return array
  *   API result array

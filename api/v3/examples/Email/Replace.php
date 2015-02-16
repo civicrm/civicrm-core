@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using email replace API.
  *
- *
  * @return array
  *   API result array
  */

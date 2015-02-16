@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using uf_field replace API.
  *
- *
  * @return array
  *   API result array
  */

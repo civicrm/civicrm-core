@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using custom_value create API.
  *
- *
  * @return array
  *   API result array
  */

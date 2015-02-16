@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using mail_settings get API.
  *
- * demonstrates get + delete in the same call
+ * Demonstrates get + delete in the same call.
  *
  * @return array
  *   API result array

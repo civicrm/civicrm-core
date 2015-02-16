@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using group_organization delete API.
  *
- *
  * @return array
  *   API result array
  */

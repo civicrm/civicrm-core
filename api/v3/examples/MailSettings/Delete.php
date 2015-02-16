@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using mail_settings delete API.
  *
- *
  * @return array
  *   API result array
  */

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using relationship_type delete API.
  *
- *
  * @return array
  *   API result array
  */

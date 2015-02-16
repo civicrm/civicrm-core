@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using survey get API.
  *
- * demonstrates get + delete in the same call
+ * Demonstrates get + delete in the same call.
  *
  * @return array
  *   API result array

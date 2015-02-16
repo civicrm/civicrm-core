@@ -296,7 +296,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "Create Contribution with Nested Line Items";
+    $description = "Create Contribution with Nested Line Items.";
     $subfile = "CreateWithNestedLineItems";
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 

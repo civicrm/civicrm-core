@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using price_set delete API.
  *
- *
  * @return array
  *   API result array
  */

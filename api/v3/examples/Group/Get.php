@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using group get API.
  *
- *
  * @return array
  *   API result array
  */

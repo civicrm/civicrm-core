@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using membership delete API.
  *
- *
  * @return array
  *   API result array
  */

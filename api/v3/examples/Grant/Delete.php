@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using grant delete API.
  *
- *
  * @return array
  *   API result array
  */

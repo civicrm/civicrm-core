@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using setting Get API.
  *
- * shows getting a variable for specified domains
+ * Shows getting a variable for specified domains.
  *
  * @return array
  *   API result array

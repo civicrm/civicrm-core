@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using tag delete API.
  *
- *
  * @return array
  *   API result array
  */

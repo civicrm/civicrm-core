@@ -249,7 +249,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($get, 'In line ' . __LINE__);
     $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
-    $description = "example demonstrates use of Replace in a nested API call";
+    $description = "Demonstrates use of Replace in a nested API call.";
     $subfile = "NestedReplaceEmail";
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $getReplace1Params = array(

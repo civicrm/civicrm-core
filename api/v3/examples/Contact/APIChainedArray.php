@@ -2,7 +2,8 @@
 /**
  * Test Generated example of using contact get API.
  *
- * /*this demonstrates the usage of chained api functions. In this case no notes or custom fields have been created 
+ * This demonstrates the usage of chained api functions.
+ * In this case no notes or custom fields have been created.
  *
  * @return array
  *   API result array

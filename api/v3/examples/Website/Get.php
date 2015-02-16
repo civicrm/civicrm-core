@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using website get API.
  *
- *
  * @return array
  *   API result array
  */

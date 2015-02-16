@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using grant create API.
  *
- *
  * @return array
  *   API result array
  */

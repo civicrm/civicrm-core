@@ -378,7 +378,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "Create Contribution with Nested Line Items";
+    $description = "Create Contribution with Nested Line Items.";
     $subfile = "CreateWithNestedLineItems";
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
@@ -574,7 +574,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test note created correctly.
    */
   public function testCreateContributionWithNote() {
-    $description = "Demonstrates creating contribution with Note Entity";
+    $description = "Demonstrates creating contribution with Note Entity.";
     $subfile = "ContributionCreateWithNote";
     $params = array(
       'contact_id' => $this->_individualId,
@@ -633,7 +633,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * This is the test for creating soft credits.
    */
   public function testCreateContributionWithSoftCredit() {
-    $description = "Demonstrates creating contribution with SoftCredit";
+    $description = "Demonstrates creating contribution with SoftCredit.";
     $subfile = "ContributionCreateWithSoftCredit";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
       'display_name' => 'superman',
@@ -658,7 +658,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionWithSoftCreditDefaults() {
-    $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type";
+    $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type.";
     $subfile = "ContributionCreateWithSoftCreditDefaults";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
       'display_name' => 'superman',
@@ -680,7 +680,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionWithHonoreeContact() {
-    $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id";
+    $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.";
     $subfile = "ContributionCreateWithHonoreeContact";
     $contact2 = $this->callAPISuccess('Contact', 'create', array(
       'display_name' => 'superman',

@@ -367,7 +367,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'options' => array('get_options' => 'custom_' . $customField['id']),
       'action' => 'create',
     );
-    $description = "Demonstrate retrieving metadata with custom field options";
+    $description = "Demonstrates retrieving metadata with custom field options.";
     $subfile = "GetFieldsOptions";
     $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description, $subfile, 'GetFields');
     $this->assertArrayHasKey('options', $fields['values']['custom_' . $customField['id']]);
@@ -375,7 +375,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $getOptionsArray = array(
       'field' => 'custom_' . $customField['id'],
     );
-    $description = "Demonstrates retrieving options for a custom field";
+    $description = "Demonstrates retrieving options for a custom field.";
     $subfile = "GetOptions";
     $result = $this->callAPIAndDocument('contact', 'getoptions', $getOptionsArray, __FUNCTION__, 'ContactTest.php', $description, '', 'getoptions');
     $this->assertEquals('Label1', $result['values'][1]);

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using country delete API.
  *
- *
  * @return array
  *   API result array
  */

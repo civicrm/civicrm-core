@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using loc_block create API.
  *
- * Create entities and locBlock in 1 api call
+ * Create entities and locBlock in 1 api call.
  *
  * @return array
  *   API result array

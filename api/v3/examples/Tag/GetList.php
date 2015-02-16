@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using tag getlist API.
  *
- * Demonstrates use of api.getlist for autocomplete and quicksearch applications
+ * Demonstrates use of api.getlist for autocomplete and quicksearch applications.
  *
  * @return array
  *   API result array

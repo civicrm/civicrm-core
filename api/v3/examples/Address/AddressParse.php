@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using address create API.
  *
- * Demonstrates Use of address parsing param
+ * Demonstrates Use of address parsing param.
  *
  * @return array
  *   API result array

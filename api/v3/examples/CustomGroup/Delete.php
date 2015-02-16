@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using custom_group delete API.
  *
- *
  * @return array
  *   API result array
  */

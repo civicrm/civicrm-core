@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using participant_status_type delete API.
  *
- *
  * @return array
  *   API result array
  */

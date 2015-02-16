@@ -2,13 +2,12 @@
 /**
  * Test Generated example of using mailing delete API.
  *
- *
  * @return array
  *   API result array
  */
 function mailing_delete_example() {
   $params = array(
-    'id' => 12,
+    'id' => 16,
   );
 
   try{

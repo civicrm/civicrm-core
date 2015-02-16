@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using address get API.
  *
- * Demonstrates Use of Like
+ * Demonstrates Use of Like.
  *
  * @return array
  *   API result array

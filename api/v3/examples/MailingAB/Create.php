@@ -1,18 +1,23 @@
 <?php
 /**
- * Test Generated example of using tag create API.
+ * Test Generated example of using mailing_a_b create API.
  *
  * @return array
  *   API result array
  */
-function tag_create_example() {
+function mailing_a_b_create_example() {
   $params = array(
-    'name' => 'Super Heros',
-    'description' => 'Outside undie-wearers',
+    'mailing_id_a' => 1,
+    'mailing_id_b' => 2,
+    'mailing_id_c' => 3,
+    'testing_criteria_id' => 1,
+    'winner_criteria_id' => 1,
+    'declare_winning_time' => '+2 days',
+    'group_percentage' => 10,
   );
 
   try{
-    $result = civicrm_api3('tag', 'create', $params);
+    $result = civicrm_api3('mailing_a_b', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -35,25 +40,27 @@ function tag_create_example() {
  * @return array
  *   API result array
  */
-function tag_create_expectedresult() {
+function mailing_a_b_create_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 12,
+    'id' => 1,
     'values' => array(
-      '12' => array(
-        'id' => '12',
-        'name' => 'Super Heros',
-        'description' => 'Outside undie-wearers',
-        'parent_id' => '',
-        'is_selectable' => '',
-        'is_reserved' => '',
-        'is_tagset' => '',
-        'used_for' => 'civicrm_contact',
-        'created_id' => '',
-        'created_date' => '2013-07-28 08:49:19',
+      '1' => array(
+        'id' => '1',
+        'name' => '',
+        'status' => '',
+        'mailing_id_a' => '1',
+        'mailing_id_b' => '2',
+        'mailing_id_c' => '3',
+        'domain_id' => '1',
+        'testing_criteria_id' => '1',
+        'winner_criteria_id' => '1',
+        'specific_url' => '',
+        'declare_winning_time' => '20150218114218',
+        'group_percentage' => '10',
       ),
     ),
   );
@@ -64,9 +71,9 @@ function tag_create_expectedresult() {
 /**
 * This example has been generated from the API test suite.
 * The test that created it is called
-* testCreate
+* testMailingABCreateSuccess
 * and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingABTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

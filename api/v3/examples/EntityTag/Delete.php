@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using entity_tag delete API.
  *
- *
  * @return array
  *   API result array
  */

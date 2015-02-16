@@ -100,7 +100,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
    * Test chained delete.
    */
   public function testGetMailSettingsChainDelete() {
-    $description = "demonstrates get + delete in the same call";
+    $description = "Demonstrates get + delete in the same call.";
     $subFile = 'ChainedGetDelete';
     $params = array(
       'title' => "MailSettings title",

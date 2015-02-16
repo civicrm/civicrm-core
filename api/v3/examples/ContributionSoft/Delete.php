@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contribution_soft delete API.
  *
- *
  * @return array
  *   API result array
  */

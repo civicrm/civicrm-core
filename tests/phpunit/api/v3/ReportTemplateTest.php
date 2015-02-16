@@ -115,7 +115,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test getrows on contact summary report.
    */
   public function testReportTemplateGetRowsContactSummary() {
-    $description = "Retrieve rows from a report template (optionally providing the instance_id)";
+    $description = "Retrieve rows from a report template (optionally providing the instance_id).";
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
       'options' => array('metadata' => array('labels', 'title')),
@@ -169,7 +169,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (in_array($reportID, array('contribute/softcredit', 'contribute/bookkeeping'))) {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
-    $description = "Get Statistics from a report (note there isn't much data to get in the test DB :-(";
+    $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     $result = $this->callAPIAndDocument('report_template', 'getstatistics', array(
       'report_id' => $reportID,
     ), __FUNCTION__, __FILE__, $description, 'Getstatistics', 'getstatistics');

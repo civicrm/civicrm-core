@@ -3,8 +3,8 @@
  * Test Generated example of using contact get API.
  *
  * This demonstrates use of the 'format.id_only' param.
-    /* This param causes the id of the only entity to be returned as an integer.
-    /* it will be ignored if there is not exactly 1 result
+ * This param causes the id of the only entity to be returned as an integer.
+ * It will be ignored if there is not exactly 1 result
  *
  * @return array
  *   API result array
@@ -49,7 +49,7 @@ function contact_get_expectedresult() {
 /**
 * This example has been generated from the API test suite.
 * The test that created it is called
-* testContactGetFormatID_only
+* testContactGetFormatIDOnly
 * and can be found in
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *

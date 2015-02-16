@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using activity Create API.
  *
- * demonstrates create with Contact Reference Custom Field
+ * Demonstrates create with Contact Reference Custom Field.
  *
  * @return array
  *   API result array

@@ -2,7 +2,6 @@
 /**
  * Test Generated example of using contribution_soft get API.
  *
- *
  * @return array
  *   API result array
  */

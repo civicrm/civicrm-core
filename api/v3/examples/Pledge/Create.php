@@ -2,16 +2,15 @@
 /**
  * Test Generated example of using pledge create API.
  *
- *
  * @return array
  *   API result array
  */
 function pledge_create_example() {
   $params = array(
     'contact_id' => 11,
-    'pledge_create_date' => '20150115',
-    'start_date' => '20150115',
-    'scheduled_date' => '20150117',
+    'pledge_create_date' => '20150216',
+    'start_date' => '20150216',
+    'scheduled_date' => '20150218',
     'amount' => '100',
     'pledge_status_id' => '2',
     'pledge_financial_type_id' => '1',

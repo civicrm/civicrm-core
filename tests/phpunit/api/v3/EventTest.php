@@ -197,7 +197,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
     $currentEventParams = array_merge($this->_params[1], $currentEventParams);
     $currentEvent = $this->callAPISuccess('Event', 'Create', $currentEventParams);
-    $description = "demonstrates use of is.Current option";
+    $description = "Demonstrates use of is.Current option.";
     $subfile = "IsCurrentOption";
     $result = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $allEvents = $this->callAPISuccess('Event', 'Get', array());
@@ -245,7 +245,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $description = "demonstrates use of return is_full ";
+    $description = "Demonstrates use of return is_full .";
     $subfile = "IsFullOption";
     $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
@@ -529,7 +529,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   public function testgetfields() {
-    $description = "demonstrate use of getfields to interrogate api";
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
@@ -539,21 +539,21 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test api_action param also works.
    */
   public function testgetfieldsRest() {
-    $description = "demonstrate use of getfields to interrogate api";
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
   }
 
   public function testgetfieldsGet() {
-    $description = "demonstrate use of getfields to interrogate api";
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'get');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('title', $result['values']['event_title']['name'], 'in line ' . __LINE__);
   }
 
   public function testgetfieldsDelete() {
-    $description = "demonstrate use of getfields to interrogate api";
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'delete');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);

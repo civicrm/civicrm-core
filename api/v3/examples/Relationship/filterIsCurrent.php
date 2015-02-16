@@ -2,7 +2,7 @@
 /**
  * Test Generated example of using relationship get API.
  *
- * demonstrates is_current filter
+ * Demonstrates is_current filter.
  *
  * @return array
  *   API result array
