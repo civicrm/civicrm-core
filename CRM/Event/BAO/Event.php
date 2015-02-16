@@ -1169,7 +1169,7 @@ WHERE civicrm_event.is_active = 1
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
         //CRM-15754 - if participant_status contains status ID
-        elseif (CRM_Utils_Rule::integer($tplParams['participant_status'])) {
+        elseif (!empty($tplParams['participant_status']) && CRM_Utils_Rule::integer($tplParams['participant_status'])) {
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($tplParams['participant_status'], NULL, 'label');
         }
 
