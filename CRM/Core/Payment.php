@@ -519,6 +519,7 @@ abstract class CRM_Core_Payment {
         'mode' => @$_GET['mode'],
       )
     );
+    CRM_Utils_System::civiExit();
   }
 
   /**
@@ -617,11 +618,6 @@ abstract class CRM_Core_Payment {
         "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
         "$method method is unsupported in legacy payment processors."
       );
-    }
-
-    // Exit here on web requests, allowing just the plain text response to be echoed
-    if ($method == 'handlePaymentNotification') {
-      CRM_Utils_System::civiExit();
     }
   }
 
