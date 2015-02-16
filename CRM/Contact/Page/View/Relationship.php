@@ -214,18 +214,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     elseif ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
       $this->edit();
     }
-    elseif ($this->_action & CRM_Core_Action::DISABLE) {
-      CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_id, CRM_Core_Action::DISABLE);
-      CRM_Contact_BAO_Relationship::setIsActive($this->_id, 0);
-      $session = CRM_Core_Session::singleton();
-      CRM_Utils_System::redirect($session->popUserContext());
-    }
-    elseif ($this->_action & CRM_Core_Action::ENABLE) {
-      CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_id, CRM_Core_Action::ENABLE);
-      CRM_Contact_BAO_Relationship::setIsActive($this->_id, 1);
-      $session = CRM_Core_Session::singleton();
-      CRM_Utils_System::redirect($session->popUserContext());
-    }
 
     // if this is called from case view, suppress browse relationships form
     else {
