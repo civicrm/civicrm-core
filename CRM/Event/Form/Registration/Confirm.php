@@ -294,14 +294,16 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
       $getTaxDetails = FALSE;
-      foreach ($this->_lineItem as $key => $value) {
-        if (!empty($value)) {
-          $lineItemForTemplate[$key] = $value;
-        }
-        if ($invoicing) {
-          foreach ($value as $v) {
-            if (isset($v['tax_rate'])) {
-              $getTaxDetails = TRUE;
+      if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
+        foreach ($this->_lineItem as $key => $value) {
+          if (!empty($value)) {
+            $lineItemForTemplate[$key] = $value;
+          }
+          if ($invoicing) {
+            foreach ($value as $v) {
+              if (isset($v['tax_rate'])) {
+                $getTaxDetails = TRUE;
+              }
             }
           }
         }
