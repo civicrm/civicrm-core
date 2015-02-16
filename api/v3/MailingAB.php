@@ -72,10 +72,10 @@ function civicrm_api3_mailing_a_b_get($params) {
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
- * @param array $params
+ * @param array $spec
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_mailing_a_b_submit_spec(&$params) {
+function _civicrm_api3_mailing_a_b_submit_spec(&$spec) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
   $mailingAbFields = CRM_Mailing_DAO_MailingAB::fields();
   $spec['id'] = $mailingAbFields['id'];
