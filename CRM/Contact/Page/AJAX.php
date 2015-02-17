@@ -51,6 +51,13 @@ class CRM_Contact_Page_AJAX {
       return self::contactReference();
     }
 
+    $json = CRM_Utils_Request::retrieve('json', 'Integer');
+    if ($json) {
+      header('Content-Type: text/json');
+    }
+    else {
+      header('Content-Type: text/plain');
+    }
     $params = array('version' => 3, 'check_permissions' => TRUE);
 
     // String params
@@ -107,7 +114,7 @@ class CRM_Contact_Page_AJAX {
     $name = CRM_Utils_Array::value('s', $_GET);
     $name = CRM_Utils_Type::escape($name, 'String');
     $cfID = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-
+    header('Content-Type: text/plain');
     // check that this is a valid, active custom field of Contact Reference type
     $params           = array('id' => $cfID);
     $returnProperties = array('filter', 'data_type', 'is_active');
@@ -207,6 +214,7 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   static function getPCPList() {
+    header('Content-Type: text/plain');
     $name  = CRM_Utils_Array::value('s', $_GET);
     $name  = CRM_Utils_Type::escape($name, 'String');
     $limit = '10';
@@ -262,6 +270,7 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch the values
    */
   static function autocomplete() {
+    header('Content-Type: text/plain');
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('cfid', 'ogid', 'sigts'));
     if (CRM_Utils_Time::getTimeRaw() > $_REQUEST['sigts'] + self::AUTOCOMPLETE_TTL
       || !$signer->validate($_REQUEST['sig'], $_REQUEST)
@@ -272,6 +281,7 @@ class CRM_Contact_Page_AJAX {
     $fieldID       = CRM_Utils_Type::escape($_GET['cfid'], 'Integer');
     $optionGroupID = CRM_Utils_Type::escape($_GET['ogid'], 'Integer');
     $label         = CRM_Utils_Type::escape($_GET['s'], 'String');
+
 
     $selectOption = CRM_Core_BAO_CustomOption::valuesByID($fieldID, $optionGroupID);
 
@@ -382,6 +392,14 @@ class CRM_Contact_Page_AJAX {
       else {
         $name = $_GET['id'];
       }
+    }
+
+    if (($name || isset($id)) && (isset($_GET['org']) || isset($_GET['hh']))) {
+      $json = FALSE;
+    }
+
+    if (!$json) {
+      header('Content-Type: text/plain');
     }
 
     $elements = array();
@@ -546,6 +564,8 @@ ORDER BY sort_name ";
    * if one then return contact id else null
    */
   static function contact() {
+    header('Content-Type: text/plain');
+
     $name = CRM_Utils_Type::escape($_GET['name'], 'String');
 
     $query = "
