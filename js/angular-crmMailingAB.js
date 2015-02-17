@@ -10,6 +10,9 @@
         resolve: {
           mailingABList: function ($route, crmApi) {
             return crmApi('MailingAB', 'get', {rowCount: 0});
+          },
+          fields: function(crmMetadata){
+            return crmMetadata.getFields('MailingAB');
           }
         }
       });
@@ -48,11 +51,13 @@
     }
   ]);
 
-  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus) {
+  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus, fields) {
     var ts = $scope.ts = CRM.ts(null);
-    $scope.mailingABList = mailingABList.values;
+    $scope.mailingABList = _.values(mailingABList.values);
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingABStatus = crmMailingABStatus;
+    $scope.fields = fields;
+    $scope.filter = {};
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABNewCtrl', function ($scope, abtest, $location) {
