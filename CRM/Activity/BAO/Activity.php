@@ -1994,6 +1994,9 @@ AND id < {$activityID}
         $activityID,
         'original_id'
       );
+      if (!$originalID) {
+        $originalID = $activityID;
+      }
       if ($originalID) {
         $query = "
 SELECT c.display_name as name, cl.modified_date as date, ca.id as activityID
