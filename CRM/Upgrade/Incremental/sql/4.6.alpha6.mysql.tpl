@@ -11,7 +11,7 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'exceeded storage allocation'),
       (@bounceTypeID, 'running out of disk space');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'disk(space)?|over the allowed|exceed(ed|s)?|storage) quota' WHERE `id` = 87;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(disk(space)?|over the allowed|exceed(ed|s)?|storage) quota' WHERE `id` = 87;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail|in)(box|folder) ((for user \w+ )?is )?full' WHERE `id` = 92;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'mailbox (has exceeded|is over) the limit' WHERE `id` = 93;
 UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'quota ?(usage|violation|exceeded)' WHERE `id` = 98;
