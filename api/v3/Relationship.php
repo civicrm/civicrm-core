@@ -147,6 +147,15 @@ function _civicrm_api3_handle_relationship_type(&$params) {
   }
 }
 
+/**
+ * Hack to ensure inherited membership got created/deleted on
+ * relationship add/delete respectively.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ */
 function civicrm_api3_relationship_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
   $result = civicrm_api3_generic_setValue(array("entity" => 'Relationship', 'params' => $params));
