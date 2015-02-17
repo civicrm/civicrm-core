@@ -454,6 +454,110 @@
       };
     })
 
+    // CrmUiOrderCtrl is a controller class which manages sort orderings.
+    // Ex:
+    //   JS:   $scope.myOrder = new CrmUiOrderCtrl(['+field1', '-field2]);
+    //         $scope.myOrder.toggle('field1');
+    //         $scope.myOrder.setDir('field2', '');
+    //   HTML: <tr ng-repeat="... | order:myOrder.get()">...</tr>
+    .service('CrmUiOrderCtrl', function(){
+      //
+      function CrmUiOrderCtrl(defaults){
+        this.values = defaults;
+      }
+      angular.extend(CrmUiOrderCtrl.prototype, {
+        get: function get() {
+          return this.values;
+        },
+        getDir: function getDir(name) {
+          if (this.values.indexOf(name) >= 0 || this.values.indexOf('+' + name) >= 0) {
+            return '+';
+          }
+          if (this.values.indexOf('-' + name) >= 0) {
+            return '-';
+          }
+          return '';
+        },
+        // @return bool TRUE if something is removed
+        remove: function remove(name) {
+          var idx = this.values.indexOf(name);
+          if (idx >= 0) {
+            this.values.splice(idx, 1);
+            return true;
+          }
+          else {
+            return false;
+          }
+        },
+        setDir: function setDir(name, dir) {
+          return this.toggle(name, dir);
+        },
+        // Toggle sort order on a field.
+        // To set a specific order, pass optional parameter 'next' ('+', '-', or '').
+        toggle: function toggle(name, next) {
+          if (!next && next !== '') {
+            next = '+';
+            if (this.remove(name) || this.remove('+' + name)) {
+              next = '-';
+            }
+            if (this.remove('-' + name)) {
+              next = '';
+            }
+          }
+
+          if (next == '+') {
+            this.values.unshift('+' + name);
+          }
+          else if (next == '-') {
+            this.values.unshift('-' + name);
+          }
+        }
+      });
+      return CrmUiOrderCtrl;
+    })
+
+    // Define a controller which manages sort order. You may interact with the controller
+    // directly ("myOrder.toggle('fieldname')") order using the helper, crm-ui-order-by.
+    // example:
+    //   <span crm-ui-order="{var: 'myOrder', defaults: {'-myField'}}"></span>
+    //   <th><a crm-ui-order-by="[myOrder,'myField']">My Field</a></th>
+    //   <tr ng-repeat="... | order:myOrder.get()">...</tr>
+    //   <button ng-click="myOrder.toggle('myField')">
+    .directive('crmUiOrder', function(CrmUiOrderCtrl) {
+      return {
+        link: function(scope, element, attrs){
+          var options = angular.extend({var: 'crmUiOrderBy'}, scope.$eval(attrs.crmUiOrder));
+          scope[options.var] = new CrmUiOrderCtrl(options.defaults);
+        }
+      };
+    })
+
+    // For usage, see crmUiOrder (above)
+    .directive('crmUiOrderBy', function() {
+      return {
+        link: function(scope, element, attrs) {
+          function updateClass(crmUiOrderCtrl, name) {
+            var dir = crmUiOrderCtrl.getDir(name);
+            element
+              .toggleClass('sorting_asc', dir === '+')
+              .toggleClass('sorting_desc', dir === '-')
+              .toggleClass('sorting', dir === '');
+          }
+
+          element.on('click', function(e){
+            var tgt = scope.$eval(attrs.crmUiOrderBy);
+            tgt[0].toggle(tgt[1]);
+            updateClass(tgt[0], tgt[1]);
+            e.preventDefault();
+            scope.$digest();
+          });
+
+          var tgt = scope.$eval(attrs.crmUiOrderBy);
+          updateClass(tgt[0], tgt[1]);
+        }
+      };
+    })
+
     // Display a fancy SELECT (based on select2).
     // usage: <select crm-ui-select="{placeholder:'Something',allowClear:true,...}" ng-model="myobj.field"><option...></select>
     .directive('crmUiSelect', function ($parse, $timeout) {
