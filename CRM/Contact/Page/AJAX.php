@@ -1074,7 +1074,7 @@ LIMIT {$offset}, {$rowCount}
 
     $params['contact_id'] = $contactID;
     $params['context'] = $context;
-    if($relationship_type_id){
+    if ($relationship_type_id){
       $params['relationship_type_id'] = $relationship_type_id;
     }
 
