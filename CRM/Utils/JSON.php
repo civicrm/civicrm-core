@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,16 +39,28 @@
 class CRM_Utils_JSON {
 
   /**
-   * Function to create JSON object
-   *
-   * @param  array  $params     associated array, that needs to be
-   *                            converted to JSON array
-   * @param  string $identifier identifier for the JSON array
-   *
-   * @return string $jsonObject JSON array
-   * @static
+   * Output json to the client.
+   * @param mixed $input
    */
-  static function encode($params, $identifier = 'id') {
+  public static function output($input) {
+    header('Content-Type: application/json');
+    CRM_Utils_JSON::output($input);
+  }
+
+  /**
+   * Create JSON object.
+   * @deprecated
+   *
+   * @param array $params
+   *   Associated array, that needs to be.
+   *                            converted to JSON array
+   * @param string $identifier
+   *   Identifier for the JSON array.
+   *
+   * @return string
+   *   JSON array
+   */
+  public static function encode($params, $identifier = 'id') {
     $buildObject = array();
     foreach ($params as $value) {
       $name = addslashes($value['name']);
@@ -61,15 +73,20 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * Function to encode json format for flexigrid, NOTE: "id" should be present in $params for each row
+   * Encode json format for flexigrid, NOTE: "id" should be present in $params for each row
    *
-   * @param array  $params associated array of values rows
-   * @param int    $page  page no for selector
-   * @param array  $selectorElements selector rows
+   * @param array $params
+   *   Associated array of values rows.
+   * @param int $page
+   *   Page no for selector.
+   * @param $total
+   * @param array $selectorElements
+   *   Selector rows.
    *
-   * @return json encode string
+   * @return string
+   *   json encoded string
    */
-  static function encodeSelector(&$params, $page, $total, $selectorElements) {
+  public static function encodeSelector(&$params, $page, $total, $selectorElements) {
     $json = "";
     $json .= "{\n";
     $json .= "page: $page,\n";
@@ -103,17 +120,21 @@ class CRM_Utils_JSON {
   }
 
   /**
-   * This function is used to encode data for dataTable plugin
+   * encode data for dataTable plugin.
    *
-   * @param array $params associated array of row elements
-   * @param int $sEcho datatable needs this to make it more secure
-   * @param int $iTotal total records
-   * @param int $iFilteredTotal total records on a page
-   * @param array $selectorElements selector elements
+   * @param array $params
+   *   Associated array of row elements.
+   * @param int $sEcho
+   *   Datatable needs this to make it more secure.
+   * @param int $iTotal
+   *   Total records.
+   * @param int $iFilteredTotal
+   *   Total records on a page.
+   * @param array $selectorElements
+   *   Selector elements.
    * @return string
-   *
    */
-  static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
+  public static function encodeDataTableSelector($params, $sEcho, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';
     $sOutput .= '"sEcho": ' . intval($sEcho) . ', ';
     $sOutput .= '"iTotalRecords": ' . $iTotal . ', ';
@@ -126,14 +147,13 @@ class CRM_Utils_JSON {
         if ($addcomma) {
           $sOutput .= ",";
         }
-
         //CRM-7130 --lets addslashes to only double quotes,
         //since we are using it to quote the field value.
         //str_replace helps to provide a break for new-line
         $sOutput .= '"' . addcslashes(str_replace(array("\r\n", "\n", "\r"), '<br />', $value[$element]), '"\\') . '"';
 
         //remove extra spaces and tab character that breaks dataTable CRM-12551
-        $sOutput  = preg_replace("/\s+/", " ", $sOutput);
+        $sOutput = preg_replace("/\s+/", " ", $sOutput);
         $addcomma = TRUE;
       }
       $sOutput .= "],";
@@ -143,5 +163,5 @@ class CRM_Utils_JSON {
 
     return $sOutput;
   }
-}
 
+}

@@ -83,6 +83,7 @@ WHERE {$whereClause}
       );
     }
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encode($elements, 'value');
     CRM_Utils_System::civiExit();
   }

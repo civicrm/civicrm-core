@@ -159,8 +159,7 @@ class CRM_Queue_ErrorPolicy {
     if (is_object($activeQueueRunner)) {
       $response['last_task_title'] = $activeQueueRunner->lastTaskTitle;
     }
-    echo json_encode($response);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($response);
   }
 }
 

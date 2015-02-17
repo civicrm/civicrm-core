@@ -383,8 +383,7 @@ class CRM_Utils_REST {
     if (array_key_exists('json', $requestParams) &&  $requestParams['json'][0] == "{") {
       $params = json_decode($requestParams['json'], TRUE);
       if($params === NULL) {
-        echo json_encode(array('is_error' => 1, 'error_message', 'Unable to decode supplied JSON.'));
-        CRM_Utils_System::civiExit();
+        CRM_Utils_JSON::output(array('is_error' => 1, 'error_message', 'Unable to decode supplied JSON.'));
       }
     }
     foreach ($requestParams as $n => $v) {
@@ -500,16 +499,13 @@ class CRM_Utils_REST {
           'reason' => 'CSRF suspected',
         )
       );
-      echo json_encode($error);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($error);
     }
     if (empty($requestParams['entity'])) {
-      echo json_encode(civicrm_api3_create_error('missing entity param'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(civicrm_api3_create_error('missing entity param'));
     }
     if (empty($requestParams['entity'])) {
-      echo json_encode(civicrm_api3_create_error('missing entity entity'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(civicrm_api3_create_error('missing entity entity'));
     }
     if (!empty($requestParams['json'])) {
       $params = json_decode($requestParams['json'], TRUE);
@@ -517,8 +513,7 @@ class CRM_Utils_REST {
     $entity = CRM_Utils_String::munge(CRM_Utils_Array::value('entity', $requestParams));
     $action = CRM_Utils_String::munge(CRM_Utils_Array::value('action', $requestParams));
     if (!is_array($params)) {
-      echo json_encode(array('is_error' => 1, 'error_message', 'invalid json format: ?{"param_with_double_quote":"value"}'));
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output(array('is_error' => 1, 'error_message', 'invalid json format: ?{"param_with_double_quote":"value"}'));
     }
 
     $params['check_permissions'] = TRUE;
@@ -559,8 +554,7 @@ class CRM_Utils_REST {
           'reason' => 'CSRF suspected',
         )
       );
-      echo json_encode($error);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($error);
     }
 
     $q = CRM_Utils_Array::value('fnName', $requestParams);

@@ -108,8 +108,7 @@ class CRM_Queue_Page_AJAX {
         CRM_Core_Error::debug_var("CRM_Queue_Page_AJAX_{$op}_error", $result);
       }
     }
-        echo json_encode($result);
-        CRM_Utils_System::civiExit();
+        CRM_Utils_JSON::output($result);
     }
   }
 
