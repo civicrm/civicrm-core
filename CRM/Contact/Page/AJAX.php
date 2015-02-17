@@ -1038,7 +1038,7 @@ LIMIT {$offset}, {$rowCount}
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape($_GET['context'], 'String');
-    $relationship_type_id = CRM_Utils_Type::escape($_GET['relationship_type_id'], 'Integer');
+    $relationship_type_id = CRM_Utils_Type::escape($_GET['relationship_type_id'], 'Integer', FALSE);
 
     if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
       return CRM_Utils_System::permissionDenied();
@@ -1074,7 +1074,9 @@ LIMIT {$offset}, {$rowCount}
 
     $params['contact_id'] = $contactID;
     $params['context'] = $context;
-    $params['relationship_type_id'] = $relationship_type_id;
+        if($relationship_type_id){
+      $params['relationship_type_id'] = $relationship_type_id;
+    }
 
     // get the contact relationships
     $relationships = CRM_Contact_BAO_Relationship::getContactRelationshipSelector($params);
