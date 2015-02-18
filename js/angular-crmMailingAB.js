@@ -68,7 +68,7 @@
     $location.replace();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
@@ -170,6 +170,19 @@
     $scope.$on('$destroy', function(){
       $interval.cancel(syncJob);
     });
+
+    var myAutosave = new CrmAutosaveCtrl({
+      save: $scope.save,
+      saveIf: $scope.sync,
+      model: function(){
+        return abtest.getAutosaveSignature();
+      },
+      form: function() {
+        return $scope.crmMailingAB;
+      }
+    });
+    $timeout(myAutosave.start);
+    $scope.$on('$destroy', myAutosave.stop);
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingPreviewMgr, dialogService) {
