@@ -40,6 +40,24 @@
 class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
+   * Status options for A/B tests.
+   * @var array
+   */
+  private static $abStatus;
+
+  /**
+   * Test criteria for A/B tests.
+   * @var array
+   */
+  private static $abTestCriteria;
+
+  /**
+   * Winner criteria for A/B tests.
+   * @var array
+   */
+  private static $abWinnerCriteria;
+
+  /**
    * Mailing templates
    * @var array
    */
@@ -61,6 +79,48 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Default component id's, indexed by component type
    */
   private static $defaultComponent;
+
+  /**
+   * @return array
+   */
+  public static function abStatus() {
+    if (!is_array(self::$abStatus)) {
+      self::$abStatus = array(
+        'Draft' => ts('Draft'),
+        'Testing' => ts('Testing'),
+        'Final' => ts('Final'),
+      );
+    }
+    return self::$abStatus;
+  }
+
+  /**
+   * @return array
+   */
+  public static function abTestCriteria() {
+    if (!is_array(self::$abTestCriteria)) {
+      self::$abTestCriteria = array(
+        'subject' => ts('Test different "Subject" lines'),
+        'from' => ts('Test different "From" lines'),
+        'full_email' => ts('Test entirely different emails'),
+      );
+    }
+    return self::$abTestCriteria;
+  }
+
+  /**
+   * @return array
+   */
+  public static function abWinnerCriteria() {
+    if (!is_array(self::$abWinnerCriteria)) {
+      self::$abWinnerCriteria  = array(
+        'open' => ts('Open'),
+        'unique_click' => ts('Total Unique Clicks'),
+        'link_click' => ts('Total Clicks on a particular link'),
+      );
+    }
+    return self::$abWinnerCriteria;
+  }
 
   /**
    * Get all the mailing components of a particular type.
