@@ -53,8 +53,8 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
       'mailing_id_a' => $this->_mailingID_A,
       'mailing_id_b' => $this->_mailingID_B,
       'mailing_id_c' => $this->_mailingID_C,
-      'testing_criteria_id' => 1,
-      'winner_criteria_id' => 1,
+      'testing_criteria' => 'subject',
+      'winner_criteria' => 'open',
       'declare_winning_time' => '+2 days',
       'group_percentage' => 10,
     );

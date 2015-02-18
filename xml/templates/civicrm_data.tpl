@@ -208,10 +208,7 @@ VALUES
    ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1, 0),
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
-   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1),
-   ('mailing_ab_status'             , '{ts escape="sql"}Mailing A/B Status{/ts}'                 , 1, 1, 1),
-   ('mailing_ab_testing_criteria'   , '{ts escape="sql"}Mailing A/B Testing Criteria{/ts}'       , 1, 1, 1),
-   ('mailing_ab_winner_criteria'    , '{ts escape="sql"}Mailing A/B Testing Winner Criteria{/ts}', 1, 1, 1);
+   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -289,9 +286,6 @@ SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where na
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
-SELECT @option_group_id_mailingABStatus := max(id) from civicrm_option_group where name = 'mailing_ab_status';
-SELECT @option_group_id_mailingABCriteria := max(id) from civicrm_option_group where name = 'mailing_ab_testing_criteria';
-SELECT @option_group_id_mailingABWinnerCriteria := max(id) from civicrm_option_group where name = 'mailing_ab_winner_criteria';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -951,22 +945,7 @@ VALUES
 
 -- Reminder Options for Contact Date Fields
 (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
-
--- Mailing A/B Status
-(@option_group_id_mailingABStatus, '{ts escape="sql"}Draft{/ts}', '1', 'Draft', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABStatus, '{ts escape="sql"}Testing{/ts}', '2', 'Testing', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABStatus, '{ts escape="sql"}Final{/ts}', '3', 'Final', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-
--- Mailing A/B Testing Winner Criteria
-(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Open{/ts}', '1', 'Open', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Total Unique Clicks{/ts}', '2', 'Total Unique Clicks', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABWinnerCriteria, '{ts escape="sql"}Total Clicks on a particular link{/ts}', '3', 'Total Clicks on a particular link', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL),
-
--- Mailing A/B Testing Criteria
-(@option_group_id_mailingABCriteria, '{ts escape="sql"}Subject Lines {/ts}', '1', 'Subject Lines', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABCriteria, '{ts escape="sql"}From Names {/ts}', '2', 'From Names', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_mailingABCriteria, '{ts escape="sql"}Two different Emails {/ts}', '3', 'Two different Emails ', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL);
+(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
