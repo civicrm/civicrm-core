@@ -1608,6 +1608,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @throws \Exception
    */
   public static function create(&$params, $ids = array()) {
+    // WTH $ids
+    if (empty($ids) && isset($params['id'])) {
+      $ids['id'] = $params['id'];
+    }
 
     // CRM-12430
     // Do the below only for an insert
