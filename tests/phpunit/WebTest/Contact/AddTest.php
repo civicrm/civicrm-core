@@ -443,8 +443,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Edit_next");
 
-    // Is new contact created?
-    $this->waitForText("css=div.crm-status-box-msg", "$currentEmployer Created");
     $this->select2('employer_id', $currentEmployer);
 
     //make sure shared address is selected
@@ -475,9 +473,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select('state_province-1', 'value=1001');
 
     $this->click("_qf_Edit_next");
-
-    // Is new contact created?
-    $this->waitForText("css=div.crm-status-box-msg", "$sharedHousehold Created");
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-2');
