@@ -31,8 +31,7 @@
     <title>Status</title>
     <comment>Status</comment>
     <pseudoconstant>
-      <optionGroupName>mailing_ab_status</optionGroupName>
-      <keyColumn>name</keyColumn>
+      <callback>CRM_Mailing_PseudoConstant::abStatus</callback>
     </pseudoconstant>
     <add>4.6</add>
   </field>
@@ -65,20 +64,22 @@
     <add>4.6</add>
   </field>
   <field>
-    <name>testing_criteria_id</name>
-    <type>int unsigned</type>
-    <title>Testing Criteria ID</title>
+    <name>testing_criteria</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Testing Criteria</title>
     <pseudoconstant>
-      <optionGroupName>mailing_ab_testing_criteria</optionGroupName>
+      <callback>CRM_Mailing_PseudoConstant::abTestCriteria</callback>
     </pseudoconstant>
     <add>4.6</add>
   </field>
   <field>
-    <name>winner_criteria_id</name>
-    <type>int unsigned</type>
-    <title>Winner Criteria ID</title>
+    <name>winner_criteria</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Winner Criteria</title>
     <pseudoconstant>
-      <optionGroupName>mailing_ab_winner_criteria</optionGroupName>
+      <callback>CRM_Mailing_PseudoConstant::abWinnerCriteria</callback>
     </pseudoconstant>
     <add>4.6</add>
   </field>
