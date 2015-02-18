@@ -60,7 +60,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $text = 'This membership will be renewed automatically every 1 year(s).';
+    $text = 'This membership will be renewed automatically every year.';
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
@@ -93,7 +93,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $text = 'This membership will be renewed automatically every 1 year(s).';
+    $text = 'This membership will be renewed automatically every year.';
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
@@ -121,7 +121,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $text = 'This membership will be renewed automatically every 1 year(s).';
+    $text = 'This membership will be renewed automatically every year.';
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]/strong[3]", $text, 'Missing text: ' . $text);
   }
 
