@@ -146,3 +146,26 @@ function _civicrm_api3_handle_relationship_type(&$params) {
     }
   }
 }
+
+/**
+ * Hack to ensure inherited membership got created/deleted on
+ * relationship add/delete respectively.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ */
+function civicrm_api3_relationship_setvalue($params) {
+  require_once 'api/v3/Generic/Setvalue.php';
+  $result = civicrm_api3_generic_setValue(array("entity" => 'Relationship', 'params' => $params));
+
+  if (empty($result['is_error']) && CRM_Utils_String::munge($params['field']) == 'is_active') {
+    $action = CRM_Core_Action::DISABLE;
+    if ($params['value'] == TRUE) {
+      $action = CRM_Core_Action::ENABLE;
+    }
+    CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
+  }
+  return $result;
+}
