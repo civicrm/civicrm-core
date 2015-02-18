@@ -84,18 +84,17 @@
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
       abtest.mailings.c.name = ts('Winner (%1)', {1: abtest.ab.name});
 
-      var criteria = crmMailingABCriteria.get(abtest.ab.testing_criteria_id);
-      if (criteria) {
+      if (abtest.ab.testing_criteria) {
         // TODO review fields exposed in UI and make sure the sync rules match
-        switch (criteria.name) {
-          case 'Subject lines':
+        switch (abtest.ab.testing_criteria) {
+          case 'subject':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
               'subject'
             ]);
             break;
-          case 'From names':
+          case 'from':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
@@ -103,7 +102,7 @@
               'from_email'
             ]);
             break;
-          case 'Two different emails':
+          case 'full_email':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
@@ -166,14 +165,7 @@
       $location.replace();
     };
 
-    function updateCriteriaName() {
-      var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id);
-      $scope.criteriaName = criteria ? criteria.name : null;
-    }
-
     // initialize
-    updateCriteriaName();
-    $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
     var syncJob = $interval($scope.sync, 333);
     $scope.$on('$destroy', function(){
       $interval.cancel(syncJob);
