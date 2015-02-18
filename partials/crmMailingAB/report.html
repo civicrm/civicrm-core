@@ -1,9 +1,4 @@
-<div crm-ui-accordion crm-title="ts('Debug')" crm-collapsed="true">
-  <pre>{{abtest.ab|json}}</pre>
-  <pre>{{abtest.mailings|json}}</pre>
-</div>
-
-<div>
+<div ng-controller="CrmMailingABReportCtrl">
   <table>
     <thead>
     <tr>
