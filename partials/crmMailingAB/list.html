@@ -44,7 +44,7 @@ Required vars: mailingABList
       <td>{{mailingAB.created_date}}</td>
       <td>
         <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status == 'Draft'">{{ts('Continue')}}</a>
-        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}/report" ng-show="mailingAB.status != 'Draft'">{{ts('Results')}}</a>
+        <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status != 'Draft'">{{ts('Results')}}</a>
       </td>
     </tr>
     </tbody>

@@ -172,20 +172,18 @@
     });
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmApi, crmMailingPreviewMgr, dialogService) {
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingPreviewMgr, dialogService) {
     var ts = $scope.ts = CRM.ts(null);
 
-    $scope.abtest = abtest;
-
     $scope.stats = {};
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_a}).then(function(data){
-      $scope.stats.a = data.values[abtest.ab.mailing_id_a];
+    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_a}).then(function(data){
+      $scope.stats.a = data.values[$scope.abtest.ab.mailing_id_a];
     });
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_b}).then(function(data){
-      $scope.stats.b = data.values[abtest.ab.mailing_id_b];
+    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_b}).then(function(data){
+      $scope.stats.b = data.values[$scope.abtest.ab.mailing_id_b];
     });
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_c}).then(function(data){
-      $scope.stats.c = data.values[abtest.ab.mailing_id_c];
+    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_c}).then(function(data){
+      $scope.stats.c = data.values[$scope.abtest.ab.mailing_id_c];
     });
 
     $scope.previewMailing = function previewMailing(mailingName, mode) {
@@ -193,7 +191,7 @@
     };
     $scope.selectWinner = function selectWinner(mailingName) {
       var model = {
-        abtest: abtest,
+        abtest: $scope.abtest,
         mailingName: mailingName
       };
       var options = CRM.utils.adjustDialogDefaults({
