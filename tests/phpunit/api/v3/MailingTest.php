@@ -39,6 +39,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_entity = 'Mailing';
   protected $_contactID;
 
+  /**
+   * APIv3 result from creating an example footer
+   * @var array
+   */
+  protected $footer;
+
   public function setUp() {
     parent::setUp();
     $this->useTransaction();
@@ -55,6 +61,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'header_id' => '',
       'footer_id' => '',
     );
+
+    $this->footer = civicrm_api3('MailingComponent', 'create', array(
+      'body_html' => '<p>From {domain.address}. To opt out, go to {action.optOutUrl}.</p>',
+      'body_text' => 'From {domain.address}. To opt out, go to {action.optOutUrl}.',
+    ));
   }
 
   public function tearDown() {
@@ -372,7 +383,20 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_text.*optOut.*\\)./", // expectedFailure
       0, // expectedJobCount
     );
-
+    $cases[] = array(
+      TRUE, //useLogin
+      array('body_text' => 'Look ma, magic tokens in the text!', 'footer_id' => '%FOOTER%'), // createParams
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      FALSE, // expectedFailure
+      1, // expectedJobCount
+    );
+    $cases[] = array(
+      TRUE, //useLogin
+      array('body_html' => '<p>Look ma, magic tokens in the markup!</p>', 'footer_id' => '%FOOTER%'), // createParams
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      FALSE, // expectedFailure
+      1, // expectedJobCount
+    );
     return $cases;
   }
 
@@ -387,6 +411,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function testMailerSubmit($useLogin, $createParams, $submitParams, $expectedFailure, $expectedJobCount) {
     if ($useLogin) {
       $this->createLoggedInUser();
+    }
+
+    if (isset($createParams['footer_id']) && $createParams['footer_id'] == '%FOOTER%') {
+      $createParams['footer_id'] = $this->footer['id'];
     }
 
     $id = $this->createDraftMailing($createParams);
