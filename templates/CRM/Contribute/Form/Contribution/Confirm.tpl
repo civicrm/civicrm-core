@@ -100,9 +100,17 @@
                 {else}
 {crmRegion name="contribution-confirm-recur"}
                     {if $installments}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2(s) for %3 installments.{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2s for %3 installments.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit 2=$installments}I want to contribute this amount every %1 for %2 installments.{/ts}</strong></p>
+                      {/if}
                     {else}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2(s).{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2s.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit }I want to contribute this amount every %1.{/ts}</strong></p>
+                      {/if}
                     {/if}
                     <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
 {/crmRegion}
