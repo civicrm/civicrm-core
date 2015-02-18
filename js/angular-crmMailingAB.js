@@ -10,6 +10,9 @@
         resolve: {
           mailingABList: function ($route, crmApi) {
             return crmApi('MailingAB', 'get', {rowCount: 0});
+          },
+          fields: function(crmMetadata){
+            return crmMetadata.getFields('MailingAB');
           }
         }
       });
@@ -48,11 +51,13 @@
     }
   ]);
 
-  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function ($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus) {
+  angular.module('crmMailingAB').controller('CrmMailingABListCtrl', function($scope, mailingABList, crmMailingABCriteria, crmMailingABStatus, fields) {
     var ts = $scope.ts = CRM.ts(null);
-    $scope.mailingABList = mailingABList.values;
+    $scope.mailingABList = _.values(mailingABList.values);
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingABStatus = crmMailingABStatus;
+    $scope.fields = fields;
+    $scope.filter = {};
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABNewCtrl', function ($scope, abtest, $location) {
@@ -79,18 +84,17 @@
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
       abtest.mailings.c.name = ts('Winner (%1)', {1: abtest.ab.name});
 
-      var criteria = crmMailingABCriteria.get(abtest.ab.testing_criteria_id);
-      if (criteria) {
+      if (abtest.ab.testing_criteria) {
         // TODO review fields exposed in UI and make sure the sync rules match
-        switch (criteria.name) {
-          case 'Subject lines':
+        switch (abtest.ab.testing_criteria) {
+          case 'subject':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
               'subject'
             ]);
             break;
-          case 'From names':
+          case 'from':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
@@ -98,7 +102,7 @@
               'from_email'
             ]);
             break;
-          case 'Two different emails':
+          case 'full_email':
             crmMailingMgr.mergeInto(abtest.mailings.b, abtest.mailings.a, [
               'name',
               'recipients',
@@ -161,14 +165,7 @@
       $location.replace();
     };
 
-    function updateCriteriaName() {
-      var criteria = crmMailingABCriteria.get($scope.abtest.ab.testing_criteria_id);
-      $scope.criteriaName = criteria ? criteria.name : null;
-    }
-
     // initialize
-    updateCriteriaName();
-    $scope.$watch('abtest.ab.testing_criteria_id', updateCriteriaName);
     var syncJob = $interval($scope.sync, 333);
     $scope.$on('$destroy', function(){
       $interval.cancel(syncJob);
