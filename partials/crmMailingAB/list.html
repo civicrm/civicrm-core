@@ -17,9 +17,9 @@ Required vars: mailingABList
       </select>
     </span>
     <span>
-      <select crm-ui-select style="width: 20em;" ng-model="filter.testing_criteria_id">
+      <select crm-ui-select style="width: 20em;" ng-model="filter.testing_criteria">
         <option value="">{{ts('- Test Type -')}}</option>
-        <option ng-repeat="o in fields.testing_criteria_id.options" ng-value="o.key">{{crmMailingABCriteria.get(o.key).label}}</option>
+        <option ng-repeat="o in fields.testing_criteria.options" ng-value="o.key">{{o.value}}</option>
       </select>
     </span>
   </form>
@@ -31,7 +31,7 @@ Required vars: mailingABList
     <tr>
       <th><a crm-ui-order-by="[myOrder, 'name']">{{ts('Name')}}</a></th>
       <th><a crm-ui-order-by="[myOrder, 'status']">{{ts('Status')}}</a></th>
-      <th><a crm-ui-order-by="[myOrder, 'testing_criteria_id']">{{ts('Test Type')}}</a></th>
+      <th><a crm-ui-order-by="[myOrder, 'testing_criteria']">{{ts('Test Type')}}</a></th>
       <th><a crm-ui-order-by="[myOrder, 'created_date']">{{ts('Created')}}</a></th>
       <th></th>
     </tr>
@@ -40,7 +40,7 @@ Required vars: mailingABList
     <tr ng-repeat="mailingAB in mailingABList | filter:filter | orderBy:myOrder.get()">
       <td>{{mailingAB.name}}</td>
       <td>{{crmMailingABStatus.getByName(mailingAB.status).label}}</td>
-      <td>{{crmMailingABCriteria.get(mailingAB.testing_criteria_id).label}}</td>
+      <td>{{crmMailingABCriteria.get(mailingAB.testing_criteria).label}}</td>
       <td>{{mailingAB.created_date}}</td>
       <td>
         <a class="action-item crm-hover-button" ng-href="#/abtest/{{mailingAB.id}}" ng-show="mailingAB.status == 'Draft'">{{ts('Continue')}}</a>

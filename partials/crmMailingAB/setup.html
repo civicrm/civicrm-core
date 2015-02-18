@@ -29,7 +29,7 @@
     <div crm-ui-field crm-title="ts('Test Type')" ng-if="fields.testing_criteria">
       <div ng-repeat="criteria in crmMailingABCriteria.getAll()">
         <label>
-          <input name="testing_critiria" ng-model="abtest.ab.testing_criteria_id" type="radio"
+          <input name="testing_criteria" ng-model="abtest.ab.testing_criteria" type="radio"
                  value="{{criteria.value}}" required/>
           {{criteria.label}}
         </label>

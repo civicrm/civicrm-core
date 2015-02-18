@@ -17,9 +17,9 @@
   angular.module('crmMailingAB').factory('crmMailingABCriteria', function () {
     // TODO Get data from server
     var values = {
-      '1': {value: '1', name: 'Subject lines', label: ts('Test different "Subject" lines')},
-      '2': {value: '2', name: 'From names', label: ts('Test different "From" lines')},
-      '3': {value: '3', name: 'Two different emails', label: ts('Test entirely different emails')}
+      '1': {value: 'subject', name: 'subject', label: ts('Test different "Subject" lines')},
+      '2': {value: 'from', name: 'from', label: ts('Test different "From" lines')},
+      '3': {value: 'full_email', name: 'full_email', label: ts('Test entirely different emails')}
     };
     return new OptionGroup(values);
   });
@@ -70,8 +70,8 @@
             mailing_id_b: null,
             mailing_id_c: null,
             domain_id: null,
-            testing_criteria_id: 1, // FIXME
-            winner_criteria_id: null,
+            testing_criteria: 'subject',
+            winner_criteria: null,
             specific_url: '',
             declare_winning_time: null,
             group_percentage: 10
