@@ -67,7 +67,7 @@
     $location.replace();
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout) {
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
@@ -162,6 +162,21 @@
           });
       }
     };
+
+    var myAutosave = new CrmAutosaveCtrl({
+      save: $scope.save,
+      saveIf: function() {
+        return true;
+      },
+      model: function() {
+        return [$scope.mailing, $scope.attachments.getAutosaveSignature()];
+      },
+      form: function() {
+        return $scope.crmMailing;
+      }
+    });
+    $timeout(myAutosave.start);
+    $scope.$on('$destroy', myAutosave.stop);
   });
 
   // Controller for the edit-recipients fields (
