@@ -18,7 +18,7 @@
   //   autosave.start();
   //   $scope.$on('$destroy', autosave.stop);
   // Note: if the save operation itself
-  angular.module('crmAutosave').service('CrmAutosaveCtrl', function($interval, $timeout) {
+  angular.module('crmAutosave').service('CrmAutosaveCtrl', function($interval, $timeout, $q) {
     function CrmAutosaveCtrl(options) {
       var intervals = angular.extend({poll: 250, save: 5000}, options.interval);
       var jobs = {poll: null, save: null}; // job handles used ot cancel/reschedule timeouts/intervals
@@ -86,6 +86,8 @@
         }
       }
 
+      var self = this;
+
       this.start = function() {
         if (!jobs.poll) {
           lastSeenModel = angular.copy(_.isFunction(options.model) ? options.model() : options.model);
@@ -102,6 +104,11 @@
           $timeout.cancel(jobs.save);
           jobs.save = null;
         }
+      };
+
+      this.suspend = function(p) {
+        self.stop();
+        return p.finally(self.start);
       };
     }
 

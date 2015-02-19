@@ -68,10 +68,12 @@
     $location.replace();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
+    $scope.crmUrl = CRM.url;
+    var myAutosave = null;
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
 
@@ -153,7 +155,7 @@
       }
       return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
           .then(function() {
-            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submitTest());
+            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, myAutosave.suspend(abtest.submitTest()));
             // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
             // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
           })
@@ -165,15 +167,31 @@
       $location.replace();
     };
 
+    $scope.selectWinner = function selectWinner(mailingName) {
+      var model = {
+        abtest: $scope.abtest,
+        mailingName: mailingName
+      };
+      var options = CRM.utils.adjustDialogDefaults({
+        autoOpen: false,
+        title: ts('Select Winner (%1)', {
+          1: mailingName.toUpperCase()
+        })
+      });
+      return myAutosave.suspend(dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options));
+    };
+
     // initialize
     var syncJob = $interval($scope.sync, 333);
     $scope.$on('$destroy', function(){
       $interval.cancel(syncJob);
     });
 
-    var myAutosave = new CrmAutosaveCtrl({
+    myAutosave = new CrmAutosaveCtrl({
       save: $scope.save,
-      saveIf: $scope.sync,
+      saveIf: function(){
+        return abtest.ab.status == 'Draft' && $scope.sync();
+      },
       model: function(){
         return abtest.getAutosaveSignature();
       },
@@ -185,7 +203,7 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingPreviewMgr, dialogService) {
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats, crmLegacy) {
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.stats = {};
@@ -198,25 +216,7 @@
     crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_c}).then(function(data){
       $scope.stats.c = data.values[$scope.abtest.ab.mailing_id_c];
     });
-
-    $scope.previewMailing = function previewMailing(mailingName, mode) {
-      return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
-    };
-    $scope.selectWinner = function selectWinner(mailingName) {
-      var model = {
-        abtest: $scope.abtest,
-        mailingName: mailingName
-      };
-      var options = CRM.utils.adjustDialogDefaults({
-        autoOpen: false,
-        title: ts('Select Winner (%1)', {
-          1: mailingName.toUpperCase()
-        })
-      });
-      return dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options);
-    };
   });
-
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
     var ts = $scope.ts = CRM.ts(null);
