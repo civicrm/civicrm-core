@@ -107,12 +107,12 @@ function civicrm_error($result) {
 /**
  * Get camel case version of entity or action name.
  *
- * @param $entity
+ * @param string|null $entity
  *
- * @return string
+ * @return string|null
  */
 function _civicrm_api_get_camel_name($entity) {
-  return CRM_Utils_String::convertStringToCamel($entity);
+  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
 }
 
 /**
@@ -196,5 +196,5 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
+  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 }

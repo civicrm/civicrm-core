@@ -67,10 +67,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   public function __construct($apiKernel) {
     $this->apiKernel = $apiKernel;
     $this->actions = array(
-      // FIXME: We really need to deal with the api's lack of uniformity wrt
-      // case (Entity or entity).
       'Entity' => array('get', 'getactions'),
-      'entity' => array('get', 'getactions'),
       '*' => array('getactions'), // 'getfields'
     );
   }
