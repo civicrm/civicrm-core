@@ -57,8 +57,10 @@ if (!in_array($installType, array('drupal', 'wordpress'))) {
 }
 
 global $crmPath;
+global $pkgPath;
 global $installDirPath;
 global $installURLPath;
+
 if ($installType == 'drupal') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
   $installDirPath = $installURLPath = '';
@@ -66,11 +68,16 @@ if ($installType == 'drupal') {
 elseif ($installType == 'wordpress') {
   $crmPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
   $installDirPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
-
   $installURLPath = WP_PLUGIN_URL . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
 }
 
-set_include_path(get_include_path() . PATH_SEPARATOR . $crmPath);
+$pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
+
+set_include_path(
+  $crmPath . PATH_SEPARATOR .
+  $pkgPath . PATH_SEPARATOR .
+  get_include_path()
+);
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
@@ -138,10 +145,31 @@ foreach ($langs as $locale => $_) {
   }
 }
 
+// Set the locale (required by CRM_Core_Config)
+// This is mostly sympbolic, since nothing we do during the install
+// really requires CIVICRM_UF to be defined.
+$installTypeToUF = array(
+  'wordpress' => 'WordPress',
+  'drupal' => 'Drupal',
+);
+
+$uf = (! isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
+define('CIVICRM_UF', $uf);
+
+global $tsLocale;
+
+$tsLocale = 'en_US';
 $seedLanguage = 'en_US';
+
 if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']])) {
   $seedLanguage = $_REQUEST['seedLanguage'];
+  $tsLocale = $_REQUEST['seedLanguage'];
 }
+
+$config = CRM_Core_Config::singleton(FALSE);
+// The translation files are in the parent directory (l10n)
+$config->gettextResourceDir = '..' . DIRECTORY_SEPARATOR . $config->gettextResourceDir;
+$i18n = CRM_Core_I18n::singleton();
 
 global $cmsPath;
 if ($installType == 'drupal') {
@@ -285,9 +313,9 @@ class InstallRequirements {
   public function checkdatabase($databaseConfig, $dbName) {
     if ($this->requireFunction('mysql_connect',
       array(
-        "PHP Configuration",
-        "MySQL support",
-        "MySQL support not included in PHP.",
+        ts("PHP Configuration"),
+        ts("MySQL support"),
+        ts("MySQL support not included in PHP."),
       )
     )
     ) {
@@ -1249,6 +1277,7 @@ class Installer extends InstallRequirements {
 ";
 
       $output = NULL;
+
       if (
         $installType == 'drupal' &&
         version_compare(VERSION, '7.0-rc1') >= 0
@@ -1284,6 +1313,11 @@ class Installer extends InstallRequirements {
 
         // relative / abosolute paths are not working for drupal, hence using chdir()
         chdir($cmsPath);
+
+        // Force the re-initialisation of the config singleton on the next call
+        // since so far, we had used the Config object without loading the DB.
+        $c = CRM_Core_Config::singleton(FALSE);
+        $c->free();
 
         include_once "./includes/bootstrap.inc";
         include_once "./includes/unicode.inc";
@@ -1333,7 +1367,7 @@ class Installer extends InstallRequirements {
         $output .= '<link rel="stylesheet" type="text/css" href="template.css" />';
         $output .= '</head>';
         $output .= '<body>';
-        $output .= '<div style="padding: 1em;"><p class="good">CiviCRM has been successfully installed</p>';
+        $output .= '<div style="padding: 1em;"><p class="good">' . ts("CiviCRM has been successfully installed") . '</p>';
         $output .= '<ul>';
         $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
@@ -1376,7 +1410,7 @@ class Installer extends InstallRequirements {
       }
       elseif ($installType == 'wordpress') {
         echo '<h1>CiviCRM Installed</h1>';
-        echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">CiviCRM has been successfully installed</p>';
+        echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">' . ts("CiviCRM has been successfully installed") . '</p>';
         echo '<ul>';
         $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
@@ -1395,6 +1429,17 @@ class Installer extends InstallRequirements {
 
         echo '</ul>';
         echo '</div>';
+      }
+
+      //change the default language to one chosen
+      if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
+        $domain = new CRM_Core_DAO_Domain();
+        $domain->id = CRM_Core_Config::domainID();
+        $domain->find(TRUE);
+        $configSettings = unserialize($domain->config_backend);
+        $configSettings['lcMessages'] = $config['seedLanguage'];
+        $domain->config_backend = serialize($configSettings);
+        $domain->save();
       }
     }
 
