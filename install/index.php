@@ -1350,6 +1350,15 @@ class Installer extends InstallRequirements {
         $GLOBALS['user'] = $original_user;
         drupal_save_session(TRUE);
 
+        //change the default language to one chosen
+        if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
+          civicrm_api3('Setting', 'create', array(
+              'domain_id' => 'current_domain',
+              'lcMessages' => $config['seedLanguage'],
+            )
+          );
+        }
+
         $output .= '</ul>';
         $output .= '</div>';
         $output .= '</body>';
@@ -1417,6 +1426,9 @@ class Installer extends InstallRequirements {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
 
+        $c = CRM_Core_Config::singleton(FALSE);
+        $c->free();
+
         $cmsURL = civicrm_cms_base();
         $cmsURL .= "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/configtask&reset=1";
         $wpPermissionsURL = "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/access/wp-permissions&reset=1";
@@ -1429,21 +1441,6 @@ class Installer extends InstallRequirements {
 
         echo '</ul>';
         echo '</div>';
-      }
-
-      //change the default language to one chosen
-      if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
-        $domainID = CRM_Core_Config::domainID();
-        $configBackend = civicrm_api3('Domain', 'getvalue', array('id' => $domainID, 'return'=> 'config_backend'));
-        $configBackend = unserialize($config_backend);
-
-        //TODO: Scope to set default attributes like for now e.g. Default Launguage
-        $configBackend['lcMessages'] = $config['seedLanguage'];
-        $result = civicrm_api3('Domain', 'setvalue', array(
-                    'id' => $domainID,
-                    'field' => 'config_backend',
-                    'value' => serialize($configBackend),
-                  ));
       }
     }
 
