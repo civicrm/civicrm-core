@@ -74,7 +74,7 @@
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
-      abtest.mailings.c.name = ts('Winner (%1)', {1: abtest.ab.name});
+      abtest.mailings.c.name = ts('Final (%1)', {1: abtest.ab.name});
 
       if (abtest.ab.testing_criteria) {
         // TODO review fields exposed in UI and make sure the sync rules match
@@ -164,7 +164,7 @@
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
-        title: ts('Select Winner (%1)', {
+        title: ts('Select Final Mailing (Test %1)', {
           1: mailingName.toUpperCase()
         })
       });
@@ -240,7 +240,7 @@
       // need to be registered with the dialog widget (and not embedded in
       // the body of the dialog).
       var buttons = {};
-      buttons[ts('Select Winner')] = function () {
+      buttons[ts('Submit final mailing')] = function () {
         crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
           'name',
           'recipients',

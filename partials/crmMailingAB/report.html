@@ -7,8 +7,9 @@
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
       <td ng-repeat="am in getActiveMailings()">
-        <button ng-click="selectWinner(am.name)">{{ts('Select as Winner')}}</button>
+        <button ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
       </td>
+      <td></td>
     </tr>
     </thead>
 
@@ -16,6 +17,7 @@
     <tr>
       <th>{{ts('Delivery')}}</th>
       <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
     </tr>
     </thead>
 
@@ -25,24 +27,28 @@
       <td ng-repeat="am in getActiveMailings()">
         <span ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.status}}</span>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'">{{ts('Not selected')}}</td>
     </tr>
     <tr>
       <td>{{ts('Scheduled')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.scheduled_date}}</div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Started at')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.start_date || ts('Not started')}}</div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Completed at')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.end_date || ts('Not completed')}}</div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     </tbody>
 
@@ -50,6 +56,7 @@
     <tr>
       <th>{{ts('Performance')}}</th>
       <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
     </tr>
     </thead>
     <tbody>
@@ -69,6 +76,7 @@
           title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
           >{{stats[am.name][statType.name] || ts('n/a')}}</a>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     </tbody>
 
@@ -76,6 +84,7 @@
     <tr>
       <th>{{ts('Details')}}</th>
       <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
     </tr>
     </thead>
 
@@ -85,18 +94,21 @@
       <td ng-repeat="am in getActiveMailings()">
         {{am.mailing.name}}
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('From')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         "{{am.mailing.from_name}}" &lt;{{am.mailing.from_email}}&gt;
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Subject')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         {{am.mailing.subject}}
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr ng-controller="ViewRecipCtrl">
       <td>{{ts('Recipients')}}</td>
@@ -108,6 +120,7 @@
           <strong>{{ts('Exclude:')}}</strong> <s>{{getExcludesAsString(am.mailing)}}</s>
         </div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Content')}}</td>
@@ -115,12 +128,14 @@
         <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('HTML')}}</a>
         <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('Text')}}</a>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Attachments')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         <div ng-repeat="file in am.attachments.files"><a ng-href="{{file.url}}" target="_blank">{{file.name}}</a></div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Tracking')}}</td>
@@ -128,6 +143,7 @@
         <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click Throughs')"></div>
         <div crm-mailing-review-bool crm-on="am.mailing.open_tracking=='1'" crm-title="ts('Opens')"></div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Responding')}}</td>
@@ -141,12 +157,14 @@
           <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Unsubscribe'), am.mailing.unsubscribe_id)">{{ts('Unsubscribe')}}</a></div>
         </div>
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     <tr>
       <td>{{ts('Publication')}}</td>
       <td ng-repeat="am in getActiveMailings()">
         {{am.mailing.visibility}}
       </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>
     </tbody>
 
