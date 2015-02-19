@@ -1,38 +1,108 @@
 <div ng-controller="CrmMailingABReportCtrl">
   <table>
     <thead>
-    <tr>
-      <th>{{ts('Details')}}</th>
-      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-show="abtest.mailings.a.body_html || abtest.mailings.b.body_html">
-      <td>{{ts('HTML')}}</td>
-      <td ng-repeat="am in getActiveMailings()">
-        <a class="crm-hover-button" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('View')}}</a>
-      </td>
-    </tr>
-    <tr ng-show="abtest.mailings.a.body_text || abtest.mailings.b.body_text">
-      <td>{{ts('Text')}}</td>
-      <td ng-repeat="am in getActiveMailings()">
-        <a class="crm-hover-button" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('View')}}</a>
-      </td>
-    </tr>
-    <tr ng-repeat="statType in statTypes">
-      <td>{{statType.title}}</td>
-      <td ng-repeat="am in getActiveMailings()">
-        <a class="crm-hover-button" ng-href="{{statUrl(am.mailing, statType, 'events')}}" title="{{statType.title}}">{{stats[am.name][statType.name] || ts('n/a')}}</a>
-        <a class="crm-hover-button" ng-href="{{statUrl(am.mailing, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
-      </td>
-    </tr>
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
       <td ng-repeat="am in getActiveMailings()">
         <button ng-click="selectWinner(am.name)">{{ts('Select as Winner')}}</button>
       </td>
     </tr>
+    </thead>
+
+    <thead>
+    <tr>
+      <th>{{ts('Delivery Summary')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="statType in statTypes">
+      <td>{{statType.title}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a class="crm-hover-button action-item" ng-href="{{statUrl(am.mailing, statType, 'search')}}" title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}" crm-icon="search"></a>
+        <a class="crm-hover-button action-item" ng-href="{{statUrl(am.mailing, statType, 'events')}}" title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}">{{stats[am.name][statType.name] || ts('n/a')}}</a>
+      </td>
+    </tr>
     </tbody>
+
+    <thead>
+    <tr>
+      <th>{{ts('Details')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+      <td>{{ts('Mailing Name')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.name}}
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('From')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        "{{am.mailing.from_name}}" &lt;{{am.mailing.from_email}}&gt;
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Subject')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.subject}}
+      </td>
+    </tr>
+    <tr ng-controller="ViewRecipCtrl">
+      <td>{{ts('Recipients')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-show="getIncludesAsString(am.mailing)">
+          <strong>{{ts('Include:')}}</strong> {{getIncludesAsString(am.mailing)}}
+        </div>
+        <div ng-show="getExcludesAsString(am.mailing)">
+          <strong>{{ts('Exclude:')}}</strong> <s>{{getExcludesAsString(am.mailing)}}</s>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Content')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('HTML')}}</a>
+        <a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('Text')}}</a>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Attachments')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="file in am.attachments.files"><a ng-href="{{file.url}}" target="_blank">{{file.name}}</a></div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Tracking')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click Throughs')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.open_tracking=='1'" crm-title="ts('Opens')"></div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Responding')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0'" crm-title="ts('Track Replies')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0' && mailing.forward_replies=='1'" crm-title="ts('Forward Replies')"></div>
+        <div ng-controller="PreviewComponentCtrl">
+          <div ng-show="am.mailing.override_verp == '0' && mailing.auto_responder"><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Auto-Respond'), am.mailing.reply_id)">{{ts('Auto-Respond')}}</a></div>
+          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Opt-out'), am.mailing.optout_id)">{{ts('Opt-out')}}</a></div>
+          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Resubscribe'), am.mailing.resubscribe_id)">{{ts('Resubscribe')}}</a></div>
+          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewComponent(ts('Unsubscribe'), am.mailing.unsubscribe_id)">{{ts('Unsubscribe')}}</a></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Publication')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.visibility}}
+      </td>
+    </tr>
+    </tbody>
+
   </table>
 
   <div crm-ui-tab-set>

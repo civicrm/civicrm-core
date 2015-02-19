@@ -175,7 +175,7 @@
         crmOn: '@',
         crmTitle: '@'
       },
-      template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{crmTitle}} </span>',
+      template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{evalTitle}} </span>',
       link: function (scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
@@ -186,7 +186,7 @@
             scope.spanClasses = {'crmMailing-inactive': true};
             scope.iconClasses = {'ui-icon-close': true};
           }
-          scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
+          scope.evalTitle = scope.$parent.$eval(attrs.crmTitle);
         }
 
         refresh();

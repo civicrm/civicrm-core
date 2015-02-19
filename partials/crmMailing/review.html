@@ -9,13 +9,15 @@ Required vars: mailing
         {{mailing.name}}
       </div>
       <div crm-ui-field crm-title="ts('Recipients')">
-        <div ng-controller="EditRecipCtrl">
-          <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a></div>
-          <div ng-show="getIncludesAsString()">
-            (<strong>{{ts('Include:')}}</strong> {{getIncludesAsString()}})
-          </div>
-          <div ng-show="getExcludesAsString()">
-            (<strong>{{ts('Exclude:')}}</strong> <s>{{getExcludesAsString()}}</s>)
+        <div ng-controller="ViewRecipCtrl">
+          <div ng-controller="EditRecipCtrl">
+            <div><a crm-icon="newwin" class="crm-hover-button action-item" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a></div>
+            <div ng-show="getIncludesAsString(mailing)">
+              (<strong>{{ts('Include:')}}</strong> {{getIncludesAsString(mailing)}})
+            </div>
+            <div ng-show="getExcludesAsString(mailing)">
+              (<strong>{{ts('Exclude:')}}</strong> <s>{{getExcludesAsString(mailing)}}</s>)
+            </div>
           </div>
         </div>
       </div>
