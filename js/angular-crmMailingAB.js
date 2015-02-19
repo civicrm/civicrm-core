@@ -29,21 +29,11 @@
         }
       });
       $routeProvider.when('/abtest/:id', {
-        templateUrl: '~/crmMailingAB/edit.html',
+        templateUrl: '~/crmMailingAB/main.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
-            return abtest.load();
-          }
-        }
-      });
-      $routeProvider.when('/abtest/:id/report', {
-        templateUrl: '~/crmMailingAB/report.html',
-        controller: 'CrmMailingABReportCtrl',
-        resolve: {
-          abtest: function ($route, CrmMailingAB) {
-            var abtest = new CrmMailingAB($route.current.params.id);
             return abtest.load();
           }
         }
