@@ -21,35 +21,20 @@
       <td><a ng-click="previewMailing('b','text')" ng-show="abtest.mailings.b.body_text">{{ts('View')}}</a></td>
       <td><a ng-click="previewMailing('c','text')" ng-show="abtest.mailings.c.body_text && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
     </tr>
-    <tr>
-      <td>{{ts('Deliveries')}}</td>
-      <td>{{stats.a.Delivered}}</td>
-      <td>{{stats.b.Delivered}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Delivered}}</td>
-    </tr>
-    <tr>
-      <td>{{ts('Opens')}}</td>
-      <td>{{stats.a.Opened}}</td>
-      <td>{{stats.b.Opened}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Opened}}</td>
-    </tr>
-    <tr>
-      <td>{{ts('Unique Clicks')}}</td>
-      <td>{{stats.a['Unique Clicks']}}</td>
-      <td>{{stats.b['Unique Clicks']}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c['Unique Clicks']}}</td>
-    </tr>
-    <tr>
-      <td>{{ts('Bounces')}}</td>
-      <td>{{stats.a.Bounces}}</td>
-      <td>{{stats.b.Bounces}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Bounces}}</td>
-    </tr>
-    <tr>
-      <td>{{ts('Unsubscribes')}}</td>
-      <td>{{stats.a.Unsubscribers}}</td>
-      <td>{{stats.b.Unsubscribers}}</td>
-      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Unsubscribers}}</td>
+    <tr ng-repeat="statType in statTypes">
+      <td>{{statType.title}}</td>
+      <td>
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.a, statType, 'events')}}" title="{{statType.title}}">{{stats.a[statType.name] || ts('n/a')}}</a>
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.a, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
+      </td>
+      <td>
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.b, statType, 'events')}}" title="{{statType.title}}">{{stats.b[statType.name] || ts('n/a')}}</a>
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.b, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
+      </td>
+      <td ng-show="abtest.ab.status == 'Final'">
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.c, statType, 'events')}}" title="{{statType.title}}">{{stats.a[statType.name] || ts('n/a')}}</a>
+        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.c, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
+      </td>
     </tr>
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
