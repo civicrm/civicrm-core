@@ -155,7 +155,7 @@
         };
         return crmApi('MailingAB', 'submit', params)
           .then(function () {
-            return crmMailingAB;
+            return crmMailingAB.load();
           });
       },
       // @param mailing Object (per APIv3)
