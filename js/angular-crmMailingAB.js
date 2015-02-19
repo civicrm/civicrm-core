@@ -206,6 +206,21 @@
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats) {
     var ts = $scope.ts = CRM.ts(null);
 
+    var activeMailingStatus = null, activeMailings = null;
+    $scope.getActiveMailings = function() {
+      if ($scope.abtest.ab.status != activeMailingStatus) {
+        activeMailingStatus = $scope.abtest.ab.status;
+        activeMailings = [
+          {name: 'a', title: ts('Mailing A'), mailing: $scope.abtest.mailings.a},
+          {name: 'b', title: ts('Mailing B'), mailing: $scope.abtest.mailings.b}
+        ];
+        if ($scope.abtest.ab.status == 'Final') {
+          activeMailings.push({name: 'c', title: ts('Final'), mailing: $scope.abtest.mailings.c});
+        }
+      }
+      return activeMailings;
+    };
+
     crmMailingStats.getStats({
       a: $scope.abtest.ab.mailing_id_a,
       b: $scope.abtest.ab.mailing_id_b,
