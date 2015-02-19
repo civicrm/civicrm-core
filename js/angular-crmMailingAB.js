@@ -159,7 +159,7 @@
             // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
             // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
           })
-      ).then($scope.leave);
+      );
     };
 
     $scope.leave = function leave() {
