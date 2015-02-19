@@ -14,7 +14,41 @@
 
     <thead>
     <tr>
-      <th>{{ts('Delivery Summary')}}</th>
+      <th>{{ts('Delivery')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+      <td>{{ts('Status')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <span ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.status}}</span>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Scheduled')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.scheduled_date}}</div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Started at')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.start_date || ts('Not started')}}</div>
+      </td>
+    </tr>
+    <tr>
+      <td>{{ts('Completed at')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.end_date || ts('Not completed')}}</div>
+      </td>
+    </tr>
+    </tbody>
+
+    <thead>
+    <tr>
+      <th>{{ts('Performance')}}</th>
       <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
     </tr>
     </thead>
