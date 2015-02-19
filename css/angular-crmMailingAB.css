@@ -15,3 +15,7 @@
     stroke: #000;
     shape-rendering: crispEdges;
 }
+
+.crm-mailing-ab-col {
+  width: 12em;
+}
