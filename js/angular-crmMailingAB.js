@@ -196,10 +196,10 @@
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats) {
     var ts = $scope.ts = CRM.ts(null);
 
-    var activeMailingStatus = null, activeMailings = null;
+    var CrmMailingABReportCnt = 1, activeMailings = null;
     $scope.getActiveMailings = function() {
-      if ($scope.abtest.ab.status != activeMailingStatus) {
-        activeMailingStatus = $scope.abtest.ab.status;
+      if ($scope.abtest.$CrmMailingABReportCnt != CrmMailingABReportCnt) {
+        $scope.abtest.$CrmMailingABReportCnt = ++CrmMailingABReportCnt;
         activeMailings = [
           {name: 'a', title: ts('Mailing A'), mailing: $scope.abtest.mailings.a, attachments: $scope.abtest.attachments.a},
           {name: 'b', title: ts('Mailing B'), mailing: $scope.abtest.mailings.b, attachments: $scope.abtest.attachments.b}
@@ -249,8 +249,9 @@
         crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
           .then(function () {
             return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
-              abtest.submitFinal().then(function(){
-                return abtest.load();
+              abtest.submitFinal().then(function(r){
+                delete abtest.$CrmMailingABReportCnt;
+                return r;
               }));
           })
           .then(function(){
