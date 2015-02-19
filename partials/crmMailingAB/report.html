@@ -19,8 +19,18 @@
     <tr ng-repeat="statType in statTypes">
       <td>{{statType.title}}</td>
       <td ng-repeat="am in getActiveMailings()">
-        <a class="crm-hover-button action-item" ng-href="{{statUrl(am.mailing, statType, 'search')}}" title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}" crm-icon="search"></a>
-        <a class="crm-hover-button action-item" ng-href="{{statUrl(am.mailing, statType, 'events')}}" title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}">{{stats[am.name][statType.name] || ts('n/a')}}</a>
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'search')}}"
+          ng-if="checkPerm('view all contacts')"
+          title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
+          crm-icon="search"
+          ></a>
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'events')}}"
+          title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
+          >{{stats[am.name][statType.name] || ts('n/a')}}</a>
       </td>
     </tr>
     </tbody>
