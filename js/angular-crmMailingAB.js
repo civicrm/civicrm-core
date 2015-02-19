@@ -203,19 +203,21 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats, crmLegacy) {
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats) {
     var ts = $scope.ts = CRM.ts(null);
 
-    $scope.stats = {};
-    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_a}).then(function(data){
-      $scope.stats.a = data.values[$scope.abtest.ab.mailing_id_a];
+    crmMailingStats.getStats({
+      a: $scope.abtest.ab.mailing_id_a,
+      b: $scope.abtest.ab.mailing_id_b,
+      c: $scope.abtest.ab.mailing_id_c
+    }).then(function(stats) {
+      $scope.stats = stats;
     });
-    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_b}).then(function(data){
-      $scope.stats.b = data.values[$scope.abtest.ab.mailing_id_b];
-    });
-    crmApi('Mailing', 'stats', {mailing_id: $scope.abtest.ab.mailing_id_c}).then(function(data){
-      $scope.stats.c = data.values[$scope.abtest.ab.mailing_id_c];
-    });
+
+    $scope.statTypes = crmMailingStats.getStatTypes();
+    $scope.statUrl = function statUrl(mailing, statType, view) {
+      return crmMailingStats.getUrl(mailing, statType, view);
+    };
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
