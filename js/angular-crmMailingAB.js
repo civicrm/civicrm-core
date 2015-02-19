@@ -233,6 +233,8 @@
     $scope.statUrl = function statUrl(mailing, statType, view) {
       return crmMailingStats.getUrl(mailing, statType, view);
     };
+
+    $scope.checkPerm = CRM.checkPerm;
   });
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
