@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,10 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_im_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
-
 class api_v3_ImTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -43,24 +42,18 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
-    $this->_entity     = 'im';
-    $this->_contactID  = $this->organizationCreate();
-    $this->params  = array(
+    $this->_entity = 'im';
+    $this->_contactID = $this->organizationCreate();
+    $this->params = array(
       'contact_id' => $this->_contactID,
       'name' => 'My Yahoo IM Handle',
       'location_type_id' => 1,
       'provider_id' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_im',
-      'civicrm_contact'
-    ));
   }
 
   public function testCreateIm() {
@@ -85,6 +78,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   public function testDeleteImInvalid() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);
@@ -92,4 +86,5 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
 }

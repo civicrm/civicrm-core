@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -26,11 +26,11 @@
 {*Table displays contribution totals for a contact or search result-set *}
 {if $annual.count OR $contributionSummary}
     <table class="form-layout-compressed">
-    
+
     {if $annual.count}
         <tr>
             <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} - {$annual.amount}</th>
-            <th class="right"> &nbsp; {ts}#  Completed Contributions{/ts} - {$annual.count}</th>
+            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} - {$annual.count}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} - {$annual.avg}</th>
             {if $contributionSummary.cancel.amount}
                 <td>&nbsp;</td>
@@ -48,15 +48,15 @@
           {if $contributionSummary.cancel.amount}
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Total Cancelled Amount{/ts} - {$contributionSummary.cancel.amount}</th>
           {/if}
-      </tr>  
+      </tr>
       {if $contributionSummary.soft_credit.count}
       <tr>
         <th class="contriTotalLeft right">{ts}Total Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.amount}</th>
         <th class="right"> &nbsp; {ts}# Completed Soft Credits{/ts} - {$contributionSummary.soft_credit.count}</th>
         <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.avg}</th>
-      </tr>  
+      </tr>
       {/if}
     {/if}
-    
+
     </table>
 {/if}

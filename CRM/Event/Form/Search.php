@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,52 +43,46 @@
 class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query.
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * prefix for the controller
-   *
+   * Prefix for the controller.
    */
   protected $_prefix = "event_";
 
   protected $_defaults;
 
   /**
-   * the saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars.
    *
    * @var int
-   * @access protected
    */
   protected $_ssID;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -104,11 +98,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->_ssID    = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
+    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->assign("context", $this->_context);
 
     // get user submitted values
@@ -169,13 +163,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -200,21 +193,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = array();
-        // Filter on is_test if specified in search form
-        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0' ) {
-          $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
-        }
-        if (!empty($this->_formValues['participant_status_id'])) {
-          $statuses = array_keys($this->_formValues['participant_status_id']);
-          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $statuses) . ' ) )';
-        }
-        if (!empty($this->_formValues['participant_role_id'])) {
-          $roles = array_keys($this->_formValues['participant_role_id']);
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
-        }
+        // CRM-15379
         $clause = NULL;
-        if (!empty($seatClause)) {
-          $clause = implode(' AND ', $seatClause);
+        if (!empty($this->_formValues['participant_fee_id'])) {
+          $participant_fee_id = $this->_formValues['participant_fee_id'];
+          $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $participant_fee_id, 'label');
+          $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
+          $clause = " ( participant.fee_level LIKE '%$feeLabel%' ) ";
         }
 
         $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $clause);
@@ -258,9 +243,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -269,6 +253,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+      foreach (array('participant_status_id', 'participant_role_id') as $element) {
+        $value = CRM_Utils_Array::value($element, $this->_formValues);
+        if ($value && is_array($value)) {
+          $this->_formValues[$element] = array('IN' => $value);
+        }
+      }
     }
 
     if (empty($this->_formValues)) {
@@ -350,29 +340,29 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {}
+  public function addRules() {
+  }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -451,7 +441,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 
@@ -459,10 +449,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Participants');
   }
-}
 
+}

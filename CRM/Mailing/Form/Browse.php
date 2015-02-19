@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,12 +34,11 @@
  */
 
 /**
- * Build the form for disable mail feature
+ * Build the form object for disable mail feature
  *
  * @param
  *
  * @return void
- * @access public
  */
 class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
@@ -49,21 +47,19 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
-    $mailing     = new CRM_Mailing_BAO_Mailing();
+    $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->_mailingId;
-    $subject     = '';
+    $subject = '';
     if ($mailing->find(TRUE)) {
       $subject = $mailing->subject;
     }
@@ -71,12 +67,10 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
-
   public function buildQuickForm() {
     $this->addButtons(array(
         array(
@@ -94,8 +88,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
   /**
    *
-   * @access public
-   *
    * @return void
    */
   public function postProcess() {
@@ -110,6 +102,5 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
     }
   }
-  //end of function
-}
 
+}

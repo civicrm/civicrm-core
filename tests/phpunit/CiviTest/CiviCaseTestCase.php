@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -60,7 +60,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     // state where tests could run afterwards without re-loading.
     $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', array(
         'name' => 'case_status',
-        'format.only_id' => 1
+        'format.only_id' => 1,
       )
     );
     $optionValues = array(
@@ -125,10 +125,8 @@ class CiviCaseTestCase extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     $this->customDirectories(array('template_path' => FALSE));
     CRM_Case_XMLRepository::singleton(TRUE);
@@ -140,6 +138,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * @param $caseTypes
    * @see CRM_Utils_Hook::caseTypes
    */
-  function hook_caseTypes(&$caseTypes) {
+  public function hook_caseTypes(&$caseTypes) {
   }
+
 }

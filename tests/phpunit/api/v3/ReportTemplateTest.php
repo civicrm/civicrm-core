@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,18 +31,16 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_report_instance_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Report
+ * @package CiviCRM_APIv3
+ * @subpackage API_Report
  */
-
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testReportTemplate() {
     $result = $this->callAPISuccess('ReportTemplate', 'create', array(
@@ -64,7 +62,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // change component to null
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+      'id' => $entityId,
       'component' => '',
     ));
     $this->assertAPISuccess($result);
@@ -77,7 +76,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       AND component_id IS NULL');
 
     // deactivate
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+      'id' => $entityId,
       'is_active' => 0,
     ));
     $this->assertAPISuccess($result);
@@ -89,7 +89,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       WHERE name = "CRM_Report_Form_Examplez"');
 
     // activate
-    $result = $this->callAPISuccess('ReportTemplate', 'create', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'create', array(
+      'id' => $entityId,
       'is_active' => 1,
     ));
     $this->assertAPISuccess($result);
@@ -100,7 +101,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 
-    $result = $this->callAPISuccess('ReportTemplate', 'delete', array(      'id' => $entityId,
+    $result = $this->callAPISuccess('ReportTemplate', 'delete', array(
+      'id' => $entityId,
     ));
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -110,13 +112,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   *
+   * Test getrows on contact summary report.
    */
-  function testReportTemplateGetRowsContactSummary() {
-    $description = "Retrieve rows from a report template (optionally providing the instance_id)";
+  public function testReportTemplateGetRowsContactSummary() {
+    $description = "Retrieve rows from a report template (optionally providing the instance_id).";
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
-      'options' => array('metadata' => array('labels', 'title'))
+      'options' => array('metadata' => array('labels', 'title')),
     ), __FUNCTION__, __FILE__, $description, 'Getrows', 'getrows');
     $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
@@ -130,79 +132,84 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Default Organization', $result[0]['civicrm_contact_sort_name']);
     $this->assertEquals('Second Domain', $result[1]['civicrm_contact_sort_name']);
     $this->assertEquals('15 Main St', $result[1]['civicrm_address_street_address']);
-    */
+     */
   }
 
   /**
+   * Tet api to get rows from reports.
+   *
    * @dataProvider getReportTemplates
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
-  function testReportTemplateGetRowsAllReports($reportID) {
-    if(stristr($reportID, 'has existing issues')) {
+  public function testReportTemplateGetRowsAllReports($reportID) {
+    if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-     $result = $this->callAPISuccess('report_template', 'getrows', array(
-       'report_id' => $reportID,
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $reportID,
     ));
   }
 
   /**
+   * Test get statistics.
+   *
    * @dataProvider getReportTemplates
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
-  function testReportTemplateGetStatisticsAllReports($reportID) {
-    if(stristr($reportID, 'has existing issues')) {
+  public function testReportTemplateGetStatisticsAllReports($reportID) {
+    if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
-    if(in_array($reportID , array('contribute/softcredit', 'contribute/bookkeeping'))) {
+    if (in_array($reportID, array('contribute/softcredit', 'contribute/bookkeeping'))) {
       $this->markTestIncomplete($reportID . " has non enotices when calling statistics fn");
     }
-    $description = "Get Statistics from a report (note there isn't much data to get in the test DB :-(";
+    $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     $result = $this->callAPIAndDocument('report_template', 'getstatistics', array(
       'report_id' => $reportID,
     ), __FUNCTION__, __FILE__, $description, 'Getstatistics', 'getstatistics');
   }
 
   /**
-   * Data provider function for getting all templates, note that the function needs to
+   * Data provider function for getting all templates.
+   *
+   * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
    */
   public static function getReportTemplates() {
     $reportsToSkip = array(
-        'activity' =>  'does not respect function signature on from clause',
-        'walklist' => 'Notice: Undefined index: type in CRM_Report_Form_Walklist_Walklist line 155.
-                       (suspect the select function should be removed in favour of the parent (state province field)
-                      also, type should be added to state province & others? & potentially getAddressColumns fn should be
-                      used per other reports',
-        'contribute/repeat' => 'Reports with important functionality in postProcess are not callable via the api. For variable setting recommend beginPostProcessCommon, for temp table creation recommend From fn',
-        'contribute/organizationSummary' => 'Failure in api call for report_template getrows:  Only variables should be assigned by reference line 381',
-        'contribute/householdSummary' => '(see contribute/repeat) Undefined property: CRM_Report_Form_Contribute_HouseholdSummary::$householdContact LINE 260, property should be declared on class, for api accessibility should be set in beginPreProcess common',
-        'contribute/topDonor' => 'construction of query in postprocess makes inaccessible ',
-        'contribute/sybunt' => 'e notice - (ui gives fatal error at civicrm/report/contribute/sybunt&reset=1&force=1
-                                e-notice is on yid_valueContribute/Sybunt.php(214) because at the force url "yid_relative" not "yid_value" is defined',
-        'contribute/lybunt' => 'same as sybunt - fatals on force url & test identifies why',
-        'event/income' => 'I do no understant why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-        'contact/relationship' => '(see contribute/repeat), property declaration issue, Undefined property: CRM_Report_Form_Contact_Relationship::$relationType in /Contact/Relationship.php(486):',
-        'activitySummary' => 'Undefined index: group_bys_freq m/ActivitySummary.php(191)',
-        'event/incomesummary' => 'Undefined index: title, Report/Form/Event/IncomeCountSummary.php(187)',
-        'logging/contact/summary' => '(likely to be test releated) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
-        'logging/contact/detail' => '(likely to be test releated) probably logging off  DB Error: no such table',
-        'logging/contribute/summary' => '(likely to be test releated) probably logging off DB Error: no such table',
-        'logging/contribute/detail' => '(likely to be test releated) probably logging off DB Error: no such table',
-        'survey/detail' => '(likely to be test releated)  Undefined index: CiviCampaign civicrm CRM/Core/Component.php(196)',
-        'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
+      'activity' => 'does not respect function signature on from clause',
+      'walklist' => 'Notice: Undefined index: type in CRM_Report_Form_Walklist_Walklist line 155.(suspect the select function should be removed in favour of the parent (state province field) also, type should be added to state province & others? & potentially getAddressColumns fn should be used per other reports',
+      'contribute/repeat' => 'Reports with important functionality in postProcess are not callable via the api. For variable setting recommend beginPostProcessCommon, for temp table creation recommend From fn',
+      'contribute/topDonor' => 'construction of query in postProcess makes inaccessible ',
+      'contribute/sybunt' => 'e notice - (ui gives fatal error at civicrm/report/contribute/sybunt&reset=1&force=1 e-notice is on yid_valueContribute/Sybunt.php(214) because at the force url "yid_relative" not "yid_value" is defined',
+      'contribute/lybunt' => 'same as sybunt - fatals on force url & test identifies why',
+      'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
+      'contact/relationship' => '(see contribute/repeat), property declaration issue, Undefined property: CRM_Report_Form_Contact_Relationship::$relationType in /Contact/Relationship.php(486):',
+      'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
+      'logging/contact/detail' => '(likely to be test related) probably logging off  DB Error: no such table',
+      'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',
+      'logging/contribute/detail' => '(likely to be test related) probably logging off DB Error: no such table',
+      'survey/detail' => '(likely to be test related)  Undefined index: CiviCampaign civicrm CRM/Core/Component.php(196)',
+      'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
     );
 
     $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));
     foreach ($reports['values'] as $report) {
-      if(empty($reportsToSkip[$report['value']])) {
+      if (empty($reportsToSkip[$report['value']])) {
         $reportTemplates[] = array($report['value']);
       }
       else {
-        $reportTemplates[] = array($report['value']. " has existing issues :  " . $reportsToSkip[$report['value']]);
+        $reportTemplates[] = array($report['value'] . " has existing issues :  " . $reportsToSkip[$report['value']]);
       }
     }
 
-
-
     return $reportTemplates;
   }
+
 }

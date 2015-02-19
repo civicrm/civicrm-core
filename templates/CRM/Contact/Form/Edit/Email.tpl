@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -41,7 +41,7 @@
 {/if}
 
 <tr id="Email_Block_{$blockId}">
-    <td style="width: 50%;">{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
+    <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
     <div class="clear"></div>
 {if $className eq 'CRM_Contact_Form_Contact'}
 <div class="email-signature crm-collapsible collapsed">

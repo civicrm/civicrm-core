@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,25 +41,34 @@ require_once 'packages/OpenFlashChart/php-ofc-library/open-flash-chart.php';
 class CRM_Utils_OpenFlashChart {
 
   /**
-   * colours.
+   * Colours.
    * @var array
-   * @static
    */
   private static $_colours = array(
-    "#C3CC38", "#C8B935", "#CEA632", "#D3932F",
-    "#D9802C", "#FA6900", "#DC9B57", "#F78F01",
-    "#5AB56E", "#6F8069", "#C92200", "#EB6C5C",
+    "#C3CC38",
+    "#C8B935",
+    "#CEA632",
+    "#D3932F",
+    "#D9802C",
+    "#FA6900",
+    "#DC9B57",
+    "#F78F01",
+    "#5AB56E",
+    "#6F8069",
+    "#C92200",
+    "#EB6C5C",
   );
 
   /**
    * Build The Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
-   * @static
+   * @return object
+   *   $chart   object of open flash chart.
    */
-  static function &barChart(&$params) {
+  public static function &barChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -104,11 +113,11 @@ class CRM_Utils_OpenFlashChart {
       $bars[$barCount]->set_values($yValues);
       if ($barCount > 0) {
         // FIXME: for bars > 2, we'll need to come out with other colors
-        $bars[$barCount]->colour( '#BF3B69');
+        $bars[$barCount]->colour('#BF3B69');
       }
 
       if ($barKey = CRM_Utils_Array::value($barCount, CRM_Utils_Array::value('barKeys', $params))) {
-        $bars[$barCount]->key($barKey,12);
+        $bars[$barCount]->key($barKey, 12);
       }
 
       // call user define function to handle on click event.
@@ -125,9 +134,9 @@ class CRM_Utils_OpenFlashChart {
     $xLabels = new x_axis_labels();
     // set_labels function requires xValues array of string or x_axis_label
     // so type casting array values to string values
-    array_walk($xValues, function(&$value, $index) {
-        $value = (string)$value;
-      });
+    array_walk($xValues, function (&$value, $index) {
+      $value = (string) $value;
+    });
     $xLabels->set_labels($xValues);
 
     // set angle for labels.
@@ -183,12 +192,13 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The Pie Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
-   * @static
+   * @return object
+   *   $chart   object of open flash chart.
    */
-  static function &pieChart(&$params) {
+  public static function &pieChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -201,7 +211,7 @@ class CRM_Utils_OpenFlashChart {
     // get the required data.
     $values = array();
     foreach ($allValues as $label => $value) {
-      $values[] = new pie_value((double)$value, $label);
+      $values[] = new pie_value((double) $value, $label);
     }
     $graphTitle = !empty($params['legend']) ? $params['legend'] : ts('Pie Chart');
 
@@ -246,12 +256,13 @@ class CRM_Utils_OpenFlashChart {
   /**
    * Build The 3-D Bar Gharph.
    *
-   * @param  array  $params  assoc array of name/value pairs
+   * @param array $params
+   *   Assoc array of name/value pairs.
    *
-   * @return object $chart   object of open flash chart.
-   * @static
+   * @return object
+   *   $chart   object of open flash chart.
    */
-  static function &bar_3dChart(&$params) {
+  public static function &bar_3dChart(&$params) {
     $chart = NULL;
     if (empty($params)) {
       return $chart;
@@ -273,10 +284,10 @@ class CRM_Utils_OpenFlashChart {
         continue;
       }
 
-      $xValueLabels[] = (string)$xVal;
+      $xValueLabels[] = (string) $xVal;
       foreach ($criterias as $criteria) {
-        $xReferences[$criteria][$xVal] = (double)CRM_Utils_Array::value($criteria, $yVal, 0);
-        $yValues[] = (double)CRM_Utils_Array::value($criteria, $yVal, 0);
+        $xReferences[$criteria][$xVal] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
+        $yValues[] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
       }
     }
 
@@ -306,7 +317,7 @@ class CRM_Utils_OpenFlashChart {
       // set colour pattel
       $xValues[$count]->set_colour(self::$_colours[$count]);
       // define colur pattel with bar criterias
-      $xValues[$count]->key((string)$criteria, 12);
+      $xValues[$count]->key((string) $criteria, 12);
       // define bar chart values
       $xValues[$count]->set_values(array_values($values));
 
@@ -396,7 +407,7 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return array
    */
-  static function chart($rows, $chart, $interval) {
+  public static function chart($rows, $chart, $interval) {
     $chartData = $dateKeys = array();
 
     switch ($interval) {
@@ -441,13 +452,12 @@ class CRM_Utils_OpenFlashChart {
       foreach ($rows['multiValue'] as $key => $val) {
         $graph[$key] = array_combine($dateKeys, $rows['multiValue'][$key]);
       }
-      $chartData =
-        array(
-          'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
-          'values' => $graph[0],
-          'multiValues' => $graph,
-          'barKeys' => CRM_Utils_Array::value('barKeys', $rows, array()),
-        );
+      $chartData = array(
+        'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
+        'values' => $graph[0],
+        'multiValues' => $graph,
+        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, array()),
+      );
     }
 
     // rotate the x labels.
@@ -462,7 +472,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach (array(
-      'xSize', 'ySize', 'divName') as $f) {
+               'xSize',
+               'ySize',
+               'divName',
+             ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -479,7 +492,7 @@ class CRM_Utils_OpenFlashChart {
    *
    * @return array
    */
-  static function reportChart($rows, $chart, $interval, &$chartInfo) {
+  public static function reportChart($rows, $chart, $interval, &$chartInfo) {
     foreach ($interval as $key => $val) {
       $graph[$val] = $rows['value'][$key];
     }
@@ -499,7 +512,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach (array(
-      'xSize', 'ySize', 'divName') as $f) {
+               'xSize',
+               'ySize',
+               'divName',
+             ) as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -509,12 +525,12 @@ class CRM_Utils_OpenFlashChart {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $chart
    *
    * @return array
    */
-  static function buildChart(&$params, $chart) {
+  public static function buildChart(&$params, $chart) {
     $openFlashChart = array();
     if ($chart && is_array($params) && !empty($params)) {
       // build the chart objects.
@@ -552,5 +568,5 @@ class CRM_Utils_OpenFlashChart {
 
     return $openFlashChart;
   }
-}
 
+}

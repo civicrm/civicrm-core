@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,16 +40,15 @@
 class CRM_Case_Page_Tab extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -97,12 +96,11 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * View details of a case
+   * View details of a case.
    *
    * @return void
-   * @access public
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Case_Form_CaseView',
       'View Case',
@@ -117,10 +115,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     $controller->run();
 
     $this->assign('caseId', $this->_id);
-    $output     = CRM_Core_Selector_Controller::SESSION;
-    $selector   = new CRM_Activity_Selector_Activity($this->_contactId, $this->_permission, FALSE, 'case');
-    $controller =
-      new CRM_Core_Selector_Controller(
+    $output = CRM_Core_Selector_Controller::SESSION;
+    $selector = new CRM_Activity_Selector_Activity($this->_contactId, $this->_permission, FALSE, 'case');
+    $controller = new CRM_Core_Selector_Controller(
         $selector,
         $this->get(CRM_Utils_Pager::PAGE_ID),
         NULL,
@@ -131,7 +128,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         $this->_id
       );
 
-
     $controller->setEmbedded(TRUE);
 
     $controller->run();
@@ -141,12 +137,11 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is browse
+   * called when action is browse.
    *
-   * return null
-   * @access public
+   * @return void
    */
-  function browse() {
+  public function browse() {
 
     $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search', ts('Case'), NULL);
     $controller->setEmbedded(TRUE);
@@ -165,12 +160,11 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function edit() {
+  public function edit() {
     $config = CRM_Core_Config::singleton();
 
     $controller = new CRM_Core_Controller_Simple(
@@ -185,13 +179,12 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -210,8 +203,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
     }
-    elseif (($this->_action &
-        (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
+    elseif (($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
           CRM_Core_Action::DELETE | CRM_Core_Action::RENEW
         )
       ) ||
@@ -227,13 +219,12 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
-   * @return array (reference) of action links
-   * @static
+   * @return array
+   *   (reference) of action links
    */
-  static
-  function &links() {
+  static public function &links() {
     $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {
@@ -257,7 +248,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     return self::$_links;
   }
 
-  function setContext() {
+  public function setContext() {
     $context = $this->get('context');
     $url = NULL;
 
@@ -297,7 +288,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $action    = CRM_Utils_Request::retrieve('action', 'String', $this);
+        $action = CRM_Utils_Request::retrieve('action', 'String', $this);
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::RENEW) {
@@ -327,5 +318,5 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       $session->pushUserContext($url);
     }
   }
-}
 
+}

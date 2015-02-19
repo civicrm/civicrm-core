@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -33,27 +33,27 @@
  *
  */
 class CRM_Utils_Cache_Memcache {
-  const DEFAULT_HOST    = 'localhost';
-  const DEFAULT_PORT    = 11211;
+  const DEFAULT_HOST = 'localhost';
+  const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
-  const DEFAULT_PREFIX  = '';
+  const DEFAULT_PREFIX = '';
 
   /**
-   * The host name of the memcached server
+   * The host name of the memcached server.
    *
    * @var string
    */
   protected $_host = self::DEFAULT_HOST;
 
   /**
-   * The port on which to connect on
+   * The port on which to connect on.
    *
    * @var int
    */
   protected $_port = self::DEFAULT_PORT;
 
   /**
-   * The default timeout to use
+   * The default timeout to use.
    *
    * @var int
    */
@@ -71,20 +71,21 @@ class CRM_Utils_Cache_Memcache {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * The actual memcache object
+   * The actual memcache object.
    *
    * @var resource
    */
   protected $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache_Memcache
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['host'])) {
       $this->_host = $config['host'];
     }
@@ -113,7 +114,7 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return bool
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, $value, FALSE, $this->_timeout)) {
       return FALSE;
     }
@@ -125,7 +126,7 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return mixed
    */
-  function &get($key) {
+  public function &get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
     return $result;
   }
@@ -135,15 +136,15 @@ class CRM_Utils_Cache_Memcache {
    *
    * @return mixed
    */
-  function delete($key) {
+  public function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);
   }
 
   /**
    * @return mixed
    */
-  function flush() {
+  public function flush() {
     return $this->_cache->flush();
   }
-}
 
+}

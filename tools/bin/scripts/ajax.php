@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -64,6 +64,7 @@ function invoke() {
 
 /**
  * Test Function used for new hs-widget.
+ * @param $config
  */
 function states(&$config) {
   $elements = array();
@@ -91,7 +92,7 @@ function states(&$config) {
       $query = "
 SELECT civicrm_state_province.name name, civicrm_state_province.id id
 FROM civicrm_state_province
-WHERE civicrm_state_province.country_id={$countryId} 
+WHERE civicrm_state_province.country_id={$countryId}
       AND civicrm_state_province.name LIKE LOWER('$stateName%')
 ORDER BY name";
 
@@ -155,6 +156,7 @@ ORDER BY name";
 
 /**
  * Test Function used for new hs-widget.
+ * @param $config
  */
 function countries(&$config) {
   //get the country limit and restrict the combo select options
@@ -217,7 +219,7 @@ function countries(&$config) {
 SELECT id, name
   FROM civicrm_country
  WHERE {$countryClause}
-   AND {$whereClause} 
+   AND {$whereClause}
 ORDER BY name";
 
     $nullArray = array();

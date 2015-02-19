@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -31,29 +31,18 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'FinancialType BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function teardown() {
+  public function teardown() {
     $this->financialAccountDelete('Donations');
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'Donations',
       'is_active' => 1,
@@ -64,18 +53,18 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialType',
-      $financialType->id ,
+      $financialType->id,
       'name',
       'id',
       'Database check on added financial type record.'
     );
-    $this->assertEquals( $result, 'Donations', 'Verify Name for Financial Type');
+    $this->assertEquals($result, 'Donations', 'Verify Name for Financial Type');
   }
 
   /**
-   * check method retrive()
+   * Check method retrive()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'Donations',
       'is_active' => 1,
@@ -92,9 +81,9 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method setIsActive()
+   * Check method setIsActive()
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -103,10 +92,10 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $ids = array();
     $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $result = CRM_Financial_BAO_FinancialType::setIsActive($financialType->id, 0);
-    $this->assertEquals($result, true , 'Verify financial type record updation for is_active.');
+    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
     $isActive = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialType',
-      $financialType->id ,
+      $financialType->id,
       'is_active',
       'id',
       'Database check on updated for financial type is_active.'
@@ -115,9 +104,9 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -129,6 +118,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialType::del($financialType->id);
     $params = array('id' => $financialType->id);
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), true, 'Verify financial types record deletion.');
+    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
+
 }

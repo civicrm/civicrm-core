@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -30,7 +30,7 @@
        <td class="label">{$form.uf_group_id.label}</td>
        <td>{$form.uf_group_id.html}</td>
     </tr>
-    <tr> 
+    <tr>
         <td class="label"></td>
         <td>
             {include file="CRM/Contact/Form/Task.tpl"}

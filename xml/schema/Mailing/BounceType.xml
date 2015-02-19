@@ -17,7 +17,7 @@
   <field>
     <name>name</name>
     <type>varchar</type>
-    <length>8</length>
+    <length>24</length>
     <required>true</required>
     <comment>Type of bounce</comment>
   </field>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @param $params
+ * @param array $params
  * @param $text
  * @param $smarty
  *
@@ -9,4 +9,3 @@
 function smarty_block_ts($params, $text, &$smarty) {
   return ts($text, $params);
 }
-

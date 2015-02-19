@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -37,7 +37,6 @@
         {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
         <table cellpadding="0" cellspacing="0" border="0">
            <thead class="sticky">
             <th>{ts}Name{/ts}</th>
@@ -62,18 +61,18 @@
          </table>
         {/strip}
 
-        {if $action ne 1 and $action ne 2}
-      <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newContributionType" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Type{/ts}</span></a>
-        </div>
-        {/if}
     </div>
 </div>
 {else}
     <div class="messages status no-popup">
         <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no Financial Types entered. You can <a href='%1'>add one</a>.{/ts}
+      {ts}None found.{/ts}
     </div>
 {/if}
+  {if $action ne 1 and $action ne 2}
+    <div class="action-link">
+      {crmButton q="action=add&reset=1" id="newContributionType"  icon="circle-plus"}{ts}Add Financial Type{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+    </div>
+  {/if}
 {/if}

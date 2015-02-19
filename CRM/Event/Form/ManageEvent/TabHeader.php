@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,11 +39,11 @@
 class CRM_Event_Form_ManageEvent_TabHeader {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function build(&$form) {
+  public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -51,29 +51,23 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     }
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
-      ->addSetting(array('tabSettings' => array(
-        'active' => self::getCurrentTab($tabs),
-      )));
-
-    // Preload libraries required by Online Registration Include Profiles
-    $schemas = array('IndividualModel', 'ParticipantModel');
-    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
-      $schemas[] = 'MembershipModel';
-    }
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas($schemas);
-
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => self::getCurrentTab($tabs),
+        ),
+      ));
+    CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    * @throws Exception
    */
-  static function process(&$form) {
+  public static function process(&$form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
@@ -97,7 +91,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['conference'] = array('title' => ts('Conference Slots')) + $default;
     $tabs['friend'] = array('title' => ts('Tell a Friend')) + $default;
     $tabs['pcp'] = array('title' => ts('Personal Campaigns')) + $default;
-
+    $tabs['repeat'] = array('title' => ts('Repeat')) + $default;
 
     // check if we're in shopping cart mode for events
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
@@ -111,14 +105,17 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if ($eventID) {
       // disable tabs based on their configuration status
       $sql = "
-SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
 FROM       civicrm_event e
 LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
 LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
 LEFT JOIN  civicrm_action_mapping  map ON ( map.entity_value = 'civicrm_event' )
 LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = map.id AND sch.entity_value = %1 )
+LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_table = 'civicrm_event' )
 WHERE      e.id = %1
 ";
+      //Check if repeat is configured
+      $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = array(1 => array($eventID, 'Integer'));
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
@@ -142,6 +139,9 @@ WHERE      e.id = %1
       if (!$dao->is_reminder) {
         $tabs['reminder']['valid'] = FALSE;
       }
+      if (!$dao->is_repeating_event) {
+        $tabs['repeat']['valid'] = FALSE;
+      }
     }
 
     // see if any other modules want to add any tabs
@@ -149,9 +149,10 @@ WHERE      e.id = %1
     CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
       array('event_id' => $eventID));
 
-    $fullName  = $form->getVar('_name');
+    $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
-    $new       = '';
+    $new = '';
+
     // hack for special cases.
     switch ($className) {
       case 'Event':
@@ -165,7 +166,6 @@ WHERE      e.id = %1
 
       case 'ScheduleReminders':
         $class = 'reminder';
-        $new = !empty($_GET['new']) ? '&new=1' : '';
         break;
 
       default:
@@ -189,8 +189,13 @@ WHERE      e.id = %1
           $tabs[$key]['qfKey'] = NULL;
         }
 
+        $action = 'update';
+        if ($key == 'reminder') {
+          $action = 'browse';
+        }
+
         $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action=update&id={$eventID}&component=event{$new}{$tabs[$key]['qfKey']}"
+          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
         );
       }
     }
@@ -201,7 +206,7 @@ WHERE      e.id = %1
   /**
    * @param $form
    */
-  static function reset(&$form) {
+  public static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -211,7 +216,7 @@ WHERE      e.id = %1
    *
    * @return int|string
    */
-  static function getCurrentTab($tabs) {
+  public static function getCurrentTab($tabs) {
     static $current = FALSE;
 
     if ($current) {
@@ -230,5 +235,5 @@ WHERE      e.id = %1
     $current = $current ? $current : 'settings';
     return $current;
   }
-}
 
+}

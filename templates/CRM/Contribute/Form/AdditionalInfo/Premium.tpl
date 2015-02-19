@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,7 @@
         <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-min_amount">
              <td class="label">{$form.min_amount.label}</td>
-       <td class="html-adjust">{$form.min_amount.html|crmAddClass:texttolabel|crmMoney:$currency}</td>
+       <td class="html-adjust">{$form.min_amount.html|crmAddClass:'no-border'|crmMoney:$currency}</td>
           </tr>
         </table>
         <div class="spacer"></div>

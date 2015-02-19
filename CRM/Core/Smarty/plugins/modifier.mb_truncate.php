@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -50,15 +50,15 @@
  * @link http://smarty.php.net/manual/en/language.modifier.truncate.php
  *          truncate (Smarty online manual)
  *
- * @param string
- * @param integer
- * @param string
- * @param boolean
+ * @param string $string
+ * @param int $length
+ * @param string $etc
+ * @param bool $break_words
  *
  * @return string
  */
 function smarty_modifier_mb_truncate($string, $length = 80, $etc = '...',
-  $break_words = FALSE
+                                     $break_words = FALSE
 ) {
   if (function_exists('mb_internal_encoding') and function_exists('mb_strlen') and function_exists('mb_substr')) {
     mb_internal_encoding('UTF-8');
@@ -84,8 +84,9 @@ function smarty_modifier_mb_truncate($string, $length = 80, $etc = '...',
 
     return $substr($string, 0, $length) . $etc;
   }
-  else return $string;
+  else {
+    return $string;
+  }
 }
 
 /* vim: set expandtab: */
-

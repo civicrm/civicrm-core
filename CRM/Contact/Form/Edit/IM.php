@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,17 +39,18 @@
 class CRM_Contact_Form_Edit_IM {
 
   /**
-   * build the form elements for an IM object
+   * Build the form object elements for an IM object.
    *
-   * @param CRM_Core_Form $form       reference to the form object
-   * @param int           $blockCount block number to build
-   * @param boolean       $blockEdit  is it block edit
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
+   * @param int $blockCount
+   *   Block number to build.
+   * @param bool $blockEdit
+   *   Is it block edit.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     if (!$blockCount) {
       $blockId = ($form->get('IM_Block_Count')) ? $form->get('IM_Block_Count') : 1;
     }
@@ -62,7 +63,11 @@ class CRM_Contact_Form_Edit_IM {
     $form->addSelect("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
 
     //Block type select
-    $form->addSelect("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
+    $form->addSelect("im[$blockId][location_type_id]", array(
+        'entity' => 'im',
+        'class' => 'eight',
+        'placeholder' => NULL,
+      ));
 
     //IM box
     $form->addElement('text', "im[$blockId][name]", ts('Instant Messenger'),
@@ -77,5 +82,5 @@ class CRM_Contact_Form_Edit_IM {
 
     $form->addElement('radio', "im[$blockId][is_primary]", '', '', '1', $js);
   }
-}
 
+}

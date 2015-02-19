@@ -5,7 +5,7 @@
   /**
    * Handle user input - field or operator selection.
    *
-   * Decide whether to display select drop down, regular text or date 
+   * Decide whether to display select drop down, regular text or date
    * field for the given field and row.
    */
   function handleUserInputField() {
@@ -63,7 +63,7 @@
     $('input[id^=value]', row)
       .hide()
       .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
-    
+
     fetchOptions(row, field);
   }
 
@@ -196,71 +196,73 @@
     });
   }
 
-  $('#crm-main-content-wrapper')
-    // Reset and hide row
-    .on('click', '.crm-reset-builder-row', function() {
-      var row = $(this).closest('tr');
-      $('input, select', row).val('').change();
-      row.hide();
-      // Hide entire block if this is the only visible row
-      if (row.siblings(':visible').length < 2) {
-        row.closest('.crm-search-block').hide();
-      }
-      return false;
-    })
-    // Add new field - if there's a hidden one, show it
-    // Otherwise allow form to submit and fetch more from the server
-    .on('click', 'input[name^=addMore]', function() {
-      var table = $(this).closest('table');
-      if ($('tr:hidden', table).length) {
-        $('tr:hidden', table).first().show();
+  $(function($) {
+    $('#crm-main-content-wrapper')
+      // Reset and hide row
+      .on('click', '.crm-reset-builder-row', function() {
+        var row = $(this).closest('tr');
+        $('input, select', row).val('').change();
+        row.hide();
+        // Hide entire block if this is the only visible row
+        if (row.siblings(':visible').length < 2) {
+          row.closest('.crm-search-block').hide();
+        }
         return false;
+      })
+      // Add new field - if there's a hidden one, show it
+      // Otherwise allow form to submit and fetch more from the server
+      .on('click', 'input[name^=addMore]', function() {
+        var table = $(this).closest('table');
+        if ($('tr:hidden', table).length) {
+          $('tr:hidden', table).first().show();
+          return false;
+        }
+      })
+      // Add new block - if there's a hidden one, show it
+      // Otherwise allow form to submit and fetch more from the server
+      .on('click', '#addBlock', function() {
+        if ($('.crm-search-block:hidden', '#Builder').length) {
+          var block = $('.crm-search-block:hidden', '#Builder').first();
+          block.show();
+          $('tr:first-child, tr.crm-search-builder-add-row', block).show();
+          return false;
+        }
+      })
+      // Handle field and operator selection
+      .on('change', 'select[id^=mapper][id$="_1"], select[id^=operator]', handleUserInputField)
+      // Handle option selection - update hidden value field
+      .on('change', '.crm-search-value select', function() {
+        var value = $(this).val() || '';
+        if ($(this).attr('multiple') == 'multiple' && value.length) {
+          value = '(' + value.join(',') + ')';
+        }
+        $(this).siblings('input').val(value);
+      })
+      .on('crmLoad', function() {
+        initialize();
+        $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+      });
+
+    initialize();
+
+    // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request
+    var initialFields = {}, fetchFields = false;
+    $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
+      var field = $(this).attr('value');
+      if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
+        initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
+        fetchFields = true;
       }
-    })
-    // Add new block - if there's a hidden one, show it
-    // Otherwise allow form to submit and fetch more from the server
-    .on('click', '#addBlock', function() {
-      if ($('.crm-search-block:hidden', '#Builder').length) {
-        var block = $('.crm-search-block:hidden', '#Builder').first();
-        block.show();
-        $('tr:first-child, tr.crm-search-builder-add-row', block).show();
-        return false;
-      }
-    })
-    // Handle field and operator selection
-    .on('change', 'select[id^=mapper][id$="_1"], select[id^=operator]', handleUserInputField)
-    // Handle option selection - update hidden value field
-    .on('change', '.crm-search-value select', function() {
-      var value = $(this).val() || '';
-      if ($(this).attr('multiple') == 'multiple' && value.length) {
-        value = '(' + value.join(',') + ')';
-      }
-      $(this).siblings('input').val(value);
-    })
-    .on('crmLoad', function() {
-      initialize();
-      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     });
-
-  initialize();
-
-  // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request
-  var initialFields = {}, fetchFields = false;
-  $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
-    var field = $(this).attr('value');
-    if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
-      initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
-      fetchFields = true;
+    if (fetchFields) {
+      CRM.api3(initialFields).done(function(data) {
+        $.each(data, function(field, result) {
+          CRM.searchBuilder.fieldOptions[field] = result.values;
+        });
+        $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+      });
+    } else {
+      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     }
   });
-  if (fetchFields) {
-    CRM.api3(initialFields).done(function(data) {
-      $.each(data, function(field, result) {
-        CRM.searchBuilder.fieldOptions[field] = result.values;
-      });
-      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
-    });
-  } else {
-    $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
-  }
 })(cj, CRM);

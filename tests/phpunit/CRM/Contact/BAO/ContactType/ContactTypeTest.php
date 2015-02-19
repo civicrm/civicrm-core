@@ -5,20 +5,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Contact_BAO_ContactType_ContactTypeTest
  */
 class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contact Subtype',
-      'description' => 'Test Contact for subtype.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
-    $labelsub1 = 'sub1_individual'.substr(sha1(rand()), 0, 7);
+    $labelsub1 = 'sub1_individual' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub1,
       'name' => $labelsub1,
@@ -29,7 +19,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesIndividual[] = $params['name'];
 
-    $labelsub2 = 'sub2_individual'.substr(sha1(rand()), 0, 7);
+    $labelsub2 = 'sub2_individual' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub2,
       'name' => $labelsub2,
@@ -40,7 +30,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesIndividual[] = $params['name'];
 
-    $labelsub = 'sub_organization'.substr(sha1(rand()), 0, 7);
+    $labelsub = 'sub_organization' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelsub,
       'name' => $labelsub,
@@ -51,7 +41,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypesOrganization[] = $params['name'];
 
-    $labelhousehold = 'sub_household'.substr(sha1(rand()), 0, 7);
+    $labelhousehold = 'sub_household' . substr(sha1(rand()), 0, 7);
     $params = array(
       'label' => $labelhousehold,
       'name' => $labelhousehold,
@@ -63,11 +53,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->subTypesHousehold[] = $params['name'];
   }
 
-  /*
-     * test contactTypes() and subTypes() methods with valid data
-     * success expected
-     */
-  function testGetMethods() {
+  /**
+   * Test contactTypes() and subTypes() methods with valid data
+   * success expected
+   */
+  public function testGetMethods() {
 
     // check all contact types
     $contactTypes = array('Individual', 'Organization', 'Household');
@@ -122,10 +112,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     }
   }
 
-  /*
-     * test subTypes() methods with invalid data
-     */
-  function testGetMethodsInvalid() {
+  /**
+   * Test subTypes() methods with invalid data
+   */
+  public function testGetMethodsInvalid() {
 
     $params = 'invalid';
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
@@ -136,11 +126,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(empty($result), TRUE, 'In line ' . __LINE__);
   }
 
-  /*
-     * test add() methods with valid data
-     * success expected
-     */
-  function testAdd() {
+  /**
+   * Test add() methods with valid data
+   * success expected
+   */
+  public function testAdd() {
 
     $params = array(
       'label' => 'indiviSubType',
@@ -169,10 +159,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     CRM_Contact_BAO_ContactType::del($result->id);
   }
 
-  /*
-     * test add() with invalid data
-     */
-  function testAddInvalid1() {
+  /**
+   * Test add() with invalid data
+   */
+  public function testAddInvalid1() {
 
     // parent id does not exist in db
     $params = array(
@@ -186,7 +176,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, NULL, 'In line ' . __LINE__);
   }
 
-  function testAddInvalid2() {
+  public function testAddInvalid2() {
 
     // params does not have name and label keys
     $params = array(
@@ -197,7 +187,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, NULL, 'In line ' . __LINE__);
   }
 
-  function testAddInvalid3() {
+  public function testAddInvalid3() {
 
     // params does not have parent_id
     $params = array(
@@ -209,11 +199,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, NULL, 'In line' . __LINE__);
   }
 
-  /*
-     * test del() with valid data
-     * success expected
-     */
-  function testDel() {
+  /**
+   * Test del() with valid data
+   * success expected
+   */
+  public function testDel() {
 
     $params = array(
       'label' => 'indiviSubType',
@@ -229,13 +219,13 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(in_array($subtype->name, $result), TRUE, 'In line ' . __LINE__);
   }
 
-  /*
-     * test del() with invalid data
-     */
-  function testDelInvalid() {
+  /**
+   * Test del() with invalid data
+   */
+  public function testDelInvalid() {
 
     $del = CRM_Contact_BAO_ContactType::del(NULL);
     $this->assertEquals($del, FALSE, 'In line ' . __LINE__);
   }
-}
 
+}

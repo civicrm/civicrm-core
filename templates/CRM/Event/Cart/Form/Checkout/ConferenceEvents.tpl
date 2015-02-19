@@ -15,7 +15,7 @@
       </ul>
     </div>
   </fieldset>
-{/foreach}    
+{/foreach}
 
 <script type="text/javascript">
 var session_options = {$session_options};

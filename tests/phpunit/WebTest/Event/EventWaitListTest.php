@@ -20,7 +20,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -33,12 +33,12 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEventWaitList() {
+  public function testEventWaitList() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -159,7 +159,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $eventInfoStrings
    */
-  function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
+  public function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
@@ -174,7 +174,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testVerifyRegisterPage($registerStrings) {
+  public function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
     $this->waitForElementPresent("_qf_Register_upload-bottom");
@@ -187,7 +187,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
    * @param int $numberRegistrations
    * @param bool $anonymous
    */
-  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
+  public function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();
     }
@@ -240,5 +240,5 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
       $this->webtestLogin();
     }
   }
-}
 
+}

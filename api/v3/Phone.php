@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,39 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 phone functions
+ * This api exposes CiviCRM phone.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Phone
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Phone.php 2011-03-16 ErikHommel $
  */
 
 /**
- *  Add an Phone for a contact
+ * Add an Phone for a contact.
  *
- * Allowed @params array keys are:
- * {@getfields phone_create}
- * @example PhoneCreate.php
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @param $params
- *
- * @return array of newly created phone property values.
- * @access public
+ * @return array
+ *   Array of newly created phone property values.
  */
 function civicrm_api3_phone_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Phone');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_phone_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -66,14 +60,13 @@ function _civicrm_api3_phone_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Phone
+ * Delete an existing Phone.
  *
- * @param  array  $params
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array Api Result
- * {@getfields phone_delete}
- * @example PhoneDelete.php
- * @access public
+ * @return array
+ *   Api Result
  */
 function civicrm_api3_phone_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -83,6 +76,4 @@ function civicrm_api3_phone_delete($params) {
  *  civicrm_api('Phone','Get') to retrieve one or more phones is implemented by
  *  function civicrm_api3_phone_get ($params) into the file Phone/Get.php
  *  Could have been implemented here in this file too, but we moved it to illustrate the feature with a real usage.
- *
  */
-

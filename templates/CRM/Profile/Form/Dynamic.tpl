@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -33,15 +33,18 @@
   <div class="icon inform-icon"></div>&nbsp;
         {ts}Are you sure you want to delete this record?{/ts}
   </div>
-  <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-  <div class="crm-submit-buttons" style='display:inline'>{include file="CRM/common/formButtons.tpl"}</div>
+
+  <div class="crm-submit-buttons">
+    <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
+    <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+  </div>
 {else}
 {if ! empty( $fields )}
 {* Wrap in crm-container div so crm styles are used.*}
 {* Replace div id "crm-container" only when profile is not loaded in civicrm container, i.e for profile shown in my account and in profile standalone mode otherwise id should be "crm-profile-block" *}
 
   {if $action eq 1 or $action eq 2 or $action eq 4 }
-  <div id="crm-profile-block" class="crm-container-snippet crm-public">
+  <div id="crm-profile-block" class="crm-container crm-public">
     {else}
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
@@ -201,7 +204,7 @@
         {/if}
       {/if}{* end of main if field name if *}
     {/foreach}
-   
+
     {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
       {include file='CRM/common/ReCAPTCHA.tpl'}
       <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>
@@ -222,7 +225,8 @@
         {assign var=floatStyle value='float:right'}
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}

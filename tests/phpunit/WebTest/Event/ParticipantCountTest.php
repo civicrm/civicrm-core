@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,12 +35,12 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testParticipantCountWithFeelevel() {
+  public function testParticipantCountWithFeelevel() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create an event
@@ -73,7 +73,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jones' . substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register
@@ -90,7 +90,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click("xpath=//input[@class='crm-form-radio']");
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jones' . substr(sha1(rand()), 0, 5));
     $this->type('email-Primary', $email);
 
     // fill billing details and register
@@ -106,15 +106,15 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of registered participants
-    $this->assertStringsPresent(array('2 Result'));
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", '2 Results');
   }
 
-  function testParticipantCountWithPriceset() {
+  public function testParticipantCountWithPriceset() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = 'Webtest Dummy' . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     // create priceset
@@ -176,6 +176,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     foreach ($fields as $label => $field) {
       $this->type('label', $label);
+      $this->waitForAjaxContent();
       $this->select('html_type', "value={$field['type']}");
 
       if ($field['type'] == 'Text') {
@@ -188,7 +189,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       else {
         $this->_testAddMultipleChoiceOptions($field['options']);
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText("crm-notification-container", "Price Field '$label' has been saved.");
     }
 
     // create event.
@@ -289,7 +291,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify number of participants records and total participant count
-    $this->assertStringsPresent(array('2 Result', 'Actual participant count : 24'));
+    $this->assertStringsPresent(array('2 Results', 'Actual participant count : 24'));
 
     // CRM-7953, check custom search Price Set Details for Event
     // Participants
@@ -300,7 +302,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
    * @param $setTitle
    * @param string $financialType
    */
-  function _testAddSet($setTitle, $financialType = 'Event Fee') {
+  public function _testAddSet($setTitle, $financialType = 'Event Fee') {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -316,7 +318,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   /**
    * @param $options
    */
-  function _testAddMultipleChoiceOptions($options) {
+  public function _testAddMultipleChoiceOptions($options) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
       $this->type("option_amount_{$oIndex}", $oValue['amount']);
@@ -330,11 +332,11 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return string
    */
-  function _testAddEvent($params) {
+  public function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $this->select('event_type_id', "value={$params['event_type_id']}");
@@ -411,7 +413,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   /**
    * @param array $participant
    */
-  function _testRegisterWithBillingInfo($participant = array()) {
+  public function _testRegisterWithBillingInfo($participant = array()) {
     $this->waitForElementPresent("credit_card_type");
     $this->select('credit_card_type', 'value=Visa');
     $this->type('credit_card_number', '4111111111111111');
@@ -436,18 +438,18 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventParams
+   * @param array $eventParams
    * @param $participants
    * @param $priceFieldOptionCounts
    */
-  function _testPricesetDetailsCustomSearch($eventParams, $participants, $priceFieldOptionCounts) {
+  public function _testPricesetDetailsCustomSearch($eventParams, $participants, $priceFieldOptionCounts) {
     $this->openCiviPage('contact/search/custom', 'csid=9&reset=1');
 
     $this->select('event_id', 'label=' . $eventParams['title']);
     $this->click('_qf_Custom_refresh-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $tableHeaders = array('Contact Id', 'Participant Id', 'Name');
+    $tableHeaders = array('Contact ID', 'Participant ID', 'Name');
     $tableHeaders = array_merge($tableHeaders, array_keys(current($priceFieldOptionCounts)));
 
     $tdnum = 2;
@@ -465,5 +467,5 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
       }
     }
   }
-}
 
+}

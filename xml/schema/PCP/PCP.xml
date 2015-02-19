@@ -192,4 +192,14 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <field>
+    <name>is_notify</name>
+    <type>boolean</type>
+    <comment>Notify owner via email when someone donates to page?</comment>
+    <default>0</default>
+    <add>4.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
 </table>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddMailing() {
+  public function testAddMailing() {
     $this->webtestLogin();
 
     //----do create test mailing group
@@ -87,8 +87,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->clickLink("_qf_Group_next", "_qf_Settings_cancel", FALSE);
@@ -215,7 +214,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->clickLink("link=Successful Deliveries");
 
     // check for open page
-    $this->assertElementContainsText( 'page-title', "Successful Deliveries");
+    $this->assertElementContainsText('page-title', "Successful Deliveries");
 
     // verify email
     $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));
@@ -229,7 +228,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     // build forward url
-    $forwardUrl = array("mailing/forward", "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}");
+    $forwardUrl = array(
+      "mailing/forward",
+      "reset=1&jid={$eventQueue->job_id}&qid={$eventQueue->id}&h={$eventQueue->hash}",
+    );
     $this->openCiviPage($forwardUrl[0], $forwardUrl[1], NULL);
 
     $this->type("email_0", substr(sha1(rand()), 0, 7) . '@example.com');
@@ -287,7 +289,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // //------ end unsubscribe -------
   }
 
-  function testAdvanceSearchAndReportCheck() {
+  public function testAdvanceSearchAndReportCheck() {
 
     $this->webtestLogin();
 
@@ -344,8 +346,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->type("name", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->click("_qf_Group_next");
@@ -423,13 +424,23 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // verify successful deliveries
     $this->verifyText("xpath=//table//tr[td/a[text()='Successful Deliveries']]/descendant::td[2]", preg_quote("1 (100.00%)"));
 
-    $summaryInfoLinks = array('Intended Recipients', 'Successful Deliveries', 'Tracked Opens', 'Click-throughs', 'Forwards', 'Replies', 'Bounces', 'Unsubscribe Requests','Opt-out Requests');
+    $summaryInfoLinks = array(
+      'Intended Recipients',
+      'Successful Deliveries',
+      'Tracked Opens',
+      'Click-throughs',
+      'Forwards',
+      'Replies',
+      'Bounces',
+      'Unsubscribe Requests',
+      'Opt-out Requests',
+    );
 
     //check for report and adv search links
-    foreach($summaryInfoLinks as $value) {
+    foreach ($summaryInfoLinks as $value) {
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[1][text()='Report']"), "Report link missing for {$value}");
       $this->assertTrue($this->isElementPresent("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$value}']]/descendant::td[3]/span/a[2][text()='Advanced Search']"), "Advance Search link missing for {$value}");
-}
+    }
     // verify mailing name
     $this->verifyText("xpath=//table//tr[td[1]/text()='Mailing Name']/descendant::td[2]", preg_quote("Mailing $mailingName Webtest"));
 
@@ -437,59 +448,85 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table//tr[td[1]/text()='Subject']/descendant::td[2]", preg_quote("Test subject $mailingName for Webtest"));
 
     // after asserts do clicks and confirm filters
-    $criteriaCheck =
-      array(
-        'Intended Recipients' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest"),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest")
+    $criteriaCheck = array(
+      'Intended Recipients' => array(
+        'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest"),
+        'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest"),
+      ),
+      'Successful Deliveries' => array(
+        'report' => array(
+          'report_name' => 'Mailing Details',
+          'Mailing' => "Mailing $mailingName Webtest",
+          "Delivery Status" => " Successful",
         ),
-        'Successful Deliveries' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                    "Delivery Status" => " Successful"),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing Delivery -' => "Successful")
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing Delivery -' => "Successful",
         ),
-        'Tracked Opens' =>
-        array(
-          'report' => array('report_name' => 'Mail Opened', 'Mailing' => "Mailing $mailingName Webtest"),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: Trackable Opens -' => "Opened")
+      ),
+      'Tracked Opens' => array(
+        'report' => array('report_name' => 'Mail Opened', 'Mailing' => "Mailing $mailingName Webtest"),
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing: Trackable Opens -' => "Opened",
         ),
-        'Click-throughs' =>
-        array(
-          'report' => array('report_name' => 'Mail Clickthroughs', 'Mailing' => "Mailing $mailingName Webtest"),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: Trackable URL Clicks -' => "Clicked")
+      ),
+      'Click-throughs' => array(
+        'report' => array('report_name' => 'Mail Clickthroughs', 'Mailing' => "Mailing $mailingName Webtest"),
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing: Trackable URL Clicks -' => "Clicked",
         ),
-        'Forwards' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                    'Forwarded' => 'Is equal to Yes'),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Forwards")
+      ),
+      'Forwards' => array(
+        'report' => array(
+          'report_name' => 'Mailing Details',
+          'Mailing' => "Mailing $mailingName Webtest",
+          'Forwarded' => 'Is equal to Yes',
         ),
-        'Replies' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                    'Replied' => 'Is equal to Yes'),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: Trackable Replies -' => "Replied")
+        'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Forwards"),
+      ),
+      'Replies' => array(
+        'report' => array(
+          'report_name' => 'Mailing Details',
+          'Mailing' => "Mailing $mailingName Webtest",
+          'Replied' => 'Is equal to Yes',
         ),
-        'Bounces' =>
-        array(
-          'report' => array('report_name' => 'Mail Bounces', 'Mailing' => "Mailing $mailingName Webtest"),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing Delivery -' => "Bounced")
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing: Trackable Replies -' => "Replied",
         ),
-        'Unsubscribe Requests' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                    'Unsubscribed' => 'Is equal to Yes'),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Unsubscribe Requests")
+      ),
+      'Bounces' => array(
+        'report' => array('report_name' => 'Mail Bounces', 'Mailing' => "Mailing $mailingName Webtest"),
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing Delivery -' => "Bounced",
         ),
-        'Opt-out Requests' =>
-        array(
-          'report' => array('report_name' => 'Mailing Details', 'Mailing' => "Mailing $mailingName Webtest",
-                    'Opted-out' => 'Is equal to Yes'),
-          'search' => array('Mailing Name IN' => "\"Mailing {$mailingName} Webtest", 'Mailing: -' => "Opt-out Requests")
+      ),
+      'Unsubscribe Requests' => array(
+        'report' => array(
+          'report_name' => 'Mailing Details',
+          'Mailing' => "Mailing $mailingName Webtest",
+          'Unsubscribed' => 'Is equal to Yes',
         ),
-      );
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing: -' => "Unsubscribe Requests",
+        ),
+      ),
+      'Opt-out Requests' => array(
+        'report' => array(
+          'report_name' => 'Mailing Details',
+          'Mailing' => "Mailing $mailingName Webtest",
+          'Opted-out' => 'Is equal to Yes',
+        ),
+        'search' => array(
+          'Mailing Name IN' => "\"Mailing {$mailingName} Webtest",
+          'Mailing: -' => "Opt-out Requests",
+        ),
+      ),
+    );
     $this->criteriaCheck($criteriaCheck, $mailingReportUrl);
   }
 
@@ -497,16 +534,17 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $criteriaCheck
    * @param $mailingReportUrl
    */
-  function criteriaCheck($criteriaCheck, $mailingReportUrl) {
-    foreach($criteriaCheck as $key => $infoFilter) {
-      foreach($infoFilter as $entity => $dataToCheck) {
+  public function criteriaCheck($criteriaCheck, $mailingReportUrl) {
+    foreach ($criteriaCheck as $key => $infoFilter) {
+      foreach ($infoFilter as $entity => $dataToCheck) {
         $this->open($mailingReportUrl);
         if ($entity == "report") {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[1][text()='Report']");
-        } else {
+        }
+        else {
           $this->clickLink("xpath=//fieldset/legend[text()='Delivery Summary']/../table//tr[td/a[text()='{$key}']]/descendant::td[3]/span/a[2][text()='Advanced Search']");
         }
-        $this-> _verifyCriteria($key, $dataToCheck, $entity);
+        $this->_verifyCriteria($key, $dataToCheck, $entity);
       }
     }
   }
@@ -516,22 +554,24 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
    * @param $dataToCheck
    * @param $entity
    */
-  function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
-    foreach($dataToCheck as $key => $value) {
+  public function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
+    foreach ($dataToCheck as $key => $value) {
       if ($entity == 'report') {
         if ($key == 'report_name') {
           $this->assertElementContainsText('page-title', "{$value}");
           continue;
         }
-        $this->assertTrue($this->isElementPresent("xpath=//form//div[3]/table/tbody//tr/th[contains(text(),'{$key}')]/../td[contains(text(),'{$value}')]"),"Criteria check for {$key} failed for Report for {$summaryInfo}");
-      } else {
+        $this->assertTrue($this->isElementPresent("xpath=//form//div[3]/table/tbody//tr/th[contains(text(),'{$key}')]/../td[contains(text(),'{$value}')]"), "Criteria check for {$key} failed for Report for {$summaryInfo}");
+      }
+      else {
         $this->assertElementContainsText('page-title', "Advanced Search");
         $assertedValue = $this->isElementPresent("xpath=//div[@class='crm-results-block']//div[@class='qill'][contains(text(),'{$key} {$value}')]");
         if (!$assertedValue) {
           $assertedValue = $this->isTextPresent("{$key} {$value}");
         }
-       $this->assertTrue($assertedValue,"Criteria check for {$key} failed for Advance Search for {$summaryInfo}");
+        $this->assertTrue($assertedValue, "Criteria check for {$key} failed for Advance Search for {$summaryInfo}");
       }
     }
   }
+
 }

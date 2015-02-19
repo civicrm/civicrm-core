@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -104,22 +104,22 @@ class CRM_GCD {
    */
 
   // Set ADD_TO_DB = FALSE to do a dry run
-  CONST ADD_TO_DB = TRUE;
+  const ADD_TO_DB = TRUE;
 
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 200;
-  CONST INDIVIDUAL_PERCENT = 80;
-  CONST HOUSEHOLD_PERCENT = 10;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 200;
+  const INDIVIDUAL_PERCENT = 80;
+  const HOUSEHOLD_PERCENT = 10;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // Location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
 
   /**
    * Class constructor
@@ -147,6 +147,7 @@ class CRM_GCD {
   /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
+   * @param $itemName
    */
   public function generate($itemName) {
     echo "Generating $itemName\n";
@@ -260,7 +261,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function randomString($size = 32) {
@@ -388,6 +392,9 @@ class CRM_GCD {
 
   /**
    * Automatically manage the is_primary field by tracking which contacts have each item
+   * @param $cid
+   * @param $type
+   * @return int
    */
   private function isPrimary($cid, $type) {
     if (empty($this->location[$type][$cid])) {
@@ -400,6 +407,9 @@ class CRM_GCD {
   /**
    * Execute a query unless we are doing a dry run
    * Note: this wrapper should not be used for SELECT queries
+   * @param $query
+   * @param array $params
+   * @return \CRM_Core_DAO
    */
   private function _query($query, $params = array()) {
     if (self::ADD_TO_DB) {
@@ -409,6 +419,7 @@ class CRM_GCD {
 
   /**
    * Call dao insert method unless we are doing a dry run
+   * @param $dao
    */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
@@ -422,6 +433,7 @@ class CRM_GCD {
 
   /**
    * Call dao update method unless we are doing a dry run
+   * @param $dao
    */
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
@@ -435,6 +447,8 @@ class CRM_GCD {
 
   /**
    * Add core DAO object
+   * @param $type
+   * @param $params
    */
   private function _addDAO($type, $params) {
     $daoName = "CRM_Core_DAO_$type";
@@ -450,6 +464,8 @@ class CRM_GCD {
 
   /**
    * Fetch contact type based on stored mapping
+   * @param $id
+   * @return
    */
   private function getContactType($id) {
     foreach (array('Individual', 'Household', 'Organization') as $type) {
@@ -1179,7 +1195,8 @@ class CRM_GCD {
       }
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
         $activityDAO = new CRM_Activity_DAO_Activity();
-        $activityTypeID = mt_rand(7, 10);
+        $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
+        $activityTypeID = array_rand($activityId);
         $activity = CRM_Core_PseudoConstant::activityType();
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
@@ -1194,19 +1211,11 @@ class CRM_GCD {
         $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $this->_insert($activityContactDAO);
 
-        if (in_array($activityTypeID, array(6, 9))) {
+        if ($activityTypeID == 9) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = mt_rand(1, 101);
           $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-          $this->_insert($activityContactDAO);
-        }
-
-        if ($activityTypeID == 7) {
-          $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
-          $activityContactDAO->activity_id = $activityDAO->id;
-          $activityContactDAO->contact_id = mt_rand(1, 101);
-          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
           $this->_insert($activityContactDAO);
         }
       }
@@ -1691,9 +1700,9 @@ VALUES
   private function addPCP() {
     $query = "
 INSERT INTO `civicrm_pcp`
-    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id)
+    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id, is_notify)
 VALUES
-    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1);
+    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1, 1);
 ";
     $this->_query($query);
   }
@@ -1809,8 +1818,8 @@ VALUES
   }
 
   private function addContributionLineItem() {
-    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_contribution', cc.id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
+    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_contribution', cc.id, cc.id contribution_id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
 FROM civicrm_contribution cc
 LEFT JOIN civicrm_price_set cps ON cps.name = 'default_contribution_amount'
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
@@ -1880,8 +1889,9 @@ WHERE cefa.account_relationship = 1";
 
   private function addLineItemParticipants() {
     $participant = new CRM_Event_DAO_Participant();
-    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_participant',cp.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
+    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_participant', cp.id, cpp.contribution_id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
+LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
   }
 
   private function addMembershipPayment() {
@@ -1901,8 +1911,8 @@ WHERE cc.id > $maxContribution;";
 
     $this->_query($sql);
 
-    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
-SELECT  'civicrm_contribution', cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
+    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, contribution_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
+SELECT 'civicrm_membership', cm.id, cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
 LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id

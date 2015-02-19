@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,6 @@
  *
  */
 
-require_once 'CRM/Core/Form.php';
 
 /**
  * This class manages the auction form
@@ -43,10 +42,9 @@ require_once 'CRM/Core/Form.php';
 class CRM_Auction_Form_Auction extends CRM_Core_Form {
 
   /**
-   * the id of the auction we are proceessing
+   * the id of the auction we are processsing
    *
    * @var int
-   * @protected
    */
   public $_id;
 
@@ -57,17 +55,17 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   protected $_numbers;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!CRM_Core_Permission::checkActionPermission('CiviAuction', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     if (($this->_action & CRM_Core_Action::VIEW ||
@@ -81,15 +79,11 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
+   * @return array
    */
   function setDefaultValues() {
-    require_once 'CRM/Auction/BAO/Auction.php';
 
     $defaults = array();
 
@@ -105,10 +99,9 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object
    *
-   * @return None
-   * @access public
+   * @return array
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -211,15 +204,9 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
-   *
-   * @internal param array $options additional user data
-   *
    * @return true if no errors, else array of errors
-   * @access public
-   * @static
    */
-  static
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
 
     // add rules to validate dates and overlap
@@ -227,11 +214,7 @@ class CRM_Auction_Form_Auction extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::VIEW) {

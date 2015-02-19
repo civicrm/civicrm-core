@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -38,7 +38,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'title' => "campaign title",
@@ -46,12 +46,12 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
       'created_date' => 'first sat of July 2008',
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {}
-
   public function testCreateCampaign() {
-    $description = "Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php";
+    $description = "Create a campaign - Note use of relative dates here:
+      @link http://www.php.net/manual/en/datetime.formats.relative.php.";
     $result = $this->callAPIAndDocument('campaign', 'create', $this->params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
@@ -66,6 +66,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
   }
 
   public function testDeleteCampaign() {
+    $this->callAPISuccess('campaign', 'create', $this->params);
     $entity = $this->callAPISuccess('campaign', 'get', ($this->params));
     $delete = array('id' => $entity['id']);
     $result = $this->callAPIAndDocument('campaign', 'delete', $delete, __FUNCTION__, __FILE__);
@@ -73,5 +74,5 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess('campaign', 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
-}
 
+}

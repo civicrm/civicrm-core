@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  --------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -43,7 +43,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function reserve() {
+  public function reserve() {
     //build ajax voter search and selector.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Gotv', ts('Reserve Respondents'));
     $controller->set('votingTab', TRUE);
@@ -56,7 +56,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function interview() {
+  public function interview() {
     //build interview and release voter interface.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Task_Interview', ts('Interview Respondents'));
     $controller->set('votingTab', TRUE);
@@ -71,8 +71,9 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function browse() {
-    $this->_tabs = array('reserve' => ts('Reserve Respondents'),
+  public function browse() {
+    $this->_tabs = array(
+      'reserve' => ts('Reserve Respondents'),
       'interview' => ts('Interview Respondents'),
     );
 
@@ -93,26 +94,35 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     $this->assign('subPageType', $subPageType);
 
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
-      ->addSetting(array('tabSettings' => array(
-        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
-      )));
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
+        ),
+      ));
   }
 
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $this->browse();
 
     return parent::run();
   }
 
-  function buildTabs() {
+  public function buildTabs() {
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
       // check for required permissions.
-      if (!CRM_Core_Permission::check(array(array('manage campaign', 'administer CiviCampaign', "{$name} campaign contacts")))) {
+      if (!CRM_Core_Permission::check(array(
+          array(
+            'manage campaign',
+            'administer CiviCampaign',
+            "{$name} campaign contacts",
+          ),
+        ))
+      ) {
         continue;
       }
 
@@ -133,5 +143,5 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
 
     $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
   }
-}
 
+}

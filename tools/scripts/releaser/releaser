@@ -57,7 +57,7 @@ function do_mk_project() {
     fi
   done
 
-  $cmd_gitify all "$git_base_url" "$workdir/$version/export" --l10n
+  $cmd_gitify all "$git_base_url" "$workdir/$version/export" --l10n --branch "$start_point" --skip-gencode
 }
 
 #################################################
@@ -200,7 +200,7 @@ function do_update() {
     fi
   else
     echo "No version entered. Aborting version update."
-  fi 
+  fi
 }
 
 #################################################

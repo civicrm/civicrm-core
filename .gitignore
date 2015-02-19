@@ -1,5 +1,7 @@
 *~
 *.bak
+bower_components
+composer.lock
 CRM/ACL/DAO
 CRM/Activity/DAO
 CRM/Auction/DAO
@@ -78,6 +80,7 @@ CRM/Core/DAO/PriceField.php
 CRM/Core/DAO/PriceSet.php
 CRM/Core/DAO/PriceSetEntity.php
 CRM/Core/DAO/PrintLabel.php
+CRM/Core/DAO/RecurringEntity.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
 CRM/Core/DAO/SystemLog.php
@@ -112,6 +115,7 @@ civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
 install/langs.php
+node_modules
 packages/.channels
 packages/.depdb
 packages/.depdblock
@@ -143,6 +147,7 @@ drupal/
 WordPress
 joomla
 packages/
+tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
 tools/scripts/releaser/releaser.conf
@@ -154,3 +159,4 @@ vendor
 civicrm.settings.php
 sql/dummy_processor.mysql
 distmaker/distmaker.conf
+distmaker/out

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,41 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * Test class for API functions
+ * Test class for API functions.
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
 
+  protected $_apiversion = 3;
 
-  protected $_apiversion =3;
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   *
-   * @access protected
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {}
-
-  function testAPIReplaceVariables() {
+  public function testAPIReplaceVariables() {
     $result = array();
     $result['testfield'] = 6;
     $result['api.tag.get'] = 999;
@@ -77,7 +58,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       'big_rock' => '$value.api.tag.create.api.tag.create.values.0.display',
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
     );
-    _civicrm_api_replace_variables('Activity', 'Get', $params, $result);
+    _civicrm_api_replace_variables($params, $result);
     $this->assertEquals(999, $params['number']);
     $this->assertEquals(8, $params['tag_id']);
     $this->assertEquals(6, $params['activity_type_id']);
@@ -87,26 +68,32 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->assertEquals('krypton', $params['big_rock']);
   }
 
-  /*
-    * test that error doesn't occur for non-existant file
-    */
-  function testAPIWrapperIncludeNoFile() {
-
-
-    $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
+  /**
+   * Test that error doesn't occur for non-existent file.
+   */
+  public function testAPIWrapperIncludeNoFile() {
+    $this->callAPIFailure(
+      'RandomFile',
+      'get',
+      array(),
+      'API (RandomFile,get) does not exist (join the API team and  implement it!)'
+    );
   }
 
-  function testAPIWrapperCamelCaseFunction() {
-    $result = $this->callAPISuccess('OptionGroup', 'Get', array());
+  public function testAPIWrapperCamelCaseFunction() {
+    $this->callAPISuccess('OptionGroup', 'Get', array());
   }
 
-  function testAPIWrapperLcaseFunction() {
-    $result = $this->callAPISuccess('OptionGroup', 'get', array());
+  public function testAPIWrapperLcaseFunction() {
+    $this->callAPISuccess('OptionGroup', 'get', array());
   }
 
-  function testAPIResolver() {
-    $oldpath = get_include_path();
-    set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
+  /**
+   * Test resolver.
+   */
+  public function testAPIResolver() {
+    $oldPath = get_include_path();
+    set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
     $result = $this->callAPISuccess('contact', 'example_action1', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
@@ -115,10 +102,10 @@ class api_v3_APITest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('test_entity', 'example_action3', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
-    set_include_path($oldpath);
+    set_include_path($oldPath);
   }
 
-  function testFromCamel() {
+  public function testFromCamel() {
     $cases = array(
       'Contribution' => 'contribution',
       'contribution' => 'contribution',
@@ -135,7 +122,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     }
   }
 
-  function testToCamel() {
+  public function testToCamel() {
     $cases = array(
       'Contribution' => 'Contribution',
       'contribution' => 'Contribution',
@@ -143,7 +130,6 @@ class api_v3_APITest extends CiviUnitTestCase {
       'optionValue' => 'OptionValue',
       'option_value' => 'OptionValue',
       'UFJoin' => 'UFJoin',
-      // dommage 'ufJoin' => 'UFJoin',
       'uf_join' => 'UFJoin',
     );
     foreach ($cases as $input => $expected) {
@@ -151,14 +137,15 @@ class api_v3_APITest extends CiviUnitTestCase {
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
-/**
- * Test that calling via wrapper works
- */
-  function testv3Wrapper() {
-    try{
+
+  /**
+   * Test that calling via wrapper works.
+   */
+  public function testv3Wrapper() {
+    try {
       $result = civicrm_api3('contact', 'get', array());
     }
-    catch (CRM_Exception $e){
+    catch (CRM_Exception $e) {
       $this->fail("This should have been a success test");
     }
     $this->assertTrue(is_array($result));
@@ -166,13 +153,13 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   /**
-   * test exception is thrown
+   * Test exception is thrown.
    */
-  function testv3WrapperException(){
-    try{
-      $result = civicrm_api3('contact', 'create', array('debug' => 1));
+  public function testV3WrapperException() {
+    try {
+      civicrm_api3('contact', 'create', array('debug' => 1));
     }
-    catch (CiviCRM_API3_Exception $e){
+    catch (CiviCRM_API3_Exception $e) {
       $this->assertEquals('mandatory_missing', $e->getErrorCode());
       $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
       $extra = $e->getExtraParams();
@@ -182,7 +169,10 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->fail('Exception was expected');
   }
 
-  public function testCreate_NoStringNullResult() {
+  /**
+   * Test result parsing for null.
+   */
+  public function testCreateNoStringNullResult() {
     // create an example contact
     // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
     $result = $this->callAPISuccess('ContributionPage', 'create', array(
@@ -206,13 +196,13 @@ class api_v3_APITest extends CiviUnitTestCase {
       'currency' => '',
     ));
 
-    // check return format
+    // Check return format.
     $this->assertEquals(1, $result['count']);
     foreach ($result['values'] as $resultValue) {
       $this->assertEquals('New title', $resultValue['title']);
-      $this->assertEquals('', $resultValue['currency']); // BUG: $resultValue['location'] === 'null'
+      // BUG: $resultValue['location'] === 'null'.
+      $this->assertEquals('', $resultValue['currency']);
     }
   }
 
 }
-

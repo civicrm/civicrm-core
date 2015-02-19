@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,14 +39,12 @@
 class CRM_Import_StateMachine extends CRM_Core_StateMachine {
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action
-   *
-   * @internal param \CRM_ $object *_Import_Controller
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $classType = str_replace('_Controller', '', get_class($controller));
@@ -59,5 +57,5 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
-}
 
+}

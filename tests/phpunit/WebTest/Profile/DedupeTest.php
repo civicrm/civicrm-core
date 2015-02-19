@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,9 +35,14 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testProfileCreateDupeStrictDefault() {
+  public function testProfileCreateDupeStrictDefault() {
     // lets give profile related permision to anonymous user.
-    $permission = array('edit-1-profile-create', 'edit-1-profile-edit', 'edit-1-profile-listings', 'edit-1-profile-view');
+    $permission = array(
+      'edit-1-profile-create',
+      'edit-1-profile-edit',
+      'edit-1-profile-listings',
+      'edit-1-profile-view',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -82,4 +87,5 @@ class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
     $this->click("_qf_Edit_next");
     $this->waitForTextPresent("A record already exists with the same information.");
   }
+
 }

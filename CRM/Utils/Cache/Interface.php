@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,34 +35,36 @@
 interface CRM_Utils_Cache_Interface {
 
   /**
-   * Set the value in the cache
+   * Set the value in the cache.
    *
    * @param string $key
    * @param mixed $value
    * @return void
    */
-  function set($key, &$value);
+  public function set($key, &$value);
 
   /**
-   * Get a value from the cache
+   * Get a value from the cache.
    *
    * @param string $key
-   * @return mixed NULL if $key has not been previously set
+   * @return mixed
+   *   NULL if $key has not been previously set
    */
-  function get($key);
+  public function get($key);
 
   /**
-   * Delete a value from the cache
+   * Delete a value from the cache.
    *
    * @param string $key
    * @return void
    */
-  function delete($key);
+  public function delete($key);
 
   /**
-   * Delete all values from the cache
+   * Delete all values from the cache.
    *
    * @return void
    */
-  function flush();
+  public function flush();
+
 }

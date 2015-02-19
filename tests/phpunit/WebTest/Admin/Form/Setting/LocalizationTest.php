@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDefaultCountryIsEnabled() {
+  public function testDefaultCountryIsEnabled() {
     $this->webtestLogin();
     $this->openCiviPage("admin/setting/localization", "reset=1");
     $this->addSelection("countryLimit-t", "label=United States");
@@ -54,9 +54,9 @@ class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
     try {
       $this->assertFalse($this->isTextPresent("Your changes have been saved."));
     }
-    catch(PHPUnit_Framework_AssertionFailedError$e) {
+    catch (PHPUnit_Framework_AssertionFailedError$e) {
       array_push($this->verificationErrors, $e->toString());
     }
   }
-}
 
+}

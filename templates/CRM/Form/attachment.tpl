@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -63,7 +63,7 @@
         {/if}
         <tr>
           <td class="label">{$form.attachFile_1.label}</td>
-          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
             <div class="description">{ts}Browse to the <strong>file</strong> you want to upload.{/ts}{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} {ts 1=$config->maxFileSize}Each file must be less than %1M in size. You can also add a short description.{/ts}</div>
           </td>
         </tr>
@@ -81,10 +81,10 @@
           {assign var=attachName value="attachFile_"|cat:$index}
           {assign var=attachDesc value="attachDesc_"|cat:$index}
           {assign var=tagElement value="tag_"|cat:$index}
-            <tr class="attachment-fieldset"><td colspan="2"></td></tr>
+            <tr class="attachment-fieldset solid-border-top"><td colspan="2"></td></tr>
             <tr>
                 <td class="label">{$form.attachFile_1.label}</td>
-                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a></td>
+                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a></td>
             </tr>
             <tr>
               <td class="label">{$form.$tagElement.label}</td>
@@ -97,7 +97,7 @@
 
       {/if}
       {if $currentAttachmentInfo}
-        <tr class="attachment-fieldset"><td colspan="2"></td></tr>
+        <tr class="attachment-fieldset solid-border-top"><td colspan="2"></td></tr>
         <tr>
             <td class="label">{ts}Current Attachment(s){/ts}</td>
             <td class="view-value">

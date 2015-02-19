@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -37,6 +37,21 @@
  */
 
 return array(
+  'userFrameworkLogging' => array(
+    'group_name' => 'Developer Preferences',
+    'group' => 'developer',
+    'name' => 'userFrameworkLogging',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '0',
+    'add' => '4.3',
+    'title' => 'Enable Drupal Watchdog Logging',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs",
+    'prefetch' => 1,
+    'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
+  ),
   'debug_enabled' => array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
@@ -52,22 +67,6 @@ return array(
     'description' => "Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites",
     'prefetch' => 1,
     'help_text' => 'Do not turn this on on production sites',
-  ),
-  'userFrameworkLogging' => array(
-    'group_name' => 'Developer Preferences',
-    'group' => 'developer',
-    'name' => 'userFrameworkLogging',
-    'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
-    'default' => '0',
-    'add' => '4.3',
-    'title' => 'Enable Drupal Watchdog Logging',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => "Set this value to Yes if you want CiviCRM error/debugging messages to also appear in Drupal error logs",
-    'prefetch' => 1,
-    'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log.
-In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
   ),
   'backtrace' => array(
     'group_name' => 'Developer Preferences',
@@ -105,7 +104,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Fatal Error Handler',
     'is_domain' => 1,

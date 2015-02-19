@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -31,26 +31,15 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'FinancialTypeAccount BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->organizationCreate();
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'TestFinancialAccount_1',
       'accounting_code' => 4800,
@@ -80,13 +69,13 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'financial_account_id',
       'Database check on added financial type record.'
     );
-    $this->assertEquals( $result, $financialType->id, 'Verify Account Type');
+    $this->assertEquals($result, $financialType->id, 'Verify Account Type');
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'TestFinancialAccount_2',
       'is_deductible' => 0,
@@ -108,15 +97,15 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     );
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     CRM_Financial_BAO_FinancialTypeAccount::del($financialAccountType->id);
-    $params = array('id' => $financialAccountType->id );
+    $params = array('id' => $financialAccountType->id);
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals( empty($result), true, 'Verify financial types record deletion.');
+    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
 
   /**
-   * check method getFinancialAccount()
+   * Check method getFinancialAccount()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'TestFinancialAccount_3',
       'is_deductible' => 0,
@@ -138,14 +127,14 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     $defaults = array();
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::retrieve($financialParams, $defaults);
-    $this->assertEquals( $financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
-    $this->assertEquals( $financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
+    $this->assertEquals($financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
+    $this->assertEquals($financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
   }
 
   /**
-   * check method getFinancialAccount()
+   * Check method getFinancialAccount()
    */
-  function testGetFinancialAccount() {
+  public function testGetFinancialAccount() {
     $params = array(
       'name' => 'TestFinancialAccount',
       'accounting_code' => 4800,
@@ -172,9 +161,9 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getInstrumentFinancialAccount()
+   * Check method getInstrumentFinancialAccount()
    */
-  function testGetInstrumentFinancialAccount() {
+  public function testGetInstrumentFinancialAccount() {
     $paymentInstrumentValue = 1;
     $params = array(
       'name' => 'Donations',
@@ -199,6 +188,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, $ids);
     $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($paymentInstrumentValue);
 
-    $this->assertEquals( $financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
+    $this->assertEquals($financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
   }
+
 }

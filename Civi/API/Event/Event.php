@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
@@ -34,19 +34,25 @@ namespace Civi\API\Event;
 class Event extends \Symfony\Component\EventDispatcher\Event {
   /**
    * @var \Civi\API\Provider\ProviderInterface
+   *   The API provider responsible for executing the request.
    */
   protected $apiProvider;
 
   /**
    * @var array
+   *   The full description of the API request.
+   *
+   * @see \Civi\API\Request::create
    */
   protected $apiRequest;
 
   /**
-   * @param $apiProvider
-   * @param $apiRequest
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
    */
-  function __construct($apiProvider, $apiRequest) {
+  public function __construct($apiProvider, $apiRequest) {
     $this->apiProvider = $apiProvider;
     $this->apiRequest = $apiRequest;
   }
@@ -64,4 +70,5 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
   public function getApiRequest() {
     return $this->apiRequest;
   }
+
 }

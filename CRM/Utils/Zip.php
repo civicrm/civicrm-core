@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -57,10 +57,12 @@ class CRM_Utils_Zip {
         if (preg_match('/^[^\/]+\/$/', $filename) && $filename != './' && $filename != '../') {
           $base = $filename;
           $baselen = strlen($filename);
-        } else {
+        }
+        else {
           return FALSE;
         }
-      }  elseif (0 != substr_compare($base, $filename, 0, $baselen)) {
+      }
+      elseif (0 != substr_compare($base, $filename, 0, $baselen)) {
         return FALSE;
       }
     }
@@ -91,24 +93,27 @@ class CRM_Utils_Zip {
   }
 
   /**
-   * Determine the name of the folder within a zip
+   * Determine the name of the folder within a zip.
    *
    * @param ZipArchive $zip
    * @param $expected
    *
-   * @return string or FALSE
+   * @return string
+   *   or FALSE
    */
   static public function guessBasedir(ZipArchive $zip, $expected) {
     $candidate = FALSE;
     $basedirs = CRM_Utils_Zip::findBaseDirs($zip);
     if (in_array($expected, $basedirs)) {
       $candidate = $expected;
-    } elseif (count($basedirs) == 1) {
+    }
+    elseif (count($basedirs) == 1) {
       $candidate = array_shift($basedirs);
     }
     if ($candidate !== FALSE && preg_match('/^[a-zA-Z0-9]/', $candidate)) {
       return $candidate;
-    } else {
+    }
+    else {
       return FALSE;
     }
   }
@@ -118,9 +123,12 @@ class CRM_Utils_Zip {
    * An inefficient helper for creating a ZIP file from data in memory.
    * This is only intended for building temp files for unit-testing.
    *
-   * @param $zipName string, file name
-   * @param $dirs array, list of directory paths
-   * @param $files array, keys are file names and values are file contents
+   * @param string $zipName
+   *   file name.
+   * @param array $dirs
+   *   Array, list of directory paths.
+   * @param array $files
+   *   Array, keys are file names and values are file contents.
    * @return bool
    */
   static public function createTestZip($zipName, $dirs, $files) {
@@ -138,9 +146,11 @@ class CRM_Utils_Zip {
         }
       }
       $zip->close();
-    } else {
-       return FALSE;
+    }
+    else {
+      return FALSE;
     }
     return TRUE;
   }
+
 }

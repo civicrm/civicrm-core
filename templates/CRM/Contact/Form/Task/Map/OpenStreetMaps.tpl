@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -26,11 +26,11 @@
 {if $showDirectly}
   {assign var=height value="350px"}
   {assign var=width  value="425px"}
-{else}  
+{else}
   {assign var=height value="600px"}
   {assign var=width  value="100%"}
 {/if}
-{assign var=defaultZoom value=12}  
+{assign var=defaultZoom value=12}
 {literal}
 <script src="http://openlayers.org/api/OpenLayers.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -72,17 +72,17 @@
         map.addLayer(new OpenLayers.Layer.OSM());
 
         var lonLat = new OpenLayers.LonLat(
-            {/literal}{$center.lng}{literal}, 
+            {/literal}{$center.lng}{literal},
             {/literal}{$center.lat}{literal}).transform(
                 new OpenLayers.Projection("EPSG:4326"),
                 map.getProjectionObject()
             );
 
         map.setCenter(lonLat, {/literal}{$defaultZoom}{literal});
-        
+
         setMapOptions(map);
     }
-    
+
     function setMapOptions(map) {
         markers = new OpenLayers.Layer.Markers("Markers");
         map.addLayer(markers);
@@ -103,7 +103,7 @@
             {/literal}
             {if $location.lat}
                 point = new OpenLayers.LonLat(
-                    {$location.lng}, 
+                    {$location.lng},
                     {$location.lat}).transform(
                         new OpenLayers.Projection("EPSG:4326"),
                         map.getProjectionObject()
@@ -128,12 +128,12 @@
             {/if}
         {/foreach}
         map.setCenter(bounds.getCenterLonLat());
-        {if count($locations) gt 1}  
+        {if count($locations) gt 1}
             map.zoomToExtent(bounds);
         {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization' }
             map.zoomTo({$defaultZoom});
-        {else} 
-            map.zoomTo({$defaultZoom}); 
+        {else}
+            map.zoomTo({$defaultZoom});
         {/if}
         {literal}
         //attribution sits awkwardly high, move it down
@@ -142,7 +142,7 @@
 
     function createMarker(map, markers, point, data, image) {
         var marker = new OpenLayers.Marker(point);
-        
+
         var size = new OpenLayers.Size(20,20);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
         marker.icon.size = size;
@@ -170,7 +170,7 @@
 
     function gpopUp() {
         var from   = document.getElementById('from').value;
-        var to     = document.getElementById('to').value;   
+        var to     = document.getElementById('to').value;
         var URL    = "http://maps.google.com/maps?saddr=" + from + "&daddr=" + to;
         day = new Date();
         id  = day.getTime();

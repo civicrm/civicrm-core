@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 <div class="crm-form-block crm-search-form-block">
 <div class="crm-accordion-wrapper crm-activity_search-accordion {if $rows}crm-accordion-closed{else}crm-accordion-open{/if}">
  <div class="crm-accordion-header crm-master-accordion-header">
-  <div class="icon crm-accordion-pointer"></div> 
+  <div class="icon crm-accordion-pointer"></div>
    {ts}Edit Search Criteria{/ts}
 </div><!-- /.crm-accordion-header -->
 <div class="crm-accordion-body">
@@ -59,22 +59,22 @@
 
 <div class="crm-content-block">
     {if $rowsEmpty}
-	<div class="crm-results-block crm-results-block-empty">
+  <div class="crm-results-block crm-results-block-empty">
     {include file="CRM/Contact/Form/Search/Custom/EmptyResults.tpl"}
     </div>
 {/if}
 
 {if $rows}
-	<div class="crm-results-block">
+  <div class="crm-results-block">
     {* Search request has returned 1 or more matching rows. Display results and collapse the search criteria fieldset. *}
-        
+
     {* This section handles form elements for action task select and submit *}
-	<div class="crm-search-tasks">
+  <div class="crm-search-tasks">
     {include file="CRM/Contact/Form/Search/ResultTasks.tpl"}
-	</div>
+  </div>
     {* This section displays the rows along and includes the paging controls *}
     <div class="crm-search-results">
-    
+
     {include file="CRM/common/pager.tpl" location="top"}
 
     {include file="CRM/common/pagerAToZ.tpl"}
@@ -119,7 +119,7 @@
                                 {/if}
                                 {if isset($row.activity_subject) AND $row.activity_subject NEQ 'NULL'}{$row.activity_subject}{else}{ts}(no subject){/ts}{/if}</a>
                             </td>
-                        {elseif ($fName eq 'activity_id') or ($fName eq 'activity_type_id') or ($fName eq 'case_id')}   
+                        {elseif ($fName eq 'activity_id') or ($fName eq 'activity_type_id') or ($fName eq 'case_id')}
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}
@@ -136,7 +136,7 @@
 
     </div>
     {* END Actions/Results section *}
-	</div>
+  </div>
 {/if}
 </div>
 {/if}

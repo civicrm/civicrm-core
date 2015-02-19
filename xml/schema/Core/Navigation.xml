@@ -96,6 +96,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Order</title>
     <type>int</type>
     <comment>Ordering of the navigation items in various blocks.</comment>
     <add>3.0</add>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,41 +27,40 @@
 
 <div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
 <div class="crm-accordion-header">
-  {ts}SMS Message{/ts}
+  {$form.sms_text_message.label}
   </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
  <div id='char-count-message'></div>
    <div class="helpIcon" id="helptext">
-     <input class="crm-token-selector big" data-field="text_message" />
+     <input class="crm-token-selector big" data-field="sms_text_message" />
      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}
    </div>
     <div class='text'>
-  {$form.text_message.html}<br />
+  {$form.sms_text_message.html}<br />
     </div>
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
-<div id="editMessageDetails" class="section">
-    <div id="updateDetails" class="section" >
-  {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
+<div id="SMSeditMessageDetails" class="section">
+    <div id="SMSupdateDetails" class="section" >
+  {$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}
     </div>
     <div class="section">
-  {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
+  {$form.SMSsaveTemplate.html}&nbsp;{$form.SMSsaveTemplate.label}
     </div>
 </div>
 
-<div id="saveDetails" class="section">
-   <div class="label">{$form.saveTemplateName.label}</div>
-   <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+<div id="SMSsaveDetails" class="section">
+   <div class="label">{$form.SMSsaveTemplateName.label}</div>
+   <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
 </div>
 
-{include file="CRM/Mailing/Form/InsertTokens.tpl"}
 {literal}
 <script type="text/javascript">
 
 {/literal}{if $max_sms_length}{literal}
 maxCharInfoDisplay();
 
-cj('#text_message').bind({
+cj('#sms_text_message').bind({
   change: function() {
    maxLengthMessage();
   },
@@ -72,10 +71,10 @@ cj('#text_message').bind({
 
 function maxLengthMessage()
 {
-   var len = cj('#text_message').val().length;
+   var len = cj('#sms_text_message').val().length;
    var maxLength = {/literal}{$max_sms_length}{literal};
    if (len > maxLength) {
-      cj('#text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of 160 characters{/ts}'{literal});
+      cj('#sms_text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of 160 characters{/ts}'{literal});
       return false;
    }
 return true;
@@ -83,11 +82,11 @@ return true;
 
 function maxCharInfoDisplay(){
    var maxLength = {/literal}{$max_sms_length}{literal};
-   var enteredCharLength = cj('#text_message').val().length;
+   var enteredCharLength = cj('#sms_text_message').val().length;
    var count = enteredCharLength;
 
    if( count < 0 ) {
-      cj('#text_message').val(cj('#text_message').val().substring(0, maxLength));
+      cj('#sms_text_message').val(cj('#sms_text_message').val().substring(0, maxLength));
       count = 0;
    }
    cj('#char-count-message').text( "You can insert up to " + maxLength + " characters. You have entered " + count + " characters." );

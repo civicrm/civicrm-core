@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,15 +36,17 @@
 /**
  * Adds inline help
  *
- * @param array  $params the function params
- * @param object $smarty reference to the smarty object
+ * @param array $params
+ *   The function params.
+ * @param CRM_Core_Smarty $smarty
+ *   Reference to the smarty object.
  *
- * @return string the help html to be inserted
- * @access public
+ * @return string
+ *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
   if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
-    return;
+    return NULL;
   }
 
   if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {
@@ -71,6 +73,11 @@ function smarty_function_help($params, &$smarty) {
     $name = trim(strip_tags($params['title']));
   }
 
+  $class = "helpicon";
+  if (!empty($params['class'])) {
+    $class .= " {$params['class']}";
+  }
+
   // Escape for html
   $title = htmlspecialchars(ts('%1 Help', array(1 => $name)));
   // Escape for html and js
@@ -81,5 +88,5 @@ function smarty_function_help($params, &$smarty) {
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="helpicon" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="' . $class . '" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

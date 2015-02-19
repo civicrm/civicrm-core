@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db.
    *
    * @var int
    */
@@ -51,9 +51,8 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
@@ -89,10 +88,9 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (isset($this->_id)) {
@@ -107,9 +105,8 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -143,10 +140,9 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Tell a Friend');
   }
-}
 
+}

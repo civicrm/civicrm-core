@@ -57,11 +57,11 @@
   <field>
     <name>status_id</name>
     <uniqueName>participant_status_id</uniqueName>
-    <title>Participant Status</title>
+    <title>Participant Status ID</title>
     <headerPattern>/(participant.)?(status)$/i</headerPattern>
     <import>true</import>
     <type>int unsigned</type>
-    <export>false</export>
+    <export>true</export>
     <required>true</required>
     <default>1</default>
     <comment>Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status =
@@ -91,7 +91,7 @@
   <field>
     <name>role_id</name>
     <uniqueName>participant_role_id</uniqueName>
-    <title>Participant Role(s)</title>
+    <title>Participant Role ID</title>
     <pseudoconstant>
       <optionGroupName>participant_role</optionGroupName>
     </pseudoconstant>

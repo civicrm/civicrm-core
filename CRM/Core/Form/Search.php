@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Base class for most search forms
@@ -33,46 +33,40 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Are we forced to run a search
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
   /**
-   * name of search button
+   * Name of search button
    *
    * @var string
-   * @access protected
    */
   protected $_searchButtonName;
 
   /**
-   * name of action button
+   * Name of action button
    *
    * @var string
-   * @access protected
    */
   protected $_actionButtonName;
 
   /**
-   * form values that we will be using
+   * Form values that we will be using
    *
    * @var array
-   * @access public
    */
   public $_formValues;
 
   /**
-   * have we already done this search
+   * Have we already done this search
    *
-   * @access protected
    * @var boolean
    */
   protected $_done;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
@@ -80,7 +74,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Common buildform tasks required by all searches
    */
-  function buildQuickform() {
+  public function buildQuickform() {
     $resources = CRM_Core_Resources::singleton();
 
     if ($resources->ajaxPopupsEnabled) {
@@ -88,7 +82,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js');
+    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
 
     $this->addButtons(array(
       array(
@@ -104,7 +98,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Add checkboxes for each row plus a master checkbox
    */
-  function addRowSelectors($rows) {
+  public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
     foreach ($rows as $row) {
       $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
@@ -115,7 +109,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Add actions menu to search results form
    * @param $tasks
    */
-  function addTaskMenu($tasks) {
+  public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {
       $tasks = array('' => ts('Actions')) + $tasks;
       $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
@@ -128,4 +122,5 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
   }
+
 }

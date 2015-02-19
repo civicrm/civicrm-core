@@ -21,11 +21,11 @@ ini_set('max_execution_time', 3000);
 
 if (stristr(PHP_OS, 'WIN')) {
   define('CIVICRM_DIRECTORY_SEPARATOR', '/');
-  define('CIVICRM_WINDOWS', 1 );
+  define('CIVICRM_WINDOWS', 1);
 }
 else {
   define('CIVICRM_DIRECTORY_SEPARATOR', DIRECTORY_SEPARATOR);
-  define('CIVICRM_WINDOWS', 0 );
+  define('CIVICRM_WINDOWS', 0);
 }
 
 // set installation type - drupal
@@ -50,8 +50,7 @@ else {
 global $installType;
 $installType = strtolower($_SESSION['civicrm_install_type']);
 
-if (!in_array($installType, array(
-  'drupal', 'wordpress'))) {
+if (!in_array($installType, array('drupal', 'wordpress'))) {
   $errorTitle = "Oops! Unsupported installation mode";
   $errorMsg = "";
   errorDisplayPage($errorTitle, $errorMsg);
@@ -76,18 +75,22 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $crmPath);
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
-$docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide',NULL,NULL,"wiki");
+$docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
 
 if ($installType == 'drupal') {
   //lets check only /modules/.
   $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
 
   if (!preg_match($pattern,
-      str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME'])
-    )) {
+    str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME'])
+  )
+  ) {
     $errorTitle = "Oops! Please Correct Your Install Location";
     $errorMsg = "Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-      'sites', 'all', 'modules')) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
+        'sites',
+        'all',
+        'modules',
+      )) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -130,7 +133,9 @@ foreach ($langs as $locale => $_) {
   if ($locale == 'en_US') {
     continue;
   }
-  if (!file_exists(implode(CIVICRM_DIRECTORY_SEPARATOR, array($crmPath, 'sql', "civicrm_data.$locale.mysql"))))unset($langs[$locale]);
+  if (!file_exists(implode(CIVICRM_DIRECTORY_SEPARATOR, array($crmPath, 'sql', "civicrm_data.$locale.mysql")))) {
+    unset($langs[$locale]);
+  }
 }
 
 $seedLanguage = 'en_US';
@@ -164,7 +169,10 @@ if ($alreadyInstalled) {
   if ($installType == 'drupal') {
 
     $errorMsg = "CiviCRM has already been installed in this Drupal site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-      '[your Drupal root directory]', 'sites', $siteDir)) . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
+        '[your Drupal root directory]',
+        'sites',
+        $siteDir,
+      )) . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
   }
   elseif ($installType == 'wordpress') {
     $errorMsg = "CiviCRM has already been installed in this WordPress site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . $cmsPath . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
@@ -174,7 +182,7 @@ if ($alreadyInstalled) {
 
 $versionFile = $crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm-version.php';
 if (file_exists($versionFile)) {
-  require_once ($versionFile);
+  require_once $versionFile;
   $civicrm_version = civicrmVersion();
 }
 else {
@@ -242,7 +250,7 @@ if ($databaseConfig) {
 if (isset($_REQUEST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
   // Confirm before reinstalling
   if (!isset($_REQUEST['force_reinstall']) && $alreadyInstalled) {
-    include ($installDirPath . 'template.html');
+    include $installDirPath . 'template.html';
   }
   else {
     $inst = new Installer();
@@ -252,7 +260,7 @@ if (isset($_REQUEST['go']) && !$req->hasErrors() && !$dbReq->hasErrors()) {
   // Show the config form
 }
 else {
-  include ($installDirPath . 'template.html');
+  include $installDirPath . 'template.html';
 }
 
 /**
@@ -270,16 +278,19 @@ class InstallRequirements {
   const MINIMUM_THREAD_STACK = 192;
 
   /**
-   * Just check that the database configuration is okay
+   * Just check that the database configuration is okay.
+   * @param $databaseConfig
+   * @param $dbName
    */
-  function checkdatabase($databaseConfig, $dbName) {
+  public function checkdatabase($databaseConfig, $dbName) {
     if ($this->requireFunction('mysql_connect',
-        array(
-          "PHP Configuration",
-          "MySQL support",
-          "MySQL support not included in PHP.",
-        )
-      )) {
+      array(
+        "PHP Configuration",
+        "MySQL support",
+        "MySQL support not included in PHP.",
+      )
+    )
+    ) {
       $this->requireMySQLServer($databaseConfig['server'],
         array(
           "MySQL $dbName Configuration",
@@ -289,14 +300,15 @@ class InstallRequirements {
         )
       );
       if ($this->requireMysqlConnection($databaseConfig['server'],
-          $databaseConfig['username'],
-          $databaseConfig['password'],
-          array(
-            "MySQL $dbName Configuration",
-            "Are the access credentials correct",
-            "That username/password doesn't work",
-          )
-        )) {
+        $databaseConfig['username'],
+        $databaseConfig['password'],
+        array(
+          "MySQL $dbName Configuration",
+          "Are the access credentials correct",
+          "That username/password doesn't work",
+        )
+      )
+      ) {
         @$this->requireMySQLVersion("5.1",
           array(
             "MySQL $dbName Configuration",
@@ -322,7 +334,8 @@ class InstallRequirements {
           array(
             "MySQL $dbName Configuration",
             "Does MySQL thread_stack meet minimum (" . self::MINIMUM_THREAD_STACK . "k)",
-            "", // "The MySQL thread_stack does not meet minimum " . CRM_Upgrade_Form::MINIMUM_THREAD_STACK . "k. Please update thread_stack in my.cnf.",
+            "",
+            // "The MySQL thread_stack does not meet minimum " . CRM_Upgrade_Form::MINIMUM_THREAD_STACK . "k. Please update thread_stack in my.cnf.",
           )
         );
       }
@@ -385,14 +398,19 @@ class InstallRequirements {
   }
 
   /**
-   * Check everything except the database
+   * Check everything except the database.
    */
-  function check() {
+  public function check() {
     global $crmPath, $installType;
 
     $this->errors = NULL;
 
-    $this->requirePHPVersion('5.3.3', array("PHP Configuration", "PHP5 installed", NULL, "PHP version " . phpversion()));
+    $this->requirePHPVersion('5.3.3', array(
+      "PHP Configuration",
+      "PHP5 installed",
+      NULL,
+      "PHP version " . phpversion(),
+    ));
 
     // Check that we can identify the root folder successfully
     $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.txt',
@@ -419,7 +437,10 @@ class InstallRequirements {
     foreach ($requiredDirectories as $dir) {
       $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . $dir,
         array(
-          "File permissions", "$dir folder exists", "There is no $dir folder"), TRUE
+          "File permissions",
+          "$dir folder exists",
+          "There is no $dir folder",
+        ), TRUE
       );
     }
 
@@ -475,7 +496,11 @@ class InstallRequirements {
     }
 
     // Check for $_SERVER configuration
-    $this->requireServerVariables(array('SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME'), array("Webserver config", "Recognised webserver", "You seem to be using an unsupported webserver.  The server variables SCRIPT_NAME, HTTP_HOST, SCRIPT_FILENAME need to be set."));
+    $this->requireServerVariables(array('SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME'), array(
+      "Webserver config",
+      "Recognised webserver",
+      "You seem to be using an unsupported webserver.  The server variables SCRIPT_NAME, HTTP_HOST, SCRIPT_FILENAME need to be set.",
+    ));
 
     // Check for MySQL support
     $this->requireFunction('mysql_connect',
@@ -490,9 +515,9 @@ class InstallRequirements {
     // Check for xcache_isset and emit warning if exists
     $this->checkXCache(array(
       "PHP Configuration",
-        "XCache compatibility",
-        "XCache is installed and there are known compatibility issues between XCache and CiviCRM. Consider using an alternative PHP caching mechanism or disable PHP caching altogether.",
-      ));
+      "XCache compatibility",
+      "XCache is installed and there are known compatibility issues between XCache and CiviCRM. Consider using an alternative PHP caching mechanism or disable PHP caching altogether.",
+    ));
 
     // Check memory allocation
     $this->requireMemory(32 * 1024 * 1024,
@@ -513,7 +538,7 @@ class InstallRequirements {
    * @param $recommended
    * @param $testDetails
    */
-  function requireMemory($min, $recommended, $testDetails) {
+  public function requireMemory($min, $recommended, $testDetails) {
     $this->testing($testDetails);
     $mem = $this->getPHPMemory();
 
@@ -534,7 +559,7 @@ class InstallRequirements {
   /**
    * @return float
    */
-  function getPHPMemory() {
+  public function getPHPMemory() {
     $memString = ini_get("memory_limit");
 
     switch (strtolower(substr($memString, -1))) {
@@ -552,7 +577,7 @@ class InstallRequirements {
     }
   }
 
-  function listErrors() {
+  public function listErrors() {
     if ($this->errors) {
       echo "<p>The following problems are preventing me from installing CiviCRM:</p>";
       foreach ($this->errors as $error) {
@@ -564,7 +589,7 @@ class InstallRequirements {
   /**
    * @param null $section
    */
-  function showTable($section = NULL) {
+  public function showTable($section = NULL) {
     if ($section) {
       $tests = $this->tests[$section];
       echo "<table class=\"testResults\" width=\"100%\">";
@@ -587,12 +612,12 @@ class InstallRequirements {
   }
 
   /**
-   * @param $funcName
+   * @param string $funcName
    * @param $testDetails
    *
    * @return bool
    */
-  function requireFunction($funcName, $testDetails) {
+  public function requireFunction($funcName, $testDetails) {
     $this->testing($testDetails);
 
     if (!function_exists($funcName)) {
@@ -607,7 +632,7 @@ class InstallRequirements {
   /**
    * @param $testDetails
    */
-  function checkXCache($testDetails) {
+  public function checkXCache($testDetails) {
     if (function_exists('xcache_isset') &&
       ini_get('xcache.size') > 0
     ) {
@@ -621,11 +646,11 @@ class InstallRequirements {
    * @param $testDetails
    * @param null $maxVersion
    */
-  function requirePHPVersion($minVersion, $testDetails, $maxVersion = NULL) {
+  public function requirePHPVersion($minVersion, $testDetails, $maxVersion = NULL) {
 
     $this->testing($testDetails);
 
-    $phpVersion      = phpversion();
+    $phpVersion = phpversion();
     $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
     $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
 
@@ -649,11 +674,11 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    * @param bool $absolute
    */
-  function requireFile($filename, $testDetails, $absolute = FALSE) {
+  public function requireFile($filename, $testDetails, $absolute = FALSE) {
     $this->testing($testDetails);
     if (!$absolute) {
       $filename = $this->getBaseDir() . $filename;
@@ -667,7 +692,7 @@ class InstallRequirements {
   /**
    * @param $testDetails
    */
-  function requireNoPathSeparator($testDetails) {
+  public function requireNoPathSeparator($testDetails) {
     $this->testing($testDetails);
     if (substr_count($this->getBaseDir(), PATH_SEPARATOR)) {
       $this->error($testDetails);
@@ -675,10 +700,10 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    */
-  function requireNoFile($filename, $testDetails) {
+  public function requireNoFile($filename, $testDetails) {
     $this->testing($testDetails);
     $filename = $this->getBaseDir() . $filename;
     if (file_exists($filename)) {
@@ -688,10 +713,10 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    */
-  function moveFileOutOfTheWay($filename, $testDetails) {
+  public function moveFileOutOfTheWay($filename, $testDetails) {
     $this->testing($testDetails);
     $filename = $this->getBaseDir() . $filename;
     if (file_exists($filename)) {
@@ -703,17 +728,17 @@ class InstallRequirements {
   }
 
   /**
-   * @param $filename
+   * @param string $filename
    * @param $testDetails
    * @param bool $absolute
    */
-  function requireWriteable($filename, $testDetails, $absolute = FALSE) {
+  public function requireWriteable($filename, $testDetails, $absolute = FALSE) {
     $this->testing($testDetails);
     if (!$absolute) {
       $filename = $this->getBaseDir() . $filename;
     }
 
-    if (!is_writeable($filename)) {
+    if (!is_writable($filename)) {
       $name = NULL;
       if (function_exists('posix_getpwuid')) {
         $user = posix_getpwuid(posix_geteuid());
@@ -729,10 +754,10 @@ class InstallRequirements {
   }
 
   /**
-   * @param $moduleName
+   * @param string $moduleName
    * @param $testDetails
    */
-  function requireApacheModule($moduleName, $testDetails) {
+  public function requireApacheModule($moduleName, $testDetails) {
     $this->testing($testDetails);
     if (!in_array($moduleName, apache_get_modules())) {
       $this->error($testDetails);
@@ -741,11 +766,11 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $testDetails
    */
-  function requireMysqlConnection($server, $username, $password, $testDetails) {
+  public function requireMysqlConnection($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
 
@@ -762,7 +787,7 @@ class InstallRequirements {
    * @param $server
    * @param $testDetails
    */
-  function requireMySQLServer($server, $testDetails) {
+  public function requireMySQLServer($server, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, NULL, NULL);
 
@@ -779,7 +804,7 @@ class InstallRequirements {
    * @param $version
    * @param $testDetails
    */
-  function requireMySQLVersion($version, $testDetails) {
+  public function requireMySQLVersion($version, $testDetails) {
     $this->testing($testDetails);
 
     if (!mysql_get_server_info()) {
@@ -802,12 +827,12 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
    */
-  function requireMySQLInnoDB($server, $username, $password, $database, $testDetails) {
+  public function requireMySQLInnoDB($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -837,12 +862,12 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
    */
-  function requireMySQLTempTables($server, $username, $password, $database, $testDetails) {
+  public function requireMySQLTempTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -867,12 +892,12 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
    */
-  function requireMySQLTrigger($server, $username, $password, $database, $testDetails) {
+  public function requireMySQLTrigger($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -900,7 +925,6 @@ class InstallRequirements {
       $this->error($testDetails);
     }
 
-
     mysql_query('DROP TRIGGER civicrm_install_temp_table_test_trigger');
     mysql_query('DROP TABLE civicrm_install_temp_table_test');
   }
@@ -908,12 +932,12 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
    */
-  function requireMySQLLockTables($server, $username, $password, $database, $testDetails) {
+  public function requireMySQLLockTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -952,16 +976,15 @@ class InstallRequirements {
     }
 
     $result = mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
-    return;
   }
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $testDetails
    */
-  function requireMySQLAutoIncrementIncrementOne($server, $username, $password, $testDetails) {
+  public function requireMySQLAutoIncrementIncrementOne($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -989,13 +1012,13 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $minValueKB
    * @param $testDetails
    */
-  function requireMySQLThreadStack($server, $username, $password, $database, $minValueKB, $testDetails) {
+  public function requireMySQLThreadStack($server, $username, $password, $database, $minValueKB, $testDetails) {
     $this->testing($testDetails);
     $conn = @mysql_connect($server, $username, $password);
     if (!$conn) {
@@ -1014,10 +1037,11 @@ class InstallRequirements {
     if (!$result) {
       $testDetails[2] = 'Could not query thread_stack.';
       $this->error($testDetails);
-    } else {
+    }
+    else {
       $values = mysql_fetch_row($result);
-      if ($values[1] < (1024*$minValueKB)) {
-        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1]/1024) . 'k';
+      if ($values[1] < (1024 * $minValueKB)) {
+        $testDetails[2] = 'MySQL "thread_stack" is ' . ($values[1] / 1024) . 'k';
         $this->error($testDetails);
       }
     }
@@ -1025,13 +1049,14 @@ class InstallRequirements {
 
   /**
    * @param $server
-   * @param $username
+   * @param string $username
    * @param $password
    * @param $database
    * @param $testDetails
    * @param bool $onlyRequire
    */
-  function requireDatabaseOrCreatePermissions($server,
+  public function requireDatabaseOrCreatePermissions(
+    $server,
     $username,
     $password,
     $database,
@@ -1071,7 +1096,7 @@ class InstallRequirements {
    * @param $varNames
    * @param $errorMessage
    */
-  function requireServerVariables($varNames, $errorMessage) {
+  public function requireServerVariables($varNames, $errorMessage) {
     //$this->testing($testDetails);
     foreach ($varNames as $varName) {
       if (!$_SERVER[$varName]) {
@@ -1092,7 +1117,7 @@ class InstallRequirements {
    *
    * @return bool
    */
-  function isRunningApache($testDetails) {
+  public function isRunningApache($testDetails) {
     $this->testing($testDetails);
     if (function_exists('apache_get_modules') || stristr($_SERVER['SERVER_SIGNATURE'], 'Apache')) {
       return TRUE;
@@ -1105,14 +1130,14 @@ class InstallRequirements {
   /**
    * @return string
    */
-  function getBaseDir() {
+  public function getBaseDir() {
     return dirname($_SERVER['SCRIPT_FILENAME']) . CIVICRM_DIRECTORY_SEPARATOR;
   }
 
   /**
    * @param $testDetails
    */
-  function testing($testDetails) {
+  public function testing($testDetails) {
     if (!$testDetails) {
       return;
     }
@@ -1131,7 +1156,7 @@ class InstallRequirements {
   /**
    * @param $testDetails
    */
-  function error($testDetails) {
+  public function error($testDetails) {
     $section = $testDetails[0];
     $test = $testDetails[1];
 
@@ -1142,10 +1167,9 @@ class InstallRequirements {
   /**
    * @param $testDetails
    */
-  function warning($testDetails) {
+  public function warning($testDetails) {
     $section = $testDetails[0];
     $test = $testDetails[1];
-
 
     $this->tests[$section][$test] = array("warning", $testDetails[2]);
     $this->warnings[] = $testDetails;
@@ -1154,16 +1178,17 @@ class InstallRequirements {
   /**
    * @return int
    */
-  function hasErrors() {
-    return sizeof($this->errors);
+  public function hasErrors() {
+    return count($this->errors);
   }
 
   /**
    * @return int
    */
-  function hasWarnings() {
-    return sizeof($this->warnings);
+  public function hasWarnings() {
+    return count($this->warnings);
   }
+
 }
 
 /**
@@ -1176,7 +1201,7 @@ class Installer extends InstallRequirements {
    * @param $password
    * @param $database
    */
-  function createDatabaseIfNotExists($server, $username, $password, $database) {
+  public function createDatabaseIfNotExists($server, $username, $password, $database) {
     $conn = @mysql_connect($server, $username, $password);
 
     if (@mysql_select_db($database)) {
@@ -1184,7 +1209,8 @@ class Installer extends InstallRequirements {
       return;
     }
 
-    if (@mysql_query("CREATE DATABASE $database")) {}
+    if (@mysql_query("CREATE DATABASE $database")) {
+    }
     else {
       $errorTitle = "Oops! Could not create Database $database";
       $errorMsg = "We encountered an error when attempting to create the database. Please check your mysql server permissions and the database name and try again.";
@@ -1197,7 +1223,7 @@ class Installer extends InstallRequirements {
    *
    * @return mixed
    */
-  function install($config) {
+  public function install($config) {
     global $installDirPath;
 
     // create database if does not exists
@@ -1240,7 +1266,7 @@ class Installer extends InstallRequirements {
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">CiviCRM has been successfully installed</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1309,7 +1335,7 @@ class Installer extends InstallRequirements {
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">CiviCRM has been successfully installed</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1352,7 +1378,7 @@ class Installer extends InstallRequirements {
         echo '<h1>CiviCRM Installed</h1>';
         echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">CiviCRM has been successfully installed</p>';
         echo '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here',NULL,NULL,"wiki");
+        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
         if (!function_exists('ts')) {
           $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
         }
@@ -1367,13 +1393,14 @@ class Installer extends InstallRequirements {
           {$commonOutputMessage}
 ";
 
-         echo '</ul>';
-         echo '</div>';
-       }
-     }
+        echo '</ul>';
+        echo '</div>';
+      }
+    }
 
     return $this->errors;
   }
+
 }
 
 function civicrm_install_set_drupal_perms() {
@@ -1401,8 +1428,8 @@ function civicrm_install_set_drupal_perms() {
     foreach (array_diff($perms, $allPerms) as $perm) {
       watchdog('civicrm',
         'Cannot grant the %perm permission because it does not yet exist.',
-        array(
-          '%perm' => $perm), WATCHDOG_ERROR
+        array('%perm' => $perm),
+        WATCHDOG_ERROR
       );
     }
     $perms = array_intersect($perms, $allPerms);
@@ -1441,8 +1468,8 @@ function getSiteDir($cmsPath, $str) {
       for ($j = count($server); $j > 0; $j--) {
         $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
         if (file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
-            'sites' . CIVICRM_DIRECTORY_SEPARATOR . $dir
-          )) {
+          'sites' . CIVICRM_DIRECTORY_SEPARATOR . $dir
+        )) {
           $siteDir = $dir;
           return $siteDir;
         }
@@ -1459,7 +1486,6 @@ function getSiteDir($cmsPath, $str) {
  * @param $errorMsg
  */
 function errorDisplayPage($errorTitle, $errorMsg) {
-  include ('error.html');
+  include 'error.html';
   exit();
 }
-

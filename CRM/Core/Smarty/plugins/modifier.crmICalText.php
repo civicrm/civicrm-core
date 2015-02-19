@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -38,10 +38,9 @@
  *
  * @param string $str
  *
- * @return string  formatted text
- * @access public
+ * @return string
+ *   formatted text
  */
 function smarty_modifier_crmICalText($str) {
   return CRM_Utils_ICalendar::formatText($str);
 }
-

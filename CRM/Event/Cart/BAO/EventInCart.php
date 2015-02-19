@@ -8,17 +8,18 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $event;
   public $event_cart;
   public $location = NULL;
-  public $participants = array(
-    );
+  public $participants = array();
 
   /**
-   *
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
+   * Add participant to cart.
+   *
    * @param $participant
    */
   public function add_participant($participant) {
@@ -26,9 +27,9 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
-   * @return $this|CRM_Event_Cart_BAO_EventInCart
+   * @return object $this|CRM_Event_Cart_BAO_EventInCart
    * @throws Exception
    */
   public static function create(&$params) {
@@ -49,13 +50,15 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
   /**
    * @param bool $useWhere
+   *
+   * @return mixed|void
    */
-  function delete($useWhere = false) {
+  public function delete($useWhere = FALSE) {
     $this->load_associations();
     $contacts_to_delete = array();
     foreach ($this->participants as $participant) {
-      $defaults          = array();
-      $params            = array('id' => $participant->contact_id);
+      $defaults = array();
+      $params = array('id' => $participant->contact_id);
       $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
       if ($temporary_contact->is_deleted) {
@@ -66,11 +69,11 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     foreach (array_keys($contacts_to_delete) as $contact_id) {
       CRM_Contact_BAO_Contact::deleteContact($contact_id);
     }
-    parent::delete();
+    return parent::delete();
   }
 
   /**
-   * @param $event_cart_id
+   * @param int $event_cart_id
    *
    * @return array
    */
@@ -79,7 +82,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -96,7 +99,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool|CRM_Event_Cart_BAO_EventInCart
    */
@@ -105,7 +108,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool|CRM_Event_Cart_BAO_EventInCart
    */
@@ -121,7 +124,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $contact_id
+   * @param int $contact_id
    */
   public function remove_participant_by_contact_id($contact_id) {
     $to_remove = array();
@@ -135,7 +138,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $participant_id
+   * @param int $participant_id
    *
    * @return mixed
    */
@@ -144,7 +147,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $participant_id
+   * @param int $participant_id
    */
   public function remove_participant_by_id($participant_id) {
     $this->get_participant_by_id($participant_id)->delete();
@@ -156,7 +159,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    *
    * @return mixed
    */
-  static function part_key($participant) {
+  public static function part_key($participant) {
     return $participant->id;
   }
 
@@ -254,12 +257,14 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {}
+  public function offsetSet($offset, $value) {
+  }
 
   /**
    * @param mixed $offset
    */
-  public function offsetUnset($offset) {}
+  public function offsetUnset($offset) {
+  }
 
   /**
    * @return array
@@ -275,11 +280,11 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param $event_id
+   * @param int $event_id
    *
    * @return array
    */
-  static function get_registration_link($event_id) {
+  public static function get_registration_link($event_id) {
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
     $cart->load_associations();
     $event_in_cart = $cart->get_event_in_cart_by_event_id($event_id);
@@ -303,20 +308,22 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   /**
    * @return bool
    */
-  function is_parent_event() {
+  public function is_parent_event() {
     return (NULL !== (CRM_Event_BAO_Event::get_sub_events($this->event_id)));
   }
 
   /**
-   * @param null $parent_event_id
+   * @param int $parent_event_id
    *
    * @return bool
    */
-  function is_child_event($parent_event_id = NULL) {
+  public function is_child_event($parent_event_id = NULL) {
     if ($parent_event_id == NULL) {
       return $this->event->parent_event_id;
     }
-    else return $this->event->parent_event_id == $parent_event_id;
+    else {
+      return $this->event->parent_event_id == $parent_event_id;
+    }
   }
-}
 
+}

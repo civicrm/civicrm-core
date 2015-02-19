@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,24 +35,22 @@
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
@@ -61,9 +59,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $this->_id,
         'title'
       );
-      CRM_Utils_System::setTitle(ts('Title and Settings (%1)',
-          array(1 => $title)
-        ));
+      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
 
       $ufJoinParams = array(
         'module' => 'OnBehalf',
@@ -93,7 +89,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         }
         $defaults['soft_credit_types'] = array(
           CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-          CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+          CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
         );
       }
     }
@@ -107,7 +103,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       }
       $defaults['soft_credit_types'] = array(
         CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-        CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+        CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
       );
     }
 
@@ -115,10 +111,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -144,18 +139,29 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, array('onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"));
 
-    $allowCoreTypes = array_merge(array('Contact', 'Organization'), CRM_Contact_BAO_ContactType::subTypes('Organization'));
-    $allowSubTypes = array();
-    $entities = array(
-      array(
-        'entity_name' => 'contact_1',
-        'entity_type' => 'OrganizationModel',
-      ),
+    //CRM-15787 - If applicable, register 'membership_1'
+    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
+    $coreTypes = array('Contact', 'Organization');
+
+    $entities[] = array(
+      'entity_name' => array('contact_1'),
+      'entity_type' => 'OrganizationModel',
     );
+
+    if ($member && $member['is_active']) {
+      $coreTypes[] = 'Membership';
+      $entities[] = array(
+        'entity_name' => array('membership_1'),
+        'entity_type' => 'MembershipModel',
+      );
+    }
+
+    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $allowSubTypes = array();
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
-    $options   = array();
+    $options = array();
     $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $options[] = $this->createElement('radio', NULL, NULL, ts('Required'), 2);
     $this->addGroup($options, 'is_for_organization', ts(''));
@@ -186,7 +192,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       'entity' => 'ContributionSoft',
       'field' => 'soft_credit_type_id',
       'multiple' => TRUE,
-      'class' => 'huge'
+      'class' => 'huge',
     ));
 
     $entities = array(
@@ -196,7 +202,12 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       ),
     );
 
-    $allowCoreTypes = array_merge(array('Contact', 'Individual', 'Organization', 'Household'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
+    $allowCoreTypes = array_merge(array(
+        'Contact',
+        'Individual',
+        'Organization',
+        'Household',
+      ), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $allowSubTypes = array();
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
@@ -216,18 +227,18 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     $errors = array();
     $contributionPageId = $self->_id;
     //CRM-4286
@@ -237,7 +248,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     // ensure on-behalf-of profile meets minimum requirements
     if (!empty($values['is_organization'])) {
-      if (empty($values['onbehalf_profile_id']) ) {
+      if (empty($values['onbehalf_profile_id'])) {
         $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
       }
       else {
@@ -270,7 +281,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
       list($contributionProfiles['custom_pre_id'],
         $contributionProfiles['custom_post_id']
-      ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       $conProfileType = NULL;
       if ($contributionProfiles['custom_pre_id']) {
@@ -283,7 +294,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       if ($contributionProfiles['custom_post_id']) {
         $postProfileType = CRM_Core_BAO_UFField::getProfileType($contributionProfiles['custom_post_id']);
         if ($postProfileType == 'Membership') {
-          $conProfileType  = empty($conProfileType) ? "'Includes Profile (bottom of page)'" : "{$conProfileType} and 'Includes Profile (bottom of page)'";
+          $conProfileType = empty($conProfileType) ? "'Includes Profile (bottom of page)'" : "{$conProfileType} and 'Includes Profile (bottom of page)'";
         }
       }
       if (!empty($conProfileType)) {
@@ -294,10 +305,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -338,38 +348,35 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
 
     $ufJoinParams = array(
-      'onbehalf_profile_id' =>
-        array(
-          'is_active' => 1,
-          'module' => 'OnBehalf',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $dao->id,
-        ),
-      'honor_block_is_active' =>
-        array(
-          'module' => 'soft_credit',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $dao->id,
-        )
+      'onbehalf_profile_id' => array(
+        'is_active' => 1,
+        'module' => 'OnBehalf',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $dao->id,
+      ),
+      'honor_block_is_active' => array(
+        'module' => 'soft_credit',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $dao->id,
+      ),
     );
-
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {
       if (!empty($params[$index])) {
-          $ufJoinParam['weight'] = 1;
-          if ($index == 'honor_block_is_active') {
-            $ufJoinParam['is_active'] = 1;
-            $ufJoinParam['module'] = 'soft_credit';
-            $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
-            $ufJoinParam['module_data'] = $sctJSON;
-          }
-          else {
-            // first delete all past entries
-            CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
-            $ufJoinParam['uf_group_id'] = $params[$index];
-          }
-            CRM_Core_BAO_UFJoin::create($ufJoinParam);
+        $ufJoinParam['weight'] = 1;
+        if ($index == 'honor_block_is_active') {
+          $ufJoinParam['is_active'] = 1;
+          $ufJoinParam['module'] = 'soft_credit';
+          $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
+          $ufJoinParam['module_data'] = $sctJSON;
         }
+        else {
+          // first delete all past entries
+          CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
+          $ufJoinParam['uf_group_id'] = $params[$index];
+        }
+        CRM_Core_BAO_UFJoin::create($ufJoinParam);
+      }
       elseif ($index == 'honor_block_is_active') {
         //On subsequent honor_block_is_active uncheck, disable(don't delete)
         //that particular honoree profile entry in UFjoin table, CRM-13981
@@ -391,8 +398,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $url = 'civicrm/admin/contribute';
         $urlParams = 'reset=1';
         CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-            array(1 => $this->getTitle())
-          ), ts('Saved'), 'success');
+          array(1 => $this->getTitle())
+        ), ts('Saved'), 'success');
       }
 
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
@@ -404,10 +411,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Title and Settings');
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,12 +40,12 @@
 class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
   /**
-   * ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    */
   var $contactIds = array();
 
   /**
-   * params to dedupe against (queries against the whole contact set otherwise)
+   * Params to dedupe against (queries against the whole contact set otherwise)
    */
   var $params = array();
 
@@ -53,9 +53,10 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @return string  SQL query performing the search
+   * @return string
+   *   SQL query performing the search
    */
-  function sql() {
+  public function sql() {
     if ($this->params &&
       (!array_key_exists($this->rule_table, $this->params) ||
         !array_key_exists($this->rule_field, $this->params[$this->rule_table])
@@ -70,7 +71,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // $using are arrays of required field matchings (for substring and
     // full matches, respectively)
     $where = array();
-    $on    = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
+    $on = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
     $using = array($this->rule_field);
 
     switch ($this->rule_table) {
@@ -89,8 +90,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
         break;
 
       case 'civicrm_address':
-        $id      = 'contact_id';
-        $on[]    = 't1.location_type_id = t2.location_type_id';
+        $id = 'contact_id';
+        $on[] = 't1.location_type_id = t2.location_type_id';
         $using[] = 'location_type_id';
         if ($this->params['civicrm_address']['location_type_id']) {
           $locTypeId = CRM_Utils_Type::escape($this->params['civicrm_address']['location_type_id'], 'Integer', FALSE);
@@ -185,16 +186,16 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
   }
 
   /**
-   * To find fields related to a rule group.
+   * find fields related to a rule group.
    *
-   * @param array contains the rule group property to identify rule group
+   * @param array $params contains the rule group property to identify rule group
    *
-   * @return rule fields array associated to rule group
-   * @access public
+   * @return array
+   *   rule fields array associated to rule group
    */
-  static function dedupeRuleFields($params) {
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used         = $params['used'];
+  public static function dedupeRuleFields($params) {
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->used = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
     $rgBao->find(TRUE);
 
@@ -209,14 +210,14 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
   }
 
   /**
-   * @param $cid
-   * @param $oid
+   * @param int $cid
+   * @param int $oid
    *
    * @return bool
    */
-  static function validateContacts($cid, $oid) {
+  public static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
-      return;
+      return NULL;
     }
     $exception = new CRM_Dedupe_DAO_Exception();
     $exception->contact_id1 = $cid;
@@ -229,5 +230,5 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
     return $exception->find(TRUE) ? FALSE : TRUE;
   }
-}
 
+}

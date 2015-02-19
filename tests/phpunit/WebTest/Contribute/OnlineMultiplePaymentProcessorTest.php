@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -34,7 +34,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     parent::setUp();
   }
 
-  function testOnlineMultpiplePaymentProcessor() {
+  public function testOnlineMultpiplePaymentProcessor() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -116,7 +116,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
 
   }
 
-  function testOnlineMultiplePaymentProcessorWithPayLater() {
+  public function testOnlineMultiplePaymentProcessorWithPayLater() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -146,7 +146,7 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
       $isPcpApprovalNeeded = FALSE,
       $isSeparatePayment = FALSE,
       $honoreeSection = FALSE,
-      $allowOtherAmmount = TRUE
+      $allowOtherAmount = TRUE
     );
 
     $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", NULL);
@@ -177,27 +177,29 @@ class WebTest_Contribute_OnlineMultiplePaymentProcessorTest extends CiviSelenium
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $payLaterInstructionsText = "Pay later instructions $hash";
-    $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
+    $this->verifyText("xpath=//div[@class='bold pay_later_receipt-section']/p", $payLaterInstructionsText);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent($payLaterInstructionsText));
+    $this->verifyText("xpath=//div[@id='help']/div/p", $payLaterInstructionsText);
 
     //login to check contribution
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
-    $this->type('sort_name', "$firstName $lastName");
+    $this->type('sort_name', "$lastName $firstName");
     $this->check('contribution_test');
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
+    $this->click('_qf_Search_refresh');
+    $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
-      'From'            => "{$firstName} {$lastName}",
-      'Financial Type'  => 'Donation',
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
       'Contribution Status' => 'Pending : Pay Later',
     );
     $this->webtestVerifyTabularData($expected);
     $this->click('_qf_ContributionView_cancel-bottom');
   }
-}
 
+}

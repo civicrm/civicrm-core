@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
@@ -37,35 +37,36 @@
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
   /**
-   * @param $exts
+   * @param array $exts
+   *   Array(string $key => array $spec) List of extensions.
    */
   public function __construct($exts) {
     $this->exts = $exts;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function checkRequirements() {
     return array();
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getName() {
     return $this->name;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getKeys() {
     return array_keys($this->exts);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getPath($key) {
     $e = $this->getExt($key);
@@ -73,7 +74,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getResUrl($key) {
     $e = $this->getExt($key);
@@ -81,21 +82,24 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function refresh() {
   }
 
   /**
-   * @param $key
+   * @param string $key
+   *   Extension name.
    *
    * @throws CRM_Extension_Exception_MissingException
    */
   protected function getExt($key) {
     if (isset($this->exts[$key])) {
       return $this->exts[$key];
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception_MissingException("Missing extension: $key");
     }
   }
+
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -28,7 +28,6 @@
 {strip}
   {if $rows and is_array($rows)}
     {include file="CRM/common/enableDisableApi.tpl"}
-    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
   {/if}
   <table id="scheduleReminders" class="display">

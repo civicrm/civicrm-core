@@ -19,7 +19,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -45,6 +45,20 @@ function dm_remove_files() {
   done
 }
 
+## Copy all bower dependencies
+function dm_install_bower() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+}
+
 ## Copy all core files
 ## usage: dm_install_core <core_repo_path> <to_path>
 function dm_install_core() {
@@ -56,6 +70,7 @@ function dm_install_core() {
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
@@ -91,7 +106,7 @@ function dm_install_packages() {
   ##   packages/Files packages/PHP packages/Text
 
   [ ! -d "$to" ] && mkdir "$to"
-  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
@@ -135,6 +150,21 @@ function dm_install_l10n() {
   dm_install_dir "$repo" "$to"
 }
 
+## Copy composer's "vendor" folder
+## usage: dm_install_vendor <from_path> <to_path>
+function dm_install_vendor() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+}
+
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
 function dm_install_wordpress() {
   local repo="$1"
@@ -143,7 +173,7 @@ function dm_install_wordpress() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  $DM_RSYNC -avC \
+  ${DM_RSYNC:-rsync} -avC \
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
@@ -151,6 +181,26 @@ function dm_install_wordpress() {
     --exclude=civicrm \
     "$repo/./"  "$to/./"
   ## Need --exclude=civicrm for self-building on WP site
+}
+
+
+## Generate the "bower_components" folder.
+## usage: dm_generate_bower <repo_path>
+function dm_generate_bower() {
+  local repo="$1"
+  pushd "$repo"
+    ${DM_NPM:-npm} install
+    ${DM_NODE:-node} node_modules/bower/bin/bower install
+  popd
+}
+
+## Generate the composer "vendor" folder
+## usage: dm_generate_vendor <repo_path>
+function dm_generate_vendor() {
+  local repo="$1"
+  pushd "$repo"
+    ${DM_COMPOSER:-composer} install
+  popd
 }
 
 ## Generate civicrm-version.php

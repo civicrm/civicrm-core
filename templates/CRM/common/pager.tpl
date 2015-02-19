@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -60,7 +60,7 @@
         CRM.$(function($) {
           {/literal}
           var
-            $form = $('form.{$form.formClass}'),
+            $form = $({if empty($form.formClass)}'#crm-main-content-wrapper'{else}'form.{$form.formClass}'{/if}),
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
@@ -72,7 +72,7 @@
             if (!refreshing) {
               refreshing = true;
               var options = url ? {url: url} : {};
-              $form.off().closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
+              $form.off('.crm-pager').closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
             }
           }
           function page(num) {
@@ -115,7 +115,7 @@
             })
             .on('keyup keydown keypress', preventSubmit);
           $form
-            .on('click', 'a.ui-spinner-button', function(e) {
+            .on('click.crm-pager', 'a.ui-spinner-button', function(e) {
               var $el = $(this);
               // Update after a short delay to allow multiple clicks
               spinning !== null && window.clearTimeout(spinning);
@@ -128,7 +128,7 @@
               }, 200);
             })
             // Handle sorting, paging and alpha filtering links
-            .on('click', 'a.crm-pager-link, #alpha-filter a, th a.sorting, th a.sorting_desc, th a.sorting_asc', function(e) {
+            .on('click.crm-pager', 'a.crm-pager-link, #alpha-filter a, th a.sorting, th a.sorting_desc, th a.sorting_asc', function(e) {
               refresh($(this).attr('href'));
               e.preventDefault();
             });

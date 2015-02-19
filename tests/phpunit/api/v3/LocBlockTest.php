@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -34,17 +34,20 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'loc_block';
 
+  /**
+   * Set up.
+   */
   public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {
-  }
-
+  /**
+   * Test creating location block.
+   */
   public function testCreateLocBlock() {
     $email = $this->callAPISuccess('email', 'create', array(
       'contact_id' => 'null',
-      'location_type_id' => 1,
       'email' => 'test@loc.block',
     ));
     $phone = $this->callAPISuccess('phone', 'create', array(
@@ -65,11 +68,14 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     $description = 'Create locBlock with existing entities';
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'simpleCreate');
     $id = $result['id'];
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$id]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$id]['id']);
     $this->getAndCheck($params, $id, $this->_entity);
   }
 
+  /**
+   * Test creating location block entities.
+   */
   public function testCreateLocBlockEntities() {
     $params = array(
       'email' => array(
@@ -89,35 +95,28 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
         'street_address' => '987654321',
       ),
     );
-    $description = "Create entities and locBlock in 1 api call";
+    $description = "Create entities and locBlock in 1 api call.";
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'createEntities');
     $id = $result['id'];
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
 
-    // Now check our results using the return param 'all'
+    // Now check our results using the return param 'all'.
     $getParams = array(
       'id' => $id,
       'return' => 'all',
     );
-    // Can't use callAPISuccess with getsingle
+    // Can't use callAPISuccess with getsingle.
     $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', 'getEntities', 'get');
     $result = array_pop($result['values']);
-    $this->assertNotNull($result['email_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['phone_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['phone_2_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['address_id'], 'In line ' . __LINE__);
-    $this->assertEquals($params['email']['email'], $result['email']['email'],  'In line ' . __LINE__);
-    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone'],  'In line ' . __LINE__);
-    $this->assertEquals($params['address']['street_address'], $result['address']['street_address'],  'In line ' . __LINE__);
-    // Delete block
-    $result = $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
+    $this->assertNotNull($result['email_id']);
+    $this->assertNotNull($result['phone_id']);
+    $this->assertNotNull($result['phone_2_id']);
+    $this->assertNotNull($result['address_id']);
+    $this->assertEquals($params['email']['email'], $result['email']['email']);
+    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone']);
+    $this->assertEquals($params['address']['street_address'], $result['address']['street_address']);
+
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $id));
   }
 
-  public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
-  }
-
-  public static function tearDownAfterClass(){
-  }
 }
-

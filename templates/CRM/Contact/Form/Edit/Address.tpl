@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -63,7 +63,7 @@
     {/if}
      <tr>
         <td>
-     <table id="address_{$blockId}" style="display:block" class="form-layout-compressed">
+     <table id="address_table_{$blockId}" class="form-layout-compressed">
          {* build address block w/ address sequence. *}
          {foreach item=addressElement from=$addressSequence}
               {include file=CRM/Contact/Form/Edit/Address/$addressElement.tpl}
@@ -81,7 +81,7 @@
 
   {if $className eq 'CRM_Contact_Form_Contact'}
       <div id="addMoreAddress{$blockId}" class="crm-add-address-wrapper">
-          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><div class="icon add-icon"></div>{ts}Another Address{/ts}</span></a>
+          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Another Address{/ts}</span></a>
       </div>
   {/if}
 

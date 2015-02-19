@@ -1,8 +1,7 @@
 <?php
-
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,14 +39,13 @@
 class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @access public
    * @return void
    */
-  function buildQuickForm( ) {
+  public function buildQuickForm() {
 
-    CRM_Utils_System::setTitle( 'Wordpress Access Control' );
+    CRM_Utils_System::setTitle('Wordpress Access Control');
 
     // Get the core permissions array
     $permissionsArray = self::getPermissionArray();
@@ -58,14 +56,14 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
-    foreach ( $wp_roles->role_names as $role => $name ) {
+    foreach ($wp_roles->role_names as $role => $name) {
       // Dont show the permissions options for administrator, as they have all permissions
       if ($role !== 'administrator') {
         $roleObj = $wp_roles->get_role($role);
         if (!empty($roleObj->capabilities)) {
           foreach ($roleObj->capabilities as $ckey => $cname) {
-            if (array_key_exists($ckey , $permissionsArray)) {
-              $elementName = $role.'['.$ckey.']';
+            if (array_key_exists($ckey, $permissionsArray)) {
+              $elementName = $role . '[' . $ckey . ']';
               $defaults[$elementName] = 1;
             }
           }
@@ -73,9 +71,9 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
         // Compose the checkbox array for each role, to assign to form
         $rolePerms[$role] = $permissionsArray;
-        foreach ( $rolePerms[$role] as $key => $value) {
-          $elementName = $role.'['.$key.']';
-          $this->add('checkbox' , $elementName , $value);
+        foreach ($rolePerms[$role] as $key => $value) {
+          $elementName = $role . '[' . $key . ']';
+          $this->add('checkbox', $elementName, $value);
         }
         $roles[$role] = $name;
       }
@@ -88,20 +86,20 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $this->addButtons(
       array(
-        array (
-          'type'      => 'next',
-          'name'      => ts('Save'),
-          'spacing'   => '',
-          'isDefault' => false   ),
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'spacing' => '',
+          'isDefault' => FALSE,
+        ),
       )
     );
 
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    * @return void
    */
   public function postProcess() {
@@ -114,18 +112,18 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
-    foreach ( $wp_roles->role_names as $role => $name ) {
+    foreach ($wp_roles->role_names as $role => $name) {
       $roleObj = $wp_roles->get_role($role);
 
       //Remove all civicrm capabilities for the role, as there may be some capabilities checkbox unticked
-      foreach ($permissionsArray as $key => $capability){
+      foreach ($permissionsArray as $key => $capability) {
         $roleObj->remove_cap($key);
       }
 
       //Add the selected wordpress capabilities for the role
       $rolePermissions = $params[$role];
       if (!empty($rolePermissions)) {
-        foreach ( $rolePermissions as $key => $capability ) {
+        foreach ($rolePermissions as $key => $capability) {
           $roleObj->add_cap($key);
         }
       }
@@ -133,7 +131,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       if ($role == 'anonymous_user') {
         // Get the permissions into a format that matches what we get from WP
         $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
-        foreach ($allWarningPermissions  as $key => $permission) {
+        foreach ($allWarningPermissions as $key => $permission) {
           $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
@@ -143,7 +141,10 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         }
         if (!empty($warningPermissionNames)) {
           CRM_Core_Session::setStatus(
-            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array( 1 => $wp_roles->role_names[$role], 2 => implode(', ', $warningPermissionNames))),
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(
+                1 => $wp_roles->role_names[$role],
+                2 => implode(', ', $warningPermissionNames),
+              )),
             ts('Unsafe Permission Settings')
           );
         }
@@ -161,7 +162,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     CRM_Core_Session::setStatus("", ts('Wordpress Access Control Updated'), "success");
 
     // rebuild the menus to comply with the new permisssions/capabilites
-    CRM_Core_Invoke::rebuildMenuAndCaches( );
+    CRM_Core_Invoke::rebuildMenuAndCaches();
 
     CRM_Utils_System::redirect('admin.php?page=CiviCRM&q=civicrm/admin/access&reset=1');
     CRM_Utils_System::civiExit();
@@ -172,10 +173,10 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * This function should be shared from a similar one in
    * distmaker/utils/joomlaxml.php
    *
-   * @access public
-   * @return array   civicrm permissions
+   * @return array
+   *   civicrm permissions
    */
-  static function getPermissionArray(){
+  public static function getPermissionArray() {
     global $civicrm_root;
 
     $permissions = CRM_Core_Permission::basicPermissions();
@@ -188,4 +189,5 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     return $perms_array;
   }
+
 }

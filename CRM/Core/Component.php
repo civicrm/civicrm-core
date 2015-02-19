@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Component stores all the static and dynamic information of the various
@@ -36,11 +36,11 @@
  */
 class CRM_Core_Component {
 
-  /*
-     * End part (filename) of the component information class'es name
-     * that needs to be present in components main directory.
-     */
-  CONST COMPONENT_INFO_CLASS = 'Info';
+  /**
+   * End part (filename) of the component information class'es name
+   * that needs to be present in components main directory.
+   */
+  const COMPONENT_INFO_CLASS = 'Info';
 
   private static $_info = NULL;
 
@@ -70,12 +70,12 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param null $attribute
    *
    * @return mixed
    */
-  static function get($name, $attribute = NULL) {
+  public static function get($name, $attribute = NULL) {
     $comp = CRM_Utils_Array::value($name, self::_info());
     if ($attribute) {
       return CRM_Utils_Array::value($attribute, $comp->info);
@@ -99,7 +99,7 @@ class CRM_Core_Component {
       $cr->find(FALSE);
       while ($cr->fetch()) {
         $infoClass = $cr->namespace . '_' . self::COMPONENT_INFO_CLASS;
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
         $infoObject = new $infoClass($cr->name, $cr->namespace, $cr->id);
         if ($infoObject->info['name'] !== $cr->name) {
           CRM_Core_Error::fatal("There is a discrepancy between name in component registry and in info file ({$cr->name}).");
@@ -151,7 +151,7 @@ class CRM_Core_Component {
    *
    * @return bool
    */
-  static function invoke(&$args, $type) {
+  public static function invoke(&$args, $type) {
     $info = self::_info();
     $config = CRM_Core_Config::singleton();
 
@@ -186,7 +186,7 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function xmlMenu() {
+  public static function xmlMenu() {
 
     // lets build the menu for all components
     $info = self::getComponents(TRUE);
@@ -204,7 +204,7 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function &menu() {
+  public static function &menu() {
     $info = self::_info();
     $items = array();
     foreach ($info as $name => $comp) {
@@ -222,23 +222,25 @@ class CRM_Core_Component {
   /**
    * @param $config
    * @param bool $oldMode
+   *
+   * @return null
    */
-  static function addConfig(&$config, $oldMode = FALSE) {
+  public static function addConfig(&$config, $oldMode = FALSE) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
       $cfg = $comp->getConfigObject();
       $cfg->add($config, $oldMode);
     }
-    return;
+    return NULL;
   }
 
   /**
-   * @param $componentName
+   * @param string $componentName
    *
    * @return mixed
    */
-  static function getComponentID($componentName) {
+  public static function getComponentID($componentName) {
     $info = self::_info();
     if (!empty($info[$componentName])) {
       return $info[$componentName]->componentID;
@@ -249,11 +251,11 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $componentID
+   * @param int $componentID
    *
    * @return int|null|string
    */
-  static function getComponentName($componentID) {
+  public static function getComponentName($componentID) {
     $info = self::_info();
 
     $componentName = NULL;
@@ -270,13 +272,13 @@ class CRM_Core_Component {
   /**
    * @return array
    */
-  static function &getQueryFields() {
+  public static function &getQueryFields() {
     $info = self::_info();
     $fields = array();
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
-        $bqr    = $comp->getBAOQueryObject();
-        $flds   = $bqr->getFields();
+        $bqr = $comp->getBAOQueryObject();
+        $flds = $bqr->getFields();
         $fields = array_merge($fields, $flds);
       }
     }
@@ -285,9 +287,9 @@ class CRM_Core_Component {
 
   /**
    * @param $query
-   * @param $fnName
+   * @param string $fnName
    */
-  static function alterQuery(&$query, $fnName) {
+  public static function alterQuery(&$query, $fnName) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -299,13 +301,13 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $mode
    * @param $side
    *
    * @return null
    */
-  static function from($fieldName, $mode, $side) {
+  public static function from($fieldName, $mode, $side) {
     $info = self::_info();
 
     $from = NULL;
@@ -327,7 +329,8 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function &defaultReturnProperties($mode,
+  public static function &defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $info = self::_info();
@@ -346,9 +349,9 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  static function &buildSearchForm(&$form) {
+  public static function &buildSearchForm(&$form) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -361,9 +364,9 @@ class CRM_Core_Component {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
-  static function searchAction(&$row, $id) {
+  public static function searchAction(&$row, $id) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -377,7 +380,7 @@ class CRM_Core_Component {
   /**
    * @return array|null
    */
-  static function &contactSubTypes() {
+  public static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
       self::$_contactSubTypes = array();
     }
@@ -391,7 +394,7 @@ class CRM_Core_Component {
    *
    * @return null
    */
-  static function &contactSubTypeProperties($subType, $op) {
+  public static function &contactSubTypeProperties($subType, $op) {
     $properties = self::contactSubTypes();
     if (array_key_exists($subType, $properties) &&
       array_key_exists($op, $properties[$subType])
@@ -404,7 +407,7 @@ class CRM_Core_Component {
   /**
    * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
    */
-  static function &taskList() {
+  public static function &taskList() {
     $info = self::_info();
 
     $tasks = array();
@@ -417,15 +420,13 @@ class CRM_Core_Component {
   }
 
   /**
-   * Function to handle table dependencies of components
+   * Handle table dependencies of components.
    *
-   * @param array $tables  array of tables
+   * @param array $tables
+   *   Array of tables.
    *
-   * @return null
-   * @access public
-   * @static
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     $info = self::_info();
 
     foreach ($info as $name => $comp) {
@@ -437,14 +438,12 @@ class CRM_Core_Component {
   }
 
   /**
-   * Function to get components info from info file
-   *
+   * Get components info from info file.
    */
-  static function getComponentsFromFile($crmFolderDir) {
+  public static function getComponentsFromFile($crmFolderDir) {
     $components = array();
     //traverse CRM folder and check for Info file
-    if (is_dir($crmFolderDir)) {
-      $dir = opendir($crmFolderDir);
+    if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {
         // skip the extensions diretory since it has an Info.php file also
         if ($subDir == 'Extension') {
@@ -454,7 +453,7 @@ class CRM_Core_Component {
         $infoFile = $crmFolderDir . "/{$subDir}/" . self::COMPONENT_INFO_CLASS . '.php';
         if (file_exists($infoFile)) {
           $infoClass = 'CRM_' . $subDir . '_' . self::COMPONENT_INFO_CLASS;
-          require_once (str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php');
+          require_once str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
           $infoObject = new $infoClass(NULL, NULL, NULL);
           $components[$infoObject->info['name']] = $infoObject;
           unset($infoObject);
@@ -464,5 +463,5 @@ class CRM_Core_Component {
 
     return $components;
   }
-}
 
+}

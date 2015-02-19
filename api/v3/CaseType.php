@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -23,41 +23,35 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 Case functions
- * Developed by woolman.org
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Case
- * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Function to create or update case type
+ * This api exposes CiviCRM Case.
  *
- * @param  array $params   input parameters
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Create or update case type.
  *
- * Allowed @params array keys are:
- * {@getfields case_type_create}
+ * @param array $params
+ *   Input parameters.
  *
  * @throws API_Exception
- * @return array API result array
- *
- * @static void
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
-  unset($params['is_forkable']); // computed property
-  unset($params['is_forked']); // computed property
+  // Computed properties.
+  unset($params['is_forkable']);
+  unset($params['is_forked']);
 
   if (!array_key_exists('is_active', $params) && empty($params['id'])) {
     $params['is_active'] = TRUE;
   }
-  if (!empty($params['id']) // this is an existing case-type
+  // This is an existing case-type.
+  if (!empty($params['id'])
     && !CRM_Case_BAO_CaseType::isForked($params['id']) // which is not yet forked
     && !CRM_Case_BAO_CaseType::isForkable($params['id']) // for which new forks are prohibited
   ) {
@@ -68,26 +62,29 @@ function civicrm_api3_case_type_create($params) {
 }
 
 /**
- * Function to retrieve case types
+ * Retrieve case types.
  *
- * @param $params
+ * @param array $params
  *
- * @return array $caseTypes case types keyed by id
- * @access public
+ * @return array
+ *   case types keyed by id
  */
 function civicrm_api3_case_type_get($params) {
-  civicrm_api3_verify_mandatory($params);
+  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
   $caseTypes = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-
   // format case type, to fetch xml definition
   return _civicrm_api3_case_type_get_formatResult($caseTypes);
 }
 
 /**
- * Function to format definition
+ * Format definition.
  *
- * @param $caseTypes
- * @return mixed
+ * @param array $result
+ *
+ * @return array
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
   foreach ($result['values'] as $key => $caseType) {
@@ -95,7 +92,8 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
     $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
     if ($xml) {
       $result['values'][$key]['definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
-    } else {
+    }
+    else {
       $result['values'][$key]['definition'] = array();
     }
     $result['values'][$key]['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($result['values'][$key]['id']);
@@ -105,14 +103,13 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
 }
 
 /**
- * Function to delete case type
+ * Function to delete case type.
  *
- * @param array $params array including id of case_type to delete
-
- * @return array API result array
+ * @param array $params
+ *   Array including id of case_type to delete.
  *
- * @access public
- *
+ * @return array
+ *   API result array
  */
 function civicrm_api3_case_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

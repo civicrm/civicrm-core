@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,20 +40,25 @@
 class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
-    $id      = $this->get('id');
-    $values  = $ids = array();
-    $params  = array('id' => $id);
+    $id = $this->get('id');
+    $values = $ids = array();
+    $params = array('id' => $id);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->assign('context', $context);
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
+    $cancelledStatus = TRUE;
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if (CRM_Utils_Array::value('contribution_status_id', $values) == array_search('Cancelled', $status)) {
+      $cancelledStatus = FALSE;
+    }
+    $this->assign('cancelledStatus', $cancelledStatus);
 
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
@@ -68,12 +73,16 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       if ($values['to_financial_account_id']) {
         $values['to_financial_account'] = CRM_Contribute_PseudoConstant::financialAccount($values['to_financial_account_id']);
       }
+      $values['payment_processor_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'payment_processor_id');
+      if ($values['payment_processor_id']) {
+        $values['payment_processor_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', $values['payment_processor_id'], 'name');
+      }
     }
 
     if (!empty($values['contribution_recur_id'])) {
-      $sql    = "SELECT  installments, frequency_interval, frequency_unit FROM civicrm_contribution_recur WHERE id = %1";
+      $sql = "SELECT  installments, frequency_interval, frequency_unit FROM civicrm_contribution_recur WHERE id = %1";
       $params = array(1 => array($values['contribution_recur_id'], 'Integer'));
-      $dao    = CRM_Core_DAO::executeQuery($sql, $params);
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
         $values['recur_installments'] = $dao->installments;
         $values['recur_frequency_unit'] = $dao->frequency_unit;
@@ -147,6 +156,12 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     // assign values to the template
     $this->assign($values);
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $this->assign('invoicing', $invoicing);
+    if ($invoicing && isset($values['tax_amount'])) {
+      $this->assign('totalTaxAmount', $values['tax_amount']);
+    }
 
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
@@ -157,7 +172,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Contribution from') .  ' ' . $displayName);
+    CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
 
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
@@ -188,10 +203,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -205,4 +219,5 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       )
     );
   }
+
 }

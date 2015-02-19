@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -55,21 +55,28 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   private $drupalModules = NULL;
 
   /**
-   *
    * @see CRM_Utils_Hook::invoke()
    *
-   * @param integer $numParams Number of parameters to pass to the hook
-   * @param unknown $arg1 parameter to be passed to the hook
-   * @param unknown $arg2 parameter to be passed to the hook
-   * @param unknown $arg3 parameter to be passed to the hook
-   * @param unknown $arg4 parameter to be passed to the hook
-   * @param unknown $arg5 parameter to be passed to the hook
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param unknown $arg1
+   *   Parameter to be passed to the hook.
+   * @param unknown $arg2
+   *   Parameter to be passed to the hook.
+   * @param unknown $arg3
+   *   Parameter to be passed to the hook.
+   * @param unknown $arg4
+   *   Parameter to be passed to the hook.
+   * @param unknown $arg5
+   *   Parameter to be passed to the hook.
    * @param mixed $arg6
-   * @param string $fnSuffix function suffix, this is effectively the hook name
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
    *
-   * @return Ambigous <boolean, multitype:>
+   * @return array|bool
    */
-  function invoke($numParams,
+  public function invoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
 
@@ -83,7 +90,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   /**
    * Build the list of modules to be processed for hooks.
    */
-  function buildModuleList() {
+  public function buildModuleList() {
     if ($this->isBuilt === FALSE) {
       if ($this->drupalModules === NULL) {
         if (function_exists('module_list')) {
@@ -122,4 +129,5 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
       }
     }
   }
+
 }

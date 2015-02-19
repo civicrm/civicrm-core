@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,12 +40,10 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
   public $_contactId;
 
   /**
-   * This function is called when action is browse
+   * called when action is browse.
    *
-   * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
@@ -58,11 +56,11 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     }
 
     $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId);
-    $this->assign('groupSmart'  , NULL);
+    $this->assign('groupSmart', NULL);
     $this->assign('groupParent', NULL);
 
     if (!empty($allGroup)) {
-      $smart = $parent = array( );
+      $smart = $parent = array();
       foreach ($allGroup['group'] as $group) {
         // delete all smart groups which are also in static groups
         if (isset($staticGroups[$group['id']])) {
@@ -85,7 +83,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     }
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -97,16 +95,16 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called
+   * the main function that is called
    * when the page loads, it decides the which action has
    * to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     $this->browse();
     return parent::run();
   }
+
 }

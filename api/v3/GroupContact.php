@@ -1,9 +1,7 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -28,27 +26,34 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group contact functions
+ * This api exposes CiviCRM group contacts.
+ *
+ * This api is for adding/removing contacts from a group,
+ * or fetching a list of groups for a contact.
+ *
+ * Important note: This api does not fetch smart groups for a contact.
+ * To fetch all contacts in a smart group, use the contact api
+ * passing a contact_id and group_id.
+ *
+ * To create/delete groups, use the group api instead.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Group
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: GroupContact.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 
 /**
- * This API will give list of the groups for particular contact
- * Particualr status can be sent in params array
+ * This API will give list of the groups for particular contact.
+ *
+ * Particular status can be sent in params array.
+ *
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
  *
- * @param  array $params  name value pair of contact information
- * {@getfields GroupContact_get}
+ * @param array $params
+ *   Name value pair of contact information.
  *
- * @return  array  list of groups, given contact subsribed to
+ * @return array
+ *   list of groups, given contact subsribed to
  */
 function civicrm_api3_group_contact_get($params) {
 
@@ -62,29 +67,18 @@ function civicrm_api3_group_contact_get($params) {
   }
   $status = CRM_Utils_Array::value('status', $params, 'Added');
 
-  $values = &CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE);
+  $groupId = CRM_Utils_Array::value('group_id', $params);
+  $values = &CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE, FALSE, TRUE, $groupId);
   return civicrm_api3_create_success($values, $params);
 }
 
 /**
- * Add contact(s) to group(s)
+ * Add contact(s) to group(s).
  *
- * @access public
- *
- * @param  array $params Input parameters
- *
- * Allowed @params array keys are:<br>
- * "contact_id" (required) : first contact to add<br>
- * "group_id" (required): first group to add contact(s) to<br>
- * "contact_id.1" etc. (optional) : another contact to add<br>
- * "group_id.1" etc. (optional) : additional group to add contact(s) to<br>
- * "status" (optional) : one of "Added", "Pending" or "Removed" (default is "Added")
- * {@example GroupContactCreate.php 0}
- *
- * @return array Information about operation results
- *
+ * This api has a legacy/nonstandard signature.
  * On success, the return array will be structured as follows:
- * <code>array(
+ * @code
+ * array(
  *   "is_error" => 0,
  *   "version"  => 3,
  *   "count"    => 3,
@@ -93,15 +87,28 @@ function civicrm_api3_group_contact_get($params) {
  *     "added"       => integer,
  *     "total_count" => integer
  *   )
- * )</code>
+ * )
+ * @endcode
  *
  * On failure, the return array will be structured as follows:
- * <code>array(
+ * @code
+ * array(
  *   'is_error' => 1,
  *   'error_message' = string,
  *   'error_data' = mixed or undefined
- * )</code>
- * {@getfields GroupContact_create}
+ * )
+ * @endcode
+ *
+ * @param array $params
+ *   Input parameters.
+ *   - "contact_id" (required) : first contact to add
+ *   - "group_id" (required): first group to add contact(s) to
+ *   - "contact_id.1" etc. (optional) : another contact to add
+ *   - "group_id.1" etc. (optional) : additional group to add contact(s) to
+ *   - "status" (optional) : one of "Added", "Pending" or "Removed" (default is "Added")
+ *
+ * @return array
+ *   Information about operation results
  */
 function civicrm_api3_group_contact_create($params) {
   // Nonstandard bao - doesn't accept ID as a param, so convert id to group_id + contact_id
@@ -119,10 +126,13 @@ function civicrm_api3_group_contact_create($params) {
 }
 
 /**
+ * Delete group contact record.
  *
- * @param <type> $params
+ * @param array $params
  *
- * @return array <type>@deprecated
+ * @return array
+ *
+ * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
   $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
@@ -131,7 +141,9 @@ function civicrm_api3_group_contact_delete($params) {
 }
 
 /**
- * modify metadata
+ * Adjust metadata.
+ *
+ * @param array $params
  */
 function _civicrm_api3_group_contact_delete_spec(&$params) {
   // set as not required no either/or std yet
@@ -139,10 +151,12 @@ function _civicrm_api3_group_contact_delete_spec(&$params) {
 }
 
 /**
+ * Get pending group contacts.
  *
- * @param <type> $params
+ * @param array $params
  *
- * @return array|int <type>@deprecated
+ * @return array|int
+ * @deprecated
  */
 function civicrm_api3_group_contact_pending($params) {
   $params['status'] = 'Pending';
@@ -150,13 +164,15 @@ function civicrm_api3_group_contact_pending($params) {
 }
 
 /**
+ * Group contact helper function.
+ *
+ * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
+ *   & at the very least return IDs & details of the groups created / changed
  *
  * @param array $params
  * @param string $op
  *
- * @return Array
- * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
- * & at the very least return IDs & details of the groups created / changed
+ * @return array
  */
 function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 
@@ -184,10 +200,10 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   $tracking = CRM_Utils_Array::value('tracking', $params);
 
   if ($op == 'Added' || $op == 'Pending') {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'added' => 0,
-      'not_added' => 0
+      'not_added' => 0,
     );
     foreach ($groupIDs as $groupID) {
       list($tc, $a, $na) = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs,
@@ -202,10 +218,10 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     }
   }
   else {
-    $extraReturnValues= array(
+    $extraReturnValues = array(
       'total_count' => 0,
       'removed' => 0,
-      'not_removed' => 0
+      'not_removed' => 0,
     );
     foreach ($groupIDs as $groupID) {
       list($tc, $r, $nr) = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIDs, $groupID, $method, $status, $tracking);
@@ -214,12 +230,19 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
       $extraReturnValues['not_removed'] += $nr;
     }
   }
-  $dao = null;// can't pass this by reference
-  return civicrm_api3_create_success(1,$params,'group_contact','create',$dao,$extraReturnValues);
+  $dao = NULL;// can't pass this by reference
+  return civicrm_api3_create_success(1, $params, 'group_contact', 'create', $dao, $extraReturnValues);
 }
 
 /**
+ * Update group contact status.
+ *
  * @deprecated - this should be part of create but need to know we aren't missing something
+ *
+ * @param array $params
+ *
+ * @return bool
+ * @throws \API_Exception
  */
 function civicrm_api3_group_contact_update_status($params) {
 
@@ -236,3 +259,17 @@ function civicrm_api3_group_contact_update_status($params) {
   return TRUE;
 }
 
+/**
+ * Deprecated function notices.
+ *
+ * @deprecated api notice
+ * @return array
+ *   Array of deprecated actions
+ */
+function _civicrm_api3_group_contact_deprecation() {
+  return array(
+    'delete' => 'GroupContact "delete" action is deprecated in favor of "create".',
+    'pending' => 'GroupContact "pending" action is deprecated in favor of "create".',
+    'update_status' => 'GroupContact "update_status" action is deprecated in favor of "create".',
+  );
+}

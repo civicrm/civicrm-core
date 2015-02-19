@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -28,10 +28,10 @@
         <div class="messages help">{$priceSet.help_pre}</div>
     {/if}
 
-		{assign var='adminFld' value=false}
-		{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-			{assign var='adminFld' value=true}
-		{/if}
+    {assign var='adminFld' value=false}
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+      {assign var='adminFld' value=true}
+    {/if}
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
@@ -68,17 +68,40 @@
 
                 <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name}-content">{$form.$element_name.html}
-                  {if $element.is_display_amounts && $element.html_type eq 'Text'}
-                    <span class="price-field-amount">
-                      {foreach item=option from=$element.options}{$option.amount|crmMoney}{/foreach}
+                  {if $element.html_type eq 'Text'}
+                    {if $element.is_display_amounts}
+                    <span class="price-field-amount{if $form.$element_name.frozen EQ 1} sold-out-option{/if}">
+                    {foreach item=option from=$element.options}
+                      {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
+                        {assign var="amount" value=`$option.amount+$option.tax_amount`}
+                        {if $displayOpt == 'Do_not_show'}
+                          {$amount|crmMoney}
+                        {elseif $displayOpt == 'Inclusive'}
+                          {$amount|crmMoney}
+                          <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
+                        {else}
+                          {$option.amount|crmMoney}
+                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
+                        {/if}
+                      {else}
+                        {$option.amount|crmMoney} {$fieldHandle} {$form.$fieldHandle.frozen}
+                      {/if}
+                      {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
+                    {/foreach}
                     </span>
+                    {else}
+                      {* Not showing amount, but still need to conditionally show Sold out marker *}
+                      {if $form.$element_name.frozen EQ 1}
+                        <span class="sold-out-option">({ts}Sold out{/ts})<span>
+                      {/if}
+                    {/if}
                   {/if}
-                      {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
+                  {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
                 </div>
                 <div class="clear"></div>
 
             {/if}
-            </div>
+          </div>
         {/if}
     {/foreach}
 

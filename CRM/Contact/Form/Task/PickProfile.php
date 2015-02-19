@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,40 +39,34 @@
 class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contacts that should be allowed to update
-   *
+   * Maximum contacts that should be allowed to update
    */
   protected $_maxContacts = 100;
 
   /**
-   * maximum profile fields that will be displayed
-   *
+   * Maximum profile fields that will be displayed
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
 
     $session = CRM_Core_Session::singleton();
@@ -81,7 +75,10 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contactIds) > $this->_maxContacts) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch Update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(1 => $this->_maxContacts, 2 => count($this->_contactIds))), ts('Maximum Exceeded'), 'error');
+      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch Update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(
+            1 => $this->_maxContacts,
+            2 => count($this->_contactIds),
+          )), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 
@@ -97,13 +94,12 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Batch Profile Update for Contact'));
 
     foreach ($this->_contactIds as $id) {
@@ -122,30 +118,29 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     }
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'), array('' => ts('- select profile -')) + $profiles, TRUE, array('class' => 'crm-select2 huge'));
 
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Task_PickProfile', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if (CRM_Core_BAO_UFField::checkProfileType($fields['uf_group_id'])) {
       $errorMsg['uf_group_id'] = "You cannot select mix profile for batch update.";
     }
@@ -158,9 +153,8 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -172,6 +166,5 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
-  //end of function
-}
 
+}

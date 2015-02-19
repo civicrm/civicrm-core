@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
   <table class="form-layout crm-edit-address-form crm-inline-edit-form">
     <tr>
       <td>
-        <div class="crm-submit-buttons"> 
+        <div class="crm-submit-buttons">
           {include file="CRM/common/formButtons.tpl"}
           {if $addressId}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -50,10 +50,10 @@
            <span class="crm-address-element is_billing-address-element">{$form.address.$blockId.is_billing.html}</span>
         </td>
      </tr>
-     
+
      {* include shared address template *}
      {include file="CRM/Contact/Form/ShareAddress.tpl"}
- 
+
      <tr>
       <td>
         <table id="address_table_{$blockId}" class="form-layout-compressed">
@@ -66,10 +66,10 @@
       </td>
      </tr>
   </table>
-  
-  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}"> 
+
+  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}">
     {include file="CRM/Contact/Form/Edit/Address/CustomData.tpl"}
-  </div> 
+  </div>
 {literal}
 <script type="text/javascript">
   {/literal}{* // Enforce unique location_type_id fields *}{literal}

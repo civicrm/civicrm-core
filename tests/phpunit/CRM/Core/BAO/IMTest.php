@@ -6,25 +6,14 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_IMTest
  */
 class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'IM BAOs',
-      'description' => 'Test all Core_BAO_IM methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -65,8 +54,8 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   /**
    * AllIMs() method - get all IMs for our contact, with primary IM first
    */
-  function testAllIMs() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+  public function testAllIMs() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
       $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml')
@@ -84,6 +73,5 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
 
     Contact::delete($contactId);
   }
+
 }
-
-

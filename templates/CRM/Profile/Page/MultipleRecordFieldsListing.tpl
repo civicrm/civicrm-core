@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,7 @@
   {/if}
   {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-    <div id="custom-{$customGroupId}-table-wrapper">
+    <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
         {strip}
           <table id="records" class="display">
@@ -51,16 +51,14 @@
               <tr class="{cycle values="odd-row,even-row"}">
                 {foreach from=$headers key=hrecId item=head}
                   {if $dateFieldsVals.$hrecId.$recId}
-                    <td>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
                   {else}
-                    <td>{$rows.$hrecId}</td>
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
                   {/if}
                 {/foreach}
                 <td>{$rows.action}</td>
                 {foreach from=$dateFieldsVals key=fid item=rec}
-                  {if $rec.$recId}
                     <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
-                  {/if}
                 {/foreach}
               </tr>
             {/foreach}
@@ -80,11 +78,11 @@
 
   {if !$reachedMax}
     {if $pageViewType eq 'customDataView'}
-      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single&mode=add"}" 
-       class="button action-item"><span><div class="icon add-icon"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
+      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single&mode=add"}"
+       class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
     {else}
       <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
-       class="button action-item"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
+       class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Record{/ts}</span></a>
     {/if}
   {/if}
 {/if}

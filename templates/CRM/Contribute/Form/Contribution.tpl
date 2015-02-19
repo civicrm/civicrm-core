@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -61,16 +61,18 @@
     {ts}WARNING: Deleting this contribution will result in the loss of the associated financial transactions (if any).{/ts} {ts}Do you want to continue?{/ts}
   </div>
   {else}
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
     {if $newCredit AND $action EQ 1 AND $contributionMode EQ null}
+    <div class="action-link css_right crm-link-credit-card-mode">
       {if $contactId}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button action-item" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
+    </div>
     {/if}
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl"}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
   <table class="form-layout-compressed">
@@ -109,7 +111,10 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
+        <div id="totalAmountBlock">
+          {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
+          <div id="totalTaxAmount" class="label"></div>
+        </div>
       </td>
     </tr>
 
@@ -213,6 +218,21 @@
     {/if}
 
   </table>
+
+  <div class="accordion ui-accordion ui-widget ui-helper-reset">
+    {* Billing Pane is the only billing pane currently *}
+    {foreach from=$billingPanes key=paneName item=paneValue}
+      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
+        <div class="crm-accordion-header" id="{$paneValue.id}">
+          {$paneName}
+        </div><!-- /.crm-accordion-header -->
+        <div class="crm-accordion-body">
+          <div class="{$paneValue.id}"></div>
+        </div>
+      </div>
+    {/foreach}
+  </div>
+
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">
@@ -242,8 +262,7 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
-                 email address.{/ts}</span>
+                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
 
                 <div class="spacer"></div>
                  <div class="crm-contribution-form-block-pcp_details">
@@ -255,8 +274,7 @@
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
                       <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
-                      Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
                       </td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
@@ -601,5 +619,81 @@ cj('#fee_amount').change( function() {
     cj('#net_amount').val(netAmount);
   }
 });
+
+cj("#financial_type_id").on("change",function(){
+    cj('#total_amount').trigger("change");
+})
+
+cj("#currency").on("change",function(){
+  cj('#total_amount').trigger("change");
+})
+
+{/literal}{if $taxRates && $invoicing}{literal}
+CRM.$(function($) {
+  $('#total_amount').on("change",function(event) {
+    if (event.handled !== true) {
+      var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
+      if (!freezeFinancialType) {
+        var financialType = $('#financial_type_id').val();
+        var taxRates = '{/literal}{$taxRates}{literal}';
+        taxRates = JSON.parse(taxRates);
+        var currencies = '{/literal}{$currencies}{literal}';
+        currencies = JSON.parse(currencies);
+        var currencySelect = $('#currency').val();
+        var currencySymbol = currencies[currencySelect];
+        var re= /\((.*?)\)/g;
+        for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
+          currencySymbol = m[1];
+        }
+        var taxRate = taxRates[financialType];
+        if (!taxRate) {
+          taxRate = 0;
+          cj("#totalTaxAmount").hide( );
+        } else {
+          cj("#totalTaxAmount").show( );
+        }
+        var totalAmount = $('#total_amount').val();
+        var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
+        var seperator = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+        // replace all thousandMarker and change the seperator to a dot
+  totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
+
+        var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
+        var taxAmount = (taxRate/100)*totalAmount;
+        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+        var totalTaxAmount = taxAmount + Number(totalAmount);
+        totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
+
+        $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+      }
+      event.handled = true;
+    }
+    return false;
+  });
+
+  $('#total_amount').trigger("change");
+});
+{/literal}{/if}{literal}
+
+CRM.$(function($) {
+  $('#price_set_id').click(function() {
+    if( $('#price_set_id').val() ) {
+      $('#totalAmountBlock').hide();
+    }
+    else {
+      $('#totalAmountBlock').show();
+    }
+  });
+});
+
+function formatMoney (amount, c, d, t){
+  var n = amount,
+  c = isNaN(c = Math.abs(c)) ? 2 : c,
+  d = d == undefined ? "," : d,
+  t = t == undefined ? "." : t, s = n < 0 ? "-" : "",
+  i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+  j = (j = i.length) > 3 ? j % 3 : 0;
+return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};
 </script>
 {/literal}

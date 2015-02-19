@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,13 +40,11 @@
 class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
 
   /**
-   * List activities as dashlet
+   * List activities as dashlet.
    *
    * @return void
-   *
-   * @access public
    */
-  function run() {
+  public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
     $this->assign('context', $context);
 
@@ -55,8 +53,8 @@ class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $session  = CRM_Core_Session::singleton();
-    $userID   = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
     $upcoming = CRM_Case_BAO_Case::getCases(TRUE, $userID, 'upcoming', $context);
 
     if (!empty($upcoming)) {
@@ -64,5 +62,5 @@ class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
     }
     return parent::run();
   }
-}
 
+}

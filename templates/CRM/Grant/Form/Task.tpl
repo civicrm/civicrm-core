@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {if $totalSelectedGrants}
     {ts 1=$totalSelectedGrants}Number of selected grants: %1{/ts}
 {/if}
-{if $rows } 
+{if $rows }
 <div class="form-item">
 <table width="30%">
   <tr class="columnheader">

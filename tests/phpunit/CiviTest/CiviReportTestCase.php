@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,12 +31,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CiviReportTestCase
  */
 class CiviReportTestCase extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();
   }
 
-  function tearDown() {
+  public function tearDown() {
     // TODO Figure out how to automatically drop all temporary tables.
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
@@ -48,12 +48,12 @@ class CiviReportTestCase extends CiviUnitTestCase {
 
   /**
    * @param $reportClass
-   * @param $inputParams
+   * @param array $inputParams
    *
    * @return string
    * @throws Exception
    */
-  function getReportOutputAsCsv($reportClass, $inputParams) {
+  public function getReportOutputAsCsv($reportClass, $inputParams) {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
@@ -90,7 +90,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
       $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
       file_put_contents($tmpFile, $csvContent);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // print_r($e->getCause()->getUserInfo());
       CRM_Utils_GlobalStack::singleton()->pop();
       throw $e;
@@ -105,7 +106,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
    *
    * @return array
    */
-  function getArrayFromCsv($csvFile) {
+  public function getArrayFromCsv($csvFile) {
     $arrFile = array();
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -117,8 +118,10 @@ class CiviReportTestCase extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $expectedCsvArray two-dimensional array representing a CSV table
-   * @param array $actualCsvArray two-dimensional array representing a CSV table
+   * @param array $expectedCsvArray
+   *   Two-dimensional array representing a CSV table.
+   * @param array $actualCsvArray
+   *   Two-dimensional array representing a CSV table.
    */
   public function assertCsvArraysEqual($expectedCsvArray, $actualCsvArray) {
     // TODO provide better debug output
@@ -137,13 +140,13 @@ class CiviReportTestCase extends CiviUnitTestCase {
     foreach ($actualCsvArray as $intKey => $strVal) {
       $rowData = var_export(array(
         'expected' => $expectedCsvArray[$intKey],
-        'actual'  => $actualCsvArray[$intKey],
+        'actual' => $actualCsvArray[$intKey],
       ), TRUE);
       $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),
-        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__. '; data: ' . $rowData
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__ . '; data: ' . $rowData
       );
       $this->assertEquals($expectedCsvArray[$intKey], $strVal);
     }
@@ -161,4 +164,5 @@ class CiviReportTestCase extends CiviUnitTestCase {
     }
     return $result;
   }
+
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -76,13 +76,13 @@
     <tr class="crm-contribution-form-block-is_tax">
       <td class="label">{$form.is_tax.label}</td>
       <td class="html-adjust">{$form.is_tax.html}<br />
-        <span class="description">{ts}Does this account hold taxes collected? NB: for information only - not used by core CiviCRM.{/ts}</span>
+        <span class="description">{ts}Does this account hold taxes collected?{/ts}</span>
       </td>
     </tr>
     <tr class="crm-contribution-form-block-tax_rate">
       <td class="label">{$form.tax_rate.label}</td>
       <td class="html-adjust">{$form.tax_rate.html}<br />
-        <span class="description">{ts}The default rate used to calculate the taxes collected into this account (e.g. for tax rate of 8.27%, enter 8.27). NB: for information only - not used by core CiviCRM.{/ts}</span>
+        <span class="description">{ts}The default rate used to calculate the taxes collected into this account (e.g. for tax rate of 8.27%, enter 8.27).{/ts}</span>
       </td>
     </tr>
     <tr class="crm-contribution-form-block-is_default">

@@ -7,22 +7,12 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Core_BAO_CustomFieldTest
  */
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Custom Field BAOs',
-      'description' => 'Test all Core_BAO_CustomField methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testCreateCustomfield() {
+  public function testCreateCustomfield() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld',
@@ -50,12 +40,12 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dbFieldName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'name', 'id', 'Database check for edited CustomField.');
     $dbColumnName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'column_name', 'id', 'Database check for edited CustomField.');
     $this->assertEquals(strtolower("{$dbFieldName}_{$customFieldID}"), $dbColumnName,
-        "Column name ends in ID");
+      "Column name ends in ID");
 
     Custom::deleteGroup($customGroup);
   }
 
-  function testCreateCustomfieldColumnName() {
+  public function testCreateCustomfieldColumnName() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld 2',
@@ -70,12 +60,12 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     );
     $dbColumnName = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldID, 'column_name', 'id', 'Database check for edited CustomField.');
     $this->assertEquals($fields['column_name'], $dbColumnName,
-        "Column name set as specified");
+      "Column name set as specified");
 
     Custom::deleteGroup($customGroup);
   }
 
-  function testCreateCustomfieldName() {
+  public function testCreateCustomfieldName() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld 2',
@@ -96,7 +86,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   }
 
 
-  function testGetFields() {
+  public function testGetFields() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testFld1',
@@ -122,15 +112,13 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     );
     $getCustomFields = array();
     $getCustomFields = CRM_Core_BAO_CustomField::getFields('Individual', TRUE, TRUE);
-    //CRM_Core_Error::debug('fdf',$getCustomFields);
     //$this->assertEquals( 'testFld1',  $getCustomFields[$customFieldID1][0], 'Confirm First Custom field label' );
     //$this->assertEquals( 'testFld2',  $getCustomFields[$customFieldID2][0], 'Confirm Second Custom field label' );
-
 
     Custom::deleteGroup($customGroup);
   }
 
-  function testGetDisplayedValues() {
+  public function testGetDisplayedValues() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'label' => 'testCountryFld1',
@@ -157,7 +145,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testDeleteCustomfield() {
+  public function testDeleteCustomfield() {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $fields = array(
       'groupId' => $customGroup->id,
@@ -179,71 +167,68 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * Move a custom field from $groupA to $groupB. Make sure that data records are
    * correctly matched and created.
    */
-  function testMoveField() {
+  public function testMoveField() {
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $this->assertTrue($countriesByName['Andorra'] > 0);
     $groups = array(
       'A' => Custom::createGroup(array(
-          'title' => 'Test_Group A',
-          'name' => 'test_group_a',
-          'extends' => array('Individual'),
-          'style' => 'Inline',
-          'is_multiple' => 0,
-          'is_active' => 1,
-          'version' => 3,
-        )),
+        'title' => 'Test_Group A',
+        'name' => 'test_group_a',
+        'extends' => array('Individual'),
+        'style' => 'Inline',
+        'is_multiple' => 0,
+        'is_active' => 1,
+        'version' => 3,
+      )),
       'B' => Custom::createGroup(array(
-          'title' => 'Test_Group B',
-          'name' => 'test_group_b',
-          'extends' => array('Individual'),
-          'style' => 'Inline',
-          'is_multiple' => 0,
-          'is_active' => 1,
-          'version' => 3,
-        )),
+        'title' => 'Test_Group B',
+        'name' => 'test_group_b',
+        'extends' => array('Individual'),
+        'style' => 'Inline',
+        'is_multiple' => 0,
+        'is_active' => 1,
+        'version' => 3,
+      )),
     );
     $fields = array(
-      'countryA' => Custom::createField(array(
-        ), array(
-          'groupId' => $groups['A']->id,
-          'label' => 'Country A',
-          'dataType' => 'Country',
-          'htmlType' => 'Select Country',
-        )),
-      'countryB' => Custom::createField(array(
-        ), array(
-          'groupId' => $groups['A']->id,
-          'label' => 'Country B',
-          'dataType' => 'Country',
-          'htmlType' => 'Select Country',
-        )),
-      'countryC' => Custom::createField(array(
-        ), array(
-          'groupId' => $groups['B']->id,
-          'label' => 'Country C',
-          'dataType' => 'Country',
-          'htmlType' => 'Select Country',
-        )),
+      'countryA' => Custom::createField(array(), array(
+        'groupId' => $groups['A']->id,
+        'label' => 'Country A',
+        'dataType' => 'Country',
+        'htmlType' => 'Select Country',
+      )),
+      'countryB' => Custom::createField(array(), array(
+        'groupId' => $groups['A']->id,
+        'label' => 'Country B',
+        'dataType' => 'Country',
+        'htmlType' => 'Select Country',
+      )),
+      'countryC' => Custom::createField(array(), array(
+        'groupId' => $groups['B']->id,
+        'label' => 'Country C',
+        'dataType' => 'Country',
+        'htmlType' => 'Select Country',
+      )),
     );
     $contacts = array(
       'alice' => Contact::createIndividual(array(
-          'first_name' => 'Alice',
-          'last_name' => 'Albertson',
-          'custom_' . $fields['countryA']->id => $countriesByName['Andorra'],
-          'custom_' . $fields['countryB']->id => $countriesByName['Barbados'],
-        )),
+        'first_name' => 'Alice',
+        'last_name' => 'Albertson',
+        'custom_' . $fields['countryA']->id => $countriesByName['Andorra'],
+        'custom_' . $fields['countryB']->id => $countriesByName['Barbados'],
+      )),
       'bob' => Contact::createIndividual(array(
-          'first_name' => 'Bob',
-          'last_name' => 'Roberts',
-          'custom_' . $fields['countryA']->id => $countriesByName['Austria'],
-          'custom_' . $fields['countryB']->id => $countriesByName['Bermuda'],
-          'custom_' . $fields['countryC']->id => $countriesByName['Chad'],
-        )),
+        'first_name' => 'Bob',
+        'last_name' => 'Roberts',
+        'custom_' . $fields['countryA']->id => $countriesByName['Austria'],
+        'custom_' . $fields['countryB']->id => $countriesByName['Bermuda'],
+        'custom_' . $fields['countryC']->id => $countriesByName['Chad'],
+      )),
       'carol' => Contact::createIndividual(array(
-          'first_name' => 'Carol',
-          'last_name' => 'Carolson',
-          'custom_' . $fields['countryC']->id => $countriesByName['Cambodia'],
-        )),
+        'first_name' => 'Carol',
+        'last_name' => 'Carolson',
+        'custom_' . $fields['countryC']->id => $countriesByName['Cambodia'],
+      )),
     );
 
     // Move!
@@ -255,7 +240,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       $this->assertDBQuery(1, "SELECT {$fields['countryB']->column_name} FROM {$groups['A']->table_name}");
       $this->fail('Expected exception when querying column on wrong table');
     }
-    catch(PEAR_Exception$e) {}
+    catch (PEAR_Exception$e) {
+    }
     $errorScope = NULL;
 
     // Alice: Group[B] has fields[countryB], but fields[countryC] did not exist before
@@ -298,6 +284,5 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     Custom::deleteGroup($groups['A']);
     Custom::deleteGroup($groups['B']);
   }
+
 }
-
-

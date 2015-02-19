@@ -1,6 +1,3 @@
-.crm-profile-selector {
-    display: none;
-}
 .crm-profile-selector-preview-pane {
     width: 75%;
     min-width: 500px;
@@ -157,8 +154,7 @@
   font-size: .8em;
 }
 
-.crm-designer .crm-designer-palette-tree span.ui-button-text,
-.crm-designer .crm-designer-edit-custom span.ui-button-text {
+.crm-designer .crm-designer-palette-tree span.ui-button-text {
   padding: 0.4em;
 }
 

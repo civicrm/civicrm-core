@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 <p>
 
-{if $rows } 
+{if $rows }
 <div class="crm-submit-buttons element-right">{$form.buttons.html}</div>
 <div class="spacer"></div>
 <br />

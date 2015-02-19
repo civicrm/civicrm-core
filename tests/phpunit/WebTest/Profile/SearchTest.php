@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSearchProfile() {
+  public function testSearchProfile() {
     $this->webtestLogin();
 
     // enable county field
@@ -58,6 +58,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     //click on save
     $this->click('_qf_Group_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Field']");
 
     //check for  profile create
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
@@ -66,6 +67,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $profileId = $this->urlArg('gid');
 
     // Add Last Name field.
+    $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Individual');
     $this->click('field_name[1]');
@@ -77,7 +79,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('in_selector');
     // click on save
     $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
     $this->waitForText('crm-notification-container', 'You can add another profile field.');
@@ -94,7 +95,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('in_selector');
     // click on save
     $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
     $this->waitForText('crm-notification-container', 'You can add another profile field.');
@@ -109,7 +109,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->select('visibility', 'value=Public Pages');
     $this->click('is_searchable');
     $this->click('in_selector');
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     // Add state, country and county field
     $this->click('field_name[0]');
@@ -122,7 +123,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save and new
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -134,7 +136,8 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
     // click on save and new
-    $this->clickLink('_qf_Field_next_new-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
 
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
@@ -146,13 +149,23 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
     $this->click('in_selector');
 
+    // click on save and new
+    $this->clickLink('_qf_Field_next_new-bottom', 'field_name[0]', FALSE);
+    $this->waitForElementPresent("xpath=//select[@id='field_name_1'][@style='display: none;']");
+
+    $this->select('field_name[0]', 'value=Individual');
+    $this->select('field_name[1]', 'value=current_employer');
+    $this->select('visibility', 'value=Public Pages and Listings');
+    $this->click('is_searchable');
+    $this->click('in_selector');
+
     // click on save
-    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
+    $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']", FALSE);
 
     $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
-    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_cancel');
-    $this->waitForElementPresent('_qf_Edit_next');
+    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_next');
     $lastName = substr(sha1(rand()), 0, 7);
+    $orgName = 'Organisation' . substr(sha1(rand()), 0, 7);
 
     // Fill Last Name
     $this->type('last_name', $lastName);
@@ -163,16 +176,18 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // fill country, state, county
     $this->select('country-Primary', "United States");
-    // adding sleep gives time for state data
-    // to get populated in state combo box
-    sleep(1);
+
+    // wait for state data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
     $this->select('state_province-Primary', "California");
-    // adding sleep gives time for county data
-    // to get populated in county combo box
-    sleep(1);
+
+    // wait for county data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='county-Primary']/option[text()='Alameda']");
     $this->select('county-Primary', "Alameda");
-    $this->click('_qf_Edit_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->type('current_employer', $orgName);
+
+    $this->clickLink('_qf_Edit_next', NULL);
 
     $this->assertElementContainsText("css=span.msg-text", 'Your information has been saved.');
 
@@ -188,19 +203,18 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Fill state, county, country
     $this->select('country-Primary', "United States");
-    // adding sleep gives time for state data
-    // to get populated in state combo box
-    sleep(1);
+
+    // wait for state data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
     $this->select('state_province-Primary', "California");
-    // adding sleep gives time for county data
-    // to get populated in county combo box
-    sleep(1);
+
+    // wait for county data to be populated
+    $this->waitForElementPresent("xpath=//select[@id='county-Primary']/option[text()='Alameda']");
     $this->select('county-Primary', "Alameda");
 
     // Select Custom option
-    $this->click('CIVICRM_QFID_Edu_2');
-    $this->click('_qf_Search_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->select('custom_1', 'Education');
+    $this->clickLink('_qf_Search_refresh', NULL);
 
     // Verify Data.
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[2][text()='$lastName']"));
@@ -211,22 +225,27 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[7][text()='CA']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[8][text()='Alameda']"));
 
+    // verify if the organization has been created -- CRM-15368
+    $this->click("css=input#sort_name_navigation");
+    $this->type("css=input#sort_name_navigation", "$orgName");
+    $this->typeKeys("css=input#sort_name_navigation", "$orgName");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
+
+    // visit contact summary page
+    $this->click("css=ul.ui-autocomplete li");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
     // Go back to Profile fields admin
-    $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId");
+    $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId", "xpath=//table/tbody/tr[1]/td[9]");
 
     // Edit first profile field
-    $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
     $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom', FALSE);
 
-    // sleep 5 to make sure jQuery is not hiding field after page load
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
-    $this->assertTrue($this->isElementPresent("visibility"), 'Visibility field not present when editing existing profile field.');
+    $this->waitForElementPresent("visibility");
     $this->click("xpath=//tr[@id='profile_visibility']/td[1]/a");
     $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']/div/div[2]/p[2]");
     $this->waitForText('crm-notification-container', 'Is this field hidden from other users');
     $this->select('visibility', 'value=Public Pages and Listings');
   }
+
 }

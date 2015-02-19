@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,10 +36,11 @@
 /**
  * Determine the URL of a resource file
  *
- * @param $params array with keys:
- *  - ext: string, extension name. see CRM_Core_Resources::getUrl
- *  - file: string, relative file path. see CRM_Core_Resources::getUrl
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::getUrl
+ *   - file: string, relative file path. see CRM_Core_Resources::getUrl
+ * @param CRM_Core_Smarty $smarty
  *
  * @return string
  */
@@ -48,5 +49,5 @@ function smarty_function_crmResURL($params, &$smarty) {
   if (!array_key_exists('file', $params)) {
     $params['file'] = NULL;
   }
-  return  $res->getUrl($params['ext'], $params['file'], $params['addCacheCode']);
+  return $res->getUrl($params['ext'], $params['file'], $params['addCacheCode']);
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testOfflineMembershipRenew() {
+  public function testOfflineMembershipRenew() {
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -76,7 +76,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -94,15 +93,13 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span/a[1][text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span/a[1][text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
@@ -120,9 +117,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
       'End date' => $endDate,
     );
     $this->webtestVerifyTabularData($verifyMembershipRenewData);
-   }
+  }
 
-  function testOfflineMemberRenewOverride() {
+  public function testOfflineMemberRenewOverride() {
     $this->webtestLogin();
 
     // add membership type
@@ -181,7 +178,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -189,31 +185,29 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span/a[1][text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
-    $joinDate  = date('F jS, Y');
+    $joinDate = date('F jS, Y');
     $startDate = date('F jS, Y', strtotime("+1 month"));
-    $endDate   = date('F jS, Y', strtotime("+4 year 1 month -1 day"));
+    $endDate = date('F jS, Y', strtotime("+4 year 1 month -1 day"));
 
     // verify membership renew override
     $verifyMembershipRenewOverrideData = array(
@@ -228,7 +222,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyMembershipRenewOverrideData);
   }
 
-  function testOfflineMembershipRenewChangeType() {
+  public function testOfflineMembershipRenewChangeType() {
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -269,7 +263,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -299,7 +292,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
@@ -310,9 +302,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
-    $joinDate  = date('F jS, Y', strtotime("-2 year"));
+    $joinDate = date('F jS, Y', strtotime("-2 year"));
     $startDate = date('F jS, Y');
-    $endDate   = date('F jS, Y', strtotime("+1 year -1 day"));
+    $endDate = date('F jS, Y', strtotime("+1 year -1 day"));
 
     // verify membership renewed and the membership type is changed
     $verifyMembershipData = array(
@@ -327,7 +319,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyMembershipData);
   }
 
-  function testOfflineMembershipRenewMultipleTerms() {
+  public function testOfflineMembershipRenewMultipleTerms() {
     $this->webtestLogin();
 
     // make sure period is correct for the membership type we testing for,
@@ -363,8 +355,8 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Record contribution
     $this->click('record_contribution');
-    $this->waitForElementPresent( 'financial_type_id' );
-    $this->select( 'financial_type_id', "label=Member Dues" );
+    $this->waitForElementPresent('financial_type_id');
+    $this->select('financial_type_id', "label=Member Dues");
     $this->select('payment_instrument_id', "label=Check");
     $this->waitForElementPresent('check_number');
     $this->type('check_number', '1023');
@@ -378,7 +370,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -386,7 +377,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
     $this->waitForText('crm-notification-container', "A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
-
 
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
     // click through to the Membership Renewal Link
@@ -417,7 +407,6 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // save the renewed membership
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
-
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
@@ -444,4 +433,5 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($verifyMembershipRenewData);
   }
+
 }

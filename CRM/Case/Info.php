@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -38,11 +38,13 @@
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'case';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -56,7 +58,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function getAngularModules() {
     $result = array();
@@ -64,6 +66,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'ext' => 'civicrm',
       'js' => array('js/angular-crmCaseType.js'),
       'css' => array('css/angular-crmCaseType.css'),
+      'partials' => array('partials/crmCaseType'),
     );
 
     CRM_Core_Resources::singleton()->addSetting(array(
@@ -74,8 +77,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    * @throws CRM_Core_Exception
    */
@@ -88,8 +91,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $entities;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -105,7 +108,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getReferenceCounts($dao) {
     $result = array();
@@ -139,45 +142,47 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getUserDashboardElement() {
     return array();
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Cases'),
+    return array(
+      'title' => ts('Cases'),
       'url' => 'case',
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Cases'),
+    return array(
+      'title' => ts('Cases'),
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getActivityTypes() {
     return NULL;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New.
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
@@ -190,11 +195,13 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       );
       if ($atype) {
         $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/case/add',
-              'query' => "reset=1&action=add&atype=$atype&context=standalone",
-              'ref' => 'new-case',
-              'title' => ts('Case'),
-            )));
+          array(
+            'path' => 'civicrm/case/add',
+            'query' => "reset=1&action=add&atype=$atype&context=standalone",
+            'ref' => 'new-case',
+            'title' => ts('Case'),
+          ),
+        ));
       }
     }
   }
@@ -205,9 +212,12 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *
    * If CiviCase is being enabled, load the case related sample data
    *
-   * @param array $oldValue List of component names
-   * @param array $newValue List of component names
-   * @param array $metadata Specification of the setting (per *.settings.php)
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
@@ -215,7 +225,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       &&
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
-      $pathToCaseSampleTpl =  __DIR__ . '/xml/configuration.sample/';
+      $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
       $config = CRM_Core_Config::singleton();
       CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
@@ -224,5 +234,5 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       }
     }
   }
-}
 
+}

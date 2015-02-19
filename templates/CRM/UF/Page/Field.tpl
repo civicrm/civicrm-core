@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -37,14 +37,13 @@
         <div id="field_page">
         {if not ($action eq 2 or $action eq 1)}
             <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Field{/ts}</span></a>{if !$isGroupReserved}<a href="{crmURL p="civicrm/admin/uf/group/update" q="action=update&id=`$gid`&reset=1&context=field"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Settings{/ts}</span></a>{/if}<a href="{crmURL p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>{if !$skipCreate }<a href="{crmURL p="civicrm/profile/create" q="gid=$gid&reset=1"}" class="button"><span><div class="icon play-icon"></div>{ts}Use (create mode){/ts}</span></a>{/if}
+                {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}{if !$isGroupReserved}{crmButton p="civicrm/admin/uf/group/update" q="action=update&id=`$gid`&reset=1&context=field" icon="pencil"}{ts}Edit Settings{/ts}{/crmButton}{/if}{crmButton p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}{if !$skipCreate }{crmButton p="civicrm/profile/create" q="gid=$gid&reset=1" icon="play"}{ts}Use (create mode){/ts}{/crmButton}{/if}
                 <div class="clear"></div>
             </div>
         {/if}
         {strip}
         {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
         <table id="options" class="row-highlight">
             <thead>
             <tr>
@@ -65,13 +64,13 @@
             <tr id="UFField-{$row.id}"class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td><span class="crmf-label crm-editable">{$row.label}</span>({$row.field_type})</td>
                 {if in_array("Profile",$otherModules) or in_array("Search Profile",$otherModules) }
-                <td>{$row.visibility_display}</td>
-                <td class="crmf-is_searchable">{if $row.is_searchable   eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-                <td class="crmf-in_selector">{if $row.in_selector     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+                <td class="crm-editable crmf-visibility" data-type="select">{$row.visibility_display}</td>
+                <td class="crm-editable crmf-is_searchable" data-type="boolean">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+                <td class="crm-editable crmf-in_selector" data-type="boolean">{if $row.in_selector eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 {/if}
                 <td class="nowrap">{$row.weight}</td>
-                <td class="crmf-is_required">{if $row.is_required     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-                <td>{if $row.is_view         eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+                <td class="crm-editable crmf-is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+                <td class="crm-editable crmf-is_view" data-type="boolean">{if $row.is_view eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{if $row.is_reserved     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>
@@ -80,7 +79,7 @@
         {/strip}
         {if not ($action eq 2 or $action eq 1)}
             <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Field{/ts}</span></a>{if !$isGroupReserved}<a href="{crmURL p="civicrm/admin/uf/group" q="action=update&id=`$gid`&reset=1&context=field"}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Settings{/ts}</span></a>{/if}<a href="{crmURL p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>{if !$skipCreate }<a href="{crmURL p="civicrm/profile/create" q="gid=$gid&reset=1"}" class="button"><span><div class="icon play-icon"></div>{ts}Use (create mode){/ts}</span></a>{/if}
+                {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}{if !$isGroupReserved}{crmButton p="civicrm/admin/uf/group" q="action=update&id=`$gid`&reset=1&context=field" icon="pencil"}{ts}Edit Settings{/ts}{/crmButton}{/if}{crmButton p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}{if !$skipCreate }{crmButton p="civicrm/profile/create" q="gid=$gid&reset=1" icon="play"}{ts}Use (create mode){/ts}{/crmButton}{/if}
                 <div class="clear"></div>
             </div>
         {/if}
@@ -89,12 +88,12 @@
     {else}
         {if $action eq 16}
         {capture assign=crmURL}{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}{/capture}
-        <div class="messages status no-popup">
+        <div class="messages status no-popup crm-empty-table">
           <div class="icon inform-icon"></div>
-          {ts 1=$groupTitle 2=$crmURL}There are no CiviCRM Profile Fields for '%1'</a>.{/ts}
+          {ts}None found.{/ts}
         </div>
         <div class="action-link">
-          <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Field{/ts}</span></a>
+          {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="circle-plus"}{ts}Add Field{/ts}{/crmButton}
         </div>
         {/if}
     {/if}

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -51,7 +51,7 @@
         <th> {ts}Label{/ts}</th>
         <th> {ts}Value{/ts}</th>
   <th> {ts}Recontact Interval{/ts}</th>
-        <th> {ts}Weight{/ts}</th>
+        <th> {ts}Order{/ts}</th>
     </tr>
 
   {section name=rowLoop start=1 loop=12}

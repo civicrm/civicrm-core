@@ -59,7 +59,7 @@ INSERT INTO `civicrm_option_value` ( `option_group_id`, `label`, `value`, `name`
 INSERT INTO `civicrm_option_value` ( `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id` )
 (SELECT @option_group_id_activity_type, 'ADC referral', (SELECT @max_val := @max_val+1), 'ADC referral',  NULL, 0,  0, (SELECT @max_val := @max_val+1), '', 0, 0, 1, @caseCompId
  FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_option_value`  WHERE `name` = 'ADC referral'));
- 
+
 -- /*******************************************************
 -- *
 -- * Relationship Types

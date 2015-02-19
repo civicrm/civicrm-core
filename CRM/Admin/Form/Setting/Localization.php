@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,10 +43,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   protected $_currencySymbols;
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
@@ -174,7 +173,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     if (CRM_Utils_Array::value('monetaryThousandSeparator', $fields) ==
       CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
@@ -212,7 +211,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     return empty($errors) ? TRUE : $errors;
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     parent::setDefaultValues();
 
     // CRM-1496
@@ -252,8 +251,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $values['currencyLimit'] = array($values['defaultCurrency']);
     }
     elseif (!in_array($values['defaultCurrency'],
-        $values['currencyLimit']
-      )) {
+      $values['currencyLimit']
+    )
+    ) {
       $values['currencyLimit'][] = $values['defaultCurrency'];
     }
 
@@ -304,7 +304,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     }
 
     // if we manipulated the language list, return to the localization admin screen
-    $return = (bool)(CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
+    $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
 
     // save all the settings
     parent::commonProcess($values);
@@ -313,5 +313,5 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1'));
     }
   }
-}
 
+}

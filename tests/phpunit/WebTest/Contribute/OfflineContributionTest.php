@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -36,7 +35,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneContributeAdd() {
+  public function testStandaloneContributeAdd() {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -46,7 +45,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     //financial account for check
     $this->openCiviPage("admin/options/payment_instrument", "reset=1");
-    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div/table/tbody//tr/td[1][text()='Check']/../td[3]");
+    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/table/tbody//tr/td[1]/div[text()='Check']/../../td[3]");
 
     // Add new Financial Account
     $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
@@ -137,8 +136,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");
@@ -178,7 +175,6 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $expected = array(
       'Soft Credit To 1' => "{$softCreditFname} {$softCreditLname}",
       'Soft Credit To 2' => "{$softCreditSecondFname} {$softCreditSecondLname}",
-      'Amount (Soft Credit Type)' => '50.00 (Solicited)',
       'Amount (Soft Credit Type)' => '100.00 (In Honor of)',
     );
 
@@ -199,14 +195,14 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       4 => 'Donation',
       2 => '50.00',
       6 => 'Completed',
-      1 => "{$firstName} {$lastName}"
+      1 => "{$firstName} {$lastName}",
     );
     foreach ($expected as $value => $label) {
       $this->verifyText("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
 
-  function testDeductibleAmount() {
+  public function testDeductibleAmount() {
     $this->webtestLogin();
 
     //add authorize .net payment processor
@@ -310,19 +306,18 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->_verifyAmounts($checkScenario5);
   }
 
-  //common function for doing offline contribution
   /**
-   * @param $params
-   * @param $firstName
-   * @param $lastName
+   * common function for doing offline contribution.
+   * @param array $params
+   * @param string $firstName
+   * @param string $lastName
    * @param $processorName
    */
-  function _doOfflineContribution($params, $firstName, $lastName, $processorName) {
+  public function _doOfflineContribution($params, $firstName, $lastName, $processorName) {
 
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Submit Credit Card Contribution");
-    $this->clickLink("link=Submit Credit Card Contribution", "_qf_Contribution_cancel-bottom", FALSE);
 
     // since we don't have live credentials we will switch to test mode
     $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[2]@href");
@@ -367,11 +362,11 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("The contribution record has been processed."), "Status message didn't show up after saving!");
   }
 
-  //common function for verifing total_amount, and non_deductible_amount
   /**
+   * common function for verifing total_amount, and non_deductible_amount
    * @param $verifyData
    */
-  function _verifyAmounts($verifyData) {
+  public function _verifyAmounts($verifyData) {
     // since we are doing test contributions we need to search for test contribution and select first contribution
     // record for the contact
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
@@ -383,7 +378,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     foreach ($verifyData as $label => $value) {
-      if ( $label == 'sort_name' ) {
+      if ($label == 'sort_name') {
         continue;
       }
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
@@ -398,10 +393,10 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       "xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']");
 
     $this->clickLink("xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']",
-    'crm-contact-actions-link', FALSE);
+      'crm-contact-actions-link', FALSE);
   }
 
-  function testOnlineContributionWithZeroAmount() {
+  public function testOnlineContributionWithZeroAmount() {
     $this->webtestLogin();
 
     // Create a contact to be used as soft creditor
@@ -432,8 +427,9 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '0.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Credit Card'
+      'Paid By' => 'Credit Card',
     );
     $this->webtestVerifyTabularData($expected);
   }
+
 }

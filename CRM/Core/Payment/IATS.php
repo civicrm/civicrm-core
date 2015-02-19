@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | Affero General Public License or the licensing  of CiviCRM,        |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,29 +35,29 @@
  */
 class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
   /* check IATS website for additional supported currencies */
-  CONST CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
+  const CURRENCIES = 'CAD,USD,AUD,GBP,EUR,NZD';
 
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
    * @return \CRM_Core_Payment_IATS
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('IATS');
 
@@ -75,29 +75,17 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   }
 
   /**
-   * @param string $mode
-   * @param array $paymentProcessor
-   *
-   * @return mixed
-   */
-  static function &singleton($mode, &$paymentProcessor) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_IATS($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     // $result = '';
     //       foreach($params as $key => $value) {
     //         $result .= "<strong>$key</strong>: $value<br />";
@@ -117,12 +105,12 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     // beginning of modified sample code from IATS php api include IATS supplied api library
 
     if ($isRecur) {
-      include_once ('Services/IATS/iats_reoccur.php');
-      $iatslink1 = new iatslinkReoccur;
+      include_once 'Services/IATS/iats_reoccur.php';
+      $iatslink1 = new iatslinkReoccur();
     }
     else {
-      include_once ('Services/IATS/iatslink.php');
-      $iatslink1 = new iatslink;
+      include_once 'Services/IATS/iatslink.php';
+      $iatslink1 = new iatslink();
     }
 
     $iatslink1->setTestMode($this->_profile['mode'] != 'live');
@@ -200,7 +188,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
         case 'week':
           $scheduleType = 'WEEKLY';
           $scheduleDate = $date['wday'] + 1;
-          $endTime      = $startTime + ($paymentsRecur * 7 * 24 * 60 * 60);
+          $endTime = $startTime + ($paymentsRecur * 7 * 24 * 60 * 60);
           break;
 
         case 'month':
@@ -216,7 +204,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
 
         default:
           die('Invalid frequency unit!');
-          break;
+        break;
       }
       $endDate = date('Y-m-d', $endTime);
       $startDate = date('Y-m-d', $startTime);
@@ -238,9 +226,9 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
       // this just means we got some kind of answer, not necessarily approved
       $result = $iatslink1->getAuthorizationResult();
       //return self::error($result);
-      $result      = explode(':', $result, 2);
+      $result = explode(':', $result, 2);
       $trxn_result = trim($result[0]);
-      $trxn_id     = trim($result[1]);
+      $trxn_id = trim($result[1]);
       if ($trxn_result == 'OK') {
         $params['trxn_id'] = $trxn_id . ':' . time();
         $params['gross_amount'] = $amount;
@@ -266,7 +254,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($error = NULL) {
+  public function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
       $e->push($error->getResponseCode(),
@@ -293,11 +281,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   }
 
   /**
-   * @param $error_id
+   * @param int $error_id
    *
    * @return string
    */
-  function errorString($error_id) {
+  public function errorString($error_id) {
     $errors = array(
       1 => 'Agent Code has not been set up on the authorization system.',
       2 => 'Unable to process transaction. Verify and re-enter credit card information.',
@@ -332,14 +320,14 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
    * @internal param string $mode the mode we are operating in (live or test)
    *
-   * @return string the error message if any
-   * @public
+   * @return string
+   *   the error message if any
    */
-  function checkConfig() {
+  public function checkConfig() {
     $error = array();
 
     if (empty($this->_paymentProcessor['signature'])) {
@@ -357,5 +345,5 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
       return NULL;
     }
   }
-}
 
+}

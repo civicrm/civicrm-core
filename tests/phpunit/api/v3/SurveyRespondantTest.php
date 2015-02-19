@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -31,11 +31,13 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class api_v3_SurveyRespondantTest
  */
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $params;
 
 
-  function setUp() {
+  public function setUp() {
+    parent::setUp();
+    $this->useTransaction(TRUE);
     $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));
     $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
     $surveyParams = array(
@@ -45,23 +47,17 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
     );
     $survey = $this->callAPISuccess('survey', 'create', $surveyParams);
     $surveyID = $survey['id'];
-    $this->params = array (
-      'sequential' =>'1',
-      'survey_id' => $surveyID
+    $this->params = array(
+      'sequential' => '1',
+      'survey_id' => $surveyID,
     );
-    parent::setUp();
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_survey'));
   }
 
   /**
    * Test survey respondent get.
    */
   public function testGetSurveyRespondants() {
-    $result = $this->callAPIAndDocument("SurveyRespondant","get", $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument("SurveyRespondant", "get", $this->params, __FUNCTION__, __FILE__);
   }
 
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddViaCreateProfile() {
+  public function testAddViaCreateProfile() {
     $this->webtestLogin();
 
-    $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_cancel');
+    $this->openCiviPage('profile/create', 'reset=1&gid=1', '_qf_Edit_next');
 
     $firstName = 'Jo' . substr(sha1(rand()), 0, 4);
     $lastName = 'Ad' . substr(sha1(rand()), 0, 7);
@@ -54,7 +54,7 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
     $this->type("street_address-1", "902C El Camino Way SW");
     $this->type("city-1", "Dumfries");
     $this->type("postal_code-1", "1234");
-    $this->assertElementContainsText('country-1', "United States");
+    $this->assertSelected('country-1', "United States");
     $this->select("state_province-1", "value=1019");
 
     // Clicking save.
@@ -63,5 +63,5 @@ class WebTest_Contact_AddViaProfileTest extends CiviSeleniumTestCase {
 
     $this->assertElementContainsText('css=.msg-text', "Your information has been saved.");
   }
-}
 
+}

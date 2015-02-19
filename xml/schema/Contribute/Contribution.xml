@@ -77,7 +77,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
@@ -99,7 +99,7 @@
   </foreignKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>The Contribution Page which triggered this contribution</comment>
@@ -122,7 +122,7 @@
   <field>
     <name>payment_instrument_id</name>
     <uniqueName>contribution_payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
+    <title>Payment Instrument ID</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
@@ -377,7 +377,7 @@
   </field>
   <field>
     <name>contribution_status_id</name>
-    <title>Contribution Status</title>
+    <title>Contribution Status ID</title>
     <type>int unsigned</type>
     <default>1</default>
     <import>true</import>
@@ -449,6 +449,32 @@
     <html>
       <type>Select</type>
     </html>
+  </field>
+  <field>
+    <name>creditnote_id</name>
+    <title>Credit Note ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/creditnote(.?id)?/i</headerPattern>
+    <comment>unique credit note id, system generated or passed in</comment>
+    <add>4.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>tax_amount</name>
+    <title>Tax Amount</title>
+    <type>decimal</type>
+    <import>true</import>
+    <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>Total tax amount of this contribution.</comment>
+    <add>4.6</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>

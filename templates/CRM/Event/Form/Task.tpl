@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,7 @@
 *}
 {ts 1=$totalSelectedParticipants}Number of selected participants: %1{/ts}
 
-{if $rows } 
+{if $rows }
 <div class="form-item">
 <table width="30%">
   <tr class="columnheader">

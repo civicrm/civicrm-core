@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -41,9 +41,8 @@ require_once 'CRM/Core/Config.php';
  */
 class CRM_UpdatePledgeRecord {
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $config = CRM_Core_Config::singleton();
     // this does not return on failure
     require_once 'CRM/Utils/System.php';
@@ -71,7 +70,10 @@ class CRM_UpdatePledgeRecord {
 
     //unset statues that we never use for pledges
     foreach (array(
-      'Completed', 'Cancelled', 'Failed') as $statusKey) {
+               'Completed',
+               'Cancelled',
+               'Failed',
+             ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         unset($allStatus[$key]);
       }
@@ -144,7 +146,8 @@ SELECT  pledge.contact_id              as contact_id,
 
       if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($dao->scheduled_date, '%Y%m%d'),
           $now
-        ) && $dao->payment_status != array_search('Overdue', $allStatus)) {
+        ) && $dao->payment_status != array_search('Overdue', $allStatus)
+      ) {
         $pledgePayments[$dao->pledge_id][$dao->payment_id] = $dao->payment_id;
       }
     }
@@ -170,7 +173,8 @@ SELECT  pledge.contact_id              as contact_id,
       require_once 'CRM/Core/BAO/Domain.php';
       require_once 'CRM/Core/SelectValues.php';
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = array(
+        'domain' => array('name', 'phone', 'address', 'email'),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
@@ -297,11 +301,10 @@ SELECT  pledge.contact_id              as contact_id,
     // end if ( $sendReminders )
     echo "<br />{$updateCnt} records updated.";
   }
+
 }
 
 $obj = new CRM_UpdatePledgeRecord();
 echo "Updating<br />";
 $obj->updatePledgeStatus();
 echo "<br />Pledge records update script finished.";
-
-

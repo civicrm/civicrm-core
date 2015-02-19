@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,21 +22,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
-// name of the class doesn't end with Test on purpose - this way this
-// webtest is not picked up by the suite, since it needs to run
-// on specially prepare sandbox
-// more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
 /**
+ * name of the class doesn't end with Test on purpose - this way this
+ * webtest is not picked up by the suite, since it needs to run
+ * on specially prepare sandbox
+ * more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
  * Class WebTest_Release_ReleaseTestCase
  */
 class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
 
   /**
-   *  Constructor
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of
@@ -45,13 +45,12 @@ class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
    *  ReflectionClass of the Test class and checks the constructor
    *  of that class to decide how to set up the test.
    *
-   * @param  string $name
-   * @param  array $data
-   * @param  string $dataName
+   * @param string $name
+   * @param array $data
+   * @param string $dataName
    * @param array $browser
    */
-  function __construct($name = NULL, array$data = array(
-    ), $dataName = '', array$browser = array()) {
+  public function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
     parent::__construct($name, $data, $dataName, $browser);
 
     require_once 'CiviTest/ReleaseTestSettings.php';
@@ -61,5 +60,5 @@ class WebTest_Release_ReleaseTestCase extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
   }
-}
 
+}

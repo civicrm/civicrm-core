@@ -5,14 +5,15 @@
  */
 class Contact extends CiviUnitTestCase {
   /**
-   * Helper function to create
+   * Helper function to create.
    * a contact
    *
-   * @param $params
+   * @param array $params
    *
-   * @return int $contactID id of created contact
+   * @return int
+   *   $contactID id of created contact
    */
-  static function create($params) {
+  public static function create($params) {
     require_once "CRM/Contact/BAO/Contact.php";
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
     return $contactID;
@@ -22,10 +23,11 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Individual
    *
-   * @param null $params
-   * @return int $contactID id of created Individual
+   * @param array $params
+   * @return int
+   *   $contactID id of created Individual
    */
-  static function createIndividual($params = NULL) {
+  public static function createIndividual($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $first_name = 'John';
@@ -44,10 +46,11 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Household
    *
-   * @param null $params
-   * @return mixed $contactID id of created Household
+   * @param array $params
+   * @return int
+   *   id of created Household
    */
-  static function createHousehold($params = NULL) {
+  public static function createHousehold($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $household_name = "John Doe's home";
@@ -65,10 +68,11 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Organisation
    *
-   * @param null $params
-   * @return mixed $contactID id of created Organisation
+   * @param array $params
+   * @return int
+   *   id of created Organisation
    */
-  static function createOrganisation($params = NULL) {
+  public static function createOrganisation($params = NULL) {
     //compose the params, when not passed
     if (!$params) {
       $organization_name = "My Organization";
@@ -83,13 +87,16 @@ class Contact extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to delete a contact
+   * Helper function to delete a contact.
    *
-   * @param  int  $contactID   id of the contact to delete
-   * @return boolean true if contact deleted, false otherwise
+   * @param int $contactID
+   *   Id of the contact to delete.
+   * @return bool
+   *   true if contact deleted, false otherwise
    */
-  static function delete($contactID) {
+  public static function delete($contactID) {
     require_once 'CRM/Contact/BAO/Contact.php';
     return CRM_Contact_BAO_Contact::deleteContact($contactID);
   }
+
 }

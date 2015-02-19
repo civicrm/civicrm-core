@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Include parent class definition
@@ -33,27 +33,26 @@ require_once 'CiviTest/CiviTestSuite.php';
 /**
  *  Class containing all CRM test suites
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class WebTest_AllTests extends CiviTestSuite {
   private static $instance = NULL;
 
   /**
-   *
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {
-      self::$instance = new self;
+      self::$instance = new self();
     }
     return self::$instance;
   }
 
   /**
-   *  Build test suite dynamically
+   *  Build test suite dynamically.
    */
   public static function suite() {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
-}
 
+}

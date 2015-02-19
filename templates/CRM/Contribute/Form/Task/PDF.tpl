@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -40,6 +40,12 @@
   </tr>
   <tr id="selectPdfFormat" style="display: none;">
     <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="id-contribution-receipt" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+  </tr>
+  <tr>
+    <td>{$form.receipt_update.html} {$form.receipt_update.label}</td>
+  </tr>
+  <tr>
+    <td>{$form.override_privacy.html} {$form.override_privacy.label}</td>
   </tr>
 </table>
 

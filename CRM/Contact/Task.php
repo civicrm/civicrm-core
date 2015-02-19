@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,7 +39,7 @@
  *
  */
 class CRM_Contact_Task {
-  CONST
+  const
     GROUP_CONTACTS = 1,
     REMOVE_CONTACTS = 2,
     TAG_CONTACTS = 3,
@@ -67,22 +67,20 @@ class CRM_Contact_Task {
     COMMUNICATION_PREFS = 25;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
-  static function initTasks() {
+  public static function initTasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
         self::GROUP_CONTACTS => array(
@@ -279,11 +277,10 @@ class CRM_Contact_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of contacts
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::initTasks();
 
     $titles = array();
@@ -310,16 +307,17 @@ class CRM_Contact_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission
-   * @param bool $deletedContacts  are these tasks for operating on deleted contacts?
+   * @param bool $deletedContacts
+   *   Are these tasks for operating on deleted contacts?.
    *
-   * @return array set of tasks that are valid for the user
-   * @access public
+   * @return array
+   *   set of tasks that are valid for the user
    */
-  static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
+  public static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
     self::initTasks();
     $tasks = array();
     if ($deletedContacts) {
@@ -356,13 +354,12 @@ class CRM_Contact_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
-   * @return array the set of optional tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of optional tasks for a group of contacts
    */
-  static function &optionalTaskTitle() {
+  public static function &optionalTaskTitle() {
     $tasks = array(
       self::SAVE_SEARCH_UPDATE => self::$_tasks[self::SAVE_SEARCH_UPDATE]['title'],
     );
@@ -374,7 +371,7 @@ class CRM_Contact_Task {
    *
    * @return array
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::initTasks();
 
     if (!CRM_Utils_Array::value($value, self::$_tasks)) {
@@ -386,5 +383,5 @@ class CRM_Contact_Task {
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     );
   }
-}
 
+}

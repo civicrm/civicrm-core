@@ -36,9 +36,9 @@
 define( 'MULTICURRENCY_EVENT_ID', 4 );
 
 function multicurrency_civicrm_buildForm( $formName,
-					  &$form ) {
+            &$form ) {
     if ( ( strpos( $formName, 'CRM_Event_Form_Registration_' ) !== false ) &&
-	 ( $form->getVar( '_eventId' ) == MULTICURRENCY_EVENT_ID ) ) {
+   ( $form->getVar( '_eventId' ) == MULTICURRENCY_EVENT_ID ) ) {
       multicurrency_set_currency( $form );
     }
 }
@@ -63,16 +63,16 @@ function multicurrency_set_currency( &$form ) {
 }
 
 function multicurrency_civicrm_buildAmount( $pageType,
-					    &$form,
-					    &$amount ) {
+              &$form,
+              &$amount ) {
 
   // only modify the event pages for the UK event
   if ( $form->getVar( '_eventId' ) == MULTICURRENCY_EVENT_ID ) {
     $currency = multicurrency_set_currency( $form );
-    
+
     // as of may 5th: 1 USD = 0.75 EUR, 1 USD = 0.667 GBP
     $ratio = ( $currency == 'EUR' ) ? 0.75 : ( 2.0 / 3.0 );
-    
+
     foreach ( $amount as $amountID =>& $amountInfo ) {
       $amountInfo['value'] = ceil( $amountInfo['value'] * $ratio );
     }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -53,7 +53,7 @@
 
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
@@ -65,7 +65,6 @@
 
         {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}
-        {include file="CRM/common/crmeditable.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <div id="user-profiles">
            <div class="crm-content-block">
@@ -85,13 +84,13 @@
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
               <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
-                <td><span class="crmf-title crm-editable">{$row.title}</span></td>
+                <td class="crmf-title crm-editable">{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
-                <td>{$row.description}</td>
+                <td class="crmf-description crm-editable" data-type="textarea">{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -104,7 +103,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -147,7 +146,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,41 +23,26 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  *  Test APIv3 civicrm_mailing_group_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
   protected $_apiversion;
 
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailer Group',
-      'description' => 'Test all Mailer Group methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
-  }
-
-  function tearDown() {
-    $this->groupDelete($this->_groupID);
   }
 
   //---------- civicrm_mailing_event_subscribe methods ---------
@@ -199,5 +184,5 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
   }
-}
 
+}

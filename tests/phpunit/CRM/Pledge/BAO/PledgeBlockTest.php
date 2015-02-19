@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,15 +32,13 @@ require_once 'CiviTest/ContributionPage.php';
 /**
  * Test class for CRM_Pledge_BAO_PledgeBlock BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -50,26 +48,14 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
-
-  /**
-   *  test info
-   */
-  function get_info() {
-    return array(
-      'name' => 'PledgeBlock BAOs',
-      'description' => 'Test all Pledge_BAO_PledgeBlock methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
+  protected function tearDown() {
   }
 
   /**
    *  create() and deletepledgeblock() method
    */
-  function testCreateAndDeletePledgeBlock() {
+  public function testCreateAndDeletePledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -100,9 +86,9 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   }
 
   /**
-   * add() method (add and edit modes of pledge block)
+   * Add() method (add and edit modes of pledge block)
    */
-  function testAddPledgeBlock() {
+  public function testAddPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -144,9 +130,9 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve() and getPledgeBlock() method of  pledge block
+   * Retrieve() and getPledgeBlock() method of  pledge block
    */
-  function testRetrieveAndGetPledgeBlock() {
+  public function testRetrieveAndGetPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -186,5 +172,5 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $this->assertEquals($pledgeBlock->id, $retrievePledgeBlock->id);
     $this->assertEquals($pledgeBlock->id, $getPledgeBlock['id']);
   }
-}
 
+}

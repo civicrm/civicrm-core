@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,13 +43,13 @@
 class CRM_Contact_Page_Task extends CRM_Core_Page {
 
   /**
-   * returns the page title
+   * Returns the page title.
    *
-   * @return string the title of the page
-   * @access public
+   * @return string
+   *   the title of the page
    */
-  function getTitle() {
+  public function getTitle() {
     return "Task Results";
   }
-}
 
+}

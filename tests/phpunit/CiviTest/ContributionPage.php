@@ -5,14 +5,15 @@
  */
 class ContributionPage extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create
+   * Helper function to create.
    * a Contribution Page
    *
-   * @param null $id
+   * @param int $id
    *
-   * @return mixed $contributionPage id of created Contribution Page
+   * @return int
+   *   id of created Contribution Page
    */
-  static function create($id = NULL) {
+  public static function create($id = NULL) {
     require_once "CRM/Contribute/BAO/ContributionPage.php";
     $params = array(
       'title' => 'Help Test CiviCRM!',
@@ -24,7 +25,7 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
       'min_amount' => 10,
       'max_amount' => 10000,
       'goal_amount' => 100000,
-      'thankyou_title' => 'Thanks for Your Support!',
+      'thankyou_title' => 'Thank you for your support!',
       'thankyou_text' => 'Thank you for your support.',
       'is_email_receipt' => 1,
       'receipt_from_name' => 'From TEST',
@@ -39,13 +40,15 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete a Contribution Page
+   * Helper function to delete a Contribution Page.
    *
-   * @param  int $contributionPageId - id of the Contribution Page
-   * to be deleted
-   * @return boolean true if Contribution Page deleted, false otherwise
+   * @param int $contributionPageId
+   *   Id of the Contribution Page.
+   *   to be deleted
+   * @return bool
+   *   true if Contribution Page deleted, false otherwise
    */
-  static function delete($contributionPageId) {
+  public static function delete($contributionPageId) {
     require_once "CRM/Contribute/DAO/ContributionPage.php";
     $cp = new CRM_Contribute_DAO_ContributionPage();
     $cp->id = $contributionPageId;
@@ -54,4 +57,5 @@ class ContributionPage extends PHPUnit_Framework_Testcase {
     }
     return $result;
   }
+
 }

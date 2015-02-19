@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,18 +40,7 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Core_BAO_CustomValueTest
  */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'CustomValue BAOs',
-      'description' => 'Test all Core_BAO_CustomValue methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function testTypeCheckWithValidInput() {
+  public function testTypeCheckWithValidInput() {
 
     $values = array();
     $values = array(
@@ -60,7 +49,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
       'Int' => 1,
       'Float' => 10.00,
       'Date' => '2008-06-24',
-      'Boolean' => True,
+      'Boolean' => TRUE,
       'StateProvince' => 'California',
       'Country' => 'US',
       'Link' => 'http://civicrm.org',
@@ -71,12 +60,12 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
         $this->assertEquals($valid, '2008-06-24', 'Checking type ' . $type . ' for returned CustomField Type.');
       }
       else {
-        $this->assertEquals($valid, true, 'Checking type ' . $type . ' for returned CustomField Type.');
+        $this->assertEquals($valid, TRUE, 'Checking type ' . $type . ' for returned CustomField Type.');
       }
     }
   }
 
-  function testTypeCheckWithInvalidInput() {
+  public function testTypeCheckWithInvalidInput() {
     $values = array();
     $values = array('check1' => 'chk');
     foreach ($values as $type => $value) {
@@ -85,7 +74,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeCheckWithWrongInput() {
+  public function testTypeCheckWithWrongInput() {
     $values = array();
     $values = array(
       'String' => 1,
@@ -97,7 +86,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeToFieldWithValidInput() {
+  public function testTypeToFieldWithValidInput() {
     $values = array();
     $values = array(
       'String' => 'char_data',
@@ -119,7 +108,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeToFieldWithWrongInput() {
+  public function testTypeToFieldWithWrongInput() {
     $values = array();
     $values = array(
       'String' => 'memo_data',
@@ -132,7 +121,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testFixFieldValueOfTypeMemo() {
+  public function testFixFieldValueOfTypeMemo() {
     $customGroup = Custom::createGroup(array(), 'Individual');
 
     $fields = array(
@@ -157,10 +146,10 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
   }
 
-  function testFixFieldValueOfTypeMemoWithEmptyParams() {
+  public function testFixFieldValueOfTypeMemoWithEmptyParams() {
     $params = array();
     $result = CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
-}
 
+}

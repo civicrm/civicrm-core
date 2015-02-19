@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,7 +49,7 @@ class CRM_Utils_Crypt {
    *   Base64-encoded ciphertext, or base64-encoded plaintext if encryption is
    *   disabled or unavailable.
    */
-  static function encrypt($string) {
+  public static function encrypt($string) {
     if (empty($string)) {
       return $string;
     }
@@ -59,8 +59,8 @@ class CRM_Utils_Crypt {
     ) {
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
-      $iv  = '00000000000000000000000000000000';
-      $ks  = mcrypt_enc_get_key_size($td);
+      $iv = '00000000000000000000000000000000';
+      $ks = mcrypt_enc_get_key_size($td);
       $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
 
       mcrypt_generic_init($td, $key, $iv);
@@ -83,7 +83,7 @@ class CRM_Utils_Crypt {
    *   Plaintext, or base64-decoded ciphertext if encryption is disabled or
    *   unavailable.
    */
-  static function decrypt($string) {
+  public static function decrypt($string) {
     if (empty($string)) {
       return $string;
     }
@@ -98,8 +98,8 @@ class CRM_Utils_Crypt {
     ) {
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
-      $iv  = '00000000000000000000000000000000';
-      $ks  = mcrypt_enc_get_key_size($td);
+      $iv = '00000000000000000000000000000000';
+      $ks = mcrypt_enc_get_key_size($td);
       $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
 
       mcrypt_generic_init($td, $key, $iv);
@@ -110,5 +110,5 @@ class CRM_Utils_Crypt {
 
     return $string;
   }
-}
 
+}

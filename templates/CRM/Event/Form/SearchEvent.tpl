@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -42,9 +42,9 @@
                 {/foreach}
             </div>
         </td>
-        <td class="right" rowspan="2">&nbsp;{include file="CRM/common/formButtons.tpl"}</td>  
+        <td class="right" rowspan="2">&nbsp;{include file="CRM/common/formButtons.tpl"}</td>
     </tr>
-  
+
     <tr>
        <td colspan="2">
        <table class="form-layout-compressed" id="id_fromToDates">
@@ -54,13 +54,13 @@
         </tr>
         <tr class="crm-event-searchevent-form-block-end_date" >
             <td class="label">{$form.end_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>             
+            <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
         </tr>
-      </table> 
-    </td></tr>  
+      </table>
+    </td></tr>
 
     {* campaign in event search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch" 
+    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
     campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
 
   </table>
@@ -68,10 +68,10 @@
 
 {include file="CRM/common/showHide.tpl"}
 
-{literal} 
+{literal}
 <script type="text/javascript">
 if ( document.getElementsByName('eventsByDates')[1].checked ) {
   cj('#id_fromToDates').show();
 }
 </script>
-{/literal} 
+{/literal}

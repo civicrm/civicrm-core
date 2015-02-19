@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -109,7 +109,7 @@
                 <span class="description">{ts 1=$email}Automatically email an acknowledgment of this pledge to %1?{/ts}</span></td></tr>
             {/if}
       {elseif $context eq 'standalone' and $outBound_option != 2 }
-                <tr id="acknowledgment-receipt" style="display:none;"><td class="label">{$form.is_acknowledge.label}</td><td>{$form.is_acknowledge.html} <span class="description">{ts}Automatically email an acknowledgment of this pledge to {/ts}<span id="email-address"></span>?</span></td></tr>
+                <tr id="acknowledgment-receipt" style="display:none;"><td class="label">{$form.is_acknowledge.label}</td><td>{$form.is_acknowledge.html} <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span></td></tr>
         {/if}
         <tr id="fromEmail" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
@@ -196,16 +196,13 @@ function loadPanes( id ) {
      <script type="text/javascript">
 
      function verify( ) {
-       var element = document.getElementsByName("is_acknowledge");
-        if ( element[0].checked ) {
+        if (cj('#is_acknowledge').is(':checked')) {
             var emailAddress = '{/literal}{$email}{literal}';
       if ( !emailAddress ) {
       var emailAddress = cj('#email-address').html();
       }
-      var message = '{/literal}{ts 1="'+emailAddress+'"}Click OK to save this Pledge record AND send an acknowledgment to %1 now{/ts}{literal}.';
-            if (!confirm( message) ) {
-                return false;
-            }
+      var message = '{/literal}{ts escape="js" 1="%1"}Click OK to save this Pledge record AND send an acknowledgment to %1 now.{/ts}{literal}';
+         return confirm(ts(message, {1: emailAddress}));
         }
      }
 

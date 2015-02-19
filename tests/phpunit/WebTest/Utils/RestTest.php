@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -66,7 +66,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     if (isset($this->nocms_contact_id)) {
       $deleteParams = array(
         "id" => $this->nocms_contact_id,
-        "skip_undelete" => 1
+        "skip_undelete" => 1,
       );
       $res = $this->webtest_civicrm_api("Contact", "delete", $deleteParams);
       unset($this->nocms_contact_id);
@@ -79,12 +79,12 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    *
    * @return array; each item is a list of parameters for testAPICalls
    */
-  function apiTestCases() {
+  public function apiTestCases() {
     $cases = array();
 
     // entity,action: omit apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -95,7 +95,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -107,7 +107,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contact",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -119,7 +119,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "entity" => "Contactses",
         "action" => "get",
         "key" => $this->settings->siteKey,
@@ -131,7 +131,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: omit apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -141,7 +141,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -152,7 +152,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contact/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -163,7 +163,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/contactses/get",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -175,7 +175,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     // XXX Actually Ping is valid, no?
     $cases[] = array(
-      array( // query
+      array(// query
         "q" => "civicrm/ping",
         "key" => $this->settings->siteKey,
         "json" => "1",
@@ -189,8 +189,10 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
 
   /**
    * @dataProvider apiTestCases
+   * @param $query
+   * @param $is_error
    */
-  function testAPICalls($query, $is_error) {
+  public function testAPICalls($query, $is_error) {
     $client = CRM_Utils_HttpClient::singleton();
     list($status, $data) = $client->post($this->url, $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -203,10 +205,10 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Submit a request with an API key that exists but does not correspond to
+   * Submit a request with an API key that exists but does not correspond to.
    * a real user. Submit in "?entity=X&action=X" notation
    */
-  function testNotCMSUser_entityAction() {
+  public function testNotCMSUser_entityAction() {
     $client = CRM_Utils_HttpClient::singleton();
 
     //Create contact with api_key
@@ -214,7 +216,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contactParams = array(
       "api_key" => $test_key,
       "contact_type" => "Individual",
-      "first_name" => "RestTester1"
+      "first_name" => "RestTester1",
     );
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
@@ -225,7 +227,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "action" => "get",
       "key" => $this->settings->siteKey,
       "json" => "1",
-      "api_key" => $test_key
+      "api_key" => $test_key,
     );
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -238,7 +240,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    * Submit a request with an API key that exists but does not correspond to
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
-  function testNotCMSUser_q() {
+  public function testNotCMSUser_q() {
     $client = CRM_Utils_HttpClient::singleton();
 
     //Create contact with api_key
@@ -246,7 +248,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $contactParams = array(
       "api_key" => $test_key,
       "contact_type" => "Individual",
-      "first_name" => "RestTester1"
+      "first_name" => "RestTester1",
     );
     $contact = $this->webtest_civicrm_api("Contact", "create", $contactParams);
     $this->nocms_contact_id = $contact["id"];
@@ -256,7 +258,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
       "q" => "civicrm/contact/get",
       "key" => $this->settings->siteKey,
       "json" => "1",
-      "api_key" => $test_key
+      "api_key" => $test_key,
     );
     list($status, $data) = $client->post($this->url, $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);

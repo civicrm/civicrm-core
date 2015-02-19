@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,12 +36,13 @@
 /**
  * Dynamically construct a link based on an entity-type and entity-id.
  *
- * @param $params array with keys:
- *  - table: string
- *  - id: int
- *  - action: string, 'VIEW' or 'UPDATE' [default: VIEW]
- *  - title: string [optionally override default title]
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - table: string
+ *   - id: int
+ *   - action: string, 'VIEW' or 'UPDATE' [default: VIEW]
+ *   - title: string [optionally override default title]
+ * @param CRM_Core_Smarty $smarty
  *
  * @return string
  */

@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -38,8 +38,9 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
 
   static private $tables = null;
   static private $daoToClass = null;
+  static private $entityTypes = null;
 
-  static private function init($fresh = FALSE) {ldelim}
+  static public function init($fresh = FALSE) {ldelim}
     static $init = FALSE;
     if ($init && !$fresh) return;
 
@@ -55,6 +56,7 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
 
     CRM_Utils_Hook::entityTypes($entityTypes);
 
+    self::$entityTypes = array();
     self::$tables = array();
     self::$daoToClass = array();
     foreach ($entityTypes as $entityType) {ldelim}
@@ -64,9 +66,22 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     $init = TRUE;
   {rdelim}
 
-  static private function registerEntityType($daoName, $className, $tableName) {ldelim}
+  /**
+   * (Quasi-Private) Do not call externally (except for unit-testing)
+   */
+  static public function registerEntityType($daoName, $className, $tableName) {ldelim}
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
+    self::$entityTypes[$className] = array(
+      'name' => $daoName,
+      'class' => $className,
+      'table' => $tableName,
+    );
+  {rdelim}
+
+  static public function get() {ldelim}
+    self::init();
+    return self::$entityTypes;
   {rdelim}
 
   static public function tables() {ldelim}

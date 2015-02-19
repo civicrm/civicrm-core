@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -318,7 +318,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   //post data to create interview.
   CRM.$.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      CRM.$("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
+      CRM.$("#row_"+voterId+' td.name').attr('class', 'name strikethrough' );
       CRM.$('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
       CRM.$('#interview_voter_button_' + voterId).html(updateVote);
       CRM.$('#release_voter_button_' + voterId).hide( );
@@ -329,7 +329,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<div class = "icon red-icon alert-icon"></div>Please correct the following errors in the survey fields below:' + '<ul>' + errorList + '</ul>';
+        var allErrors = '<div class = "icon red-icon ui-icon-alert"></div>Please correct the following errors in the survey fields below:' + '<ul>' + errorList + '</ul>';
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }

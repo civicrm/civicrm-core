@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Financial/DAO/FinancialAccount.php';
 require_once 'CRM/Financial/BAO/FinancialAccount.php';
@@ -33,28 +33,17 @@ require_once 'CRM/Financial/BAO/FinancialAccount.php';
  */
 class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'        => 'FinancialItem BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group'       => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -67,8 +56,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();
@@ -89,21 +78,21 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialItem::add($lineItem, $contribution);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialItem',
-      $lineItem->id ,
+      $lineItem->id,
       'amount',
       'entity_id',
       'Database check on added financial item record.'
     );
-    $this->assertEquals( $result, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($result, $price, 'Verify Amount for Financial Item');
   }
 
   /**
-   * check method retrive()
+   * Check method retrive()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -115,8 +104,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();
@@ -141,16 +130,16 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_line_item',
     );
     $financialItem = CRM_Financial_BAO_FinancialItem::retrieve($fParams, $values);
-    $this->assertEquals( $financialItem->amount, $price, 'Verify financial item amount.');
+    $this->assertEquals($financialItem->amount, $price, 'Verify financial item amount.');
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
-  function testCreate() {
+  public function testCreate() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
@@ -162,8 +151,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contact->id,
       'total_amount' => $price,
       'financial_type_id' => 1,
-      'is_active'     => 1,
-      'skipLineItem'  => 1,
+      'is_active' => 1,
+      'skipLineItem' => 1,
     );
 
     $defaults = array();
@@ -203,29 +192,29 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialItem',
-      $lineItem->id ,
+      $lineItem->id,
       'amount',
       'entity_id',
       'Database check on added financial item record.'
     );
 
-    $this->assertEquals( $result, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($result, $price, 'Verify Amount for Financial Item');
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
-      $entityId ,
+      $entityId,
       'amount',
       'entity_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $price, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $price, 'Verify Amount for Financial Item');
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
-  function testCreateEntityTrxn() {
+  public function testCreateEntityTrxn() {
     $fParams = array(
-      'name' => 'Donations'.substr(sha1(rand()), 0, 7),
+      'name' => 'Donations' . substr(sha1(rand()), 0, 7),
       'is_deductible' => 0,
       'is_active' => 1,
     );
@@ -247,19 +236,19 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $entityTrxn = CRM_Financial_BAO_FinancialItem::createEntityTrxn($params);
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
-      $financialTrxn->id ,
+      $financialTrxn->id,
       'amount',
       'financial_trxn_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $amount, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $amount, 'Verify Amount for Financial Item');
     return $entityTrxn;
   }
 
   /**
-   * check method retrieveEntityFinancialTrxn()
+   * Check method retrieveEntityFinancialTrxn()
    */
-  function testRetrieveEntityFinancialTrxn() {
+  public function testRetrieveEntityFinancialTrxn() {
     $entityTrxn = self::testCreateEntityTrxn();
     $params = array(
       'entity_table' => 'civicrm_contribution',
@@ -276,6 +265,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_trxn_id',
       'Database check on added entity financial trxn record.'
     );
-    $this->assertEquals( $entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
+    $this->assertEquals($entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
   }
+
 }

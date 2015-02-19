@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,15 +22,15 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'ReleaseTestCase.php';
 
-// name of the class doesn't end with Test on purpose - this way this
-// webtest is not picked up by the suite, since it needs to run
-// on specially prepare sandbox
-// more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
 /**
+ * name of the class doesn't end with Test on purpose - this way this
+ * webtest is not picked up by the suite, since it needs to run
+ * on specially prepare sandbox
+ * more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
  * Class WebTest_Release_UpgradeScript
  */
 class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
@@ -39,7 +39,7 @@ class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
     parent::setUp();
   }
 
-  function testUpgrade() {
+  public function testUpgrade() {
     $this->webtestLogin();
     $this->open($this->settings->upgradeURL);
     $this->waitForTextPresent("Upgrade CiviCRM to Version");
@@ -47,5 +47,5 @@ class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
 
     $this->waitForTextPresent("CiviCRM upgrade was successful.");
   }
-}
 
+}

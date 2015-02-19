@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,15 +40,16 @@
  */
 class CRM_Contact_Form_Edit_Organization {
 
- /**
+  /**
    * This function provides the HTML form elements that are specific
    * to the Organization Contact Type
    *
-   * @param object $form form object
-   * @param int $inlineEditMode ( 1 for contact summary
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param int $inlineEditMode
+   *   ( 1 for contact summary.
    * top bar form and 2 for display name edit )
    *
-   * @access public
    * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
@@ -56,12 +57,12 @@ class CRM_Contact_Form_Edit_Organization {
 
     $form->applyFilter('__ALL__', 'trim');
 
-    if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+    if (!$inlineEditMode || $inlineEditMode == 1) {
       // Organization_name
       $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name']);
     }
 
-    if ( !$inlineEditMode || $inlineEditMode == 2 ) {
+    if (!$inlineEditMode || $inlineEditMode == 2) {
       // legal_name
       $form->addElement('text', 'legal_name', ts('Legal Name'), $attributes['legal_name']);
 
@@ -76,7 +77,7 @@ class CRM_Contact_Form_Edit_Organization {
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 
-    if ( !$inlineEditMode ) {
+    if (!$inlineEditMode) {
       $form->add('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
@@ -89,11 +90,11 @@ class CRM_Contact_Form_Edit_Organization {
   /**
    * @param $fields
    * @param $files
-   * @param null $contactID
+   * @param int $contactID
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
 
@@ -108,5 +109,5 @@ class CRM_Contact_Form_Edit_Organization {
     // add code to make sure that the uniqueness criteria is satisfied
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

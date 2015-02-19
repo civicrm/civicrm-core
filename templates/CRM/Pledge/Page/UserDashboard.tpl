@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -124,7 +124,7 @@ function buildPaymentDetails( pledgeId, contactId )
                               cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                          },
                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                                 console.error( 'Error: '+ textStatus );
+                                 CRM.console('error', 'Error: ', textStatus);
                         }
          });
 }

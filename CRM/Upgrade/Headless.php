@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Perform an upgrade without using the web-frontend
@@ -35,12 +35,11 @@ class CRM_Upgrade_Headless {
    *
    * @param bool $enablePrint
    *
-   * @throws
    * @throws Exception
    * @return array, with keys:
    *   - message: string, HTML-ish blob
    */
-  function run($enablePrint = TRUE) {
+  public function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
@@ -62,16 +61,16 @@ class CRM_Upgrade_Headless {
 
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner(array(
-        'title' => ts('CiviCRM Upgrade Tasks'),
-        'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
-      ));
+      'title' => ts('CiviCRM Upgrade Tasks'),
+      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
+    ));
     $queueResult = $queueRunner->runAll();
     if ($queueResult !== TRUE) {
       $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);
       CRM_Core_Error::debug_log_message($errorMessage);
       if ($enablePrint) {
-        print($errorMessage);
-    }
+        print ($errorMessage);
+      }
       throw $queueResult['exception']; // FIXME test
     }
 
@@ -82,5 +81,5 @@ class CRM_Upgrade_Headless {
       'message' => file_get_contents($postUpgradeMessageFile),
     );
   }
-}
 
+}

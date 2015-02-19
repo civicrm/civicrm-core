@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -45,10 +45,8 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
    * This method is called after the page is created.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
@@ -64,12 +62,12 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
       }
     }
 
-    $contact = new CRM_Contact_BAO_Contact( );
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
-    $contact->find(true);
-    $privacy = array( );
-    foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
-      if ( isset( $contact->$name ) ) {
+    $contact->find(TRUE);
+    $privacy = array();
+    foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
+      if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;
       }
     }
@@ -84,5 +82,5 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
     // finally call parent
     parent::run();
   }
-}
 
+}

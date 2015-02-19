@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,13 +39,10 @@
 class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
-
-
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
@@ -70,7 +67,13 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->assign('rowDisplayCount', 2);
     }
     $highlightedFields = array();
-    $requiredFields = array('activity_date_time', 'activity_type_id', 'activity_label', 'target_contact_id', 'activity_subject');
+    $requiredFields = array(
+      'activity_date_time',
+      'activity_type_id',
+      'activity_label',
+      'target_contact_id',
+      'activity_subject',
+    );
     foreach ($requiredFields as $val) {
       $highlightedFields[] = $val;
     }
@@ -78,10 +81,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -98,17 +100,17 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingRelation) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
 
       //get loaded Mapping Fields
-      $mappingName        = CRM_Utils_Array::value('1', $mappingName);
+      $mappingName = CRM_Utils_Array::value('1', $mappingName);
       $mappingContactType = CRM_Utils_Array::value('1', $mappingContactType);
-      $mappingLocation    = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType   = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation    = CRM_Utils_Array::value('1', $mappingRelation);
+      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
+      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
+      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
 
       $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);
 
-      $params         = array('id' => $savedMapping);
-      $temp           = array();
+      $params = array('id' => $savedMapping);
+      $temp = array();
       $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
 
       $this->assign('savedName', $mappingDetails->name);
@@ -130,11 +132,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $defaults = array();
     $mapperKeys = array_keys($this->_mapperFields);
 
-    $hasHeaders       = !empty($this->_columnHeaders);
-    $headerPatterns   = $this->get('headerPatterns');
-    $dataPatterns     = $this->get('dataPatterns');
+    $hasHeaders = !empty($this->_columnHeaders);
+    $headerPatterns = $this->get('headerPatterns');
+    $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
-
 
     /* Initialize all field usages to false */
 
@@ -151,7 +152,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //used to warn for mismatch column count or mismatch mapping
     $warning = 0;
-
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
@@ -195,7 +195,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             $defaults["mapper[$i]"] = array(
               $this->defaultFromHeader($this->_columnHeaders[$i],
                 $headerPatterns
-              ));
+              ),
+            );
           }
           else {
             $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
@@ -250,11 +251,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->addButtons(array(
         array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
         ),
         array(
           'type' => 'next',
-          'name' => ts('Continue >>'),
+          'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
@@ -267,15 +268,15 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     // define so we avoid notices below
     $errors['_qf_default'] = '';
@@ -291,11 +292,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         'target_contact_id' => ts('Contact ID'),
         'activity_date_time' => ts('Activity Date'),
         'activity_subject' => ts('Activity Subject'),
-        'activity_type_id' => ts('Activity Type Id'),
+        'activity_type_id' => ts('Activity Type ID'),
       );
 
       $params = array(
-        'used'         => 'Unsupervised',
+        'used' => 'Unsupervised',
         'contact_type' => 'Individual',
       );
       list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
@@ -327,10 +328,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
             else {
               $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
-                array(
-                  1 => $title,
-                  2 => 'Activity Type Label'
-                )) . '<br />';
+                  array(
+                    1 => $title,
+                    2 => 'Activity Type Label',
+                  )) . '<br />';
             }
           }
           else {
@@ -369,11 +370,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
+   * Process the mapped fields and map it into the uploaded file.
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
@@ -390,11 +390,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
 
-    $mapperKeys      = array();
-    $mapper          = array();
-    $mapperKeys      = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain  = array();
-    $mapperLocType   = array();
+    $mapperKeys = array();
+    $mapper = array();
+    $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
+    $mapperKeysMain = array();
+    $mapperLocType = array();
     $mapperPhoneType = array();
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
@@ -470,7 +470,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->set('savedMapping', $saveMappingFields->mapping_id);
     }
 
-
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain, $mapperLocType, $mapperPhoneType);
     $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
       CRM_Import_Parser::MODE_PREVIEW
@@ -479,5 +478,5 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     // add all the necessary variables to the form
     $parser->set($this);
   }
-}
 
+}

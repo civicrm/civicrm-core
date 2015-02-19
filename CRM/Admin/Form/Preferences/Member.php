@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -38,11 +38,10 @@
  *
  */
 class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMember Component Settings'));
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => array(
         'default_renewal_contribution_page' => array(
           'html_type' => 'select',
           'title' => ts('Default online membership renewal page'),
@@ -57,13 +56,12 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
   }
-}
 
+}

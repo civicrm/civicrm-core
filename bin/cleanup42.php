@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,13 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A PHP script which deletes extraneous civicrm_membership_payment rows
  * in order to correct the condition where a contribution row is linked to > 1 membership.
-  */
+ */
 
+/**
+ * Initialization
+ */
 function initialize() {
   session_start();
   if (!function_exists('drush_get_context')) {
@@ -50,10 +53,10 @@ function initialize() {
 function run() {
   initialize();
 
-  $fh   = fopen('php://output', 'w');
+  $fh = fopen('php://output', 'w');
   $rows = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
 
-  if ( !empty($rows)) {
+  if (!empty($rows)) {
     echo "The following records have been processed. If action = Un-linked, that membership has been disconnected from the contribution record.\n";
     echo "Contact ID, ContributionID, Contribution Status, MembershipID, Membership Type, Start Date, End Date, Membership Status, Action \n";
   }
@@ -61,7 +64,7 @@ function run() {
     echo "Could not find any records to process.\n";
   }
 
-  foreach ( $rows as $row ) {
+  foreach ($rows as $row) {
     fputcsv($fh, $row);
   }
 }

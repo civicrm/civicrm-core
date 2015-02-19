@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\Core\Event;
 
@@ -53,10 +53,17 @@ class PreEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public $params;
 
-  function __construct($action, $entity, $id, $params) {
+  /**
+   * @param $action
+   * @param $entity
+   * @param $id
+   * @param $params
+   */
+  public function __construct($action, $entity, $id, $params) {
     $this->action = $action;
     $this->entity = $entity;
     $this->id = $id;
     $this->params = $params;
   }
+
 }

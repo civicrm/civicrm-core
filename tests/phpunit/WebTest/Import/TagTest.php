@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-    *  Test contact import for Individuals.
-    */
-  function testContactImportWithTag() {
+  /**
+   * Test contact import for Individuals.
+   */
+  public function testContactImportWithTag() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -88,13 +88,12 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("{$countContacts} Contacts"));
   }
 
-  /*
-     *  Helper function to provide data for contact import for sample.
-     */
   /**
+   * Helper function to provide data for contact import for sample.
+   *
    * @return array
    */
-  function _contactTagCSVData() {
+  public function _contactTagCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -109,7 +108,8 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -120,7 +120,8 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -135,5 +136,5 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

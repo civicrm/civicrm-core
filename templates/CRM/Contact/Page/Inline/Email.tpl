@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -75,7 +75,7 @@
 <script type="text/javascript">
 
 function showHideSignature( blockId ) {
-  cj("#Email_Block_" + blockId + "_signature").show( );   
+  cj("#Email_Block_" + blockId + "_signature").show( );
 
   cj("#Email_Block_" + blockId + "_signature").dialog({
       title: "Signature",
@@ -86,10 +86,10 @@ function showHideSignature( blockId ) {
         cj(this).dialog("destroy");
       },
       buttons: {
-        "Done": function() { 
-                  cj(this).dialog("destroy"); 
-                } 
-      } 
+        "Done": function() {
+                  cj(this).dialog("destroy");
+                }
+      }
   });
 }
 </script>

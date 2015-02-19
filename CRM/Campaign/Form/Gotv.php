@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,14 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -42,7 +41,6 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
    * Are we forced to run a search
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
@@ -51,11 +49,9 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   protected $_searchVoterFor;
 
   /**
-   * processing needed for buildForm and later
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Processing needed for buildForm and later.
+   */
+  public function preProcess() {
     $this->_search = CRM_Utils_Array::value('search', $_GET);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
@@ -97,13 +93,9 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if ($this->_search) {
       return;
     }
@@ -150,7 +142,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     $this->validateIds();
   }
 
-  function validateIds() {
+  public function validateIds() {
     $errorMessages = array();
     //check for required permissions.
     if (!CRM_Core_Permission::check('manage campaign') &&
@@ -173,5 +165,5 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
 
     $this->assign('errorMessages', empty($errorMessages) ? FALSE : $errorMessages);
   }
-}
 
+}

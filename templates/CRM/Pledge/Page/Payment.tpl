@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -55,10 +55,10 @@
             <a class="crm-hover-button action-item" href="{$viewContribURL}">{ts}View Payment{/ts}</a>
         {else} {* Links to record / submit a payment. *}
             {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=`$context`&ppid=`$row.id`"}{/capture}
-            <a class="crm-hover-button action-item" href="{$newContribURL}">{ts}Record Payment{/ts}</a>
+            <a class="open-inline-noreturn crm-hover-button action-item" href="{$newContribURL}">{ts}Record Payment{/ts}</a>
             {if $newCredit}
               {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&ppid=`$row.id`&context=`$context`&mode=live"}{/capture}
-              <a class="crm-hover-button action-item" href="{$newCreditURL}">{ts}Credit Card Payment{/ts}</a>
+              <a class="open-inline-noreturn action-item crm-hover-button" href="{$newCreditURL}">{ts}Credit Card Payment{/ts}</a>
             {/if}
             {capture assign=editURL}{crmURL p="civicrm/pledge/payment" q="reset=1&action=update&cid=`$contactId`&context=`$context`&ppId=`$row.id`"}{/capture}
             <a class="crm-hover-button action-item" href="{$editURL}">{ts}Edit Scheduled Payment{/ts}</a>

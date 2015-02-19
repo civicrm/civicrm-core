@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,11 +35,17 @@
 class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   protected $mockObject;
+
+  /**
+   * @var array adhocHooks to call
+   */
   protected $adhocHooks;
   protected $civiModules = NULL;
 
-  // Call this in CiviUnitTestCase::setUp()
-  function reset() {
+  /**
+   * Call this in CiviUnitTestCase::setUp()
+   */
+  public function reset() {
     $this->mockObject = NULL;
     $this->adhocHooks = array();
   }
@@ -48,29 +53,43 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   /**
    * Use a unit-testing mock object to handle hook invocations
    * e.g. hook_civicrm_foo === $mockObject->foo()
+   * @param object $mockObject
    */
-  function setMock($mockObject) {
+  public function setMock($mockObject) {
     $this->mockObject = $mockObject;
   }
 
   /**
-   * Register a piece of code to run when invoking a hook
+   * Register a piece of code to run when invoking a hook.
+   * @param string $hook
+   *   Hook name, e.g civicrm_pre.
+   * @param array $callable
+   *   Function to call ie array(class, method).
+   *   eg. array($this, mymethod)
    */
-  function setHook($hook, $callable) {
+  public function setHook($hook, $callable) {
     $this->adhocHooks[$hook] = $callable;
   }
 
   /**
-   *Invoke hooks
+   * Invoke hooks.
    *
-   * @param int $numParams Number of parameters to pass to the hook
-   * @param mixed $arg1 parameter to be passed to the hook
-   * @param mixed $arg2 parameter to be passed to the hook
-   * @param mixed $arg3 parameter to be passed to the hook
-   * @param mixed $arg4 parameter to be passed to the hook
-   * @param mixed $arg5 parameter to be passed to the hook
-   * @param mixed $arg6 parameter to be passed to the hook
-   * @param string $fnSuffix function suffix, this is effectively the hook name
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param mixed $arg1
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg2
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg3
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg4
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg5
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg6
+   *   Parameter to be passed to the hook.
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
    *
    * @return mixed
    */
@@ -86,11 +105,12 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  function invoke($numParams,
+  public function invoke(
+    $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
 
-    $params = array( &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
+    $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
 
     if ($this->civiModules === NULL) {
       $this->civiModules = array();
@@ -102,8 +122,8 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
       call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
     }
     if (!empty($this->adhocHooks[$fnSuffix])) {
-      call_user_func_array($this->adhocHooks[$fnSuffix], $params );
+      call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,21 +43,21 @@ class CRM_Contact_Form_Search_Custom_Base {
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_formValues = &$formValues;
   }
 
   /**
    * @return null|string
    */
-  function count() {
+  public function count() {
     return CRM_Core_DAO::singleValueQuery($this->sql('count(distinct contact_a.id) as total'));
   }
 
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
@@ -69,7 +69,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $sql = $this->sql(
       'contact_a.id as contact_id',
       $offset,
@@ -95,13 +95,13 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @return string
    */
-  function sql(
+  public function sql(
     $selectClause,
-    $offset   = 0,
+    $offset = 0,
     $rowcount = 0,
     $sort = NULL,
     $includeContactIDs = FALSE,
-    $groupBy           = NULL
+    $groupBy = NULL
   ) {
 
     $sql = "SELECT $selectClause " . $this->from();
@@ -127,11 +127,11 @@ class CRM_Contact_Form_Search_Custom_Base {
   /**
    * @return null
    */
-  function templateFile() {
+  public function templateFile() {
     return NULL;
   }
 
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
@@ -139,7 +139,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $sql
    * @param $formValues
    */
-  static function includeContactIDs(&$sql, &$formValues) {
+  public static function includeContactIDs(&$sql, &$formValues) {
     $contactIDs = array();
     foreach ($formValues as $id => $value) {
       if ($value &&
@@ -161,7 +161,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $rowcount
    * @param $sort
    */
-  function addSortOffset(&$sql, $offset, $rowcount, $sort) {
+  public function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
         $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -186,7 +186,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @throws Exception
    */
-  function validateUserSQL(&$sql, $onlyWhere = FALSE) {
+  public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
     $includeStrings = array('contact_a');
     $excludeStrings = array('insert', 'delete', 'update');
 
@@ -197,36 +197,37 @@ class CRM_Contact_Form_Search_Custom_Base {
     foreach ($includeStrings as $string) {
       if (stripos($sql, $string) === FALSE) {
         CRM_Core_Error::fatal(ts('Could not find \'%1\' string in SQL clause.',
-            array(1 => $string)
-          ));
+          array(1 => $string)
+        ));
       }
     }
 
     foreach ($excludeStrings as $string) {
       if (preg_match('/(\s' . $string . ')|(' . $string . '\s)/i', $sql)) {
         CRM_Core_Error::fatal(ts('Found illegal \'%1\' string in SQL clause.',
-            array(1 => $string)
-          ));
+          array(1 => $string)
+        ));
       }
     }
   }
 
   /**
    * @param $where
-   * @param $params
+   * @param array $params
    *
    * @return string
    */
-  function whereClause(&$where, &$params) {
+  public function whereClause(&$where, &$params) {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
 
-  // override this method to define the contact query object
-  // used for creating $sql
   /**
+   * override this method to define the contact query object
+   * used for creating $sql
    * @return null
    */
-  function getQueryObj() {
+  public function getQueryObj() {
     return NULL;
   }
+
 }

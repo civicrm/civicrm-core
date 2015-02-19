@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,24 +40,22 @@
  */
 class CRM_Event_Task {
   // Value for SAVE_SEARCH is set to 13 in accordance with CRM_Contact_Task::SAVE_SEARCH
-  CONST DELETE_EVENTS = 1, PRINT_EVENTS = 2, EXPORT_EVENTS = 3, BATCH_EVENTS = 4, CANCEL_REGISTRATION = 5, EMAIL_CONTACTS = 6,
-  // Value for LABEL_CONTACTS is set to 16 in accordance with CRM_Contact_Task::LABEL_CONTACTS
-  SAVE_SEARCH = 13, SAVE_SEARCH_UPDATE = 14, PARTICIPANT_STATUS = 15,
-  LABEL_CONTACTS = 16;
+  const DELETE_EVENTS = 1, PRINT_EVENTS = 2, EXPORT_EVENTS = 3, BATCH_EVENTS = 4, CANCEL_REGISTRATION = 5, EMAIL_CONTACTS = 6,
+    // Value for LABEL_CONTACTS is set to 16 in accordance with CRM_Contact_Task::LABEL_CONTACTS
+    SAVE_SEARCH = 13, SAVE_SEARCH_UPDATE = 14, PARTICIPANT_STATUS = 15,
+    LABEL_CONTACTS = 16, GROUP_CONTACTS = 20;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -65,14 +63,14 @@ class CRM_Event_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of contacts
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(1 => array(
-        'title' => ts('Delete Participants'),
+      self::$_tasks = array(
+        1 => array(
+          'title' => ts('Delete Participants'),
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
         ),
@@ -127,11 +125,20 @@ class CRM_Event_Task {
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
+        20 => array(
+          'title' => ts('Add Contacts to Group'),
+          'class' => 'CRM_Event_Form_Task_AddToGroup',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviEvent')) {
         unset(self::$_tasks[1]);
+      }
+      //CRM-12920 - check for edit permission
+      if (!CRM_Core_Permission::check('edit event participants')) {
+        unset(self::$_tasks[4], self::$_tasks[5], self::$_tasks[15]);
       }
     }
 
@@ -144,11 +151,10 @@ class CRM_Event_Task {
    * These tasks are the core set of task titles
    * for participants
    *
-   * @return array the set of task titles
-   * @static
-   * @access public
+   * @return array
+   *   the set of task titles
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -161,13 +167,12 @@ class CRM_Event_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
-   * @return array the set of optional tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of optional tasks for a group of contacts
    */
-  static function &optionalTaskTitle() {
+  public static function &optionalTaskTitle() {
     $tasks = array(
       14 => self::$_tasks[14]['title'],
     );
@@ -175,15 +180,15 @@ class CRM_Event_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission
    *
-   * @return array set of tasks that are valid for the user
-   * @access public
+   * @return array
+   *   set of tasks that are valid for the user
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit event participants')
@@ -210,11 +215,10 @@ class CRM_Event_Task {
    *
    * @param int $value
    *
-   * @return array the set of tasks for a group of participants
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of participants
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default
@@ -225,5 +229,5 @@ class CRM_Event_Task {
       self::$_tasks[$value]['result'],
     );
   }
-}
 
+}

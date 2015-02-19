@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,12 +39,10 @@
 class CRM_Core_Page_AJAX {
 
   /**
-   * function to call generic ajax forms
+   * Call generic ajax forms.
    *
-   * @static
-   * @access public
    */
-  static function run() {
+  public static function run() {
     $className = CRM_Utils_Type::escape($_REQUEST['class_name'], 'String');
     $type = '';
     if (!empty($_REQUEST['type'])) {
@@ -75,7 +73,7 @@ class CRM_Core_Page_AJAX {
         // FIXME: This is done to maintain current wire protocol, but it might be
         // simpler to just require different 'types' for pages and forms
         if (preg_match('/^CRM_[a-zA-Z0-9]+_Page_Inline_/', $className)) {
-          $page = new $className;
+          $page = new $className();
           $page->run();
         }
         else {
@@ -83,6 +81,7 @@ class CRM_Core_Page_AJAX {
           $wrapper->run($className);
         }
         break;
+
       default:
         CRM_Core_Error::debug_log_message('Unsupported inline request type: ' . var_export($type, TRUE));
     }
@@ -90,12 +89,10 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * function to change is_quick_config priceSet to complex
+   * Change is_quick_config priceSet to complex.
    *
-   * @static
-   * @access public
    */
-  static function setIsQuickConfig() {
+  public static function setIsQuickConfig() {
     $id = $context = NULL;
     if (!empty($_REQUEST['id'])) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
@@ -107,7 +104,7 @@ class CRM_Core_Page_AJAX {
     // return false if $id is null and
     // $context is not civicrm_event or civicrm_contribution_page
     if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
-      return false;
+      return FALSE;
     }
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
     if ($priceSetId) {
@@ -124,7 +121,7 @@ class CRM_Core_Page_AJAX {
       }
     }
     if (!$result) {
-      $priceSetId = null;
+      $priceSetId = NULL;
     }
     CRM_Utils_JSON::output($priceSetId);
   }
@@ -132,13 +129,16 @@ class CRM_Core_Page_AJAX {
   /**
    * Determine whether the request is for a valid class/method name.
    *
-   * @param string $type 'method'|'class'|''
-   * @param string $className 'Class_Name'
-   * @param string $fnName method name
+   * @param string $type
+   *   'method'|'class'|''.
+   * @param string $className
+   *   'Class_Name'.
+   * @param string $fnName
+   *   Method name.
    *
    * @return bool
    */
-  static function checkAuthz($type, $className, $fnName = null) {
+  public static function checkAuthz($type, $className, $fnName = NULL) {
     switch ($type) {
       case 'method':
         if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
@@ -158,6 +158,7 @@ class CRM_Core_Page_AJAX {
           return FALSE;
         }
         return class_exists($className);
+
       default:
         return FALSE;
     }
@@ -167,7 +168,7 @@ class CRM_Core_Page_AJAX {
    * Outputs the CiviCRM standard json-formatted page/form response
    * @param array|string $response
    */
-  static function returnJsonResponse($response) {
+  public static function returnJsonResponse($response) {
     // Allow lazy callers to not wrap content in an array
     if (is_string($response)) {
       $response = array('content' => $response);
@@ -198,13 +199,32 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
+   * Set headers appropriate for a js file.
+   *
+   * @param int|NULL $ttl
+   *   Time-to-live (seconds).
+   */
+  public static function setJsHeaders($ttl = NULL) {
+    if ($ttl === NULL) {
+      // Encourage browsers to cache for a long time - 1 year
+      $ttl = 60 * 60 * 24 * 364;
+    }
+    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
+    header('Content-Type:	application/javascript');
+    header("Cache-Control: max-age=$ttl, public");
+  }
+
+  /**
    * Send autocomplete results to the client. Input can be a simple or nested array.
-   * @param array $results - If nested array, also provide:
-   * @param string $val - array key to use as the value
-   * @param string $key - array key to use as the key
+   * @param array $results
+   *   If nested array, also provide:.
+   * @param string $val
+   *   Array key to use as the value.
+   * @param string $key
+   *   Array key to use as the key.
    * @deprecated
    */
-  static function autocompleteResults($results, $val='label', $key='id') {
+  public static function autocompleteResults($results, $val = 'label', $key = 'id') {
     $output = array();
     if (is_array($results)) {
       foreach ($results as $k => $v) {
@@ -218,5 +238,5 @@ class CRM_Core_Page_AJAX {
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

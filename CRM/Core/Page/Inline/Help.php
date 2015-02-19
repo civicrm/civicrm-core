@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
@@ -37,7 +36,7 @@
  * This loads a smarty help file via ajax and returns as html
  */
 class CRM_Core_Page_Inline_Help {
-  function run() {
+  public function run() {
     $args = $_REQUEST;
     if (!empty($args['file']) && strpos($args['file'], '..') === FALSE) {
       $file = $args['file'] . '.hlp';
@@ -60,4 +59,5 @@ class CRM_Core_Page_Inline_Help {
       exit($smarty->fetch($file) . $extraoutput);
     }
   }
+
 }

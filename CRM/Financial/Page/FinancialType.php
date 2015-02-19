@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,56 +40,57 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = null;
+  static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Financial_BAO_FinancialType';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        CRM_Core_Action::BROWSE  => array(
-          'name'  => ts('Accounts'),
-          'url'   => 'civicrm/admin/financial/financialType/accounts',
-          'qs'    => 'reset=1&action=browse&aid=%%id%%',
+        CRM_Core_Action::BROWSE => array(
+          'name' => ts('Accounts'),
+          'url' => 'civicrm/admin/financial/financialType/accounts',
+          'qs' => 'reset=1&action=browse&aid=%%id%%',
           'title' => ts('Accounts'),
         ),
-        CRM_Core_Action::UPDATE  => array(
-          'name'  => ts('Edit'),
-          'url'   => 'civicrm/admin/financial/financialType',
-          'qs'    => 'action=update&id=%%id%%&reset=1',
+        CRM_Core_Action::UPDATE => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/admin/financial/financialType',
+          'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
         ),
         CRM_Core_Action::DISABLE => array(
-          'name'  => ts('Disable'),
-          'ref'   => 'crm-enable-disable',
+          'name' => ts('Disable'),
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
         ),
-        CRM_Core_Action::ENABLE  => array(
-          'name'  => ts('Enable'),
-          'ref'   => 'crm-enable-disable',
+        CRM_Core_Action::ENABLE => array(
+          'name' => ts('Enable'),
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
         ),
-        CRM_Core_Action::DELETE  => array(
-          'name'  => ts('Delete'),
-          'url'   => 'civicrm/admin/financial/financialType',
-          'qs'    => 'action=delete&id=%%id%%',
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete'),
+          'url' => 'civicrm/admin/financial/financialType',
+          'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
         ),
       );
@@ -105,20 +106,18 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, false, 0);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($action, $id) ;
+      $this->edit($action, $id);
     }
 
     // parent run
@@ -126,14 +125,12 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all financial types
+   * Browse all financial types.
    *
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse() {
+  public function browse() {
     // get all financial types sorted by weight
     $financialType = array();
     $dao = new CRM_Financial_DAO_FinancialType();
@@ -142,7 +139,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
 
     while ($dao->fetch()) {
       $financialType[$dao->id] = array();
-      CRM_Core_DAO::storeValues( $dao, $financialType[$dao->id]);
+      CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
       $defaults = $financialAccountId = array();
       $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
       $financialAccountIds = array();
@@ -151,15 +148,15 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $params['entity_table'] = 'civicrm_financial_type';
       CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
 
-      foreach( $financialAccountIds as $key => $values){
+      foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {
           $financialAccountId[$values['financial_account_id']] = CRM_Utils_Array::value(
-            $values['financial_account_id'], $financialAccounts );
+            $values['financial_account_id'], $financialAccounts);
         }
       }
 
       if (!empty($financialAccountId)) {
-        $financialType[$dao->id]['financial_account'] = implode( ',', $financialAccountId );
+        $financialType[$dao->id]['financial_account'] = implode(',', $financialAccountId);
       }
 
       // form all action links
@@ -194,20 +191,22 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_FinancialType';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Financial Types';
   }
 
@@ -216,9 +215,11 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
-  function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/financial/financialType';
   }
+
 }

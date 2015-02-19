@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -33,8 +33,6 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 /**
  * Page to decide the flow of adding an item.
  */
@@ -48,8 +46,6 @@ class CRM_Auction_Page_AddItem extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -91,7 +87,6 @@ class CRM_Auction_Page_AddItem extends CRM_Core_Page {
       }
     }
 
-    // parent run
     parent::run();
   }
 }

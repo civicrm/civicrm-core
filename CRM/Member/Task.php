@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,21 +40,19 @@
  *
  */
 class CRM_Member_Task {
-  CONST DELETE_MEMBERS = 1, PRINT_MEMBERS = 2, EXPORT_MEMBERS = 3, EMAIL_CONTACTS = 4, BATCH_MEMBERS = 5;
+  const DELETE_MEMBERS = 1, PRINT_MEMBERS = 2, EXPORT_MEMBERS = 3, EMAIL_CONTACTS = 4, BATCH_MEMBERS = 5;
 
   /**
-   * the task array
+   * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -62,11 +60,10 @@ class CRM_Member_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of contacts
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
@@ -118,6 +115,10 @@ class CRM_Member_Task {
       if (!CRM_Core_Permission::check('delete in CiviMember')) {
         unset(self::$_tasks[1]);
       }
+      //CRM-12920 - check for edit permission
+      if (!CRM_Core_Permission::check('edit memberships')) {
+        unset(self::$_tasks[5]);
+      }
     }
     CRM_Utils_Hook::searchTasks('membership', self::$_tasks);
     asort(self::$_tasks);
@@ -128,11 +129,10 @@ class CRM_Member_Task {
    * These tasks are the core set of task titles
    * on members
    *
-   * @return array the set of task titles
-   * @static
-   * @access public
+   * @return array
+   *   the set of task titles
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -142,15 +142,15 @@ class CRM_Member_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level
    * of the user
    *
    * @param int $permission
    *
-   * @return array set of tasks that are valid for the user
-   * @access public
+   * @return array
+   *   set of tasks that are valid for the user
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit memberships')
@@ -176,11 +176,10 @@ class CRM_Member_Task {
    *
    * @param int $value
    *
-   * @return array the set of tasks for a group of members
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of members
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default
@@ -191,5 +190,5 @@ class CRM_Member_Task {
       self::$_tasks[$value]['result'],
     );
   }
-}
 
+}

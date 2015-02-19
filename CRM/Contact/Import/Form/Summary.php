@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,10 +39,9 @@
 class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // set the error message path to display
@@ -101,7 +100,21 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
     $this->assign('dupeActionString', $dupeActionString);
 
-    $properties = array('totalRowCount', 'validRowCount', 'invalidRowCount', 'conflictRowCount', 'downloadConflictRecordsUrl', 'downloadErrorRecordsUrl', 'duplicateRowCount', 'downloadDuplicateRecordsUrl', 'downloadMismatchRecordsUrl', 'groupAdditions', 'tagAdditions', 'unMatchCount', 'unparsedAddressCount');
+    $properties = array(
+      'totalRowCount',
+      'validRowCount',
+      'invalidRowCount',
+      'conflictRowCount',
+      'downloadConflictRecordsUrl',
+      'downloadErrorRecordsUrl',
+      'duplicateRowCount',
+      'downloadDuplicateRecordsUrl',
+      'downloadMismatchRecordsUrl',
+      'groupAdditions',
+      'tagAdditions',
+      'unMatchCount',
+      'unparsedAddressCount',
+    );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
@@ -111,10 +124,9 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
   /**
-   * Clean up the import table we used
+   * Clean up the import table we used.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $dao = new CRM_Core_DAO();
@@ -129,4 +141,3 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -38,11 +38,11 @@
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function build(&$form) {
+  public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -50,73 +50,84 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     }
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
-      ->addSetting(array('tabSettings' => array(
-        'active' => self::getCurrentTab($tabs),
-      )));
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => self::getCurrentTab($tabs),
+        ),
+      ));
     return $tabs;
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function process(&$form) {
+  public static function process(&$form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
 
     $tabs = array(
-      'settings' => array('title' => ts('Title'),
+      'settings' => array(
+        'title' => ts('Title'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'amount' => array('title' => ts('Amounts'),
+      'amount' => array(
+        'title' => ts('Amounts'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'membership' => array('title' => ts('Memberships'),
+      'membership' => array(
+        'title' => ts('Memberships'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'thankyou' => array('title' => ts('Receipt'),
+      'thankyou' => array(
+        'title' => ts('Receipt'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'friend' => array('title' => ts('Tell a Friend'),
+      'friend' => array(
+        'title' => ts('Tell a Friend'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'custom' => array('title' => ts('Profiles'),
+      'custom' => array(
+        'title' => ts('Profiles'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'premium' => array('title' => ts('Premiums'),
+      'premium' => array(
+        'title' => ts('Premiums'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'widget' => array('title' => ts('Widgets'),
+      'widget' => array(
+        'title' => ts('Widgets'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'pcp' => array('title' => ts('Personal Campaigns'),
+      'pcp' => array(
+        'title' => ts('Personal Campaigns'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
@@ -125,8 +136,8 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     );
 
     $contribPageId = $form->getVar('_id');
-    $fullName      = $form->getVar('_name');
-    $className     = CRM_Utils_String::getClassName($fullName);
+    $fullName = $form->getVar('_name');
+    $className = CRM_Utils_String::getClassName($fullName);
 
     // Hack for special cases.
     switch ($className) {
@@ -160,11 +171,10 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
           $tabs[$key]['qfKey'] = NULL;
         }
 
-        $tabs[$key]['link'] =
-          CRM_Utils_System::url(
+        $tabs[$key]['link'] = CRM_Utils_System::url(
             "civicrm/admin/contribute/{$key}",
-          "{$reset}action=update&id={$contribPageId}{$tabs[$key]['qfKey']}"
-        );
+            "{$reset}action=update&id={$contribPageId}{$tabs[$key]['qfKey']}"
+          );
         $tabs[$key]['active'] = $tabs[$key]['valid'] = TRUE;
       }
       //get all section info.
@@ -182,7 +192,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
    * @param $form
    */
-  static function reset(&$form) {
+  public static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -192,7 +202,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
    *
    * @return int|string
    */
-  static function getCurrentTab($tabs) {
+  public static function getCurrentTab($tabs) {
     static $current = FALSE;
 
     if ($current) {
@@ -211,5 +221,5 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     $current = $current ? $current : 'settings';
     return $current;
   }
-}
 
+}

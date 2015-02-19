@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddTag() {
+  public function testAddTag() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1", "_qf_Tag_next");
@@ -67,13 +67,13 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=table.display tbody tr td");
 
     // verify text
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagName']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagName']/following-sibling::td[2][text()='Adding new tag. ']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagName']/following-sibling::td[4][text()= 'Contacts']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagName']/following-sibling::td[7]/span/a[text()= 'Edit']");
+    $this->assertTrue($this->isTextPresent($tagName), 'Missing text: ' . $tagName);
+    $this->assertTrue($this->isTextPresent('Adding new tag.'), 'Missing text: ' . 'Adding new tag.');
+    $this->assertTrue($this->isTextPresent('Contacts'), 'Missing text: ' . 'Contacts');
+    $this->assertTrue($this->isTextPresent('Edit'), 'Missing text: ' . 'Edit');
   }
 
-  function testAddTagSet() {
+  public function testAddTagSet() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
@@ -105,10 +105,10 @@ class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=table.display tbody tr td");
 
     // verify text
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[2][text()='Adding new tag set. ']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[4][text()= 'Contacts']");
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
+    $this->assertTrue($this->isTextPresent($tagSetName), 'Missing text: ' . $tagSetName);
+    $this->assertTrue($this->isTextPresent('Adding new tag set.'), 'Missing text: ' . 'Adding new tag set.');
+    $this->assertTrue($this->isTextPresent('Contacts'), 'Missing text: ' . 'Contacts');
+    $this->assertTrue($this->isTextPresent('Edit'), 'Missing text: ' . 'Edit');
   }
-}
 
+}

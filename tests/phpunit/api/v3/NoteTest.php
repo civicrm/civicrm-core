@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class contains api test cases for "civicrm_note"
- *
  */
 class api_v3_NoteTest extends CiviUnitTestCase {
 
@@ -39,30 +38,12 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_noteID;
   protected $_note;
 
-
-  /**
-   *
-   */
-  function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Note Create',
-      'description' => 'Test all Note Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
 
     $this->_apiversion = 3;
-    //  Connect to the database
+    // Connect to the database.
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
 
@@ -72,88 +53,85 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'note' => 'Hello!!! m testing Note',
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
-      'subject' => 'Test Note',    );
+      'subject' => 'Test Note',
+    );
     $this->_note = $this->noteCreate($this->_contactID);
     $this->_noteID = $this->_note['id'];
-  }
-
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_note', 'civicrm_contact',
-    );
-    $this->quickCleanup($tablesToTruncate);
   }
 
   ///////////////// civicrm_note_get methods
 
   /**
-   * check retrieve note with empty parameter array
+   * Check retrieve note with empty parameter array.
+   *
    * Error expected
    */
-  function testGetWithEmptyParams() {
+  public function testGetWithEmptyParams() {
     $this->callAPISuccess('note', 'get', array());
   }
 
   /**
-   * check retrieve note with missing patrameters
+   * Check retrieve note with missing parameters.
+   *
    * Error expected
    */
-  function testGetWithoutEntityId() {
+  public function testGetWithoutEntityId() {
     $params = array(
       'entity_table' => 'civicrm_contact',
     );
-    $note = $this->callAPISuccess('note', 'get', $params);
+    $this->callAPISuccess('note', 'get', $params);
   }
 
   /**
-   * check civicrm_note_get
+   * Check civicrm_note get.
    */
-  function testGet() {
+  public function testGet() {
     $entityId = $this->_noteID;
     $params = array(
       'entity_table' => 'civicrm_contact',
       'entity_id' => $entityId,
     );
-    $result = $this->callAPIAndDocument('note', 'get', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('note', 'get', $params, __FUNCTION__, __FILE__);
   }
 
-
-  ///////////////// civicrm_note_create methods
-
   /**
-   * Check create with empty parameter array
+   * Check create with empty parameter array.
+   *
    * Error Expected
    */
-  function testCreateWithEmptyNoteField() {
+  public function testCreateWithEmptyNoteField() {
     $this->_params['note'] = "";
-    $result = $this->callAPIFailure('note', 'create', $this->_params,
-      'Mandatory key(s) missing from params array: note');
+    $this->callAPIFailure('note', 'create', $this->_params,
+      'Mandatory key(s) missing from params array: note'
+    );
   }
 
   /**
-   * Check create with partial params
+   * Check create with partial params.
+   *
    * Error expected
    */
-  function testCreateWithoutEntityId() {
+  public function testCreateWithoutEntityId() {
     unset($this->_params['entity_id']);
-    $result = $this->callAPIFailure('note', 'create', $this->_params,
+    $this->callAPIFailure('note', 'create', $this->_params,
       'Mandatory key(s) missing from params array: entity_id');
   }
 
   /**
-   * Check create with partially empty params
+   * Check create with partially empty params.
+   *
    * Error expected
    */
-  function testCreateWithEmptyEntityId() {
+  public function testCreateWithEmptyEntityId() {
     $this->_params['entity_id'] = "";
-    $result = $this->callAPIFailure('note', 'create', $this->_params,
+    $this->callAPIFailure('note', 'create', $this->_params,
       'Mandatory key(s) missing from params array: entity_id');
   }
 
   /**
-   * Check civicrm_note_create
+   * Check civicrm note create.
    */
-  function testCreate() {
+  public function testCreate() {
 
     $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note', 'in line ' . __LINE__);
@@ -161,11 +139,12 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     $this->assertArrayHasKey('id', $result);
     $note = array(
-      'id' => $result['id'],    );
+      'id' => $result['id'],
+    );
     $this->noteDelete($note);
   }
 
-  function testCreateWithApostropheInString() {
+  public function testCreateWithApostropheInString() {
     $params = array(
       'entity_table' => 'civicrm_contact',
       'entity_id' => $this->_contactID,
@@ -173,7 +152,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
       'subject' => "With a '",
-      'sequential' => 1,    );
+      'sequential' => 1,
+    );
     $result = $this->callAPISuccess('Note', 'Create', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note", 'in line ' . __LINE__);
@@ -182,58 +162,61 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     //CleanUP
     $note = array(
-      'id' => $result['id'],    );
+      'id' => $result['id'],
+    );
     $this->noteDelete($note);
   }
 
   /**
-   * Check civicrm_note_create - tests used of default set to now
+   * Check civicrm_note_create - tests used of default set to .
    */
-  function testCreateWithoutModifiedDate() {
+  public function testCreateWithoutModifiedDate() {
     unset($this->_params['modified_date']);
     $apiResult = $this->callAPISuccess('note', 'create', $this->_params);
     $this->assertAPISuccess($apiResult);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($apiResult['values'][$apiResult['id']]['modified_date'])));
     $this->noteDelete(array(
-      'id' => $apiResult['id'],      ));
+      'id' => $apiResult['id'],
+    ));
   }
 
-
-  ///////////////// civicrm_note_update methods
-
   /**
-   * Check update with empty parameter array
+   * Check update with empty parameter array.
+   *
    * Please don't copy & paste this - is of marginal value
    * better to put time into the function on Syntax Conformance class that tests this
    */
-  function testUpdateWithEmptyParams() {
-    $note = $this->callAPIFailure('note', 'create', array());
+  public function testUpdateWithEmptyParams() {
+    $this->callAPIFailure('note', 'create', array());
   }
 
   /**
-   * Check update with missing parameter (contact id)
+   * Check update with missing parameter (contact id).
+   *
    * Error expected
    */
-  function testUpdateWithoutContactId() {
+  public function testUpdateWithoutContactId() {
     $params = array(
       'entity_id' => $this->_contactID,
-      'entity_table' => 'civicrm_contact',    );
-    $note = $this->callAPIFailure('note', 'create', $params,
+      'entity_table' => 'civicrm_contact',
+    );
+    $this->callAPIFailure('note', 'create', $params,
       'Mandatory key(s) missing from params array: note'
     );
   }
 
   /**
-   * Check civicrm_note_update
+   * Check civicrm_note update.
    */
-  function testUpdate() {
+  public function testUpdate() {
     $params = array(
       'id' => $this->_noteID,
       'contact_id' => $this->_contactID,
       'note' => 'Note1',
-      'subject' => 'Hello World',    );
+      'subject' => 'Hello World',
+    );
 
-    //Update Note
+    // Update Note.
     $this->callAPISuccess('note', 'create', $params);
     $note = $this->callAPISuccess('Note', 'Get', array());
     $this->assertEquals($note['id'], $this->_noteID, 'in line ' . __LINE__);
@@ -243,50 +226,48 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals('Note1', $note['values'][$this->_noteID]['note'], 'in line ' . __LINE__);
   }
 
-  ///////////////// civicrm_note_delete methods
-
-
   /**
-   * Check delete with empty parametes array
-   * Error expected
+   * Check delete with empty parameters array.
+   *
+   * Error expected.
    */
-  function testDeleteWithEmptyParams() {
-    $deleteNote = $this->callAPIFailure('note', 'delete', array(), 'Mandatory key(s) missing from params array: id');
+  public function testDeleteWithEmptyParams() {
+    $this->callAPIFailure('note', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
   /**
-   * Check delete with wrong id
+   * Check delete with wrong id.
+   *
    * Error expected
    */
-  function testDeleteWithWrongID() {
+  public function testDeleteWithWrongID() {
     $params = array(
       'id' => 0,
     );
-    $deleteNote = $this->callAPIFailure('note', 'delete', $params
-      , 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('note', 'delete', $params, 'Mandatory key(s) missing from params array: id');
   }
 
   /**
-   * Check civicrm_note_delete
+   * Check civicrm_note delete.
    */
-  function testDelete() {
+  public function testDelete() {
     $additionalNote = $this->noteCreate($this->_contactID);
 
     $params = array(
       'id' => $additionalNote['id'],
     );
 
-    $result = $this->callAPIAndDocument('note', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('note', 'delete', $params, __FUNCTION__, __FILE__);
   }
+
 }
 
 /**
- *  Test civicrm_activity_create() using example code
+ * Test civicrm note create() using example code.
  */
 function testNoteCreateExample() {
   require_once 'api/v3/examples/Note/Create.php';
-  $result = UF_match_get_example();
-  $expectedResult = UF_match_get_expectedresult();
+  $result = Note_get_example();
+  $expectedResult = Note_get_expectedresult();
   $this->assertEquals($result, $expectedResult);
 }
-

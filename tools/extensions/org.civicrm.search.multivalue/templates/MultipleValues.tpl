@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -34,8 +34,8 @@
 
 <div id="searchForm" class="crm-block crm-form-block crm-contact-custom-search-multipleValues-form-block">
     <fieldset>
-        <legend><span id="searchForm_hide"><a href="#" onclick="hide('searchForm','searchForm_hide'); show('searchForm_show'); return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}close section{/ts}" /></a></span>{ts}Search Criteria{/ts}</legend>  
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>  
+        <legend><span id="searchForm_hide"><a href="#" onclick="hide('searchForm','searchForm_hide'); show('searchForm_show'); return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}close section{/ts}" /></a></span>{ts}Search Criteria{/ts}</legend>
+        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
             <tr class="crm-contact-custom-search-multipleValues-form-block-sort_name">
                 <td><label>{$form.sort_name.label}</label></td>
@@ -76,9 +76,9 @@
     {* Search request has returned 1 or more matching rows. Display results and collapse the search criteria fieldset. *}
     {assign var="showBlock" value="'searchForm_show'"}
     {assign var="hideBlock" value="'searchForm'"}
-    
+
     <fieldset>
-    
+
         {* This section handles form elements for action task select and submit *}
         {include file="CRM/Contact/Form/Search/ResultTasks.tpl"}
 
@@ -86,9 +86,9 @@
         <p>
 
         {include file="CRM/common/pager.tpl" location="top"}
-        
+
         {include file="CRM/common/pagerAToZ.tpl"}
-        
+
         {strip}
         <table class="selector" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">

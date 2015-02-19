@@ -12,10 +12,11 @@
   var tplURL;
   CRM.url = function (path, query, mode) {
     if (typeof path === 'object') {
-      return tplURL = path;
+      tplURL = path;
+      return path;
     }
     if (!tplURL) {
-      console && console.log && console.log('Warning: CRM.url called before initialization');
+      CRM.console('error', 'Error: CRM.url called before initialization');
     }
     if (!mode) {
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
@@ -36,10 +37,10 @@
     return url;
   };
 
-  // Backwards compatible with jQuery fn
+  // @deprecated
   $.extend ({'crmURL':
     function (p, params) {
-      console && console.log && console.log('Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
+      CRM.console('warn', 'Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
       return CRM.url(p, params);
     }
   });
@@ -156,7 +157,7 @@
    * @deprecated
    */
   $.fn.crmAPI = function(entity, action, params, options) {
-    console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
+    CRM.console('warn', 'Calling crmAPI from jQuery is deprecated. Please use CRM.api3() instead.');
     return CRM.api.call(this, entity, action, params, options);
   };
 
@@ -204,10 +205,19 @@
       this.options.url = this.options.url || document.location.href;
       this._originalUrl = this.options.url;
     },
-    _onFailure: function(data) {
-      this.options.block && this.element.unblock();
+    _onFailure: function(data, status) {
+      var msg, title = ts('Network Error');
+      if (this.options.block) this.element.unblock();
       this.element.trigger('crmAjaxFail', data);
-      CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
+      switch (status) {
+        case 'Forbidden':
+          title = ts('Access Denied');
+          msg = ts('Ensure you are still logged in and have permission to access this feature.');
+          break;
+        default:
+          msg = ts('Unable to reach the server. Please refresh this page in your browser and try again.');
+      }
+      CRM.alert(msg, title, 'error');
     },
     _onError: function(data) {
       this.element.attr('data-unsaved-changes', 'false').trigger('crmAjaxError', data);
@@ -230,7 +240,7 @@
     _handleOrderLinks: function() {
       var that = this;
       $('a.crm-weight-arrow', that.element).click(function(e) {
-        that.options.block && that.element.block();
+        if (that.options.block) that.element.block();
         $.getJSON(that._formatUrl(this.href)).done(function() {
           that.refresh();
         });
@@ -241,12 +251,13 @@
     refresh: function() {
       var that = this;
       var url = this._formatUrl(this.options.url);
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this._originalContent === null) {
         this._originalContent = this.element.contents().detach();
       }
-      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
+      if (this.options.block) this.element.block();
       $.getJSON(url, function(data) {
+        if (that.options.block) that.element.unblock();
         if (!$.isPlainObject(data)) {
           that._onFailure(data);
           return;
@@ -256,17 +267,31 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data).html(data.content);
+        that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
+        that._beforeRemovingContent();
+        that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
-        that.options.crmForm && that.element.trigger('crmFormLoad', data);
-      }).fail(function() {
-        that._onFailure();
+        if (that.options.crmForm) that.element.trigger('crmFormLoad', data);
+      }).fail(function(data, msg, status) {
+        that._onFailure(data, status);
       });
     },
+    // Perform any cleanup needed before removing/replacing content
+    _beforeRemovingContent: function() {
+      var that = this;
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function(k) {
+          if ($.contains(that.element[0], this.getElement())) {
+            this.remove();
+          }
+        });
+      }
+      if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
+    },
     _destroy: function() {
-      this.element.removeClass('crm-ajax-container');
-      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      this.element.removeClass('crm-ajax-container').trigger('crmUnload');
+      this._beforeRemovingContent();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
       }
@@ -279,23 +304,13 @@
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
-      dialog: false
+      dialog: (options && options.target) ? false : {}
     };
-    if (!options || !options.target) {
-      settings.dialog = {
-        modal: true,
-        width: '65%',
-        height: '75%'
-      };
-    }
-    options && $.extend(true, settings, options);
+    if (options) $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
     if (settings.dialog) {
-      // HACK: jQuery UI doesn't support relative height
-      if (typeof settings.dialog.height === 'string' && settings.dialog.height.indexOf('%') > 0) {
-        settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
-      }
+      settings.dialog = CRM.utils.adjustDialogDefaults(settings.dialog);
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target)
         .on('dialogclose', function() {
@@ -308,21 +323,6 @@
           if (e.target === $(settings.target)[0] && data && !settings.dialog.title && data.title) {
             $(this).dialog('option', 'title', data.title);
           }
-          // Adjust height to fit content (small delay to allow elements to render)
-          window.setTimeout(function() {
-            var currentHeight = $(settings.target).parent().outerHeight(),
-              padding = currentHeight - $(settings.target).height(),
-              newHeight = $(settings.target).prop('scrollHeight') + padding,
-              menuHeight = $('#civicrm-menu').outerHeight(),
-              maxHeight = $(window).height() - menuHeight;
-            newHeight = newHeight > maxHeight ? maxHeight : newHeight;
-            if (newHeight > (currentHeight + 15)) {
-              $(settings.target).dialog('option', {
-                position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
-                height: newHeight
-              });
-            }
-          }, 500);
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -336,12 +336,12 @@
         validate: true,
         refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
         cancelButton: '.cancel',
-        openInline: 'a.open-inline, a.button, a.action-item',
+        openInline: 'a.open-inline, a.button, a.action-item, a.open-inline-noreturn',
         onCancel: function(event) {}
       }
     };
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
-    options && $.each(options, function(key, value) {
+    if (options) $.each(options, function(key, value) {
       if (typeof(settings.crmForm[key]) !== 'undefined') {
         settings.crmForm[key] = value;
       }
@@ -367,7 +367,7 @@
       }
     }
 
-    widget.data('uiDialog') && widget.on('dialogbeforeclose', function(e) {
+    if (widget.data('uiDialog')) widget.on('dialogbeforeclose', function(e) {
       // CRM-14353 - Warn unsaved changes if user clicks close button or presses "esc"
       if (e.originalEvent) {
         cancelAction();
@@ -375,10 +375,9 @@
     });
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
-      var $el = $(this)
-        .attr('data-unsaved-changes', 'false');
-      var settings = $el.crmSnippet('option', 'crmForm');
-      settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
+      var $el = $(this).attr('data-unsaved-changes', 'false'),
+        settings = $el.crmSnippet('option', 'crmForm');
+      if (settings.cancelButton) $(settings.cancelButton, this).click(function(e) {
         e.preventDefault();
         var returnVal = settings.onCancel.call($el, e);
         if (returnVal !== false) {
@@ -400,7 +399,6 @@
         dataType: 'json',
         success: function(response) {
           if (response.content === undefined) {
-            $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (response.userContext && (response.status === 'redirect' || (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0))) {
@@ -417,6 +415,7 @@
             }
           }
           else {
+            if ($el.crmSnippet('option', 'block')) $el.unblock();
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
@@ -431,24 +430,61 @@
         beforeSerialize: function(form, options) {
           if (window.CKEDITOR && window.CKEDITOR.instances) {
             $.each(CKEDITOR.instances, function() {
-              this.updateElement && this.updateElement();
+              if (this.updateElement) this.updateElement();
+            });
+          }
+          if (window.tinyMCE && tinyMCE.editors) {
+            $.each(tinyMCE.editors, function() {
+              this.save();
             });
           }
         },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
-            this && this.close && this.close();
+            if (this && this.close) this.close();
           });
-          $el.crmSnippet('option', 'block') && $el.block();
+          if ($el.crmSnippet('option', 'block')) $el.block();
           $el.trigger('crmFormSubmit', submission);
         }
       }, settings.ajaxForm));
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
         $(settings.openInline, this).not(exclude + ', .crm-popup').click(function(event) {
+          if ($(this).hasClass('open-inline-noreturn')) {
+            // Force reset of original url
+            $el.data('civiCrmSnippet')._originalUrl = $(this).attr('href');
+          }
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
           return false;
         });
+      }
+      // Show form buttons as part of the dialog
+      if ($el.data('uiDialog')) {
+        var buttonContainers = '.crm-submit-buttons, .action-link',
+          buttons = [],
+          added = [];
+        $(buttonContainers, $el).find('input.crm-form-submit, a.button').each(function() {
+          var $el = $(this),
+            label = $el.is('input') ? $el.attr('value') : $el.text(),
+            identifier = $el.attr('name') || $el.attr('href');
+          if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
+            var $icon = $el.find('.icon'),
+              button = {'data-identifier': identifier, text: label, click: function() {
+                $el[0].click();
+              }};
+            if ($icon.length) {
+              button.icons = {primary: $icon.attr('class')};
+            } else {
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
+              button.icons = {primary: 'ui-icon-' + action};
+            }
+            buttons.push(button);
+            added.push(identifier);
+          }
+          // display:none causes the form to not submit when pressing "enter"
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
+        });
+        $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
@@ -480,9 +516,6 @@
     else if ($el.hasClass('medium-popup')) {
       settings.dialog.width = settings.dialog.height = '50%';
     }
-    else if ($el.hasClass('huge-popup')) {
-      settings.dialog.height = '90%';
-    }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
     $el.trigger('crmPopupOpen', [dialog]);
@@ -510,7 +543,7 @@
     if ($table.length && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
       // Refresh ALL datatables - needed for contact relationship tab
       $.each($.fn.dataTable.fnTables(), function() {
-        $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+        if ($(this).dataTable().fnSettings().sAjaxSource) $(this).unblock().dataTable().fnDraw();
       });
     }
     // Otherwise refresh the nearest crmSnippet
@@ -529,6 +562,27 @@
       // Destroy old unsaved dialog
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      })
+      // Auto-resize dialogs when loading content
+      .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {
+        var
+          $wrapper = $(this),
+          $dialog = $wrapper.children('.ui-dialog-content');
+        // small delay to allow contents to render
+        window.setTimeout(function() {
+          var currentHeight = $wrapper.outerHeight(),
+            padding = currentHeight - $dialog.height(),
+            newHeight = $dialog.prop('scrollHeight') + padding,
+            menuHeight = $('#civicrm-menu').outerHeight(),
+            maxHeight = $(window).height() - menuHeight;
+          newHeight = newHeight > maxHeight ? maxHeight : newHeight;
+          if (newHeight > (currentHeight + 15)) {
+            $dialog.dialog('option', {
+              position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
+              height: newHeight
+            });
+          }
+        }, 500);
       });
   });
 

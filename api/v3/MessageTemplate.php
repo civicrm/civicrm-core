@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /*
  +--------------------------------------------------------------------+
  | Project60 version 4.3                                              |
@@ -23,67 +22,71 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 message_template functions
- *
- * @package CiviCRM_SEPA
- *
  */
 
 /**
- * @access public
+ * This api exposes CiviCRM message_template.
+ *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Create message template.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_message_template_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_create_spec(&$params) {
   $params['msg_title']['api.required'] = 1;
-  $params['is_active']['api.default'] = true;
-/*  $params['entity_id']['api.required'] = 1;
+  $params['is_active']['api.default'] = TRUE;
+  /*  $params['entity_id']['api.required'] = 1;
   $params['entity_table']['api.default'] = "civicrm_contribution_recur";
   $params['type']['api.default'] = "R";
-*/
+   */
 }
 
 /**
- * @param  array  $params
+ * Delete message template.
  *
- * @return boolean | error  true if successfull, error otherwise
- * {@getfields message_template_delete}
- * @access public
+ * @param array $params
+ *
+ * @return bool
+ *   API result array
  */
 function civicrm_api3_message_template_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * @param $params
+ * Adjust metadata for message_template get action.
+ *
+ * @param array $params
  */
 function _civicrm_api3_message_template_get_spec(&$params) {
 }
 
 /**
- * Retrieve one or more message_template
+ * Retrieve one or more message_template.
  *
- * @param  array input parameters
+ * @param array $params
+ *   Array of name/value pairs.
  *
- *
- * @example SepaCreditorGet.php Standard Get Example
- *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array api result array
- * {@getfields message_template_get}
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_message_template_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -91,18 +94,21 @@ function civicrm_api3_message_template_get($params) {
 
 /**
  * Sends a template.
+ *
+ * @param array $params
  */
 function civicrm_api3_message_template_send($params) {
   CRM_Core_BAO_MessageTemplates::sendTemplate($params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
  * The metadata is used for setting defaults, documentation &
  * validation.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_send_spec(&$params) {
   $params['messageTemplateID']['api.required'] = 1;

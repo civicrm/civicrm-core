@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,15 +42,10 @@ class CRM_Admin_Page_AJAX {
    * CRM-12337 Output navigation menu as executable javascript
    * @see smarty_function_crmNavigationMenu
    */
-  static function getNavigationMenu() {
+  public static function getNavigationMenu() {
     $contactID = CRM_Core_Session::singleton()->get('userID');
     if ($contactID) {
-      // Set headers to encourage browsers to cache for a long time
-      $year = 60*60*24*364;
-      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
-      header('Content-Type:	application/javascript');
-      header("Cache-Control: max-age=$year, public");
-
+      CRM_Core_Page_AJAX::setJsHeaders();
       print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/navigation.js.tpl', array(
         'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
       ));
@@ -59,27 +54,27 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Return menu tree as json data for editing
+   * Return menu tree as json data for editing.
    */
-  static function getNavigationList() {
+  public static function getNavigationList() {
     echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * Function to process drag/move action for menu tree
+   * Process drag/move action for menu tree
    */
-  static function menuTree() {
+  public static function menuTree() {
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
   /**
-   * Function to build status message while
+   * Build status message while.
    * enabling/ disabling various objects
    */
-  static function getStatusMsg() {
-    require_once('api/v3/utils.php');
-    $recordID  = CRM_Utils_Type::escape($_GET['id'], 'Integer');
+  public static function getStatusMsg() {
+    require_once 'api/v3/utils.php';
+    $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
     $ret = array();
 
@@ -107,7 +102,7 @@ class CRM_Admin_Page_AJAX {
             $comps = array(
               'Event' => 'civicrm_event',
               'Contribution' => 'civicrm_contribution_page',
-              'EventTemplate' => 'civicrm_event_template'
+              'EventTemplate' => 'civicrm_event_template',
             );
             $contexts = array();
             foreach ($comps as $name => $table) {
@@ -118,9 +113,10 @@ class CRM_Admin_Page_AJAX {
             $template->assign('contexts', $contexts);
 
             $ret['illegal'] = TRUE;
-            $table  = $template->fetch('CRM/Price/Page/table.tpl');
+            $table = $template->fetch('CRM/Price/Page/table.tpl');
             $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', array(
-              1 => $priceSet)) . "<br/> $table";
+                1 => $priceSet,
+              )) . "<br/> $table";
           }
           else {
             $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', array(1 => $priceSet));
@@ -137,6 +133,10 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contribute_BAO_ManagePremiums':
           $ret['content'] = ts('Are you sure you want to disable this premium? This action will remove the premium from any contribution pages that currently offer it. However it will not delete the premium record - so you can re-enable it and add it back to your contribution page(s) at a later time.');
+          break;
+
+        case 'CRM_Contact_BAO_Relationship':
+          $ret['content'] = ts('Are you sure you want to disable this relationship?');
           break;
 
         case 'CRM_Contact_BAO_RelationshipType':
@@ -247,7 +247,7 @@ class CRM_Admin_Page_AJAX {
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
 
-  static function mergeTagList() {
+  public static function mergeTagList() {
     $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
     $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
@@ -295,7 +295,7 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  function mappingList() {
+  public function mappingList() {
     if (empty($_GET['mappingID'])) {
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
@@ -319,7 +319,7 @@ LIMIT $limit";
     CRM_Utils_JSON::output($output);
   }
 
-  static function mergeTags() {
+  public static function mergeTags() {
     $tagAId = CRM_Utils_Type::escape($_POST['fromId'], 'Integer');
     $tagBId = CRM_Utils_Type::escape($_POST['toId'], 'Integer');
 
@@ -341,4 +341,3 @@ LIMIT $limit";
   }
 
 }
-

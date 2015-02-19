@@ -14,7 +14,7 @@ class CRM_Case_Audit_AuditConfig {
   private $ifBlanks;
 
   /**
-   * @param $filename
+   * @param string $filename
    */
   public function __construct($filename) {
     $this->filename = $filename;
@@ -131,12 +131,9 @@ class CRM_Case_Audit_AuditConfig {
     }
   }
 
-  /* inRegion
-   *
-   * Check if label $n is explicitly listed in region $r in the config.
-   */
-
   /**
+   * Check if label $n is explicitly listed in region $r in the config.
+   *
    * @param $n
    * @param $r
    *
@@ -151,12 +148,9 @@ class CRM_Case_Audit_AuditConfig {
     }
   }
 
-  /* includeInRegion
-   *
-   * Should field $n be included in region $r, taking into account exclusion rules.
-   */
-
   /**
+   * Should field $n be included in region $r, taking into account exclusion rules.
+   *
    * @param $n
    * @param $r
    *
@@ -176,12 +170,9 @@ class CRM_Case_Audit_AuditConfig {
     return $add_it;
   }
 
-  /* includeTime
-   *
-   * Should the time component of field $n in region $r be displayed?
-   */
-
   /**
+   * Should the time component of field $n in region $r be displayed?
+   *
    * @param $n
    * @param $r
    *
@@ -210,25 +201,19 @@ class CRM_Case_Audit_AuditConfig {
     return $retval;
   }
 
-  /* getRegions
-   *
-   * Return a list of all the regions in the config file.
-   */
-
   /**
+   * Return a list of all the regions in the config file.
+   *
    * @return array
    */
   public function getRegions() {
     return array_keys($this->regionFieldList);
   }
 
-  /* sort
-   *
+  /**
    * Sort a group of fields for a given region according to the order in the config.
    * The array to be sorted should have elements that have a member with a key of 'label', and the value should be the field label.
-   */
-
-  /**
+   *
    * @param $f
    * @param $r
    */
@@ -242,13 +227,10 @@ class CRM_Case_Audit_AuditConfig {
     uasort($f, array(&$this, "compareFields"));
   }
 
-  /* compareFields
-   *
+  /**
    * This is intended to be called as a sort callback function, returning whether a field in a region comes before or after another one.
    * See also PHP's usort().
-   */
-
-  /**
+   *
    * @param $a
    * @param $b
    *
@@ -271,5 +253,5 @@ class CRM_Case_Audit_AuditConfig {
 
     return $x - $y;
   }
-}
 
+}

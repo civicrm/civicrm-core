@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -36,7 +36,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
 
     $this->webtestLogin();
 
@@ -51,11 +51,11 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $widgetConfigureID
+   * @param int $widgetConfigureID
    * @param $widgetEnabledSelector
    * @param $widgetTitle
    */
-  function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
+  public function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
     // Check if desired widget is already loaded on dashboard and remove it if it is so we can test adding it.
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
@@ -94,14 +94,14 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    $this->click("xpath=//*[@class='ui-button-text'][contains(text(), 'close')]");
+    $this->click("xpath=//button[@title='Close']");
   }
 
   /**
-   * @param $widgetConfigureID
+   * @param int $widgetConfigureID
    * @param $widgetEnabledSelector
    */
-  function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {
+  public function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {
     $this->click("link=Configure Your Dashboard");
     $this->waitForElementPresent("dashlets-header-col-0");
     $this->mouseDownAt("{$widgetConfigureID}", "");
@@ -129,7 +129,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isElementPresent($widgetEnabledSelector));
   }
 
-  function _testActivityDashlet() {
+  public function _testActivityDashlet() {
     // Add an activity that will show up in the widget
     $this->WebtestAddActivity();
     $widgetTitle = "Activities";
@@ -145,11 +145,11 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // If CiviCase enabled, click 'more' link for context menu pop-up in the widget selector
     if ($this->isElementPresent("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span[text()='more ']")) {
       // click 'Delete Activity' link
-      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span[text()='more ']/ul/li[2]/a[text()='Delete']");
+      $this->click("//table[@class='contact-activity-selector-dashlet dataTable no-footer']/tbody/tr[1]/td[8]/span[text()='more ']/ul/li[2]/a[text()='Delete']");
     }
     else {
       // click 'Delete Activity' link
-      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
+      $this->click("//table[@class='contact-activity-selector-dashlet dataTable no-footer']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
     }
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Activity_next-bottom");
@@ -167,5 +167,5 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // cleanup by removing the widget
     $this->_testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector);
   }
-}
 
+}

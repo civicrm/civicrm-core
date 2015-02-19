@@ -6,9 +6,9 @@ require_once 'Contact.php';
  */
 class Membership extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create membership type
+   * Helper function to create membership type.
    */
-  function createMembershipType() {
+  public function createMembershipType() {
     $orgId = Contact::createOrganisation();
 
     $ids = array('memberOfContact' => $orgId);
@@ -39,9 +39,12 @@ class Membership extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to create membership block for contribution page
+   * Helper function to create membership block for contribution page.
+   * @param $membershipType
+   * @param $contributionPageId
+   * @return $this
    */
-  function createMembershipBlock($membershipType, $contributionPageId) {
+  public function createMembershipBlock($membershipType, $contributionPageId) {
     $param = array(
       'is_active' => 1,
       'new_title' => 'Membership Fees',
@@ -66,16 +69,15 @@ class Membership extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete the membership block
+   * Helper function to delete the membership block.
+   * @param $blcokId
    */
-  function deleteMembershipBlock($blcokId) {
+  public function deleteMembershipBlock($blcokId) {
     $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->id = $blcokId;
     if ($dao->find(TRUE)) {
       $dao->delete();
     }
   }
+
 }
-
-
-

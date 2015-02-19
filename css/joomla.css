@@ -57,6 +57,8 @@ td.active {
 
 td.label {
   background: none;
+  color: #3e3e3e;
+  display: table-cell;
 }
 
 /*

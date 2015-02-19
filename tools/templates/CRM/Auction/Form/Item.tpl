@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="form-item"> 
+<div class="form-item">
 <fieldset><legend>{ts}Item Information{/ts}</legend>
     <table class="form-layout-compressed">
          <tr><td class="label">{ts}Auction{/ts}</td><td>{$auctionTitle}</td></tr>
@@ -40,14 +40,14 @@
          <tr><td class="label">{$form.buy_now_value.label}</td><td>{$form.buy_now_value.html|crmReplace:class:four}<br />
 
          <tr><td>&nbsp;</td><td>{$form.is_group.html} {$form.is_group.label}<br />
-         <tr><td>&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}</td></tr> 
+         <tr><td>&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}</td></tr>
         <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     </table>
 
 {include file="CRM/Form/attachment.tpl" context="pcpCampaign"}
 
-    <dl>    
-       <dt></dt><dd class="html-adjust">{$form.buttons.html}</dd>   
-    </dl> 
-</fieldset>     
+    <dl>
+       <dt></dt><dd class="html-adjust">{$form.buttons.html}</dd>
+    </dl>
+</fieldset>
 </div>

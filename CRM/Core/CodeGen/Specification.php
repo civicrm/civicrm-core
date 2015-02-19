@@ -13,12 +13,13 @@ class CRM_Core_CodeGen_Specification {
    * Read and parse.
    *
    * @param $schemaPath
-   * @param string $buildVersion which version of the schema to build
+   * @param string $buildVersion
+   *   Which version of the schema to build.
    */
-  function parse($schemaPath, $buildVersion) {
+  public function parse($schemaPath, $buildVersion) {
     $this->buildVersion = $buildVersion;
 
-    echo "Parsing schema description ".$schemaPath."\n";
+    echo "Parsing schema description " . $schemaPath . "\n";
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
     // print_r( $dbXML );
 
@@ -36,18 +37,18 @@ class CRM_Core_CodeGen_Specification {
     $this->tables = $this->orderTables($this->tables);
 
     // add archive tables here
-    $archiveTables = array( );
-    foreach ($this->tables as $name => $table ) {
-      if ( $table['archive'] == 'true' ) {
+    $archiveTables = array();
+    foreach ($this->tables as $name => $table) {
+      if ($table['archive'] == 'true') {
         $name = 'archive_' . $table['name'];
         $table['name'] = $name;
         $table['archive'] = 'false';
-        if ( isset($table['foreignKey']) ) {
+        if (isset($table['foreignKey'])) {
           foreach ($table['foreignKey'] as $fkName => $fkValue) {
             if ($this->tables[$fkValue['table']]['archive'] == 'true') {
               $table['foreignKey'][$fkName]['table'] = 'archive_' . $table['foreignKey'][$fkName]['table'];
-              $table['foreignKey'][$fkName]['uniqName'] =
-                str_replace( 'FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName'] );
+              $table['foreignKey'][$fkName]['uniqName']
+                = str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
             }
           }
           $archiveTables[$name] = $table;
@@ -61,7 +62,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function &getDatabase(&$dbXML) {
+  public function &getDatabase(&$dbXML) {
     $database = array('name' => trim((string ) $dbXML->name));
 
     $attributes = '';
@@ -86,7 +87,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function getTables($dbXML, &$database) {
+  public function getTables($dbXML, &$database) {
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
@@ -105,9 +106,9 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $classNames
+   * @param string $classNames
    */
-  function resolveForeignKeys(&$tables, &$classNames) {
+  public function resolveForeignKeys(&$tables, &$classNames) {
     foreach (array_keys($tables) as $name) {
       $this->resolveForeignKey($tables, $classNames, $name);
     }
@@ -115,10 +116,10 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $classNames
-   * @param $name
+   * @param string $classNames
+   * @param string $name
    */
-  function resolveForeignKey(&$tables, &$classNames, $name) {
+  public function resolveForeignKey(&$tables, &$classNames, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return;
     }
@@ -140,7 +141,7 @@ class CRM_Core_CodeGen_Specification {
    *
    * @return array
    */
-  function orderTables(&$tables) {
+  public function orderTables(&$tables) {
     $ordered = array();
 
     while (!empty($tables)) {
@@ -156,12 +157,12 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * @param $tables
-   * @param $valid
-   * @param $name
+   * @param int $valid
+   * @param string $name
    *
    * @return bool
    */
-  function validTable(&$tables, &$valid, $name) {
+  public function validTable(&$tables, &$valid, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return TRUE;
     }
@@ -180,7 +181,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $database
    * @param $tables
    */
-  function getTable($tableXML, &$database, &$tables) {
+  public function getTable($tableXML, &$database, &$tables) {
     $name = trim((string ) $tableXML->name);
     $klass = trim((string ) $tableXML->class);
     $base = $this->value('base', $tableXML);
@@ -273,17 +274,16 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $tables[$name] = &$table;
-    return;
   }
 
   /**
    * @param $fieldXML
    * @param $fields
    */
-  function getField(&$fieldXML, &$fields) {
-    $name  = trim((string ) $fieldXML->name);
+  public function getField(&$fieldXML, &$fields) {
+    $name = trim((string ) $fieldXML->name);
     $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
-    $type  = (string ) $fieldXML->type;
+    $type = (string ) $fieldXML->type;
     switch ($type) {
       case 'varchar':
       case 'char':
@@ -301,7 +301,8 @@ class CRM_Core_CodeGen_Specification {
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
-        break;
+
+      break;
 
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = $type;
@@ -342,10 +343,10 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $field['required'] = $this->value('required', $fieldXML);
-    $field['collate']  = $this->value('collate', $fieldXML);
-    $field['comment']  = $this->value('comment', $fieldXML);
-    $field['default']  = $this->value('default', $fieldXML);
-    $field['import']   = $this->value('import', $fieldXML);
+    $field['collate'] = $this->value('collate', $fieldXML);
+    $field['comment'] = $this->value('comment', $fieldXML);
+    $field['default'] = $this->value('default', $fieldXML);
+    $field['import'] = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
       $field['export'] = $this->value('export', $fieldXML);
     }
@@ -375,13 +376,13 @@ class CRM_Core_CodeGen_Specification {
       );
       $field['html'] = array();
       foreach ($validOptions as $htmlOption) {
-        if(!empty($fieldXML->html->$htmlOption)){
+        if (!empty($fieldXML->html->$htmlOption)) {
           $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
         }
       }
     }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if(!empty($field['pseudoconstant'])){
+    if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach
       $field['pseudoconstant'] = array();
       $validOptions = array(
@@ -400,7 +401,7 @@ class CRM_Core_CodeGen_Specification {
         'callback',
       );
       foreach ($validOptions as $pseudoOption) {
-        if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
+        if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
         }
       }
@@ -415,11 +416,11 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return string
    */
-  function composeTitle($name) {
+  public function composeTitle($name) {
     $names = explode('_', strtolower($name));
     $title = '';
     for ($i = 0; $i < count($names); $i++) {
@@ -445,12 +446,12 @@ class CRM_Core_CodeGen_Specification {
    * @param $fields
    * @param $table
    */
-  function getPrimaryKey(&$primaryXML, &$fields, &$table) {
+  public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
     /** need to make sure there is a field of type name */
     if (!array_key_exists($name, $fields)) {
-        echo "primary key $name in $table->name does not have a field definition, ignoring\n";
+      echo "primary key $name in $table->name does not have a field definition, ignoring\n";
       return;
     }
 
@@ -469,20 +470,20 @@ class CRM_Core_CodeGen_Specification {
    * @param $fields
    * @param $indices
    */
-  function getIndex(&$indexXML, &$fields, &$indices) {
+  public function getIndex(&$indexXML, &$fields, &$indices) {
     //echo "\n\n*******************************************************\n";
     //echo "entering getIndex\n";
 
     $index = array();
     // empty index name is fine
-    $indexName      = trim((string)$indexXML->name);
-    $index['name']  = $indexName;
+    $indexName = trim((string) $indexXML->name);
+    $index['name'] = $indexName;
     $index['field'] = array();
 
     // populate fields
     foreach ($indexXML->fieldName as $v) {
-      $fieldName = (string)($v);
-      $length = (string)($v['length']);
+      $fieldName = (string) ($v);
+      $length = (string) ($v['length']);
       if (strlen($length) > 0) {
         $fieldName = "$fieldName($length)";
       }
@@ -534,14 +535,14 @@ class CRM_Core_CodeGen_Specification {
    * @param $foreignXML
    * @param $fields
    * @param $foreignKeys
-   * @param $currentTableName
+   * @param string $currentTableName
    */
-  function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
+  public function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
     $name = trim((string ) $foreignXML->name);
 
     /** need to make sure there is a field of type name */
     if (!array_key_exists($name, $fields)) {
-        echo "foreign $name in $currentTableName does not have a field definition, ignoring\n";
+      echo "foreign $name in $currentTableName does not have a field definition, ignoring\n";
       return;
     }
 
@@ -565,7 +566,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $foreignXML
    * @param $dynamicForeignKeys
    */
-  function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
+  public function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
     $foreignKey = array(
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
@@ -591,7 +592,7 @@ class CRM_Core_CodeGen_Specification {
   /**
    * @param $attributes
    * @param $object
-   * @param $name
+   * @param string $name
    * @param null $pre
    * @param null $post
    */
@@ -638,7 +639,7 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * Sets the size property of a textfield
+   * Sets the size property of a textfield.
    * See constants defined in CRM_Utils_Type for possible values
    */
   protected function getSize($fieldXML) {
@@ -669,4 +670,5 @@ class CRM_Core_CodeGen_Specification {
     }
     return 'CRM_Utils_Type::HUGE';
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * The ChainSubscriber looks for API parameters which specify a nested or chained API call. For example:
+ * The ChainSubscriber looks for API parameters which specify a nested or
+ * chained API call. For example:
  *
  * @code
  * $result = civicrm_api('Contact', 'create', array(
@@ -43,8 +45,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ));
  * @endcode
  *
- * The ChainSubscriber looks for any parameters of the form "api.Email.create"; if found, it issues the nested
- * API call (and passes some extra context -- eg Amy's contact_id).
+ * The ChainSubscriber looks for any parameters of the form "api.Email.create";
+ * if found, it issues the nested API call (and passes some extra context --
+ * eg Amy's contact_id).
  */
 class ChainSubscriber implements EventSubscriberInterface {
   /**
@@ -58,6 +61,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\RespondEvent $event
+   *   API response event.
    *
    * @throws \Exception
    */
@@ -65,20 +69,27 @@ class ChainSubscriber implements EventSubscriberInterface {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
     if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
-      $this->_civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
+      $this->callNestedApi($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       $event->setResponse($result);
     }
   }
 
   /**
-   * Call any nested api calls
+   * Call any nested api calls.
    *
    * TODO: We don't really need this to be a separate function.
+   * @param $params
+   * @param $result
+   * @param $action
+   * @param $entity
+   * @param $version
+   * @throws \Exception
    */
-  protected function _civicrm_api_call_nested_api(&$params, &$result, $action, $entity, $version) {
+  protected function callNestedApi(&$params, &$result, $action, $entity, $version) {
     $entity = _civicrm_api_get_entity_name_from_camel($entity);
 
-    //we don't need to worry about nested api in the getfields/getoptions actions, so just return immediately
+    // We don't need to worry about nested api in the getfields/getoptions
+    // actions, so just return immediately.
     if (in_array(strtolower($action), array('getfields', 'getoptions'))) {
       return;
     }
@@ -93,7 +104,8 @@ class ChainSubscriber implements EventSubscriberInterface {
     foreach ($params as $field => $newparams) {
       if ((is_array($newparams) || $newparams === 1) && $field <> 'api.has_parent' && substr($field, 0, 3) == 'api') {
 
-        // 'api.participant.delete' => 1 is a valid options - handle 1 instead of an array
+        // 'api.participant.delete' => 1 is a valid options - handle 1
+        // instead of an array
         if ($newparams === 1) {
           $newparams = array('version' => $version);
         }
@@ -114,17 +126,19 @@ class ChainSubscriber implements EventSubscriberInterface {
 
           if (strtolower($subEntity) != 'contact') {
             //contact spits the dummy at activity_id so what else won't it like?
-            //set entity_id & entity table based on the parent's id & entity. e.g for something like
-            //note if the parent call is contact 'entity_table' will be set to 'contact' & 'id' to the contact id from
-            //the parent call.
-            //in this case 'contact_id' will also be set to the parent's id
+            //set entity_id & entity table based on the parent's id & entity.
+            //e.g for something like note if the parent call is contact
+            //'entity_table' will be set to 'contact' & 'id' to the contact id
+            //from the parent call. in this case 'contact_id' will also be
+            //set to the parent's id
             $subParams["entity_id"] = $parentAPIValues['id'];
             $subParams['entity_table'] = 'civicrm_' . _civicrm_api_get_entity_name_from_camel($entity);
             $subParams[strtolower($entity) . "_id"] = $parentAPIValues['id'];
           }
           if (strtolower($entity) != 'contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
-            //e.g. if event_id is in the values returned & subentity is event then pass in event_id as 'id'
-            //don't do this for contact as it does some wierd things like returning primary email &
+            //e.g. if event_id is in the values returned & subentity is event
+            //then pass in event_id as 'id' don't do this for contact as it
+            //does some wierd things like returning primary email &
             //thus limiting the ability to chain email
             //TODO - this might need the camel treatment
             $subParams['id'] = $parentAPIValues[$subEntity . "_id"];
@@ -133,11 +147,11 @@ class ChainSubscriber implements EventSubscriberInterface {
           if (\CRM_Utils_Array::value('entity_table', $result['values'][$idIndex]) == $subEntity) {
             $subParams['id'] = $result['values'][$idIndex]['entity_id'];
           }
-          // if we are dealing with the same entity pass 'id' through (useful for get + delete for example)
+          // if we are dealing with the same entity pass 'id' through
+          // (useful for get + delete for example)
           if (strtolower($entity) == strtolower($subEntity)) {
             $subParams['id'] = $result['values'][$idIndex]['id'];
           }
-
 
           $subParams['version'] = $version;
           if (!empty($params['check_permissions'])) {
@@ -150,7 +164,7 @@ class ChainSubscriber implements EventSubscriberInterface {
             // it is a numerically indexed array - ie. multiple creates
             foreach ($newparams as $entityparams) {
               $subParams = array_merge($genericParams, $entityparams);
-              _civicrm_api_replace_variables($subAPI[1], $subaction, $subParams, $result['values'][$idIndex], $separator);
+              _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
               $result['values'][$result['id']][$field][] = civicrm_api($subEntity, $subaction, $subParams);
               if ($result['is_error'] === 1) {
                 throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
@@ -160,7 +174,7 @@ class ChainSubscriber implements EventSubscriberInterface {
           else {
 
             $subParams = array_merge($subParams, $newparams);
-            _civicrm_api_replace_variables($subAPI[1], $subaction, $subParams, $result['values'][$idIndex], $separator);
+            _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
             $result['values'][$idIndex][$field] = civicrm_api($subEntity, $subaction, $subParams);
             if (!empty($result['is_error'])) {
               throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);

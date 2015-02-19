@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -32,9 +32,9 @@
 cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
 var html_message = null;
+var prefix = '';
 var isPDF        = false;
 var isMailing    = false;
-
 
 {if $form.formName eq 'MessageTemplates'}
   {literal}
@@ -45,6 +45,12 @@ var isMailing    = false;
   {literal}
   text_message = "mailing_format";
   isMailing = false;
+  {/literal}
+  {elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+  {literal}
+  prefix = "SMS";
+  text_message = "sms_text_message";
+  isMailing = true;
   {/literal}
   {else}
   {literal}
@@ -62,55 +68,64 @@ var isMailing    = false;
 
 {if $templateSelected}
   {literal}
-  if ( document.getElementsByName("saveTemplate")[0].checked ) {
-    document.getElementById('template').selectedIndex = {/literal}{$templateSelected}{literal};
+  if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
+    document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};
   }
 {/literal}
 {/if}
 {literal}
 
 var editor = {/literal}"{$editor}"{literal};
-function showSaveUpdateChkBox() {
-  if (document.getElementById('template') == null) {
-    if (document.getElementsByName("saveTemplate")[0].checked){
-      document.getElementById("saveDetails").style.display = "block";
-      document.getElementById("editMessageDetails").style.display = "block";
+function showSaveUpdateChkBox(prefix) {
+  prefix = prefix || '';
+  if (document.getElementById(prefix + "template") == null) {
+    if (document.getElementsByName(prefix + "saveTemplate")[0].checked){
+      document.getElementById(prefix + "saveDetails").style.display = "block";
+      document.getElementById(prefix + "editMessageDetails").style.display = "block";
     }
     else {
-      document.getElementById("saveDetails").style.display = "none";
-      document.getElementById("editMessageDetails").style.display = "none";
+      document.getElementById(prefix + "saveDetails").style.display = "none";
+      document.getElementById(prefix + "updateDetails").style.display = "none";
     }
     return;
   }
 
-  if (document.getElementsByName("saveTemplate")[0].checked &&
-    document.getElementsByName("updateTemplate")[0].checked == false) {
-    document.getElementById("updateDetails").style.display = "none";
+  if (document.getElementsByName(prefix + "saveTemplate")[0].checked &&
+    document.getElementsByName(prefix + "updateTemplate")[0].checked == false) {
+    document.getElementById(prefix + "updateDetails").style.display = "none";
   }
-  else if ( document.getElementsByName("saveTemplate")[0].checked &&
-    document.getElementsByName("updateTemplate")[0].checked ){
-    document.getElementById("editMessageDetails").style.display = "block";
-    document.getElementById("saveDetails").style.display = "block";
+  else if ( document.getElementsByName(prefix + "saveTemplate")[0].checked &&
+    document.getElementsByName(prefix + "updateTemplate")[0].checked ){
+    document.getElementById(prefix + "editMessageDetails").style.display = "block";
+    document.getElementById(pefix + "saveDetails").style.display = "block";
   }
-  else if ( document.getElementsByName("saveTemplate")[0].checked == false &&
-      document.getElementsByName("updateTemplate")[0].checked ) {
-    document.getElementById("saveDetails").style.display = "none";
-    document.getElementById("editMessageDetails").style.display = "block";
+  else if ( document.getElementsByName(prefix + "saveTemplate")[0].checked == false &&
+      document.getElementsByName(prefix + "updateTemplate")[0].checked ) {
+    document.getElementById(prefix + "saveDetails").style.display = "none";
+    document.getElementById(prefix + "editMessageDetails").style.display = "block";
   }
   else {
-    document.getElementById("saveDetails").style.display = "none";
-    document.getElementById("editMessageDetails").style.display = "none";
+    document.getElementById(prefix + "saveDetails").style.display = "none";
+    document.getElementById(prefix + "updateDetails").style.display = "none";
   }
 }
 
-function selectValue( val ) {
-  document.getElementsByName("saveTemplate")[0].checked = false;
-  document.getElementsByName("updateTemplate")[0].checked = false;
-  showSaveUpdateChkBox();
+function selectValue( val, prefix) {
+  document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
+  document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
+  showSaveUpdateChkBox(prefix);
   if ( !val ) {
-    document.getElementById("subject").value ="";
+    if (document.getElementById("subject").length) {
+      document.getElementById("subject").value ="";
+    }
     if ( !isPDF ) {
-      document.getElementById(text_message).value ="";
+      if (prefix == 'SMS') {
+        document.getElementById("sms_text_message").value ="";
+        return;
+      }
+      else {
+        document.getElementById("text_message").value ="";
+      }
     }
     if ( editor == "ckeditor" ) {
       oEditor = CKEDITOR.instances[html_message];
@@ -148,8 +163,13 @@ function selectValue( val ) {
   var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
-    cj("#subject").val( data.subject );
     if ( !isPDF ) {
+      if (prefix == "SMS") {
+          text_message = "sms_text_message";
+      }
+      else {
+        cj("#subject").val( data.subject );
+      }
       if ( data.msg_text ) {
         cj("#"+text_message).val( data.msg_text );
         cj("div.text").show();
@@ -159,6 +179,10 @@ function selectValue( val ) {
       else {
         cj("#"+text_message).val("");
       }
+    }
+
+    if (prefix == "SMS") {
+      return;
     }
     var html_body  = "";
     if (  data.msg_html ) {
@@ -203,41 +227,48 @@ function selectValue( val ) {
 }
 
 if ( isMailing ) {
-  document.getElementById("editMessageDetails").style.display = "block";
+  document.getElementById(prefix + "editMessageDetails").style.display = "block";
 
-  function verify(select) {
-    if (document.getElementsByName("saveTemplate")[0].checked  == false) {
-      document.getElementById("saveDetails").style.display = "none";
+  function verify(select, prefix) {
+    prefix = prefix || '';
+    if (document.getElementsByName(prefix + "saveTemplate")[0].checked  == false) {
+      document.getElementById(prefix + "saveDetails").style.display = "none";
     }
-    document.getElementById("editMessageDetails").style.display = "block";
+    document.getElementById(prefix + "editMessageDetails").style.display = "block";
 
     var templateExists = true;
-    if (document.getElementById('template') == null) {
+    if (document.getElementById(prefix + "template") == null) {
       templateExists = false;
     }
 
-    if (templateExists && document.getElementById('template').value) {
-      document.getElementById("updateDetails").style.display = '';
+    if (templateExists && document.getElementById(prefix + "template").value) {
+      document.getElementById(prefix + "updateDetails").style.display = '';
     }
     else {
-      document.getElementById("updateDetails").style.display = 'none';
+      document.getElementById(prefix + "updateDetails").style.display = 'none';
     }
 
-    document.getElementById("saveTemplateName").disabled = false;
+    document.getElementById(prefix + "saveTemplateName").disabled = false;
   }
 
-  function showSaveDetails(chkbox) {
+  function showSaveDetails(chkbox, prefix) {
+    prefix = prefix || '';
     if (chkbox.checked) {
-      document.getElementById("saveDetails").style.display = "block";
-      document.getElementById("saveTemplateName").disabled = false;
+      document.getElementById(prefix + "saveDetails").style.display = "block";
+      document.getElementById(prefix + "saveTemplateName").disabled = false;
     }
     else {
-      document.getElementById("saveDetails").style.display = "none";
-      document.getElementById("saveTemplateName").disabled = true;
+      document.getElementById(prefix + "saveDetails").style.display = "none";
+      document.getElementById(prefix + "saveTemplateName").disabled = true;
     }
   }
 
-  showSaveUpdateChkBox();
+  if (cj("#sms_text_message").length) {
+    showSaveUpdateChkBox('SMS');
+  }
+  if (cj("#text_message").length) {
+    showSaveUpdateChkBox();
+  }
 
   {/literal}
   {if $editor eq "ckeditor"}
@@ -354,11 +385,11 @@ CRM.$(function($) {
   // Initialize token selector widgets
   var form = $('form.{/literal}{$form.formClass}{literal}');
   $('input.crm-token-selector', form)
-    .addClass('crm-action-menu')
+    .addClass('crm-action-menu action-icon-token')
     .change(insertToken)
     .crmSelect2({
       data: form.data('tokens'),
-      placeholder: '{/literal}{ts escape='js'}Insert Token{/ts}{literal}'
+      placeholder: '{/literal}{ts escape='js'}Tokens{/ts}{literal}'
     });
 
   $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
@@ -433,14 +464,7 @@ CRM.$(function($) {
       }, 'json');
     }
   }
-  if (!$().find('div.crm-error').text()) {
-    $(window).load(function () {
-      setSignature();
-    });
-  }
-  $("#fromEmailAddress").change( function( ) {
-    setSignature( );
-  });
+  $("#fromEmailAddress", form).change(setSignature);
 });
 
 </script>

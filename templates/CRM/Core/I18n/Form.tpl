@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -30,36 +30,5 @@
       <dt>{$form.$elem.label}</dt><dd>{$form.$elem.html}</dd>
     {/foreach}
   </dl>
-  {if $context == 'dialog'}
-    <input type="submit" value="Save"/>
-  {else}
-    {$form.buttons.html}
-  {/if}
 </fieldset>
-{$form.action}
-{literal}
-<script type="text/javascript">
-var fieldName = "{/literal}{$field}{literal}";
-var tsLocale = "{/literal}{$tsLocale}{literal}";
-var $form = $('form.{/literal}{$form.formClass}{literal}');
-cj($form).submit(function() {
-      cj(this).ajaxSubmit({
-                            beforeSubmit: function (formData, jqForm, options) {
-                                                    var queryString = cj.param(formData);
-                                                    var postUrl     = cj($form).attr('action');
-                                                    cj.ajax({
-                                                             type   : "POST",
-                                                             url    : postUrl,
-                                                             async  : false,
-                                                             data   : queryString,
-                                                             success: function( response ) {
-                                    cj('#' + fieldName).val( cj('#' + fieldName +'_' + tsLocale ).val() );
-                                                                      cj("#locale-dialog_"+fieldName).dialog("close");
-                                                                     }
-                                                    });
-                                                return false;
-                                            }});
-          return false;
-});
-</script>
-{/literal}
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

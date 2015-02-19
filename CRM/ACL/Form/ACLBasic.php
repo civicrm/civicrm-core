@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,13 +43,12 @@
 class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_id ||
@@ -75,10 +74,9 @@ SELECT object_table
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -95,9 +93,9 @@ SELECT object_table
       array('</td><td>', '</td></tr><tr><td>')
     );
 
-
     $label = ts('Role');
-    $role = array('-1' => ts('- select role -'),
+    $role = array(
+      '-1' => ts('- select role -'),
       '0' => ts('Everyone'),
     ) + CRM_Core_OptionGroup::values('acl_role');
     $entityID = &$this->add('select', 'entity_id', $label, $role, TRUE);
@@ -111,11 +109,11 @@ SELECT object_table
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array|bool
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     if ($params['entity_id'] == -1) {
       $errors = array('entity_id' => ts('Role is a required field'));
       return $errors;
@@ -125,9 +123,8 @@ SELECT object_table
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -168,5 +165,5 @@ DELETE
       }
     }
   }
-}
 
+}

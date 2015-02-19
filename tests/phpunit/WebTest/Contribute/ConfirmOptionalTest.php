@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -36,7 +36,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testWithConfirm() {
+  public function testWithConfirm() {
     $this->_addContributionPage(TRUE);
     $this->_fillOutContributionPage();
 
@@ -51,7 +51,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Your transaction has been processed successfully"), "Should load thank you page");
   }
 
-  function testWithoutConfirm() {
+  public function testWithoutConfirm() {
     $this->_addContributionPage(FALSE);
     $this->_fillOutContributionPage();
 
@@ -110,5 +110,5 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->click("_qf_Main_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-}
 
+}

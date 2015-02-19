@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,21 +40,21 @@
 class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
   /**
-   * The id of the object being edited
+   * The id of the object being edited.
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * action
+   * Action.
    *
    * @var int
    */
   protected $_action;
 
   /**
-   * surveyTitle
+   * SurveyTitle.
    *
    * @var string
    */
@@ -65,7 +65,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
-    $this->_action   = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
     $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
 
     if ($this->_surveyId) {
@@ -90,12 +90,9 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -123,50 +120,49 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       $buttons = array(
         array(
           'type' => 'upload',
-          'name' => ts('Continue >>'),
+          'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
       );
     }
-    $buttons[] =
-      array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-            );
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    );
     $this->addButtons($buttons);
 
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
     $session->replaceUserContext($url);
   }
 
-  function endPostProcess() {
+  public function endPostProcess() {
     // make submit buttons keep the current working tab opened.
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $tabTitle = $className = CRM_Utils_String::getClassName($this->_name);
       if ($tabTitle == 'Main') {
         $tabTitle = 'Main settings';
       }
-      $subPage   = strtolower($className);
+      $subPage = strtolower($className);
       CRM_Core_Session::setStatus(ts("'%1' have been saved.", array(1 => $tabTitle)), ts('Saved'), 'success');
 
       $this->postProcessHook();
 
-      if ($this->_action & CRM_Core_Action::ADD)
+      if ($this->_action & CRM_Core_Action::ADD) {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/questions",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
-
+          "action=update&reset=1&id={$this->_surveyId}"));
+      }
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
       }
-      else if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_next") {
+      elseif ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_next") {
         $subPage = CRM_Campaign_Form_Survey_TabHeader::getNextTab($this);
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/{$subPage}",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
+          "action=update&reset=1&id={$this->_surveyId}"));
       }
       else {
         CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/survey/configure/{$subPage}",
-                                                         "action=update&reset=1&id={$this->_surveyId}"));
+          "action=update&reset=1&id={$this->_surveyId}"));
       }
     }
   }
@@ -174,8 +170,8 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * @return string
    */
-  function getTemplateFileName() {
-    if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0 ) {
+  public function getTemplateFileName() {
+    if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0) {
       return parent::getTemplateFileName();
     }
     else {
@@ -184,5 +180,5 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       return 'CRM/Campaign/Form/Survey/Tab.tpl';
     }
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.6                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testSeperateMembershipCreate() {
+  public function testSeperateMembershipCreate() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -91,14 +91,14 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
     // create new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();
-    $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-    $memTypeId1     = $memTypeId1[1];
+    $memTypeTitle1 = $memTypeParams1['membership_type'];
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
+    $memTypeId1 = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
-    $memTypeTitle2  = $memTypeParams2['membership_type'];
-    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
-    $memTypeId2     = $memTypeId2[1];
+    $memTypeTitle2 = $memTypeParams2['membership_type'];
+    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle2}']/../../td[12]/span/a[3]@href"));
+    $memTypeId2 = $memTypeId2[1];
 
     // edit contribution page memberships tab to add two new membership types
     $this->openCiviPage('admin/contribute/membership', "reset=1&action=update&id={$pageId}", "_qf_MembershipBlock_next-bottom");
@@ -111,7 +111,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
     //Find Member
     $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');
-    $this->type("sort_name", "$firstName1 $lastName1");
+    $this->type("sort_name", "$lastName1 $firstName1");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -127,9 +127,10 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->webtestVerifyTabularData($verifyData);
 
     // Click View action link on associated contribution record
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->click("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
+    $this->click("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
 
     //View Contribution Record
     $verifyData = array(
@@ -139,15 +140,15 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->webtestVerifyTabularData($verifyData);
 
     $this->click("_qf_ContributionView_cancel-bottom");
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/div[@class='crm-accordion-wrapper']/div/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
   }
 
   /**
-   * @param $pageId
-   * @param $memTypeId
-   * @param null $cid
+   * @param int $pageId
+   * @param int $memTypeId
+   * @param int $cid
    */
-  function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
     $args = array('reset' => 1, 'id' => $pageId);
     if ($cid) {
@@ -156,9 +157,10 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->openCiviPage("contribute/transact", $args, '_qf_Main_upload-bottom');
 
     // Select membership type 1
-    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label/span[2][contains(text(),'$memTypeId')]");
+    $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//div/span/label/span[1][contains(text(),'$memTypeId')]");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", 60);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
   }
+
 }

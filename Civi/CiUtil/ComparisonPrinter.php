@@ -1,15 +1,23 @@
 <?php
 namespace Civi\CiUtil;
 
+/**
+ * Class ComparisonPrinter
+ *
+ * @package Civi\CiUtil
+ */
 class ComparisonPrinter {
   var $headers;
   var $hasHeader = FALSE;
 
-  function __construct($headers) {
+  /**
+   * @param $headers
+   */
+  public function __construct($headers) {
     $this->headers = $headers;
   }
 
-  function printHeader() {
+  public function printHeader() {
     if ($this->hasHeader) {
       return;
     }
@@ -35,7 +43,11 @@ class ComparisonPrinter {
     $this->hasHeader = TRUE;
   }
 
-  function printRow($test, $values) {
+  /**
+   * @param $test
+   * @param $values
+   */
+  public function printRow($test, $values) {
     $this->printHeader();
     printf("%-90s ", $test);
     foreach ($values as $value) {
@@ -43,4 +55,5 @@ class ComparisonPrinter {
     }
     print "\n";
   }
+
 }

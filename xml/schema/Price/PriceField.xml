@@ -114,7 +114,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Price Field Weight</title>
+    <title>Order</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the fields should appear</comment>

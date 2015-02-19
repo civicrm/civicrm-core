@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -31,22 +31,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'      => 'Signer Test',
-      'description' => 'Test array-signing functions',
-      'group'      => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testSignValidate() {
+  public function testSignValidate() {
     $cases = array();
     $cases[] = array(
       'signParams' => array(
@@ -167,4 +156,5 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
       $this->assertTrue(TRUE, 'Validation yielded expected result');
     }
   }
+
 }

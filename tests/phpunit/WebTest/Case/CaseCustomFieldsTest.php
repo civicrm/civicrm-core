@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCase() {
+  public function testAddCase() {
     $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
@@ -45,8 +45,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // create custom group1
     $this->openCiviPage('admin/custom/group', 'reset=1');
-    $this->click("newCustomDataGroup");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("newCustomDataGroup");
     $this->type("title", $customGrp1);
     $this->select("extends[0]", "value=Case");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -54,8 +53,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(1);
     $this->select("extends_1", "value=2");
-    $this->click("_qf_Group_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Group_next-bottom");
 
     // get custom group id
     $customGrpId1 = $this->urlArg('gid');
@@ -66,7 +64,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_3 = 'custom_' . $customId[2] . '_-1';
 
     // let's give full CiviCase permissions.
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -82,27 +85,16 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
-    // Try submitting the form without creating or selecting a contact (test for CRM-7971)
-    $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
-
     // Adding contact with randomized first name (so we can then select that contact when creating case)
-    // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
     $custFname = "Mike" . substr(sha1(rand()), 0, 7);
     $custMname = "Dav" . substr(sha1(rand()), 0, 7);
     $custLname = "Krist" . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    // We're using pop-up New Contact dialog
+    $client = $this->createDialogContact("client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
 
-    // activity types we expect for this case type
-    $activityTypes = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
-    $caseRoles = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
     $caseStatusLabel = "Ongoing";
     $subject = "Safe daytime setting - senior female";
     $this->select("medium_id", "value=1");
@@ -113,10 +105,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->type("activity_subject", $subject);
 
     $this->select("case_type_id", "label={$caseTypeLabel}");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
+    $this->waitForAjaxContent();
     $this->select("status_id", "label={$caseStatusLabel}");
 
     // Choose Case Start Date.
@@ -131,19 +120,13 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
-    $this->assertTextPresent("Case opened successfully.", "Save successful status message didn't show up after saving!");
-    $this->click("_qf_CaseView_cancel-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
-    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
-    $this->waitForElementPresent("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
+    $this->checkCRMAlert("Case opened successfully.");
+    $this->clickLink("_qf_CaseView_cancel-bottom");
+    $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
+    $this->clickPopupLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
 
     $openCaseData = array(
-      "Client" => $displayName,
+      "Client" => $client['display_name'],
       "Activity Type" => "Open Case",
       "Subject" => $subject,
       "Created By" => "{$testUserFirstName} {$testUserLastName}",
@@ -159,38 +142,27 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("css=#{$customGrp1} .crm-accordion-header");
-    $this->waitForElementPresent("css=#{$customGrp1} a.button");
+    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[1][text()='Manage']");
+
+    $this->clickAjaxLink("css=#{$customGrp1} .crm-accordion-header", "css=#{$customGrp1} a.button");
     $cusId_1 = 'custom_' . $customId[0] . '_1';
     $cusId_2 = 'custom_' . $customId[1] . '_1';
     $cusId_3 = 'custom_' . $customId[2] . '_1';
-    $this->click("css=#{$customGrp1} a.button");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->waitForElementPresent("{$cusId_1}");
+    $this->clickAjaxLink("css=#{$customGrp1} a.button", $cusId_1);
+
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
     $custMname = "Davy" . substr(sha1(rand()), 0, 7);
     $custLname = "Kristy" . substr(sha1(rand()), 0, 7);
     $this->type("{$cusId_1}", $custFname);
     $this->type("{$cusId_2}", $custMname);
     $this->type("{$cusId_3}", $custLname);
-    $this->click("_qf_CustomData_upload");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
+    $this->clickAjaxLink("_qf_CustomData_upload");
+
     $this->openCiviPage('case', 'reset=1');
-    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Change Custom Data']");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(3);
+    $this->clickAjaxLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Change Custom Data']");
+
     $openCaseChangeData = array(
-      "Client" => $displayName,
+      "Client" => $client['display_name'],
       "Activity Type" => "Change Custom Data",
       "Subject" => $customGrp1 . " : change data",
       "Created By" => "{$testUserFirstName} {$testUserLastName}",
@@ -200,26 +172,8 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       "Priority" => "Normal",
     );
     $this->webtestVerifyTabularData($openCaseChangeData);
-    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
     $this->_testAdvansearchCaseData($customId, $custFname, $custMname, $custLname);
     $this->_testDeleteCustomData($customGrpId1, $customId);
-  }
-
-  /**
-   * @param $validateStrings
-   * @param $activityTypes
-   */
-  function _testVerifyCaseSummary($validateStrings, $activityTypes) {
-    $this->assertStringsPresent($validateStrings);
-    foreach ($activityTypes as $aType) {
-      $this->assertText("activity_type_id", $aType);
-    }
-    $this->assertElementPresent("link=Assign to Another Client", "Assign to Another Client link is missing.");
-    $this->assertElementPresent("name=case_report_all", "Print Case Summary button is missing.");
   }
 
   /**
@@ -228,8 +182,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
+  public function _testGetCustomFieldId($customGrpId1, $noteRichEditor = FALSE) {
     $customId = array();
+    $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
 
     if ($noteRichEditor) {
       // Create a custom data to add in profile
@@ -237,7 +192,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $field2 = "Note_Richtexteditor" . substr(sha1(rand()), 0, 7);
 
       // add custom fields for group 1
-      $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
       $this->type("label", $field1);
       $this->select("data_type_0", "value=4");
       $this->select("data_type_1", "value=TextArea");
@@ -252,7 +206,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->clickLink("_qf_Field_next_new-bottom");
 
       // get id of custom fields
-      $this->openCiviPage("admin/custom/group/field", array('reset' => 1, 'action' => 'browse', 'gid' => $customGrpId1));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'reset' => 1,
+          'action' => 'browse',
+          'gid' => $customGrpId1,
+        ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
       array_push($customId, $custom1);
@@ -267,24 +225,24 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $field3 = "Lname" . substr(sha1(rand()), 0, 7);
 
       // add custom fields for group 1
-      $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
       $this->type("label", $field1);
       $this->check("is_searchable");
-      $this->click("_qf_Field_next_new-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("_qf_Field_next_new-bottom");
 
       $this->type("label", $field2);
       $this->check("is_searchable");
-      $this->click("_qf_Field_next_new-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("_qf_Field_next_new-bottom");
 
       $this->type("label", $field3);
       $this->check("is_searchable");
-      $this->click("_qf_Field_next-bottom");
-      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->clickLink("_qf_Field_done-bottom");
 
       // get id of custom fields
-      $this->openCiviPage("admin/custom/group/field", array('reset' => 1, 'action' => 'browse', 'gid' => $customGrpId1));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'reset' => 1,
+          'action' => 'browse',
+          'gid' => $customGrpId1,
+        ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
       array_push($customId, $custom1);
@@ -301,12 +259,17 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   /**
    * @param $customGrpId1
-   * @param $customId
+   * @param array $customId
    */
-  function _testDeleteCustomData($customGrpId1, $customId) {
+  public function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
     foreach ($customId as $cKey => $cValue) {
-      $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $cValue));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'action' => 'delete',
+          'reset' => '1',
+          'gid' => $customGrpId1,
+          'id' => $cValue,
+        ));
       $this->clickLink("_qf_DeleteField_next-bottom");
     }
 
@@ -318,7 +281,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   /**
    * CRM-12812
    */
-  function testCaseCustomNoteRichEditor() {
+  public function testCaseCustomNoteRichEditor() {
     $this->webtestLogin('admin');
 
     //setting ckeditor as WYSIWYG
@@ -347,7 +310,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_2 = 'custom_' . $customId[1] . '_-1';
 
     // let's give full CiviCase permissions.
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -363,26 +331,15 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
 
-    // Try submitting the form without creating or selecting a contact (test for CRM-7971)
-    $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
-
     // Adding contact with randomized first name (so we can then select that contact when creating case)
-    // We're using pop-up New Contact dialog
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
     $custFname = "Mike" . substr(sha1(rand()), 0, 7);
     $custLname = "Krist" . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    // We're using pop-up New Contact dialog
+    $client = $this->createDialogContact("client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
 
-    // activity types we expect for this case type
-    $activityTypes = array("ADC referral", "Follow up", "Medical evaluation", "Mental health evaluation");
-    $caseRoles = array("Senior Services Coordinator", "Health Services Coordinator", "Benefits Specialist", "Client");
     $caseStatusLabel = "Ongoing";
     $subject = "Safe daytime setting - senior female";
     $this->select("medium_id", "value=1");
@@ -406,16 +363,16 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Case_upload-bottom", "_qf_CaseView_cancel-bottom");
 
     // Is status message correct?
-    $this->assertTextPresent("Case opened successfully.", "Save successful status message didn't show up after saving!");
+    $this->checkCRMAlert("Case opened successfully.");
     $this->clickLink("_qf_CaseView_cancel-bottom");
 
     $this->openCiviPage('case', 'reset=1');
-    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
+    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
 
-    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
+    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[8]/a[text()='Open Case']");
 
     $openCaseData = array(
-      "Client" => $displayName,
+      "Client" => $client['display_name'],
       "Activity Type" => "Open Case",
       "Subject" => $subject,
       "Created By" => "{$testUserFirstName} {$testUserLastName}",
@@ -434,15 +391,15 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']", "css=#{$customGrp1} .crm-accordion-header");
+    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[text()='Manage']", "css=#{$customGrp1} .crm-accordion-header");
 
     $this->click("css=#{$customGrp1} .crm-accordion-header");
 
     $cusId_1 = 'custom_' . $customId[0] . '_1';
     $cusId_2 = 'custom_' . $customId[1] . '_1';
-    $this->clickLink("css=#{$customGrp1} a.button");
+    $this->clickLink("css=#{$customGrp1} a.button", '_qf_CustomData_cancel-bottom', FALSE);
 
-    $this->assertElementContainsText("page-title", "Edit $customGrp1");
+    $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Edit $customGrp1");
 
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
     $custLname = "Kristy" . substr(sha1(rand()), 0, 7);
@@ -458,12 +415,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $customId
-   * @param $custFname
-   * @param $custMname
+   * @param int $customId
+   * @param string $custFname
+   * @param string $custMname
    * @param $custLname
    */
-  function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
+  public function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
     // search casecontact
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click("CiviCase");
@@ -478,5 +435,5 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-container', '1 Contact');
   }
-}
 
+}

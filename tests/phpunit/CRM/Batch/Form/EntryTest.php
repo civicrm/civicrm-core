@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -30,58 +30,46 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
-   * Membership type name used in test function
+   * Membership type name used in test function.
    * @var String
    */
   protected $_membershipTypeName = NULL;
 
   /**
-   * Membership type id used in test function
+   * Membership type id used in test function.
    * @var String
    */
   protected $_membershipTypeID = NULL;
 
   /**
-   * Contact id used in test function
+   * Contact id used in test function.
    * @var String
    */
   protected $_contactID = NULL;
   /**
-   * Contact id used in test function
+   * Contact id used in test function.
    * @var String
    */
   protected $_contactID2 = NULL;
 
   /**
-   * Contact id used in test function
+   * Contact id used in test function.
    * @var String
    */
   protected $_contactID3 = NULL;
 
   /**
-   * Contact id used in test function
+   * Contact id used in test function.
    * @var String
    */
   protected $_contactID4 = NULL;
 
-  /**
-   * Describe test class
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipParserTest',
-      'description' => 'Test import parser function',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $params = array(
@@ -137,10 +125,8 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
-  function tearDown()
-  {
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     if ($this->callAPISuccessGetCount('membership', array('id' => $this->_membershipTypeID))) {
@@ -153,9 +139,9 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Import
+   *  Test Import.
    */
-  function testProcessMembership() {
+  public function testProcessMembership() {
     $form = new CRM_Batch_Form_Entry();
     $params = $this->getMembershipData();
     $this->assertTrue($form->testProcessMembership($params));
@@ -176,8 +162,8 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
     $this->assertEquals(3, $result['count']);
-    foreach($result['values'] as $contribution) {
-      $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
+    foreach ($result['values'] as $contribution) {
+      $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
         'contribution_id' => $contribution['id'],
         'return' => 'line_total',
 
@@ -186,40 +172,41 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Contribution Import
+   *  Test Contribution Import.
    */
-  function testProcessContribution() {
+  public function testProcessContribution() {
     $this->offsetDefaultPriceSet();
     $form = new CRM_Batch_Form_Entry();
     $params = $this->getContributionData();
     $this->assertTrue($form->testProcessContribution($params));
     $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
     $this->assertEquals(2, $result['count']);
-    foreach($result['values'] as $contribution) {
-     $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
-       'contribution_id' => $contribution['id'],
-       'return' => 'line_total',
+    foreach ($result['values'] as $contribution) {
+      $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
+        'contribution_id' => $contribution['id'],
+        'return' => 'line_total',
 
-     )), $contribution['total_amount']);
+      )), $contribution['total_amount']);
     }
   }
+
   /**
-   * data provider for test process membership
+   * Data provider for test process membership.
    * @return array
    */
-  function getMembershipData() {
+  public function getMembershipData() {
 
     return array(
       'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_id' => Array (
+      'primary_contact_id' => array(
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,
-        ),
+      ),
       'field' => array(
         1 => array(
-          'membership_type' => Array (0 => 1, 1 => 1),// (I was unable to determine what these both mean but both are refered to in code
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
           'join_date' => '07/22/2013',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
@@ -232,35 +219,35 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ),
-      2 => array(
-        'membership_type' => Array (0 => 1, 1 => 1 ),
-        'join_date' => '07/03/2013',
-        'membership_start_date' => '02/03/2013',
-        'membership_end_date' => NULL,
-        'membership_source' => NULL,
-        'financial_type' => 2,
-        'total_amount' => 1,
-        'receive_date' => '07/17/2013',
-        'receive_date_time' => NULL,
-        'payment_instrument' => NULL,
-        'check_number' => NULL,
-        'contribution_status_id' => 1,
-       ),
+        2 => array(
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+          'join_date' => '07/03/2013',
+          'membership_start_date' => '02/03/2013',
+          'membership_end_date' => NULL,
+          'membership_source' => NULL,
+          'financial_type' => 2,
+          'total_amount' => 1,
+          'receive_date' => '07/17/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => NULL,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
         // no join date, coded end date
-       3 => array(
-         'membership_type' => Array (0 => 1, 1 => 1 ),
-         'join_date' => NULL,
-         'membership_start_date' => NULL,
-         'membership_end_date' => '2013-12-01',
-         'membership_source' => NULL,
-         'financial_type' => 2,
-         'total_amount' => 1,
-         'receive_date' => '07/17/2013',
-         'receive_date_time' => NULL,
-         'payment_instrument' => NULL,
-         'check_number' => NULL,
-         'contribution_status_id' => 1,
-       ),
+        3 => array(
+          'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
+          'join_date' => NULL,
+          'membership_start_date' => NULL,
+          'membership_end_date' => '2013-12-01',
+          'membership_source' => NULL,
+          'financial_type' => 2,
+          'total_amount' => 1,
+          'receive_date' => '07/17/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => NULL,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
 
       ),
       'actualBatchTotal' => 0,
@@ -271,11 +258,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function getContributionData() {
+  public function getContributionData() {
     return array(
       //'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_id' => Array (
+      'primary_contact_id' => array(
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,
@@ -304,5 +291,5 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     );
   }
-}
 
+}

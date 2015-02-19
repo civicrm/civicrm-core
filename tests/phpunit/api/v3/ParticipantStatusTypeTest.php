@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -36,10 +35,9 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
 
-
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'name' => 'test status',
@@ -52,9 +50,8 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
       'weight' => 10,
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testCreateParticipantStatusType() {
     $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -63,6 +60,9 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   }
 
   public function testGetParticipantStatusType() {
+    $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+
     $result = $this->callAPIAndDocument('participant_status_type', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
@@ -75,9 +75,8 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $entity = $this->callAPISuccess('participant_status_type', 'get', array());
     $result = $this->callAPIAndDocument('participant_status_type', 'delete', array('id' => $ParticipantStatusType['id']), __FUNCTION__, __FILE__);
     $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', array('id' => $ParticipantStatusType['id']));
-    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array(
-           ));
+    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array());
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
-}
 
+}

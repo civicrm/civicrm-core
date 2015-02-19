@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,15 +35,13 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCancelPayment() {
+  public function testAddCancelPayment() {
     $this->webtestLogin();
 
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
-    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName = 'Za' . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $firstName . '@example.com');
+    $contact = $this->createDialogContact();
 
     $this->type('amount', '1200');
     $this->type('installments', '12');
@@ -65,7 +63,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
     $this->webtestVerifyTabularData(array(
-        'Pledge By' => $firstName . ' ' . $lastName,
+        'Pledge By' => $contact['display_name'],
         'Total Pledge Amount' => '$ 1,200.00',
         'To be paid in' => '12 installments of $ 100.00 every 1 month(s)',
         'Payments are due on the' => '1 day of the period',
@@ -74,16 +72,17 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
         'Pledge Status' => 'Pending',
       )
     );
-    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
-    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     //Edit and add the first payment for 300.00
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click('_qf_PledgeView_next-bottom');
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
     $this->click("xpath=//div[@class='view-content']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '300.00');
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
@@ -91,9 +90,8 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
     //Check whether the next two payments are done or not
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Completed");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]","Completed");
-
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Completed");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Completed");
 
     //Cancel the contribution made for amount of 300.00
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
@@ -103,22 +101,26 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Contribution_upload-bottom");
     $this->select('contribution_status_id', 'value=3');
     $this->click("_qf_Contribution_upload-bottom");
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+    $this->click("_qf_ContributionView_cancel-bottom");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 
     // verify that first paayment is cancelled and the rest two payments are revert back to the pending status
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[7]","Cancelled");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Pending");
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]","Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[7]", "Cancelled");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Pending");
 
     // Check whether a new payment with pending status is added at the last or not
-    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[14]/td[7]","Pending");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[14]/td[7]", "Pending");
 
     // verify that Balance sum is correct
-    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]","1,200.00");
+    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]", "1,200.00");
 
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAuthenticAddUser() {
+  public function testAuthenticAddUser() {
 
     $this->webtestLogin('admin');
 
@@ -68,7 +68,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testAnonymousAddUser() {
+  public function testAnonymousAddUser() {
     // Make sure Drupal account settings allow visitors to register for account w/o admin approval
     // login as admin
     $this->webtestLogin('admin');
@@ -123,5 +123,5 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results', 'Dumfries');
     $this->assertElementContainsText('css=.crm-search-results', '1234');
   }
-}
 
+}

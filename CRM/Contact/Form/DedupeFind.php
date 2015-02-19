@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,26 +40,23 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   * defined defaults
-   *
+   * Defined defaults.
    */
   public $_defaults;
 
   /**
-   * Function to pre processing
+   * Pre processing.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -75,20 +72,21 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
         //hack to support cancel button functionality
         array(
           'type' => 'submit',
+          'class' => 'cancel',
+          'icon' => 'close',
           'name' => ts('Cancel'),
         ),
       )
     );
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -108,5 +106,5 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
     CRM_Utils_System::redirect($url);
   }
-}
 
+}

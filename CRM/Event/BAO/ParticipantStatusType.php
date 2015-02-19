@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,25 +34,25 @@
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
   /**
-   * @param $params
+   * @param array $params
    *
-   * @return $this|null
+   * @return this|null
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     if (empty($params)) {
       return NULL;
     }
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     return $dao->save();
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
-   * @return $this|null
+   * @return this|null
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
     $statusType = self::add($params);
     if (is_a($statusType, 'CRM_Core_Error')) {
@@ -64,13 +64,13 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return bool
    */
-  static function deleteParticipantStatusType($id) {
+  public static function deleteParticipantStatusType($id) {
     // return early if there are participants with this status
-    $participant = new CRM_Event_DAO_Participant;
+    $participant = new CRM_Event_DAO_Participant();
     $participant->status_id = $id;
     if ($participant->find()) {
       return FALSE;
@@ -78,7 +78,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
     CRM_Utils_Weight::delWeight('CRM_Event_DAO_ParticipantStatusType', $id);
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->id = $id;
     $dao->find(TRUE);
     $dao->delete();
@@ -86,15 +86,15 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param $defaults
    *
    * @return CRM_Event_DAO_ParticipantStatusType|null
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $result = NULL;
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     if ($dao->find(TRUE)) {
       CRM_Core_DAO::storeValues($dao, $defaults);
@@ -105,17 +105,17 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $isActive
    *
    * @return bool
    */
-  static function setIsActive($id, $isActive) {
+  public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -197,9 +197,9 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
             //lets get the transaction mechanism.
             $transaction = new CRM_Core_Transaction();
 
-            $ids       = array($participantId);
+            $ids = array($participantId);
             $expiredId = array_search('Expired', $expiredStatuses);
-            $results   = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
+            $results = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
             $transaction->commit();
 
             if (!empty($results)) {
@@ -321,5 +321,5 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
 
     return array('is_error' => 0, 'messages' => $returnMessages);
   }
-}
 
+}

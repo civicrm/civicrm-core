@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,24 +34,24 @@
  *
  */
 class CRM_Core_BAO_CustomQuery {
-  CONST PREFIX = 'custom_value_';
+  const PREFIX = 'custom_value_';
 
   /**
-   * the set of custom field ids
+   * The set of custom field ids.
    *
    * @var array
    */
   protected $_ids;
 
   /**
-   * the select clause
+   * The select clause.
    *
    * @var array
    */
   public $_select;
 
   /**
-   * the name of the elements that are in the select clause
+   * The name of the elements that are in the select clause.
    * used to extract the values
    *
    * @var array
@@ -60,7 +59,7 @@ class CRM_Core_BAO_CustomQuery {
   public $_element;
 
   /**
-   * the tables involved in the query
+   * The tables involved in the query.
    *
    * @var array
    */
@@ -68,28 +67,28 @@ class CRM_Core_BAO_CustomQuery {
   public $_whereTables;
 
   /**
-   * the where clause
+   * The where clause.
    *
    * @var array
    */
   public $_where;
 
   /**
-   * The english language version of the query
+   * The english language version of the query.
    *
    * @var array
    */
   public $_qill;
 
   /**
-   * The cache to translate the option values into labels
+   * The cache to translate the option values into labels.
    *
    * @var array
    */
   public $_options;
 
   /**
-   * The custom fields information
+   * The custom fields information.
    *
    * @var array
    */
@@ -105,11 +104,9 @@ class CRM_Core_BAO_CustomQuery {
   protected $_locationSpecificCustomFields;
 
   /**
-   * This stores custom data group types and tables that it extends
+   * This stores custom data group types and tables that it extends.
    *
-   * @todo add comments explaining why survey & campaign are missing from this
    * @var array
-   * @static
    */
   static $extendsMap = array(
     'Contact' => 'civicrm_contact',
@@ -127,32 +124,33 @@ class CRM_Core_BAO_CustomQuery {
     'Pledge' => 'civicrm_pledge',
     'Grant' => 'civicrm_grant',
     'Address' => 'civicrm_address',
+    'Campaign' => 'civicrm_campaign',
+    'Survey' => 'civicrm_survey',
   );
 
   /**
-   * class constructor
+   * Class constructor.
    *
    * Takes in a set of custom field ids andsets up the data structures to
    * generate a query
    *
-   * @param  array $ids the set of custom field ids
+   * @param array $ids
+   *   The set of custom field ids.
    *
    * @param bool $contactSearch
    * @param array $locationSpecificFields
-   *
-   * @access public
    */
-  function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
+  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
     $this->_ids = &$ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
-    $this->_select      = array();
-    $this->_element     = array();
-    $this->_tables      = array();
+    $this->_select = array();
+    $this->_element = array();
+    $this->_tables = array();
     $this->_whereTables = array();
-    $this->_where       = array();
-    $this->_qill        = array();
-    $this->_options     = array();
+    $this->_where = array();
+    $this->_qill = array();
+    $this->_options = array();
 
     $this->_fields = array();
     $this->_contactSearch = $contactSearch;
@@ -164,7 +162,7 @@ class CRM_Core_BAO_CustomQuery {
     // initialize the field array
     $tmpArray = array_keys($this->_ids);
     $idString = implode(',', $tmpArray);
-    $query    = "
+    $query = "
 SELECT f.id, f.label, f.data_type,
        f.html_type, f.is_search_range,
        f.option_group_id, f.custom_group_id,
@@ -255,15 +253,12 @@ SELECT label, value
   }
 
   /**
-   * generate the select clause and the associated tables
+   * Generate the select clause and the associated tables.
    * for the from clause
    *
-   * @param  NULL
-   *
    * @return void
-   * @access public
    */
-  function select() {
+  public function select() {
     if (empty($this->_fields)) {
       return;
     }
@@ -323,16 +318,12 @@ SELECT label, value
   }
 
   /**
-   * generate the where clause and also the english language
+   * Generate the where clause and also the english language.
    * equivalent
    *
-   * @param NULL
-   *
    * @return void
-   *
-   * @access public
    */
-  function where() {
+  public function where() {
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Isuue CRM 607
@@ -360,7 +351,10 @@ SELECT label, value
         if (is_array($value) && !$field['is_search_range']) {
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
           $wildcard = $isSerialized ? $wildcard : TRUE;
-          $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array('field' => $name, 'context' => 'search'), array()));
+          $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
+                'field' => $name,
+                'context' => 'search',
+              ), array()));
           $qillValue = '';
           $sqlOP = $wildcard ? ' OR ' : ' AND ';
           $sqlValue = array();
@@ -409,7 +403,7 @@ SELECT label, value
               if ($wildcard) {
                 $val = $strtolower(CRM_Core_DAO::escapeString($val));
                 $val = "%$val%";
-                $op  = 'LIKE';
+                $op = 'LIKE';
               }
 
               //FIX for custom data query fired against no value(NULL/NOT NULL)
@@ -488,7 +482,7 @@ SELECT label, value
             $toValue = CRM_Utils_Array::value('to', $value);
 
             if (!$fromValue && !$toValue) {
-              if (!CRM_Utils_Date::processDate($value) && $op != 'IS NULL' && $op != 'IS NOT NULL') {
+              if (!CRM_Utils_Date::processDate($value) && !in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
                 continue;
               }
 
@@ -534,11 +528,12 @@ SELECT label, value
             break;
 
           case 'File':
-            if ( $op == 'IS NULL' || $op == 'IS NOT NULL' || $op == 'IS EMPTY' || $op == 'IS NOT EMPTY' ) {
+            if ($op == 'IS NULL' || $op == 'IS NOT NULL' || $op == 'IS EMPTY' || $op == 'IS NOT EMPTY') {
               switch ($op) {
                 case 'IS EMPTY':
                   $op = 'IS NULL';
                   break;
+
                 case 'IS NOT EMPTY':
                   $op = 'IS NOT NULL';
                   break;
@@ -553,15 +548,13 @@ SELECT label, value
   }
 
   /**
-   * function that does the actual query generation
+   * Function that does the actual query generation.
    * basically ties all the above functions together
    *
-   * @param NULL
-   *
-   * @return  array   array of strings
-   * @access public
+   * @return array
+   *   array of strings
    */
-  function query() {
+  public function query() {
     $this->select();
 
     $this->where();
@@ -579,21 +572,22 @@ SELECT label, value
       }
     }
 
-    return array(implode(' , ', $this->_select),
+    return array(
+      implode(' , ', $this->_select),
       implode(' ', $this->_tables),
       $whereStr,
     );
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $label
    * @param $type
-   * @param $fieldName
+   * @param string $fieldName
    * @param $value
    * @param $grouping
    */
-  function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
+  public function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
     $qill = array();
 
     if (isset($value['from'])) {
@@ -623,4 +617,5 @@ SELECT label, value
       $this->_qill[$grouping][] = $label . ' - ' . implode(' ' . ts('and') . ' ', $qill);
     }
   }
+
 }

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,25 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 for Dashboard Contact
- *
- * @package CiviCRM_APIv3
- * @subpackage API_ActionSchedule
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Creates/Updates a new Dashboard Contact Entry
+ * This api exposes CiviCRM dashboard contacts.
+ *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Creates/Updates a new Dashboard Contact Entry.
  *
  * @param array $params
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_contact_create($params) {
   if (empty($params['id'])) {
@@ -61,30 +55,34 @@ function civicrm_api3_dashboard_contact_create($params) {
 }
 
 /**
- * Gets a CiviCRM Dashlets of Contacts according to parameters
+ * Gets a CiviCRM Dashlets of Contacts according to parameters.
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs for the activity.
+ * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array
- *
  */
 function civicrm_api3_dashboard_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);
 }
 
 /**
- * @param $params
+ * Check permissions on contact dashboard retrieval.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
  *
  * @return array|null
  */
@@ -100,13 +98,15 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
 }
 
 /**
- * Delete an existing dashboard-contact
+ * Delete an existing dashboard-contact.
  *
  * This method is used to delete any existing dashboard-board. the id of the dashboard-contact
  * is required field in $params array
  *
- * {@getfields dashboard_contact_delete}
- * @access public
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_dashboard_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

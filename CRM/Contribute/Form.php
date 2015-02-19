@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,19 +40,18 @@
 class CRM_Contribute_Form extends CRM_Admin_Form {
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
-      if (!empty( $this->_BAOName)) {
+      if (!empty($this->_BAOName)) {
         $baoName = $this->_BAOName;
         $baoName::retrieve($params, $defaults);
       }
@@ -62,7 +61,7 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
     }
     elseif ($this->_action == CRM_Core_Action::ADD) {
       $condition = " AND is_default = 1";
-      $values = CRM_Core_OptionGroup::values('financial_account_type', false, false, false, $condition);
+      $values = CRM_Core_OptionGroup::values('financial_account_type', FALSE, FALSE, FALSE, $condition);
       $defaults['financial_account_type_id'] = array_keys($values);
       $defaults['is_active'] = 1;
 
@@ -82,4 +81,3 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
   }
 
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,8 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
+
 /**
  *
  * @package CRM
@@ -36,66 +37,66 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
   /**
    * @return array
    */
-  static function &columns() {
-    static $result = null;
+  public static function &columns() {
+    static $result = NULL;
     if (!$result) {
       $result = array(
         'civicrm_location_type' => array(
           'display_name' => "varchar(64)",
-        ) ,
+        ),
         'civicrm_option_group' => array(
           'title' => "varchar(255)",
           'description' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_contact_type' => array(
           'label' => "varchar(64)",
           'description' => "text",
-        ) ,
+        ),
         'civicrm_batch' => array(
           'title' => "varchar(64)",
           'description' => "text",
-        ) ,
+        ),
         'civicrm_premiums' => array(
           'premiums_intro_title' => "varchar(255)",
           'premiums_intro_text' => "text",
           'premiums_nothankyou_label' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_membership_status' => array(
           'label' => "varchar(128)",
-        ) ,
+        ),
         'civicrm_survey' => array(
           'title' => "varchar(255)",
           'instructions' => "text",
           'thankyou_title' => "varchar(255)",
           'thankyou_text' => "text",
-        ) ,
+        ),
         'civicrm_participant_status_type' => array(
           'label' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_tell_friend' => array(
           'title' => "varchar(255)",
           'intro' => "text",
           'suggested_message' => "text",
           'thankyou_title' => "varchar(255)",
           'thankyou_text' => "text",
-        ) ,
+        ),
         'civicrm_custom_group' => array(
           'title' => "varchar(64)",
           'help_pre' => "text",
           'help_post' => "text",
-        ) ,
+        ),
         'civicrm_custom_field' => array(
           'label' => "varchar(255)",
           'help_pre' => "text",
           'help_post' => "text",
-        ) ,
+        ),
         'civicrm_option_value' => array(
           'label' => "varchar(255)",
           'description' => "text",
-        ) ,
+        ),
         'civicrm_group' => array(
           'title' => "varchar(64)",
-        ) ,
+        ),
         'civicrm_contribution_page' => array(
           'title' => "varchar(255)",
           'intro_text' => "text",
@@ -110,52 +111,52 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
           'receipt_from_name' => "varchar(255)",
           'receipt_text' => "text",
           'footer_text' => "text",
-        ) ,
+        ),
         'civicrm_product' => array(
           'name' => "varchar(255)",
           'description' => "text",
           'options' => "text",
-        ) ,
+        ),
         'civicrm_membership_type' => array(
           'name' => "varchar(128)",
           'description' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_membership_block' => array(
           'new_title' => "varchar(255)",
           'new_text' => "text",
           'renewal_title' => "varchar(255)",
           'renewal_text' => "text",
-        ) ,
+        ),
         'civicrm_price_set' => array(
           'title' => "varchar(255)",
           'help_pre' => "text",
           'help_post' => "text",
-        ) ,
+        ),
         'civicrm_dashboard' => array(
           'label' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_uf_group' => array(
           'title' => "varchar(64)",
           'help_pre' => "text",
           'help_post' => "text",
-        ) ,
+        ),
         'civicrm_uf_field' => array(
           'help_post' => "text",
           'help_pre' => "text",
           'label' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_price_field' => array(
           'label' => "varchar(255)",
           'help_pre' => "text",
           'help_post' => "text",
-        ) ,
+        ),
         'civicrm_price_field_value' => array(
           'label' => "varchar(255)",
           'description' => "text",
-        ) ,
+        ),
         'civicrm_pcp_block' => array(
           'link_text' => "varchar(255)",
-        ) ,
+        ),
         'civicrm_event' => array(
           'title' => "varchar(255)",
           'summary' => "text",
@@ -180,7 +181,7 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
           'waitlist_text' => "text",
           'approval_req_text' => "text",
           'template_title' => "varchar(255)",
-        ) ,
+        ),
       );
     }
     return $result;
@@ -189,9 +190,8 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
   /**
    * @return array
    */
-  static function &indices()
-  {
-    static $result = null;
+  public static function &indices() {
+    static $result = NULL;
     if (!$result) {
       $result = array(
         'civicrm_custom_group' => array(
@@ -200,29 +200,29 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
             'field' => array(
               'title',
               'extends',
-            ) ,
+            ),
             'unique' => 1,
-          ) ,
-        ) ,
+          ),
+        ),
         'civicrm_custom_field' => array(
           'UI_label_custom_group_id' => array(
             'name' => 'UI_label_custom_group_id',
             'field' => array(
               'label',
               'custom_group_id',
-            ) ,
+            ),
             'unique' => 1,
-          ) ,
-        ) ,
+          ),
+        ),
         'civicrm_group' => array(
           'UI_title' => array(
             'name' => 'UI_title',
             'field' => array(
               'title',
-            ) ,
+            ),
             'unique' => 1,
-          ) ,
-        ) ,
+          ),
+        ),
       );
     }
     return $result;
@@ -231,12 +231,12 @@ class CRM_Core_I18n_SchemaStructure_4_5_alpha1 {
   /**
    * @return array
    */
-  static function &tables()
-  {
-    static $result = null;
+  public static function &tables() {
+    static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());
     }
     return $result;
   }
+
 }

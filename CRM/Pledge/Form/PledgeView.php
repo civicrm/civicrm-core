@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,10 +40,9 @@
 class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -76,7 +75,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       $values['contribution_page'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $values['contribution_page_id'], 'title');
     }
 
-        $values['financial_type'] = CRM_Utils_Array::value( $values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType() );
+    $values['financial_type'] = CRM_Utils_Array::value($values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType());
 
     if ($values['status_id']) {
       $values['pledge_status'] = CRM_Utils_Array::value($values['status_id'], CRM_Contribute_PseudoConstant::contributionStatus());
@@ -102,7 +101,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     $this->assign('displayName', $displayName);
 
     $title = $displayName .
-      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format( $values['pledge_amount'] ) .
+      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($values['pledge_amount']) .
       ' - ' . $values['financial_type'] . ')';
 
     // add Pledge to Recent Items
@@ -120,7 +119,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       $displayName .= ' (' . ts('default organization') . ')';
     }
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Pledge by') .  ' ' . $displayName);
+    CRM_Utils_System::setTitle(ts('View Pledge by') . ' ' . $displayName);
 
     //do check for campaigns
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
@@ -132,10 +131,9 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -148,5 +146,5 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

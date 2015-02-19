@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -50,16 +50,13 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_prefix;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * @param
    *
    * @return void
-   *
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
     $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
@@ -90,8 +87,8 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     if ($this->get('edit')) {
       // make sure we have right permission to edit this user
       $session = CRM_Core_Session::singleton();
-      $userID  = $session->get('userID');
-      $id      = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
+      $userID = $session->get('userID');
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
 
       if ($id) {
         // this is edit mode.
@@ -141,10 +138,9 @@ SELECT module,is_reserved
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -153,10 +149,10 @@ SELECT module,is_reserved
 
     // set the title
     if ($this->_multiRecord && $this->_customGroupTitle) {
-      $groupTitle = ($this->_multiRecord & CRM_Core_Action::UPDATE) ?
-        'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle;
+      $groupTitle = ($this->_multiRecord & CRM_Core_Action::UPDATE) ? 'Edit ' . $this->_customGroupTitle . ' Record' : $this->_customGroupTitle;
 
-    } else {
+    }
+    else {
       $groupTitle = $this->_ufGroup['title'];
     }
     CRM_Utils_System::setTitle($groupTitle);
@@ -213,18 +209,13 @@ SELECT module,is_reserved
 
     parent::buildQuickForm();
 
+    $this->assign('cancelURL', $this->_cancelURL);
+
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
 
       $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'isDefault' => TRUE,
-        'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
-      );
-      $this->addButtons($buttons);
       return;
     }
 
@@ -245,13 +236,6 @@ SELECT module,is_reserved
       'isDefault' => TRUE,
     );
 
-    $buttons[] = array(
-      'type' => 'cancel',
-      'name' => ts('Cancel'),
-      'isDefault' => TRUE,
-      'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
-    );
-
     $this->addButtons($buttons);
 
     $this->addFormRule(array('CRM_Profile_Form', 'formRule'), $this);
@@ -260,7 +244,6 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -319,7 +302,7 @@ SELECT module,is_reserved
   }
 
   /**
-   * Function to intercept QF validation and do our own redirection
+   * Intercept QF validation and do our own redirection.
    *
    * We use this to send control back to the user for a user formatted page
    * This allows the user to maintain the same state and display the error messages
@@ -327,11 +310,11 @@ SELECT module,is_reserved
    *
    * This is a first version and will be tweaked over a period of time
    *
-   * @access    public
    *
-   * @return    boolean   true if no error found
+   * @return bool
+   *   true if no error found
    */
-  function validate() {
+  public function validate() {
     $errors = parent::validate();
 
     if (!$errors && !empty($_POST['errorURL'])) {
@@ -358,5 +341,5 @@ SELECT module,is_reserved
 
     return $errors;
   }
-}
 
+}

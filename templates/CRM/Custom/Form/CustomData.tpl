@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -66,7 +66,7 @@
      <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
       {if !$skipTitle}
       <div class="crm-accordion-header">
-        {$cd_edit.title} {$cgCount}
+        {$cd_edit.title}
        </div><!-- /.crm-accordion-header -->
       {/if}
       <div class="crm-accordion-body">

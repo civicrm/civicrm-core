@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,32 +35,29 @@
 class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
 
   /**
-   * static holder for the default payment processor
+   * Static holder for the default payment processor.
    */
   static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_LocaationType object on success, null otherwise
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_LocaationType|null
+   *   object on success, null otherwise
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
     if ($paymentProcessorType->find(TRUE)) {
@@ -71,31 +68,29 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on sucess, null otherwise
    *
-   * @access public
-   * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessorType', $id, 'is_active', $is_active);
   }
 
   /**
-   * retrieve the default payment processor
+   * Retrieve the default payment processor.
    *
-   * @param NULL
-   *
-   * @return object           The default payment processor object on success,
+   * @return object
+   *   The default payment processor object on success,
    *                          null otherwise
-   * @static
-   * @access public
    */
-  static function &getDefault() {
+  public static function &getDefault() {
     if (self::$_defaultPaymentProcessorType == NULL) {
       $params = array('is_default' => 1);
       $defaults = array();
@@ -105,22 +100,19 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Function to add the payment-processor type in the db
+   * Add the payment-processor type in the db
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
    * @throws Exception
-   * @internal param array $ids the array that holds all the db ids
-   *
-   * @return object CRM_Financial_DAO_PaymentProcessorType
-   * @access public
-   * @static
+   * @return CRM_Financial_DAO_PaymentProcessorType
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
 
-    /*
+    /* @codingStandardsIgnoreStart
     // adapted from CRM_Core_Extensions_Payment::install
     foreach (array(
       'class_name',
@@ -142,12 +134,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
       'billing_mode',
       'is_recur',
       'payment_type'
-    ) as $trimmable) {
+      ) as $trimmable) {
       if (isset($paymentProcessorType->{$trimmable})) {
         $paymentProcessorType->{$trimmable} = trim($paymentProcessorType->{$trimmable});
       }
     }
-    */
+    @codingStandardsIgnoreEnd */
 
     if (isset($paymentProcessorType->billing_mode)) {
       // ugh unidirectional manipulation
@@ -176,15 +168,14 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   }
 
   /**
-   * Function to delete payment processor
+   * Delete payment processor.
    *
-   * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
+   * @param int $paymentProcessorTypeId
+   *   ID of the processor to be deleted.
    *
-   * @return bool
-   * @access public
-   * @static
+   * @return bool|NULL
    */
-  static function del($paymentProcessorTypeId) {
+  public static function del($paymentProcessorTypeId) {
     $query = "
 SELECT pp.id processor_id
 FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt
@@ -195,13 +186,13 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
 
     if ($dao->fetch()) {
       CRM_Core_Session::setStatus(ts('There is a Payment Processor associated with selected Payment Processor type, hence it can not be deleted.'), ts('Deletion Error'), 'error');
-      return;
+      return NULL;
     }
 
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->id = $paymentProcessorTypeId;
     if ($paymentProcessorType->delete()) {
-      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br>'), '', 'success');
+      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br/>'), '', 'success');
       return TRUE;
     }
   }
@@ -222,4 +213,3 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
   }
 
 }
-

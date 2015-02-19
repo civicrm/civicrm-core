@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -68,7 +68,7 @@
   </tr>
   <tr class="crm-custom-import-uploadfile-from-block-contactType">
               <td class="label">{$form.contactType.label}</td>
-     	      <td>{$form.contactType.html}<br />
+             <td>{$form.contactType.html}<br />
                 <span class="description">
                 {ts}Select 'Individual' if you are importing custom data for individual persons.{/ts}
                 {ts}Select 'Organization' or 'Household' if you are importing custom data . (NOTE: Some built-in contact types may not be enabled for your site.){/ts}

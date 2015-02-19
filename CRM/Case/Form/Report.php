@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -50,18 +50,18 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   public $_clientID = NULL;
 
   /**
-   * activity set name
+   * Activity set name
    */
   public $_activitySetName = NULL;
 
   public $_report = NULL;
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $this->_caseID = CRM_Utils_Request::retrieve('caseid', 'Integer', $this, TRUE);
     $this->_clientID = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
     $this->_activitySetName = CRM_Utils_Request::retrieve('asn', 'String', $this, TRUE);
@@ -84,8 +84,9 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       return;
     }
 
-    $includeActivites = array(1 => ts('Include All Activities'),
-      2 => ts('Include Missing Activities Only'),
+    $includeActivites = array(
+      1 => ts('All Activities'),
+      2 => ts('Exclude Completed Activities'),
     );
     $includeActivitesGroup = $this->addRadio('include_activities',
       NULL,
@@ -118,9 +119,8 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -136,5 +136,5 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
     );
     $this->set('report', $contents);
   }
-}
 
+}

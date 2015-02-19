@@ -8,12 +8,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
-
-  function tearDown() {}
 
   public function testCustomSearch() {
     $result = $this->callAPISuccess('CustomSearch', 'create', array(
@@ -69,4 +68,5 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       OR label = "CRM_Contact_Form_Search_Custom_Examplez"
       ');
   }
+
 }

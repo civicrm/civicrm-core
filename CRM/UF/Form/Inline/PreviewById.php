@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,21 +41,18 @@
 class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
    * @param
    *
    * @return void
-   *
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     // Inline forms don't get menu-level permission checks
     if (!CRM_Core_Permission::check('access CiviCRM')) {
-      CRM_Core_Error::fatal(ts('Permission denied'));
+      CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $gid = CRM_Utils_Request::retrieve('id', 'Positive');
     $fields = CRM_Core_BAO_UFGroup::getFields($gid);
@@ -63,4 +60,3 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
   }
 
 }
-

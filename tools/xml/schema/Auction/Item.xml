@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="iso-8859-1" ?> 
- 
-<table> 
-  <base>CRM/Auction</base> 
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Auction</base>
   <class>Item</class>
   <comment>stores item information for an auction</comment>
-  <name>civicrm_auction_item</name> 
-  <add>3.0</add> 
-  <field> 
-      <name>id</name> 
-      <type>int unsigned</type> 
-      <required>true</required> 
-      <add>3.0</add> 
-  </field> 
-  <primaryKey> 
-       <name>id</name> 
-       <autoincrement>true</autoincrement> 
+  <name>civicrm_auction_item</name>
+  <add>3.0</add>
+  <field>
+      <name>id</name>
+      <type>int unsigned</type>
+      <required>true</required>
+      <add>3.0</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
       <name>auction_id</name>
@@ -44,27 +44,27 @@
        <add>3.0</add>
        <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <field> 
-      <name>auction_item_type_id</name> 
-      <type>int unsigned</type> 
-      <title>Auction Item Type ID</title>  
-      <default>0</default>                
-      <comment>Auction Type ID.Implicit FK to civicrm_option_value where option_group = auction_item_type.</comment> 
-      <add>3.0</add> 
-  </field> 
+  <field>
+      <name>auction_item_type_id</name>
+      <type>int unsigned</type>
+      <title>Auction Item Type ID</title>
+      <default>0</default>
+      <comment>Auction Type ID.Implicit FK to civicrm_option_value where option_group = auction_item_type.</comment>
+      <add>3.0</add>
+  </field>
   <index>
     <name>index_auction_item_type_id</name>
     <fieldName>auction_item_type_id</fieldName>
     <add>3.0</add>
   </index>
-  <field> 
-      <name>auction_item_category_id</name> 
-      <type>int unsigned</type> 
-      <title>Auction Item Category ID</title>  
-      <default>0</default>                
-      <comment>Auction Category ID.Implicit FK to civicrm_option_value where option_group = auction_item_.</comment> 
-      <add>3.0</add> 
-  </field> 
+  <field>
+      <name>auction_item_category_id</name>
+      <type>int unsigned</type>
+      <title>Auction Item Category ID</title>
+      <default>0</default>
+      <comment>Auction Category ID.Implicit FK to civicrm_option_value where option_group = auction_item_.</comment>
+      <add>3.0</add>
+  </field>
   <index>
     <name>index_auction_item_category_id</name>
     <fieldName>auction_item_category_id</fieldName>
@@ -97,15 +97,15 @@
       <comment>Optional specific instructions / restrictions regarding this item.</comment>
       <add>3.0</add>
   </field>
-  <field> 
-      <name>lot_number</name> 
+  <field>
+      <name>lot_number</name>
       <title>Lot Number</title>
       <type>varchar</type>
       <length>50</length>
-      <export>true</export>  
+      <export>true</export>
       <comment>lot numbers associated with this item. could be a range. automatically computed.</comment>
-      <add>3.0</add> 
-  </field> 
+      <add>3.0</add>
+  </field>
   <field>
        <name>url</name>
        <type>varchar</type>
@@ -114,66 +114,66 @@
        <comment>optional URL of website to associate with item.</comment>
        <add>1.1</add>
   </field>
-  <field> 
-      <name>sku</name> 
+  <field>
+      <name>sku</name>
       <title>SKU</title>
       <type>varchar</type>
       <length>50</length>
-      <export>true</export> 
+      <export>true</export>
       <comment>Optional product sku or code.</comment>
-      <add>3.0</add> 
-  </field> 
-  <field>  
-      <name>options</name>  
+      <add>3.0</add>
+  </field>
+  <field>
+      <name>options</name>
       <title>Options</title>
       <type>text</type>
       <localizable>true</localizable>
-      <comment>Store comma-delimited list of color, size, etc. options for the product.</comment>  
-      <add>3.0</add>  
-  </field>    
-  <field>   
+      <comment>Store comma-delimited list of color, size, etc. options for the product.</comment>
+      <add>3.0</add>
+  </field>
+  <field>
       <name>image</name>
       <title>Image</title>
-      <type>varchar</type>   
+      <type>varchar</type>
       <length>255</length>
-      <comment>Full or relative URL to uploaded image - fullsize.</comment>   
-      <add>3.0</add>   
-  </field>     
-  <field>     
-      <name>quantity</name>  
+      <comment>Full or relative URL to uploaded image - fullsize.</comment>
+      <add>3.0</add>
+  </field>
+  <field>
+      <name>quantity</name>
       <title>Quantity</title>
-      <type>int unsigned</type> 
-      <comment>Number of Units availaible.</comment>  
-      <add>3.0</add>  
+      <type>int unsigned</type>
+      <comment>Number of Units availaible.</comment>
+      <add>3.0</add>
   </field>
-  <field>     
-      <name>retail_value</name>  
+  <field>
+      <name>retail_value</name>
       <title>Price</title>
-      <type>decimal</type> 
-      <comment>Retail value of item.</comment>  
-      <add>3.0</add>  
+      <type>decimal</type>
+      <comment>Retail value of item.</comment>
+      <add>3.0</add>
   </field>
-  <field>     
+  <field>
       <name>min_bid_value</name>
       <title>Minimum Bid</title>
       <type>decimal</type>
-      <comment>Minimum bid allowed for this item.</comment>  
-      <add>3.0</add>  
+      <comment>Minimum bid allowed for this item.</comment>
+      <add>3.0</add>
   </field>
-  <field>     
+  <field>
       <name>min_bid_increment</name>
       <title>Minimum Bid Increment</title>
       <type>decimal</type>
-      <comment>Minimum bid increment allowed for this item.</comment>  
-      <add>3.0</add>  
+      <comment>Minimum bid increment allowed for this item.</comment>
+      <add>3.0</add>
   </field>
-  <field>     
+  <field>
       <name>buy_now_value</name>
       <title>Buy Now Value</title>
-      <type>decimal</type> 
-      <comment>The amount that the item can be bought for immediately</comment>  
-      <add>3.0</add>  
-  </field> 
+      <type>decimal</type>
+      <comment>The amount that the item can be bought for immediately</comment>
+      <add>3.0</add>
+  </field>
   <field>
        <name>bid_start_date</name>
        <type>datetime</type>
@@ -188,17 +188,17 @@
        <comment>Date and time bidding ends.</comment>
        <add>3.0</add>
   </field>
-  <field>     
+  <field>
       <name>is_active</name>
-      <type>boolean</type> 
+      <type>boolean</type>
       <default>0</default>
-      <required>true</required> 
+      <required>true</required>
       <comment>Is this item active/approved and available</comment>
-      <add>3.0</add>  
+      <add>3.0</add>
   </field>
-  <field>     
+  <field>
       <name>is_group</name>
-      <type>boolean</type> 
+      <type>boolean</type>
       <default>0</default>
       <comment>Does this item group other items?</comment>
       <add>3.0</add>

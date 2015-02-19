@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -33,7 +33,7 @@
   {if $action eq 8}
      <div class="messages status">
          <p><div class="icon inform-icon"></div>&nbsp;
-         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This operation cannot be undone.{/ts}</p>
+         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>
   {else}

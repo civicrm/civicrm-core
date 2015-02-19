@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -33,49 +33,49 @@
  *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  CONST
+  const
     NUM_ROWS_TO_INSERT = 100;
 
   /**
-   * Provides information about the data source
+   * Provides information about the data source.
    *
-   * @return array collection of info about this data source
-   *
-   * @access public
-   *
+   * @return array
+   *   collection of info about this data source
    */
-  function getInfo() {
+  public function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @access public
+   * Set variables up before form is built.
    */
-  function preProcess(&$form) {}
+  public function preProcess(&$form) {
+  }
 
   /**
    * This is function is called by the form object to get the DataSource's
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return void (operates directly on form argument)
-   * @access public
+   * @return void
+   *   (operates directly on form argument)
    */
-  function buildQuickForm(&$form) {
+  public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
+    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize . 'm', TRUE);
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $form->setMaxFileSize($uploadFileSize);
-    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
+          1 => $uploadSize,
+          2 => $uploadFileSize,
+        )), 'maxfilesize', $uploadFileSize);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
 
@@ -83,11 +83,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
+   * Process the form submission.
    */
-  function postProcess(&$params, &$db, &$form) {
+  public function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
     $result = self::_CsvToTable($db,
       $file,
@@ -106,18 +104,25 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   /**
    * Create a table that matches the CSV file and populate it with the file's contents
    *
-   * @param object $db     handle to the database connection
-   * @param string $file   file name to load
-   * @param bool   $headers  whether the first row contains headers
-   * @param string $table  Name of table from which data imported.
-   * @param string $fieldSeparator Character that seperates the various columns in the file
+   * @param object $db
+   *   Handle to the database connection.
+   * @param string $file
+   *   File name to load.
+   * @param bool $headers
+   *   Whether the first row contains headers.
+   * @param string $table
+   *   Name of table from which data imported.
+   * @param string $fieldSeparator
+   *   Character that seperates the various columns in the file.
    *
-   * @return string  name of the created table
+   * @return string
+   *   name of the created table
    */
-  private static function _CsvToTable(&$db,
+  private static function _CsvToTable(
+    &$db,
     $file,
-    $headers        = FALSE,
-    $table          = NULL,
+    $headers = FALSE,
+    $table = NULL,
     $fieldSeparator = ','
   ) {
     $result = array();
@@ -142,16 +147,15 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $result['original_col_header'] = $firstrow;
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $columns    = array_map($strtolower, $firstrow);
-      $columns    = str_replace(' ', '_', $columns);
-      $columns    = preg_replace('/[^a-z_]/', '', $columns);
+      $columns = array_map($strtolower, $firstrow);
+      $columns = str_replace(' ', '_', $columns);
+      $columns = preg_replace('/[^a-z_]/', '', $columns);
 
       // need to take care of null as well as duplicate col names.
       $duplicateColName = FALSE;
       if (count($columns) != count(array_unique($columns))) {
         $duplicateColName = TRUE;
       }
-
 
       // need to truncate values per mysql field name length limits
       // mysql allows 64, but we need to account for appending colKey
@@ -174,11 +178,15 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) $column = "`$column`";
+      foreach ($columns as & $column) {
+        $column = "`$column`";
+      }
     }
     else {
       $columns = array();
-      foreach ($firstrow as $i => $_) $columns[] = "col_$i";
+      foreach ($firstrow as $i => $_) {
+        $columns[] = "col_$i";
+      }
     }
 
     // FIXME: we should regen this table's name if it exists rather than drop it
@@ -202,7 +210,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       rewind($fd);
     }
 
-    $sql   = NULL;
+    $sql = NULL;
     $first = TRUE;
     $count = 0;
     while ($row = fgetcsv($fd, 0, $fieldSeparator)) {
@@ -224,7 +232,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
         $sql = "INSERT IGNORE INTO $table VALUES $sql";
         $db->query($sql);
 
-        $sql   = NULL;
+        $sql = NULL;
         $first = TRUE;
         $count = 0;
       }
@@ -242,6 +250,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     return $result;
   }
+
 }
 
 /**
@@ -256,4 +265,3 @@ function civicrm_mysql_real_escape_string($string) {
   }
   return $dao->escape($string);
 }
-

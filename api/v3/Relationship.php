@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,73 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 relationship functions
+ * This api exposes CiviCRM relationships.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Relationship
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Relationship.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Add or update a relationship
+ * Add or update a relationship.
  *
- * @param  array $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
  * @throws API_Exception
- * @example RelationshipCreate.php Std Create example
  *
- * @return array API Result Array
- * {@getfields relationship_create}
- * @static void
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_relationship_create($params) {
-
-  $values = array();
-  _civicrm_api3_relationship_format_params($params, $values);
-  $ids = array();
-  $action = CRM_Core_Action::ADD;
-
-  if (!empty($params['id'])) {
-    $ids['contactTarget'] = $values['contact_id_b'];
-    $action = CRM_Core_Action::UPDATE;
-  }
-
-  $values['relationship_type_id'] = $values['relationship_type_id'] . '_a_b';
-  if(!empty($params['contact_id_b'])){
-    $values['contact_check'] = array($params['contact_id_b'] => $params['contact_id_b']);
-  }
-  if(!empty($values['contact_id_a'])){
-    $ids['contact'] = $values['contact_id_a'];
-  }
-  $relationshipBAO = CRM_Contact_BAO_Relationship::create($values, $ids);
-
-  if ($relationshipBAO[1]) {
-    throw new API_Exception('Relationship is not valid');
-  }
-  elseif ($relationshipBAO[2]) {
-    throw new API_Exception('Relationship already exists');
-  }
-  // Handle related memberships CRM-13652
-  if (!empty($params['contact_id_a'])) {
-    CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, $action);
-  }
-  $id = $relationshipBAO[4][0];
-  $values = array();
-  _civicrm_api3_object_to_array($relationshipBAO[5][$id], $values[$id]);
-  return civicrm_api3_create_success($values, $params, 'relationship', 'create');
+  _civicrm_api3_handle_relationship_type($params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Relationship');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_a']['api.required'] = 1;
@@ -100,16 +61,12 @@ function _civicrm_api3_relationship_create_spec(&$params) {
 }
 
 /**
- * Delete a relationship
+ * Delete a relationship.
  *
- * @param  array $params
+ * @param array $params
  *
- * @return array API Result Array
- * {@getfields relationship_delete}
- * @example RelationshipDelete.php Delete Example
- *
- * @static void
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_relationship_delete($params) {
 
@@ -129,29 +86,28 @@ function civicrm_api3_relationship_delete($params) {
 }
 
 /**
- * Function to get the relationship
+ * Get one or more relationship/s.
  *
- * @param array   $params input parameters.
+ * @param array $params
+ *   Input parameters.
+ *
  * @todo  Result is inconsistent depending on whether contact_id is passed in :
  * -  if you pass in contact_id - it just returns all relationships for 'contact_id'
  * -  if you don't pass in contact_id then it does a filter on the relationship table (DAO based search)
  *
- * @return  Array API Result Array
- * {@getfields relationship_get}
- * @example RelationshipGet.php
- * @access  public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
 
   if (empty($params['contact_id'])) {
-    if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
+    if (!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
       CRM_Contact_BAO_Relationship::membershipTypeToRelationshipTypes($params);
     }
-    $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
+    $relationships = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Relationship');
   }
   else {
-    $relationships = array();
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
       CRM_Utils_Array::value('status_id', $params),
       0,
@@ -164,131 +120,52 @@ function civicrm_api3_relationship_get($params) {
     );
   }
   //perhaps we should add a 'getcount' but at this stage lets just handle getcount output
-  if($options['is_count']) {
+  if ($options['is_count']) {
     return array('count' => $relationships);
   }
   foreach ($relationships as $relationshipId => $values) {
-    _civicrm_api3_custom_data_get($relationships[$relationshipId], 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id',$values));
+    _civicrm_api3_custom_data_get($relationships[$relationshipId], 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
   }
   return civicrm_api3_create_success($relationships, $params);
 }
 
 /**
- * take the input parameter list as specified in the data model and
- * convert it into the same format that we use in QF and BAO object
+ * Legacy handling for relationship_type parameter.
  *
- * @param array $params Associative array of property name/value
- *                             pairs to insert in new contact.
- * @param array $values The reformatted properties that we can use internally
- *                            '
- *
- * @throws Exception
- * @return array|CRM_Error
- * @access public
+ * @param array $params
+ *   Associative array of property name/value.
+ *   pairs to insert in new contact.
  */
-function _civicrm_api3_relationship_format_params($params, &$values) {
-  // copy all the relationship fields as is
-
-  $fields = CRM_Contact_DAO_Relationship::fields();
-  _civicrm_api3_store_values($fields, $params, $values);
-
-  $relationTypes = CRM_Core_PseudoConstant::relationshipType('name');
-  if (!empty($params['id'])) {
-    $relation = new CRM_Contact_BAO_Relationship();
-    $relation->id = $params['id'];
-    if (!$relation->find(TRUE)) {
-      throw new Exception('Relationship id is not valid');
-    }
-    else {
-      if ((isset($params['contact_id_a']) && $params['contact_id_a'] != $relation->contact_id_a) ||
-        (isset($params['contact_id_b']) && $params['contact_id_b'] != $relation->contact_id_b)
-      ) {
-        throw new Exception('Cannot change the contacts once relationship has been created');
-      }
-      else {
-        // since the BAO function is not std & won't accept just 'id' (aargh) let's
-        // at least return our BAO here
-        $values = array();
-        _civicrm_api3_object_to_array($relation, $values);
-        $values = array_merge($values, $params);
-        // and we need to reformat our date fields....
-        $dateFields = array('start_date', 'end_date');
-        foreach ($dateFields as $dateField){
-          $values[$dateField] = CRM_Utils_Date::processDate($values[$dateField]);
-        }
+function _civicrm_api3_handle_relationship_type(&$params) {
+  if (empty($params['relationship_type_id']) && !empty($params['relationship_type'])) {
+    $relationTypes = CRM_Core_PseudoConstant::relationshipType('name');
+    foreach ($relationTypes as $relationshipTypeId => $relationshipValue) {
+      if (CRM_Utils_Array::key(ucfirst($params['relationship_type']), $relationshipValue)) {
+        $params['relationship_type_id'] = $relationshipTypeId;
       }
     }
   }
+}
 
-  foreach ($params as $key => $value) {
-    // ignore empty values or empty arrays etc
-    if (CRM_Utils_System::isNull($value)) {
-      continue;
+/**
+ * Hack to ensure inherited membership got created/deleted on
+ * relationship add/delete respectively.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ */
+function civicrm_api3_relationship_setvalue($params) {
+  require_once 'api/v3/Generic/Setvalue.php';
+  $result = civicrm_api3_generic_setValue(array("entity" => 'Relationship', 'params' => $params));
+
+  if (empty($result['is_error']) && CRM_Utils_String::munge($params['field']) == 'is_active') {
+    $action = CRM_Core_Action::DISABLE;
+    if ($params['value'] == TRUE) {
+      $action = CRM_Core_Action::ENABLE;
     }
-
-    switch ($key) {
-      case 'contact_id_a':
-      case 'contact_id_b':
-        if (!CRM_Utils_Rule::integer($value)) {
-          throw new Exception("contact_id not valid: $value");
-        }
-        $dao     = new CRM_Core_DAO();
-        $qParams = array();
-        $svq     = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
-          $qParams
-        );
-        if (!$svq) {
-          throw new Exception("Invalid Contact ID: There is no contact record with contact_id = $value.");
-        }
-        break;
-
-      case 'relationship_type':
-        foreach ($relationTypes as $relTypId => $relValue) {
-          if (CRM_Utils_Array::key(ucfirst($value), $relValue)) {
-            $relationshipTypeId = $relTypId;
-            break;
-          }
-        }
-
-        if ($relationshipTypeId) {
-          if (!empty($values['relationship_type_id']) &&
-            $relationshipTypeId != $values['relationship_type_id']
-          ) {
-            throw new Exception('Mismatched Relationship Type and Relationship Type Id');
-          }
-          $values['relationship_type_id'] = $params['relationship_type_id'] = $relationshipTypeId;
-        }
-        else {
-          throw new Exception('Invalid Relationship Type');
-        }
-      case 'relationship_type_id':
-        if ($key == 'relationship_type_id' && !array_key_exists($value, $relationTypes)) {
-          throw new Exception("$key not a valid: $value");
-        }
-
-        // execute for both relationship_type and relationship_type_id
-        $relation = $relationTypes[$params['relationship_type_id']];
-        if (!empty($params['contact_id_a']) && $relation['contact_type_a'] &&
-          $relation['contact_type_a'] != CRM_Contact_BAO_Contact::getContactType($params['contact_id_a'])
-        ) {
-          throw new Exception("Contact ID :{$params['contact_id_a']} is not of contact type {$relation['contact_type_a']}");
-        }
-        if (!empty($params['contact_id_b']) && $relation['contact_type_b'] &&
-          $relation['contact_type_b'] != CRM_Contact_BAO_Contact::getContactType($params['contact_id_b'])
-        ) {
-          throw new Exception("Contact ID :{$params['contact_id_b']} is not of contact type {$relation['contact_type_b']}");
-        }
-        break;
-
-      default:
-        break;
-    }
+    CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
   }
-
-  if (array_key_exists('note', $params)) {
-    $values['note'] = $params['note'];
-  }
-  _civicrm_api3_custom_format_params($params, $values, 'Relationship');
-
-  return array();
+  return $result;
 }

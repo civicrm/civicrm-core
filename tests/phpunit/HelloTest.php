@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @file HelloTest.php
@@ -47,34 +47,40 @@ class HelloTest extends PHPUnit_Framework_TestCase {
   var $abc;
 
   /**
-   * @param null $name
+   * @param string|null $name
    */
-  function __construct($name = NULL) {
+  public function __construct($name = NULL) {
     parent::__construct($name);
   }
 
-  // called before the test functions will be executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function setUp() {
+  /**
+   * Called before the test functions will be executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here
+   */
+  public function setUp() {
     // create a new instance of String with the
     // string 'abc'
     $this->abc = "hello";
   }
 
-  // called after the test functions are executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function tearDown() {
+  /**
+   * Called after the test functions are executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here.
+   */
+  public function tearDown() {
     // delete your instance
     unset($this->abc);
   }
 
-  // test the toString function
-  function testHello() {
+  /**
+   * test the toString function.
+   */
+  public function testHello() {
     $result = $this->abc;
     $expected = 'hello';
     $this->assertEquals($result, $expected);
   }
-}
 
+}

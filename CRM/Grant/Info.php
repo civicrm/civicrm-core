@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -37,11 +37,13 @@
  */
 class CRM_Grant_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'grant';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -56,8 +58,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
   }
 
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -70,8 +72,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getUserDashboardElement() {
@@ -79,8 +81,8 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getUserDashboardObject() {
@@ -88,37 +90,39 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Grants'),
+    return array(
+      'title' => ts('Grants'),
       'url' => 'grant',
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Grants'),
+    return array(
+      'title' => ts('Grants'),
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getActivityTypes() {
     return NULL;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New.
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
@@ -126,12 +130,14 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
       CRM_Core_Permission::check('edit grants')
     ) {
       $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/grant/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-grant',
-            'title' => ts('Grant'),
-          )));
+        array(
+          'path' => 'civicrm/grant/add',
+          'query' => "reset=1&action=add&context=standalone",
+          'ref' => 'new-grant',
+          'title' => ts('Grant'),
+        ),
+      ));
     }
   }
-}
 
+}

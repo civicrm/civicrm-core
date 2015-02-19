@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,15 +35,14 @@
 class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * casid set if called from case context
+   * Casid set if called from case context.
    *
    * @var int
    */
@@ -53,13 +52,11 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * View details of a relationship
+   * View details of a relationship.
    *
    * @return void
-   *
-   * @access public
    */
-  function view() {
+  public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId, NULL, NULL, NULL, $this->_id);
     //To check whether selected contact is a contact_id_a in
     //relationship type 'a_b' in relationship table, if yes then
@@ -102,7 +99,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
       "action=view&reset=1&id={$viewRelationship[$this->_id]['id']}&cid={$this->_contactId}&context=home"
     );
 
-
     $session = CRM_Core_Session::singleton();
     $recentOther = array();
 
@@ -137,22 +133,18 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is browse
+   * called when action is browse.
    *
-   * return null
-   * @access public
    */
-  function browse() {
+  public function browse() {
     // do nothing :) we are using datatable for rendering relationship selectors
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new.
    *
-   * return null
-   * @access public
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Relationship', ts('Contact Relationships'), $this->_action);
     $controller->setEmbedded(TRUE);
 
@@ -170,8 +162,9 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-        CRM_Core_DAO::$_nullObject
-      )) {
+      CRM_Core_DAO::$_nullObject
+    )
+    ) {
       if ($this->_caseId) {
         //create an activity for case role removal.CRM-4480
         CRM_Case_BAO_Case::createCaseRoleActivity($this->_caseId, $this->_id);
@@ -190,7 +183,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $controller->run();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
@@ -203,13 +196,12 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->setContext();
@@ -222,18 +214,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     elseif ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
       $this->edit();
     }
-    elseif ($this->_action & CRM_Core_Action::DISABLE) {
-      CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_id, CRM_Core_Action::DISABLE);
-      CRM_Contact_BAO_Relationship::setIsActive($this->_id, 0);
-      $session = CRM_Core_Session::singleton();
-      CRM_Utils_System::redirect($session->popUserContext());
-    }
-    elseif ($this->_action & CRM_Core_Action::ENABLE) {
-      CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_id, CRM_Core_Action::ENABLE);
-      CRM_Contact_BAO_Relationship::setIsActive($this->_id, 1);
-      $session = CRM_Core_Session::singleton();
-      CRM_Utils_System::redirect($session->popUserContext());
-    }
 
     // if this is called from case view, suppress browse relationships form
     else {
@@ -243,7 +223,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
+  public function setContext() {
     $context = CRM_Utils_Request::retrieve('context', 'String',
       $this, FALSE, 'search'
     );
@@ -264,23 +244,21 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * This function is called to delete the relationship of a contact
+   * called to delete the relationship of a contact.
    *
-   * return null
-   * @access public
    */
-  function delete() {
+  public function delete() {
     // calls a function to delete relationship
     CRM_Contact_BAO_Relationship::del($this->_id);
   }
 
   /**
-   * Get action links
+   * Get action links.
    *
-   * @return array (reference) of action links
-   * @static
+   * @return array
+   *   (reference) of action links
    */
-  static function &links() {
+  public static function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
@@ -323,5 +301,5 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     }
     return self::$_links;
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -43,7 +43,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     parent::setUp();
     // put stuff here that should happen before all tests in this unit
     $priceSetparams = array(
-           #     [domain_id] =>
+      #     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accomodation',
       'is_active' => 1,
@@ -55,10 +55,11 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
       'is_reserved' => 1,
     );
 
-    $price_set = $this->callAPISuccess('price_set', 'create',$priceSetparams);
+    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetparams);
     $this->priceSetID = $price_set['id'];
 
-    $this->_params = array(      'price_set_id' => $this->priceSetID,
+    $this->_params = array(
+      'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
@@ -67,15 +68,15 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
-        'civicrm_contact',
-        'civicrm_contribution',
+      'civicrm_contact',
+      'civicrm_contribution',
     );
     $this->quickCleanup($tablesToTruncate);
 
-    $delete = $this->callAPISuccess('PriceSet','delete', array(
-           'id' => $this->priceSetID,
+    $delete = $this->callAPISuccess('PriceSet', 'delete', array(
+      'id' => $this->priceSetID,
     ));
 
     $this->assertAPISuccess($delete);
@@ -97,16 +98,16 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
-    $this->callAPISuccess('price_field','delete', array('id' => $createResult['id']));
+    $this->callAPISuccess('price_field', 'delete', array('id' => $createResult['id']));
   }
 
   public function testDeletePriceField() {
-    $startCount = $this->callAPISuccess($this->_entity, 'getcount', array(      ));
+    $startCount = $this->callAPISuccess($this->_entity, 'getcount', array());
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = array('id' => $createResult['id']);
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $endCount = $this->callAPISuccess($this->_entity, 'getcount', array(      ));
+    $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
     $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
   }
 
@@ -116,4 +117,3 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
   }
 
 }
-

@@ -1,8 +1,7 @@
 <?php
-
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Parse Javascript content and extract translatable strings.
@@ -36,10 +35,12 @@
  */
 class CRM_Utils_JS {
   /**
-   * Parse a javascript file for translatable strings
+   * Parse a javascript file for translatable strings.
    *
-   * @param string $jsCode raw Javascript code
-   * @return array of translatable strings
+   * @param string $jsCode
+   *   Raw Javascript code.
+   * @return array
+   *   Array of translatable strings
    */
   public static function parseStrings($jsCode) {
     $strings = array();
@@ -63,4 +64,5 @@ class CRM_Utils_JS {
     }
     return array_values($strings);
   }
+
 }

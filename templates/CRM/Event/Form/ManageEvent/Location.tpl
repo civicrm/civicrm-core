@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -59,7 +59,6 @@
       </tr>
       <tr>
         <td id="locUsedMsg" colspan="3">
-        {assign var=locUsedMsgTxt value="<strong>Note:</strong> This location is used by multiple events. Modifying location information will change values for all events."}
         </td>
       </tr>
 
@@ -101,18 +100,16 @@
 
 <script type="text/javascript">
 {literal}
-var locUsedMsgTxt = {/literal}"{$locUsedMsgTxt}"{literal};
-var locBlockId    = {/literal}"{$form.loc_event_id.value.0}"{literal};
-
-if ( {/literal}"{$locUsed}"{literal} ) {
-   displayMessage( true );
-}
-
 CRM.$(function($) {
   //FIX ME: by default load 2 blocks and hide add and delete links
   //we should make additional block function more flexible to set max block limit
   buildBlocks('Email');
   buildBlocks('Phone');
+
+  var $form = $('form.{/literal}{$form.formClass}{literal}'),
+    locBlockId = {/literal}"{$form.loc_event_id.value.0}"{literal};
+
+  displayMessage({/literal}{$locUsed}{literal});
 
   // build blocks only if it is not built
   function buildBlocks(element) {
@@ -124,69 +121,84 @@ CRM.$(function($) {
   hideAddDeleteLinks('Email');
   hideAddDeleteLinks('Phone');
   function hideAddDeleteLinks(element) {
-    $('#add'+ element).hide();
-    $('[id='+ element +'_Block_2] a:last').hide();
+    $('#add'+ element, $form).hide();
+    $('[id='+ element +'_Block_2] a:last', $form).hide();
   }
 
-  $('#loc_event_id').change(function() {
+  $('#loc_event_id', $form).change(function() {
     $.ajax({
       url: CRM.url('civicrm/ajax/locBlock', 'reset=1'),
-      type: 'POST',
       data: {'lbid': $(this).val()},
       dataType: 'json',
       success: function(data) {
         var selectLocBlockId = $('#loc_event_id').val();
+        // Only change state when options are loaded
+        if (data.address_1_state_province_id) {
+          var defaultState = data.address_1_state_province_id;
+          $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
+            $(this).val(defaultState).change();
+          });
+          delete data.address_1_state_province_id;
+        }
         for(i in data) {
           if ( i == 'count_loc_used' ) {
-            if ( ((selectLocBlockId == locBlockId) && data['count_loc_used'] > 1) ||
-                 ((selectLocBlockId != locBlockId) && data['count_loc_used'] > 0) ) {
-              displayMessage( true );
+            if ( ((selectLocBlockId == locBlockId) && data.count_loc_used > 1) ||
+                 ((selectLocBlockId != locBlockId) && data.count_loc_used > 0) ) {
+              displayMessage(data.count_loc_used);
             } else {
-              displayMessage( false );
+              displayMessage(0);
             }
           } else {
-            if (i == 'phone_1_phone_type_id' || i == 'phone_2_phone_type_id') {
-              $('#'+i).select2('val', data[i]);
-            }
-            else {
-              $('#'+i).val(data[i]);
-            }
+            $('#'+i, $form).val(data[i]).change();
           }
         }
       }
     });
     return false;
   });
+
+  function showLocFields(clear) {
+    var createNew = document.getElementsByName("location_option")[0].checked;
+    if (createNew) {
+      $('#existingLoc', $form).hide();
+      //clear all location fields values.
+      if (clear !== false) {
+        $(":input[id *= 'address_1_'], :input[id *= 'email_1_'], :input[id *= 'phone_1_']", $form).val("").change();
+        {/literal}{if $config->defaultContactCountry}
+          {if $config->defaultContactStateProvince}
+            // Set default state once options are loaded
+            var defaultState = {$config->defaultContactStateProvince}
+            {literal}
+              $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
+                $(this).val(defaultState).change();
+              });
+            {/literal}
+          {/if}
+          // Set default country
+          $('#address_1_country_id', $form).val({$config->defaultContactCountry}).change();
+        {/if}{literal}
+      }
+      displayMessage(0);
+    } else {
+      $('#existingLoc', $form).show();
+      if (clear !== false) {
+        $('#loc_event_id', $form).change();
+      }
+    }
+  }
+
+  $('input[name=location_option]').click(showLocFields);
+  showLocFields(false);
+
+  function displayMessage(count) {
+    if (count) {
+      var msg = {/literal}'{ts escape="js" 1="%1"}This location is used by %1 other events. Modifying location information will change values for all events.{/ts}'{literal};
+      $('#locUsedMsg', $form).text(ts(msg, {1: count})).addClass('status');
+    } else {
+      $('#locUsedMsg', $form).text(' ').removeClass('status');
+    }
+  }
 });
-
-function displayMessage( set ) {
-   CRM.$(function($) {
-     if ( set ) {
-       $('#locUsedMsg').html( locUsedMsgTxt ).addClass('status');
-     } else {
-       $('#locUsedMsg').html( ' ' ).removeClass('status');
-     }
-   });
-}
-
-function showLocFields( ) {
-   var createNew = document.getElementsByName("location_option")[0].checked;
-   var useExisting = document.getElementsByName("location_option")[1].checked;
-   if ( createNew ) {
-     cj('#existingLoc').hide();
-     //clear all location fields values.
-     cj("input[id *= 'address_1_']").val("");
-     cj("input[id *= 'email_1_']").val("");
-     cj("input[id *= 'phone_1_']").val("");
-     //reset country/state.
-     cj("select[id *= 'address_1_']").val("");
-     displayMessage(false);
-   } else if ( useExisting ) {
-     cj('#existingLoc').show();
-   }
-}
-
-showLocFields( );
 {/literal}
 </script>
 {/if}

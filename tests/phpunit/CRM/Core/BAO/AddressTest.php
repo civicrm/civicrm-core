@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -33,27 +33,16 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Core_BAO_AddressTest
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Address BAOs',
-      'description' => 'Test all Core_BAO_Address methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array('civicrm_contact', 'civicrm_address'));
   }
 
   /**
-   * create() method (create and update modes)
+   * Create() method (create and update modes)
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -73,7 +62,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     );
 
     $params['contact_id'] = $contactId;
-
 
     $fixAddress = TRUE;
 
@@ -102,7 +90,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     );
     $params['contact_id'] = $contactId;
 
-
     $block = CRM_Core_BAO_Address::create($params, $fixAddress, $entity = NULL);
 
     $cid = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
@@ -117,7 +104,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Add() method ( )
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -156,7 +143,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( )
    */
-  function testallAddress() {
+  public function testallAddress() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -214,7 +201,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( ) with null value
    */
-  function testnullallAddress() {
+  public function testnullallAddress() {
     $contactId = Contact::createIndividual();
 
     $fixParams = array(
@@ -250,9 +237,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method (get Address fields)
+   * GetValues() method (get Address fields)
    */
-  function testGetValues() {
+  public function testGetValues() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -290,9 +277,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * parseStreetAddress() method (get street address parsed)
+   * ParseStreetAddress() method (get street address parsed)
    */
-  function testParseStreetAddress() {
+  public function testParseStreetAddress() {
 
     // valid Street address to be parsed ( without locale )
     $street_address = "54A Excelsior Ave. Apt 1C";
@@ -303,8 +290,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // valid Street address to be parsed ( $locale = 'en_US' )
-    $street_address      = "54A Excelsior Ave. Apt 1C";
-    $locale              = 'en_US';
+    $street_address = "54A Excelsior Ave. Apt 1C";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Excelsior Ave.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1C');
@@ -312,8 +299,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // invalid Street address ( $locale = 'en_US' )
-    $street_address      = "West St. Apt 1";
-    $locale              = 'en_US';
+    $street_address = "West St. Apt 1";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'West St.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1');
@@ -321,8 +308,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
 
     // valid Street address to be parsed ( $locale = 'fr_CA' )
-    $street_address      = "2-123CA Main St";
-    $locale              = 'fr_CA';
+    $street_address = "2-123CA Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_unit'], '2');
@@ -330,14 +317,13 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'CA');
 
     // invalid Street address ( $locale = 'fr_CA' )
-    $street_address      = "123 Main St";
-    $locale              = 'fr_CA';
+    $street_address = "123 Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_number'], '123');
     $this->assertNotContains('street_unit', $parsedStreetAddress);
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
   }
+
 }
-
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -33,8 +33,6 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 /**
  * Page for displaying list of auctions
  */
@@ -44,7 +42,6 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 
@@ -58,7 +55,8 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * Get action Links
    *
    * @return array (reference) of action links
-   */ function &links() {
+   */
+  function &links() {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $disableExtra = ts('Are you sure you want to disable this Auction?');
@@ -118,8 +116,6 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -178,10 +174,7 @@ class CRM_Auction_Page_Manage extends CRM_Core_Page {
   /**
    * Browse all auctions
    *
-   *
    * @return void
-   * @access public
-   * @static
    */
   function browse() {
 
@@ -250,6 +243,9 @@ ORDER BY start_date desc
     $this->assign('rows', $auctions);
   }
 
+  /**
+   *
+   */
   function search() {
     $form = new CRM_Core_Controller_Simple('CRM_Auction_Form_SearchAuction',
       ts('Search Items'), CRM_Core_Action::ADD
@@ -261,7 +257,7 @@ ORDER BY start_date desc
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param $force
    *
@@ -352,4 +348,3 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 }
-

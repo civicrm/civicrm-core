@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,33 +49,29 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Delete Pledges'), 'done');
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -87,8 +83,11 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
       }
     }
 
-    $status = ts('Deleted Pledge(s): %1 (Total Selected: %2) ', array(1 => $deletedPledges, 2 => count($this->_pledgeIds)));
+    $status = ts('Deleted Pledge(s): %1 (Total Selected: %2) ', array(
+        1 => $deletedPledges,
+        2 => count($this->_pledgeIds),
+      ));
     CRM_Core_Session::setStatus($status, '', 'info');
   }
-}
 
+}

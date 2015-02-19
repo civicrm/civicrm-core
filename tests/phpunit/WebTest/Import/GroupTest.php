@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     *  Test contact import for Individuals.
-     */
-  function testIndividualImportWithGroup() {
+  /**
+   *  Test contact import for Individuals.
+   */
+  public function testIndividualImportWithGroup() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -64,8 +64,7 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Number Of Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
@@ -86,20 +85,18 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     // Select GroupName
     $this->select("group", "label={$groupName}");
 
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // To Check Imported Contacts
     $this->assertTrue($this->isTextPresent("{$count} Contacts"), "Contacts Not Found");
   }
 
-  /*
-     *  Helper function to provide data for contact import for Individuals.
-     */
   /**
+   * Helper function to provide data for contact import for Individuals.
+   *
    * @return array
    */
-  function _individualGroupCSVData() {
+  public function _individualGroupCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -114,7 +111,8 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -125,7 +123,8 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -139,5 +138,5 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
     );
     return array($headers, $rows);
   }
-}
 
+}

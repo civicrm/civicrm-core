@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,22 +34,15 @@
  */
 
 /**
- * Replace the value of an attribute in the input string. Assume
- * the the attribute is well formed, of the type name="value". If
- * no replacement is mentioned the value is inserted at the end of
- * the form element
+ * Replace a string with the first word in the string
  *
- * @param string $string the html to be tweaked with
+ * @param string $string
+ *   The html to be tweaked with.
  *
- * @internal param string $attribute the attribute to modify
- * @internal param string $value the new attribute value
- *
- * @return string        the new modified html string
- * @access public
+ * @return string
  */
 function smarty_modifier_crmFirstWord($string) {
   $string = trim($string);
   $words = explode(' ', $string);
   return $words[0];
 }
-

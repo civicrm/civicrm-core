@@ -50,8 +50,8 @@ Simple release test is located in scripts/release-testing/simpleupgradetest.sh
 Step by step description:
 * good idea to run-checks at the beginning to make sure all the stuff is set up correctly
 * first two lines: cleans up databases for upgrade testing installation and removes CiviCRM files (in case they weren't cleaned up from previous runs) for upgrade testing installation
-* installs start version (3.3.0 in above case) - 
-* upgrades 3.3.0 to 3.4.1 
+* installs start version (3.3.0 in above case) -
+* upgrades 3.3.0 to 3.4.1
 
 
 h3. Upgraded database schema verification
@@ -192,7 +192,7 @@ function run-checks {
         errecho "Tarball: \""$FILENAME"\" doesn't exist or is not readable."
         CHECKS=1
     fi
-    
+
     if [ $ACTION == "upgrade" ] && [ ! -r $FILENAME ] ; then
         errecho "Tarball: \""$FILENAME"\" doesn't exist or is not readable."
         CHECKS=1
@@ -251,7 +251,7 @@ function run-checks {
 
 function run-upgrade-scenario {
     upgecho "Running upgrade scenario tests."
-    echo "*** Take it away, Sebastian! "    
+    echo "*** Take it away, Sebastian! "
     echo
     cd $PHPUNITSCRIPTDIR
     $PHPUNITCOMMAND $PU_UPGRADETEST
@@ -260,16 +260,16 @@ function run-upgrade-scenario {
 
 function run-install-scenario {
     upgecho "Running install scenario tests."
-    echo "*** Take it away, Sebastian! "    
+    echo "*** Take it away, Sebastian! "
     echo
     cd $PHPUNITSCRIPTDIR
     $PHPUNITCOMMAND $PU_INSTALLTEST
-    echo   
+    echo
 }
 
 function run-tests {
     upgecho "Running post upgrade tests."
-    echo "*** Take it away, Sebastian! "    
+    echo "*** Take it away, Sebastian! "
     echo
     cd $PHPUNITSCRIPTDIR
     $PHPUNITCOMMAND $PU_SUITE
@@ -290,7 +290,7 @@ function remove-files {
 }
 
 function remove-settings {
-    upgecho "Removing civicrm.settings.php. ($SETTINGSDIR/civicrm.settings.php is gone!)"    
+    upgecho "Removing civicrm.settings.php. ($SETTINGSDIR/civicrm.settings.php is gone!)"
     rm -rf $SETTINGSDIR"/civicrm.settings.php"
 }
 
@@ -357,12 +357,12 @@ case $ACTION in
     ;;
 
     dumpschema-cividb)
-        run-checks 0    
+        run-checks 0
         dump-schema $FILENAME
     ;;
 
     tests)
-        run-checks 0    
+        run-checks 0
         run-tests
     ;;
 esac

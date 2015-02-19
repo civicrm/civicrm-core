@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactMemberAdd() {
+  public function testContactMemberAdd() {
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
@@ -158,7 +158,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
   }
 
-  function testMemberAddWithLifeTimeMembershipType() {
+  public function testMemberAddWithLifeTimeMembershipType() {
     $this->webtestLogin();
 
     // Create a membership type to use for this test (defaults for this helper function are rolling 1 year membership)
@@ -234,5 +234,5 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_MembershipView_cancel-bottom");
     $this->waitForElementPresent("mainTabContainer");
   }
-}
 
+}

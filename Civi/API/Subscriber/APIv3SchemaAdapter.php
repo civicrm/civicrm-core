@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -48,6 +49,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\PrepareEvent $event
+   *   API preparation event.
    *
    * @throws \API_Exception
    */
@@ -64,7 +66,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
       if (empty($apiRequest['params']['id'])) {
         $apiRequest['params'] = array_merge($this->getDefaults($apiRequest['fields']), $apiRequest['params']);
       }
-      //if 'id' is set then only 'version' will be checked but should still be checked for consistency
+      // Note: If 'id' is set then verify_mandatory will only check 'version'.
       civicrm_api3_verify_mandatory($apiRequest['params'], NULL, $this->getRequired($apiRequest['fields']));
     }
 
@@ -73,12 +75,14 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\Event $event
+   *   API preparation event.
    *
    * @throws \Exception
    */
   public function onApiPrepare_validate(\Civi\API\Event\Event $event) {
-     $apiRequest = $event->getApiRequest();
-    // Not sure why this is omitted for generic actions. It would make sense to omit 'getfields', but that's only one generic action.
+    $apiRequest = $event->getApiRequest();
+    // Not sure why this is omitted for generic actions. It would make sense
+    // to omit 'getfields', but that's only one generic action.
 
     if (isset($apiRequest['function']) && !$apiRequest['is_generic'] && isset($apiRequest['fields'])) {
       _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $apiRequest['fields']);
@@ -87,7 +91,9 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
   }
 
   /**
-   * Return array of defaults for the given API (function is a wrapper on getfields)
+   * Return array of defaults for the given API (function is a wrapper on getfields).
+   * @param $fields
+   * @return array
    */
   public function getDefaults($fields) {
     $defaults = array();
@@ -101,7 +107,9 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
   }
 
   /**
-   * Return array of required fields for the given API (function is a wrapper on getfields)
+   * Return array of required fields for the given API (function is a wrapper on getfields).
+   * @param $fields
+   * @return array
    */
   public function getRequired($fields) {
     $required = array('version');
@@ -113,4 +121,5 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
     }
     return $required;
   }
+
 }

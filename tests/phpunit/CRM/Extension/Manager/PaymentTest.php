@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -34,7 +34,8 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
-  function setUp() {
+
+  public function setUp() {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {
       test_extension_manager_paymenttest::$counts = array();
@@ -46,7 +47,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_payment_processor'));
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     $this->system = NULL;
     $this->quickCleanup(array('civicrm_payment_processor'));
@@ -54,9 +55,9 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
-  function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $manager->install(array('test.extension.manager.paymenttest'));
@@ -74,9 +75,9 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
-  function testInstallDisableEnable() {
+  public function testInstallDisableEnable() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -94,11 +95,12 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest" AND is_active = 1');
   }
+
   /**
    * Install an extension and create a payment processor which uses it.
    * Attempts to uninstall fail
    */
-  function testInstall_Add_FailUninstall() {
+  public function testInstall_Add_FailUninstall() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -121,7 +123,8 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     try {
       $manager->uninstall(array('test.extension.manager.paymenttest'));
       $this->fail('Failed to catch expected exception');
-    } catch (CRM_Extension_Exception_DependencyException $e) {
+    }
+    catch (CRM_Extension_Exception_DependencyException $e) {
     }
     $this->assertEquals(0, test_extension_manager_paymenttest::$counts['uninstall']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
@@ -133,4 +136,5 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, test_extension_manager_paymenttest::$counts['uninstall']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
   }
+
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,12 +35,9 @@
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
-   * This function is called when action is browse
-   *
-   * return null
-   * @access public
+   * called when action is browse.
    */
-  function listContribution() {
+  public function listContribution() {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contribute_Form_Search',
       ts('Contributions'),
@@ -66,10 +63,9 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       $this->assign('honor', TRUE);
     }
 
-
-    $recur             = new CRM_Contribute_DAO_ContributionRecur();
+    $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->contact_id = $this->_contactId;
-    $recur->is_test    = 0;
+    $recur->is_test = 0;
     $recur->find();
 
     $config = CRM_Core_Config::singleton();
@@ -145,15 +141,15 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
   }
 
   /**
-   * This function is the main function that is called when the page
+   * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
-   *
-   * return null
-   * @access public
    */
-  function run() {
+  public function run() {
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $this->assign('invoicing', $invoicing);
     parent::preProcess();
     $this->listContribution();
   }
-}
 
+}

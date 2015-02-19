@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Provider;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -51,14 +52,14 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   private $cache;
 
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->cache = array();
   }
 
   /**
    * @param \Civi\API\Event\ResolveEvent $event
+   *   API resolution event.
    */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -73,6 +74,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param array $apiRequest
+   * @return array
    */
   public function invoke($apiRequest) {
     $function = $apiRequest['function'];
@@ -90,14 +93,17 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @return array
    */
-  function getEntityNames($version) {
+  public function getEntityNames($version) {
     $entities = array();
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     #$include_dirs = array(dirname(__FILE__). '/../../');
     foreach ($include_dirs as $include_dir) {
-      $api_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', 'v' . $version));
-      if (! is_dir($api_dir)) {
+      $api_dir = implode(DIRECTORY_SEPARATOR,
+        array($include_dir, 'api', 'v' . $version));
+      if (!is_dir($api_dir)) {
         continue;
       }
       $iterator = new \DirectoryIterator($api_dir);
@@ -106,12 +112,12 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
         // Check for entities with a master file ("api/v3/MyEntity.php")
         $parts = explode(".", $file);
-        if (end($parts) == "php" && $file != "utils.php" && !preg_match('/Tests?.php$/', $file) ) {
+        if (end($parts) == "php" && $file != "utils.php" && !preg_match('/Tests?.php$/', $file)) {
           // without the ".php"
           $entities[] = substr($file, 0, -4);
         }
 
-        // Check for entities with standalone action files ("api/v3/MyEntity/MyAction.php")
+        // Check for entities with standalone action files (eg "api/v3/MyEntity/MyAction.php").
         $action_dir = $api_dir . DIRECTORY_SEPARATOR . $file;
         if (preg_match('/^[A-Z][A-Za-z0-9]*$/', $file) && is_dir($action_dir)) {
           if (count(glob("$action_dir/[A-Z]*.php")) > 0) {
@@ -129,8 +135,12 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @param string $entity
+   * @return array
    */
   public function getActionNames($version, $entity) {
+    $entity = _civicrm_api_get_camel_name($entity);
     $entities = $this->getEntityNames($version);
     if (!in_array($entity, $entities)) {
       return array();
@@ -153,17 +163,19 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * Look up the implementation for a given API request
+   * Look up the implementation for a given API request.
    *
-   * @param $apiRequest array with keys:
-   *  - entity: string, required
-   *  - action: string, required
-   *  - params: array
-   *  - version: scalar, required
+   * @param array $apiRequest
+   *   Array with keys:
+   *   - entity: string, required.
+   *   - action: string, required.
+   *   - params: array.
+   *   - version: scalar, required.
    *
-   * @return array with keys
-   *  - function: callback (mixed)
-   *  - is_generic: boolean
+   * @return array
+   *   Array with keys:
+   *   - function: callback (mixed)
+   *   - is_generic: boolean
    */
   protected function resolve($apiRequest) {
     $cachekey = strtolower($apiRequest['entity']) . ':' . strtolower($apiRequest['action']) . ':' . $apiRequest['version'];
@@ -178,13 +190,15 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     $stdFunction = $this->getFunctionName($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']);
     if (function_exists($stdFunction)) {
       // someone already loaded the appropriate file
-      // FIXME: This has the affect of masking bugs in load order; this is included to provide bug-compatibility
+      // FIXME: This has the affect of masking bugs in load order; this is
+      // included to provide bug-compatibility.
       $this->cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
       return $this->cache[$cachekey];
     }
 
     $stdFiles = array(
-      // By convention, the $camelName.php is more likely to contain the function, so test it first
+      // By convention, the $camelName.php is more likely to contain the
+      // function, so test it first
       'api/v' . $apiRequest['version'] . '/' . $camelName . '.php',
       'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
     );
@@ -203,7 +217,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     # $genericFunction = 'civicrm_api3_generic_' . $apiRequest['action'];
     $genericFunction = $this->getFunctionName('generic', $apiRequest['action'], $apiRequest['version']);
     $genericFiles = array(
-      // By convention, the Generic.php is more likely to contain the function, so test it first
+      // By convention, the Generic.php is more likely to contain the
+      // function, so test it first
       'api/v' . $apiRequest['version'] . '/Generic.php',
       'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
     );
@@ -222,9 +237,14 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
+   * Determine the function name for a given API request.
+   *
    * @param string $entity
+   *   API entity name.
    * @param string $action
-   * @param $version
+   *   API action name.
+   * @param int $version
+   *   API version.
    *
    * @return string
    */
@@ -240,9 +260,9 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    * only appropriate when introspection is really required (eg for "getActions").
    *
    * @param string $entity
+   *   API entity name.
    * @param int $version
-   *
-   * @return void
+   *   API version.
    */
   protected function loadEntity($entity, $version) {
     $camelName = _civicrm_api_get_camel_name($entity, $version);
@@ -257,22 +277,25 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     $loaded_files = array(); // array($relativeFilePath => TRUE)
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     foreach ($include_dirs as $include_dir) {
-      $action_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', "v${version}", $camelName));
-      if (!is_dir($action_dir)) {
-        continue;
-      }
-
-      $iterator = new \DirectoryIterator($action_dir);
-      foreach ($iterator as $fileinfo) {
-        $file = $fileinfo->getFilename();
-        if (array_key_exists($file, $loaded_files)) {
-          continue; // action provided by an earlier item on include_path
+      foreach (array($camelName, 'Generic') as $name) {
+        $action_dir = implode(DIRECTORY_SEPARATOR,
+          array($include_dir, 'api', "v${version}", $name));
+        if (!is_dir($action_dir)) {
+          continue;
         }
 
-        $parts = explode(".", $file);
-        if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file)) {
-          require_once $action_dir . DIRECTORY_SEPARATOR . $file;
-          $loaded_files[$file] = TRUE;
+        $iterator = new \DirectoryIterator($action_dir);
+        foreach ($iterator as $fileinfo) {
+          $file = $fileinfo->getFilename();
+          if (array_key_exists($file, $loaded_files)) {
+            continue; // action provided by an earlier item on include_path
+          }
+
+          $parts = explode(".", $file);
+          if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file)) {
+            require_once $action_dir . DIRECTORY_SEPARATOR . $file;
+            $loaded_files[$file] = TRUE;
+          }
         }
       }
     }

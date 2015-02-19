@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -65,6 +65,10 @@
                 <td>{$form.pay_later_receipt.html|crmAddClass:big}<br />
                   <span class="description">{ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}</span></td></tr>
 
+                <tr><th scope="row" class="label">{$form.is_billing_required.label}</th>
+                <td>{$form.is_billing_required.html}<br />
+                    <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+                </td></tr>
             </table>
             </td>
         </tr>
@@ -138,15 +142,15 @@
                     </tr>
                     <tr class="crm-contribution-form-block-initial_reminder_day"><th scope="row" class="label">{$form.initial_reminder_day.label}</th>
                         <td>{$form.initial_reminder_day.html}
-                            <span class="label">{ts}days prior to each scheduled payment due date.{/ts}</span></td>
+                            <span class="label">{ts}Days prior to each scheduled payment due date.{/ts}</span></td>
                     </tr>
                     <tr class="crm-contribution-form-block-max_reminders"><th scope="row" class="label">{$form.max_reminders.label}</th>
                         <td>{$form.max_reminders.html}
-                            <span class="label">{ts}reminders for each scheduled payment.{/ts}</span></td>
+                            <span class="label">{ts}Reminders for each scheduled payment.{/ts}</span></td>
                     </tr>
                     <tr class="crm-contribution-form-block-additional_reminder_day"><th scope="row" class="label">{$form.additional_reminder_day.label}</th>
                         <td>{$form.additional_reminder_day.html}
-                            <span class="label">{ts}days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
+                            <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
                 </table>
                 </td>

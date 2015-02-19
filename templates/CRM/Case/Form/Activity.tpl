@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -82,7 +82,7 @@
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label font-size12pt">{ts}Client{/ts}</td>
-                  <td class="view-value">	
+                  <td class="view-value">
                     <span class="font-size12pt">
                       {foreach from=$client_names item=client name=clients key=id}
                         {foreach from=$client_names.$id item=client1}
@@ -100,7 +100,7 @@
                 </tr>
 
                 {if $action eq 1 or $action eq 2}
-                  <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
+                  <tr class="crm-case-activity-form-block-target_contact_id hiddenElement" id="with-contacts-widget">
                     <td class="label font-size10pt">{ts}With Contact{/ts}</td>
                     <td class="view-value">
                       {$form.target_contact_id.html}
@@ -128,7 +128,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>
@@ -245,7 +245,7 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
-	    <tr>
+      <tr>
               <td class="label">
                 {$form.followup_assignee_contact_id.label}
                 {edit}

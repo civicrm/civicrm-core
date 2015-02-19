@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,22 +39,21 @@
 class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
-   * custom group id
+   * Custom group id.
    *
    * @int
-   * @access public
    */
   public $_groupID;
 
   /**
-   * entity type of the table id
+   * Entity type of the table id.
    *
    * @var string
    */
   protected $_entityType;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -64,15 +63,14 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', $this, FALSE, 1, $_REQUEST);
     $cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1, $_REQUEST);
     $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
-    CRM_Custom_Form_CustomData::preProcess($this, null, $subType, $cgcount,
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, $cgcount,
       $this->_contactType, $this->_contactId);
   }
 
   /**
-   * build the form elements for custom data
+   * Build the form object elements for custom data.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -80,20 +78,18 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     return CRM_Custom_Form_CustomData::setDefaultValues($this);
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // Process / save custom data
@@ -106,9 +102,12 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $this->_entityType
     );
 
+    $this->log();
+
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
 
     $this->response();
   }
+
 }

@@ -6,7 +6,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_InnoDBIndexerTest
  */
 class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
-  function tearDown() {
+  public function tearDown() {
     // May or may not cleanup well if there's a bug in the indexer.
     // This is better than nothing -- and better than duplicating the
     // cleanup logic.
@@ -16,11 +16,11 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  function testHasDeclaredIndex() {
+  public function testHasDeclaredIndex() {
     $idx = new CRM_Core_InnoDBIndexer(TRUE, array(
       'civicrm_contact' => array(
         array('first_name', 'last_name'),
-        array('foo')
+        array('foo'),
       ),
       'civicrm_email' => array(
         array('whiz'),
@@ -42,7 +42,7 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   /**
    * When disabled, there is no FTS index, so queries that rely on FTS index fail.
    */
-  function testDisabled() {
+  public function testDisabled() {
     $idx = new CRM_Core_InnoDBIndexer(FALSE, array(
       'civicrm_contact' => array(
         array('first_name', 'last_name'),
@@ -53,7 +53,8 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     try {
       CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_contact WHERE MATCH(first_name,last_name) AGAINST ("joe")');
       $this->fail("Missed expected exception");
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $this->assertTrue(TRUE, 'Received expected exception');
     }
   }
@@ -61,7 +62,7 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   /**
    * When enabled, the FTS index is created, so queries that rely on FTS work.
    */
-  function testEnabled() {
+  public function testEnabled() {
     if (!$this->supportsFts()) {
       $this->markTestSkipped("Local installation of InnoDB does not support FTS.");
       return;
@@ -77,7 +78,11 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_contact WHERE MATCH(first_name,last_name) AGAINST ("joe")');
   }
 
-  function supportsFts() {
+  /**
+   * @return mixed
+   */
+  public function supportsFts() {
     return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.6.0', '>=');
   }
+
 }

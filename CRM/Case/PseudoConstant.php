@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,55 +40,49 @@
 class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * case statues
+   * Case statues
    * @var array
-   * @static
    */
   static $caseStatus = array();
 
   /**
-   * redaction rules
+   * Redaction rules
    * @var array
-   * @static
    */
   static $redactionRule;
 
   /**
-   * case type
+   * Case type
    * @var array
-   * @static
    */
   static $caseType = array();
 
   /**
    * Encounter Medium
    * @var array
-   * @static
    */
   static $encounterMedium = array();
 
   /**
-   * activity type
+   * Activity type
    * @var array
-   * @static
    */
   static $activityTypeList = array();
 
   /**
-   * Get all the case statues
+   * Get all the case statues.
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
    * @param null $condition
    * @param bool $fresh
    *
-   * @return array - array reference of all case statues
-   * @static
+   * @return array
+   *   array reference of all case statues
    */
   public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
+    $cacheKey = "{$column}_" . (int) $onlyActive;
     if (!$condition) {
       $condition = 'AND filter = 0';
     }
@@ -104,16 +98,14 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the redaction rules
+   * Get all the redaction rules.
    *
-   * @access public
    *
    * @param null $filter
    *
-   * @return array - array reference of all redaction rules
-   * @static
+   * @return array
+   *   array reference of all redaction rules
    */
-
   public static function redactionRule($filter = NULL) {
     // if ( ! self::$redactionRule ) {
     self::$redactionRule = array();
@@ -134,20 +126,20 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the case type
+   * Get all the case type.
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
    *
-   * @return array - array reference of all case type
-   * @static
+   * @return array
+   *   array reference of all case type
    */
   public static function caseType($column = 'title', $onlyActive = TRUE) {
     if ($onlyActive) {
       $condition = " is_active = 1 ";
-    } else {
+    }
+    else {
       $condition = NULL;
     }
     $caseType = NULL;
@@ -167,18 +159,17 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Encounter Medium
+   * Get all the Encounter Medium.
    *
-   * @access public
    *
    * @param string $column
    * @param bool $onlyActive
    *
-   * @return array - array reference of all Encounter Medium.
-   * @static
+   * @return array
+   *   array reference of all Encounter Medium.
    */
   public static function encounterMedium($column = 'label', $onlyActive = TRUE) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
+    $cacheKey = "{$column}_" . (int) $onlyActive;
     if (!isset(self::$encounterMedium[$cacheKey])) {
       self::$encounterMedium[$cacheKey] = CRM_Core_OptionGroup::values('encounter_medium',
         FALSE, FALSE, FALSE, NULL,
@@ -190,19 +181,19 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all Activty types for the CiviCase component
+   * Get all Activity types for the CiviCase component.
    *
    * The static array activityType is returned
    *
-   * @param boolean $indexName - true return activity name in array
-   * key else activity id as array key.
+   * @param bool $indexName
+   *   True return activity name in array.
+   *   key else activity id as array key.
    *
    * @param bool $all
    *
-   * @access public
-   * @static
    *
-   * @return array - array reference of all activity types.
+   * @return array
+   *   array reference of all activity types.
    */
   public static function &caseActivityType($indexName = TRUE, $all = FALSE) {
     $cache = (int) $indexName . '_' . (int) $all;
@@ -254,15 +245,13 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }
-}
 
+}

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,23 +26,21 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group nesting functions
+ * This api exposes CiviCRM group nesting.
+ *
+ * This defines parent/child relationships between nested groups.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Group
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: GroupNesting.php 21624 2009-08-07 22:02:55Z wmorgan $
- *
  */
 
 /**
  * Provides group nesting record(s) given parent and/or child id.
  *
- * @param array $params  an array containing at least child_group_id or parent_group_id
- * {@getfields GroupNesting_get}
+ * @param array $params
+ *   An array containing at least child_group_id or parent_group_id.
  *
- * @return  array  list of group nesting records
+ * @return array
+ *   list of group nesting records
  */
 function civicrm_api3_group_nesting_get($params) {
 
@@ -52,12 +49,14 @@ function civicrm_api3_group_nesting_get($params) {
 
 /**
  * Creates group nesting record for given parent and child id.
+ *
  * Parent and child groups need to exist.
  *
- * @param array $params parameters array - allowed array keys include:
+ * @param array $params
+ *   Parameters array - allowed array keys include:.
  *
- * @return array TBD
- * {@getfields GroupNesting_create
+ * @return array
+ *   TBD
  * @todo Work out the return value.
  */
 function civicrm_api3_group_nesting_create($params) {
@@ -70,10 +69,12 @@ function civicrm_api3_group_nesting_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_group_nesting_create_spec(&$params) {
   $params['child_group_id']['api.required'] = 1;
@@ -83,10 +84,10 @@ function _civicrm_api3_group_nesting_create_spec(&$params) {
 /**
  * Removes specific nesting records.
  *
- * @param array $params parameters array - allowed array keys include:
- * {@getfields GroupNesting_delete}
+ * @param array $params
  *
- * @return array API Success or fail array
+ * @return array
+ *   API Success or fail array
  *
  * @todo Work out the return value.
  */
@@ -94,4 +95,3 @@ function civicrm_api3_group_nesting_delete($params) {
 
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

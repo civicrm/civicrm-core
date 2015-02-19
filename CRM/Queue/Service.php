@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The queue service provides an interface for creating or locating
@@ -51,17 +51,18 @@
  */
 class CRM_Queue_Service {
 
-  static $_singleton;
+  protected static $_singleton;
 
   /**
    * FIXME: Singleton pattern should be removed when dependency-injection
    * becomes available.
    *
-   * @param $forceNew bool
+   * @param bool $forceNew
+   *   TRUE if a new instance must be created.
    *
    * @return \CRM_Queue_Service
    */
-  static function &singleton($forceNew = FALSE) {
+  public static function &singleton($forceNew = FALSE) {
     if ($forceNew || !self::$_singleton) {
       self::$_singleton = new CRM_Queue_Service();
     }
@@ -69,28 +70,31 @@ class CRM_Queue_Service {
   }
 
   /**
-   * @var array(queueName => CRM_Queue_Queue)
+   * @var array (string $queueName => CRM_Queue_Queue)
    */
-  var $queues;
+  public $queues;
 
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->queues = array();
   }
 
   /**
+   * Create a queue. If one already exists, then it will be reused.
    *
-   * @param $queueSpec, array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
+   * @param array $queueSpec
+   *   Array with keys:
+   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
+   *    "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
-   *   - reset: bool, optional; if a queue is found, then it should be flushed; default to TRUE
-   *   - (additional keys depending on the queue provider)
+   *   - reset: bool, optional; if a queue is found, then it should be
+   *     flushed; default to TRUE
+   *   - (additional keys depending on the queue provider).
    *
    * @return CRM_Queue_Queue
    */
-  function create($queueSpec) {
+  public function create($queueSpec) {
     if (@is_object($this->queues[$queueSpec['name']]) && empty($queueSpec['reset'])) {
       return $this->queues[$queueSpec['name']];
     }
@@ -112,15 +116,18 @@ class CRM_Queue_Service {
   }
 
   /**
+   * Look up an existing queue.
    *
-   * @param $queueSpec, array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
+   * @param array $queueSpec
+   *   Array with keys:
+   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
+   *     "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
-   *   - (additional keys depending on the queue provider)
+   *   - (additional keys depending on the queue provider).
    *
    * @return CRM_Queue_Queue
    */
-  function load($queueSpec) {
+  public function load($queueSpec) {
     if (is_object($this->queues[$queueSpec['name']])) {
       return $this->queues[$queueSpec['name']];
     }
@@ -131,11 +138,13 @@ class CRM_Queue_Service {
   }
 
   /**
-   * Convert a queue "type" name to a class name
+   * Convert a queue "type" name to a class name.
    *
-   * @param $type string, e.g. "interactive", "immediate", "stomp", "beanstalk"
+   * @param string $type
+   *   E.g. "interactive", "immediate", "stomp", "beanstalk".
    *
-   * @return string, class-name
+   * @return string
+   *   Class-name
    */
   protected function getQueueClass($type) {
     $type = preg_replace('/[^a-zA-Z0-9]/', '', $type);
@@ -149,8 +158,8 @@ class CRM_Queue_Service {
   }
 
   /**
-   *
-   * @param $queueSpec array, see create()
+   * @param array $queueSpec
+   *   See create().
    *
    * @return CRM_Queue_Queue
    */
@@ -159,5 +168,5 @@ class CRM_Queue_Service {
     $class = new ReflectionClass($this->getQueueClass($queueSpec['type']));
     return $class->newInstance($queueSpec);
   }
-}
 
+}

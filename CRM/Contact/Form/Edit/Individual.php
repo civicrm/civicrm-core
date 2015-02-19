@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -44,17 +44,18 @@ class CRM_Contact_Form_Edit_Individual {
    * This function provides the HTML form elements that are specific
    * to the Individual Contact Type
    *
-   * @param CRM_Core_Form $form form object
-   * @param int $inlineEditMode ( 1 for contact summary
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param int $inlineEditMode
+   *   ( 1 for contact summary.
    * top bar form and 2 for display name edit )
    *
-   * @access public
    * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
     $form->applyFilter('__ALL__', 'trim');
 
-    if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+    if (!$inlineEditMode || $inlineEditMode == 1) {
       $nameFields = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_edit_options', TRUE, NULL,
         FALSE, 'name', TRUE, 'AND v.filter = 2'
@@ -94,7 +95,7 @@ class CRM_Contact_Form_Edit_Individual {
       }
     }
 
-    if ( !$inlineEditMode || $inlineEditMode == 2 ) {
+    if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addElement('text', 'nick_name', ts('Nickname'),
         CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'nick_name')
@@ -115,14 +116,14 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 
-    if ( !$inlineEditMode ) {
+    if (!$inlineEditMode) {
       $checkSimilar = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_ajax_check_similar',
         NULL,
         TRUE
       );
 
-      if ( $checkSimilar == null ) {
+      if ($checkSimilar == NULL) {
         $checkSimilar = 0;
       }
       $form->assign('checkSimilar', $checkSimilar);
@@ -143,19 +144,18 @@ class CRM_Contact_Form_Edit_Individual {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
-   * @param null $contactID
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param int $contactID
    *
-   * @internal param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool
+   *   TRUE if no errors, else array of errors.
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
 
@@ -169,5 +169,5 @@ class CRM_Contact_Form_Edit_Individual {
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

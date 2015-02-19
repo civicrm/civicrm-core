@@ -14,12 +14,11 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $cases[] = array('method', 'CRM_Contact_Page_AJAX', TRUE, 'getAddressDisplay');
     $cases[] = array('method', 'CRM_Foo_Page_AJAX', FALSE, 'method(');
     $cases[] = array('method', 'CRM_Foo_Page_AJAX', FALSE, 'method()');
-    $cases[] = array('method', 'othermethod;CRM_Foo_Page_AJAX', FALSE,'method');
-    $cases[] = array('method', 'CRM_Foo_Page_AJAX;othermethod', FALSE,'method');
+    $cases[] = array('method', 'othermethod;CRM_Foo_Page_AJAX', FALSE, 'method');
+    $cases[] = array('method', 'CRM_Foo_Page_AJAX;othermethod', FALSE, 'method');
     $cases[] = array('method', 'CRM_Foo_Page_Inline_Bar', FALSE, '');
     $cases[] = array('method', 'CRM_Foo_Page_Inline_Bar', FALSE, 'method');
     $cases[] = array('method', 'CRM_Foo->method', FALSE);
-
 
     $cases[] = array('page', 'CRM_Foo', FALSE);
     $cases[] = array('page', 'CRM_Foo_Bar', FALSE);
@@ -62,4 +61,5 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

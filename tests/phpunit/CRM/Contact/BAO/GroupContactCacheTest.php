@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,14 +32,14 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
   /**
-   * Manually add and remove contacts from a smart group
+   * Manually add and remove contacts from a smart group.
    */
-  function testManualAddRemove() {
+  public function testManualAddRemove() {
     // Create smart group $g
     $params = array(
       'name' => 'Deceased Contacts',
@@ -86,7 +86,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
-      array(/* deceased[0], */ $deceased[1]->id, $deceased[2]->id, $living[0]->id),
+      array(/* deceased[0], */
+        $deceased[1]->id,
+        $deceased[2]->id,
+        $living[0]->id,
+      ),
       $group->id
     );
   }
@@ -95,7 +99,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Allow removing contact from a parent group even if contact is in
    * a child group. (CRM-8858)
    */
-  function testRemoveFromParentSmartGroup() {
+  public function testRemoveFromParentSmartGroup() {
     // Create smart group $parent
     $params = array(
       'name' => 'Deceased Contacts',
@@ -146,7 +150,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     // Assert $c1 not in $parent
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
-      array( /* deceased[0], */ $deceased[1]->id, $deceased[2]->id),
+      array(/* deceased[0], */
+        $deceased[1]->id,
+        $deceased[2]->id,
+      ),
       $parent->id
     );
 
@@ -162,12 +169,13 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
-   * Assert that the cache for a group contains exactly the listed contacts
+   * Assert that the cache for a group contains exactly the listed contacts.
    *
-   * @param $expectedContactIds array(int)
-   * @param $groupId int
+   * @param array $expectedContactIds
+   *   Array(int).
+   * @param int $groupId
    */
-  function assertCacheMatches($expectedContactIds, $groupId) {
+  public function assertCacheMatches($expectedContactIds, $groupId) {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
     $params = array(1 => array($groupId, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -191,8 +199,6 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     $this->_testObjects = array();
@@ -202,8 +208,6 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
   protected function tearDown() {
     parent::tearDown();
@@ -215,22 +219,27 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * created entities and provides for brainless clenaup.
    *
    * @see CRM_Core_DAO::createTestObject
+   * @param $daoName
+   * @param array $params
+   * @param int $numObjects
+   * @param bool $createOnly
    */
-  function createTestObject($daoName, $params = array(
-    ), $numObjects = 1, $createOnly = FALSE) {
+  public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);
-    } else {
+    }
+    else {
       $this->registerTestObjects(array($objects));
     }
     return $objects;
   }
 
   /**
-   * @param $objects array(object) DAO or BAO objects
+   * @param array $objects
+   *   DAO or BAO objects.
    */
-  function registerTestObjects($objects) {
+  public function registerTestObjects($objects) {
     //if (is_object($objects)) {
     //  $objects = array($objects);
     //}
@@ -240,7 +249,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     }
   }
 
-  function deleteTestObjects() {
+  public function deleteTestObjects() {
     // Note: You might argue that the FK relations between test
     // objects could make this problematic; however, it should
     // behave intuitively as long as we mentally split our

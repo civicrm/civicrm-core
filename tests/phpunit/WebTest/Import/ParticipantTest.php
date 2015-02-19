@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
-     *  Test participant import for Individuals.
-     */
-  function testParticipantImportIndividual() {
+  /**
+   *  Test participant import for Individuals.
+   */
+  public function testParticipantImportIndividual() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -56,10 +56,10 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Event', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Organizations.
-     */
-  function testParticipantImportOrganization() {
+  /**
+   *  Test participant import for Organizations.
+   */
+  public function testParticipantImportOrganization() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -77,10 +77,10 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Event', $headers, $rows, 'Organization', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Households.
-     */
-  function testParticipantImportHousehold() {
+  /**
+   *  Test participant import for Households.
+   */
+  public function testParticipantImportHousehold() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -98,13 +98,12 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Event', $headers, $rows, 'Household', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Helper function to provide data for participant import for Individuals.
-     */
   /**
+   * Helper function to provide data for participant import for Individuals.
+   *
    * @return array
    */
-  function _participantIndividualCSVData() {
+  public function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -146,13 +145,12 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
-     *  Helper function to provide data for participant import for Household.
-     */
   /**
+   * Helper function to provide data for participant import for Household.
+   *
    * @return array
    */
-  function _participantHouseholdCSVData() {
+  public function _participantHouseholdCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
@@ -192,13 +190,11 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
-     *  Helper function to provide data for participant import for Organization.
-     */
   /**
+   * Helper function to provide data for participant import for Organization.
    * @return array
    */
-  function _participantOrganizationCSVData() {
+  public function _participantOrganizationCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
@@ -238,25 +234,21 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
-     * Helper function to add new event
-     *
-     * @params array $params parameters to create an event
-     *
-     * @return array $params event details of newly created event
-     */
   /**
+   * Helper function to add new event.
+   *
    * @param array $params
+   *   Parameters to create an event.
    *
    * @return array
+   *   event details of newly created event
    */
-  function _addNewEvent($params = array(
-    )) {
+  public function _addNewEvent($params = array()) {
 
     if (empty($params)) {
 
-      // We need a payment processor
-      $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+      // Use default payment processor
+      $processorName = 'Test Processor';
       $this->webtestAddPaymentProcessor($processorName);
 
       // create an event
@@ -267,8 +259,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
         'event_type_id' => 4,
         'payment_processor' => $processorName,
         'fee_level' => array(
-        'Member' => "250.00",
-        'Non-Member' => "325.00",
+          'Member' => "250.00",
+          'Non-Member' => "325.00",
         ),
       );
     }
@@ -345,5 +337,5 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     return $params;
   }
-}
 
+}

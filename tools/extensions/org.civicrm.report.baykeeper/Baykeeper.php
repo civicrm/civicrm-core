@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -336,7 +336,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
                         } else {
                             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
                         }
-						*/
+            */
 
 
             // only include statistics columns if set
@@ -411,9 +411,9 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
               $contribJoin JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
                       ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id
-			  LEFT JOIN  civicrm_note {$this->_aliases['civicrm_note']}
+        LEFT JOIN  civicrm_note {$this->_aliases['civicrm_note']}
                       ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_note']}.contact_id AND
-						  {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )
+              {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )
               LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
                       ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1)
@@ -426,9 +426,9 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
               LEFT  JOIN civicrm_contact {$alias_creditor}
                          ON {$this->_aliases['civicrm_contribution_soft']}.contact_id =
                             {$alias_creditor}.id
-			  LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_hon_mem']}
-			  			 ON {$this->_aliases['civicrm_contribution']}.honor_contact_id = {$this->_aliases['civicrm_contact_hon_mem']}.id
-						 ";
+        LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_hon_mem']}
+               ON {$this->_aliases['civicrm_contribution']}.honor_contact_id = {$this->_aliases['civicrm_contact_hon_mem']}.id
+             ";
     // add group - concatenated
     $this->_from .= " LEFT JOIN civicrm_group_contact gc ON {$this->_aliases['civicrm_contact']}.id = gc.contact_id  AND gc.status = 'Added'
                       LEFT JOIN civicrm_group {$this->_aliases['civicrm_group_field']} ON {$this->_aliases['civicrm_group_field']}.id = gc.group_id ";
@@ -482,13 +482,13 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
 
       /*
-			$statistics['counts']['amount']    = array( 'value' => $dao->amount,
+      $statistics['counts']['amount']    = array( 'value' => $dao->amount,
                                                         'title' => 'Total Amount',
                                                         'type'  => CRM_Utils_Type::T_MONEY );
             $statistics['counts']['avg']       = array( 'value' => $dao->avg,
                                                         'title' => 'Average',
                                                         'type'  => CRM_Utils_Type::T_MONEY );
-			*/
+      */
     }
 
     return $statistics;

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomAdd() {
+  public function testCustomAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/custom/group", "action=add&reset=1");
@@ -51,15 +51,18 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->click("//option[@value='Contact']");
     $this->click("//form[@id='Group']/div[2]/div[3]/span[1]/input");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('newCustomField');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '$customGroupTitle' has been added. You can add custom fields now.");
+
     //add custom field - alphanumeric text
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $textFieldLabel = 'test_text_field' . substr(sha1(rand()), 0, 3);
     $this->click("header");
     $this->type("label", $textFieldLabel);
     $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=0");
     $this->click("//option[@value='0']");
@@ -98,7 +101,7 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
 
     //clicking save
     $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     //create another custom field - Number Radio
     $this->click("data_type[0]");
@@ -130,8 +133,8 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_done-bottom");
+    $this->waitForElementPresent('newCustomField');
 
     //On New Individual contact form
     $this->openCiviPage("contact/add", "ct=Individual&reset=1");
@@ -190,5 +193,5 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('customData', $radioOptionLabel1);
     $this->assertElementContainsText('customData', $radioOptionLabel2);
   }
-}
 
+}

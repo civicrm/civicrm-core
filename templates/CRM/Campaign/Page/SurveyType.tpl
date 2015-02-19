@@ -4,14 +4,13 @@
 {else}
 {if $rows}
 <div class="action-link">
-  <a href="{$addSurveyType}" class="button"><span><div class="icon add-icon"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+  <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
 </div>
 
 <div id={$gName}>
         {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
         <table class="row-highlight">
          <thead>
          <tr>
@@ -42,7 +41,7 @@
         </table>
         {/strip}
         <div class="action-link">
-          <a href="{$addSurveyType}" class="button"><span><div class="icon add-icon"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+          <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
         </div>
 
 </div>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -60,7 +60,7 @@
       <tr class="crm-membership-type-form-block-minimum_fee">
         <td class="label">{$form.minimum_fee.label}</td>
         <td>{$form.minimum_fee.html|crmMoney}<br />
-          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0).{/ts}</span>
+          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0). NOTE: When using CiviCRM to process sales taxes this should be the tax exclusive amount.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-financial_type_id">

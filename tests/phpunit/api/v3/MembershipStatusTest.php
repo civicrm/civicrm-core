@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -37,20 +37,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_membershipStatusID;
 
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipStatus Calc',
-      'description' => 'Test all MembershipStatus Calc API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
@@ -60,7 +49,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->membershipStatusDelete($this->_membershipStatusID);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
     $this->contactDelete($this->_contactID);
@@ -70,9 +59,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
 
   /**
-   *  Test civicrm_membership_status_get with empty params
+   * Test civicrm_membership_status_get with empty params.
    */
-  function testGetEmptyParams() {
+  public function testGetEmptyParams() {
     $result = $this->callAPISuccess('membership_status', 'get', array());
     // It should be 8 statuses, 7 default from mysql_data
     // plus one test status added in setUp
@@ -80,9 +69,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_membership_status_get. Success expected.
+   * Test civicrm_membership_status_get. Success expected.
    */
-  function testGet() {
+  public function testGet() {
     $params = array(
       'name' => 'test status',
     );
@@ -91,9 +80,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_membership_status_get. Success expected.
+   * Test civicrm_membership_status_get. Success expected.
    */
-  function testGetLimit() {
+  public function testGetLimit() {
     $result = $this->callAPISuccess('membership_status', 'get', array());
     $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['option.limit'] = 1;
@@ -101,7 +90,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], "Check only 1 retrieved " . __LINE__);
   }
 
-  function testCreateDuplicateName() {
+  public function testCreateDuplicateName() {
     $params = array('name' => 'name');
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $result = $this->callAPIFailure('membership_status', 'create', $params,
@@ -109,12 +98,12 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     );
   }
 
-  function testCreateWithMissingRequired() {
+  public function testCreateWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
     $result = $this->callAPIFailure('membership_status', 'create', $params);
   }
 
-  function testCreate() {
+  public function testCreate() {
     $params = array(
       'name' => 'test membership status',
     );
@@ -124,16 +113,18 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->membershipStatusDelete($result['id']);
   }
 
-  function testUpdate() {
+  public function testUpdate() {
     $params = array(
-        'name' => 'test membership status',    );
+      'name' => 'test membership status',
+    );
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
     $this->assertEquals('test membership status', $result['values'][$id]['name']);
     $newParams = array(
       'id' => $id,
-      'name' => 'renamed',    );
+      'name' => 'renamed',
+    );
     $result = $this->callAPISuccess('membership_status', 'create', $newParams);
     $result = $this->callAPISuccess('membership_status', 'get', array('id' => $id));
     $this->assertEquals('renamed', $result['values'][$id]['name']);
@@ -142,26 +133,31 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
 
   ///////////////// civicrm_membership_status_delete methods
-  function testDeleteEmptyParams() {
+
+  /**
+   * Attempt (and fail) to delete membership status without an parameters.
+   */
+  public function testDeleteEmptyParams() {
     $result = $this->callAPIFailure('membership_status', 'delete', array());
   }
 
-  function testDeleteWithMissingRequired() {
+  public function testDeleteWithMissingRequired() {
     $params = array('title' => 'Does not make sense');
     $result = $this->callAPIFailure('membership_status', 'delete', $params);
   }
 
-  function testDelete() {
+  public function testDelete() {
     $membershipID = $this->membershipStatusCreate();
     $params = array(
       'id' => $membershipID,
     );
     $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
-  /*
-     * Test that trying to delete membership status while membership still exists creates error
-     */
-  function testDeleteWithMembershipError() {
+
+  /**
+   * Test that trying to delete membership status while membership still exists creates error.
+   */
+  public function testDeleteWithMembershipError() {
     $membershipStatusID = $this->membershipStatusCreate();
     $this->_contactID = $this->individualCreate();
     $this->_entity = 'membership';
@@ -189,5 +185,5 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     ));
     $result = $this->callAPISuccess('membership_status', 'delete', $params);
   }
-}
 
+}

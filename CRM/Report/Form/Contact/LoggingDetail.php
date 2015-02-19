@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,12 +34,11 @@
  */
 class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
   /**
-   *
    */
-  function __construct() {
-    $logging        = new CRM_Logging_Schema;
+  public function __construct() {
+    $logging = new CRM_Logging_Schema();
     $this->tables[] = 'civicrm_contact';
-    $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
+    $this->tables = array_merge($this->tables, array_keys($logging->customDataLogTables()));
     $this->tables[] = 'civicrm_email';
     $this->tables[] = 'civicrm_phone';
     $this->tables[] = 'civicrm_im';
@@ -61,7 +59,7 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
     parent::__construct();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $layout = CRM_Utils_Request::retrieve('layout', 'String', $this);
     $this->assign('layout', $layout);
 
@@ -77,5 +75,5 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
       $this->assign('backURL', CRM_Report_Utils_Report::getNextUrl('logging/contact/summary', 'reset=1', FALSE, TRUE));
     }
   }
-}
 
+}

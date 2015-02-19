@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -38,14 +38,15 @@
     </tr>
 
     <tr class="crm-mailing-upload-form-block-template">
-      <td class="label">{$form.template.label}</td>
-  <td>{$form.template.html}</td>
+      <td class="label">{$form.SMStemplate.label}</td>
+  <td>{$form.SMStemplate.html}</td>
     </tr>
     <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
 </table>
 
 <fieldset id="compose_id"><legend>{ts}Compose On-screen{/ts}</legend>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
+{include file="CRM/Mailing/Form/InsertTokens.tpl"}
 </fieldset>
 
    <fieldset id="upload_id"><legend>{ts}Upload Content{/ts}</legend>
@@ -77,7 +78,6 @@
             cj('#compose_id').show();
       cj('.crm-mailing-upload-form-block-template').show();
       cj('#upload_id').hide();
-            verify( );
         }
     }
 </script>

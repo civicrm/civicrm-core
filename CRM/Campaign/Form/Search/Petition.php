@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,21 +39,20 @@
 class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
 
   /**
-   * Are we forced to run a search
+   * Are we forced to run a search.
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
-    $this->_search    = CRM_Utils_Array::value('search', $_GET);
-    $this->_force     = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
+   */
+  public function preProcess() {
+    $this->_search = CRM_Utils_Array::value('search', $_GET);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'petition');
 
     //when we do load tab, lets load the default objects.
@@ -69,13 +68,12 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if ($this->_search) {
       return;
     }
@@ -102,5 +100,5 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
     $this->set('searchParams', $this->_searchParams);
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
-}
 
+}

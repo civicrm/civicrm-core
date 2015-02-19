@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -30,10 +30,8 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
-require_once 'CRM/Core/Page.php';
 
 /**
  * Page for displaying list of auctions
@@ -44,7 +42,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * the id of the auction for this item
    *
    * @var int
-   * @protected
    */
   public $_aid;
 
@@ -52,7 +49,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * The action links that we need to display for the browse screen
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 
@@ -66,7 +62,8 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * Get action Links
    *
    * @return array (reference) of action links
-   */ function &links() {
+   */
+  function &links() {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $disableExtra = ts('Are you sure you want to disable this Item?');
@@ -113,8 +110,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
@@ -175,10 +170,7 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
   /**
    * Browse all auctions
    *
-   *
    * @return void
-   * @access public
-   * @static
    */
   function browse() {
     $this->assign('newItemURL', CRM_Utils_System::url('civicrm/auction/item/add',
@@ -274,7 +266,6 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
    * all the fields in the event wizard
    *
    * @return void
-   * @access public
    */
   function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');
@@ -294,7 +285,7 @@ class CRM_Auction_Page_ManageItem extends CRM_Core_Page {
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $sortBy
    * @param $force
    *

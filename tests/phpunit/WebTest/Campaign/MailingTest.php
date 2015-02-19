@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     // Log in as admin first to verify permissions for CiviCampaign
     $this->webtestLogin('admin');
 
@@ -81,9 +81,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -97,17 +95,17 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $this->mailingAddTest($groupName, $campaignTitle, $id);
   }
 
   /**
-   * @param $groupName
+   * @param string $groupName
    * @param $campaignTitle
-   * @param $id
+   * @param int $id
    */
-  function mailingAddTest($groupName, $campaignTitle, $id) {
+  public function mailingAddTest($groupName, $campaignTitle, $id) {
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
@@ -131,8 +129,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->select("campaign_id", "value=$id");
 
     // Add the test mailing group
-    $this->select("includeGroups-f", "$groupName");
-    $this->click("add");
+    $this->select("includeGroups", "$groupName");
 
     // click next
     $this->click("_qf_Group_next");
@@ -230,7 +227,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // verify undelivered status message
-    $this->assertElementContainsText('crm-container',"Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
+    $this->assertElementContainsText('crm-container', "Delivery has not yet begun for this mailing. If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.");
 
     // do check for recipient group
     $this->assertElementContainsText('crm-container', "Members of $groupName");
@@ -277,5 +274,5 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('mailing_event', "mailino$firstName@mailson.co.in");
     //------end delivery verification---------
   }
-}
 
+}

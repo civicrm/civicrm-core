@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@
             {if $originalPledgeAmount}<div class="messages status no-popup"><div class="icon inform-icon"></div>{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
         </td>
      </tr>
-     <tr class="crm-pledge-form-block-installments"><td class="label">{ts}To be paid in{/ts}</td><td>{$installments}{ts} installments of {/ts}{$original_installment_amount|crmMoney:$currency}{ts} every {/ts} {$frequency_interval} {$frequencyUnit}</td></tr>
+     <tr class="crm-pledge-form-block-installments"><td class="label">{ts}To be paid in{/ts}</td><td>{$installments} {ts}installments of{/ts} {$original_installment_amount|crmMoney:$currency} {ts}every{/ts} {$frequency_interval} {$frequencyUnit}</td></tr>
     <tr><td class="label">{ts}Payments are due on the{/ts}</td><td>{$frequency_day} day of the period</td></tr>
 
     {if $start_date}

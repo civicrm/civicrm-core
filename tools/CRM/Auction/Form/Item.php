@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -46,7 +46,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the item we are processing
    *
    * @var int
-   * @protected
    */
   public $_id;
 
@@ -54,7 +53,6 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the auction for this item
    *
    * @var int
-   * @protected
    */
   public $_aid;
 
@@ -62,16 +60,15 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * the id of the person donating this item
    *
    * @var int
-   * @protected
    */
   public $_donorID;
 
   /**
-   * Function to set variables up before form is built
+   * set variables up before form is built
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -111,16 +108,11 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
+   * @return array
    */
   function setDefaultValues() {
-    require_once 'CRM/Auction/BAO/Item.php';
-
     $defaults = array();
 
     if (isset($this->_id)) {
@@ -136,10 +128,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -266,15 +255,9 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
    * @param array $fields the input form values
    * @param array $files the uploaded files if any
    * @param $self
-   *
-   * @internal param array $options additional user data
-   *
    * @return true if no errors, else array of errors
-   * @access public
-   * @static
    */
-  static
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
 
     if (isset($files['attachFile_1'])) {
@@ -288,11 +271,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::VIEW) {

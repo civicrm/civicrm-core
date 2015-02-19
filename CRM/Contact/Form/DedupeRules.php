@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -38,19 +38,18 @@
  *
  */
 class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
-  CONST RULES_COUNT = 5;
+  const RULES_COUNT = 5;
   protected $_contactType;
   protected $_defaults = array();
   protected $_fields = array();
   protected $_rgid;
 
   /**
-   * Function to pre processing
+   * Pre processing.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // Ensure user has permission to be here
     if (!CRM_Core_Permission::check('administer dedupe rules')) {
       CRM_Utils_System::permissionDenied();
@@ -95,10 +94,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $foo = CRM_Core_DAO::getAttribute('CRM_Dedupe_DAO_Rule', 'title');
@@ -125,7 +123,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       $this->add('select', "where_$count", ts('Field'),
         array(
-          NULL => ts('- none -')
+          NULL => ts('- none -'),
         ) + $this->_fields, FALSE, $disabled
       );
       $this->add('text', "length_$count", ts('Length'), $attributes);
@@ -142,18 +140,18 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['is_reserved'])) {
       return TRUE;
@@ -175,24 +173,22 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -221,11 +217,11 @@ UPDATE civicrm_dedupe_rule_group
       $rgDao->id = $this->_rgid;
     }
 
-    $rgDao->title        = $values['title'];
-    $rgDao->is_reserved  = CRM_Utils_Array::value('is_reserved', $values, FALSE);
-    $rgDao->used         = $values['used'];
+    $rgDao->title = $values['title'];
+    $rgDao->is_reserved = CRM_Utils_Array::value('is_reserved', $values, FALSE);
+    $rgDao->used = $values['used'];
     $rgDao->contact_type = $this->_contactType;
-    $rgDao->threshold    = $values['threshold'];
+    $rgDao->threshold = $values['threshold'];
     $rgDao->save();
 
     // make sure name is set only during insert
@@ -288,7 +284,15 @@ UPDATE civicrm_dedupe_rule_group
 
         if ($dao->fetch()) {
           // set the length to null for all the fields where prefix length is not supported. eg. int,tinyint,date,enum etc dataTypes.
-          if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, array('char', 'varchar', 'binary', 'varbinary', 'text', 'blob'))) {
+          if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, array(
+                'char',
+                'varchar',
+                'binary',
+                'varbinary',
+                'text',
+                'blob',
+              ))
+          ) {
             $length = NULL;
           }
           elseif ($dao->COLUMN_NAME == $field && !empty($dao->CHARACTER_MAXIMUM_LENGTH) && ($length > $dao->CHARACTER_MAXIMUM_LENGTH)) {
@@ -313,5 +317,5 @@ UPDATE civicrm_dedupe_rule_group
 
     CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
   }
-}
 
+}

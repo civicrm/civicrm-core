@@ -269,6 +269,7 @@
      <page_callback>CRM_Admin_Page_MessageTemplates</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
+     <access_arguments>edit message templates</access_arguments>
      <weight>30</weight>
   </item>
   <item>
@@ -276,6 +277,7 @@
      <title>Message Templates</title>
      <desc>Add/Edit Message Templates</desc>
      <page_callback>CRM_Admin_Form_MessageTemplates</page_callback>
+     <access_arguments>edit message templates</access_arguments>
      <weight>262</weight>
   </item>
   <item>
@@ -356,7 +358,7 @@
   </item>
   <item>
      <path>civicrm/admin/setting/localization</path>
-     <title>Languages, Currency, Location</title>
+     <title>Languages, Currency, Locations</title>
      <page_callback>CRM_Admin_Form_Setting_Localization</page_callback>
      <adminGroup>Localization</adminGroup>
      <icon>admin/small/36.png</icon>
@@ -475,7 +477,7 @@
   <item>
      <path>civicrm/admin/setting/misc</path>
      <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
-   	 <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
+     <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $row, info, enabled, fieldLabel;
+    var $a, $row, info, enabled, fieldLabel;
 
     function successMsg() {
       {/literal} {* client-side variable substitutions in smarty are AWKWARD! *}
@@ -36,44 +36,38 @@
     }
 
     function refresh() {
+      $a.trigger('crmPopupFormSuccess');
       CRM.refreshParent($row);
     }
 
     function save() {
       $row.closest('table').block();
       CRM.api3(info.entity, info.action, {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
-      if (enabled) {
-        $(this).dialog('close');
+    }
+
+    function checkResponse(e, response) {
+      if (response.illegal) {
+        $(this).dialog('option', 'buttons', [
+          {text: {/literal}'{ts escape="js"}Close{/ts}'{literal}, click: function() {$(this).dialog('close');}, icons: {primary: 'ui-icon-close'}}
+        ]);
       }
     }
 
-    function confirmation() {
-      var conf = $(this);
-      $.getJSON(CRM.url('civicrm/ajax/statusmsg', {entity: info.entity, id: info.id}), function(response) {
-        conf.html(response.content);
-        if (!response.illegal) {
-          conf.dialog('option', 'buttons', [
-            {text: {/literal}'{ts escape="js"}Yes{/ts}'{literal}, click: save},
-            {text: {/literal}'{ts escape="js"}No{/ts}'{literal}, click: function() {$(this).dialog('close');}}
-          ]);
-        }
-      });
-    }
-
     function enableDisable() {
-      $row = $(this).closest('.crm-entity');
-      info = $(this).crmEditableEntity();
+      $a = $(this);
+      $row = $a.closest('.crm-entity');
+      info = $a.crmEditableEntity();
       fieldLabel = info.label || info.title || info.display_name || info.name || {/literal}'{ts escape="js"}Record{/ts}'{literal};
       enabled = !$row.hasClass('disabled');
       if (enabled) {
-        CRM.confirm({{/literal}
-          message: '<div class="crm-loading-element">{ts escape="js"}Loading{/ts}...</div>',
-          {* client-side variable substitutions in smarty are AWKWARD! *}
-          title: ts('{ts escape="js" 1='%1'}Disable %1{/ts}{literal}', {1: fieldLabel}),
-          width: 300,
-          options: null,
-          open: confirmation
-        });
+        CRM.confirm({
+          url: CRM.url('civicrm/ajax/statusmsg', {entity: info.entity, id: info.id}),
+          title: ts('{/literal}{ts escape="js" 1='%1'}Disable %1{/ts}{literal}', {1: fieldLabel}),
+          options: {{/literal}yes: '{ts escape="js"}Yes{/ts}', no: '{ts escape="js"}No{/ts}'{literal}},
+          width: 300
+        })
+          .on('crmLoad', checkResponse)
+          .on('crmConfirm:yes', save);
       } else {
         save();
       }

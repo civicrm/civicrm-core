@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -21,17 +21,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
-   * PxPay Functionality Copyright (C) 2008 Lucas Baker, Logistic Information Systems Limited (Logis)
-   * PxAccess Functionality Copyright (C) 2008 Eileen McNaughton
-   * Licensed to CiviCRM under the Academic Free License version 3.0.
-   *
-   * Grateful acknowledgements go to Donald Lobo for invaluable assistance
-   * in creating this payment processor module
-   */
+ * PxPay Functionality Copyright (C) 2008 Lucas Baker, Logistic Information Systems Limited (Logis)
+ * PxAccess Functionality Copyright (C) 2008 Eileen McNaughton
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ * Grateful acknowledgements go to Donald Lobo for invaluable assistance
+ * in creating this payment processor module
+ */
 
 /**
  * Class CRM_Core_Payment_PaymentExpressIPN
@@ -43,26 +43,25 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * mode of operation: live or test
+   * Mode of operation: live or test
    *
    * @var object
    */
   protected $_mode = NULL;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $type
    * @param $object
    * @param bool $abort
    *
    * @return mixed
    */
-  static function retrieve($name, $type, $object, $abort = TRUE) {
+  public static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
@@ -82,15 +81,16 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
    * @return \CRM_Core_Payment_PaymentExpressIPN
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     parent::__construct();
 
     $this->_mode = $mode;
@@ -98,29 +98,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * singleton function used to manage this object
-   *
-   * @param string $mode the mode of operation: live or test
-   *
-   * @param $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
-   * @return object
-   * @static
-   */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    if (self::$_singleton === NULL) {
-      self::$_singleton = new CRM_Core_Payment_PaymentExpressIPN($mode, $paymentProcessor);
-    }
-    return self::$_singleton;
-  }
-
-  /**
    * The function gets called when a new order takes place.
    *
    * @param $success
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
    * @param $component
    * @param $amount
@@ -129,7 +111,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @internal param \xml $dataRoot response send by google in xml format
    * @return void
    */
-  function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
+  public function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = array();
 
     $input['component'] = strtolower($component);
@@ -138,9 +120,9 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, TRUE);
 
     if ($input['component'] == "event") {
-      $ids['event']       = self::retrieve('eventID', 'Integer', $privateData, TRUE);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
       $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
-      $ids['membership']  = NULL;
+      $ids['membership'] = NULL;
     }
     else {
       $ids['membership'] = self::retrieve('membershipID', 'Integer', $privateData, FALSE);
@@ -156,10 +138,10 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     // make sure the invoice is valid and matches what we have in the contribution record
-    $input['invoice']    = $privateData['invoiceID'];
+    $input['invoice'] = $privateData['invoiceID'];
     $input['newInvoice'] = $transactionReference;
-    $contribution        = &$objects['contribution'];
-    $input['trxn_id']    = $transactionReference;
+    $contribution = &$objects['contribution'];
+    $input['trxn_id'] = $transactionReference;
 
     if ($contribution->invoice_id != $input['invoice']) {
       CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
@@ -190,8 +172,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       /* Since trxn_id hasn't got any use here,
-             * lets make use of it by passing the eventID/membershipTypeID to next level.
-             * And change trxn_id to the payment processor reference before finishing db update */
+       * lets make use of it by passing the eventID/membershipTypeID to next level.
+       * And change trxn_id to the payment processor reference before finishing db update */
 
       if ($ids['event']) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
@@ -205,23 +187,25 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-
-   /**
+   *
+   * /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
-   * @param array   $privateData    contains the name-value pairs of transaction related data
-   * @param int     $orderNo        <order-total> send by google
+   * @param array $privateData
+   *   Contains the name-value pairs of transaction related data.
+   * @param int $orderNo
+   *   <order-total> send by google.
    *
-   * @return array context of this call (test, component, payment processor id)
-   * @static
+   * @return array
+   *   context of this call (test, component, payment processor id)
    */
-  static function getContext($privateData, $orderNo) {
+  public static function getContext($privateData, $orderNo) {
 
     $component = NULL;
     $isTest = NULL;
 
-    $contributionID   = $privateData['contributionID'];
-    $contribution     = new CRM_Contribute_DAO_Contribution();
+    $contributionID = $privateData['contributionID'];
+    $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->id = $contributionID;
 
     if (!$contribution->find(TRUE)) {
@@ -273,16 +257,16 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     return array($isTest, $component, $duplicateTransaction);
-    }
+  }
 
   /**
    * This method is handles the response that will be invoked by the
    * notification or request sent by the payment processor.
-   *hex string from paymentexpress is passed to this function as hex string. Code based on googleIPN
+   * hex string from paymentexpress is passed to this function as hex string. Code based on googleIPN
    * mac_key is only passed if the processor is pxaccess as it is used for decryption
    * $dps_method is either pxaccess or pxpay
    */
-  static function main($dps_method, $rawPostData, $dps_url, $dps_user, $dps_key, $mac_key) {
+  public static function main($dps_method, $rawPostData, $dps_url, $dps_user, $dps_key, $mac_key) {
 
     $config = CRM_Core_Config::singleton();
     define('RESPONSE_HANDLER_LOG_FILE', $config->uploadDir . 'CiviCRM.PaymentExpress.log');
@@ -295,40 +279,40 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
     if ($dps_method == "pxpay") {
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml(array(
-          'PxPayUserId' => $dps_user,
-          'PxPayKey' => $dps_key,
-          'Response' => $_GET['result'],
-        ));
+        'PxPayUserId' => $dps_user,
+        'PxPayKey' => $dps_key,
+        'Response' => $_GET['result'],
+      ));
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml('ProcessResponse', $processResponse);
 
       fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-          $processResponse
-        ));
+        $processResponse
+      ));
 
       // Send the XML-formatted validation request to DPS so that we can receive a decrypted XML response which contains the transaction results
       $curl = CRM_Core_Payment_PaymentExpressUtils::_initCURL($processResponse, $dps_url);
 
       fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-          $curl
-        ));
+        $curl
+      ));
       $success = FALSE;
       if ($response = curl_exec($curl)) {
         fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-            $response
-          ));
+          $response
+        ));
         curl_close($curl);
 
         // Assign the returned XML values to variables
-        $valid             = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
-        $success           = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
-        $txnId             = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
-        $responseText      = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
-        $authCode          = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
-        $DPStxnRef         = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
-        $qfKey             = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
-        $privateData       = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
-        list($component,$paymentProcessorID,)  =explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
-        $amount            = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
+        $valid = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
+        $success = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
+        $txnId = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
+        $responseText = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
+        $authCode = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
+        $DPStxnRef = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
+        $qfKey = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
+        $privateData = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
+        list($component, $paymentProcessorID,) = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
+        $amount = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
         $merchantReference = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "MerchantReference");
       }
       else {
@@ -339,20 +323,20 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
     elseif ($dps_method == "pxaccess") {
 
-      require_once ('PaymentExpress/pxaccess.inc.php');
+      require_once 'PaymentExpress/pxaccess.inc.php';
       global $pxaccess;
       $pxaccess = new PxAccess($dps_url, $dps_user, $dps_key, $mac_key);
       #getResponse method in PxAccess object returns PxPayResponse object
       #which encapsulates all the response data
       $rsp = $pxaccess->getResponse($rawPostData);
 
-      $qfKey             = $rsp->getTxnData1();
-      $privateData       = $rsp->getTxnData2();
-      list($component,$paymentProcessorID)  = explode(',',$rsp->getTxnData3());
-      $success           = $rsp->getSuccess();
-      $authCode          = $rsp->getAuthCode();
-      $DPStxnRef         = $rsp->getDpsTxnRef();
-      $amount            = $rsp->getAmountSettlement();
+      $qfKey = $rsp->getTxnData1();
+      $privateData = $rsp->getTxnData2();
+      list($component, $paymentProcessorID) = explode(',', $rsp->getTxnData3());
+      $success = $rsp->getSuccess();
+      $authCode = $rsp->getAuthCode();
+      $DPStxnRef = $rsp->getDpsTxnRef();
+      $amount = $rsp->getAmountSettlement();
       $MerchantReference = $rsp->getMerchantReference();
     }
 
@@ -383,13 +367,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     list($mode, $component, $duplicateTransaction) = self::getContext($privateData, $transactionReference);
     $mode = $mode ? 'test' : 'live';
 
-
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
       $mode
     );
 
     $ipn = self::singleton($mode, $component, $paymentProcessor);
-
 
     //Check status and take appropriate action
 
@@ -436,7 +418,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * Converts the comma separated name-value pairs in <TxnData2>
    * to an array of values.
    */
-  static function stringToArray($str) {
+  public static function stringToArray($str) {
     $vars = $labels = array();
     $labels = explode(',', $str);
     foreach ($labels as $label) {
@@ -445,5 +427,5 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
     return $vars;
   }
-}
 
+}

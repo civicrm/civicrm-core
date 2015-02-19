@@ -8,11 +8,12 @@ class Event extends PHPUnit_Framework_Testcase {
    * Helper function to create
    * an Event
    *
-   * @param $contactId
+   * @param int $contactId
    *
-   * @return mixed $event id of created Event
+   * @return int
+   *   id of created Event
    */
-  static function create($contactId) {
+  public static function create($contactId) {
     require_once "CRM/Event/BAO/Event.php";
     $params = array(
       'title' => 'Test Event',
@@ -28,22 +29,19 @@ class Event extends PHPUnit_Framework_Testcase {
       'contact_id' => $contactId,
     );
 
-
     $event = CRM_Event_BAO_Event::create($params);
     return $event->id;
   }
 
   /**
-   * Helper function to delete an Event
+   * Helper function to delete an Event.
    *
-   * @param $eventId
-   * @internal param int $eventID id of the event to delete
-   * @return boolean true if event deleted, false otherwise
+   * @param int $eventId
+   * @return bool
+   *   true if event deleted, false otherwise
    */
-  static function delete($eventId) {
+  public static function delete($eventId) {
     return CRM_Event_BAO_Event::del($eventId);
   }
+
 }
-
-
-

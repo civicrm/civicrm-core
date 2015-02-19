@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -86,7 +86,7 @@ CRM.$(function($) {
     {/if}
     {if $form.first_name}
     <td>
-      {$form.first_name.label}<br /> 
+      {$form.first_name.label}<br />
       {$form.first_name.html}
     </td>
     {/if}

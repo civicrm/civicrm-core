@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -55,7 +54,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * mode of operation: live or test
    *
    * @var object
-   * @static
    */
   static protected $_mode = NULL;
 
@@ -81,7 +79,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param object $paymentProcessor
    * @return object
-   * @static
    */
   static
   function &singleton($mode, &$paymentProcessor) {
@@ -96,7 +93,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * This function checks to see if we have the right config values
    *
    * @return string the error message if any
-   * @public
    */
   function checkConfig() {
     $config = CRM_Core_Config::singleton();
@@ -140,7 +136,6 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * @param $component
    * @throws Exception
    * @return void
-   * @access public
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
@@ -237,6 +232,10 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    * @paymentProcessor is the array of payment processor settings value.
    * @searchParamsnvpStr is the array of search params.
    * returns an associtive array containing the response from the server.
+   * @param $paymentProcessor
+   * @param $searchParams
+   * @return array|object
+   * @throws \Exception
    */
   function invokeAPI($paymentProcessor, $searchParams) {
     $merchantID  = $paymentProcessor['user_name'];

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * CiviCRM's Smarty gettext plugin
@@ -40,11 +40,15 @@
  *
  * See CRM_Core_I18n class documentation for details.
  *
- * @param array $params   template call's parameters
- * @param string $text    {ts} block contents from the template
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param string $text
+ *   {ts} block contents from the template.
+ * @param CRM_Core_Smarty $smarty
+ *   The Smarty object.
  *
- * @return string  the string, translated by gettext
+ * @return string
+ *   the string, translated by gettext
  */
 function smarty_block_ts($params, $text, &$smarty) {
   if (!isset($params['domain'])) {
@@ -52,4 +56,3 @@ function smarty_block_ts($params, $text, &$smarty) {
   }
   return ts($text, $params);
 }
-

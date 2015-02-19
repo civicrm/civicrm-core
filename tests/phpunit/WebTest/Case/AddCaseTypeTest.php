@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddEditCaseType() {
+  public function testAddEditCaseType() {
     $caseRoles = array(1 => 'Parent of', 2 => 'Spouse of', 3 => 'Partner of');
-    $activityTypes = array(1 => 'Meeting',2 => 'Contribution',3 => 'Event Registration');
-    $timelineActivityTypes = array(1 => 'Meeting',2 => 'Phone Call',3 => 'Email');
+    $activityTypes = array(1 => 'Meeting', 2 => 'Contribution', 3 => 'Event Registration');
+    $timelineActivityTypes = array(1 => 'Meeting', 2 => 'Phone Call', 3 => 'Email');
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -46,7 +46,12 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -54,7 +59,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage('a/#/caseType/new');
 
-    $caseTypeLabel = "Case Type". substr(sha1(rand()), 0, 7);
+    $caseTypeLabel = "Case Type" . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('title');
     $this->type('title', $caseTypeLabel);
 
@@ -71,15 +76,10 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
       $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", $tActivityType, FALSE, TRUE);
     }
 
-    $this->click("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
+    $this->clickAjaxLink("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName = "Fraser";
-    $contactName = "{$lastName}, {$firstName}";
-    $displayName = "{$firstName} {$lastName}";
-    $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
+    $client = $this->createDialogContact("client_id");
 
     $caseStatusLabel = "Ongoing";
     $subject = "Safe daytime setting - senior female";
@@ -90,8 +90,9 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->fireEvent('activity_details', 'focus');
     $this->fillRichTextField("activity_details", $details, 'CKEditor');
     $this->type("activity_subject", $subject);
-
+    $this->waitForElementPresent('case_type_id');
     $this->select("case_type_id", "label={$caseTypeLabel}");
+    $this->waitForElementPresent('status_id');
     $this->select("status_id", "label={$caseStatusLabel}");
 
     $this->webtestFillDate('start_date', 'now');
@@ -104,7 +105,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Case opened successfully.");
 
     foreach ($activityTypes as $aType) {
-      $this->assertText("add_activity_type_id", $aType);
+      $this->assertElementPresent("xpath=//div[@class='case-control-panel']/div/p/select", $aType);
     }
 
     $this->click("xpath=//div[contains(text(), 'Roles')]");
@@ -127,12 +128,12 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=//table/tbody//tr/td[1][text()='{$caseTypeLabel}']/../td[5]/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
 
-    $editCaseTypeLabel = "Case Type Edit". substr(sha1(rand()), 0, 7);
+    $editCaseTypeLabel = "Case Type Edit" . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('title');
     $this->type('title', $editCaseTypeLabel);
 
-    $this->select2("xpath=//tr[@class='addRow']/td/span/div/a", 'Sibling of', FALSE, TRUE);
-    $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[3]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
+    $this->select2("xpath=//div[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tfoot/tr/td/span/div/a", 'Sibling of', FALSE, TRUE);
+    $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
 
     $this->click("xpath=//a[text()='Standard Timeline']");
     $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", 'SMS', FALSE, TRUE);
@@ -142,4 +143,5 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
 
     $this->verifyText("xpath=//table/tbody//tr/td[contains(text(),'$editCaseTypeLabel')]", $editCaseTypeLabel);
   }
+
 }

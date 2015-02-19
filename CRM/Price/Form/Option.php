@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,31 +39,26 @@
 class CRM_Price_Form_Option extends CRM_Core_Form {
 
   /**
-   * the price field id saved to the session for an update
+   * The price field id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_fid;
 
   /**
-   * option value  id, used when editing the Option
+   * Option value  id, used when editing the Option
    *
    * @var int
-   * @access protected
    */
   protected $_oid;
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @param null
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
-
+    $this->setPageTitle(ts('Price Option'));
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this
     );
@@ -73,17 +68,14 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array   array of default values
-   * @access public
+   * @return array|void  array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action == CRM_Core_Action::DELETE) {
-      return;
+      return NULL;
     }
     $defaults = array();
 
@@ -116,12 +108,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -136,15 +125,18 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           ),
         )
       );
-      return;
+      return NULL;
     }
     else {
-      $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
+      $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
       // lets trim all the whitespace
       $this->applyFilter('__ALL__', 'trim');
 
       // hidden Option Id for validation use
       $this->add('hidden', 'optionId', $this->_oid);
+
+      // Needed for i18n dialog
+      $this->assign('optionId', $this->_oid);
 
       //hidden field ID for validation use
       $this->add('hidden', 'fieldId', $this->_fid);
@@ -160,17 +152,18 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       ) {
         $this->_sid = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'price_set_id', 'id');
       }
-      $this->isEvent = False;
+      $this->isEvent = FALSE;
       $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
       $this->assign('showMember', FALSE);
       if ($memberComponentId == $extendComponentId) {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $this->add('select', 'membership_type_id', ts('Membership Type'), array(
-          '' => ' ') + $membershipTypes, FALSE,
+            '' => ' ',
+          ) + $membershipTypes, FALSE,
           array('onClick' => "calculateRowValues( );")
         );
-        $this->add('text', 'membership_num_terms', ts('Number of terms'), $attributes['membership_num_terms']);
+        $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
         $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
@@ -178,7 +171,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participants Count'));
+          $this->add('text', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
           $this->add('text', 'max_value', ts('Max Participants'));
@@ -197,18 +190,17 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         'financial_type_id',
         ts('Financial Type'),
         array('' => ts('- select -')) + $financialType,
-        true
+        TRUE
       );
 
       //CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id' );
       // FIX ME: duplicate rule?
       /*
-            $this->addRule( 'label',
-                            ts('Duplicate option label.'),
-                            'optionExists',
-                            array( 'CRM_Core_DAO_OptionValue', $this->_oid, $this->_ogId, 'label' ) );
-            */
-
+      $this->addRule( 'label',
+      ts('Duplicate option label.'),
+      'optionExists',
+      array( 'CRM_Core_DAO_OptionValue', $this->_oid, $this->_ogId, 'label' ) );
+       */
 
       // value
       $this->add('text', 'amount', ts('Option Amount'), NULL, TRUE);
@@ -269,19 +261,19 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields (referance) posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
-   * @static
-   * @access public
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     if (!empty($fields['count']) && !empty($fields['max_value']) &&
       $fields['count'] > $fields['max_value']
@@ -293,18 +285,15 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
-   *
-   * @param null
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $fieldValues = array('price_field_id' => $this->_fid);
-      $wt          = CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceFieldValue', $this->_oid, $fieldValues);
-      $label       = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
+      $wt = CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceFieldValue', $this->_oid, $fieldValues);
+      $label = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
         $this->_oid,
         'label', 'id'
       );
@@ -312,11 +301,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       if (CRM_Price_BAO_PriceFieldValue::del($this->_oid)) {
         CRM_Core_Session::setStatus(ts('%1 option has been deleted.', array(1 => $label)), ts('Record Deleted'), 'success');
       }
-      return;
+      return NULL;
     }
     else {
-      $params     = $ids = array();
-      $params     = $this->controller->exportValues('Option');
+      $params = $ids = array();
+      $params = $this->controller->exportValues('Option');
       $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
       $params['amount'] = CRM_Utils_Rule::cleanMoney(trim($params['amount']));
@@ -331,5 +320,5 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", array(1 => $params['label'])), ts('Value Saved'), 'success');
     }
   }
-}
 
+}

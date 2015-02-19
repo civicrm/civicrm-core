@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Provider;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -54,21 +55,23 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   /**
    * @var array (string $name => array('perm' => string, 'callback' => callable))
    */
-  private $actions = array();
+  protected $actions = array();
 
   /**
    * @var string
    */
-  private $entity;
+  protected $entity;
 
   /**
    * @var int
    */
-  private $version;
+  protected $version;
 
   /**
    * @param int $version
+   *   API version.
    * @param string $entity
+   *   API entity.
    */
   public function __construct($version, $entity) {
     $this->entity = $entity;
@@ -76,9 +79,14 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
+   * Register a new API.
+   *
    * @param string $name
+   *   Action name.
    * @param string $perm
-   * @param callable $callback
+   *   Permissions required for invoking the action.
+   * @param mixed $callback
+   *   The function which executes the API.
    * @return ReflectionProvider
    */
   public function addAction($name, $perm, $callback) {
@@ -91,6 +99,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * @param \Civi\API\Event\ResolveEvent $event
+   *   API resolution event.
    */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -103,6 +112,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * @param \Civi\API\Event\AuthorizeEvent $event
+   *   API authorization event.
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -114,6 +124,8 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * {inheritdoc}
+   * @param array $apiRequest
+   * @return array|mixed
    */
   public function invoke($apiRequest) {
     return call_user_func($this->actions[strtolower($apiRequest['action'])]['callback'], $apiRequest);
@@ -121,15 +133,20 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @return array
    */
-  function getEntityNames($version) {
+  public function getEntityNames($version) {
     return array($this->entity);
   }
 
   /**
    * {inheritdoc}
+   * @param int $version
+   * @param string $entity
+   * @return array
    */
-  function getActionNames($version, $entity) {
+  public function getActionNames($version, $entity) {
     if ($version == $this->version && $entity == $this->entity) {
       return array_keys($this->actions);
     }
@@ -139,11 +156,13 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
-   * @param $apiRequest
+   * @param array $apiRequest
+   *   The full description of the API request.
    *
    * @return bool
    */
   public function matchesRequest($apiRequest) {
     return $apiRequest['entity'] == $this->entity && $apiRequest['version'] == $this->version && isset($this->actions[strtolower($apiRequest['action'])]);
   }
+
 }

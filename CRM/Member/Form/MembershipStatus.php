@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -37,13 +37,12 @@
  * This class generates form components for Membership Type
  *
  */
-class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
+class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig {
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
@@ -58,10 +57,9 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -99,7 +97,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
     $this->add('checkbox', 'is_current_member', ts('Current Membership?'));
     $this->add('checkbox', 'is_admin', ts('Administrator Only?'));
 
-    $this->add('text', 'weight', ts('Weight'),
+    $this->add('text', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'weight')
     );
     $this->add('checkbox', 'is_default', ts('Default?'));
@@ -107,18 +105,17 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      try{
+      try {
         CRM_Member_BAO_MembershipStatus::del($this->_id);
       }
-      catch(CRM_Core_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Delete Failed'));
       }
       CRM_Core_Session::setStatus(ts('Selected membership status has been deleted.'), ts('Record Deleted'), 'success');
@@ -144,8 +141,9 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
 
       $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params, $ids);
       CRM_Core_Session::setStatus(ts('The membership status \'%1\' has been saved.',
-          array(1 => $membershipStatus->label)
-        ), ts('Saved'), 'success');
+        array(1 => $membershipStatus->label)
+      ), ts('Saved'), 'success');
     }
   }
+
 }

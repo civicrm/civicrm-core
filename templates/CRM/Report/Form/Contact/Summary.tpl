@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,4 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    $('#birth_date_from, #birth_date_to').attr({startOffset: '200', endoffset: '0'});
+  });
+</script>
+{/literal}
+
 {include file="CRM/Report/Form.tpl"}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneMemberAdd() {
+  public function testStandaloneMemberAdd() {
 
     $this->webtestLogin();
 
@@ -88,7 +88,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testStandaloneGiftMembership() {
+  public function testStandaloneGiftMembership() {
 
     $this->webtestLogin();
 
@@ -125,11 +125,11 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     // add softcredit details
     $totalAmount = 100;
     $financialType = 'Donation';
-    $this->clickLink('is_different_contribution_contact','total_amount',FALSE);
+    $this->clickLink('is_different_contribution_contact', 'total_amount', FALSE);
 
     $this->select('soft_credit_type_id', 'Gift');
     $this->select2('soft_credit_contact_id', $giftMembercontactName);
-    $this->select('financial_type_id','Donation');
+    $this->select('financial_type_id', 'Donation');
     $this->type('total_amount', $totalAmount);
     $this->select('payment_instrument_id', 'Check');
     $this->select('contribution_status_id', 'Completed');
@@ -143,20 +143,20 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // verify soft credit data
     $expected = array(
-      '1' => $giftMemberfirstName.' Memberson',
+      '1' => $giftMemberfirstName . ' Memberson',
       '2' => $totalAmount,
       '3' => 'Gift',
       '4' => 'Donation',
       '6' => 'Completed',
     );
 
-    foreach($expected as $key => $value) {
+    foreach ($expected as $key => $value) {
       $this->verifyText("xpath=//div[@class='crm-accordion-wrapper']//table/tbody//tr/td[$key]", $value);
     }
 
   }
 
-  function testStandaloneMemberOverrideAdd() {
+  public function testStandaloneMemberOverrideAdd() {
 
     $this->webtestLogin();
 
@@ -198,7 +198,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     // fill in Record Membership Payment?
     $this->click("record_contribution", "value=1");
     $this->waitForElementPresent("contribution_status_id");
-      // let financial type be default
+    // let financial type be default
 
     // let the amount be default
 
@@ -235,12 +235,12 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'membership_type_id_1', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Membership', 'subEntity' => 'General', 'triggerElement' => $triggerElement),
-      array('entity' => 'Membership', 'subEntity' => 'Student', 'triggerElement' => $triggerElement)
+      array('entity' => 'Membership', 'subEntity' => 'Student', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'member/add', 'args' => 'reset=1&action=add&context=standalone');
@@ -249,9 +249,10 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     //ui actions which helps triggering possible
     $test = $this;
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl,
-      function() use ($test) {
+      function () use ($test) {
         $test->select('membership_type_id_0', 'value=1');
       }
     );
   }
+
 }

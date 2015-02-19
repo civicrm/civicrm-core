@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -64,10 +64,7 @@ class CRM_Auction_Form_SearchAuction extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
+   * Build the form object
    * @return void
    */
   public function buildQuickForm() {

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -85,6 +85,16 @@
     </div>
     <div class="clear"></div>
   </div>
+  {if $owner_notification_option}
+    <div class="crm-section crm-pcp-is_notify-section crm-contribution-form-block-is_notify">
+      <div class="label">{$form.is_notify.label}</div>
+      <div class="content">
+        {$form.is_notify.html}
+        <div class="description">{ts}If this option is checked, you will receive an email notification when people contribute to your campaign.{/ts}</div>
+      </div>
+      <div class="clear"></div>
+    </div>
+  {/if}
   <div class="crm-section crm-pcp-is_active crm-contribution-form-block-is_active">
     <div class="label">{$form.is_active.label}</div>
     <div class="content">

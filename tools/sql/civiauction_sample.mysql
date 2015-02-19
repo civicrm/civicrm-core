@@ -36,13 +36,13 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Create Donors / Bidders.
 --
 
-INSERT INTO `civicrm_contact` (`contact_type`, `sort_name`, `display_name`, `first_name`, `last_name`) 
+INSERT INTO `civicrm_contact` (`contact_type`, `sort_name`, `display_name`, `first_name`, `last_name`)
 VALUES
 ('Individual', 'Mouse Micky', 'Mouse Micky', 'Mickey', 'Mouse');
 
 SELECT @donorID := id FROM `civicrm_contact` where `display_name` like 'Mouse Micky';
 
-INSERT INTO `civicrm_contact` (`contact_type`, `sort_name`, `display_name`, `first_name`, `last_name`) 
+INSERT INTO `civicrm_contact` (`contact_type`, `sort_name`, `display_name`, `first_name`, `last_name`)
 VALUES
 ('Individual', 'Doo Scooby', 'Doo Scooby', 'Scooby', 'Doo');
 

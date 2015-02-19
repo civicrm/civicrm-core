@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,17 +49,16 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * cache shared address message so we don't query twice
+   * Cache shared address message so we don't query twice
    */
   protected $_sharedAddressMessage = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
@@ -68,9 +67,9 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_searchKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
     // sort out whether it’s a delete-to-trash, delete-into-oblivion or restore (and let the template know)
-    $values              = $this->controller->exportValues();
+    $values = $this->controller->exportValues();
     $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::DELETE_PERMANENTLY));
-    $this->_restore      = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
+    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
@@ -89,7 +88,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
         CRM_Core_Error::fatal(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
-      } elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
+      }
+      elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
         CRM_Core_Error::fatal(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
 
@@ -126,11 +126,17 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       if ($sharedAddressCount > 0) {
         if (count($this->_contactIds) > 1) {
           // more than one contact deleted
-          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', array('plural' => 'One or more selected contacts have address records which are shared with %count other contacts.', 'count' => $sharedAddressCount));
+          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', array(
+              'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
+              'count' => $sharedAddressCount,
+            ));
         }
         else {
           // only one contact deleted
-          $message = ts('This contact has an address record which is shared with 1 other contact.', array('plural' => 'This contact has an address record which is shared with %count other contacts.', 'count' => $sharedAddressCount));
+          $message = ts('This contact has an address record which is shared with 1 other contact.', array(
+              'plural' => 'This contact has an address record which is shared with %count other contacts.',
+              'count' => $sharedAddressCount,
+            ));
         }
         CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
       }
@@ -141,13 +147,12 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $label = $this->_restore ? ts('Restore Contact(s)') : ts('Delete Contact(s)');
 
     if ($this->_single) {
@@ -162,8 +167,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          'reset=1&cid=' . $this->_contactIds[0] . $urlParams
-        ));
+        'reset=1&cid=' . $this->_contactIds[0] . $urlParams
+      ));
       $this->addDefaultButtons($label, 'done', 'cancel');
     }
     else {
@@ -174,17 +179,19 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param object $self form object
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param object $self
+   *   Form object.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     // CRM-12929
     $error = array();
     if ($self->_skipUndelete) {
@@ -194,9 +201,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -204,7 +210,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $session = CRM_Core_Session::singleton();
     $currentUserId = $session->get('userID');
 
-    $context   = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'basic');
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'basic');
     $urlParams = 'force=1';
     $urlString = "civicrm/contact/search/$context";
 
@@ -249,13 +255,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $title = ts('Deleted');
       if ($this->_restore) {
         $title = ts('Restored');
-        $status = ts('%1 has been restored from the trash.', array(1 => $name, 'plural' => '%count contacts restored from trash.', 'count' => $deleted));
+        $status = ts('%1 has been restored from the trash.', array(
+            1 => $name,
+            'plural' => '%count contacts restored from trash.',
+            'count' => $deleted,
+          ));
       }
       elseif ($this->_skipUndelete) {
-        $status = ts('%1 has been permanently deleted.', array(1 => $name, 'plural' => '%count contacts permanently deleted.', 'count' => $deleted));
+        $status = ts('%1 has been permanently deleted.', array(
+            1 => $name,
+            'plural' => '%count contacts permanently deleted.',
+            'count' => $deleted,
+          ));
       }
       else {
-        $status = ts('%1 has been moved to the trash.', array(1 => $name, 'plural' => '%count contacts moved to trash.', 'count' => $deleted));
+        $status = ts('%1 has been moved to the trash.', array(
+            1 => $name,
+            'plural' => '%count contacts moved to trash.',
+            'count' => $deleted,
+          ));
       }
       $session->setStatus($status, $title, 'success');
     }
@@ -287,6 +305,5 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $session->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
     }
   }
-  //end of function
-}
 
+}

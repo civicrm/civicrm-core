@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,12 +27,14 @@
 <script type="text/javascript">
 
 function buildPaymentBlock( type ) {
-    if ( type == 0 ) {
-     if (cj("#billing-payment-block").length) {
-           cj("#billing-payment-block").html('');
-   }
-        return;
+  {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
+  if (type == 0) {
+    if (cj("#billing-payment-block").length) {
+      cj("#billing-payment-block").html('');
     }
+    return;
+  }
+  {/literal}{/if}{literal}
 
   var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
 

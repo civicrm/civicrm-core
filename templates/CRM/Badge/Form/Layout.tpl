@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -52,7 +52,7 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
              <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
@@ -63,7 +63,7 @@
               {$form.height_image_1.html}</br>{$form.height_image_1.label}
             </td>
            </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
@@ -72,7 +72,7 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
             <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>
@@ -83,7 +83,7 @@
             {$form.height_image_2.html}<br/>{$form.height_image_2.label}
            </td>
           </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-participant_image">
@@ -105,7 +105,7 @@
               {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
             </td>
            </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">

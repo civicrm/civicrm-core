@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,9 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 namespace Civi\CCase;
 
+/**
+ * Class Events
+ *
+ * @package Civi\CCase
+ */
 class Events {
   /**
    * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
@@ -48,6 +53,7 @@ class Events {
           $caseId = $event->object->case_id;
         }
         break;
+
       case 'Case':
         // by the time we get the post-delete event, the record is gone, so
         // there's nothing to analyze
@@ -55,12 +61,14 @@ class Events {
           $caseId = $event->id;
         }
         break;
+
       default:
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
     if ($caseId) {
       if (!isset(self::$isActive[$caseId])) {
+        $tx = new \CRM_Core_Transaction();
         \CRM_Core_Transaction::addCallback(
           \CRM_Core_Transaction::PHASE_POST_COMMIT,
           array(__CLASS__, 'fireCaseChangeForRealz'),
@@ -71,6 +79,9 @@ class Events {
     }
   }
 
+  /**
+   * @param $caseId
+   */
   public static function fireCaseChangeForRealz($caseId) {
     if (!isset(self::$isActive[$caseId])) {
       $tx = new \CRM_Core_Transaction();
@@ -83,9 +94,9 @@ class Events {
   }
 
   /**
-   * Find any extra listeners declared in XML and pass the event along to them
+   * Find any extra listeners declared in XML and pass the event along to them.
    *
-   * @param Event\CaseChangeEvent $event
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
    */
   public static function delegateToXmlListeners(\Civi\CCase\Event\CaseChangeEvent $event) {
     $p = new \CRM_Case_XMLProcessor_Process();
@@ -95,4 +106,5 @@ class Events {
       $listener->onCaseChange($event);
     }
   }
+
 }

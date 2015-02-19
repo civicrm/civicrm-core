@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -45,10 +45,9 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   );
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
@@ -73,7 +72,8 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     // Autocomplete for Contact Search (quick search etc.)
     $options = array(
-      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
         FALSE, FALSE, TRUE
       ));
     $this->addCheckBox('autocompleteContactSearch', ts('Autocomplete Contact Search'), $options,
@@ -84,7 +84,8 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     // Autocomplete for Contact Reference (custom fields)
     $optionsCR = array(
-      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
         FALSE, FALSE, TRUE
       ));
     $this->addCheckBox('autocompleteContactReference', ts('Contact Reference Options'), $optionsCR,
@@ -95,5 +96,5 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
   }
-}
 
+}

@@ -12,14 +12,10 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  function definitionProvider() {
+  public function definitionProvider() {
     $fixtures['empty-defn'] = array(
       'json' => json_encode(array()),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/empty-defn.xml'),
     );
 
     $fixtures['empty-lists'] = array(
@@ -28,20 +24,13 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
         'activityTypes' => array(),
         'caseRoles' => array(),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes></ActivityTypes>
-  <ActivitySets></ActivitySets>
-  <CaseRoles></CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
     );
 
     $fixtures['one-item-in-each'] = array(
       'json' => json_encode(array(
         'activityTypes' => array(
-          array('name' => 'First act'),
+          array('name' => 'First act (foréign éxamplé)'),
         ),
         'activitySets' => array(
           array(
@@ -57,36 +46,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes>
-    <ActivityType>
-      <name>First act</name>
-    </ActivityType>
-  </ActivityTypes>
-  <ActivitySets>
-    <ActivitySet>
-      <name>set1</name>
-      <label>Label 1</label>
-      <timeline>true</timeline>
-      <ActivityTypes>
-        <ActivityType>
-          <name>Open Case</name>
-          <status>Completed</status>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-  </ActivitySets>
-  <CaseRoles>
-    <RelationshipType>
-      <name>First role</name>
-      <creator>1</creator>
-      <manager>1</manager>
-    </RelationshipType>
-  </CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/one-item-in-each.xml'),
     );
 
     $fixtures['two-items-in-each'] = array(
@@ -125,85 +85,21 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array('name' => 'Second role'),
         ),
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <ActivityTypes>
-    <ActivityType>
-      <name>First act</name>
-    </ActivityType>
-    <ActivityType>
-      <name>Second act</name>
-    </ActivityType>
-  </ActivityTypes>
-  <ActivitySets>
-    <ActivitySet>
-      <name>set1</name>
-      <label>Label 1</label>
-      <timeline>true</timeline>
-      <ActivityTypes>
-        <ActivityType>
-          <name>Open Case</name>
-          <status>Completed</status>
-        </ActivityType>
-        <ActivityType>
-          <name>Meeting</name>
-          <reference_activity>Open Case</reference_activity>
-          <reference_offset>1</reference_offset>
-          <reference_select>newest</reference_select>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-    <ActivitySet>
-      <name>set2</name>
-      <label>Label 2</label>
-      <sequence>true</sequence>
-      <ActivityTypes>
-        <ActivityType>
-          <name>First act</name>
-        </ActivityType>
-        <ActivityType>
-          <name>Second act</name>
-        </ActivityType>
-      </ActivityTypes>
-    </ActivitySet>
-  </ActivitySets>
-  <CaseRoles>
-    <RelationshipType>
-      <name>First role</name>
-      <creator>1</creator>
-      <manager>1</manager>
-    </RelationshipType>
-    <RelationshipType>
-      <name>Second role</name>
-    </RelationshipType>
-  </CaseRoles>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/two-items-in-each.xml'),
     );
 
     $fixtures['forkable-0'] = array(
       'json' => json_encode(array(
         'forkable' => 0,
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <forkable>0</forkable>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/forkable-0.xml'),
     );
 
     $fixtures['forkable-1'] = array(
       'json' => json_encode(array(
         'forkable' => 1,
       )),
-      'xml' => '<?xml version="1.0" encoding="iso-8859-1" ?>
-<CaseType>
-  <name>Housing Support</name>
-  <forkable>1</forkable>
-</CaseType>
-      ',
+      'xml' => file_get_contents(__DIR__ . '/xml/forkable-1.xml'),
     );
 
     $cases = array();
@@ -226,7 +122,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $inputXml
    * @dataProvider definitionProvider
    */
-  function testConvertXmlToDefinition($fixtureName, $expectedJson, $inputXml) {
+  public function testConvertXmlToDefinition($fixtureName, $expectedJson, $inputXml) {
     $xml = simplexml_load_string($inputXml);
     $expectedDefinition = json_decode($expectedJson, TRUE);
     $actualDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
@@ -239,7 +135,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $expectedXml
    * @dataProvider definitionProvider
    */
-  function testConvertDefinitionToXml($fixtureName, $inputJson, $expectedXml) {
+  public function testConvertDefinitionToXml($fixtureName, $inputJson, $expectedXml) {
     $inputDefinition = json_decode($inputJson, TRUE);
     $actualXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', $inputDefinition);
     $this->assertEquals($this->normalizeXml($expectedXml), $this->normalizeXml($actualXml));
@@ -251,7 +147,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $inputXml
    * @dataProvider definitionProvider
    */
-  function testRoundtrip_XmlToJsonToXml($fixtureName, $ignore, $inputXml) {
+  public function testRoundtrip_XmlToJsonToXml($fixtureName, $ignore, $inputXml) {
     $tempDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition(simplexml_load_string($inputXml));
     $actualXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', $tempDefinition);
     $this->assertEquals($this->normalizeXml($inputXml), $this->normalizeXml($actualXml));
@@ -263,7 +159,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @param string $ignore
    * @dataProvider definitionProvider
    */
-  function testRoundtrip_JsonToXmlToJson($fixtureName, $inputJson, $ignore) {
+  public function testRoundtrip_JsonToXmlToJson($fixtureName, $inputJson, $ignore) {
     $tempXml = CRM_Case_BAO_CaseType::convertDefinitionToXML('Housing Support', json_decode($inputJson, TRUE));
     $actualDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition(simplexml_load_string($tempXml));
     $expectedDefinition = json_decode($inputJson, TRUE);
@@ -271,12 +167,12 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Normalize the whitespace in an XML document
+   * Normalize the whitespace in an XML document.
    *
    * @param string $xml
    * @return string
    */
-  function normalizeXml($xml) {
+  public function normalizeXml($xml) {
     return trim(
       preg_replace(":\n*<:", "\n<", // tags on new lines
         preg_replace("/\n[\n ]+/", "\n", // no leading whitespace
@@ -285,4 +181,5 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       )
     );
   }
+
 }

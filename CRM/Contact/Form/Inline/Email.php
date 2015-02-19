@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,17 +39,17 @@
 class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
-   * email addresses of the contact that is been viewed
+   * Email addresses of the contact that is been viewed.
    */
   private $_emails = array();
 
   /**
-   * No of email blocks for inline edit
+   * No of email blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,10 +62,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for an email object
+   * Build the form object elements for an email object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -75,9 +74,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     if (count($this->_emails) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_emails);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -97,15 +96,16 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
-   * @return array $errors@static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
@@ -115,27 +115,25 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
           $hasData[] = $instance;
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            }
           }
         }
-
+      }
 
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["email[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one email can be marked as primary.');
+        $errors["email[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one email can be marked as primary.');
       }
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -154,10 +152,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -170,4 +167,5 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->log();
     $this->response();
   }
+
 }

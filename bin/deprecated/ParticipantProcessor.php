@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -40,9 +40,8 @@ require_once 'CRM/Core/Config.php';
  */
 class CRM_ParticipantProcessor {
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $config = CRM_Core_Config::singleton();
 
     //this does not return on failure
@@ -133,9 +132,9 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
             $transaction = new CRM_Core_Transaction();
 
             require_once 'CRM/Event/BAO/Participant.php';
-            $ids       = array($participantId);
+            $ids = array($participantId);
             $expiredId = array_search('Expired', $expiredStatuses);
-            $results   = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
+            $results = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
             $transaction->commit();
 
             if (!empty($results)) {
@@ -258,11 +257,10 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       }
     }
   }
+
 }
 
 $obj = new CRM_ParticipantProcessor();
 echo "Updating..";
 $obj->updateParticipantStatus();
 echo "<br />Participant records updated. (Done)";
-
-

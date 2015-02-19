@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,7 +47,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   protected $_entityID;
   protected $_entityTable;
 
-  function preProcess() {
+  public function preProcess() {
     if ($this->get('entityID')) {
       $this->_entityID = $this->get('entityID');
     }
@@ -66,10 +66,9 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Core_Resources::singleton()
@@ -114,8 +113,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
   /**
    *
-   * @access public
-   *
    * @return void
    */
   public function postProcess() {
@@ -130,6 +127,5 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Your update(s) have been saved.'), ts('Saved'), 'success');
   }
-  //end of function
-}
 
+}

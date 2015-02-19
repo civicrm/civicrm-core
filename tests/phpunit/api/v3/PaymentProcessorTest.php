@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -36,19 +36,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'PaymentProcessor Create',
-      'description' => 'Test all PaymentProcessor Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     // Create dummy processor
     $params = array(
       'name' => 'API_Test_PP_Type',
@@ -68,21 +58,12 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_payment_processor',
-      'civicrm_payment_processor_type',
-    );
-    $this->quickCleanup($tablesToTruncate);
-  }
-
   ///////////////// civicrm_payment_processor_add methods
 
   /**
-   * check with no name
+   * Check with no name.
    */
-  function testPaymentProcessorCreateWithoutName() {
+  public function testPaymentProcessorCreateWithoutName() {
     $payProcParams = array(
       'is_active' => 1,
     );
@@ -90,9 +71,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
-   * create payment processor
+   * Create payment processor.
    */
-  function testPaymentProcessorCreate() {
+  public function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'in line ' . __LINE__);
@@ -103,9 +84,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code
+   * Test  using example code.
    */
-  function testPaymentProcessorCreateExample() {
+  public function testPaymentProcessorCreateExample() {
     require_once 'api/v3/examples/PaymentProcessor/Create.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
@@ -115,9 +96,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processor_delete methods
 
   /**
-   * check payment processor delete
+   * Check payment processor delete.
    */
-  function testPaymentProcessorDelete() {
+  public function testPaymentProcessorDelete() {
     $id = $this->testPaymentProcessorCreate();
     $params = array(
       'id' => $id,
@@ -129,9 +110,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   ///////////////// civicrm_payment_processors_get methods
 
   /**
-   * check with valid params array.
+   * Check with valid params array.
    */
-  function testPaymentProcessorsGet() {
+  public function testPaymentProcessorsGet() {
     $params = $this->_params;
     $params['user_name'] = 'test@test.com';
     $this->callAPISuccess('payment_processor', 'create', $params);
@@ -144,5 +125,5 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
     $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,20 +35,20 @@
 /*
  * Settings metadata file
  */
-return array (
+return array(
   'userFrameworkResourceURL' => array(
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
     'title' => 'Script and CSS Resources URL',
     'type' => 'String',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'CiviCRM Resource URL',
-    'help_text' => null,
+    'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
   'imageUploadURL' => array(
@@ -57,13 +57,13 @@ return array (
     'title' => 'Image URL Prefix',
     'name' => 'imageUploadURL',
     'type' => 'String',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Image Upload URL',
-    'help_text' => null,
+    'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
   'customCSSURL' => array(
@@ -72,13 +72,13 @@ return array (
     'name' => 'customCSSURL',
     'title' => 'Custom CSS',
     'type' => 'String',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Custom CiviCRM CSS URL',
-    'help_text' => null,
+    'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
 

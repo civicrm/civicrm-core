@@ -1,8 +1,7 @@
 <?php
 /*
-/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,27 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
- * File for the CiviCRM APIv3 loc_block functions
+ * This api exposes CiviCRM loc_block.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_LocBlock
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
- * Create or update a loc_block
+ * Create or update a loc_block.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'loc_block'
- * @example LocBlockCreate.php Std Create example
+ * @param array $params
+ *   name/value pairs to insert in new 'loc_block'
  *
- * @return array api result array
- * {@getfields loc_block_create}
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_loc_block_create($params) {
   $entities = array();
@@ -87,14 +82,14 @@ function civicrm_api3_loc_block_create($params) {
 }
 
 /**
- * Returns array of loc_blocks matching a set of one or more properties
+ * Returns array of loc_blocks matching a set of one or more properties.
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
- *  as null, all loc_blocks will be returned (default limit is 25)
+ * @param array $params
+ *   Array of one or more valid property_name=>value pairs. If $params is set.
+ *   as null, all loc_blocks will be returned (default limit is 25)
  *
- * @return array  Array of matching loc_blocks
- * {@getfields loc_block_get}
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_loc_block_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
@@ -122,16 +117,13 @@ function civicrm_api3_loc_block_get($params) {
 }
 
 /**
- * delete an existing loc_block
+ * Delete an existing loc_block.
  *
- * This method is used to delete any existing loc_block.
- * id of the record to be deleted is required field in $params array
+ * @param array $params
+ *   Array containing id of the record to be deleted.
  *
- * @param array $params array containing id of the record to be deleted
- *
- * @return array  returns flag true if successfull, error message otherwise
- * {@getfields loc_block_delete}
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_loc_block_delete($params) {
   return _civicrm_api3_basic_delete('CRM_Core_DAO_LocBlock', $params);

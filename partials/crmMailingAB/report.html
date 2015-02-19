@@ -1,0 +1,81 @@
+<div crm-ui-accordion crm-title="ts('Debug')" crm-collapsed="true">
+  <pre>{{abtest.ab|json}}</pre>
+  <pre>{{abtest.mailings|json}}</pre>
+</div>
+
+<div>
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Details')}}</th>
+      <th style="width: 12em;">{{ts('Mailing A')}}</th>
+      <th style="width: 12em;">{{ts('Mailing B')}}</th>
+      <th style="width: 12em;" ng-show="abtest.ab.status == 'Final'">{{ts('Final')}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-show="abtest.mailings.a.body_html || abtest.mailings.b.body_html">
+      <td>{{ts('HTML')}}</td>
+      <td><a ng-click="previewMailing('a','html')" ng-show="abtest.mailings.a.body_html">{{ts('View')}}</a></td>
+      <td><a ng-click="previewMailing('b','html')" ng-show="abtest.mailings.b.body_html">{{ts('View')}}</a></td>
+      <td><a ng-click="previewMailing('c','html')" ng-show="abtest.mailings.c.body_html && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
+    </tr>
+    <tr ng-show="abtest.mailings.a.body_text || abtest.mailings.b.body_text">
+      <td>{{ts('Text')}}</td>
+      <td><a ng-click="previewMailing('a','text')" ng-show="abtest.mailings.a.body_text">{{ts('View')}}</a></td>
+      <td><a ng-click="previewMailing('b','text')" ng-show="abtest.mailings.b.body_text">{{ts('View')}}</a></td>
+      <td><a ng-click="previewMailing('c','text')" ng-show="abtest.mailings.c.body_text && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
+    </tr>
+    <tr>
+      <td>{{ts('Deliveries')}}</td>
+      <td>{{stats.a.Delivered}}</td>
+      <td>{{stats.b.Delivered}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Delivered}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Opens')}}</td>
+      <td>{{stats.a.Opened}}</td>
+      <td>{{stats.b.Opened}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Opened}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Unique Clicks')}}</td>
+      <td>{{stats.a['Unique Clicks']}}</td>
+      <td>{{stats.b['Unique Clicks']}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c['Unique Clicks']}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Bounces')}}</td>
+      <td>{{stats.a.Bounces}}</td>
+      <td>{{stats.b.Bounces}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Bounces}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Unsubscribes')}}</td>
+      <td>{{stats.a.Unsubscribers}}</td>
+      <td>{{stats.b.Unsubscribers}}</td>
+      <td ng-show="abtest.ab.status == 'Final'">{{stats.c.Unsubscribers}}</td>
+    </tr>
+    <tr ng-show="abtest.ab.status == 'Testing'">
+      <td></td>
+      <td>
+        <button ng-click="selectWinner('a')">{{ts('Select as Winner')}}</button>
+      </td>
+      <td>
+        <button ng-click="selectWinner('b')">{{ts('Select as Winner')}}</button>
+      </td>
+      <!-- Final column is n/a -->
+    </tr>
+    </tbody>
+  </table>
+
+  <div crm-ui-tab-set>
+    <div crm-ui-tab id="tab-opens" crm-title="ts('Opens (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'open', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+    <div crm-ui-tab id="tab-clicks" crm-title="ts('Total Clicks (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'total unique clicks', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+  </div>
+
+</div>

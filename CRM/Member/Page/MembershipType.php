@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,21 +39,21 @@
 class CRM_Member_Page_MembershipType extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   public $useLivePageJS = TRUE;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -91,10 +91,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     $this->browse();
 
     // parent run
@@ -106,10 +104,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse() {
+  public function browse() {
     // get all membership types sorted by weight
     $membershipType = array();
     $dao = new CRM_Member_DAO_MembershipType();
@@ -117,10 +113,12 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $dao->orderBy('weight');
     $dao->find();
 
-
     while ($dao->fetch()) {
       $membershipType[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
+
+      $membershipType[$dao->id]['period_type'] = CRM_Utils_Array::value($dao->period_type, CRM_Core_SelectValues::periodType(), '');
+      $membershipType[$dao->id]['visibility'] = CRM_Utils_Array::value($dao->visibility, CRM_Core_SelectValues::memberVisibility(), '');
 
       //adding column for relationship type label. CRM-4178.
       if ($dao->relationship_type_id) {
@@ -170,5 +168,5 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
     $this->assign('rows', $membershipType);
   }
-}
 
+}

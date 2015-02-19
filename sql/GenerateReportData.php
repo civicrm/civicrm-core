@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -120,34 +120,34 @@ class CRM_GCD {
   /*******************************************************
    * constants
    *******************************************************/
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 5000;
-  CONST NUM_CONTRIBUTION = 2000;
-  CONST NUM_MEMBERSHIP = 2000;
-  CONST NUM_PARTICIPANT = 2000;
-  CONST INDIVIDUAL_PERCENT = 75;
-  CONST HOUSEHOLD_PERCENT = 15;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 5000;
+  const NUM_CONTRIBUTION = 2000;
+  const NUM_MEMBERSHIP = 2000;
+  const NUM_PARTICIPANT = 2000;
+  const INDIVIDUAL_PERCENT = 75;
+  const HOUSEHOLD_PERCENT = 15;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // relationship types from the table crm_relationship_type
-  CONST CHILD_OF = 1;
-  CONST SPOUSE_OF = 2;
-  CONST SIBLING_OF = 3;
-  CONST HEAD_OF_HOUSEHOLD = 6;
-  CONST MEMBER_OF_HOUSEHOLD = 7;
+  const CHILD_OF = 1;
+  const SPOUSE_OF = 2;
+  const SIBLING_OF = 3;
+  const HEAD_OF_HOUSEHOLD = 6;
+  const MEMBER_OF_HOUSEHOLD = 7;
 
 
   // location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
-  CONST ADD_TO_DB = TRUE;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
+  const ADD_TO_DB = TRUE;
   //const ADD_TO_DB=FALSE;
-  CONST DEBUG_LEVEL = 1;
+  const DEBUG_LEVEL = 1;
 
   /*********************************
    * private members
@@ -240,7 +240,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function _getRandomString($size = 32) {

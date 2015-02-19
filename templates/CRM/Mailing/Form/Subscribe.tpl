@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -50,7 +50,7 @@
                 <td class="crm-mailing-subscribe-form-block-title"><strong>{$row.title}</strong></td>
                 <td class="crm-mailing-subscribe-form-block-description">&nbsp;&nbsp;{$row.description}&nbsp;</td>
             </tr>
-            {/foreach}  
+            {/foreach}
             </table>
         {/if}
         </td>

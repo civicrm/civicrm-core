@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,35 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- *
- * APIv3 functions for registering/processing mailing events.
+ * APIv3 functions for registering/processing mailing recipients.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Mailing
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * Files required for this package
  */
 
 
 /**
- * Returns array of Mailing Recipients
+ * Returns array of Mailing Recipients.
  *
- * @param array $params Array of one or more valid
- * @param array $ids
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array API return Array of matching mailing jobs
- * {@getfields mailing_recipient_get}
- * @access public
+ * @return array
+ *   API return Array of matching mailing jobs
  */
-function civicrm_api3_mailing_recipients_get($params, $ids = array()) {
+function civicrm_api3_mailing_recipients_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,10 +40,9 @@
 class CRM_Case_Form_EditClient extends CRM_Core_Form {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -68,7 +67,9 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
       $url = CRM_Utils_System::url('civicrm/case', 'reset=1');
     }
     elseif (in_array($context, array(
-      'dashlet', 'dashletFullscreen'))) {
+      'dashlet',
+      'dashletFullscreen',
+    ))) {
       $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
     }
     $session = CRM_Core_Session::singleton();
@@ -76,21 +77,20 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addEntityRef('reassign_contact_id', ts('Select Contact'), array('create' => TRUE), TRUE);
     $this->addButtons(array(
       array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-      array(
         'type' => 'done',
         'name' => ts('Reassign Case'),
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     ));
 
@@ -99,18 +99,18 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   }
 
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array(get_class($this), 'formRule'), $this);
   }
 
   /**
    * @param $vals
    * @param $rule
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function formRule($vals, $rule, $form) {
+  public static function formRule($vals, $rule, $form) {
     $errors = array();
     if (empty($vals['reassign_contact_id']) || $vals['reassign_contact_id'] == $form->get('cid')) {
       $errors['reassign_contact_id'] = ts("Please select a different contact.");
@@ -119,10 +119,9 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -136,5 +135,5 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     );
     CRM_Core_Session::singleton()->pushUserContext($url);
   }
-}
 
+}

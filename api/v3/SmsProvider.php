@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,59 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 sms_provider functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_sms_provider
- *
  */
 
 /**
- * Save an sms_provider
+ * This api exposes CiviCRM sms_provider records.
  *
- * Allowed @params array keys are:
- * {@getfields sms_provider_create}
- * @example sms_providerCreate.php
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save an sms_provider.
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created sms_provider property values.
- * @access public
+ * @return array
+ *   Array of newly created sms_provider property values.
  */
 function civicrm_api3_sms_provider_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get an sms_provider
+ * Get an sms_provider.
  *
- * Allowed @params array keys are:
- * {@getfields sms_provider_get}
- * @example sms_providerCreate.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of retrieved sms_provider property values.
- * @access public
+ * @return array
+ *   Array of retrieved sms_provider property values.
  */
 function civicrm_api3_sms_provider_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete an sms_provider
+ * Delete an sms_provider.
  *
- * Allowed @params array keys are:
- * {@getfields sms_provider_delete}
- * @example sms_providerCreate.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_sms_provider_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

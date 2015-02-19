@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     parent::setUp();
   }
 
-  function testBatchUpdatePendingContribution() {
+  public function testBatchUpdatePendingContribution() {
     $this->webtestLogin();
     $this->_testOfflineContribution();
     $this->_testOfflineContribution();
@@ -43,16 +43,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "Contributor");
+    $this->type("sort_name", "Individual");
     $this->click('contribution_status_id_2');
-    $this->click("_qf_Search_refresh");
+    $this->clickLink("_qf_Search_refresh");
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('radio_ts', 'ts_all');
 
     $this->select('task', "label=Update Pending Contribution Status");
-    $this->click("_qf_Search_next_action");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Search_next_action");
     $this->select('contribution_status_id', 'label=Completed');
     $this->click('_qf_Status_next');
     $this->waitForElementPresent("_qf_Result_done");
@@ -60,7 +58,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->waitForElementPresent("contribution_date_low");
 
-    $this->type("sort_name", "Contributor");
+    $this->type("sort_name", "Individual");
     $this->click('contribution_status_id_1');
     $this->click("_qf_Search_refresh");
 
@@ -75,7 +73,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testParticipationAdd() {
+  public function testParticipationAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -123,9 +121,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
-      'Received Into'        => "Deposit Bank Account",
+      'Received Into' => "Deposit Bank Account",
       'Contribution Status' => "Completed",
     );
 
@@ -133,9 +131,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   }
 
   /**
-   * @param $firstName
+   * @param string $firstName
    */
-  function _addParticipant($firstName) {
+  public function _addParticipant($firstName) {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
@@ -190,18 +188,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     );
   }
 
-  function _testOfflineContribution() {
-    $firstName = substr(sha1(rand()), 0, 7);
-    $lastName  = 'Contributor';
-    $email     = $firstName . "@example.com";
-
+  public function _testOfflineContribution() {
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
-    $this->webtestNewDialogContact($firstName, "Contributor", $email);
+    $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     //Contribution status
     $this->select("contribution_status_id", "label=Pending");
@@ -232,5 +226,5 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
       $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
     }
   }
-}
 
+}

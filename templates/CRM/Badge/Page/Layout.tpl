@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,6 @@
       {strip}
       {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}
-        {include file="CRM/common/crmeditable.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
           <thead>
@@ -69,7 +68,7 @@
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
           <a href="{crmURL q="action=add&reset=1"}" id="newbadge-layout"
-             class="button"><span><div class="icon add-icon"></div> {ts}New Badge Layout{/ts}</span></a>
+             class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}New Badge Layout{/ts}</span></a>
         </div>
       {/if}
     </div>

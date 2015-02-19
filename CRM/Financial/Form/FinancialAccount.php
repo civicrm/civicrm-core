@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,7 +40,7 @@
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
-   * Flag if its a AR account type
+   * Flag if its a AR account type.
    *
    * @var boolean
    */
@@ -48,10 +48,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -64,7 +63,8 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
       if ($financialAccount->financial_account_type_id == array_search('Asset', $financialAccountType)
         && strtolower($financialAccount->account_type_code) == 'ar'
-        && !CRM_Financial_BAO_FinancialAccount::getARAccounts($this->_id, array_search('Asset', $financialAccountType))) {
+        && !CRM_Financial_BAO_FinancialAccount::getARAccounts($this->_id, array_search('Asset', $financialAccountType))
+      ) {
         $this->_isARFlag = TRUE;
         if ($this->_action & CRM_Core_Action::DELETE) {
           $msg = ts("The selected financial account cannot be deleted because at least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance).");
@@ -75,13 +75,12 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
-  public function buildQuickForm( ) {
-    parent::buildQuickForm( );
+  public function buildQuickForm() {
+    parent::buildQuickForm();
     $this->setPageTitle(ts('Financial Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -97,7 +96,10 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $this->add('text', 'description', ts('Description'), $attributes['description']);
     $this->add('text', 'accounting_code', ts('Accounting Code'), $attributes['accounting_code']);
     $elementAccounting = $this->add('text', 'account_type_code', ts('Account Type Code'), $attributes['account_type_code']);
-    $this->addEntityRef('contact_id', ts('Owner'), array('api' => array('params' => array('contact_type' => 'Organization')), 'create' => TRUE));
+    $this->addEntityRef('contact_id', ts('Owner'), array(
+      'api' => array('params' => array('contact_type' => 'Organization')),
+      'create' => TRUE,
+    ));
     $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
     $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -121,44 +123,64 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE &&
-      CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')) {
+      CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
+    ) {
       $this->freeze(array('name', 'description', 'is_active'));
     }
     $this->addFormRule(array('CRM_Financial_Form_FinancialAccount', 'formRule'), $this);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param $values
+   * @param array $values
+   *   posted values of the form
    * @param $files
    * @param $self
    *
-   * @internal param array $fields posted values of the form
-   *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule( $values, $files, $self ) {
-    $errorMsg = array( );
-    if (!empty( $values['tax_rate'])) {
-      if ($values['tax_rate'] <= 0 || $values['tax_rate'] > 100) {
+  public static function formRule($values, $files, $self) {
+    $errorMsg = array();
+    $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
+    if (isset($values['is_tax'])) {
+      if ($values['financial_account_type_id'] != $financialAccountTypeId) {
+        $errorMsg['financial_account_type_id'] = ts('Taxable accounts should have Financial Account Type set to Liability.');
+      }
+      if (CRM_Utils_Array::value('tax_rate', $values) == NULL) {
+        $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
+      }
+    }
+    if ((CRM_Utils_Array::value('tax_rate', $values) != NULL)) {
+      if ($values['tax_rate'] < 0 || $values['tax_rate'] >= 100) {
         $errorMsg['tax_rate'] = ts('Tax Rate Should be between 0 - 100');
       }
     }
-    return CRM_Utils_Array::crmIsEmptyArray( $errorMsg ) ? true : $errorMsg;
+    if ($self->_action & CRM_Core_Action::UPDATE) {
+      if (!(isset($values['is_tax']))) {
+        $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+        $params = array(
+          'financial_account_id' => $self->_id,
+          'account_relationship' => $relationshipId,
+        );
+        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+        if ($result) {
+          $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
+        }
+      }
+    }
+    return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
@@ -167,18 +189,17 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_FinancialAccount::del($this->_id);
-      CRM_Core_Session::setStatus( ts('Selected Financial Account has been deleted.') );
+      CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
     }
     else {
-      $ids = array( );
+      $ids = array();
       // store the submitted values in an array
       $params = $this->exportValues();
 

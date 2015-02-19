@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -34,35 +34,25 @@ require_once 'CiviTest/Custom.php';
  * Class CRM_Contribute_BAO_ContributionTest
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Contribution BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function teardown() {
+  public function teardown() {
   }
 
   /**
-   * create() method (create and update modes)
+   * Create() method (create and update modes)
    */
-  function testCreate() {
+  public function testCreate() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -100,9 +90,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method with custom data
+   * Create() method with custom data
    */
-  function testCreateWithCustomData() {
+  public function testCreateWithCustomData() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
@@ -120,7 +110,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -136,7 +126,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-
     $params['custom'] = array(
       $customField->id => array(
         -1 => array(
@@ -150,7 +139,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
         ),
       ),
     );
-
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
@@ -172,16 +160,16 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleteContribution() method
+   * DeleteContribution() method
    */
-  function testDeleteContribution() {
+  public function testDeleteContribution() {
     $contactId = Contact::createIndividual();
     $ids = array('contribution' => NULL);
 
     $params = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -211,12 +199,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * create honor-contact method
+   * Create honor-contact method
    */
-  function testcreateAndGetHonorContact() {
+  public function testcreateAndGetHonorContact() {
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}.{$lastName}@example.com";
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
 
     //Get profile id of name honoree_individual used to create profileContact
     $honoreeProfileId = NULL;
@@ -235,8 +223,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $softParam = array('soft_credit_type_id' => 1);
 
     $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
-        NULL, NULL, $honoreeProfileId
-      );
+      NULL, NULL, $honoreeProfileId
+    );
 
     $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
@@ -250,7 +238,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 4,
+      'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 66,
@@ -279,7 +267,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $annual = CRM_Contribute_BAO_Contribution::annual($contactId);
 
     $config = CRM_Core_Config::singleton();
-        $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency',$config->defaultCurrency,'symbol','name') ;
+    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $config->defaultCurrency, 'symbol', 'name');
     $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'total_amount',
       'id', ltrim($annual[2], $currencySymbol), 'Check DB for total amount of the contribution'
     );
@@ -295,11 +283,11 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * display sort name during
+   * Display sort name during.
    * contribution batch update through profile
    * sortName();
    */
-  function testsortName() {
+  public function testsortName() {
     $params = array(
       'first_name' => 'Shane',
       'last_name' => 'Whatson',
@@ -318,7 +306,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -351,17 +339,16 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add premium during online Contribution
+   * Add premium during online Contribution.
    *
    * AddPremium();
    */
-  function testAddPremium() {
+  public function testAddPremium() {
     $contactId = Contact::createIndividual();
 
     $ids = array(
       'premium' => NULL,
     );
-
 
     $params = array(
       'name' => 'TEST Premium',
@@ -382,7 +369,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -426,11 +413,11 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check duplicate contribution id
+   * Check duplicate contribution id.
    * during the contribution import
    * checkDuplicateIds();
    */
-  function testcheckDuplicateIds() {
+  public function testcheckDuplicateIds() {
     $contactId = Contact::createIndividual();
 
     $ids = array('contribution' => NULL);
@@ -438,7 +425,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id'   => 1,
+      'financial_type_id' => 1,
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -471,6 +458,5 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     // Delete Contact
     Contact::delete($contactId);
   }
+
 }
-
-

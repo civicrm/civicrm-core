@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for Individuals.
    */
-  function testIndividualImport() {
+  public function testIndividualImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -122,10 +122,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Organization.
    */
-  function testOrganizationImport() {
+  public function testOrganizationImport() {
 
     $this->webtestLogin();
 
@@ -203,10 +203,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Household.
    */
-  function testHouseholdImport() {
+  public function testHouseholdImport() {
 
     $this->webtestLogin();
 
@@ -290,7 +290,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualCSVData() {
+  public function _individualCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -305,7 +305,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -316,7 +317,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -338,7 +340,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _organizationCSVData() {
+  public function _organizationCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
       'email' => 'Email',
@@ -351,7 +353,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '9949912154',
         'address_1' => 'Add 1',
@@ -360,7 +363,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '6949412154',
         'address_1' => 'Add 1',
@@ -380,7 +384,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _householdCSVData() {
+  public function _householdCSVData() {
     $headers = array(
       'household_name' => 'Household Name',
       'email' => 'Email',
@@ -393,7 +397,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '3949912154',
         'address_1' => 'Add 1',
@@ -402,7 +407,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '5949412154',
         'address_1' => 'Add 1',
@@ -415,5 +421,5 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

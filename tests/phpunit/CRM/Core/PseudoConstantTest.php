@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,18 +31,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for pseudoconstant retrieval
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'PseudoConstant',
-      'description' => 'Tests for pseudoconstant option values',
-      'group'     => 'Core',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->loadAllFixtures();
@@ -55,7 +45,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  function testOptionValues() {
+  public function testOptionValues() {
 
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
@@ -74,12 +64,14 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'html_type' => 'Select',
       'data_type' => 'String',
       'is_active' => TRUE,
-      'option_values' => array(array(
-        'label' => 'Foo',
-        'value' => 'foo',
-        'is_active' => 1,
-        'weight' => 0,
-      )),
+      'option_values' => array(
+        array(
+          'label' => 'Foo',
+          'value' => 'foo',
+          'is_active' => 1,
+          'weight' => 0,
+        ),
+      ),
     );
     $result = civicrm_api3('custom_field', 'create', $api_params);
     $customFieldId = $result['id'];
@@ -127,7 +119,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'duration_interval' => 1,
     );
     $result = civicrm_api3('membership_type', 'create', $api_params);
-    
+
     // Create a contribution page for testing.
     $contribution_page = md5(microtime());
     $api_params = array(
@@ -243,12 +235,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'used',
           'sample' => 'Unsupervised',
-        ),
-      ),
-      'CRM_Mailing_Event_DAO_Subscribe' => array(
-        array(
-          'fieldName' => 'group_id',
-          'sample' => $group_name,
         ),
       ),
       'CRM_Activity_DAO_Activity' => array(
@@ -534,7 +520,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => $campaign_name,
         ),
       ),
-     'CRM_Pledge_DAO_PledgePayment' => array(
+      'CRM_Pledge_DAO_PledgePayment' => array(
         array(
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
@@ -1080,7 +1066,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     }
   }
 
-  function testContactTypes() {
+  public function testContactTypes() {
     $byName = array(
       'Individual' => 'Individual',
       'Household' => 'Household',
@@ -1095,10 +1081,18 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $result = CRM_Contact_DAO_Contact::buildOptions('contact_type');
     $this->assertEquals($byName, $result);
     // But we can also fetch by ID
-    $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name'));
+    $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
+        'keyColumn' => 'id',
+        'labelColumn' => 'name',
+      ));
     $this->assertEquals($byId, $result);
     // Make sure flip param works
-    $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array('keyColumn' => 'id', 'labelColumn' => 'name', 'flip' => TRUE));
+    $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
+        'keyColumn' => 'id',
+        'labelColumn' => 'name',
+        'flip' => TRUE,
+      ));
     $this->assertEquals(array_flip($byId), $result);
   }
+
 }

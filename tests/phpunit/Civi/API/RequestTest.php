@@ -10,7 +10,7 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  function v4options() {
+  public function v4options() {
     $cases = array(); // array(0 => $requestParams, 1 => $expectedOptions, 2 => $expectedData, 3 => $expectedChains)
     $cases[] = array(
       array('version' => 4), // requestParams
@@ -31,13 +31,25 @@ class RequestTest extends \CiviUnitTestCase {
       array(), // expectedChains
     );
     $cases[] = array(
-      array('version' => 4, 'option.limit' => 15, 'option.foo' => array('bar'), 'options' => array('whiz' => 'bang'), 'optionnotreally' => 'data'), // requestParams
+      array(
+        'version' => 4,
+        'option.limit' => 15,
+        'option.foo' => array('bar'),
+        'options' => array('whiz' => 'bang'),
+        'optionnotreally' => 'data',
+      ), // requestParams
       array('limit' => 15, 'foo' => array('bar'), 'whiz' => 'bang'), // expectedOptions
       array('optionnotreally' => 'data'), // expectedData
       array(), // expectedChains
     );
     $cases[] = array(
-      array('version' => 4, 'return' => array('field1', 'field2'), 'return.field3' => 1, 'return.field4' => 0, 'returnontreally' => 'data'), // requestParams
+      array(
+        'version' => 4,
+        'return' => array('field1', 'field2'),
+        'return.field3' => 1,
+        'return.field4' => 0,
+        'returnontreally' => 'data',
+      ), // requestParams
       array('return' => array('field1', 'field2', 'field3')), // expectedOptions
       array('returnontreally' => 'data'), // expectedData
       array(), // expectedChains
@@ -74,13 +86,13 @@ class RequestTest extends \CiviUnitTestCase {
   }
 
   /**
-   * @param $inputParams
+   * @param array $inputParams
    * @param $expectedOptions
    * @param $expectedData
    * @param $expectedChains
    * @dataProvider v4options
    */
-  function testCreateRequest_v4Options($inputParams, $expectedOptions, $expectedData, $expectedChains) {
+  public function testCreateRequest_v4Options($inputParams, $expectedOptions, $expectedData, $expectedChains) {
     $apiRequest = Request::create('MyEntity', 'MyAction', $inputParams, NULL);
     $this->assertEquals($expectedOptions, $apiRequest['options']->getArray());
     $this->assertEquals($expectedData, $apiRequest['data']->getArray());
@@ -90,21 +102,21 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @expectedException \API_Exception
    */
-  function testCreateRequest_v4BadEntity() {
+  public function testCreateRequest_v4BadEntity() {
     Request::create('Not!Valid', 'create', array('version' => 4), NULL);
   }
 
   /**
    * @expectedException \API_Exception
    */
-  function testCreateRequest_v4BadAction() {
+  public function testCreateRequest_v4BadAction() {
     Request::create('MyEntity', 'bad!action', array('version' => 4), NULL);
   }
 
   /**
    * @return array
    */
-  function validEntityActionPairs() {
+  public function validEntityActionPairs() {
     $cases = array();
     $cases[] = array(
       array('MyEntity', 'MyAction', 3),
@@ -123,8 +135,11 @@ class RequestTest extends \CiviUnitTestCase {
 
   /**
    * @dataProvider validEntityActionPairs
+   * @param $input
+   * @param $expected
+   * @throws \API_Exception
    */
-  function testCreateRequest_EntityActionMunging($input, $expected) {
+  public function testCreateRequest_EntityActionMunging($input, $expected) {
     list ($inEntity, $inAction, $inVersion) = $input;
     $apiRequest = Request::create($inEntity, $inAction, array('version' => $inVersion), NULL);
     $this->assertEquals($expected, array($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']));
@@ -133,7 +148,7 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @return array
    */
-  function invalidEntityActionPairs() {
+  public function invalidEntityActionPairs() {
     $cases = array();
     $cases[] = array('My+Entity', 'MyAction', 4);
     $cases[] = array('My Entity', 'MyAction', 4);
@@ -147,8 +162,12 @@ class RequestTest extends \CiviUnitTestCase {
   /**
    * @dataProvider invalidEntityActionPairs
    * @expectedException \API_Exception
+   * @param $inEntity
+   * @param $inAction
+   * @param $inVersion
+   * @throws \API_Exception
    */
-  function testCreateRequest_InvalidEntityAction($inEntity, $inAction, $inVersion) {
+  public function testCreateRequest_InvalidEntityAction($inEntity, $inAction, $inVersion) {
     Request::create($inEntity, $inAction, array('version' => $inVersion), NULL);
   }
 

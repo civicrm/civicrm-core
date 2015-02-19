@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -34,29 +34,37 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
   // new test classes should be compliant.
   public $_eNoticeCompliant = FALSE;
-  function setUp() {
+
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
-  function testGetKeysEmpty() {
+  public function testGetKeysEmpty() {
     $c = new CRM_Extension_Container_Collection(array());
     $this->assertEquals($c->getKeys(), array());
   }
 
-  function testGetKeys() {
+  public function testGetKeys() {
     $c = $this->_createContainer();
-    $this->assertEquals(array('test.conflict', 'test.whiz', 'test.whizbang', 'test.foo', 'test.foo.bar'), $c->getKeys());
+    $this->assertEquals(array(
+        'test.conflict',
+        'test.whiz',
+        'test.whizbang',
+        'test.foo',
+        'test.foo.bar',
+      ), $c->getKeys());
   }
 
-  function testGetPath() {
+  public function testGetPath() {
     $c = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -68,11 +76,12 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertEquals("/path/to/conflict-b", $c->getPath('test.conflict'));
   }
 
-  function testGetResUrl() {
+  public function testGetResUrl() {
     $c = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -84,7 +93,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertEquals('http://conflict-b', $c->getResUrl('test.conflict'));
   }
 
-  function testCaching() {
+  public function testCaching() {
     $cache = new CRM_Utils_Cache_Arraycache(array());
     $this->assertTrue(!is_array($cache->get('ext-collection')));
     $c = $this->_createContainer($cache, 'ext-collection');
@@ -102,7 +111,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
    *
    * @return CRM_Extension_Container_Collection
    */
-  function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $containers = array();
     $containers['a'] = new CRM_Extension_Container_Static(array(
       'test.foo' => array(
@@ -134,7 +143,8 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
         'resUrl' => 'http://conflict-c',
       ),
     ));
-    $c  = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
+    $c = new CRM_Extension_Container_Collection($containers, $cache, $cacheKey);
     return $c;
   }
+
 }

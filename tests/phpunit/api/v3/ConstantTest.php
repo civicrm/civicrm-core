@@ -4,13 +4,13 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
- *   @package CiviCRM_APIv3
- *   @subpackage API_Constant
+ * @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
  *
  *   This file is part of CiviCRM
  *
@@ -37,26 +37,17 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Constant
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
  */
 class api_v3_ConstantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-
   /**
-   *  Constructor
+   * Test setup for every test.
    *
-   *  Initialize configuration
-   */ function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   *  Test setup for every test
-   *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
@@ -65,7 +56,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( ) for unknown constant
+   * Test civicrm_constant_get( ) for unknown constant
    */
   public function testUnknownConstant() {
     $result = $this->callAPIFailure('constant', 'get', array(
@@ -74,7 +65,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityStatus' )
+   * Test civicrm_constant_get( 'activityStatus' )
    */
   public function testActivityStatus() {
 
@@ -90,21 +81,18 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityType' )
+   * Test civicrm_constant_get( 'activityType' )
    */
   public function testActivityType() {
-
-    $parameters = array(TRUE, FALSE, TRUE);
-
-    $result = $this->callAPISuccess('constant', 'get', array(
+    $result = $this->callAPIAndDocument('constant', 'get', array(
       'name' => 'activityType',
-    ));
+    ), __FUNCTION__, __FILE__, NULL, NULL, 'get');
     $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
     $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
   }
 
   /**
-   *  Test civicrm_address_getoptions( 'location_type_id' )
+   * Test civicrm_address_getoptions( 'location_type_id' )
    */
   public function testLocationTypeGet() {
     // needed to get rid of cached values from previous tests
@@ -113,7 +101,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $params = array(
       'field' => 'location_type_id',
     );
-    $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('address', 'getoptions', $params);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
     $this->assertContains('Work', $result['values'], "In line " . __LINE__);
@@ -122,7 +110,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_phone_getoptions( 'phone_type_id' )
+   * Test civicrm_phone_getoptions( 'phone_type_id' )
    */
   public function testPhoneType() {
     $params = array(
@@ -139,7 +127,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_constant_get( 'mailProtocol' )
+   * Test civicrm_constant_get( 'mailProtocol' )
    */
   public function testmailProtocol() {
     $params = array(
@@ -153,4 +141,5 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
     $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
   }
+
 }

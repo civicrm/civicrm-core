@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,7 +42,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->normalize();
@@ -68,7 +68,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
     foreach ($this->_columns as $name => $field) {
       if (in_array($field, array(
-        'street_address', 'city', 'state_province', 'postal_code', 'country')) && empty($addressOptions[$field])) {
+          'street_address',
+          'city',
+          'state_province',
+          'postal_code',
+          'country',
+        )) && empty($addressOptions[$field])
+      ) {
         unset($this->_columns[$name]);
         continue;
       }
@@ -81,14 +87,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   }
 
   /**
-   * normalize the form values to make it look similar to the advanced form values
+   * Normalize the form values to make it look similar to the advanced form values
    * this prevents a ton of work downstream and allows us to use the same code for
    * multiple purposes (queries, save/edit etc)
    *
    * @return void
-   * @access private
    */
-  function normalize() {
+  public function normalize() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
     if ($contactType && !is_array($contactType)) {
       unset($this->_formValues['contact_type']);
@@ -107,13 +112,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
       $this->_formValues['tag'][$tag] = 1;
     }
 
-    return;
+    return NULL;
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
     // this is loaded onto then replace with something like '__' & test
     $separator = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -137,7 +142,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   /**
    * @return CRM_Contact_DAO_Contact
    */
-  function count() {
+  public function count() {
     return $this->_query->searchQuery(0, 0, NULL, TRUE);
   }
 
@@ -150,7 +155,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    *
    * @return CRM_Contact_DAO_Contact
    */
-  function all(
+  public function all(
     $offset = 0,
     $rowCount = 0,
     $sort = NULL,
@@ -172,7 +177,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     return $this->_query->_fromClause;
   }
 
@@ -181,7 +186,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    *
    * @return string|void
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
       return $whereClause;
     }
@@ -191,14 +196,15 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }
 
   /**
    * @return CRM_Contact_BAO_Query
    */
-  function getQueryObj() {
+  public function getQueryObj() {
     return $this->_query;
   }
+
 }

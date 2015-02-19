@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -55,25 +55,21 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * This is a string which is either a_b or  b_a  used to determine the relationship between to contacts
-   *
    */
   public $_rtype;
 
   /**
    * This is a string which is used to determine the relationship between to contacts
-   *
    */
   public $_rtypeId;
 
   /**
    * Display name of contact a
-   *
    */
   public $_display_name_a;
 
   /**
    * Display name of contact b
-   *
    */
   public $_display_name_b;
 
@@ -85,7 +81,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_relationshipTypeId;
 
   /**
-   * an array of all relationship names
+   * An array of all relationship names
    *
    * @var array
    */
@@ -112,7 +108,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_values;
 
   /**
-   * casid if it called from case context
+   * Casid if it called from case context
    */
   public $_caseId;
 
@@ -121,7 +117,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public $_cdType;
 
-  function preProcess() {
+  public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
@@ -149,12 +145,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       case CRM_Core_Action::VIEW:
         CRM_Utils_System::setTitle(ts('View Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::ADD:
         CRM_Utils_System::setTitle(ts('Add Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::UPDATE:
         CRM_Utils_System::setTitle(ts('Edit Relationship for %1', array(1 => $this->_display_name_a)));
         break;
+
       case CRM_Core_Action::DELETE:
         CRM_Utils_System::setTitle(ts('Delete Relationship for %1', array(1 => $this->_display_name_a)));
         break;
@@ -211,14 +210,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Relationship that in edit/view mode
+   * Set default values for the form. Relationship that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -261,9 +259,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'entity_id' => $this->_relationshipId,
           'entity_table' => 'civicrm_relationship',
           'limit' => 1,
-          'version' => 3
+          'version' => 3,
         );
-        $note = civicrm_api('Note' ,'getsingle', $noteParams);
+        $note = civicrm_api('Note', 'getsingle', $noteParams);
         $defaults['note'] = CRM_Utils_Array::value('note', $note);
       }
     }
@@ -277,12 +275,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules for form.
+   * add the rules for form.
    *
    * @return void
-   * @access public
    */
-  function addRules() {
+  public function addRules() {
     if ($this->_cdType) {
       return;
     }
@@ -293,10 +290,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -329,7 +325,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $jsData = array();
     // Get just what we need to keep the dom small
     $whatWeWant = array_flip(array('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b'));
-    foreach($this->_allRelationshipNames as $id => $vals) {
+    foreach ($this->_allRelationshipNames as $id => $vals) {
       if ($vals['name_a_b'] === 'Employee of') {
         $this->assign('employmentRelationship', $id);
       }
@@ -348,13 +344,16 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       'select',
       'relationship_type_id',
       ts('Relationship Type'),
-      array( '' => ts('- select -')) + $relationshipList,
+      array('' => ts('- select -')) + $relationshipList,
       TRUE,
       array('class' => 'crm-select2 huge')
     );
 
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
-    $contactField = $this->addEntityRef('related_contact_id', $label, array('multiple' => TRUE, 'create' => TRUE), TRUE);
+    $contactField = $this->addEntityRef('related_contact_id', $label, array(
+        'multiple' => TRUE,
+        'create' => TRUE,
+      ), TRUE);
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();
@@ -400,9 +399,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   *  This function is called when the form is submitted
+   *  This function is called when the form is submitted.
    *
-   * @access public
    *
    * @return void
    */
@@ -462,7 +460,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     // Save relationships
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::create($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
@@ -471,13 +469,28 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     if ($valid) {
-      CRM_Core_Session::setStatus(ts('Relationship created.', array('count' => $valid, 'plural' => '%count relationships created.')), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Relationship created.', array(
+            'count' => $valid,
+            'plural' => '%count relationships created.',
+          )), ts('Saved'), 'success');
     }
     if ($invalid) {
-      CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array('count' => $invalid, 'plural' => '%count relationship records were not created due to invalid contact types.')), ts('%count invalid relationship record', array('count' => $invalid, 'plural' => '%count invalid relationship records')));
+      CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array(
+            'count' => $invalid,
+            'plural' => '%count relationship records were not created due to invalid contact types.',
+          )), ts('%count invalid relationship record', array(
+            'count' => $invalid,
+            'plural' => '%count invalid relationship records',
+          )));
     }
     if ($duplicate) {
-      CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array('count' => $duplicate, 'plural' => '%count relationships were not created because they already exist.')), ts('%count duplicate relationship', array('count' => $duplicate, 'plural' => '%count duplicate relationships')));
+      CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array(
+            'count' => $duplicate,
+            'plural' => '%count relationships were not created because they already exist.',
+          )), ts('%count duplicate relationship', array(
+            'count' => $duplicate,
+            'plural' => '%count duplicate relationships',
+          )));
     }
     if ($saved) {
       CRM_Core_Session::setStatus(ts('Relationship record has been updated.'), ts('Saved'), 'success');
@@ -490,7 +503,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'entity_id' => $id,
           'entity_table' => 'civicrm_relationship',
         );
-        $existing = civicrm_api3('note' ,'get', $noteParams);
+        $existing = civicrm_api3('note', 'get', $noteParams);
         if (!empty($existing['id'])) {
           $noteParams['id'] = $existing['id'];
         }
@@ -520,9 +533,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
         }
       }
-      // Refresh contact tabs with related data
+      // Refresh contact tabs which might have been affected
       $this->ajaxResponse['updateTabs'] = array(
         '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
+        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
       );
     }
     // Set current employee/employer relationship, CRM-3532
@@ -540,15 +554,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * function for date validation
+   * Date validation.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return mixed true or array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   mixed true or array of errors
    */
-  static function dateRule($params) {
+  public static function dateRule($params) {
     $errors = array();
 
     // check start and end date
@@ -564,4 +578,3 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
 }
-

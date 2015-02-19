@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
              </div>
              <div style="height: auto; vertical-align: bottom">{$form.auctionsByDates.html}</div>
         </td>
-        <td class="left" rowspan="2">&nbsp;{$form.buttons.html}</td>  
+        <td class="left" rowspan="2">&nbsp;{$form.buttons.html}</td>
     </tr>
     <tr>
        <td></td>
@@ -52,21 +52,21 @@
             <td>&nbsp;{$form.end_date.html}&nbsp;
              &nbsp;{include file="CRM/common/calendar/desc.tpl" trigger=trigger_search_member_2}
              {include file="CRM/common/calendar/body.tpl" dateVar=end_date startDate=startYear endDate=endYear offset=5 trigger=trigger_search_member_2}
-            </td> 
+            </td>
           </tr>
-       </table> 
+       </table>
        </td>
-    </tr>  
+    </tr>
   </table>
 </fieldset>
 </div>
 
 {include file="CRM/common/showHide.tpl"}
 
-{literal} 
+{literal}
 <script type="text/javascript">
 if ( document.getElementsByName('auctionsByDates')[1].checked ) {
   cj('#id_fromToDates').show();
 }
 </script>
-{/literal} 
+{/literal}

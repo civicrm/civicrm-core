@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrivacyOptionSearch() {
+  public function testPrivacyOptionSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -121,7 +121,7 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("No matches found"));
+    $this->assertTrue($this->isTextPresent("None found."));
 
     // Go to advance search, check for 'Include' + 'OR' options.
     $this->openCiviPage("contact/search/advanced", "reset=1");
@@ -164,5 +164,5 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("1 Contact"));
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
   }
-}
 
+}

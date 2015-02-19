@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,30 +41,24 @@ require_once 'CiviTest/Event.php';
  * Class CRM_Core_BAO_LocationTest
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Location BAOs',
-      'description' => 'Test all Core_BAO_Location methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
-    $this->quickCleanup( array( 'civicrm_contact', 'civicrm_address', 'civicrm_loc_block', 'civicrm_email', 'civicrm_phone', 'civicrm_im' ) );
+    $this->quickCleanup(array(
+        'civicrm_contact',
+        'civicrm_address',
+        'civicrm_loc_block',
+        'civicrm_email',
+        'civicrm_phone',
+        'civicrm_im',
+      ));
   }
 
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_openid',
@@ -73,7 +67,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
   }
 
-  function testCreateWithMissingParams() {
+  public function testCreateWithMissingParams() {
     $contactId = Contact::createIndividual();
     $params = array(
       'contact_id' => $contactId,
@@ -92,11 +86,11 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method
+   * Create() method
    * create various elements of location block
    * without civicrm_loc_block entry
    */
-  function testCreateWithoutLocBlock() {
+  public function testCreateWithoutLocBlock() {
     $contactId = Contact::createIndividual();
 
     //create various element of location block
@@ -216,11 +210,11 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * create() method
+   * Create() method
    * create various elements of location block
    * with civicrm_loc_block
    */
-  function testCreateWithLocBlock() {
+  public function testCreateWithLocBlock() {
     $this->_contactId = Contact::createIndividual();
     //create test event record.
     $eventId = Event::create($this->_contactId);
@@ -304,7 +298,8 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     );
 
     //Now check DB for location elements.
-    $searchParams = array('id' => CRM_Utils_Array::value('address_id', $locElementIds),
+    $searchParams = array(
+      'id' => CRM_Utils_Array::value('address_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );
@@ -321,15 +316,16 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     );
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('email_id', $locElementIds),
+    $searchParams = array(
+      'id' => CRM_Utils_Array::value('email_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );
     $compareParams = array('email' => 'john.smith@example.org');
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
-
-    $searchParams = array('id' => CRM_Utils_Array::value('phone_id', $locElementIds),
+    $searchParams = array(
+      'id' => CRM_Utils_Array::value('phone_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
@@ -337,14 +333,16 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $compareParams = array('phone' => '303443689');
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('phone_2_id', $locElementIds),
+    $searchParams = array(
+      'id' => CRM_Utils_Array::value('phone_2_id', $locElementIds),
       'location_type_id' => 1,
       'phone_type_id' => 2,
     );
     $compareParams = array('phone' => '9833910234');
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
-    $searchParams = array('id' => CRM_Utils_Array::value('im_id', $locElementIds),
+    $searchParams = array(
+      'id' => CRM_Utils_Array::value('im_id', $locElementIds),
       'location_type_id' => 1,
       'is_primary' => 1,
     );
@@ -363,12 +361,11 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleteLocBlock() method
+   * DeleteLocBlock() method
    * delete the location block
    * created with various elements.
-   *
    */
-  function testDeleteLocBlock() {
+  public function testDeleteLocBlock() {
     $this->_contactId = Contact::createIndividual();
     //create test event record.
     $eventId = Event::create($this->_contactId);
@@ -457,10 +454,10 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
   }
 
   /**
-   * getValues() method
+   * GetValues() method
    * get the values of various location elements
    */
-  function testLocBlockgetValues() {
+  public function testLocBlockgetValues() {
     $contactId = Contact::createIndividual();
 
     //create various element of location block
@@ -559,5 +556,5 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //cleanup DB by deleting the contact
     Contact::delete($contactId);
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The InnoDB indexer is responsible for creating and destroying
@@ -45,7 +45,7 @@ class CRM_Core_InnoDBIndexer {
     if ($fresh || self::$singleton === NULL) {
       $indices = array(
         'civicrm_address' => array(
-          array('street_address', 'city', 'postal_code')
+          array('street_address', 'city', 'postal_code'),
         ),
         'civicrm_activity' => array(
           array('subject', 'details'),
@@ -57,7 +57,7 @@ class CRM_Core_InnoDBIndexer {
           array('source', 'amount_level', 'trxn_Id', 'invoice_id'),
         ),
         'civicrm_email' => array(
-          array('email')
+          array('email'),
         ),
         'civicrm_membership' => array(
           array('source'),
@@ -87,7 +87,8 @@ class CRM_Core_InnoDBIndexer {
    *
    * @param bool $oldValue
    * @param bool $newValue
-   * @param array $metadata Specification of the setting (per *.settings.php)
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleFts($oldValue, $newValue, $metadata) {
     $indexer = CRM_Core_InnoDBIndexer::singleton();
@@ -107,15 +108,25 @@ class CRM_Core_InnoDBIndexer {
    */
   protected $isActive;
 
+  /**
+   * Class constructor.
+   *
+   * @param $isActive
+   * @param $indices
+   */
   public function __construct($isActive, $indices) {
     $this->isActive = $isActive;
     $this->indices = $this->normalizeIndices($indices);
   }
 
+  /**
+   * Fix schema differences.
+   *
+   * Limitation: This won't pick up stale indices on tables which are not
+   * declared in $this->indices. That's not much of an issue for now b/c
+   * we have a static list of tables.
+   */
   public function fixSchemaDifferences() {
-    // Limitation: This won't pick up stale indices on tables which are not
-    // declared in $this->indices. That's not much of an issue for now b/c
-    // we have a static list of tables.
     foreach ($this->indices as $tableName => $ign) {
       $todoSqls = $this->reconcileIndexSqls($tableName);
       foreach ($todoSqls as $todoSql) {
@@ -125,10 +136,11 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Determine if an index is expected to exist
+   * Determine if an index is expected to exist.
    *
    * @param string $table
-   * @param array $fields list of field names that must be in the index
+   * @param array $fields
+   *   List of field names that must be in the index.
    * @return bool
    */
   public function hasDeclaredIndex($table, $fields) {
@@ -153,7 +165,8 @@ class CRM_Core_InnoDBIndexer {
    * Get a list of FTS index names that are currently defined in the database.
    *
    * @param string $table
-   * @return array (string $indexName => string $indexName)
+   * @return array
+   *   (string $indexName => string $indexName)
    */
   public function findActualFtsIndexNames($table) {
     $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
@@ -184,7 +197,9 @@ class CRM_Core_InnoDBIndexer {
    * FTS index.
    *
    * @param $table
-   * @return array (string $indexName => string $sql)
+   *
+   * @return array
+   *   (string $indexName => string $sql)
    */
   public function buildIndexSql($table) {
     $sqls = array(); // array (string $idxName => string $sql)
@@ -198,10 +213,12 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Generate a "DROP INDEX" statement for each existing FTS index
+   * Generate a "DROP INDEX" statement for each existing FTS index.
    *
    * @param string $table
-   * @return array (string $idxName => string $sql)
+   *
+   * @return array
+   *   (string $idxName => string $sql)
    */
   public function dropIndexSql($table) {
     $sqls = array();
@@ -216,7 +233,8 @@ class CRM_Core_InnoDBIndexer {
    * Construct a set of SQL statements which will create (or preserve)
    * required indices and destroy unneeded indices.
    *
-   * @param $table
+   * @param string $table
+   *
    * @return array
    */
   public function reconcileIndexSqls($table) {
@@ -244,7 +262,7 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * Put the indices into a normalized format
+   * Put the indices into a normalized format.
    *
    * @param $indices
    * @return array
@@ -261,16 +279,21 @@ class CRM_Core_InnoDBIndexer {
   }
 
   /**
-   * @param boolean $isActive
+   * Setter for isActive.
+   *
+   * @param bool $isActive
    */
   public function setActive($isActive) {
     $this->isActive = $isActive;
   }
 
   /**
-   * @return boolean
+   * Getter for isActive.
+   *
+   * @return bool
    */
   public function getActive() {
     return $this->isActive;
   }
+
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,11 +35,11 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testOnlineContributionAdd() {
+  public function testOnlineContributionAdd() {
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(10, 50);
@@ -144,9 +144,9 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(
@@ -176,13 +176,13 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$honorDisplayName"), "Honoree contact not found.");
 
-    }
+  }
 
-  function testOnlineContributionWithZeroAmount () {
+  public function testOnlineContributionWithZeroAmount() {
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(10, 50);
@@ -235,31 +235,31 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type('title', "Test Priceset $rand");
     $this->check('extends_2');
     $this->select("financial_type_id", "label=Donation");
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom', FALSE);
     $sid = $this->urlArg('sid');
     //add field
     $this->type('label', "Testfield");
     $this->select('html_type', "value=Radio");
     $this->type('option_label_1', 'test Label');
     $this->type('option_amount_1', 0.00);
-    $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
     $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_cancel-bottom');
     $this->select('price_set_id', "value=$sid");
-    $this->clickLink('_qf_Amount_upload_done-bottom');
+    $this->clickLink('_qf_Amount_upload_done-bottom', FALSE);
 
     //Contribution using priceset
     $this->_doContributionAndVerifyData($pageId, TRUE);
   }
 
   /**
-   * @param $pageId
+   * @param int $pageId
    * @param bool $priceSet
    */
-  function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
+  public function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
     //logout
     $this->webtestLogout();
     $amountLabel = 'Total Amount';
-    $amountValue = '0.00';
+    $amountValue = '1.00';
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -293,27 +293,26 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
 
-
     //login to check contribution
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-      //Find Contribution
+    //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
-    $this->type("sort_name", "$firstName $lastName");
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->type("sort_name", "$lastName $firstName");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       $amountLabel => $amountValue,
-      'Contribution Status' => 'Completed'
+      'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);
   }
-}
 
+}

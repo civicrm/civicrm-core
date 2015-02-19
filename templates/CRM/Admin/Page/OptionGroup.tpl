@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,7 @@
 {else}
 <div id="help">
     {ts}CiviCRM stores configurable choices for various drop-down fields as 'option groups'. You can click <strong>Options</strong> to view the available choices.{/ts}
-    <p><div class="icon alert-icon"></div> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
+    <p><div class="icon ui-icon-alert"></div> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
 </div>
 {/if}
 
@@ -39,7 +39,6 @@
     {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
     <table cellpadding="0" cellspacing="0" border="0">
         <tr class="columnheader">
         <th>{ts}Title{/ts}</th>
@@ -58,7 +57,8 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newOptionGroup" class="button"><span><div class="icon add-icon"></div>{ts}Add Option Group{/ts}</span></a>
+          {crmButton q="action=add&reset=1" id="newOptionGroup"  icon="circle-plus"}{ts}Add Option Group{/ts}{/crmButton}
+          {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
         </div>
     {/if}
 </div>

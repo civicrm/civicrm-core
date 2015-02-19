@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,23 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
- *
  */
 
 /**
- *
+ * SMS Form.
  */
 class CRM_SMS_Form_Provider extends CRM_Core_Form {
   protected $_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_id = $this->get('id');
 
@@ -62,10 +61,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -98,7 +94,10 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       $attributes['title'], TRUE
     );
 
-    $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array('CRM_SMS_DAO_Provider', $this->_id));
+    $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', array(
+        'CRM_SMS_DAO_Provider',
+        $this->_id,
+      ));
 
     $this->add('text', 'username', ts('Username'),
       $attributes['username'], TRUE
@@ -122,18 +121,11 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
+   * Set the default values of various form elements.
    *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
-  /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $name = CRM_Utils_Request::retrieve('key', 'String', $this, FALSE, NULL);
@@ -151,8 +143,9 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $this->_id;
 
-    if ($name)
+    if ($name) {
       $dao->name = $name;
+    }
 
     if (!$dao->find(TRUE)) {
       return $defaults;
@@ -164,11 +157,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
 
@@ -191,5 +180,5 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       CRM_SMS_BAO_Provider::saveRecord($recData);
     }
   }
-}
 
+}

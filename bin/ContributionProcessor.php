@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -142,8 +142,7 @@ class CiviContributeProcessor {
    * @param $start
    * @param $end
    */
-  static
-  function paypal($paymentProcessor, $paymentMode, $start, $end) {
+  public static function paypal($paymentProcessor, $paymentMode, $start, $end) {
     $url = "{$paymentProcessor['url_api']}nvp";
 
     $keyArgs = array(
@@ -186,13 +185,13 @@ class CiviContributeProcessor {
           // details about a transaction, let's make sure that it doesn't
           // already exist in the database.
           require_once 'CRM/Contribute/DAO/Contribution.php';
-          $dao = new CRM_Contribute_DAO_Contribution;
+          $dao = new CRM_Contribute_DAO_Contribution();
           $dao->trxn_id = $value;
           if ($dao->find(TRUE)) {
             preg_match('/(\d+)$/', $name, $matches);
-            $seq   = $matches[1];
+            $seq = $matches[1];
             $email = $result["l_email{$seq}"];
-            $amt   = $result["l_amt{$seq}"];
+            $amt = $result["l_amt{$seq}"];
             CRM_Core_Error::debug_log_message("Skipped (already recorded) - $email, $amt, $value ..<p>", TRUE);
             continue;
           }
@@ -234,9 +233,9 @@ class CiviContributeProcessor {
         }
       }
       if ($result['l_errorcode0'] == '11002') {
-        $end             = $result['l_timestamp99'];
-        $end_time        = strtotime("{$end}", time());
-        $end_date        = date('Y-m-d\T00:00:00.00\Z', $end_time);
+        $end = $result['l_timestamp99'];
+        $end_time = strtotime("{$end}", time());
+        $end_date = date('Y-m-d\T00:00:00.00\Z', $end_time);
         $args['enddate'] = $end_date;
       }
     } while ($result['l_errorcode0'] == '11002');
@@ -248,8 +247,7 @@ class CiviContributeProcessor {
    * @param $start
    * @param $end
    */
-  static
-  function google($paymentProcessor, $paymentMode, $start, $end) {
+  public static function google($paymentProcessor, $paymentMode, $start, $end) {
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
     require_once 'CRM/Core/Payment/Google.php';
     $nextPageToken = TRUE;
@@ -272,8 +270,8 @@ class CiviContributeProcessor {
       if (is_array($response[1][$response[0]]['notifications']['charge-amount-notification'])) {
 
         if (array_key_exists('google-order-number',
-            $response[1][$response[0]]['notifications']['charge-amount-notification']
-          )) {
+          $response[1][$response[0]]['notifications']['charge-amount-notification']
+        )) {
           // sometimes 'charge-amount-notification' itself is an absolute
           // array and not array of arrays. This is the case when there is only one
           // charge-amount-notification. Hack for this special case -
@@ -282,10 +280,9 @@ class CiviContributeProcessor {
           $response[1][$response[0]]['notifications']['charge-amount-notification'][] = $chrgAmt;
         }
 
-        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification']
-          as $amtData
-        ) {
-          $searchParams = array('order-numbers' => array($amtData['google-order-number']['VALUE']),
+        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification'] as $amtData) {
+          $searchParams = array(
+            'order-numbers' => array($amtData['google-order-number']['VALUE']),
             'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
           );
           $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor,
@@ -320,11 +317,10 @@ class CiviContributeProcessor {
     }
   }
 
-  static
-  function csv() {
-    $csvFile   = '/home/deepak/Desktop/crm-4247.csv';
+  public static function csv() {
+    $csvFile = '/home/deepak/Desktop/crm-4247.csv';
     $delimiter = ";";
-    $row       = 1;
+    $row = 1;
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {
@@ -363,8 +359,7 @@ class CiviContributeProcessor {
     fclose($handle);
   }
 
-  static
-  function process() {
+  public static function process() {
     require_once 'CRM/Utils/Request.php';
 
     $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'csv', 'REQUEST');
@@ -393,7 +388,6 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 'live', 'REQUEST'
         );
 
-        require_once 'CRM/Financial/BAO/PaymentProcessor.php';
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $mode);
 
         CRM_Core_Error::debug_log_message("Start Date=$start,  End Date=$end, ppID=$ppID, mode=$mode <p>", TRUE);
@@ -404,6 +398,7 @@ class CiviContributeProcessor {
         return self::csv();
     }
   }
+
 }
 
 // bootstrap the environment and run the processor
@@ -435,4 +430,3 @@ else {
 $lock->release();
 
 echo "Done processing<p>";
-

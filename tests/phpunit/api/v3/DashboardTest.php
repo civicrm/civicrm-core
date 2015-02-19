@@ -30,7 +30,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
  */
-
 class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;
@@ -38,30 +37,18 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
-   *  Test setup for every test
+   * Test setup for every test.
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  function tearDown() {
-    $tablesToTruncate = array(
-      'civicrm_dashboard',
-    );
-    $this->quickCleanup($tablesToTruncate, TRUE);
-  }
-
-  function testDashboardCreate() {
+  public function testDashboardCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $params = array(
       'version' => 3,
@@ -79,10 +66,10 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $id
+   * @param int $id
    * @param $oldCount
    */
-  function DashboardDelete($id, $oldCount) {
+  public function DashboardDelete($id, $oldCount) {
     $params = array(
       'version' => 3,
       'id' => $id,
@@ -93,4 +80,5 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $this->assertEquals($oldCount, $newCount);
   }
+
 }

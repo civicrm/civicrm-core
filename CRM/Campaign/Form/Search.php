@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,25 +39,22 @@
 class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query.
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
@@ -65,8 +62,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   protected $_defaults;
 
   /**
-   * prefix for the controller
-   *
+   * Prefix for the controller.
    */
   protected $_prefix = "survey_";
 
@@ -74,11 +70,11 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   private $_operation = 'reserve';
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $this->_done = FALSE;
     $this->_defaults = array();
 
@@ -89,16 +85,20 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
     //we allow the controller to set force/reset externally,
     //useful when we are being driven by the wizard framework
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
 
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');
     //validate operation.
     if (!in_array($this->_operation, array(
-      'reserve', 'release', 'interview'))) {
+      'reserve',
+      'release',
+      'interview',
+    ))
+    ) {
       $this->_operation = 'reserve';
       $this->set('op', $this->_operation);
     }
@@ -181,7 +181,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     CRM_Utils_System::setTitle(ts('Find Respondents To %1', array(1 => ucfirst($this->_operation))));
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //load the default survey for all actions.
     if (empty($this->_defaults)) {
       $defaultSurveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
@@ -194,13 +194,12 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     //build the search form.
     CRM_Campaign_BAO_Query::buildSearchForm($this);
@@ -233,7 +232,8 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $taskValue = array(
           $currentTaskValue => ts('Record %1 Responses',
             array(1 => $activityTypes[$surveyTypeId])
-          ));
+          ),
+        );
       }
 
       $this->addTaskMenu($taskValue);
@@ -256,9 +256,8 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -333,7 +332,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  function formatParams() {
+  public function formatParams() {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
     if ($interviewerId) {
       $this->set('interviewerId', $interviewerId);
@@ -356,7 +355,10 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //apply filter of survey contact type for search.
     $contactType = CRM_Campaign_BAO_Survey::getSurveyContactType(CRM_Utils_Array::value('campaign_survey_id', $this->_formValues));
     if ($contactType && in_array($this->_operation, array(
-      'reserve', 'interview'))) {
+        'reserve',
+        'interview',
+      ))
+    ) {
       $this->_formValues['contact_type'][$contactType] = 1;
     }
 
@@ -373,7 +375,9 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $groups = CRM_Utils_Array::value('group', $this->_formValues);
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-          foreach ($campGroups as $id => $title) $this->_formValues['group'][$id] = 1;
+          foreach ($campGroups as $id => $title) {
+            $this->_formValues['group'][$id] = 1;
+          }
         }
 
         //carry servey id w/ this.
@@ -396,7 +400,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_formValues['campaign_search_voter_for'] = $this->_operation;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -446,7 +450,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return array
    */
-  function voterClause() {
+  public function voterClause() {
     $params = array('campaign_search_voter_for' => $this->_operation);
 
     $clauseFields = array(
@@ -471,10 +475,9 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Respondents');
   }
-}
 
+}

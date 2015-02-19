@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Our base DAO class. All DAO classes should inherit from this class.
@@ -45,31 +45,32 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_DAO extends DB_DataObject {
 
   /**
-   * a null object so we can pass it as reference if / when needed
+   * A null object so we can pass it as reference if / when needed
    */
   static $_nullObject = NULL;
   static $_nullArray = array();
 
   static $_dbColumnValueCache = NULL;
-  CONST NOT_NULL = 1, IS_NULL = 2,
-  DB_DAO_NOTNULL = 128,
-  VALUE_SEPARATOR = "",
-  BULK_INSERT_COUNT = 200,
-  BULK_INSERT_HIGH_COUNT = 200,
-  // special value for mail bulk inserts to avoid
-  // potential duplication, assuming a smaller number reduces number of queries
-  // by some factor, so some tradeoff. CRM-8678
-  BULK_MAIL_INSERT_COUNT = 10,
-  QUERY_FORMAT_WILDCARD = 1,
-  QUERY_FORMAT_NO_QUOTES = 2;
+  const NOT_NULL = 1, IS_NULL = 2,
+    DB_DAO_NOTNULL = 128,
+    VALUE_SEPARATOR = "",
+    BULK_INSERT_COUNT = 200,
+    BULK_INSERT_HIGH_COUNT = 200,
+    // special value for mail bulk inserts to avoid
+    // potential duplication, assuming a smaller number reduces number of queries
+    // by some factor, so some tradeoff. CRM-8678
+    BULK_MAIL_INSERT_COUNT = 10,
+    QUERY_FORMAT_WILDCARD = 1,
+    QUERY_FORMAT_NO_QUOTES = 2;
 
-  /*
+  /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
-   *  test objects - this prevents world regions, countries etc from being added / deleted
+   * test objects - this prevents world regions, countries etc from being added / deleted
+   * @var array
    */
   static $_testEntitiesToSkip = array();
   /**
-   * the factory class for this application
+   * The factory class for this application.
    * @var object
    */
   static $_factory = NULL;
@@ -77,33 +78,31 @@ class CRM_Core_DAO extends DB_DataObject {
   static $_checkedSqlFunctionsExist = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @return \CRM_Core_DAO
-  @access public
    */
-  function __construct() {
+  public function __construct() {
     $this->initialize();
     $this->__table = $this->getTableName();
   }
 
   /**
-   * empty definition for virtual function
+   * Empty definition for virtual function.
    */
-  static function getTableName() {
+  public static function getTableName() {
     return NULL;
   }
 
   /**
-   * initialize the DAO object
+   * Initialize the DAO object.
    *
-   * @param string $dsn   the database connection string
+   * @param string $dsn
+   *   The database connection string.
    *
    * @return void
-   * @access private
-   * @static
    */
-  static function init($dsn) {
+  public static function init($dsn) {
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
     $options['database'] = $dsn;
     if (defined('CIVICRM_DAO_DEBUG')) {
@@ -112,16 +111,15 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $fieldDef
-   * @param $params
-   * @param $daoName
+   * @param array $params
    */
   protected function assignTestFK($fieldName, $fieldDef, $params) {
     $required = CRM_Utils_Array::value('required', $fieldDef);
     $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
     $dbName = $fieldDef['name'];
-    $daoName = get_class($this);
+    $daoName = str_replace('_BAO_', '_DAO_', get_class($this));
 
     // skip the FK if it is not required
     // if it's contact id we should create even if not required
@@ -131,7 +129,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $required = TRUE;
     }
     if (!$required && $dbName != 'contact_id') {
-      $fkDAO = new $FKClassName;
+      $fkDAO = new $FKClassName();
       if ($fkDAO->find(TRUE)) {
         $this->$dbName = $fkDAO->id;
       }
@@ -163,7 +161,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $fieldName
    * @param array $fieldDef
-   * @param int $counter the globally-unique ID of the test object
+   * @param int $counter
+   *   The globally-unique ID of the test object.
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     $dbName = $fieldDef['name'];
@@ -222,8 +221,8 @@ class CRM_Core_DAO extends DB_DataObject {
 
         case CRM_Utils_Type::T_TIME:
           CRM_Core_Error::fatal('T_TIME shouldnt be used.');
-        //$object->$dbName='000000';
-        //break;
+          //$object->$dbName='000000';
+          //break;
         case CRM_Utils_Type::T_CCNUM:
           $this->$dbName = '4111 1111 1111 1111';
           break;
@@ -268,15 +267,13 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * reset the DAO object. DAO is kinda crappy in that there is an unwritten
+   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
    * rule of one query per DAO. We attempt to get around this crappy restricrion
    * by resetting some of DAO's internal fields. Use this with caution
    *
    * @return void
-   * @access public
-   *
    */
-  function reset() {
+  public function reset() {
 
     foreach (array_keys($this->table()) as $field) {
       unset($this->$field);
@@ -292,11 +289,11 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param $tableName
+   * @param string $tableName
    *
    * @return string
    */
-  static function getLocaleTableName($tableName) {
+  public static function getLocaleTableName($tableName) {
     global $dbLocale;
     if ($dbLocale) {
       $tables = CRM_Core_I18n_Schema::schemaStructureTables();
@@ -310,12 +307,15 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Execute a query by the current DAO, localizing it along the way (if needed).
    *
-   * @param string $query        the SQL query for execution
-   * @param bool   $i18nRewrite  whether to rewrite the query
+   * @param string $query
+   *   The SQL query for execution.
+   * @param bool $i18nRewrite
+   *   Whether to rewrite the query.
    *
-   * @return object              the current DAO object after the query execution
+   * @return object
+   *   the current DAO object after the query execution
    */
-  function query($query, $i18nRewrite = TRUE) {
+  public function query($query, $i18nRewrite = TRUE) {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
     global $dbLocale;
     if ($i18nRewrite and $dbLocale) {
@@ -328,13 +328,12 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Static function to set the factory instance for this class.
    *
-   * @param object $factory  the factory application object
+   * @param object $factory
+   *   The factory application object.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function setFactory(&$factory) {
+  public static function setFactory(&$factory) {
     self::$_factory = &$factory;
   }
 
@@ -344,9 +343,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $table
    *
    * @return void
-   * @access public
    */
-  function factory($table = '') {
+  public function factory($table = '') {
     if (!isset(self::$_factory)) {
       return parent::factory($table);
     }
@@ -359,9 +357,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * we need to set the links manually.
    *
    * @return void
-   * @access protected
    */
-  function initialize() {
+  public function initialize() {
     $this->_connect();
     $this->query("SET NAMES utf8");
   }
@@ -369,11 +366,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Defines the default key as 'id'.
    *
-   * @access protected
    *
    * @return array
    */
-  function keys() {
+  public function keys() {
     static $keys;
     if (!isset($keys)) {
       $keys = array('id');
@@ -385,11 +381,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * Tells DB_DataObject which keys use autoincrement.
    * 'id' is autoincrementing by default.
    *
-   * @access protected
    *
    * @return array
    */
-  function sequenceKey() {
+  public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
       $sequenceKeys = array('id', TRUE);
@@ -398,37 +393,34 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * returns list of FK relationships
+   * Returns list of FK relationships.
    *
-   * @static
-   * @access public
    *
-   * @return array of CRM_Core_Reference_Interface
+   * @return array
+   *   Array of CRM_Core_Reference_Interface
    */
-  static function getReferenceColumns() {
+  public static function getReferenceColumns() {
     return array();
   }
 
   /**
-   * returns all the column names of this table
+   * Returns all the column names of this table.
    *
-   * @access public
    *
    * @return array
    */
-   static function &fields() {
+  public static function &fields() {
     $result = NULL;
     return $result;
   }
 
   /**
-   * get/set an associative array of table columns
+   * Get/set an associative array of table columns
    *
-   * @access public
-   * @param  array key=>type array
-   * @return array (associative)
+   * @return array
+   *   (associative)
    */
-  function table() {
+  public function table() {
     $fields = &$this->fields();
 
     $table = array();
@@ -447,12 +439,18 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * @return $this
    */
-  function save() {
+  public function save() {
     if (!empty($this->id)) {
       $this->update();
+
+      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-update", $event);
     }
     else {
       $this->insert();
+
+      $event = new \Civi\Core\DAO\Event\PostUpdate($this);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-insert", $event);
     }
     $this->free();
 
@@ -462,9 +460,43 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Deletes items from table which match current objects variables.
+   *
+   * Returns the true on success
+   *
+   * for example
+   *
+   * Designed to be extended
+   *
+   * $object = new mytable();
+   * $object->ID=123;
+   * echo $object->delete(); // builds a conditon
+   *
+   * $object = new mytable();
+   * $object->whereAdd('age > 12');
+   * $object->limit(1);
+   * $object->orderBy('age DESC');
+   * $object->delete(true); // dont use object vars, use the conditions, limit and order.
+   *
+   * @param bool $useWhere (optional) If DB_DATAOBJECT_WHEREADD_ONLY is passed in then
+   *             we will build the condition only using the whereAdd's.  Default is to
+   *             build the condition only using the object parameters.
+   *
+   *     * @return mixed Int (No. of rows affected) on success, false on failure, 0 on no data affected
+   */
+  public function delete($useWhere = FALSE) {
+    $result = parent::delete($useWhere);
+
+    $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("DAO::post-delete", $event);
+
+    return $result;
+  }
+
+  /**
    * @param bool $created
    */
-  function log($created = FALSE) {
+  public function log($created = FALSE) {
     static $cid = NULL;
 
     if (!$this->getLog()) {
@@ -481,10 +513,10 @@ class CRM_Core_DAO extends DB_DataObject {
       return;
     }
 
-    $dao                = new CRM_Core_DAO_Log();
-    $dao->entity_table  = $this->getTableName();
-    $dao->entity_id     = $this->id;
-    $dao->modified_id   = $cid;
+    $dao = new CRM_Core_DAO_Log();
+    $dao->entity_table = $this->getTableName();
+    $dao->entity_id = $this->id;
+    $dao->modified_id = $cid;
     $dao->modified_date = date("YmdHis");
     $dao->insert();
   }
@@ -493,12 +525,13 @@ class CRM_Core_DAO extends DB_DataObject {
    * Given an associative array of name/value pairs, extract all the values
    * that belong to this object and initialize the object with said values
    *
-   * @param array $params (reference ) associative array of name/value pairs
+   * @param array $params
+   *   (reference ) associative array of name/value pairs.
    *
-   * @return boolean      did we copy all null values into the object
-   * @access public
+   * @return bool
+   *   Did we copy all null values into the object
    */
-  function copyValues(&$params) {
+  public function copyValues(&$params) {
     $fields = &$this->fields();
     $allNull = TRUE;
     foreach ($fields as $name => $value) {
@@ -534,14 +567,14 @@ class CRM_Core_DAO extends DB_DataObject {
    * this is a destructive store, calling function is responsible
    * for keeping sanity of id's.
    *
-   * @param object $object the object that we are extracting data from
-   * @param array  $values (reference ) associative array of name/value pairs
+   * @param object $object
+   *   The object that we are extracting data from.
+   * @param array $values
+   *   (reference ) associative array of name/value pairs.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function storeValues(&$object, &$values) {
+  public static function storeValues(&$object, &$values) {
     $fields = &$object->fields();
     foreach ($fields as $name => $value) {
       $dbName = $value['name'];
@@ -555,15 +588,15 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * create an attribute for this specific field. We only do this for strings and text
+   * Create an attribute for this specific field. We only do this for strings and text
    *
-   * @param array $field the field under task
+   * @param array $field
+   *   The field under task.
    *
-   * @return array|null the attributes for the object
-   * @access public
-   * @static
+   * @return array|null
+   *   the attributes for the object
    */
-  static function makeAttribute($field) {
+  public static function makeAttribute($field) {
     if ($field) {
       if (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_STRING) {
         $maxLength = CRM_Utils_Array::value('maxlength', $field);
@@ -589,7 +622,7 @@ class CRM_Core_DAO extends DB_DataObject {
           $cols = 80;
         }
 
-        $attributes         = array();
+        $attributes = array();
         $attributes['rows'] = $rows;
         $attributes['cols'] = $cols;
         return $attributes;
@@ -604,19 +637,20 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Get the size and maxLength attributes for this text field
+   * Get the size and maxLength attributes for this text field.
    * (or for all text fields) in the DAO object.
    *
-   * @param string $class     name of DAO class
-   * @param string $fieldName field that i'm interested in or null if
+   * @param string $class
+   *   Name of DAO class.
+   * @param string $fieldName
+   *   Field that i'm interested in or null if.
    *                          you want the attributes for all DAO text fields
    *
-   * @return array assoc array of name => attribute pairs
-   * @access public
-   * @static
+   * @return array
+   *   assoc array of name => attribute pairs
    */
-  static function getAttribute($class, $fieldName = NULL) {
-    $object = new $class( );
+  public static function getAttribute($class, $fieldName = NULL) {
+    $object = new $class();
     $fields = &$object->fields();
     if ($fieldName != NULL) {
       $field = CRM_Utils_Array::value($fieldName, $fields);
@@ -643,25 +677,28 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @throws Exception
    */
-  static function transaction($type) {
+  public static function transaction($type) {
     CRM_Core_Error::fatal('This function is obsolete, please use CRM_Core_Transaction');
   }
 
   /**
-   * Check if there is a record with the same name in the db
+   * Check if there is a record with the same name in the db.
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $value
+   *   The value of the field we are checking.
+   * @param string $daoName
+   *   The dao object name.
+   * @param string $daoID
+   *   The id of the object being updated. u can change your name.
    *                          as long as there is no conflict
-   * @param string $fieldName the name of the field in the DAO
+   * @param string $fieldName
+   *   The name of the field in the DAO.
    *
-   * @return boolean     true if object exists
-   * @access public
-   * @static
+   * @return bool
+   *   true if object exists
    */
-  static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
-    $object = new $daoName( );
+  public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
+    $object = new $daoName();
     $object->$fieldName = $value;
 
     $config = CRM_Core_Config::singleton();
@@ -675,23 +712,24 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Check if there is a given column in a specific table
+   * Check if there is a given column in a specific table.
    *
    * @param string $tableName
    * @param string $columnName
-   * @param bool   $i18nRewrite  whether to rewrite the query on multilingual setups
+   * @param bool $i18nRewrite
+   *   Whether to rewrite the query on multilingual setups.
    *
-   * @return boolean true if exists, else false
-   * @static
+   * @return bool
+   *   true if exists, else false
    */
-  static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
+  public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
     $query = "
 SHOW COLUMNS
 FROM $tableName
 LIKE %1
 ";
     $params = array(1 => array($columnName, 'String'));
-    $dao    = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, $i18nRewrite);
+    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, $i18nRewrite);
     $result = $dao->fetch() ? TRUE : FALSE;
     $dao->free();
     return $result;
@@ -708,9 +746,8 @@ LIKE %1
    * @param string $fieldName
    *
    * @return array
-   * @static
    */
-  static function getStorageValues($tableName = NULL, $maxTablesToCheck = 10, $fieldName = 'Engine') {
+  public static function getStorageValues($tableName = NULL, $maxTablesToCheck = 10, $fieldName = 'Engine') {
     $values = array();
     $query = "SHOW TABLE STATUS LIKE %1";
 
@@ -751,7 +788,7 @@ LIKE %1
    *
    * @return bool
    */
-  static function isDBMyISAM($maxTablesToCheck = 10) {
+  public static function isDBMyISAM($maxTablesToCheck = 10) {
     // show error if any of the tables, use 'MyISAM' storage engine.
     $engines = self::getStorageValues(NULL, $maxTablesToCheck);
     if (array_key_exists('MyISAM', $engines)) {
@@ -766,10 +803,10 @@ LIKE %1
    * @param string $tableName
    * @param string $constraint
    *
-   * @return boolean true if constraint exists, false otherwise
-   * @static
+   * @return bool
+   *   true if constraint exists, false otherwise
    */
-  static function checkConstraintExists($tableName, $constraint) {
+  public static function checkConstraintExists($tableName, $constraint) {
     static $show = array();
 
     if (!array_key_exists($tableName, $show)) {
@@ -793,13 +830,13 @@ LIKE %1
    * @param array $tables
    *
    * @throws Exception
-   * @internal param string $tableName
    *
-   * @return boolean true if CONSTRAINT keyword exists, false otherwise
+   * @return bool
+   *   true if CONSTRAINT keyword exists, false otherwise
    */
-  static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
+  public static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
     $show = array();
-    foreach($tables as $tableName){
+    foreach ($tables as $tableName) {
       if (!array_key_exists($tableName, $show)) {
         $query = "SHOW CREATE TABLE $tableName";
         $dao = CRM_Core_DAO::executeQuery($query);
@@ -813,10 +850,10 @@ LIKE %1
       }
 
       $result = preg_match("/\bCONSTRAINT\b\s/i", $show[$tableName]) ? TRUE : FALSE;
-      if($result == TRUE){
+      if ($result == TRUE) {
         continue;
       }
-      else{
+      else {
         return FALSE;
       }
     }
@@ -830,10 +867,10 @@ LIKE %1
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean true if in format, false otherwise
-   * @static
+   * @return bool
+   *   true if in format, false otherwise
    */
-  static function checkFKConstraintInFormat($tableName, $columnName) {
+  public static function checkFKConstraintInFormat($tableName, $columnName) {
     static $show = array();
 
     if (!array_key_exists($tableName, $show)) {
@@ -849,53 +886,53 @@ LIKE %1
     }
     $constraint = "`FK_{$tableName}_{$columnName}`";
     $pattern = "/\bCONSTRAINT\b\s+%s\s+\bFOREIGN\s+KEY\b\s/i";
-    return preg_match(sprintf($pattern, $constraint),$show[$tableName]) ? TRUE : FALSE;
+    return preg_match(sprintf($pattern, $constraint), $show[$tableName]) ? TRUE : FALSE;
   }
 
   /**
-   * Check whether a specific column in a specific table has always the same value
+   * Check whether a specific column in a specific table has always the same value.
    *
    * @param string $tableName
    * @param string $columnName
    * @param string $columnValue
    *
-   * @return boolean true if the value is always $columnValue, false otherwise
-   * @static
+   * @return bool
+   *   true if the value is always $columnValue, false otherwise
    */
-  static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
-    $query  = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
-    $dao    = CRM_Core_DAO::executeQuery($query);
+  public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
+    $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
+    $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
     $dao->free();
     return $result;
   }
 
   /**
-   * Check whether a specific column in a specific table is always NULL
+   * Check whether a specific column in a specific table is always NULL.
    *
    * @param string $tableName
    * @param string $columnName
    *
-   * @return boolean true if if the value is always NULL, false otherwise
-   * @static
+   * @return bool
+   *   true if if the value is always NULL, false otherwise
    */
-  static function checkFieldIsAlwaysNull($tableName, $columnName) {
-    $query  = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
-    $dao    = CRM_Core_DAO::executeQuery($query);
+  public static function checkFieldIsAlwaysNull($tableName, $columnName) {
+    $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
+    $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
     $dao->free();
     return $result;
   }
 
   /**
-   * Check if there is a given table in the database
+   * Check if there is a given table in the database.
    *
    * @param string $tableName
    *
-   * @return boolean true if exists, else false
-   * @static
+   * @return bool
+   *   true if exists, else false
    */
-  static function checkTableExists($tableName) {
+  public static function checkTableExists($tableName) {
     $query = "
 SHOW TABLES
 LIKE %1
@@ -913,7 +950,7 @@ LIKE %1
    *
    * @return bool
    */
-  function checkVersion($version) {
+  public function checkVersion($version) {
     $query = "
 SELECT version
 FROM   civicrm_domain
@@ -923,19 +960,41 @@ FROM   civicrm_domain
   }
 
   /**
+   * Find a DAO object for the given ID and return it.
+   *
+   * @param int $id
+   *   Id of the DAO object being searched for.
+   *
+   * @return object
+   *   Object of the type of the class that called this function.
+   */
+  public static function findById($id) {
+    $object = new static();
+    $object->id = $id;
+    if (!$object->find(TRUE)) {
+      throw new Exception("Unable to find a " . get_called_class() . " with id {$id}.");
+    }
+    return $object;
+  }
+
+  /**
    * Given a DAO name, a column name and a column value, find the record and GET the value of another column in that record
    *
-   * @param string  $daoName       Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact)
-   * @param int     $searchValue   Value of the column you want to search by
-   * @param string  $returnColumn  Name of the column you want to GET the value of
-   * @param string  $searchColumn  Name of the column you want to search by
-   * @param boolean $force         Skip use of the cache
+   * @param string $daoName
+   *   Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact).
+   * @param int $searchValue
+   *   Value of the column you want to search by.
+   * @param string $returnColumn
+   *   Name of the column you want to GET the value of.
+   * @param string $searchColumn
+   *   Name of the column you want to search by.
+   * @param bool $force
+   *   Skip use of the cache.
    *
-   * @return string|null          Value of $returnColumn in the retrieved record
-   * @static
-   * @access public
+   * @return string|null
+   *   Value of $returnColumn in the retrieved record
    */
-  static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
+  public static function getFieldValue($daoName, $searchValue, $returnColumn = 'name', $searchColumn = 'id', $force = FALSE) {
     if (
       empty($searchValue) ||
       trim(strtolower($searchValue)) == 'null'
@@ -952,7 +1011,7 @@ FROM   civicrm_domain
     }
 
     if (!array_key_exists($cacheKey, self::$_dbColumnValueCache) || $force) {
-      $object   = new $daoName( );
+      $object = new $daoName();
       $object->$searchColumn = $searchValue;
       $object->selectAdd();
       $object->selectAdd($returnColumn);
@@ -971,18 +1030,22 @@ FROM   civicrm_domain
   /**
    * Given a DAO name, a column name and a column value, find the record and SET the value of another column in that record
    *
-   * @param string $daoName       Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact)
-   * @param int    $searchValue   Value of the column you want to search by
-   * @param string $setColumn     Name of the column you want to SET the value of
-   * @param string $setValue      SET the setColumn to this value
-   * @param string $searchColumn  Name of the column you want to search by
+   * @param string $daoName
+   *   Name of the DAO (Example: CRM_Contact_DAO_Contact to retrieve value from a contact).
+   * @param int $searchValue
+   *   Value of the column you want to search by.
+   * @param string $setColumn
+   *   Name of the column you want to SET the value of.
+   * @param string $setValue
+   *   SET the setColumn to this value.
+   * @param string $searchColumn
+   *   Name of the column you want to search by.
    *
-   * @return boolean          true if we found and updated the object, else false
-   * @static
-   * @access public
+   * @return bool
+   *   true if we found and updated the object, else false
    */
-  static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
-    $object = new $daoName( );
+  public static function setFieldValue($daoName, $searchValue, $setColumn, $setValue, $searchColumn = 'id') {
+    $object = new $daoName();
     $object->selectAdd();
     $object->selectAdd("$searchColumn, $setColumn");
     $object->$searchColumn = $searchValue;
@@ -998,16 +1061,16 @@ FROM   civicrm_domain
   }
 
   /**
-   * Get sort string
+   * Get sort string.
    *
    * @param array|object $sort either array or CRM_Utils_Sort
-   * @param string $default - default sort value
+   * @param string $default
+   *   Default sort value.
    *
-   * @return string - sortString
-   * @access public
-   * @static
+   * @return string
+   *   sortString
    */
-  static function getSortString($sort, $default = NULL) {
+  public static function getSortString($sort, $default = NULL) {
     // check if sort is of type CRM_Utils_Sort
     if (is_a($sort, 'CRM_Utils_Sort')) {
       return $sort->orderBy();
@@ -1024,23 +1087,22 @@ FROM   civicrm_domain
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param string $daoName  name of the dao object
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
-   * @param array  $returnProperities     an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
+   * @param string $daoName
+   *   Name of the dao object.
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   * @param array $returnProperities
+   *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
-   * @return object an object of type referenced by daoName
-   * @access public
-   * @static
+   * @return object
+   *   an object of type referenced by daoName
    */
-  static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
-    $object = new $daoName( );
+  public static function commonRetrieve($daoName, &$params, &$defaults, $returnProperities = NULL) {
+    $object = new $daoName();
     $object->copyValues($params);
 
     // return only specific fields if returnproperties are sent
@@ -1057,17 +1119,17 @@ FROM   civicrm_domain
   }
 
   /**
-   * Delete the object records that are associated with this contact
+   * Delete the object records that are associated with this contact.
    *
-   * @param string $daoName  name of the dao object
-   * @param  int  $contactId id of the contact to delete
+   * @param string $daoName
+   *   Name of the dao object.
+   * @param int $contactId
+   *   Id of the contact to delete.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function deleteEntityContact($daoName, $contactId) {
-    $object = new $daoName( );
+  public static function deleteEntityContact($daoName, $contactId) {
+    $object = new $daoName();
 
     $object->entity_table = 'civicrm_contact';
     $object->entity_id = $contactId;
@@ -1075,9 +1137,10 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query
+   * Execute a query.
    *
-   * @param string $query query to be executed
+   * @param string $query
+   *   Query to be executed.
    *
    * @param array $params
    * @param bool $abort
@@ -1086,27 +1149,27 @@ FROM   civicrm_domain
    * @param bool $i18nRewrite
    * @param bool $trapException
    *
-   * @return Object CRM_Core_DAO object that holds the results of the query
-   * @static
-   * @access public
+   * @return CRM_Core_DAO|object
+   *   object that holds the results of the query
+   *   NB - if this is defined as just returning a DAO phpstorm keeps pointing
+   *   out all the properties that are not part of the DAO
    */
-  static function &executeQuery(
+  public static function &executeQuery(
     $query,
-    $params        = array(),
-    $abort         = TRUE,
-    $daoName       = NULL,
-    $freeDAO       = FALSE,
-    $i18nRewrite   = TRUE,
+    $params = array(),
+    $abort = TRUE,
+    $daoName = NULL,
+    $freeDAO = FALSE,
+    $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
-    //CRM_Core_Error::debug( 'q', $queryStr );
 
     if (!$daoName) {
       $dao = new CRM_Core_DAO();
     }
     else {
-      $dao = new $daoName( );
+      $dao = new $daoName();
     }
 
     if ($trapException) {
@@ -1122,7 +1185,7 @@ FROM   civicrm_domain
     if ($freeDAO ||
       preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
     ) {
-      // we typically do this for insert/update/delete stataments OR if explicitly asked to
+      // we typically do this for insert/update/delete statements OR if explicitly asked to
       // free the dao
       $dao->free();
     }
@@ -1130,20 +1193,21 @@ FROM   civicrm_domain
   }
 
   /**
-   * execute a query and get the single result
+   * Execute a query and get the single result.
    *
-   * @param string $query query to be executed
+   * @param string $query
+   *   Query to be executed.
    * @param array $params
    * @param bool $abort
    * @param bool $i18nRewrite
-   * @return string|null the result of the query if any
+   * @return string|null
+   *   the result of the query if any
    *
-   * @static
-   * @access public
    */
-  static function &singleValueQuery($query,
-    $params      = array(),
-    $abort       = TRUE,
+  public static function &singleValueQuery(
+    $query,
+    $params = array(),
+    $abort = TRUE,
     $i18nRewrite = TRUE
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
@@ -1170,13 +1234,13 @@ FROM   civicrm_domain
 
   /**
    * @param $query
-   * @param $params
+   * @param array $params
    * @param bool $abort
    *
    * @return string
    * @throws Exception
    */
-  static function composeQuery($query, &$params, $abort = TRUE) {
+  public static function composeQuery($query, &$params, $abort = TRUE) {
     $tr = array();
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
@@ -1223,17 +1287,8 @@ FROM   civicrm_domain
   /**
    * @param null $ids
    */
-  static function freeResult($ids = NULL) {
+  public static function freeResult($ids = NULL) {
     global $_DB_DATAOBJECT;
-
-    /***
-     $q = array( );
-     foreach ( array_keys( $_DB_DATAOBJECT['RESULTS'] ) as $id ) {
-     $q[] = $_DB_DATAOBJECT['RESULTS'][$id]->query;
-     }
-     CRM_Core_Error::debug( 'k', $q );
-     return;
-     ***/
 
     if (!$ids) {
       if (!$_DB_DATAOBJECT ||
@@ -1259,24 +1314,29 @@ FROM   civicrm_domain
   }
 
   /**
-   * This function is to make a shallow copy of an object
+   * make a shallow copy of an object.
    * and all the fields in the object
    *
-   * @param string $daoName                 name of the dao
-   * @param array  $criteria                array of all the fields & values
+   * @param string $daoName
+   *   Name of the dao.
+   * @param array $criteria
+   *   Array of all the fields & values.
    *                                        on which basis to copy
-   * @param array  $newData                 array of all the fields & values
+   * @param array $newData
+   *   Array of all the fields & values.
    *                                        to be copied besides the other fields
-   * @param string $fieldsFix               array of fields that you want to prefix/suffix/replace
-   * @param string $blockCopyOfDependencies fields that you want to block from
+   * @param string $fieldsFix
+   *   Array of fields that you want to prefix/suffix/replace.
+   * @param string $blockCopyOfDependencies
+   *   Fields that you want to block from.
    *                                        getting copied
    *
    *
-   * @return (reference )                   the newly created copy of the object
-   * @access public
+   * @return CRM_Core_DAO
+   *   the newly created copy of the object
    */
-  static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
-    $object = new $daoName( );
+  public static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
+    $object = new $daoName();
     if (!$newData) {
       $object->id = $criteria['id'];
     }
@@ -1296,12 +1356,12 @@ FROM   civicrm_domain
         break;
       }
 
-      $newObject   = new $daoName( );
+      $newObject = new $daoName();
 
       $fields = &$object->fields();
       if (!is_array($fieldsFix)) {
-        $fieldsToPrefix  = array();
-        $fieldsToSuffix  = array();
+        $fieldsToPrefix = array();
+        $fieldsToSuffix = array();
         $fieldsToReplace = array();
       }
       if (!empty($fieldsFix['prefix'])) {
@@ -1349,8 +1409,58 @@ FROM   civicrm_domain
   }
 
   /**
+   * Cascade update through related entities.
+   *
+   * @param string $daoName
+   * @param $fromId
+   * @param $toId
+   * @param array $newData
+   *
+   * @return null
+   */
+  public static function cascadeUpdate($daoName, $fromId, $toId, $newData = array()) {
+    $object = new $daoName();
+    $object->id = $fromId;
+
+    if ($object->find(TRUE)) {
+      $newObject = new $daoName();
+      $newObject->id = $toId;
+
+      if ($newObject->find(TRUE)) {
+        $fields = &$object->fields();
+        foreach ($fields as $name => $value) {
+          if ($name == 'id' || $value['name'] == 'id') {
+            // copy everything but the id!
+            continue;
+          }
+
+          $colName = $value['name'];
+          $newObject->$colName = $object->$colName;
+
+          if (substr($name, -5) == '_date' ||
+            substr($name, -10) == '_date_time'
+          ) {
+            $newObject->$colName = CRM_Utils_Date::isoToMysql($newObject->$colName);
+          }
+        }
+        foreach ($newData as $k => $v) {
+          $newObject->$k = $v;
+        }
+        $newObject->save();
+        return $newObject;
+      }
+    }
+    return CRM_Core_DAO::$_nullObject;
+  }
+
+  /**
    * Given the component id, compute the contact id
    * since its used for things like send email
+   *
+   * @param $componentIDs
+   * @param string $tableName
+   *
+   * @return array
    */
   public static function &getContactIDsFromComponent(&$componentIDs, $tableName) {
     $contactIDs = array();
@@ -1374,27 +1484,22 @@ SELECT contact_id
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param string $daoName name of the dao object
+   * @param string $daoName
+   *   Name of the dao object.
    * @param string $fieldIdName
-   * @param $fieldId
+   * @param int $fieldId
    * @param $details
-   * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
+   * @param array $returnProperities
+   *   An assoc array of fields that need to be returned, eg array( 'first_name', 'last_name').
    *
-   * @internal param array $params (reference ) an assoc array of name/value pairs
-   * @internal param array $defaults (reference ) an assoc array to hold the flattened values
-   * @return object an object of type referenced by daoName
-   * @access public
-   * @static
+   * @return object
+   *   an object of type referenced by daoName
    */
-  static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php");
-    $object = new $daoName( );
+  public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
+    $object = new $daoName();
     $object->$fieldIdName = $fieldId;
 
     // return only specific fields if returnproperties are sent
@@ -1414,7 +1519,7 @@ SELECT contact_id
     return $details;
   }
 
-  static function dropAllTables() {
+  public static function dropAllTables() {
 
     // first drop all the custom tables we've created
     CRM_Core_BAO_CustomGroup::dropAllTables();
@@ -1436,10 +1541,25 @@ SELECT contact_id
    *
    * @return string
    */
-  static function escapeString($string) {
+  public static function escapeString($string) {
     static $_dao = NULL;
 
     if (!$_dao) {
+      // If this is an atypical case (e.g. preparing .sql files
+      // before Civi has been installed), then we fallback to
+      // DB-less escaping helper (mysql_real_escape_string).
+      // Note: In typical usage, escapeString() will only
+      // check one conditional ("if !$_dao") rather than
+      // two conditionals ("if !defined(DSN)")
+      if (!defined('CIVICRM_DSN')) {
+        if (function_exists('mysql_real_escape_string')) {
+          return mysql_real_escape_string($string);
+        }
+        else {
+          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
+        }
+      }
+
       $_dao = new CRM_Core_DAO();
     }
 
@@ -1449,11 +1569,13 @@ SELECT contact_id
   /**
    * Escape a list of strings for use with "WHERE X IN (...)" queries.
    *
-   * @param $strings array
-   * @param $default string the value to use if $strings has no elements
-   * @return string eg "abc","def","ghi"
+   * @param array $strings
+   * @param string $default
+   *   the value to use if $strings has no elements.
+   * @return string
+   *   eg "abc","def","ghi"
    */
-  static function escapeStrings($strings, $default = NULL) {
+  public static function escapeStrings($strings, $default = NULL) {
     static $_dao = NULL;
     if (!$_dao) {
       $_dao = new CRM_Core_DAO();
@@ -1472,14 +1594,15 @@ SELECT contact_id
    *
    * @return string
    */
-  static function escapeWildCardString($string) {
+  public static function escapeWildCardString($string) {
     // CRM-9155
     // ensure we escape the single characters % and _ which are mysql wild
     // card characters and could come in via sortByCharacter
     // note that mysql does not escape these characters
     if ($string && in_array($string,
         array('%', '_', '%%', '_%')
-      )) {
+      )
+    ) {
       return '\\' . $string;
     }
 
@@ -1488,10 +1611,18 @@ SELECT contact_id
 
   /**
    * Creates a test object, including any required objects it needs via recursion
-   *createOnly: only create in database, do not store or return the objects (useful for perf testing)
-   *ONLY USE FOR TESTING
+   * createOnly: only create in database, do not store or return the objects (useful for perf testing)
+   * ONLY USE FOR TESTING
+   *
+   * @param string $daoName
+   * @param array $params
+   * @param int $numObjects
+   * @param bool $createOnly
+   *
+   * @return object|array|NULL
+   *   NULL if $createOnly. A single object if $numObjects==1. Otherwise, an array of multiple objects.
    */
-  static function createTestObject(
+  public static function createTestObject(
     $daoName,
     $params = array(),
     $numObjects = 1,
@@ -1508,7 +1639,16 @@ SELECT contact_id
       'CRM_Core_DAO_StateProvince',
       'CRM_Core_DAO_Country',
       'CRM_Core_DAO_Domain',
+      'CRM_Financial_DAO_FinancialType',
+      //because valid ones exist & we use pick them due to pseudoconstant can't reliably create & delete these
     );
+
+    // Prefer to instantiate BAO's instead of DAO's (when possible)
+    // so that assignTestValue()/assignTestFK() can be overloaded.
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    if (class_exists($baoName)) {
+      $daoName = $baoName;
+    }
 
     for ($i = 0; $i < $numObjects; ++$i) {
 
@@ -1516,7 +1656,7 @@ SELECT contact_id
       /** @var CRM_Core_DAO $object */
       $object = new $daoName();
 
-      $fields = & $object->fields();
+      $fields = &$object->fields();
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
         $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
@@ -1530,11 +1670,13 @@ SELECT contact_id
           if ($FKClassName != NULL) {
             $object->assignTestFK($fieldName, $fieldDef, $params);
             continue;
-          } else {
+          }
+          else {
             $object->assignTestValue($fieldName, $fieldDef, $counter);
           }
         }
       }
+
       $object->save();
 
       if (!$createOnly) {
@@ -1546,7 +1688,7 @@ SELECT contact_id
     }
 
     if ($createOnly) {
-      return;
+      return NULL;
     }
     elseif ($numObjects == 1) {
       return $objects[0];
@@ -1557,11 +1699,13 @@ SELECT contact_id
   }
 
   /**
-   * deletes the this object plus any dependent objects that are associated with it
+   * Deletes the this object plus any dependent objects that are associated with it.
    * ONLY USE FOR TESTING
+   *
+   * @param string $daoName
+   * @param array $params
    */
-  static function deleteTestObjects($daoName, $params = array(
-    )) {
+  public static function deleteTestObjects($daoName, $params = array()) {
     //this is a test function  also backtrace is set for the test suite it sometimes unsets itself
     // so we re-set here in case
     $config = CRM_Core_Config::singleton();
@@ -1583,7 +1727,11 @@ SELECT contact_id
         if ($FKClassName != NULL
           && $object->$dbName
           && !in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)
-          && ($required || $dbName == 'contact_id')) {
+          && ($required || $dbName == 'contact_id')
+          //I'm a bit stuck on this one - we might need to change the singleValueAlter so that the entities don't share a contact
+          // to make this test process pass - line below makes pass for now
+          && $dbName != 'member_of_contact_id'
+        ) {
           $deletions[] = array($FKClassName, array('id' => $object->$dbName)); // x
         }
       }
@@ -1593,7 +1741,25 @@ SELECT contact_id
 
     foreach ($deletions as $deletion) {
       CRM_Core_DAO::deleteTestObjects($deletion[0], $deletion[1]);
+    }
   }
+
+  /**
+   * Set defaults when creating new entity.
+   * (don't call this set defaults as already in use with different signature in some places)
+   *
+   * @param array $params
+   * @param $defaults
+   */
+  public static function setCreateDefaults(&$params, $defaults) {
+    if (isset($params['id'])) {
+      return;
+    }
+    foreach ($defaults as $key => $value) {
+      if (!array_key_exists($key, $params) || $params[$key] === NULL) {
+        $params[$key] = $value;
+      }
+    }
   }
 
   /**
@@ -1603,7 +1769,7 @@ SELECT contact_id
    *
    * @return string
    */
-  static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
+  public static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
     $tableName = $prefix . "_temp";
 
     if ($addRandomString) {
@@ -1623,7 +1789,7 @@ SELECT contact_id
    *
    * @return bool
    */
-  static function checkTriggerViewPermission($view = TRUE, $trigger = TRUE) {
+  public static function checkTriggerViewPermission($view = TRUE, $trigger = TRUE) {
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
     // I'm not sure why we use the getStaticProperty for an error, rather than checking for DB_Error
@@ -1668,7 +1834,7 @@ SELECT contact_id
    * @param null $message
    * @param bool $printDAO
    */
-  static function debugPrint($message = NULL, $printDAO = TRUE) {
+  public static function debugPrint($message = NULL, $printDAO = TRUE) {
     CRM_Utils_System::xMemory("{$message}: ");
 
     if ($printDAO) {
@@ -1685,15 +1851,16 @@ SELECT contact_id
    * Build a list of triggers via hook and add them to (err, reconcile them
    * with) the database.
    *
-   * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param string $tableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    * @param bool $force
    *
    * @see CRM-9716
    */
-  static function triggerRebuild($tableName = NULL, $force = FALSE) {
+  public static function triggerRebuild($tableName = NULL, $force = FALSE) {
     $info = array();
 
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName, $force);
 
     CRM_Core_I18n_Schema::triggerInfo($info, $tableName);
@@ -1705,7 +1872,7 @@ SELECT contact_id
     $logging->dropTriggers($tableName);
 
     // now create the set of new triggers
-    self::createTriggers($info);
+    self::createTriggers($info, $tableName);
   }
 
   /**
@@ -1715,7 +1882,7 @@ SELECT contact_id
    *  * Stop using functions and find another way to strip numeric characters from phones
    *  * Give better error messages (currently a missing fn fatals with "unknown error")
    */
-  static function checkSqlFunctionsExist() {
+  public static function checkSqlFunctionsExist() {
     if (!self::$_checkedSqlFunctionsExist) {
       self::$_checkedSqlFunctionsExist = TRUE;
       $dao = CRM_Core_DAO::executeQuery("SHOW function status WHERE db = database() AND name = 'civicrm_strip_non_numeric'");
@@ -1726,14 +1893,15 @@ SELECT contact_id
   }
 
   /**
-   * Wrapper function to drop triggers
+   * Wrapper function to drop triggers.
    *
-   * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param string $tableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
-  static function dropTriggers($tableName = NULL) {
+  public static function dropTriggers($tableName = NULL) {
     $info = array();
 
-    $logging = new CRM_Logging_Schema;
+    $logging = new CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName);
 
     // drop all existing triggers on all tables
@@ -1741,10 +1909,12 @@ SELECT contact_id
   }
 
   /**
-   * @param $info array per hook_civicrm_triggerInfo
-   * @param $onlyTableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param array $info
+   *   per hook_civicrm_triggerInfo.
+   * @param string $onlyTableName
+   *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
-  static function createTriggers(&$info, $onlyTableName = NULL) {
+  public static function createTriggers(&$info, $onlyTableName = NULL) {
     // Validate info array, should probably raise errors?
     if (is_array($info) == FALSE) {
       return;
@@ -1829,11 +1999,11 @@ SELECT contact_id
       }
       foreach ($tables as $eventName => $events) {
         foreach ($events as $whenName => $parts) {
-          $varString   = implode("\n", $parts['variables']);
-          $sqlString   = implode("\n", $parts['sql']);
-          $validName   = CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
+          $varString = implode("\n", $parts['variables']);
+          $sqlString = implode("\n", $parts['sql']);
+          $validName = CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
-          $triggerSQL  = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
+          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
 
           CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS $triggerName");
           CRM_Core_DAO::executeQuery(
@@ -1852,10 +2022,11 @@ SELECT contact_id
   /**
    * Given a list of fields, create a list of references.
    *
-   * @param string $className BAO/DAO class name
+   * @param string $className
+   *   BAO/DAO class name.
    * @return array<CRM_Core_Reference_Interface>
    */
-  static function createReferenceColumns($className) {
+  public static function createReferenceColumns($className) {
     $result = array();
     $fields = $className::fields();
     foreach ($fields as $field) {
@@ -1875,9 +2046,10 @@ SELECT contact_id
   /**
    * Find all records which refer to this entity.
    *
-   * @return array of objects referencing this
+   * @return array
+   *   Array of objects referencing this
    */
-  function findReferences() {
+  public function findReferences() {
     $links = self::getReferencesToTable(static::getTableName());
 
     $occurrences = array();
@@ -1898,14 +2070,15 @@ SELECT contact_id
   }
 
   /**
-   * @return array each item has keys:
-   *  - name: string
-   *  - type: string
-   *  - count: int
-   *  - table: string|null SQL table name
-   *  - key: string|null SQL column name
+   * @return array
+   *   each item has keys:
+   *   - name: string
+   *   - type: string
+   *   - count: int
+   *   - table: string|null SQL table name
+   *   - key: string|null SQL column name
    */
-  function getReferenceCounts() {
+  public function getReferenceCounts() {
     $links = self::getReferencesToTable(static::getTableName());
 
     $counts = array();
@@ -1935,12 +2108,14 @@ SELECT contact_id
    * schema metadata in dynamicForeignKey which enumerates a restricted
    * set of possible entity_table's.
    *
-   * @param string $tableName table referred to
+   * @param string $tableName
+   *   Table referred to.
    *
-   * @return array structure of table and column, listing every table with a
-   * foreign key reference to $tableName, and the column where the key appears.
+   * @return array
+   *   structure of table and column, listing every table with a
+   *   foreign key reference to $tableName, and the column where the key appears.
    */
-  static function getReferencesToTable($tableName) {
+  public static function getReferencesToTable($tableName) {
     $refsFound = array();
     foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $daoClassName) {
       $links = $daoClassName::getReferenceColumns();
@@ -1959,7 +2134,8 @@ SELECT contact_id
   /**
    * Lookup the value of a MySQL global configuration variable.
    *
-   * @param string $name e.g. "thread_stack"
+   * @param string $name
+   *   E.g. "thread_stack".
    * @param mixed $default
    * @return mixed
    */
@@ -1982,10 +2158,12 @@ SELECT contact_id
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
    * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this bao object
+   * @param string $context
+   * @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props
+   *   whatever is known about this bao object.
    *
-   * @return Array|bool
+   * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     // If a given bao does not override this function
@@ -2001,7 +2179,7 @@ SELECT contact_id
   public function getOptionLabels() {
     $fields = $this->fields();
     if ($fields === NULL) {
-      throw new Exception ('Cannot call getOptionLabels on CRM_Core_DAO');
+      throw new Exception('Cannot call getOptionLabels on CRM_Core_DAO');
     }
     foreach ($fields as $field) {
       $name = CRM_Utils_Array::value('name', $field);
@@ -2019,7 +2197,7 @@ SELECT contact_id
   /**
    * Provides documentation and validation for the buildOptions $context param
    *
-   * @param String $context
+   * @param string $context
    *
    * @throws Exception
    * @return array
@@ -2030,6 +2208,7 @@ SELECT contact_id
       'create' => "Options are filtered appropriately for the object being created/updated. Labels are translated.",
       'search' => "Searchable options are returned. Labels are translated.",
       'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
+      'abbreviate' => "Active options are returned, and labels are replaced with abbreviations.",
     );
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
@@ -2039,10 +2218,10 @@ SELECT contact_id
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @return bool|array
    */
-  function getFieldSpec($fieldName) {
+  public function getFieldSpec($fieldName) {
     $fields = $this->fields();
     $fieldKeys = $this->fieldKeys();
 
@@ -2065,15 +2244,20 @@ SELECT contact_id
    * $field => array('LIKE' => array('%me%))
    * etc
    *
-   * @param $fieldName
-   * @param $filter array filter to be applied indexed by operator
-   * @param $type String type of field (not actually used - nor in api @todo )
-   * @param $alias String alternative field name ('as') @todo- not actually used
-   * @param bool $returnSanitisedArray return a sanitised array instead of a clause
-   *  this is primarily so we can add filters @ the api level to the Query object based fields
+   * @param string $fieldName
+   *   Name of fields.
+   * @param array $filter
+   *   filter to be applied indexed by operator.
+   * @param string $type
+   *   type of field (not actually used - nor in api @todo ).
+   * @param string $alias
+   *   alternative field name ('as') @todo- not actually used.
+   * @param bool $returnSanitisedArray
+   *   Return a sanitised array instead of a clause.
+   *   this is primarily so we can add filters @ the api level to the Query object based fields
    *
    * @throws Exception
-   * @internal param string $fieldname name of fields
+   *
    * @todo a better solution would be for the query object to apply these filters based on the
    *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
    * @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
@@ -2081,7 +2265,8 @@ SELECT contact_id
    *  preferable to not double-banger the return context next refactor of this - but keeping the attention
    *  in one place has some advantages as we try to extend this format
    *
-   * @return NULL|string|array a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
+   * @return NULL|string|array
+   *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
   public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
@@ -2093,10 +2278,10 @@ SELECT contact_id
           // unary operators
           case 'IS NULL':
           case 'IS NOT NULL':
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s %s', $fieldName, $operator));
             }
-            else{
+            else {
               return (sprintf('%s %s ', $fieldName, $operator));
             }
             break;
@@ -2107,10 +2292,10 @@ SELECT contact_id
             if (empty($criteria[0]) || empty($criteria[1])) {
               throw new Exception("invalid criteria for $operator");
             }
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
             }
-            else{
+            else {
               return NULL;  // not yet implemented (tests required to implement)
             }
             break;
@@ -2123,21 +2308,20 @@ SELECT contact_id
             }
             $escapedCriteria = array_map(array(
               'CRM_Core_DAO',
-              'escapeString'
+              'escapeString',
             ), $criteria);
-            if(!$returnSanitisedArray) {
+            if (!$returnSanitisedArray) {
               return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
             }
             return $escapedCriteria;
-            break;
 
           // binary operators
 
           default:
-            if(!$returnSanitisedArray) {
-              return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+            if (!$returnSanitisedArray) {
+              return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
-            else{
+            else {
               return NULL; // not yet implemented (tests required to implement)
             }
         }
@@ -2151,7 +2335,23 @@ SELECT contact_id
    * @return array
    */
   public static function acceptedSQLOperators() {
-    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS NOT NULL', 'IS NULL');
+    return array(
+      '=',
+      '<=',
+      '>=',
+      '>',
+      '<',
+      'LIKE',
+      "<>",
+      "!=",
+      "NOT LIKE",
+      'IN',
+      'NOT IN',
+      'BETWEEN',
+      'NOT BETWEEN',
+      'IS NOT NULL',
+      'IS NULL',
+    );
   }
 
   /**
@@ -2162,8 +2362,10 @@ SELECT contact_id
    * which can be longer than this length, this function helps with creating
    * strings that meet various criteria.
    *
-   * @param string $string - the string to be shortened
-   * @param int $length - the max length of the string
+   * @param string $string
+   *   The string to be shortened.
+   * @param int $length
+   *   The max length of the string.
    *
    * @param bool $makeRandom
    *
@@ -2176,7 +2378,7 @@ SELECT contact_id
     }
 
     // easy return for calls that dont need a randomized uniq string
-    if (! $makeRandom) {
+    if (!$makeRandom) {
       return substr($string, 0, $length);
     }
 
@@ -2189,8 +2391,9 @@ SELECT contact_id
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
-  function setApiFilter(&$params) {}
+  public function setApiFilter(&$params) {
+  }
 
 }

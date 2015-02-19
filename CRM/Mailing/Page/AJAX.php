@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,7 +39,7 @@
 class CRM_Mailing_Page_AJAX {
 
   /**
-   * Function to fetch the template text/html messages
+   * Fetch the template text/html messages
    */
   public static function template() {
     $templateId = CRM_Utils_Type::escape($_POST['tid'], 'Integer');
@@ -60,19 +60,24 @@ class CRM_Mailing_Page_AJAX {
   }
 
   /**
-   * Function to retrieve contact mailings
+   * Retrieve contact mailings.
    */
   public static function getContactMailings() {
     $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');
 
     $sortMapper = array(
-      0 => 'subject', 1 => 'creator_name', 2 => '', 3 => 'start_date', 4 => '', 5 => 'links',
+      0 => 'subject',
+      1 => 'creator_name',
+      2 => '',
+      3 => 'start_date',
+      4 => '',
+      5 => 'links',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -91,12 +96,16 @@ class CRM_Mailing_Page_AJAX {
 
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array(
-      'subject', 'mailing_creator', 'recipients',
-      'start_date', 'openstats', 'links',
+      'subject',
+      'mailing_creator',
+      'recipients',
+      'start_date',
+      'openstats',
+      'links',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($mailings, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
-}
 
+}

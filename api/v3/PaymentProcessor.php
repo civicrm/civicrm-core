@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,37 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 PaymentProcessor functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_PaymentProcessor
- *
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
- * Add/Update a PaymentProcessor
+ * This api exposes CiviCRM PaymentProcessor.
  *
- * Allowed @params array keys are:
- * {@getfields payment_processor_create}
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Add/Update a PaymentProcessor.
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created PaymentProcessor property values.
- * @access public
+ * @return array
+ *   Array of newly created PaymentProcessor property values.
  */
 function civicrm_api3_payment_processor_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_processor_create_spec(&$params) {
   $params['payment_processor_type_id']['api.required'] = 1;
@@ -62,29 +58,26 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing PaymentProcessor
+ * Deletes an existing PaymentProcessor.
  *
- * @param  array  $params
- * {@getfields payment_processor_delete}
+ * @param array $params
  *
- * @return array API result Array
- * @access public
+ * @return array
+ *   API result Array
  */
 function civicrm_api3_payment_processor_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more PaymentProcessor
+ * Retrieve one or more PaymentProcessor.
  *
- * @param  mixed[]  (reference) input parameters
- * {@getfields payment_processor_get}
- * @param  array $params  an associative array of name/value pairs.
+ * @param array $params
+ *   Array of name/value pairs.
  *
- * @return  array details of found PaymentProcessor
- * @access public
+ * @return array
+ *   details of found PaymentProcessor
  */
 function civicrm_api3_payment_processor_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

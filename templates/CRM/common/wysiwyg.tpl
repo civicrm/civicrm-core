@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,7 @@
     {if $defaultWysiwygEditor eq 1}
         <script>
           {* this version of tinymce requires jquery *}
-          if (typeof(jQuery) != 'function')
-            var jQuery = cj;
+          if (typeof window.jQuery !== 'function') window.jQuery = CRM.$;
         </script>
         <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
         <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>

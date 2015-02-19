@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -46,7 +46,8 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      $('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').crmSelect2({
+      var $form = $('form.{/literal}{$form.formClass}{literal}');
+      $('input[name=file_on_case_unclosed_case_id]', $form).crmSelect2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
@@ -67,114 +68,71 @@
         }
       });
     });
-
-    cj( "#fileOnCaseDialog" ).hide( );
-
   </script>
 {/literal}
 {* main form end *}
 
 {else}
 {* Markup and js to go on the main page for loading the above form in a popup *}
-<div id="fileOnCaseDialog"></div>
 {literal}
 <script type="text/javascript">
-  function fileOnCase( action, activityID, currentCaseId ) {
+(function($) {
+  window.fileOnCase = function(action, activityID, currentCaseId, a) {
     if ( action == "move" ) {
       var dialogTitle = "{/literal}{ts escape='js'}Move to Case{/ts}{literal}";
     } else if ( action == "copy" ) {
       var dialogTitle = "{/literal}{ts escape='js'}Copy to Case{/ts}{literal}";
     } else if ( action == "file" ) {
-      var dialogTitle = "{/literal}{ts escape='js'}File On Case{/ts}{literal}";
+      var dialogTitle = "{/literal}{ts escape='js'}File on Case{/ts}{literal}";
     }
 
-    var dataUrl = {/literal}"{crmURL p='civicrm/case/addToCase' q='reset=1&snippet=4' h=0}"{literal};
+    var dataUrl = {/literal}"{crmURL p='civicrm/case/addToCase' q='reset=1' h=0}"{literal};
     dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{$contactID}"{literal};
 
-    cj.ajax({
-      url     : dataUrl,
-      success : function ( content ) {
-        cj("#fileOnCaseDialog").show( ).html( content).trigger('crmLoad').dialog({
-          title: dialogTitle,
-          modal: true,
-          width: 600,
-          height: 'auto',
-          close: function( event, ui ) {
-            cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').select2('destroy');
-            cj(this).hide().dialog("destroy");
-          },
-          buttons: {
-            "{/literal}{ts escape='js'}Save{/ts}{literal}": function() {
-              var selectedCaseId = cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').val();
-              var contactId = cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').select2('data').extra.contact_id;
-              var subject         = cj("#file_on_case_activity_subject").val( );
-              var targetContactId = cj("#file_on_case_target_contact_id").val( );
+    function save() {
+      var $context = $('div.crm-confirm-dialog'),
+        selectedCaseId = $('input[name=file_on_case_unclosed_case_id]', $context).val(),
+        caseTitle = $('input[name=file_on_case_unclosed_case_id]', $context).select2('data').label,
+        contactId = $('input[name=file_on_case_unclosed_case_id]', $context).select2('data').extra.contact_id,
+        subject = $("#file_on_case_activity_subject").val(),
+        targetContactId = $("#file_on_case_target_contact_id").val();
 
-              if ( !cj("#file_on_case_unclosed_case_id").val( )  ) {
-                cj("#file_on_case_unclosed_case_id").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
-                return false;
-              }
-
-              cj(this).dialog("close");
-
-              var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
-              cj.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },
-                function( values ) {
-                  if ( values.error_msg ) {
-                    cj().crmError(values.error_msg, "{/literal}{ts escape='js'}Unable to file on case{/ts}{literal}.");
-                    return false;
-                  } else {
-                    var destUrl = {/literal}"{crmURL p='civicrm/contact/view/case' q='reset=1&action=view&id=' h=0 }"{literal};
-                    var context = '';
-                    {/literal}{if !empty($fulltext)}{literal}
-                    context = '&context={/literal}{$fulltext}{literal}';
-                    {/literal}{/if}{literal}
-                    var caseUrl = destUrl + selectedCaseId + '&cid=' + contactId + context;
-                    var redirectToCase = false;
-                    var reloadWindow = false;
-                    if ( action == 'move' ) redirectToCase = true;
-                    if ( action == 'file' ) {
-                      var curPath = document.location.href;
-                      if ( curPath.indexOf( 'civicrm/contact/view' ) != -1 ) {
-                        //hide current activity row.
-                        cj( "#crm-activity_" + activityID ).hide( );
-                        var visibleRowCount = 0;
-                        cj('[id^="'+ 'crm-activity' +'"]:visible').each(function() {
-                          visibleRowCount++;
-                        } );
-                        if ( visibleRowCount < 1 ) {
-                          reloadWindow = true;
-                        }
-                      }
-                      if ( ( curPath.indexOf( 'civicrm/contact/view/activity' ) != -1 ) ||
-                        ( curPath.indexOf( 'civicrm/activity' ) != -1 ) ) {
-                        redirectToCase = true;
-                      }
-                    }
-
-                    if ( redirectToCase ) {
-                      window.location.href = caseUrl;
-                    } else if ( reloadWindow ) {
-                      window.location.reload( );
-                    } else {
-                      var activitySubject = cj("#file_on_case_activity_subject").val( );
-                      var statusMsg = activitySubject + '" has been filed to selected case: <a href="' + caseUrl + '">' + cj("#unclosed_cases").val( ) + '</a>.';
-                      CRM.alert(statusMsg, '{/literal}{ts escape="js"}Activity Filed{/ts}{literal}', 'success');
-
-                    }
-                  }
-                }
-              );
-            },
-            "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
-              cj(this).dialog("close");
-            }
-          }
-
-        });
+      if (!$("#file_on_case_unclosed_case_id").val()) {
+        $("#file_on_case_unclosed_case_id").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
+        return false;
       }
-    });
+
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
+      $.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },
+        function( values ) {
+          if ( values.error_msg ) {
+            $().crmError(values.error_msg, "{/literal}{ts escape='js'}Unable to file on case.{/ts}{literal}");
+          } else {
+            var destUrl = {/literal}"{crmURL p='civicrm/contact/view/case' q='reset=1&action=view&id=' h=0 }"{literal};
+            var context = '';
+            {/literal}{if !empty($fulltext)}{literal}
+            context = '&context={/literal}{$fulltext}{literal}';
+            {/literal}{/if}{literal}
+            var caseUrl = destUrl + selectedCaseId + '&cid=' + contactId + context;
+
+            var statusMsg = {/literal}'{ts escape='js' 1='%1'}Activity has been filed to %1 case.{/ts}'{literal};
+            CRM.alert(ts(statusMsg, {1: '<a href="' + caseUrl + '">' + caseTitle + '</a>'}), '{/literal}{ts escape="js"}Saved{/ts}{literal}', 'success');
+            CRM.refreshParent(a);
+          }
+        }
+      );
+    }
+
+    CRM.confirm({
+      title: dialogTitle,
+      width: '600',
+      resizable: true,
+      options: {yes: "{/literal}{ts escape='js'}Save{/ts}{literal}", no: "{/literal}{ts escape='js'}Cancel{/ts}{literal}"},
+      url: dataUrl
+    }).on('crmConfirm:yes', save);
+
   }
+})(CRM.$);
 </script>
 {/literal}
 {/if}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for yyyy_mm_dd date format.
    */
-  function testDateFormat_yyyy_mm_dd() {
+  public function testDateFormat_yyyy_mm_dd() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -50,10 +50,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for mm_dd_yy date format.
    */
-  function testDateFormat_mm_dd_yy() {
+  public function testDateFormat_mm_dd_yy() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -66,10 +66,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for mm_dd_yyyy date format.
    */
-  function testDateFormat_mm_dd_yyyy() {
+  public function testDateFormat_mm_dd_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -87,10 +87,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for Month_dd_yyyy date format.
    */
-  function testDateFormat_Month_dd_yyyy() {
+  public function testDateFormat_Month_dd_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -108,10 +108,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for dd_mon_yy date format.
    */
-  function testDateFormat_dd_mon_yy() {
+  public function testDateFormat_dd_mon_yy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -129,10 +129,10 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for dd_mm_yyyy date format.
    */
-  function testDateFormat_dd_mm_yyyy() {
+  public function testDateFormat_dd_mm_yyyy() {
     // Logging in. Remember to wait for page to load. In most cases,
     // you can rely on 30000 as the value that allows your test to pass, however,
     // sometimes your test might fail because of this. In such cases, it's better to pick one element
@@ -150,13 +150,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'Skip', array(), $other);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and yyyy-mm-dd OR yyyymmdd dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_yyyy_mm_dd() {
+  public function _individualCSVData_yyyy_mm_dd() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -172,7 +172,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -184,7 +185,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => '1998-12-25',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -201,13 +203,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and mm/dd/yy OR mm-dd-yy dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_mm_dd_yy() {
+  public function _individualCSVData_mm_dd_yy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -223,7 +225,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -235,7 +238,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => '12/23/98',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -252,13 +256,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and mm/dd/yyyy OR mm-dd-yyyy dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_mm_dd_yyyy() {
+  public function _individualCSVData_mm_dd_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -274,7 +278,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -286,7 +291,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => '11/12/1995',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -303,13 +309,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and Month dd, yyyy dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_Month_dd_yyyy() {
+  public function _individualCSVData_Month_dd_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -325,7 +331,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -337,7 +344,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => 'December 12, 1998',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -354,13 +362,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and dd-mon-yy OR dd/mm/yy dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_dd_mon_yy() {
+  public function _individualCSVData_dd_mon_yy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -376,7 +384,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -388,7 +397,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => '25/12/98',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -405,13 +415,13 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  /*
+  /**
    *  Helper function to provide data for contact import for Individuals and dd/mm/yyyy dateformat.
    */
   /**
    * @return array
    */
-  function _individualCSVData_dd_mm_yyyy() {
+  public function _individualCSVData_dd_mm_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -427,7 +437,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -439,7 +450,8 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'country' => 'United States',
         'birth_date' => '25/12/1998',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -455,5 +467,5 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

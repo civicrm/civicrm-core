@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,9 +39,9 @@
 class CRM_Contact_Import_Page_AJAX {
 
   /**
-   * Function to show import status
+   * Show import status.
    */
-  static function status() {
+  public static function status() {
     // make sure we get an id
     if (!isset($_GET['id'])) {
       return;
@@ -59,5 +59,5 @@ class CRM_Contact_Import_Page_AJAX {
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

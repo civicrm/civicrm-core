@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,14 +35,14 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testDuplicateContactAdd() {
+  public function testDuplicateContactAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     $firstName = substr(sha1(rand()), 0, 7);
     $lastName1 = substr(sha1(rand()), 0, 7);
-    $email     = "{$firstName}@example.com";
+    $email = "{$firstName}@example.com";
     $lastName2 = substr(sha1(rand()), 0, 7);
 
     //contact details section
@@ -68,7 +68,7 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Contact Saved");
 
-    $this->openCiviPage('contact/add' , 'reset=1&ct=Individual');
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section
 
@@ -87,5 +87,5 @@ class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
     $this->assertElementContainsText("css=.notify-content", "Please correct the following errors in the form fields below: One matching contact was found. You can View or Edit the existing contact.");
   }
-}
 
+}

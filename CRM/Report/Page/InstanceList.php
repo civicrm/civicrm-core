@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,51 +40,48 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
   static $_links = NULL;
 
-  static $_exceptions = array( 'logging/contact/detail' );
+  static $_exceptions = array('logging/contact/detail');
 
   /**
-   * Name of component if report list is filtered
+   * Name of component if report list is filtered.
    *
    * @var string
-  **/
+   */
   protected $_compName = NULL;
 
   /**
-   * ID of component if report list is filtered
+   * ID of component if report list is filtered.
    *
    * @var int
-  **/
+   */
   protected $_compID = NULL;
 
   /**
-   * ID of grouping if report list is filtered
+   * ID of grouping if report list is filtered.
    *
    * @var int
-   **/
+   */
   protected $_grouping = NULL;
 
   /**
-   * ID of parent report template if list is filtered by template
+   * ID of parent report template if list is filtered by template.
    *
    * @var int
-  **/
+   */
   protected $_ovID = NULL;
 
-
   /**
-   * Title of parent report template if list is filtered by template
+   * Title of parent report template if list is filtered by template.
    *
    * @var string
-  **/
+   */
   protected $_title = NULL;
 
   /**
    * Retrieves report instances, optionally filtered by parent report template ($ovID)
    * or by component ($compID)
    *
-   * @return array  $rows
-   * @access public
-   * @static
+   * @return array
    */
   public function &info() {
 
@@ -176,17 +172,17 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
     //Filters by source report template or by component
-    $this->ovID   = CRM_Utils_Request::retrieve('ovid', 'Positive', $this);
+    $this->ovID = CRM_Utils_Request::retrieve('ovid', 'Positive', $this);
     $this->compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
     $this->grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
 
-    $rows   = $this->info();
+    $rows = $this->info();
 
     $this->assign('list', $rows);
     if ($this->ovID OR $this->compID) {
@@ -195,7 +191,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       $this->assign('reportUrl', $reportUrl);
       if ($this->ovID) {
         $this->assign('title', $this->title);
-      } else {
+      }
+      else {
         CRM_Utils_System::setTitle(ts('%1 Reports', array(1 => $this->_compName)));
       }
     }
@@ -204,7 +201,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       if ($this->compID) {
         $newButton = ts('New %1 Report', array(1 => $this->_compName));
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1&compid={$this->compID}");
-      } else {
+      }
+      else {
         $newButton = ts('New Report');
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1");
       }
@@ -214,5 +212,5 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     }
     return parent::run();
   }
-}
 
+}

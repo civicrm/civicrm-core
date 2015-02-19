@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     parent::setUp();
   }
 
-  function testOnlineRecurContribution() {
+  public function testOnlineRecurContribution() {
     require_once 'ContributionPageAddTest.php';
 
     // a random 7-char string and an even number to make this pass unique
@@ -59,7 +59,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $pcp = FALSE;
 
     // open browser, login
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // create a new online contribution page with recurring enabled (using a newly created AuthNet processor)
     // create contribution page with randomized title and default params
@@ -121,7 +121,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // Thank-you page
     $this->waitForElementPresent("thankyou_footer");
     $this->assertTrue($this->isElementPresent('tell-a-friend'), 'Missing tell-a-friend div');
-    $text = 'This recurring contribution will be automatically processed every 1 month(s) for a total 12 installments';
+    $text = 'This recurring contribution will be automatically processed every month for a total 12 installments';
     $this->assertTrue($this->isTextPresent($text), 'Missing recurring contribution text (thank-you): ' . $text);
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (thank-you): ' . $contributionAmount);
 
@@ -140,7 +140,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type' => 'Donation (test)',
+      'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',
@@ -152,5 +152,5 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
       );
     }
   }
-}
 
+}

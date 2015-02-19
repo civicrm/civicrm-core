@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,15 +40,14 @@
 class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param object $controller
-   * @param \const|int $action
+   * @param CRM_Contribute_Controller_ContributionPage $controller
+   * @param const|int $action
    *
-   * @internal param \CRM_Contribute_Controller_ContributionPage $object
-   * @return \CRM_Contribute_StateMachine_ContributionPage CRM_Contribute_StateMachine_ContributionPage
+   * @return CRM_Contribute_StateMachine_ContributionPage
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $session = CRM_Core_Session::singleton();
@@ -74,5 +73,5 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
 
     $this->addSequentialPages($this->_pages, $action);
   }
-}
 
+}

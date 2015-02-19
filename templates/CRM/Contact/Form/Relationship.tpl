@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -174,12 +174,11 @@
               if (contact_sub_type) {
                 api.params.contact_sub_type = contact_sub_type;
               }
-              // Todo: pass sub-type to new contact profile otherwise relationship create will fail. Disabling it completely for now.
-              $contactField.data('create-links', !contact_sub_type);
               $contactField
                 .val('')
                 .prop('disabled', false)
                 .data('api-params', api)
+                .data('user-filter', {})
                 .attr('placeholder', relationshipData[rType]['placeholder_' + target])
                 .change();
             }

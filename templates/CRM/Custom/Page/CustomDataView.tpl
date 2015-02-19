@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -37,20 +37,17 @@
             <a
               href="{crmURL p="civicrm/contact/view/cd/edit" q="tableId=`$contactId`&cid=`$contactId`&groupID=`$groupId`&action=update&reset=1"}"
               class="button" style="margin-left: 6px;"><span><div
-                  class="icon edit-icon"></div>{ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
+                  class="icon ui-icon-pencil"></div>{ts 1=$cd_edit.title}Edit %1{/ts}</span></a><br/><br/>
           </td>
         </tr>
       {/if}
       {assign var="showEdit" value=0}
-        <tr id="statusmessg_{$index}" class="hiddenElement">
-          <td><span class="success-status"></span></td>
-        </tr>
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
           <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
             {if !$skipTitle}
               <div class="crm-accordion-header">
-                {$cd_edit.title} {$rowCount}
+                {$cd_edit.title}
               </div>
             {/if}
             <div class="crm-accordion-body">

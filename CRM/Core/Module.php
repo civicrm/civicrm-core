@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A module is any software package that participates in the hook
@@ -48,7 +48,7 @@ class CRM_Core_Module {
   public $is_active;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $is_active
    */
   public function __construct($name, $is_active) {
@@ -57,7 +57,7 @@ class CRM_Core_Module {
   }
 
   /**
-   * Get a list of all known modules
+   * Get a list of all known modules.
    */
   public static function getAll($fresh = FALSE) {
     static $result;
@@ -66,10 +66,9 @@ class CRM_Core_Module {
       $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
 
       $config = CRM_Core_Config::singleton();
-      if (is_callable(array($config->userSystem, 'getModules'))) {
-        $result = array_merge($result, $config->userSystem->getModules());
-      }
+      $result = array_merge($result, $config->userSystem->getModules());
     }
     return $result;
   }
+
 }

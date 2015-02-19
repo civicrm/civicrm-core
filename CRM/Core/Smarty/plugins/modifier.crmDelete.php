@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,11 +39,13 @@
  * no replacement is mentioned the value is inserted at the end of
  * the form element
  *
- * @param string $string    the html to be tweaked with
- * @param string $attribute the attribute to modify
+ * @param string $string
+ *   The html to be tweaked with.
+ * @param string $attribute
+ *   The attribute to modify.
  *
- * @return string        the new modified html string
- * @access public
+ * @return string
+ *   the new modified html string
  */
 function smarty_modifier_crmDelete($string, $attribute) {
   static $endOfElement = '/>';
@@ -54,4 +56,3 @@ function smarty_modifier_crmDelete($string, $attribute) {
   $pattern = '/' . $attribute . '="([^"]+?)"/';
   return preg_replace($pattern, '', $string);
 }
-

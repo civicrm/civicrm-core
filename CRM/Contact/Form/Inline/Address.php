@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,7 +39,7 @@
 class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
-   * location block no
+   * Location block no
    */
   private $_locBlockNo;
 
@@ -49,17 +49,17 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public $_parseStreetAddress;
 
   /**
-   * store address values
+   * Store address values
    */
   public $_values;
 
   /**
-   * form action
+   * Form action
    */
   public $_action;
 
   /**
-   * address id
+   * Address id
    */
   public $_addressId;
 
@@ -68,15 +68,15 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
    * of address block, we need to generate unique form name for each,
    * hence calling parent contructor
    */
-  function __construct() {
+  public function __construct() {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $name = "Address_{$locBlockNo}";
 
-    parent::__construct(null, CRM_Core_Action::NONE, 'post', $name);
+    parent::__construct(NULL, CRM_Core_Action::NONE, 'post', $name);
   }
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -120,10 +120,9 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for an address object
+   * Build the form object elements for an address object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -131,10 +130,9 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -161,10 +159,9 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -191,4 +188,5 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $this->ajaxResponse['addressId'] = $address[0]->id;
     $this->response();
   }
+
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,9 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 namespace Civi\CCase;
 
+/**
+ * Interface CaseChangeListener
+ *
+ * @package Civi\CCase
+ */
 interface CaseChangeListener {
-  function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event);
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   *
+   * @return mixed
+   */
+  public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event);
+
 }

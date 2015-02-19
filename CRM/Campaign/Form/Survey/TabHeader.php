@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,11 +39,11 @@
 class CRM_Campaign_Form_Survey_TabHeader {
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function build(&$form) {
+  public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -51,37 +51,42 @@ class CRM_Campaign_Form_Survey_TabHeader {
     }
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
-      ->addSetting(array('tabSettings' => array(
-        'active' => self::getCurrentTab($tabs),
-      )));
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => self::getCurrentTab($tabs),
+        ),
+      ));
     return $tabs;
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function process(&$form) {
+  public static function process(&$form) {
     if ($form->getVar('_surveyId') <= 0) {
       return NULL;
     }
 
     $tabs = array(
-      'main' => array('title' => ts('Main Information'),
+      'main' => array(
+        'title' => ts('Main Information'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'questions' => array('title' => ts('Questions'),
+      'questions' => array(
+        'title' => ts('Questions'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
       ),
-      'results' => array('title' => ts('Results'),
+      'results' => array(
+        'title' => ts('Results'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
@@ -89,10 +94,10 @@ class CRM_Campaign_Form_Survey_TabHeader {
       ),
     );
 
-    $surveyID  = $form->getVar('_surveyId');
-    $class     = $form->getVar('_name');
-    $class     = CRM_Utils_String::getClassName($class);
-    $class     = strtolower($class);
+    $surveyID = $form->getVar('_surveyId');
+    $class = $form->getVar('_name');
+    $class = CRM_Utils_String::getClassName($class);
+    $class = strtolower($class);
 
     if (array_key_exists($class, $tabs)) {
       $tabs[$class]['current'] = TRUE;
@@ -120,9 +125,9 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  static function reset(&$form) {
+  public static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -132,7 +137,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return int|string
    */
-  static function getCurrentTab($tabs) {
+  public static function getCurrentTab($tabs) {
     static $current = FALSE;
 
     if ($current) {
@@ -157,14 +162,15 @@ class CRM_Campaign_Form_Survey_TabHeader {
    *
    * @return int|string
    */
-  static function getNextTab(&$form) {
+  public static function getNextTab(&$form) {
     static $next = FALSE;
-    if ($next)
+    if ($next) {
       return $next;
+    }
 
     $tabs = $form->get('tabHeader');
     if (is_array($tabs)) {
-      $current = false;
+      $current = FALSE;
       foreach ($tabs as $subPage => $pageVal) {
         if ($current) {
           $next = $subPage;
@@ -179,4 +185,5 @@ class CRM_Campaign_Form_Survey_TabHeader {
     $next = $next ? $next : 'main';
     return $next;
   }
+
 }

@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.6                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateEventRegisterPage() {
+  public function testCreateEventRegisterPage() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -47,8 +47,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $email1 = $firstName . "@test.com";
     $email2 = $participantfname . "@test.com";
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //add email to name and address profile
@@ -128,7 +128,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testAnoumyousRegisterPage() {
+  public function testAnoumyousRegisterPage() {
     // add the required Drupal permission
     $permission = array('edit-1-access-all-custom-data');
     $this->changePermissions($permission);
@@ -147,8 +147,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $email3 = $participantfname2 . "@test.com";
     $email4 = $firstName2 . "@test.com";
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //add email field to name and address profile
@@ -270,11 +270,13 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $customGrpId1
+   * Get custom field ID.
+   *
+   * @param int $customGrpId1
    *
    * @return array
    */
-  function _testGetCustomFieldId($customGrpId1) {
+  public function _testGetCustomFieldId($customGrpId1) {
     $customId = array();
 
     // Create a custom data to add in profile
@@ -316,28 +318,28 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
+   * @param int $eventPageId
    */
-  function _testRemoveProfile($eventPageId) {
+  public function _testRemoveProfile($eventPageId) {
     $this->openCiviPage("event/manage/settings", "reset=1&action=update&id=$eventPageId");
 
     // Go to Online Contribution tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/span/a[text()='remove profile']");
-    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/span/a[text()='remove profile']");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/span[1]/a");
+    $this->click("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/span[1]/a");
     $this->click("_qf_Registration_upload-bottom");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
   }
 
   /**
-   * @param $customId
+   * @param int $customId
    *
    * @return array
    */
-  function _testGetProfileId($customId) {
+  public function _testGetProfileId($customId) {
     // create profiles
     $profileId = array();
     $profilefield = array(
@@ -410,14 +412,16 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $profilefield
+   * Test profile creation.
+   *
+   * @param array $profileField
    * @param int $location
    * @param $type
    *
    * @return null
    */
-  function _testCreateProfile($profilefield, $location = 0, $type) {
-    $locationfields = array(
+  public function _testCreateProfile($profileField, $location = 0, $type) {
+    $locationFields = array(
       'supplemental_address_1',
       'supplemental_address_2',
       'city',
@@ -429,22 +433,22 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     );
 
     // Add new profile.
-    $profilename = "Profile_" . substr(sha1(rand()), 0, 7);
+    $profileName = "Profile_" . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("admin/uf/group", "reset=1");
     $this->click('newCiviCRMProfile-top');
     $this->waitForElementPresent('_qf_Group_next-top');
 
     //Name of profile
-    $this->type('title', $profilename);
+    $this->type('title', $profileName);
     $this->click('uf_group_type_Profile');
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileId = $this->urlArg('gid');
 
     //Add field to profile_testCreateProfile
-    foreach ($profilefield as $key => $value) {
+    foreach ($profileField as $key => $value) {
       $this->openCiviPage("admin/uf/group/field/add", "reset=1&action=add&gid=$profileId");
-      if (in_array($value, $locationfields)) {
+      if (in_array($value, $locationFields)) {
         $this->select("field_name[0]", "value={$type}");
         $this->select("field_name[1]", "value={$value}");
         $this->select("field_name[2]", "value={$location}");
@@ -465,7 +469,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $eventDescription
    */
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -493,7 +497,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @param $streetAddress
    */
-  function _testAddLocation($streetAddress) {
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -502,6 +506,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     //$streetAddress = "100 Main Street";
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
+    $this->waitForElementPresent('address_1_country_id');
+    $this->select("address_1_country_id", "value=1228");
     $this->type("address_1_postal_code", "94117");
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
@@ -510,7 +516,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForElementPresent("_qf_Location_upload-bottom");
-    $this->waitForTextPresent("'Event Location' information has been saved.");
+    $this->waitForText('crm-notification-container', "'Event Location' information has been saved.");
   }
 
   /**
@@ -518,7 +524,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param bool $priceSet
    * @param string $processorName
    */
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
@@ -553,64 +559,66 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $profileId
+   * Test adding multiple profiles.
+   *
+   * @param int $profileId
    *
    * @return null
    */
-  function _testAddMultipleProfile($profileId) {
+  public function _testAddMultipleProfile($profileId) {
     // Go to Online Contribution tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
     $this->click("is_online_registration");
     $this->check("is_multiple_registrations");
-    $this->select("xpath=//*[@id='custom_pre_id']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=1");
-    $this->select("xpath=//*[@id='custom_post_id']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[3]);
-    $this->select("xpath=//*[@id='additional_custom_post_id']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "- same as for main contact -");
+    $this->select("xpath=//*[@id='custom_pre_id']/parent::td/div[1]/div/span/select", "value=1");
+    $this->select("xpath=//*[@id='custom_post_id']/parent::td/div[1]/div/span/select", "value=" . $profileId[3]);
+    $this->select("xpath=//*[@id='additional_custom_post_id']/parent::td/div[1]/div/span/select", "- same as for main contact -");
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("custom_post_id_multiple_1");
-    $this->select("xpath=//*[@id='custom_post_id_multiple_1']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[2]);
+    $this->select("xpath=//*[@id='custom_post_id_multiple_1']/parent::td/div[1]/div/span/select", "value=" . $profileId[2]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("custom_post_id_multiple_2");
-    $this->select("xpath=//*[@id='custom_post_id_multiple_2']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[1]);
+    $this->select("xpath=//*[@id='custom_post_id_multiple_2']/parent::td/div[1]/div/span/select", "value=" . $profileId[1]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("custom_post_id_multiple_3");
-    $this->select("xpath=//*[@id='custom_post_id_multiple_3']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[4]);
+    $this->select("xpath=//*[@id='custom_post_id_multiple_3']/parent::td/div[1]/div/span/select", "value=" . $profileId[4]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("custom_post_id_multiple_4");
-    $this->select("xpath=//*[@id='custom_post_id_multiple_4']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[5]);
+    $this->select("xpath=//*[@id='custom_post_id_multiple_4']/parent::td/div[1]/div/span/select", "value=" . $profileId[5]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[2]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("custom_post_id_multiple_5");
-    $this->select("xpath=//*[@id='custom_post_id_multiple_5']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[6]);
+    $this->select("xpath=//*[@id='custom_post_id_multiple_5']/parent::td/div[1]/div/span/select", "value=" . $profileId[6]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("additional_custom_post_id_multiple_1");
-    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[5]);
+    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_1']/parent::td/div[1]/div/span/select", "value=" . $profileId[5]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("additional_custom_post_id_multiple_2");
-    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[1]);
+    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_2']/parent::td/div[1]/div/span/select", "value=" . $profileId[1]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("additional_custom_post_id_multiple_3");
-    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[2]);
+    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_3']/parent::td/div[1]/div/span/select", "value=" . $profileId[2]);
 
     $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->click("xpath=//div[@id='registration_screen']/table[3]//tbody/tr[2]/td[2]/span/a[text()='add another profile (bottom of page)']");
     $this->waitForElementPresent("additional_custom_post_id_multiple_4");
-    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/div[1]/div/span/select[@class='select2-offscreen']", "value=" . $profileId[3]);
+    $this->select("xpath=//*[@id='additional_custom_post_id_multiple_4']/parent::td/div[1]/div/span/select", "value=" . $profileId[3]);
 
     $this->click("CIVICRM_QFID_1_is_email_confirm");
     $this->type("confirm_from_name", "TestEvent");
@@ -625,17 +633,18 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
-   * @param $customId
-   * @param $firstName
-   * @param $lastName
-   * @param $participantfname
-   * @param $participantlname
+   * @param int $eventPageId
+   * @param int $customId
+   * @param string $firstName
+   * @param string $lastName
+   * @param string $participantfname
+   * @param string $participantlname
    * @param $email1
    * @param $email2
    */
-  function _testEventRegistration($eventPageId, $customId, $firstName, $lastName,
-                                  $participantfname, $participantlname, $email1, $email2
+  public function _testEventRegistration(
+    $eventPageId, $customId, $firstName, $lastName,
+    $participantfname, $participantlname, $email1, $email2
   ) {
     $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");
@@ -666,9 +675,11 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $this->type("current_employer", "ABCD");
     $this->type("job_title", "Painter");
+    $this->waitForElementPresent('nick_name');
     $this->type("nick_name", "Nick");
     $this->type("url-1", "http://www.test.com");
 
+    $this->waitForElementPresent('street_address-Primary');
     $this->type("street_address-Primary", "Primary street address");
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");
@@ -680,6 +691,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $this->type("middle_name", "xyz");
     $this->click("name=gender_id value=2");
+    $this->waitForElementPresent('participant_role');
     $this->select("participant_role", "value=2");
 
     $this->click("_qf_Register_upload-bottom");
@@ -700,11 +712,12 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("custom_" . $customId[1], "participant_custom1");
     $this->type("custom_" . $customId[2], "participant_custom1");
 
+    $this->waitForElementPresent('street_address-Primary');
     $this->type("street_address-Primary", "Primary street address");
     $this->type("city-Primary", "primecity");
     $this->type("phone-Primary-1", "98667764");
     $this->type("postal_code-Primary", "6548");
-
+    $this->waitForElementPresent('nick_name');
     $this->type("nick_name", "Nick1");
     $this->type("url-1", "http://www.part.com");
 
@@ -714,16 +727,16 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $eventPageId
-   * @param $customId
-   * @param $firstName2
-   * @param $lastName2
-   * @param $participantfname2
+   * @param int $eventPageId
+   * @param int $customId
+   * @param string $firstName2
+   * @param string $lastName2
+   * @param string $participantfname2
    * @param $participantlname2
    * @param $email3
    * @param $email4
    */
-  function _testEventRegistrationAfterRemoving($eventPageId, $customId, $firstName2, $lastName2, $participantfname2, $participantlname2, $email3, $email4) {
+  public function _testEventRegistrationAfterRemoving($eventPageId, $customId, $firstName2, $lastName2, $participantfname2, $participantlname2, $email3, $email4) {
     $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");
 
@@ -791,7 +804,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   /**
    * @return array|string
    */
-  function _addEmailField() {
+  public function _addEmailField() {
     //add email field in name and address profile
     $this->openCiviPage('admin/uf/group/field/add', 'reset=1&action=add&gid=1', "_qf_Field_next-bottom");
     $this->select("field_name[0]", "value=Contact");
@@ -811,11 +824,12 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param $cfId
+   * @param int $cfId
    */
-  function _removeEmailField($cfId) {
+  public function _removeEmailField($cfId) {
     $this->openCiviPage("admin/uf/group/field", "action=delete&id={$cfId}");
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
+
 }

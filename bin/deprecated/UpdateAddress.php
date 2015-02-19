@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A PHP cron script to format all the addresses in the database. Currently
@@ -176,7 +176,7 @@ WHERE      {$whereClause}
   $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
 
   if ($processGeocode) {
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php';
   }
 
   require_once 'CRM/Core/DAO/Address.php';
@@ -273,9 +273,6 @@ WHERE      {$whereClause}
       }
     }
   }
-
-  return;
 }
 
 run();
-

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -41,27 +41,27 @@
       });
       return optionId;
     }
-    
-    // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
-    var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
-    var sourceUrl = '';
-    var useClass  = 'display';
 
-    var tcount = 1;
+    // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
+    var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal},
+      sourceUrl = '',
+      useClass  = 'display',
+      tcount = 1,
+      tableId = [];
+
     if ( useAjax ) {
       {/literal}{if isset($sourceUrl)}sourceUrl = "{$sourceUrl}";{/if}{literal}
       useClass = 'pagerDisplay';
       tcount = 5;
     }
 
-    var tableId = [], count = 1;
+    CRM.dataTableCount = CRM.dataTableCount || 1;
 
-    //rename id of table with sequence
-    //and create the object for navigation
-    $('table.' + useClass).each(function() {
-      $(this).attr('id','option' + tcount + count);
-      tableId.push(count);
-      count++;
+    // FIXME: Rewriting DOM ids is probably a bad idea, and could be avoided
+    $('table.' + useClass).not('.dataTable').each(function() {
+      $(this).attr('id','option' + tcount + CRM.dataTableCount);
+      tableId.push(CRM.dataTableCount);
+      CRM.dataTableCount++;
     });
 
     $.each(tableId, function(i,n){
@@ -112,21 +112,6 @@
       sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
       eval('sortColumn =[' + sortColumn + ']');
       eval('columns =[' + columns + ']');
-
-      var currTable = $(tabId);
-      if (currTable) {
-        // contains the dataTables master records
-        var s = $(document).dataTableSettings;
-        if (s != 'undefined') {
-          var len = s.length;
-          for (var i=0; i < len; i++) {
-            // if already exists, remove from the array
-            if (s[i].sInstance = tabId) {
-              s.splice(i,1);
-            }
-          }
-        }
-      }
 
       var noRecordFoundMsg  = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
 

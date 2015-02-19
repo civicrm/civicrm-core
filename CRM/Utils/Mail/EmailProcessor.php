@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -46,12 +46,13 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the default mailbox (ie. that is used by civiMail for the bounce)
    *
-   * @return boolean always returns true (for the api). at a later stage we should
-   *                 fix this to return true on success / false on failure etc
+   * @return bool
+   *   Always returns true (for the api). at a later stage we should
+   *   fix this to return true on success / false on failure etc.
    */
-  static function processBounces() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+  public static function processBounces() {
+    $dao = new CRM_Core_DAO_MailSettings();
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = TRUE;
     $dao->find();
 
@@ -66,12 +67,14 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Delete old files from a given directory (recursively)
    *
-   * @param string $dir  directory to cleanup
-   * @param int    $age  files older than this many seconds will be deleted (default: 60 days)
+   * @param string $dir
+   *   Directory to cleanup.
+   * @param int $age
+   *   Files older than this many seconds will be deleted (default: 60 days).
    *
    * @return void
    */
-  static function cleanupDir($dir, $age = 5184000) {
+  public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
     if (!is_writable($dir) or !is_readable($dir) or !is_dir($dir)) {
       return;
@@ -97,9 +100,9 @@ class CRM_Utils_Mail_EmailProcessor {
    *
    * @return void
    */
-  static function processActivities() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+  public static function processActivities() {
+    $dao = new CRM_Core_DAO_MailSettings();
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
     $dao->find();
     $found = FALSE;
@@ -114,14 +117,14 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailbox for all the settings from civicrm_mail_settings
+   * Process the mailbox for all the settings from civicrm_mail_settings.
    *
    * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
    *
    * @return void
    */
-  static function process($civiMail = TRUE) {
-    $dao = new CRM_Core_DAO_MailSettings;
+  public static function process($civiMail = TRUE) {
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
 
@@ -132,32 +135,30 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * @param $civiMail
-   * @param $dao
+   * @param CRM_Core_DAO $dao
    *
    * @throws Exception
    */
-  static function _process($civiMail, $dao) {
+  public static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
 
-    $emailActivityTypeId =
-      (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ?
-      EMAIL_ACTIVITY_TYPE_ID :
-      CRM_Core_OptionGroup::getValue(
+    $emailActivityTypeId
+      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
         'activity_type',
-      'Inbound Email',
-      'name'
-    );
+        'Inbound Email',
+        'name'
+      );
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
     }
 
-    $config            = CRM_Core_Config::singleton();
-    $verpSeperator     = preg_quote($config->verpSeparator);
+    $config = CRM_Core_Config::singleton();
+    $verpSeperator = preg_quote($config->verpSeparator);
     $twoDigitStringMin = $verpSeperator . '(\d+)' . $verpSeperator . '(\d+)';
-    $twoDigitString    = $twoDigitStringMin . $verpSeperator;
-    $threeDigitString  = $twoDigitString . '(\d+)' . $verpSeperator;
+    $twoDigitString = $twoDigitStringMin . $verpSeperator;
+    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeperator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
     $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
@@ -176,13 +177,12 @@ class CRM_Utils_Mail_EmailProcessor {
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
-    catch(Exception$e) {
-      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server .'<p>';
+    catch (Exception$e) {
+      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       CRM_Core_Error::fatal($message);
     }
-
 
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {
@@ -415,5 +415,5 @@ class CRM_Utils_Mail_EmailProcessor {
       $store->expunge();
     }
   }
-}
 
+}

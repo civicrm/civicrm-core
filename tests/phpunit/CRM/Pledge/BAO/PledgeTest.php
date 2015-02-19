@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,15 +32,13 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Pledge_BAO_Pledge BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -50,15 +48,14 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
    *  Test for Add/Update Pledge.
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'contact_id' => $this->_contactId,
       'frequency_unit' => 'month',
@@ -86,29 +83,29 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    *  Retrieve a pledge based on a pledge id = 0
    */
-  function testRetrieveZeroPledeID() {
+  public function testRetrieveZeroPledeID() {
     $defaults = array();
-    $params   = array('pledge_id' => 0);
+    $params = array('pledge_id' => 0);
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
     $this->assertEquals(count($pledgeId), 0, "Pledge Id must be greater than 0");
   }
 
   /**
-   *  Retrieve a payment based on a Null pledge id random string
+   *  Retrieve a payment based on a Null pledge id random string.
    */
-  function testRetrieveStringPledgeID() {
+  public function testRetrieveStringPledgeID() {
     $defaults = array();
-    $params   = array('pledge_id' => 'random text');
+    $params = array('pledge_id' => 'random text');
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
     $this->assertEquals(count($pledgeId), 0, "Pledge Id must be a string");
   }
 
   /**
-   *  Test that payment retrieve wrks based on known pledge id
+   *  Test that payment retrieve wrks based on known pledge id.
    */
-  function testRetrieveKnownPledgeID() {
+  public function testRetrieveKnownPledgeID() {
     $params = array(
       'contact_id' => $this->_contactId,
       'frequency_unit' => 'month',
@@ -134,5 +131,5 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
   }
-}
 
+}

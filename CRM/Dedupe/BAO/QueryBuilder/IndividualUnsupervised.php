@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised
@@ -35,7 +35,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
    *
    * @return array
    */
-  static function record($rg) {
+  public static function record($rg) {
     $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
 
     $params = array(
@@ -57,7 +57,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
    *
    * @return array
    */
-  static function internal($rg) {
+  public static function internal($rg) {
     $query = "
             SELECT contact1.id as id1, contact2.id as id2, {$rg->threshold} as weight
             FROM civicrm_contact as contact1
@@ -75,7 +75,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
    * An alternative version which might perform a lot better
    * than the above. Will need to do some testing
    */
-  static function internalOptimized($rg) {
+  public static function internalOptimized($rg) {
     $sql = "
 CREATE TEMPORARY TABLE emails (
                                email varchar(255),
@@ -93,7 +93,7 @@ INSERT INTO emails
     FROM civicrm_email as email1
     JOIN civicrm_email as email2 USING (email)
     WHERE email1.contact_id < email2.contact_id
-    AND  " . self::internalFilters($rg, "email1.contact_id", "email2.contact_id" );
+    AND  " . self::internalFilters($rg, "email1.contact_id", "email2.contact_id");
     CRM_Core_DAO::executeQuery($sql);
 
     $query = "
@@ -107,7 +107,5 @@ AND    " . self::internalFilters($rg);
 
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
-};
 
-
-
+}

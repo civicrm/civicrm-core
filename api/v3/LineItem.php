@@ -1,8 +1,7 @@
 <?php
 /*
-/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,37 +23,36 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM line item.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_LineItem
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
- * Create or update a line_item
+ * Create or update a line_item.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'line_item'
- * @example LineItemCreate.php Std Create example
+ * @param array $params
+ *   Array of property name/value pairs to insert in new 'line_item'
  *
- * @return array api result array
- * {@getfields line_item_create}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_line_item_create($params) {
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_line_item_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
@@ -65,31 +63,30 @@ function _civicrm_api3_line_item_create_spec(&$params) {
 }
 
 /**
- * Returns array of line_items  matching a set of one or more group properties
+ * Returns array of line_items  matching a set of one or more group properties.
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
- *  as null, all line_items will be returned (default limit is 25)
+ * @param array $params
+ *   Array of one or more valid property_name=>value pairs. If $params is set.
+ *   as null, all line_items will be returned (default limit is 25)
  *
- * @return array  Array of matching line_items
- * {@getfields line_item_get}
- * @access public
+ * @return array
+ *   Array of matching line_items
  */
 function civicrm_api3_line_item_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * delete an existing line_item
+ * Delete an existing line_item.
  *
  * This method is used to delete any existing line_item. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
- *  to be deleted
+ * @param array $params
+ *   Array containing id of the group to be deleted.
  *
- * @return array  returns flag true if successfull, error message otherwise
- * {@getfields line_item_delete}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_line_item_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

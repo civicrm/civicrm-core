@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Case_ManagedEntities
+ */
 class CRM_Case_ManagedEntities {
 
   /**
@@ -77,7 +80,7 @@ class CRM_Case_ManagedEntities {
           'name' => $actType,
           'description' => $actType,
           'component_id' => 'CiviCase',
-        )
+        ),
       );
 
       // We'll create managed-entity if this record doesn't exist yet
@@ -125,7 +128,7 @@ class CRM_Case_ManagedEntities {
           'contact_type_b' => 'Individual',
           'contact_sub_type_a' => NULL,
           'contact_sub_type_b' => NULL,
-        )
+        ),
       );
 
       // We'll create managed-entity if this record doesn't exist yet
@@ -140,4 +143,5 @@ class CRM_Case_ManagedEntities {
 
     return $result;
   }
+
 }

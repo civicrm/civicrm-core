@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,7 +35,7 @@
 class CRM_Core_IDS {
 
   /**
-   * define the threshold for the ids reactions
+   * Define the threshold for the ids reactions.
    */
   private $threshold = array(
     'log' => 25,
@@ -44,7 +44,7 @@ class CRM_Core_IDS {
   );
 
   /**
-   * the init object
+   * The init object
    */
   private $init = NULL;
 
@@ -52,16 +52,16 @@ class CRM_Core_IDS {
    * This function includes the IDS vendor parts and runs the
    * detection routines on the request array.
    *
-   * @param object cake controller object
+   * @param object $args cake controller object
    *
-   * @return boolean
+   * @return bool
    */
   public function check(&$args) {
     // lets bypass a few civicrm urls from this check
     static $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
     $path = implode('/', $args);
     if (in_array($path, $skip)) {
-      return;
+      return NULL;
     }
 
     #add request url and user agent
@@ -76,13 +76,14 @@ class CRM_Core_IDS {
     require_once 'IDS/Init.php';
     try {
       $init = IDS_Init::init($configFile);
-      $ids  = new IDS_Monitor($_REQUEST, $init);
-    } catch (Exception $e) {
+      $ids = new IDS_Monitor($_REQUEST, $init);
+    }
+    catch (Exception $e) {
       // might be an old stale copy of Config.IDS.ini
       // lets try to rebuild it again and see if it works
       $configFile = self::createConfigFile(TRUE);
       $init = IDS_Init::init($configFile);
-      $ids  = new IDS_Monitor($_REQUEST, $init);
+      $ids = new IDS_Monitor($_REQUEST, $init);
     }
 
     $result = $ids->run();
@@ -94,14 +95,15 @@ class CRM_Core_IDS {
   }
 
   /**
-   * Create the default config file for the IDS system
+   * Create the default config file for the IDS system.
    *
-   * @param boolean $force should we recreate it irrespective if it exists or not
+   * @param bool $force
+   *   Should we recreate it irrespective if it exists or not.
    *
-   * @return string the full path to the config file
-   * @static
+   * @return string
+   *   the full path to the config file
    */
-  static function createConfigFile($force = FALSE) {
+  public static function createConfigFile($force = FALSE) {
     $config = CRM_Core_Config::singleton();
     $configFile = $config->configAndLogDir . 'Config.IDS.ini';
     if (!$force && file_exists($configFile)) {
@@ -160,7 +162,6 @@ class CRM_Core_IDS {
       CRM_Core_Error::movedSiteError($configFile);
     }
 
-
     // also create the .htaccess file so we prevent the reading of the log and ini files
     // via a browser, CRM-3875
     CRM_Utils_File::restrictAccess($config->configAndLogDir);
@@ -177,9 +178,9 @@ class CRM_Core_IDS {
    *
    * @param IDS_Report $result
    *
-   * @return boolean
+   * @return bool
    */
-  private function react(IDS_Report$result) {
+  private function react(IDS_Report $result) {
 
     $impact = $result->getImpact();
     if ($impact >= $this->threshold['kick']) {
@@ -205,20 +206,16 @@ class CRM_Core_IDS {
    * This function writes an entry about the intrusion
    * to the intrusion database
    *
-   * @param $result
+   * @param array $result
    * @param int $reaction
    *
-   * @internal param array $results
-   *
-   * @return boolean
+   * @return bool
    */
   private function log($result, $reaction = 0) {
     $ip = (isset($_SERVER['SERVER_ADDR']) &&
-      $_SERVER['SERVER_ADDR'] != '127.0.0.1'
-    ) ? $_SERVER['SERVER_ADDR'] : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ?
-      $_SERVER['HTTP_X_FORWARDED_FOR'] :
-      '127.0.0.1'
-    );
+      $_SERVER['SERVER_ADDR'] != '127.0.0.1') ? $_SERVER['SERVER_ADDR'] : (
+      isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
+      );
 
     $data = array();
     $session = CRM_Core_Session::singleton();
@@ -241,8 +238,6 @@ class CRM_Core_IDS {
 
   /**
    * //todo
-   *
-   *
    */
   private function warn($result) {
     return $result;
@@ -250,8 +245,6 @@ class CRM_Core_IDS {
 
   /**
    *  //todo
-   *
-   *
    */
   private function kick($result) {
     $session = CRM_Core_Session::singleton();
@@ -261,9 +254,9 @@ class CRM_Core_IDS {
 
     $path = implode('/', $args);
     if (in_array(
-        $path,
-        array("civicrm/ajax/rest", "civicrm/api/json")
-      )) {
+      $path,
+      array("civicrm/ajax/rest", "civicrm/api/json")
+    )) {
       require_once "api/v3/utils.php";
       $error = civicrm_api3_create_error(
         $msg,
@@ -279,5 +272,5 @@ class CRM_Core_IDS {
     }
     CRM_Core_Error::fatal($msg);
   }
-}
 
+}

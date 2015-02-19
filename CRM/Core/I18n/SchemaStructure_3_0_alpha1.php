@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,7 +36,7 @@ class CRM_Core_I18n_SchemaStructure_3_0_alpha1 {
   /**
    * @return array
    */
-  static function &columns() {
+  public static function &columns() {
     static $result = NULL;
     if (!$result) {
       $result = array(
@@ -167,7 +167,7 @@ class CRM_Core_I18n_SchemaStructure_3_0_alpha1 {
   /**
    * @return array
    */
-  static function &indices() {
+  public static function &indices() {
     static $result = NULL;
     if (!$result) {
       $result = array(
@@ -238,14 +238,14 @@ class CRM_Core_I18n_SchemaStructure_3_0_alpha1 {
   }
 
   /**
-   * @return array
+   * @return array $result
    */
-  static  function &tables() {
+  public static function &tables() {
     static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());
     }
     return $result;
   }
-}
 
+}

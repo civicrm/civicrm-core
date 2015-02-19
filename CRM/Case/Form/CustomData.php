@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -51,35 +51,31 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   protected $_entityID;
 
   /**
-   * The custom data type
+   * The custom data type.
    *
    * @var int
    */
   protected $_cdType;
 
   /**
-   * entity sub type of the table id
+   * Entity sub type of the table id.
    *
    * @var string
-   * @access protected
    */
   protected $_subTypeID;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for table name, id of entity in table, type of entity and stores them.
    *
    * @param
    *
    * @return void
-   *
-   * @access public
-   *
    */
-  function preProcess() {
-    $this->_groupID   = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
-    $this->_entityID  = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
+  public function preProcess() {
+    $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
+    $this->_entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
     $this->_subTypeID = CRM_Utils_Request::retrieve('subType', 'Positive', $this, TRUE);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
@@ -111,10 +107,9 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // make this form an upload since we dont know if the custom data injected dynamically
@@ -136,7 +131,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   /**
    * Process the user submitted custom data values.
    *
-   * @access public
    *
    * @return void
    */
@@ -156,7 +150,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
-    $session        = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
     $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'Change Custom Data', 'name');
     $activityParams = array(
       'activity_type_id' => $activityTypeID,
@@ -181,5 +175,5 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
 
     $transaction->commit();
   }
-}
 
+}

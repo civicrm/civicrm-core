@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -38,7 +38,7 @@
             <th>{ts}Market Value{/ts}</th>
             <th>{ts}Min Contribution{/ts}</th>
       <th>{ts}Financial Type{/ts}</th>
-            <th>{ts}Weight{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             <th></th>
         </tr>
         {foreach from=$rows item=row}

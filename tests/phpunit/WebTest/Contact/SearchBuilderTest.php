@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSearchBuilderOptions() {
+  public function testSearchBuilderOptions() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -50,14 +50,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad();
 
     // We should get no results. But check the options are all still set
-    $this->waitForTextPresent('No matches found');
+    $this->waitForTextPresent('No matches found for:');
     foreach (array($groupName, 'United States', 'Male') as $i => $label) {
       $this->waitForElementPresent("//span[@id='crm_search_value_1_$i']/select/option[2]");
       $this->assertSelectedLabel("//span[@id='crm_search_value_1_$i']/select", $label);
     }
   }
 
-  function testSearchBuilderRLIKE() {
+  public function testSearchBuilderRLIKE() {
     $this->webtestLogin();
 
     // Adding contact
@@ -71,11 +71,11 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
-  // function to create contact with details (contact details, address, Constituent information ...)
   /**
+   * function to create contact with details (contact details, address, Constituent information ...)
    * @param null $firstName
    */
-  function createDetailContact($firstName = NULL) {
+  public function createDetailContact($firstName = NULL) {
 
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);
@@ -112,7 +112,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$firstName adv$firstName"));
   }
 
-  function testSearchBuilderContacts() {
+  public function testSearchBuilderContacts() {
     $this->webtestLogin();
 
     //Individual
@@ -166,8 +166,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
-    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
-    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
+    $this->type('CRM_Contact_Form_Search_Builder-rows-per-page-select', '100');
+    $this->waitForElementPresent('CRM_Contact_Form_Search_Builder-rows-per-page-select');
     $names = array(
       1 => $firstName1,
       2 => $firstName2,
@@ -183,8 +183,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     //searching contacts whose phone field is not empty
     $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
-    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
-    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
+    $this->type('CRM_Contact_Form_Search_Builder-rows-per-page-select', '100');
+    $this->waitForElementPresent('CRM_Contact_Form_Search_Builder-rows-per-page-select');
     $this->assertTrue($this->isTextPresent($firstName));
 
     $firstName4 = "AB" . substr(sha1(rand()), 0, 7);
@@ -204,8 +204,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
     $this->_createContact('Individual', $firstName8, "$firstName8@advsearch.co.in", NULL);
     $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Subject only', "this is subject by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Body only', "this is notes by $firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Subject Only', "this is subject by $firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Body Only', "this is notes by $firstName8", $firstName8, 'LIKE');
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
     $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
@@ -219,7 +219,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * @param string $op
    * @param null $count
    */
-  function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
+  public function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
     // search builder using contacts(not using contactType)
     $this->openCiviPage("contact/search/builder", "reset=1");
     $this->enterValues(1, 1, 'Contacts', $field, NULL, $op, "$fieldValue");
@@ -237,9 +237,16 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Enter form values in a Search Builder row
+   * Enter form values in a Search Builder row.
+   * @param $set
+   * @param $row
+   * @param $entity
+   * @param $field
+   * @param $loc
+   * @param $op
+   * @param string $value
    */
-  function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
+  public function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
     if ($set > 1 && $row == 1) {
       $this->click('addBlock');
     }
@@ -285,7 +292,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
    * @param null $count
    * @param $field
    */
-  function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
+  public function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
     if (isset($contactType)) {
@@ -307,7 +314,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     else {
       $this->click("location");
-      $this->waitForElementPresent("xpath=//div[@id='location']/table/tbody/tr[2]/td/table/tbody/tr[4]/td[2]/select");
+      $this->waitForElementPresent("$field");
       if ($contactType == 'Individual') {
         $this->type("$field", $fieldValue);
       }
@@ -332,12 +339,12 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   /**
    * @param $contactType
-   * @param $name
+   * @param string $name
    * @param $email
    * @param null $streetName
    * @param null $postalCode
    */
-  function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
+  public function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 
     if ($contactType == 'Individual') {
@@ -371,16 +378,10 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$name has been created."));
   }
 
-  /*
+  /**
    * Webtest for CRM-12148
-   *
    */
-  function testSearchBuilderfinancialType() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
+  public function testSearchBuilderfinancialType() {
     $this->webtestLogin();
 
     // add financial type
@@ -404,8 +405,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
         $financialType = $financialTypeName2;
       }
       // create new contact using dialog
-      $firstName = substr(sha1(rand()), 0, 7);
-      $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+      $this->createDialogContact();
       $this->select('financial_type_id', $financialType);
       $this->type('total_amount', 100 * $i);
       $this->clickLink('_qf_Contribution_upload_new', '_qf_Contribution_upload_new');
@@ -413,32 +413,30 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search/builder", "reset=1", "_qf_Builder_refresh");
 
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName1));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
 
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName2));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array(
       $financialTypeName1,
-      $financialTypeName2
+      $financialTypeName2,
     ));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
   }
 
-  /*
+  /**
    * Webtest for CRM-12588
-   *
    */
-  function testSearchBuilderMembershipType() {
+  public function testSearchBuilderMembershipType() {
     $this->webtestLogin();
 
     // create first contact

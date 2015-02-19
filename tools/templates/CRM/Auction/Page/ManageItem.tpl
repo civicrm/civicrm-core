@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -33,7 +33,7 @@
     <div id=item_status_id>
         {strip}
         {include file="CRM/common/pager.tpl" location="top"}
-        {include file="CRM/common/pagerAToZ.tpl}    
+        {include file="CRM/common/pagerAToZ.tpl}
         <table class="selector">
          <tr class="columnheader">
             <th>{ts}Donor{/ts}</th>
@@ -46,7 +46,7 @@
             <th>{ts}Min Bid Value{/ts}</th>
             <th>{ts}Min Bid Increment{/ts}</th>
             <th>{ts}Approved?{/ts}</th>
-	    <th></th>
+      <th></th>
          </tr>
         {foreach from=$rows item=row}
           <tr class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
@@ -59,14 +59,14 @@
             <td>{$row.buy_now_value}</td>
             <td>{$row.min_bid_value}</td>
             <td>{$row.min_bid_increment}</td>
-	    <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-	    <td>{$row.action}</td>
+      <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+      <td>{$row.action}</td>
           </tr>
-        {/foreach}    
+        {/foreach}
         </table>
         {include file="CRM/common/pager.tpl" location="bottom"}
         {/strip}
-      
+
     </div>
 {else}
    {if $isSearch eq 1}
@@ -92,6 +92,6 @@
         <dt><div class="icon inform-icon"></div></dt>
         <dd>{ts 1=$newAuctionURL}There are no auctions created yet. You can <a href='%1'>add one</a>.{/ts}</dd>
         </dl>
-    </div>    
+    </div>
    {/if}
 {/if}

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -29,22 +29,22 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
          <table class="form-layout">
-            <tr class="crm-debugging-form-block-debug">
-                <td class="label">{$form.debug_enabled.label}</td>
-                <td>{$form.debug_enabled.html}<br />
-                <span class="description">{ts}Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools. <strong>This feature should NOT be enabled for production sites</strong>{/ts} {help id='debug'}</span></td>
-            </tr>
             {if $form.userFrameworkLogging}
             <tr class="crm-debugging-form-block-userFrameworkLogging">
                 <td class="label">{$form.userFrameworkLogging.label}</td>
                 <td>{$form.userFrameworkLogging.html}<br />
-                <span class="description">{ts}Set this value to <strong>Yes</strong> if you want CiviCRM error/debugging messages to also appear in Drupal error logs{/ts} {help id='userFrameworkLogging'}</span></td>
+                <span class="description">{ts}Set this value to <strong>Yes</strong> if you want CiviCRM error/debugging messages to appear in the Drupal error logs{/ts} {help id='userFrameworkLogging'}</span></td>
             </tr>
             {/if}
+            <tr class="crm-debugging-form-block-debug">
+                <td class="label">{$form.debug_enabled.label}</td>
+                <td>{$form.debug_enabled.html}<br />
+                <span class="description">{ts}<strong>This feature should NOT be enabled for production sites.</strong><br />Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools.{/ts} {help id='debug'}</span></td>
+            </tr>
             <tr class="crm-debugging-form-block-backtrace">
                 <td class="label">{$form.backtrace.label}</td>
                 <td>{$form.backtrace.html}<br />
-                <span class="description">{ts}Set this value to <strong>Yes</strong> if you want to display a backtrace listing when a fatal error is encountered. <strong>This feature should NOT be enabled for production sites</strong>{/ts}</span></td>
+                <span class="description">{ts}<strong>This feature should NOT be enabled for production sites.</strong><br />Set this value to <strong>Yes</strong> if you want to display a backtrace listing when a fatal error is encountered.{/ts}</span></td>
             </tr>
             <tr class="crm-debugging-form-block-fatalErrorTemplate">
                 <td class="label">{$form.fatalErrorTemplate.label}</td>

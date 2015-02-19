@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -48,19 +48,18 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   public $_single = FALSE;
 
   /**
-   * component clause
+   * Component clause.
    */
   public $_componentClause;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
     if ($this->_context == 'view') {
       $this->_single = TRUE;
@@ -74,8 +73,8 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       // also set the user context to send back to view page
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
-          "reset=1&action=view&id={$participantID}&cid={$contactID}"
-        ));
+        "reset=1&action=view&id={$participantID}&cid={$contactID}"
+      ));
     }
     else {
       parent::preProcess();
@@ -83,13 +82,12 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Make Name Badges'));
 
     //add select for label
@@ -99,7 +97,8 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       'badge_id',
       ts('Name Badge Format'),
       array(
-        '' => ts('- select -')) + $label, TRUE
+        '' => ts('- select -'),
+      ) + $label, TRUE
     );
 
     $next = 'next';
@@ -108,9 +107,8 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -118,5 +116,5 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     $params = $this->controller->exportValues($this->_name);
     CRM_Badge_BAO_Badge::buildBadges($params, $this);
   }
-}
 
+}

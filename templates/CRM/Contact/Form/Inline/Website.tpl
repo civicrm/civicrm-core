@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
 <table class="crm-inline-edit-form">
     <tr>
       <td colspan="5">
-        <div class="crm-submit-buttons"> 
+        <div class="crm-submit-buttons">
           {include file="CRM/common/formButtons.tpl"}
         </div>
       </td>
@@ -46,12 +46,12 @@
     </tr>
 
     {section name='i' start=1 loop=$totalBlocks}
-    {assign var='blockId' value=$smarty.section.i.index} 
+    {assign var='blockId' value=$smarty.section.i.index}
     <tr id="Website_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
       <td>{$form.website.$blockId.website_type_id.html}</td>
       <td>
-        {if $blockId > 1} 
+        {if $blockId > 1}
           <a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts}Delete Website{/ts}"><span class="icon delete-icon"></span></a>
         {/if}
        </td>
@@ -66,7 +66,7 @@
       $('tr[id^="Website_Block_"]' ).each( function() {
           if( $(this).find('td:first span').length > 0 ) {
             $(this).removeClass('hiddenElement');
-          } 
+          }
       });
     });
 </script>

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -25,11 +25,9 @@
 *}
 <div class="crm-block crm-form-block crm-smtp-form-block">
 <div id="help">
-    {ts}<p>CiviCRM offers several options to send emails. The default option should work fine on linux systems. If you are using windows, you probably need to enter settings for your SMTP/Sendmail server. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.</p>
-
-    <p>If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.</p>
-
-   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.</p>{/ts}
+  <p>{ts}CiviCRM offers several options to send emails. The default option should work fine on linux systems. If you are using windows, you probably need to enter settings for your SMTP/Sendmail server. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.{/ts}</p>
+  <p>{ts}If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.{/ts}</p>
+  <p>{ts}If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.{/ts}</p>
 
 </div>
      <table class="form-layout-compressed">
@@ -45,13 +43,13 @@
                     <tr class="crm-smtp-form-block-smtpServer">
                        <td class="label">{$form.smtpServer.label}</td>
                        <td>{$form.smtpServer.html}<br  />
-                            <span class="description">{ts}Enter the SMTP server (machine) name. EXAMPLE: smtp.example.com{/ts}</span>
+                            <span class="description">{ts}Enter the SMTP server (machine) name, such as "smtp.example.com".  If the server uses SSL, add "ssl://" to the beginning of the server name, such as "ssl://smtp.example.com".{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpPort">
                        <td class="label">{$form.smtpPort.label}</td>
                        <td>{$form.smtpPort.html}<br />
-                           <span class="description">{ts}The standard SMTP port is 25. You should only change that value if your SMTP server is running on a non-standard port.{/ts}</span>
+                           <span class="description">{ts}The most common SMTP port possibilities are 25, 465, and 587.  Check with your mail provider for the appropriate one.{/ts}</span>
                        </td>
                     </tr>
                     <tr class="crm-smtp-form-block-smtpAuth">
@@ -93,8 +91,6 @@
         <div class="spacer"></div>
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
-            <span class="place-left">&nbsp;</span>
-            <span class="crm-button crm-button-type-next crm-button_qf_Smtp_refresh_test">{$form._qf_Smtp_refresh_test.html}</span>
         </div>
 </div>
 
@@ -112,7 +108,7 @@
               case "0":
                 $("#bySMTP").show( );
                 $("#bySendmail").hide( );
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
@@ -120,14 +116,14 @@
               case "1":
                 $("#bySMTP").hide( );
                 $("#bySendmail").show( );
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
               break;
               case "3":
                 $('.mailoption').hide();
-                $("#_qf_Smtp_refresh_test").show( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', false);
                 if (mailSetting == '5') {
                   alert(archiveWarning);
                 }
@@ -135,7 +131,7 @@
               default:
                 $("#bySMTP").hide( );
                 $("#bySendmail").hide( );
-                $("#_qf_Smtp_refresh_test").hide( );
+                $("#_qf_Smtp_refresh_test").prop('disabled', true);
             }
         }
 

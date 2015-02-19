@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,14 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
- *
  */
 
 /**
@@ -42,25 +41,23 @@
  * Typically the first form will display the search criteria and it's results
  *
  * The second form is used to process search results with the asscociated actions
- *
  */
 class CRM_Contribute_Controller_ContributionPage extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param string $title
+   * @param bool|int $action
+   * @param bool $modal
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 
     parent::__construct($title, $modal);
-
-
     $this->_stateMachine = new CRM_Contribute_StateMachine_ContributionPage($this, $action);
-
-    // create and instantiate the pages
+    // Create and instantiate the pages.
     $this->addPages($this->_stateMachine, $action);
-
-    // add all the actions
     $this->addActions();
   }
-}
 
+}

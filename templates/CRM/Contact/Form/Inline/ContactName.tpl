@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -44,7 +44,7 @@
     {/if}
     {if $form.first_name}
       <div class="crm-inline-edit-field">
-        {$form.first_name.label}<br /> 
+        {$form.first_name.label}<br />
         {$form.first_name.html}
       </div>
     {/if}

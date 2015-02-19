@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,10 +35,10 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for Individuals Subtype.
    */
-  function testIndividualSubtypeImport() {
+  public function testIndividualSubtypeImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -117,10 +117,10 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for Organization Subtype.
    */
-  function testOrganizationSubtypeImport() {
+  public function testOrganizationSubtypeImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -193,10 +193,10 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking', array(), $other);
   }
 
-  /*
+  /**
    *  Test contact import for Household Subtype.
    */
-  function testHouseholdSubtypeImport() {
+  public function testHouseholdSubtypeImport() {
     $this->webtestLogin();
 
     // Create Household Subtype
@@ -278,7 +278,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return string
    */
-  function _createHouseholdSubtype() {
+  public function _createHouseholdSubtype() {
 
     // Visit to create contact subtype
     $this->openCiviPage("admin/options/subtype", "action=add&reset=1");
@@ -298,7 +298,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _individualSubtypeCSVData() {
+  public function _individualSubtypeCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -313,7 +313,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -324,7 +325,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -346,7 +348,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _organizationSubtypeCSVData() {
+  public function _organizationSubtypeCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
       'email' => 'Email',
@@ -359,7 +361,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '9949912154',
         'address_1' => 'Add 1',
@@ -368,7 +371,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '6949412154',
         'address_1' => 'Add 1',
@@ -388,7 +392,7 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _householdSubtypeCSVData() {
+  public function _householdSubtypeCSVData() {
     $headers = array(
       'household_name' => 'Household Name',
       'email' => 'Email',
@@ -401,7 +405,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '3949912154',
         'address_1' => 'Add 1',
@@ -410,7 +415,8 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '5949412154',
         'address_1' => 'Add 1',
@@ -423,5 +429,5 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

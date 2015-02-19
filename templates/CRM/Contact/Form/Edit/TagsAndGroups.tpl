@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,6 +23,63 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{literal}
+<style>
+  #tagtree .highlighted > span {
+    background-color: #fefca6;
+  }
+  #tagtree .helpicon ins {
+    display: none;
+  }
+  #tagtree ins.jstree-icon {
+    cursor: pointer;
+  }
+</style>
+<script type="text/javascript">
+  (function($, _){{/literal}
+    var entityID='{$entityID}',
+      entityTable='{$entityTable}',
+      $form = $('form.{$form.formClass}');
+    {literal}
+
+    $(function() {
+      function highlightSelected() {
+        $("ul input:not(:checked)", '#tagtree').each(function () {
+          $(this).closest("li").removeClass('highlighted');
+        });
+        $("ul input:checked", '#tagtree').each(function () {
+          $(this).parents("li[id^=tag]").addClass('highlighted');
+        });
+      }
+      highlightSelected();
+
+      $("#tagtree input").change(function(){
+        highlightSelected();
+      });
+
+      //load js tree.
+      $("#tagtree").jstree({
+        plugins : ["themes", "html_data"],
+        themes: {
+          "theme": 'classic',
+          "dots": false,
+          "icons": false,
+          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+        }
+      });
+
+	  {/literal}
+      {if !empty($permission) && $permission neq 'edit'}
+        {literal}
+          $("#tagtree input").prop('disabled', true);
+        {/literal}
+      {/if}
+      {literal}
+    });
+  })(CRM.$, CRM._);
+  {/literal}
+</script>
+
 {if $title}
 <div class="crm-accordion-wrapper crm-tagGroup-accordion collapsed">
   <div class="crm-accordion-header">{$title}</div>
@@ -30,38 +87,24 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-       {if $groupElementType eq 'select'}
-          <td><span class="label">{if $title}{$form.group.label}{/if}</span>
+        {if !$type || $type eq 'group'}
+          <td>
+            {if $groupElementType eq 'select'}
+              <span class="label">{if $title}{$form.group.label}{/if}</span>
+            {/if}
             {$form.group.html}
           </td>
-      {/if}
-      {foreach key=key item=item from=$tagGroup}
-        {* $type assigned from dynamic.tpl *}
-        {if !$type || $type eq $key }
-          <td width={cycle name=tdWidth values="70%","30%"}><span class="label">{if $title}{$form.$key.label}{/if}</span>
-            <div id="crm-tagListWrap">
-              <table id="crm-tagGroupTable">
-                {foreach key=k item=it from=$form.$key}
-                  {if $k|is_numeric}
-                    <tr class={cycle values="'odd-row','even-row'" name=$key} id="crm-tagRow{$k}">
-                      <td>
-                        <strong>{$it.html}</strong><br />
-                        {if $item.$k.description}
-                          <div class="description">
-                            {$item.$k.description}
-                          </div>
-                        {/if}
-                      </td>
-                    </tr>
-                  {/if}
-                {/foreach}
-              </table>
-            </div>
-          </td>
         {/if}
-      {/foreach}
-    </tr>
+      </tr>
+
     {if !$type || $type eq 'tag'}
+      <tr>
+        <td width="70%"><span class="label">{if $title}{$form.$key.label}{/if}</span>
+          <div id="tagtree">
+            {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
+          </div>
+        </td>
+      </tr>
       <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
     {/if}
   </table>

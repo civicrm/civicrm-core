@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextAddTest() {
+  public function testContactContextAddTest() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -69,7 +69,8 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click('link=Add Grant');
 
     // wait for grant form to load completely
-    $this->waitForText('css=span.ui-dialog-title', "$firstName $lastName");
+    $this->waitForText('css=span.ui-dialog-title', "New Grant");
+    $this->waitForElementPresent('status_id');
 
     // check contact name on Grant form
 
@@ -134,5 +135,5 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
       )
     );
   }
-}
 
+}

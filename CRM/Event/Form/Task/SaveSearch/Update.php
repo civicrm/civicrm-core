@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,12 +40,11 @@
 class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSearch {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_id = $this->get('ssID');
@@ -57,14 +56,13 @@ class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSear
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
     $defaults = array();
     $params = array();
@@ -74,5 +72,5 @@ class CRM_Event_Form_Task_SaveSearch_Update extends CRM_Event_Form_Task_SaveSear
 
     return $defaults;
   }
-}
 
+}

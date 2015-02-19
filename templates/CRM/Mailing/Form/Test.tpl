@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -36,13 +36,13 @@
   <table class="form-layout">
     <tr class="crm-mailing-test-form-block-test_email"><td class="label">{$form.test_email.label}</td><td>{$form.test_email.html} {ts}(filled with your contact's token values){/ts}</td></tr>
     <tr class="crm-mailing-test-form-block-test_group"><td class="label">{$form.test_group.label}</td><td>{$form.test_group.html}</td></tr>
-    <tr><td></td><td>{$form.sendtest.html}</td>  
+    <tr><td></td><td>{$form.sendtest.html}</td>
   </table>
 </fieldset>
 
 <div class="crm-accordion-wrapper crm-plain_text_email-accordion collapsed">
     <div class="crm-accordion-header">
-         
+
         {ts}Preview Mailing{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
@@ -59,8 +59,8 @@
           {/if}
         </table>
     </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->    
+</div><!-- /.crm-accordion-wrapper -->
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
-    
+
 </div><!-- / .crm-form-block -->

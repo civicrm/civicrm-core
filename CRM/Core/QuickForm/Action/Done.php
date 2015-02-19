@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the back action.
@@ -36,14 +36,14 @@
 class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action_Done
-  @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
@@ -53,13 +53,14 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
    * and if success, call post process
    * when done processing pop to user context
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
-   * @param  string    $actionName Current action name, as one Action object can serve multiple actions
+   * @param CRM_Core_Form $page
+   *   The current form-page.
+   * @param string $actionName
+   *   Current action name, as one Action object can serve multiple actions.
    *
    * @return void
-   * @access public
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     $page->isFormBuilt() or $page->buildForm();
 
     $pageName = $page->getAttribute('name');
@@ -80,5 +81,5 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
     // use Done when u want to pop back to the same context without a reset
     $this->popUserContext();
   }
-}
 
+}

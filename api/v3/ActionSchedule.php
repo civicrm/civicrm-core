@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,22 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 for Scheduled Reminders
- *
- * @package CiviCRM_APIv3
- * @subpackage API_ActionSchedule
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 /**
- * Get CiviCRM Action Schedule details
- * {@getfields action_schedule_create}
+ * This api exposes CiviCRM Scheduled Reminders.
  *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Get CiviCRM Action Schedule details.
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_action_schedule_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'action_schedule');
@@ -47,13 +44,11 @@ function civicrm_api3_action_schedule_get($params) {
 
 
 /**
- * Create a new Action Schedule
+ * Create a new Action Schedule.
  *
  * @param array $params
  *
  * @return array
- *
- * {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));
@@ -64,30 +59,28 @@ function civicrm_api3_action_schedule_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
-//  $params['entity_status']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
 }
 
 /**
- * delete an existing action_schedule
+ * Delete an existing action_schedule.
  *
- * @param array $params array containing id of the action_schedule
- * to be deleted
+ * @param array $params
+ *   Array containing id of the action_schedule to be deleted.
  *
- * @return array API result array
- *
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_action_schedule_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
-

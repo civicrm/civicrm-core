@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -31,11 +31,11 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
-
 class CRM_Badge_Page_AJAX {
-  static function getImageProp() {
+  public static function getImageProp() {
     $img = $_GET['img'];
-   list($w, $h) = CRM_Badge_BAO_Badge::getImageProperties($img);
+    list($w, $h) = CRM_Badge_BAO_Badge::getImageProperties($img);
     CRM_Utils_JSON::output(array('width' => $w, 'height' => $h));
   }
+
 }

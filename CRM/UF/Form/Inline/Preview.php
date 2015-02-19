@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,18 +41,15 @@
 class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
    * @param
    *
    * @return void
-   *
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
       // CRM_Core_Controller validates qfKey for POST requests, but not necessarily
       // for GET requests. Allowing GET would therefore be CSRF vulnerability.
@@ -60,10 +57,10 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
     }
     // Inline forms don't get menu-level permission checks
     if (!CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('Permission denied'));
+      CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $content = json_decode($_REQUEST['ufData'], TRUE);
-    foreach(array('ufGroup', 'ufFieldCollection') as $key) {
+    foreach (array('ufGroup', 'ufFieldCollection') as $key) {
       if (!is_array($content[$key])) {
         CRM_Core_Error::fatal("Missing JSON parameter, $key");
       }
@@ -77,4 +74,3 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
 }
-

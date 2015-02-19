@@ -6,7 +6,15 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_Page_RedirectTest
  */
 class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
-  function examples() {
+  /**
+   * Get example data.
+   *
+   * @return array
+   */
+  /**
+   * @return array
+   */
+  public function examples() {
     $cases = array();
     // $cases[] = array(string $requestPath, string $requestArgs, string $pageArgs, string $expectedUrl)
 
@@ -24,7 +32,7 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
       '',
       'gid=2&reset=1',
       'url=civicrm/newfoo/%%gid%%?reset=%%reset%%',
-      '/index.php?q=civicrm/newfoo/2&amp;reset=1'
+      '/index.php?q=civicrm/newfoo/2&amp;reset=1',
     );
 
     return $cases;
@@ -34,10 +42,14 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
    * Note: Expected URL is htmlized because that's what CRM_Utils_System::url()
    * and CRM_Utils_System::redirect() work with.
    *
-   * @param string $requestPath eg "civicrm/requested/path"
-   * @param string $requestArgs eg "foo=bar&whiz=bang"
-   * @param string $pageArgs eg "url=civicrm/foo/bar?whiz=bang"
-   * @param string $expectedUrl eg "/index.php?q=civicrm/foo/bar&whiz=bang"
+   * @param string $requestPath
+   *   Eg "civicrm/requested/path".
+   * @param string $requestArgs
+   *   Eg "foo=bar&whiz=bang".
+   * @param string $pageArgs
+   *   Eg "url=civicrm/foo/bar?whiz=bang".
+   * @param string $expectedUrl
+   *   Eg "/index.php?q=civicrm/foo/bar&whiz=bang".
    * @dataProvider examples
    */
   public function testCreateUrl($requestPath, $requestArgs, $pageArgs, $expectedUrl) {
@@ -47,4 +59,5 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
     $actualUrl = CRM_Core_Page_Redirect::createUrl($parsedRequestPath, $parsedRequestArgs, $parsedPageArgs, FALSE);
     $this->assertEquals($expectedUrl, $actualUrl);
   }
+
 }

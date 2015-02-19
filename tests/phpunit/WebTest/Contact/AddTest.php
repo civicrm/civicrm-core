@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -104,7 +104,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -119,7 +119,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_2_country_id");
     $this->select("address_2_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_2', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_2', "Latitude")) {
       $this->type("address_2_geo_code_1", "1234");
       $this->type("address_2_geo_code_2", "5678");
     }
@@ -171,7 +171,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testHouseholdAdd() {
+  public function testHouseholdAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -203,7 +203,9 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("phone_1_phone_type_id", "value=" . $this->webtestGetFirstValueForOptionGroup('phone_type'));
 
     //fill in IM
-    $this->assertElementContainsText('im_1_provider_id', "Yahoo MSN AIM GTalk Jabber Skype");
+    foreach (array('Yahoo', 'MSN', 'AIM', 'GTalk', 'Jabber', 'Skype') as $option) {
+      $this->assertSelectHasOption('im_1_provider_id', $option);
+    }
     $this->type("im_1_name", "testSkype");
     $this->select("im_1_location_type_id", "value=3");
     $this->select("im_1_provider_id", "value=6");
@@ -235,7 +237,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -280,7 +282,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testOrganizationAdd() {
+  public function testOrganizationAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -344,7 +346,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -384,7 +386,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testIndividualAddWithSharedAddress() {
+  public function testIndividualAddWithSharedAddress() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', "reset=1&ct=Individual");
@@ -406,7 +408,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
     //create new current employer
     $currentEmployer = substr(sha1(rand()), 0, 7) . "Web Access";
-
 
     //fill in email
     $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
@@ -442,8 +443,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Edit_next");
 
-    // Is new contact created?
-    $this->waitForText('crm-notification-container', "$currentEmployer has been created.");
     $this->select2('employer_id', $currentEmployer);
 
     //make sure shared address is selected
@@ -475,9 +474,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Edit_next");
 
-    // Is new contact created?
-    $this->waitForText('crm-notification-container', "$sharedHousehold has been created.");
-
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-2');
 
@@ -498,8 +494,8 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     // make sure relationships are created
     $this->click("xpath=id('tab_rel')/a");
     $this->waitForElementPresent('permission-legend');
-    $this->assertElementContainsText('option11', 'Employee of');
-    $this->assertElementContainsText('option11', 'Household Member of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Employee of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
-}
 
+}

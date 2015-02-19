@@ -71,7 +71,7 @@
       this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').prop('disabled', !this.hasUfGroupId());
     },
     hasUfGroupId: function() {
-      return (this.getUfGroupId() && this.getUfGroupId() != '') ? true : false;
+      return (this.getUfGroupId() && this.getUfGroupId() !== '') ? true : false;
     },
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
@@ -94,14 +94,16 @@
       var $pane = this.$('.crm-profile-selector-preview-pane');
       if ($preview.hasClass('crm-profile-selector-preview-show')) {
         $preview.removeClass('crm-profile-selector-preview-show');
+        $preview.find('.icon').removeClass('ui-icon-zoomin').addClass('ui-icon-zoomout');
         $pane.show();
       } else {
         $preview.addClass('crm-profile-selector-preview-show');
+        $preview.find('.icon').removeClass('ui-icon-zoomout').addClass('ui-icon-zoomin');
         $pane.hide();
       }
     },
     disableForm: function() {
-      this.$(':input', '.crm-profile-selector-preview-pane').prop('readOnly', true);
+      this.$(':input', '.crm-profile-selector-preview-pane').not('.select2-input').prop('readOnly', true);
     },
     doEdit: function(e) {
       e.preventDefault();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,13 +40,11 @@
 class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
 
   /**
-   * List activities as dashlet
+   * List activities as dashlet.
    *
    * @return void
-   *
-   * @access public
    */
-  function run() {
+  public function run() {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
     $this->assign('contactID', $contactID);
@@ -77,5 +75,5 @@ class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

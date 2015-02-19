@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Event_Import_Field
@@ -31,52 +31,51 @@
 class CRM_Event_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 
   /**
-   * name of the field
+   * Name of the field
    */
   public $_name;
 
   /**
-   * title of the field to be used in display
+   * Title of the field to be used in display
    */
   public $_title;
 
   /**
-   * type of field
+   * Type of field
    * @var enum
    */
   public $_type;
 
   /**
-   * regexp to match the CSV header of this column/field
+   * Regexp to match the CSV header of this column/field
    * @var string
    */
   public $_headerPattern;
 
   /**
-   * regexp to match the pattern of data from various column/fields
+   * Regexp to match the pattern of data from various column/fields
    * @var string
    */
   public $_dataPattern;
 
   /**
-   * value of this field
+   * Value of this field
    * @var object
    */
   public $_value;
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
    * @param string $dataPattern
    */
-  function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
+  public function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     $this->_name = $name;
     $this->_title = $title;
     $this->_type = $type;
@@ -86,22 +85,22 @@ class CRM_Event_Import_Field {
     $this->_value = NULL;
   }
 
-  function resetValue() {
+  public function resetValue() {
     $this->_value = NULL;
   }
 
   /**
-   * the value is in string format. convert the value to the type of this field
+   * The value is in string format. convert the value to the type of this field
    * and set the field value with the appropriate type
    */
-  function setValue($value) {
+  public function setValue($value) {
     $this->_value = $value;
   }
 
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
     if (CRM_Utils_System::isNull($this->_value)) {
       return TRUE;
     }
@@ -114,7 +113,8 @@ class CRM_Event_Import_Field {
 
       case 'register_date':
         return CRM_Utils_Rule::date($this->_value);
-      /*
+
+      /* @codingStandardsIgnoreStart
         case 'event_id':
             static $events = null;
             if (!$events) {
@@ -122,11 +122,12 @@ class CRM_Event_Import_Field {
             }
             if (in_array($this->_value, $events)) {
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
             break;
-            */
+      @codingStandardsIgnoreEnd */
 
       default:
         break;
@@ -146,5 +147,5 @@ class CRM_Event_Import_Field {
     }
     return TRUE;
   }
-}
 
+}

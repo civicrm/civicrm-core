@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataAdd() {
+  public function testCustomDataAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
@@ -49,11 +49,11 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->clickLink("_qf_Group_next-bottom");
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -86,14 +86,14 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_done");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForElementPresent('newCustomField');
 
     //create another custom field - Integer Radio
-    $this->clickLink("//a[@id='newCustomField']/span", '_qf_Field_cancel', FALSE);
+    $this->clickLink("newCustomField", '_qf_Field_cancel', FALSE);
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -127,7 +127,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
+    $this->click("_qf_Field_done");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
@@ -141,8 +141,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //fill first name, last name, email id
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName  = 'An' . substr(sha1(rand()), 0, 7);
-    $emailId   = substr(sha1(rand()), 0, 7) . '@web.com';
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->click("first_name");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
@@ -155,7 +155,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testCustomDataMoneyAdd() {
+  public function testCustomDataMoneyAdd() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -171,11 +171,11 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("extends[0]");
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
-    $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->clickLink("_qf_Group_next-bottom");
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - money text
     $moneyTextFieldLabel = 'money' . substr(sha1(rand()), 0, 4);
@@ -198,16 +198,15 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_done");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$moneyTextFieldLabel' has been saved.");
 
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
-    $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']//table/tbody//tr/td/span[text()='$customGroupTitle']/../../td[7]/span/a@href"));
-    $customFieldsetId =  $customFieldsetId[1];
+    $customFieldsetId = explode('&gid=', $this->getAttribute("xpath=//div[@id='custom_group']/table/tbody//tr/td/div[text()='$customGroupTitle']/../../td[7]/span/a@href"));
+    $customFieldsetId = $customFieldsetId[1];
 
     //create Individual contact
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -218,8 +217,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //fill first name, last name, email id
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName  = 'An' . substr(sha1(rand()), 0, 7);
-    $emailId   = substr(sha1(rand()), 0, 7) . '@web.com';
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
     $this->click("first_name");
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
@@ -236,7 +235,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@id='custom-set-content-{$customFieldsetId}']/div/div[2]/div[2]", '12,345,678.98');
   }
 
-  function testCustomDataChangeLog(){
+  public function testCustomDataChangeLog() {
     $this->webtestLogin();
 
     //enable logging
@@ -256,27 +255,26 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->type("id=title", $customFieldSet);
     $this->select("id=extends_0", "label=Individual");
     $this->click("id=collapse_display");
-    $this->click("id=_qf_Group_next-bottom");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink("id=_qf_Group_next-bottom");
     $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
+    $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset
     $customField = 'CustomField' . rand();
     $this->type("id=label", $customField);
     $this->select("id=data_type_0", "value=0");
-    $this->click("id=_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("id=_qf_Field_done-bottom");
     $this->waitForText('crm-notification-container', "Custom field '$customField' has been saved.");
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //contact details section
     //fill in first name
-    $firstName = 'Jimmy'.substr(sha1(rand()), 0, 7);
+    $firstName = 'Jimmy' . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName);
 
     //fill in last name
-    $lastName = 'Page'.substr(sha1(rand()), 0, 7);
+    $lastName = 'Page' . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $lastName);
 
     //fill in email id
@@ -286,8 +284,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->type("phone_1_phone", "2222-4444");
 
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
-    $value = "custom".rand();
-    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input",$value);
+    $value = "custom" . rand();
+    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value);
 
     //check for matching contact
     $this->click("_qf_Contact_refresh_dedupe");
@@ -304,7 +302,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=1228");
 
-    if ($this->assertElementContainsText("address_1", "Latitude")) {
+    if ($this->assertElementContainsText("address_table_1", "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -319,8 +317,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->clickLink("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
-    $value1 = "custom_1".rand();
-    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input",$value1);
+    $value1 = "custom_1" . rand();
+    $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input", $value1);
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=#tab_log a");
@@ -344,4 +342,3 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
   }
 
 }
-

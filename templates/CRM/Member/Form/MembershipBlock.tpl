@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -79,6 +79,10 @@
       <td><div class="status message">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div></td>
     </tr>
     {/if}
+          <tr id="membership_type-label" class="crm-member-membershipblock-form-block-membership_type_label">
+            <td class="label">{$form.membership_type_label.label}</td>
+            <td>{$form.membership_type_label.html}</td>
+          </tr>
           <tr id="membership_type-block" class="crm-member-membershipblock-form-block-membership_type">
               <td class="label">{$form.membership_type.label}</td>
               <td>
@@ -162,12 +166,14 @@
     // function to handle show/hide of membership type and related blocks if price set is selected
     function checkIfPriceSetIsSelected( ) {
         if ( cj('#member_price_set_id').val() ) {
+            cj('#membership_type-label').hide();
             cj('#membership_type-block').hide();
             cj('#requiredSignup').hide();
             cj('#displayFee').hide();
             cj('#separatePayment').hide();
             cj('#quickConfigConvertMessage').hide();
         } else {
+            cj('#membership_type-label').show();
             cj('#membership_type-block').show();
             cj('#requiredSignup').show();
             cj('#displayFee').show();

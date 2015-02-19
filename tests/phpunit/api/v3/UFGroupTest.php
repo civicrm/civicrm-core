@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Test class for UFGroup API - civicrm_uf_*
  * @todo Split UFGroup and UFJoin tests
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_UFGroupTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture
@@ -39,7 +39,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   protected $_ufFieldId;
   protected $_contactId;
   protected $_groupId;
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   protected $params;
 
   protected function setUp() {
@@ -49,8 +49,8 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $ufGroup = $this->callAPISuccess('uf_group', 'create', array(
       'group_type' => 'Contact',
-      'help_pre'   => 'Profile to Test API',
-      'title' =>'Test Profile',
+      'help_pre' => 'Profile to Test API',
+      'title' => 'Test Profile',
     ));
     $this->_ufGroupId = $ufGroup['id'];
     $ufMatch = $this->callAPISuccess('uf_match', 'create', array(
@@ -58,7 +58,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'uf_id' => 42,
       'uf_name' => 'email@mail.com',
     ));
-    $this->_ufGroupId = $ufMatch['id'];
+    $this->_ufMatchId = $ufMatch['id'];
     $this->params = array(
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,
@@ -83,7 +83,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     //  Truncate the tables
     $this->quickCleanup(
       array(
@@ -97,15 +97,15 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * updating group
+   * Updating group.
    */
   public function testUpdateUFGroup() {
     $params = array(
       'title' => 'Edited Test Profile',
       'help_post' => 'Profile Pro help text.',
       'is_active' => 1,
-      'id' => $this->_ufGroupId
-     );
+      'id' => $this->_ufGroupId,
+    );
 
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     foreach ($params as $key => $value) {
@@ -113,7 +113,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupCreate() {
+  public function testUFGroupCreate() {
 
     $result = $this->callAPIAndDocument('uf_group', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result);
@@ -134,11 +134,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupCreateWithWrongParams() {
+  public function testUFGroupCreateWithWrongParams() {
     $result = $this->callAPIFailure('uf_group', 'create', array('name' => 'A title-less group'));
   }
 
-  function testUFGroupUpdate() {
+  public function testUFGroupUpdate() {
     $params = array(
       'id' => $this->_ufGroupId,
       'add_captcha' => 1,
@@ -160,7 +160,8 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'name' => 'test_group',
       'notify' => 'admin@example.org',
       'post_URL' => 'http://example.org/post',
-      'title' => 'Test Group',    );
+      'title' => 'Test Group',
+    );
     $result = $this->callAPISuccess('uf_group', 'create', $params);
     $params['created_date'] = date('YmdHis', strtotime($params['created_date']));
     foreach ($params as $key => $value) {
@@ -174,7 +175,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $params['group'], 'in line ' . __LINE__);
   }
 
-  function testUFGroupGet() {
+  public function testUFGroupGet() {
     $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $result['id']);
     $result = $this->callAPIAndDocument('uf_group', 'get', $params, __FUNCTION__, __FILE__);
@@ -195,15 +196,16 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testUFGroupUpdateWithEmptyParams() {
+  public function testUFGroupUpdateWithEmptyParams() {
     $result = $this->callAPIFailure('uf_group', 'create', array(), $this->_ufGroupId);
   }
 
-  function testUFGroupDelete() {
+  public function testUFGroupDelete() {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $ufGroup['id']);
     $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
     $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
   }
+
 }

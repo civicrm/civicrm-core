@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -49,16 +49,15 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviEvent', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
     foreach ($this->_participantIds as $participantId) {
@@ -69,17 +68,16 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
-    $deleteParticipants = array(1 => ts('Delete this participant record along with associated participant record(s).'),
+  public function buildQuickForm() {
+    $deleteParticipants = array(
+      1 => ts('Delete this participant record along with associated participant record(s).'),
       2 => ts('Delete only this participant record.'),
     );
-
 
     $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
     $this->setDefaults(array('delete_participant' => 1));
@@ -88,9 +86,8 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -126,13 +123,18 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
       $deletedParticipants += $additionalCount;
     }
 
-    $status = array(ts('Participant(s) Deleted: %1 (Total Selected: %2)', array(1 => $deletedParticipants, 2 => count($this->_participantIds))));
+    $status = array(
+      ts('Participant(s) Deleted: %1 (Total Selected: %2)', array(
+          1 => $deletedParticipants,
+          2 => count($this->_participantIds),
+        )),
+    );
     if (!empty($participantLinks)) {
-      $status[] = ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:') . '<br>' . $participantLinks;
+      $status[] = ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:') . '<br/>' . $participantLinks;
     }
     foreach ($status as $text) {
       CRM_Core_Session::setStatus($text, '', 'info');
     }
   }
-}
 
+}

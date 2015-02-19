@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -110,11 +110,14 @@
 {* Build pledge payment details*}
 {literal}
 <script type="text/javascript">
-
-    function buildPaymentDetails( pledgeId, contactId )
-    {
-        var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
-        CRM.loadPage(dataUrl, {target: '#paymentDetails' + pledgeId});
-    }
+  (function($) {
+    // FIXME global function
+    window.buildPaymentDetails = function(pledgeId, contactId) {
+      var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
+      $('#paymentDetails' + pledgeId).load(dataUrl, function() {
+        $(this).trigger('crmLoad');
+      });
+    };
+  })(CRM.$);
 </script>
 {/literal}

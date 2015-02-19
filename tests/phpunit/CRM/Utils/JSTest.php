@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -34,53 +34,52 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  function translateExamples() {
+  public function translateExamples() {
     $cases = array();
     $cases[] = array(
       '',
       array(),
     );
-    $cases[] = array( // missing ts
+    $cases[] = array(// missing ts
       'alert("Hello world")',
       array(),
     );
-    $cases[] = array( // basic function call
+    $cases[] = array(// basic function call
       'alert(ts("Hello world"));',
       array('Hello world'),
     );
-    $cases[] = array( // with arg
+    $cases[] = array(// with arg
       'alert(ts("Hello world", {1: "whiz"}));',
       array('Hello world'),
     );
-    $cases[] = array( // not really ts()
+    $cases[] = array(// not really ts()
       'alert(clients("Hello world"));',
       array(),
     );
-    $cases[] = array( // not really ts()
+    $cases[] = array(// not really ts()
       'alert(clients("Hello world", {1: "whiz"}));',
       array(),
     );
-    $cases[] = array( // with arg
-      '
-      function whits() {
-        for (a in b) {
-          mitts("wallaby", function(zoo){
-            alert(zoo + ts("Hello"))
-          });
-        }
-      }
-      ',
+    $cases[] = array(// with arg
+      "\n" .
+      "public function whits() {\n" .
+      "  for (a in b) {\n" .
+      "    mitts(\"wallaby\", function(zoo) {\n" .
+      "      alert(zoo + ts(\"Hello\"))\n" .
+      "    });\n" .
+      "  }\n" .
+      "}\n",
       array('Hello'),
     );
-    $cases[] = array( // duplicate
+    $cases[] = array(// duplicate
       'alert(ts("Hello world") + "-" + ts("Hello world"));',
       array('Hello world'),
     );
-    $cases[] = array( // two strings, addition
+    $cases[] = array(// two strings, addition
       'alert(ts("Hello world") + "-" + ts("How do you do?"));',
       array('Hello world', 'How do you do?'),
     );
-    $cases[] = array( // two strings, separate calls
+    $cases[] = array(// two strings, separate calls
       'alert(ts("Hello world");\nalert(ts("How do you do?"));',
       array('Hello world', 'How do you do?'),
     );
@@ -88,11 +87,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       'alert(ts(\'Single quoted\'));',
       array('Single quoted'),
     );
-    $cases[] = array( // unclear string
+    $cases[] = array(// unclear string
       'alert(ts(message));',
       array(),
     );
-    $cases[] = array( // ts() within a string
+    $cases[] = array(// ts() within a string
       'alert(ts("Does the ts(\'example\') notation work?"));',
       array('Does the ts(\'example\') notation work?'),
     );
@@ -104,10 +103,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    * @param array $expectedStrings
    * @dataProvider translateExamples
    */
-  function testParseStrings($jsCode, $expectedStrings) {
+  public function testParseStrings($jsCode, $expectedStrings) {
     $actualStrings = CRM_Utils_JS::parseStrings($jsCode);
     sort($expectedStrings);
     sort($actualStrings);
     $this->assertEquals($expectedStrings, $actualStrings);
   }
+
 }

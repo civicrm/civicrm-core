@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,75 +23,65 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 premium functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_premium
- *
  */
 
 /**
- * Save a premium
+ * This api exposes CiviCRM premium.
  *
- * Allowed @params array keys are:
- * {@getfields premium_create}
- * @example premiumCreate.php
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save a premium.
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of newly created premium property values.
- * @access public
+ * @return array
+ *   Array of newly created premium property values.
  */
 function civicrm_api3_premium_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a premium
+ * Get a premium.
  *
- * Allowed @params array keys are:
- * {@getfields premium_get}
- * @example premiumCreate.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of retrieved premium property values.
- * @access public
+ * @return array
+ *   Array of retrieved premium property values.
  */
 function civicrm_api3_premium_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a premium
+ * Delete a premium.
  *
- * Allowed @params array keys are:
- * {@getfields premium_delete}
- * @example premiumCreate.php
- *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_premium_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * return field specification specific to get requests
+ * Return field specification specific to get requests.
+ *
+ * @param array $params
  */
 function _civicrm_api3_premium_get_spec(&$params) {
   $params['premiums_active']['api.aliases'] = array('is_active');
 }
 
 /**
- * return field specification specific to create requests
+ * Return field specification specific to create requests.
+ *
+ * @param array $params
  */
 function _civicrm_api3_premium_create_spec(&$params) {
   $params['premiums_active']['api.aliases'] = array('is_active');

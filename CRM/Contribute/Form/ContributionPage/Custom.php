@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,10 +39,9 @@
 class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -55,19 +54,29 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     // Register 'contribution_1'
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'financial_type_id');
     $allowCoreTypes[] = 'Contribution';
-    // $allowSubTypes['ContributionType'] = array($financialTypeId);
-    $entities[] = array('entity_name' => 'contribution_1', 'entity_type' => 'ContributionModel', 'entity_sub_type' => $financialTypeId);
+    //CRM-15427
+    $allowSubTypes['ContributionType'] = array($financialTypeId);
+    $entities[] = array(
+      'entity_name' => 'contribution_1',
+      'entity_type' => 'ContributionModel',
+      'entity_sub_type' => '*',
+    );
 
     // If applicable, register 'membership_1'
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     if ($member && $member['is_active']) {
-      $entities[] = array('entity_name' => 'membership_1', 'entity_type' => 'MembershipModel', 'entity_sub_type' => $member['membership_type_default']);
+      //CRM-15427
+      $entities[] = array(
+        'entity_name' => 'membership_1',
+        'entity_type' => 'MembershipModel',
+        'entity_sub_type' => '*',
+      );
       $allowCoreTypes[] = 'Membership';
       $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
-
-    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities);
-    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities);
+    //CRM-15427
+    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
+    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
 
     $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Custom', 'formRule'), $this->_id);
 
@@ -75,21 +84,19 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Include Profiles (%1)', array(1 => $title)));
+      CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
     }
-
 
     $ufJoinParams = array(
       'module' => 'CiviContribute',
@@ -100,15 +107,13 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     $defaults['custom_post_id'] = $second ? array_shift($second) : '';
 
-
     return $defaults;
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -153,32 +158,31 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Include Profiles');
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
+   * @param array $fields
+   *   The input form values.
    *
    * @param $files
-   * @param $contributionPageId
+   * @param int $contributionPageId
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $contributionPageId) {
+  public static function formRule($fields, $files, $contributionPageId) {
     $errors = array();
     $preProfileType = $postProfileType = NULL;
     // for membership profile make sure Membership section is enabled
     // get membership section for this contribution page
-    $dao               = new CRM_Member_DAO_MembershipBlock();
+    $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $contributionPageId;
+    $dao->entity_id = $contributionPageId;
 
     $membershipEnable = FALSE;
 
@@ -220,5 +224,5 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     }
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

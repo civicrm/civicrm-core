@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,10 +39,9 @@
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
@@ -72,7 +71,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
@@ -80,12 +79,13 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
       elseif (CRM_Utils_Array::value('mailerJobSize', $fields) <
-        CRM_Utils_Array::value('mailerBatchLimit', $fields)) {
+        CRM_Utils_Array::value('mailerBatchLimit', $fields)
+      ) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
     }
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

@@ -5,29 +5,20 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Utils_MailTest
  */
 class CRM_Utils_MailTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mail Test',
-      'description' => 'Test RFC822 formatting',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    * test with empty params.
    */
-  function testFormatRFC822() {
+  public function testFormatRFC822() {
 
     $values = array(
-      array('name' => "Test User",
+      array(
+        'name' => "Test User",
         'email' => "foo@bar.com",
         'result' => "Test User <foo@bar.com>",
       ),
@@ -67,5 +58,5 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
       $this->assertEquals($result, $value['result'], 'Expected encoding does not match');
     }
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,10 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_grant* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Grant
+ * @package CiviCRM_APIv3
+ * @subpackage API_Grant
  */
-
 class api_v3_GrantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -43,11 +42,11 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
-           'contact_id' => $this->ids['contact'][0],
+      'contact_id' => $this->ids['contact'][0],
       'application_received_date' => 'now',
       'decision_date' => 'next Monday',
       'amount_total' => '500',
@@ -58,10 +57,10 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     foreach ($this->ids as $entity => $entities) {
       foreach ($entities as $id) {
-        $this->callAPISuccess($entity, 'delete', array( 'id' => $id));
+        $this->callAPISuccess($entity, 'delete', array('id' => $id));
       }
     }
     $this->quickCleanup(array('civicrm_grant'));
@@ -75,7 +74,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check checkbox type custom fields are created correctly
+   * Check checkbox type custom fields are created correctly.
+   *
    * We want to ensure they are saved with separators as appropriate
    */
   public function testCreateCustomCheckboxGrant() {
@@ -91,9 +91,10 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         array('label' => 'my goat', 'value' => 'goat', 'is_active' => TRUE, 'weight' => 2),
         array('label' => 'mohair', 'value' => 'wool', 'is_active' => TRUE, 'weight' => 3),
         array('label' => 'hungry', 'value' => '', 'is_active' => TRUE, 'weight' => 3),
-    )));
+      ),
+    ));
     $columnName = $result['values'][$result['id']]['column_name'];
-    $ids['custom_field_id']  = $result['id'];
+    $ids['custom_field_id'] = $result['id'];
     $customFieldLabel = 'custom_' . $ids['custom_field_id'];
     $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR;
     //first we pass in the core separators ourselves
@@ -112,7 +113,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->assertEquals($expectedValue, $savedValue);
 
     //let's try with 2 params already separated
-    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR . 'goat' .  CRM_Core_DAO::VALUE_SEPARATOR;
+    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR . 'goat' . CRM_Core_DAO::VALUE_SEPARATOR;
     $this->params[$customFieldLabel] = $expectedValue;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
@@ -153,23 +154,23 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(
-           ));
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
-  /*
- * This is a test to check if setting fields one at a time alters other fields
- * Issues Hit so far =
- * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
- *  - in which case it is valid
- * 2)
- */
 
+  /**
+   * This is a test to check if setting fields one at a time alters other fields.
+   *
+   * Issues Hit so far =
+   * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
+   *  - in which case it is valid
+   * 2)
+   */
   public function testCreateAutoGrant() {
     $entityName = $this->_entity;
-    $baoString  = 'CRM_Grant_BAO_Grant';
-    $fields     = $this->callAPISuccess($entityName, 'getfields', array(
-               'action' => 'create',
+    $baoString = 'CRM_Grant_BAO_Grant';
+    $fields = $this->callAPISuccess($entityName, 'getfields', array(
+        'action' => 'create',
       )
     );
 
@@ -178,9 +179,9 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
     $getentities = $this->callAPISuccess($entityName, 'get', array(
-               'sequential' => 1,
-        'return' => $return,
-      ));
+      'sequential' => 1,
+      'return' => $return,
+    ));
 
     // lets use first rather than assume only one exists
     $entity = $getentities['values'][0];
@@ -226,8 +227,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       $updateParams = array(
-               'id' => $entity['id'],
-         $field => $entity[$field],
+        'id' => $entity['id'],
+        $field => $entity[$field],
         'debug' => 1,
       );
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
@@ -242,5 +243,5 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
   }
-}
 
+}

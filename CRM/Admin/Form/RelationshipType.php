@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,10 +40,9 @@
 class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -79,11 +78,13 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     // add select for contact type
     $contactTypeA = &$this->add('select', 'contact_types_a', ts('Contact Type A') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts'),
+      ) + $contactTypes
     );
     $contactTypeB = &$this->add('select', 'contact_types_b', ts('Contact Type B') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts'),
+      ) + $contactTypes
     );
 
     $isActive = &$this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -92,7 +93,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $this->_id, 'is_reserved')
     ) {
-      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field)$$field->freeze();
+      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field) {
+        $$field->freeze();
+      }
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -103,7 +106,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action != CRM_Core_Action::DELETE &&
       isset($this->_id)
     ) {
@@ -128,9 +131,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -173,4 +175,3 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
 }
-

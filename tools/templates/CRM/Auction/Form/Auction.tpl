@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="form-item"> 
+<div class="form-item">
 <fieldset><legend>{ts}Auction Information{/ts}</legend>
     <table class="form-layout-compressed">
          <tr><td class="label">{$form.title.label}</td><td>{$form.title.html}</td></tr>
@@ -50,12 +50,12 @@
 
          <tr><td>&nbsp;</td><td>{$form.is_item_approval.html} {$form.is_item_approval.label}<br />
          <tr><td>&nbsp;</td><td>{$form.is_item_groups.html} {$form.is_item_groups.label}<br />
-         <tr><td>&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}</td></tr> 
+         <tr><td>&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}</td></tr>
 
         <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     </table>
-    <dl>    
-       <dt></dt><dd class="html-adjust">{$form.buttons.html}</dd>   
-    </dl> 
-</fieldset>     
+    <dl>
+       <dt></dt><dd class="html-adjust">{$form.buttons.html}</dd>
+    </dl>
+</fieldset>
 </div>

@@ -7,41 +7,40 @@
 class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @param CRM_Contribute_Form_Task $form
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
     $isPDF = FALSE;
     $emailParams = array();
-    if(!empty($formValues['email_options'])) {
+    if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
-        'subject'   => $formValues['subject']
+        'subject' => $formValues['subject'],
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
-      if(stristr($formValues['email_options'], 'pdfemail')) {
+      if (stristr($formValues['email_options'], 'pdfemail')) {
         $isPDF = TRUE;
       }
     }
     // update dates ?
-    $receipt_update  = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
+    $receipt_update = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
     $thankyou_update = isset($formValues['thankyou_update']) ? $formValues['thankyou_update'] : FALSE;
-    $nowDate         = date('YmdHis');
+    $nowDate = date('YmdHis');
     $receipts = $thanks = $emailed = 0;
-    $updateStatus    = '';
+    $updateStatus = '';
     $task = 'CRM_Contribution_Form_Task_PDFLetterCommon';
     $realSeparator = ', ';
     //the original thinking was mutliple options - but we are going with only 2 (comma & td) for now in case
     // there are security (& UI) issues we need to think through
-    if(isset($formValues['group_by_separator'])) {
-      if($formValues['group_by_separator'] == 'td') {
+    if (isset($formValues['group_by_separator'])) {
+      if ($formValues['group_by_separator'] == 'td') {
         $realSeparator = "</td><td>";
       }
     }
@@ -59,7 +58,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     foreach ($contributions as $contributionId => $contribution) {
       $contact = &$contacts[$contribution['contact_id']];
       $grouped = $groupByID = 0;
-      if($groupBy) {
+      if ($groupBy) {
         $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
         $contribution = $contact['combined'][$groupBy][$groupByID];
         $grouped = TRUE;
@@ -67,18 +66,18 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
       self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
 
-      if(empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-        if(!$validated && $realSeparator == '</td><td>' && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
+      if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
+        if (!$validated && $realSeparator == '</td><td>' && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
           $realSeparator = ', ';
           CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
         }
         $validated = TRUE;
         $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator));
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
-        if(!empty($formValues['email_options'])) {
-          if(self::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
-            $emailed ++;
-            if(!stristr($formValues['email_options'], 'both')) {
+        if (!empty($formValues['email_options'])) {
+          if (self::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
+            $emailed++;
+            if (!stristr($formValues['email_options'], 'both')) {
               unset($html[$contributionId]);
             }
           }
@@ -104,7 +103,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     //@todo - figure out why
     $form->_contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $form->_contactIds);
-    if(!empty($html)) {
+    if (!empty($html)) {
       CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
     }
 
@@ -123,7 +122,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if ($updateStatus) {
       CRM_Core_Session::setStatus($updateStatus);
     }
-    if(!empty($html)) {
+    if (!empty($html)) {
       // ie. we have only sent emails - lets no show a white screen
       CRM_Utils_System::civiExit(1);
     }
@@ -139,12 +138,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  static function isValidHTMLWithTableSeparator($tokens, $html) {
+  public static function isValidHTMLWithTableSeparator($tokens, $html) {
     $relevantEntities = array('contribution');
     foreach ($relevantEntities as $entity) {
       if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
         foreach ($tokens[$entity] as $token) {
-          if(!self::isHtmlTokenInTableCell($token, $entity, $html)) {;
+          if (!self::isHtmlTokenInTableCell($token, $entity, $html)) {
             return FALSE;
           }
         }
@@ -154,47 +153,47 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   }
 
   /**
-   * check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
+   * Check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
    * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
    *
    * @param $token
    * @param $entity
    * @param $textToSearch
    *
-   * @internal param $html
-   *
    * @return bool
    */
-  static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
+  public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
     $tokenToMatch = $entity . '.' . $token;
     $dontCare = array();
-    $within = preg_match_all("|<td.+?{".$tokenToMatch."}.+?</td|si", $textToSearch, $dontCare);
-    $total = preg_match_all("|{".$tokenToMatch."}|", $textToSearch, $dontCare);
+    $within = preg_match_all("|<td.+?{" . $tokenToMatch . "}.+?</td|si", $textToSearch, $dontCare);
+    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch, $dontCare);
     return ($within == $total);
   }
 
- /**
-  *
-  * @param string $html_message
-  * @param array $contact
-  * @param array $contribution
-  * @param array $messageToken
-  * @param array $categories
-  * @param bool $grouped Does this letter represent more than one contribution
-  * @param string $separator What is the preferred letter separator
-  * @return string
-  */
- private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
-   $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
-   if($grouped) {
-     $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
-   }
-   else {
-     // no change to normal behaviour to avoid risk of breakage
-     $tokenHtml = CRM_Utils_Token::replaceContributionTokens($tokenHtml, $contribution, TRUE, $messageToken);
-   }
-   $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
-   if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
+  /**
+   *
+   * @param string $html_message
+   * @param array $contact
+   * @param array $contribution
+   * @param array $messageToken
+   * @param array $categories
+   * @param bool $grouped
+   *   Does this letter represent more than one contribution.
+   * @param string $separator
+   *   What is the preferred letter separator.
+   * @return string
+   */
+  private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
+    $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+    if ($grouped) {
+      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
+    }
+    else {
+      // no change to normal behaviour to avoid risk of breakage
+      $tokenHtml = CRM_Utils_Token::replaceContributionTokens($tokenHtml, $contribution, TRUE, $messageToken);
+    }
+    $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
+    if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template
       $smarty->assign_by_ref('contact', $contact);
@@ -210,15 +209,15 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param string $groupBy
    * @param CRM_Contribute_Form_Task $form
    * @param array $returnProperties
-   * @param boolean $skipOnHold
-   * @param boolean $skipDeceased
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
    * @param array $messageToken
    * @param string $task
    * @param string $separator
    *
-   * @return array:
+   * @return array
    */
-  static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
+  public static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
     $contributions = $contacts = $notSent = array();
     $contributionIDs = $form->getVar('_contributionIds');
     if ($form->_includesSoftCredits) {
@@ -238,11 +237,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         //@todo find out why this happens & add comments
         list($contactID) = explode('-', $item);
         $contactID = (int) $contactID;
-       }
-      else {
-         $contactID = $contribution['contact_id'];
       }
-      if(!isset($contacts[$contactID])) {
+      else {
+        $contactID = $contribution['contact_id'];
+      }
+      if (!isset($contacts[$contactID])) {
         list($contact) = CRM_Utils_Token::getTokenDetails(array('contact_id' => $contactID),
           $returnProperties,
           $skipOnHold,
@@ -260,7 +259,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
 
       $contacts[$contactID]['contribution_ids'][$groupBy][$groupByID][$contributionId] = TRUE;
-      if(!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
+      if (!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
         $contacts[$contactID]['combined'][$groupBy][$groupByID] = $contribution;
         $contacts[$contactID]['aggregates'][$groupBy][$groupByID] = $contribution['total_amount'];
       }
@@ -283,10 +282,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return array
    */
-  static function combineContributions($existing, $contribution, $separator) {
+  public static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
       $existing[$field] = isset($existing[$field]) ? $existing[$field] . $separator : '';
-      $existing[$field]  .= $value;
+      $existing[$field] .= $value;
     }
     return $existing;
   }
@@ -298,20 +297,21 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param array $contact
    * @param array $contributions
    * @param $groupBy
-   * @param $groupByID
+   * @param int $groupByID
    */
-  static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
+  public static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
     if (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY) {
       return;
     }
     CRM_Core_Smarty::singleton()->assign('contact_aggregate', $contact['contact_aggregate']);
-    CRM_Core_Smarty::singleton()->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));
+    CRM_Core_Smarty::singleton()
+      ->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));
     CRM_Core_Smarty::singleton()->assign('contribution_aggregate', $contact['aggregates'][$groupBy][$groupByID]);
 
   }
 
   /**
-   * Send pdf by email
+   * Send pdf by email.
    *
    * @param array $contact
    * @param string $html
@@ -322,14 +322,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  static function emailLetter($contact, $html, $is_pdf, $format = array(), $params = array()) {
+  public static function emailLetter($contact, $html, $is_pdf, $format = array(), $params = array()) {
     try {
-      if(empty($contact['email'])) {
+      if (empty($contact['email'])) {
         return FALSE;
       }
       $mustBeEmpty = array('do_not_email', 'is_deceased', 'on_hold');
       foreach ($mustBeEmpty as $emptyField) {
-        if(!empty($contact[$emptyField])) {
+        if (!empty($contact[$emptyField])) {
           return FALSE;
         }
       }
@@ -341,12 +341,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         'text' => '',
         'html' => $html,
       );
-      if(empty($params['from'])) {
+      if (empty($params['from'])) {
         $emails = CRM_Core_BAO_Email::getFromEmail();
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
       }
-      if($is_pdf) {
+      if ($is_pdf) {
         $defaults['html'] = ts('Please see attached');
         $defaults['attachments'] = array(CRM_Utils_Mail::appendPDF('ThankYou.pdf', $html, $format));
       }
@@ -357,4 +357,5 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       return FALSE;
     }
   }
+
 }

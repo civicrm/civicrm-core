@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,16 +42,16 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
+
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
     $settingFields = civicrm_api('setting', 'getfields', array(
-      'version' => 3
+      'version' => 3,
     ));
 
     $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));
@@ -73,7 +73,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    *
    * @return array|bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if (isset($fields['enableSSL']) &&
       $fields['enableSSL']
     ) {
@@ -85,8 +85,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
       );
       if (!CRM_Utils_System::checkURL($url, TRUE)) {
         $errors = array(
-          'enableSSL' =>
-          ts('You need to set up a secure server before you can use the Force Secure URLs option'),
+          'enableSSL' => ts('You need to set up a secure server before you can use the Force Secure URLs option'),
         );
         return $errors;
       }
@@ -99,12 +98,12 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     // a potentially spurious message which might already have been set. This
     // is a bit hackish
     // CRM-10629
-    $session = CRM_Core_Session::singleton( );
+    $session = CRM_Core_Session::singleton();
     $session->getStatus(TRUE);
 
     parent::postProcess();
 
     parent::rebuildMenu();
   }
-}
 
+}

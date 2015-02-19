@@ -7,19 +7,19 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
-  function run() {
+  public function run() {
     CRM_Core_Error::fatal('This is not a real page!');
   }
 
-  static function registerProfileScripts() {
+  public static function registerProfileScripts() {
     static $loaded = FALSE;
-    if ($loaded) {
+    if ($loaded || CRM_Core_Resources::isAjaxMode()) {
       return;
     }
     $loaded = TRUE;
 
     CRM_Core_Resources::singleton()
-      ->addSettingsFactory(function(){
+      ->addSettingsFactory(function () {
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
@@ -31,6 +31,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             'is_active' => 1,
             'rowCount' => 1000, // FIXME
           )),
+          'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         );
       })
@@ -63,11 +64,10 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   /**
    * Register entity schemas for use in the editor's palette
    *
-   * @param array $entityTypes strings, e.g. "IndividualModel", "ActivityModel"
+   * @param array $entityTypes
+   *   Strings, e.g. "IndividualModel", "ActivityModel".
    */
-  static function registerSchemas($entityTypes) {
-    /* CRM_Core_Error::backtrace(); */
-    /*   CRM_Core_Error::debug( '$entityTypes', $entityTypes ); */
+  public static function registerSchemas($entityTypes) {
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
     CRM_Core_Resources::singleton()->addSettingsFactory(function () use ($entityTypes) {
       return array(
@@ -77,9 +77,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   }
 
   /**
-   * AJAX callback
+   * AJAX callback.
    */
-  static function getSchemaJSON() {
+  public static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);
     CRM_Utils_JSON::output(self::getSchema($entityTypes));
   }
@@ -87,14 +87,15 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   /**
    * Get a list of Backbone-Form models
    *
-   * @param array $entityTypes model names ("IndividualModel")
+   * @param array $entityTypes
+   *   Model names ("IndividualModel").
    *
    * @throws CRM_Core_Exception
    * @return array; keys are model names ("IndividualModel") and values describe 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
    */
-  static function getSchema($entityTypes) {
+  public static function getSchema($entityTypes) {
     // FIXME: Depending on context (eg civicrm/profile/create vs search-columns), it may be appropriate to
     // pick importable or exportable fields
 
@@ -113,6 +114,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'OrganizationModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Organization',
@@ -120,6 +122,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'HouseholdModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Household',
@@ -127,6 +130,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ActivityModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Activity',
@@ -134,6 +138,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ContributionModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Contribution',
@@ -141,6 +146,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'MembershipModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Membership',
@@ -148,6 +154,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'ParticipantModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Participant',
@@ -155,6 +162,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         case 'CaseModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Case',
@@ -162,6 +170,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+
         default:
           throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
       }
@@ -174,14 +183,18 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * FIXME: Move to somewhere more useful
    * FIXME: Do real mapping of "types"
    *
-   * @param string $extends entity type; note: "Individual" means "Individual|Contact"; "Household" means "Household|Contact"
-   * @param string $title a string to use in section headers
-   * @param array $availableFields list of fields that are allowed in profiles, e.g. $availableFields['my_field']['field_type']
-   * @return array with keys 'sections' and 'schema'
+   * @param string $extends
+   *   Entity type; note: "Individual" means "Individual|Contact"; "Household" means "Household|Contact".
+   * @param string $title
+   *   A string to use in section headers.
+   * @param array $availableFields
+   *   List of fields that are allowed in profiles, e.g. $availableFields['my_field']['field_type'].
+   * @return array
+   *   with keys 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
    */
-  static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
+  public static function convertCiviModelToBackboneModel($extends, $title, $availableFields) {
     $locationFields = CRM_Core_BAO_UFGroup::getLocationFields();
 
     $result = array(
@@ -195,10 +208,14 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         case 'Individual':
         case 'Organization':
         case 'Household':
-          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact') {
+          if ($field['field_type'] != $extends && $field['field_type'] != 'Contact'
+            //CRM-15595 check if subtype
+            && !in_array($field['field_type'], CRM_Contact_BAO_ContactType::subTypes($extends))
+          ) {
             continue 2;
           }
           break;
+
         default:
           if ($field['field_type'] != $extends) {
             continue 2;
@@ -212,7 +229,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       if (in_array($fieldName, $locationFields)) {
         $result['schema'][$fieldName]['civiIsLocation'] = TRUE;
       }
-      if (in_array($fieldName, array('phone', 'phone_and_ext'))) { // FIXME what about phone_ext?
+      if (in_array($fieldName, array('phone', 'phone_and_ext'))) {
+        // FIXME what about phone_ext?
         $result['schema'][$fieldName]['civiIsPhone'] = TRUE;
       }
     }
@@ -252,4 +270,5 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     }
     return $result;
   }
+
 }

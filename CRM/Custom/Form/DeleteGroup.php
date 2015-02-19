@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,26 +39,26 @@
 class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
 
   /**
-   * the group id
+   * The group id.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title of the group being deleted
+   * The title of the group being deleted.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
 
     $defaults = array();
@@ -82,10 +82,9 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -104,10 +103,9 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $group = new CRM_Core_DAO_CustomGroup();
@@ -118,5 +116,5 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::deleteGroup($group);
     CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", array(1 => $group->title)), '', 'success');
   }
-}
 
+}

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -72,7 +72,7 @@
         {/if}
         {if $field.options_per_line != 0}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
-            <div class="label option-label">{$form.$n.label}</div>
+            <div class="label option-label">{if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}</div>
             <div class="content 3">
               {assign var="count" value="1"}
               {strip}
@@ -80,11 +80,16 @@
                 <tr>
                 {* sort by fails for option per line. Added a variable to iterate through the element array*}
                   {assign var="index" value="1"}
-                  {foreach name=outer key=key item=item from=$form.$n}
+                  {if $prefix}
+                    {assign var="formElement" value=$form.$prefix.$n}
+                  {else}
+                    {assign var="formElement" value=$form.$n}
+                  {/if}
+                  {foreach name=outer key=key item=item from=$formElement}
                     {if $index < 10}
                       {assign var="index" value=`$index+1`}
                     {else}
-                      <td class="labels font-light">{$form.$n.$key.html}</td>
+                      <td class="labels font-light">{$formElement.$key.html}</td>
                       {if $count == $field.options_per_line}
                       </tr>
                       <tr>

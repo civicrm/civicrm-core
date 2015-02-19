@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -53,7 +53,9 @@ class CRM_Report_BAO_HookInterface {
    * @param $table
    *
    * @return array
-   */public function logDiffClause(&$reportObj, $table) {
+   */
+  public function logDiffClause(&$reportObj, $table) {
     return array();
   }
+
 }

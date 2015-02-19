@@ -5,18 +5,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Case_BAO_CaseTest
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Case BAOs',
-      'description' => 'Test Case_BAO_Case methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->tablesToTruncate = array(
@@ -46,7 +36,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->quickCleanup($this->tablesToTruncate, TRUE);
   }
 
-  function testAddCaseToContact() {
+  public function testAddCaseToContact() {
     $params = array(
       'case_id' => 1,
       'contact_id' => 17,
@@ -57,30 +47,30 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
   }
 
-  function testGetCaseType() {
+  public function testGetCaseType() {
     $caseTypeLabel = CRM_Case_BAO_Case::getCaseType(1);
     $this->assertEquals('Housing Support', $caseTypeLabel);
   }
 
-  function testRetrieveCaseIdsByContactId() {
+  public function testRetrieveCaseIdsByContactId() {
     $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId(3, FALSE, 'housing_support');
     $this->assertEquals(array(1), $caseIds);
   }
 
-  /* FIXME: need to create an activity to run this test
+  /**
+   * FIXME: need to create an activity to run this test
    * function testGetCases() {
    *   $cases = CRM_Case_BAO_Case::getCases(TRUE, 3);
    *   $this->assertEquals('Housing Support', $cases[1]['case_type']);
    *   $this->assertEquals(1, $cases[1]['case_type_id']);
    * }
    */
-
-  function testGetCasesSummary() {
+  public function testGetCasesSummary() {
     $cases = CRM_Case_BAO_Case::getCasesSummary(TRUE, 3);
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
-  function testGetUnclosedCases() {
+  public function testGetUnclosedCases() {
     $params = array(
       'case_type' => 'ousing Suppor',
     );
@@ -88,7 +78,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals('Housing Support', $cases[1]['case_type']);
   }
 
-  function testGetContactCases() {
+  public function testGetContactCases() {
     $cases = CRM_Case_BAO_Case::getContactCases(3);
     $this->assertEquals('Housing Support', $cases[1]['case_type']);
   }
@@ -97,4 +87,5 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * function testGetRelatedCases() {
    * }
    */
+
 }

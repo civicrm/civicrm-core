@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Mailing Event Queue ID</title>
     <required>true</required>
   </field>
   <primaryKey>
@@ -19,6 +20,7 @@
     <name>job_id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <title>Job ID</title>
     <comment>FK to Job</comment>
   </field>
   <foreignKey>
@@ -31,6 +33,7 @@
     <name>email_id</name>
     <type>int unsigned</type>
     <default>NULL</default>
+    <title>Email ID</title>
     <comment>FK to Email</comment>
   </field>
   <foreignKey>
@@ -43,6 +46,7 @@
     <name>contact_id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <title>Contact ID</title>
     <comment>FK to Contact</comment>
   </field>
   <foreignKey>
@@ -56,12 +60,14 @@
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
+    <title>Security Hash</title>
     <comment>Security hash</comment>
   </field>
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
     <default>NULL</default>
+    <title>Phone ID</title>
     <comment>FK to Phone</comment>
   </field>
   <foreignKey>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -37,20 +37,19 @@ class CRM_Member_BAO_Query {
   /**
    * @return array
    */
-  static function &getFields() {
+  public static function &getFields() {
     $fields = CRM_Member_BAO_Membership::exportableFields();
     return $fields;
   }
 
   /**
-   * if membership are involved, add the specific membership fields
+   * If membership are involved, add the specific membership fields
    *
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     // if membership mode add membership id
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_MEMBER ||
       CRM_Contact_BAO_Query::componentPresent($query->_returnProperties, 'membership_')
@@ -134,7 +133,7 @@ class CRM_Member_BAO_Query {
   /**
    * @param $query
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
@@ -154,7 +153,7 @@ class CRM_Member_BAO_Query {
    * @param $values
    * @param $query
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     switch ($name) {
       case 'member_join_date_low':
@@ -207,7 +206,7 @@ class CRM_Member_BAO_Query {
         if (!is_array($value)) {
           $status = $value;
           if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
           }
           else {
             $value = array();
@@ -253,11 +252,9 @@ class CRM_Member_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
             "ccr.contribution_status_id",
             $op,
-            CRM_Core_DAO::getFieldValue(
-              'CRM_Core_DAO_OptionValue',
+            array_search(
               'Cancelled',
-              'value',
-              'name'
+              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
             ),
             "Integer"
           );
@@ -290,7 +287,7 @@ class CRM_Member_BAO_Query {
         if (!is_array($value)) {
           $mType = $value;
           if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
+            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
           }
           else {
             $value = array();
@@ -307,7 +304,7 @@ class CRM_Member_BAO_Query {
         $names = array();
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         foreach ($value as $id => $dontCare) {
-          if(!empty($membershipTypes[$id])) {
+          if (!empty($membershipTypes[$id])) {
             $names[] = $membershipTypes[$id];
           }
         }
@@ -350,13 +347,13 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $mode
    * @param $side
    *
    * @return null|string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
       case 'civicrm_membership':
@@ -395,7 +392,8 @@ class CRM_Member_BAO_Query {
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  public static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
@@ -435,13 +433,12 @@ class CRM_Member_BAO_Query {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
       $form->_membershipType = &$form->addElement('checkbox', "member_membership_type_id[$id]", NULL, $Name);
     }
-
 
     foreach (CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label') as $sId => $sName) {
       $form->_membershipStatus = &$form->addElement('checkbox', "member_status_id[$sId]", NULL, $sName);
@@ -486,18 +483,19 @@ class CRM_Member_BAO_Query {
 
   /**
    * @param $row
-   * @param $id
+   * @param int $id
    */
-  static function searchAction(&$row, $id) {}
+  public static function searchAction(&$row, $id) {
+  }
 
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     //add membership table
     if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
       $tables = array_merge(array('civicrm_membership' => 1), $tables);
     }
   }
-}
 
+}

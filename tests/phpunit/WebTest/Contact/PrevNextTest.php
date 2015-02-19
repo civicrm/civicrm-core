@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrevNext() {
+  public function testPrevNext() {
     $this->webtestLogin();
 
     /* add new group */
@@ -126,5 +126,5 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact1} AAA");
     $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
   }
-}
 
+}

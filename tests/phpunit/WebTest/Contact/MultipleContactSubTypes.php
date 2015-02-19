@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $selection1 = 'Student';
@@ -198,7 +198,7 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving./", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -215,8 +215,10 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
   /**
    * Add custom fields for a contact sub-type
+   * @param $contactSubType
+   * @return array
    */
-  function _addCustomData($contactSubType) {
+  public function _addCustomData($contactSubType) {
     $this->openCiviPage("admin/custom/group", "action=add&reset=1");
 
     //fill custom group title
@@ -240,12 +242,14 @@ class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
     $gid = $this->urlArg('gid');
 
+    // Add field
+    $this->openCiviPage('admin/custom/group/field/add', "reset=1&action=add&gid=$gid");
     $fieldLabel = "custom_field_for_{$contactSubType}" . substr(sha1(rand()), 0, 4);
     $this->type('label', $fieldLabel);
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
     return array($customGroupTitle, $gid);
   }
-}
 
+}

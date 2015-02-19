@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2011                 |
  +--------------------------------------------------------------------+
@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Import records from a csv file passed as an argument.
@@ -30,10 +30,8 @@
  * php bin/csv/import.php -e <entity> --file /path/to/csv/file [ -s site.org ]
  * e.g.: php bin/csv/import.php -e Contact --file /tmp/import.csv
  *
- **/
-require_once (dirname(__DIR__) . '/cli.class.php');
+ */
+require_once dirname(__DIR__) . '/cli.class.php';
 
 $entityImporter = new civicrm_cli_csv_importer();
 $entityImporter->run();
-
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomFieldsetTest() {
+  public function testCustomFieldsetTest() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -70,23 +70,20 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $this->select('id=extends_0', 'label=Grants');
     $this->addSelection('id=extends_1', "label=$grantType");
     $this->click('id=collapse_display');
-    $this->click('id=_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->clickLink('id=_qf_Group_next-bottom');
     $this->waitForText('crm-notification-container', "Your custom field set '$grantFieldSet' has been added.");
+    $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset
     $grantField = 'GrantField' . $rand;
     $this->type('id=label', $grantField);
     $this->select('id=data_type_0', 'label=Money');
-    $this->click('id=_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('id=_qf_Field_done-bottom');
     $this->waitForText('crm-notification-container', "Custom field '$grantField' has been saved.");
 
     // Create new Grant
     $this->openCiviPage('grant/add', 'reset=1&action=add&context=standalone', '_qf_Grant_upload-bottom');
-    $firstName = 'First' . $rand;
-    $lastName = 'Last' . $rand;
-    $this->webtestNewDialogContact($firstName, $lastName);
+    $contact = $this->createDialogContact();
     $this->select('id=status_id', 'label=Approved for Payment');
     $this->select('id=grant_type_id', "label=$grantType");
     $this->waitForTextPresent($grantField);
@@ -101,15 +98,15 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // verify tabular data for grant view
     $this->webtestVerifyTabularData(array(
-      'Name' => "$firstName $lastName",
-      'Grant Status' => 'Approved',
-      'Grant Type' => $grantType,
-      $grantField => '$ 99.99',
-     )
+        'Name' => $contact['display_name'],
+        'Grant Status' => 'Approved',
+        'Grant Type' => $grantType,
+        $grantField => '$ 99.99',
+      )
     );
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     // Enable CiviGrant module if necessary
@@ -118,10 +115,11 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'grant_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Grant', 'subEntity' => 'Emergency', 'triggerElement' => $triggerElement),
-      array('entity' => 'Grant', 'subEntity' => 'Family Support', 'triggerElement' => $triggerElement)
+      array('entity' => 'Grant', 'subEntity' => 'Family Support', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'grant/add', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

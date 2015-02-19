@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
   </div>
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
+      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Financial Account{/ts}</span></a>
     </div>
   {/if}
 
@@ -46,7 +46,6 @@
       {strip}
       {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
       <table id="crm-financial_accounts" class="display">
          <thead class="sticky">
           <th>{ts}Name{/ts}</th>
@@ -77,7 +76,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Account{/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newFinancialAccount-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Financial Account{/ts}</span></a>
         </div>
       {/if}
       </div>

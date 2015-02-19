@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -82,7 +82,7 @@
                 {else} {* no valid matches for name + contact_type *}
                         </div></fieldset>
                         {capture assign=infoTitle}{ts}No matching results for{/ts}{/capture}
-                        {capture assign=infoMessage}<ul><li>{ts 1=$form.name.value}Name like: %1{/ts}</li><li>{ts}Contact type{/ts}: {$contact_type_display}</li></ul>{ts}Check your spelling, or try fewer letters for the target contact name.{/ts}{/capture}
+                        {capture assign=infoMessage}<ul><li>{ts 1=$form.name.value}Name like: %1{/ts}</li><li>{ts 1=$contact_type_display}Contact Type: %1{/ts}</li></ul>{ts}Check your spelling, or try fewer letters for the target contact name.{/ts}{/capture}
                         {include file="CRM/common/info.tpl"}
                 {/if} {* end if searchCount *}
               {else}

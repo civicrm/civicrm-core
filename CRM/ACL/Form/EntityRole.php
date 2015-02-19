@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -43,10 +43,9 @@
 class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -62,9 +61,7 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       $aclRoles, TRUE
     );
 
-
-
-    $label = ts('Assigned To');
+    $label = ts('Assigned to');
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup(FALSE, 'Access');
     $this->add('select', 'entity_id', $label, $group, TRUE, array('class' => 'crm-select2 huge'));
 
@@ -72,9 +69,8 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -95,5 +91,5 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       CRM_ACL_BAO_EntityRole::create($params);
     }
   }
-}
 
+}

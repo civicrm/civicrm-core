@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testQuickSearch() {
+  public function testQuickSearch() {
     $this->webtestLogin();
 
     // Adding contact
@@ -54,17 +54,17 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $sortName);
 
     // wait for result list
-    $this->waitForElementPresent("xpath=//*[@id='ui-id-1']/li");
+    $this->waitForElementPresent("xpath=//li[contains(text(), '$sortName :: $firstName.anderson@example.org')]");
 
     // visit contact summary page
-    $this->click("xpath=//*[@id='ui-id-1']/li");
+    $this->click("xpath=//li[contains(text(), '$sortName :: $firstName.anderson@example.org')]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$displayName"), "Contact did not find!");
   }
 
-  function testQuickSearchPartial() {
+  public function testQuickSearchPartial() {
     $this->webtestLogin();
 
     // Adding contact
@@ -90,7 +90,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
   }
 
-  function testContactSearch() {
+  public function testContactSearch() {
     $this->webtestLogin();
 
     // Create new tag.
@@ -117,7 +117,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$groupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$groupName'.");
 
     // tag a contact
     // visit tag tab
@@ -125,8 +125,8 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div#tagtree");
 
     // select tag
-    $this->click("xpath=//ul/li/label[text()=\"$tagName\"]");
-    $this->waitForElementPresent("css=.success");
+    $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
+    $this->checkCRMStatus();
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");
@@ -154,9 +154,10 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
   /**
    * This code is reused with advanced search, hence the reference to $self
    *
-   * @static
+   * @param string $tagName
+   * @param $self
    */
-  static function addTag($tagName = 'New Tag', $self) {
+  public static function addTag($tagName = 'New Tag', $self) {
     $self->openCiviPage('admin/tag', array('reset' => 1, 'action' => 'add'), '_qf_Tag_next');
 
     // fill tag name
@@ -179,8 +180,10 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $self->assertTrue($self->isTextPresent("The tag '$tagName' has been saved."));
   }
 
-  // CRM-6586
-  function testContactSearchExport() {
+  /**
+   * CRM-6586
+   */
+  public function testContactSearchExport() {
     $this->webtestLogin();
 
     // Create new  group
@@ -206,7 +209,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$parentGroupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$parentGroupName'.");
 
     // Adding child group contact
     // We're using Quick Add block on the main page for this.
@@ -224,7 +227,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to child group
     $this->select("group_id", "*$childGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForText("crm-notification-container","Contact has been added to '$childGroupName'.");
+    $this->waitForText("crm-notification-container", "Contact has been added to '$childGroupName'.");
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");
@@ -236,8 +239,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->select("group", "label=$parentGroupName");
 
     // click to search
-    $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Basic_refresh");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
@@ -249,9 +251,9 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // Select the task action to export
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("_qf_Select_next-bottom");
   }
+
 }

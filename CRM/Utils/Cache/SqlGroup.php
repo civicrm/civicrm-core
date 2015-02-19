@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,7 +41,7 @@
 class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
-   * The host name of the memcached server
+   * The host name of the memcached server.
    *
    * @var string
    */
@@ -58,9 +58,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   protected $frontCache;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *   - group: string
    *   - componentID: int
    *   - prefetch: bool, whether to preemptively read the entire cache group; default: TRUE
@@ -68,15 +69,17 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @throws RuntimeException
    * @return \CRM_Utils_Cache_SqlGroup
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['group'])) {
       $this->group = $config['group'];
-    } else {
+    }
+    else {
       throw new RuntimeException("Cannot construct SqlGroup cache: missing group");
     }
     if (isset($config['componentID'])) {
       $this->componentID = $config['componentID'];
-    } else {
+    }
+    else {
       $this->componentID = NULL;
     }
     $this->frontCache = array();
@@ -89,7 +92,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @param string $key
    * @param mixed $value
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
     $this->frontCache[$key] = $value;
   }
@@ -99,8 +102,8 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function get($key) {
-    if (! array_key_exists($key, $this->frontCache)) {
+  public function get($key) {
+    if (!array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
     }
     return $this->frontCache[$key];
@@ -112,24 +115,25 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function getFromFrontCache($key, $default = NULL) {
+  public function getFromFrontCache($key, $default = NULL) {
     return CRM_Utils_Array::value($key, $this->frontCache, $default);
   }
 
   /**
    * @param string $key
    */
-  function delete($key) {
+  public function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
     unset($this->frontCache[$key]);
   }
 
-  function flush() {
+  public function flush() {
     CRM_Core_BAO_Cache::deleteGroup($this->group);
     $this->frontCache = array();
   }
 
-  function prefetch() {
+  public function prefetch() {
     $this->frontCache = CRM_Core_BAO_Cache::getItems($this->group, $this->componentID);
   }
+
 }

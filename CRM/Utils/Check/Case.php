@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -46,9 +46,9 @@ class CRM_Utils_Check_Case {
 
   /**
    * @param CRM_Case_XMLRepository $xmlRepo
-   * @param array<string> $caseTypeNames
+   * @param array <string> $caseTypeNames
    */
-  function __construct($xmlRepo, $caseTypeNames) {
+  public function __construct($xmlRepo, $caseTypeNames) {
     $this->caseTypeNames = $caseTypeNames;
     $this->xmlRepo = $xmlRepo;
   }
@@ -114,4 +114,5 @@ class CRM_Utils_Check_Case {
 
     return $messages;
   }
+
 }

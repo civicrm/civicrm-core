@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -50,7 +50,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   protected $_params = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
     );
@@ -100,7 +100,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     foreach ($this->_varNames as $groupName => $settings) {
@@ -115,7 +115,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @param $defaults
    */
-  function cbsDefaultValues(&$defaults) {
+  public function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
@@ -139,14 +139,12 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
 
     if (!empty($this->_varNames)) {
       foreach ($this->_varNames as $groupName => $groupValues) {
@@ -203,6 +201,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               );
               break;
 
+            case 'wysiwyg':
+              $this->addWysiwyg($fieldName, $fieldValue['title'], $fieldValue['attributes']);
+              break;
+
             case 'entity_reference':
               $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }
@@ -232,9 +234,8 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -248,12 +249,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->postProcessCommon();
   }
-  //end of function
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -266,8 +265,8 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                array_keys($this->_params[$settingName])
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  array_keys($this->_params[$settingName])
+                ) . CRM_Core_DAO::VALUE_SEPARATOR;
             }
             else {
               $this->_config->$settingName = NULL;
@@ -311,4 +310,3 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
 }
-

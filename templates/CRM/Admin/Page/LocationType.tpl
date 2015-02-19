@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,6 @@
     {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -53,7 +52,7 @@
     <tr id="location_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crmf-name">{$row.name}</td>
         <td class="crmf-display_name crm-editable">{$row.display_name}</td>
-        <td class="crmf-vcard_name">{$row.vcard_name}</td>
+        <td class="crmf-vcard_name crm-editable">{$row.vcard_name}</td>
         <td class="crmf-description crm-editable">{$row.description}</td>
         <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td class="crmf-is_default" >{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
@@ -70,6 +69,7 @@
     </div>
   {/if}
   <div class="action-link">
-    <a href="{crmURL q="action=add&reset=1"}" id="newLocationType" class="button"><span><div class="icon add-icon"></div>{ts}Add Location Type{/ts}</span></a>
+    {crmButton q="action=add&reset=1" id="newLocationType" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

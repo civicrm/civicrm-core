@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,10 @@
 <dt>{ts}From{/ts}</dt><dd>{if $fromName}{$fromName}{else}{ts}(display name not available){/ts}{/if}</dd>
 <dt>{ts}To{/ts}</dt><dd>{$toName}</dd>
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
-<dt>&nbsp;</dt><dd><input type="button" name="Done" value="Done" onClick="location.href='{crmURL p='civicrm/contact/view/activity' q="history=1&show=1"}';"></dd>
+<dt>&nbsp;</dt>
+  <dd class="crm-submit-buttons">
+   {crmButton class="cancel" icon="close" p='civicrm/contact/view/activity' q="history=1&show=1"}">{ts}Done{/ts}{/crmButton}
+  </dd>
 </dl>
 </fieldset>
 </div>

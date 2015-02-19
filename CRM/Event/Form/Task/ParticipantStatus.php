@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -33,10 +33,10 @@
  *
  */
 class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // CRM_Event_Form_Task_Batch::buildQuickForm() gets ufGroupId
     // from the form, so set it here to the id of the reserved profile
-    $dao = new CRM_Core_DAO_UFGroup;
+    $dao = new CRM_Core_DAO_UFGroup();
     $dao->name = 'participant_status';
     $dao->find(TRUE);
     $this->set('ufGroupId', $dao->id);
@@ -45,7 +45,8 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     asort($statuses, SORT_STRING);
     $this->add('select', 'status_change', ts('Change All Statuses'),
       array(
-        '' => ts('- select status -')) + $statuses
+        '' => ts('- select status -'),
+      ) + $statuses
     );
 
     $this->assign('context', 'statusChange');
@@ -57,5 +58,5 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
 
     parent::buildQuickForm();
   }
-}
 
+}

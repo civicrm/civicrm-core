@@ -10,7 +10,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEventListing() {
+  public function testEventListing() {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
 
@@ -118,7 +118,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
    * @param $startdate
    * @param $enddate
    */
-  function _testCreateEvent($eventTitle, $startdate, $enddate) {
+  public function _testCreateEvent($eventTitle, $startdate, $enddate) {
 
     $this->openCiviPage("event/add", "reset=1&action=add");
 
@@ -162,5 +162,5 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText("crm-notification-container", "'Event Location' information has been saved.");
   }
-}
 
+}

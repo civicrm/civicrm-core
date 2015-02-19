@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -59,7 +59,7 @@
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon add-icon"></span> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon ui-icon-circle-plus"></span> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>
@@ -125,13 +125,13 @@
       return false;
     });
 
-    $('input[name^="soft_credit_contact["]').change(function(){
-      var rowNum = $(this).prop('id').replace('soft_credit_contact_','');
+    $('input[name^="soft_credit_contact_"]').on('change', function(){
+      var rowNum = $(this).prop('id').replace('soft_credit_contact_id_','');
       var totalAmount = $('#total_amount').val();
       //assign total amount as default soft credit amount
       $('#soft_credit_amount_'+ rowNum).val(totalAmount);
       var thousandMarker = {/literal}{$config->monetaryThousandSeparator|json_encode}{literal};
-      $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+      $('#soft_credit_type_'+ rowNum).select2('val', $('#sct_default_id').val());
       totalAmount = Number(totalAmount.replace(thousandMarker,''));
       if (rowNum > 1) {
         var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));

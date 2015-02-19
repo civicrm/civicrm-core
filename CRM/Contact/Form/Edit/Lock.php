@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,14 +40,11 @@
 class CRM_Contact_Form_Edit_Lock {
 
   /**
-   * This function provides the HTML form elements
+   * Build the form object.
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
-   * @internal param int $inlineEditMode ( 1 for contact summary
-   * top bar form and 2 for display name edit )
-   *
-   * @access public
    * @return void
    */
   public static function buildQuickForm(&$form) {
@@ -57,17 +54,16 @@ class CRM_Contact_Form_Edit_Lock {
   /**
    * Ensure that modified_date hasn't changed in the underlying DB
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
-   * @param null $contactID
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param int $contactID
    *
-   * @internal param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
@@ -80,4 +76,5 @@ class CRM_Contact_Form_Edit_Lock {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -74,11 +74,10 @@
 
         {if $action ne 1 and $action ne 2}
           <div class="action-link">
-            <a href="{crmURL q="action=add&reset=1"}" id="newACL" class="button"><span><div class="icon add-icon"></div>{ts}Add ACL{/ts}</span></a>
+            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add ACL{/ts}{/crmButton}
           </div>
         {/if}
       </div>
-      {include file="CRM/common/crmeditable.tpl"}
     {else}
       <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>

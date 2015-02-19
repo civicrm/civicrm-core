@@ -43,14 +43,13 @@
   <field>
     <name>limit_to</name>
     <type>boolean</type>
-    <default>1</default>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
     <add>4.4</add>
   </field>
   <field>
     <name>entity_value</name>
     <type>varchar</type>
-    <length>64</length>
+    <length>255</length>
     <comment>Entity value</comment>
     <add>3.4</add>
   </field>
@@ -192,6 +191,13 @@
     <add>3.4</add>
   </field>
   <field>
+    <name>sms_body_text</name>
+    <title>SMS Reminder Text</title>
+    <type>longtext</type>
+    <comment>Content of the SMS text.</comment>
+    <add>4.5</add>
+  </field>
+  <field>
     <name>subject</name>
     <title>Reminder Subject</title>
     <type>varchar</type>
@@ -244,6 +250,18 @@
   <field>
     <name>msg_template_id</name>
     <title>Reminder Template</title>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
+  </field>
+  <foreignKey>
+    <name>msg_template_id</name>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>sms_template_id</name>
+    <title>SMS Reminder Template</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
   </field>
@@ -307,4 +325,11 @@
     <onDelete>SET NULL</onDelete>
     <add>4.5</add>
   </foreignKey>
+  <field>
+    <name>used_for</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Used for repeating entity</comment>
+    <add>4.6</add>
+  </field>
 </table>

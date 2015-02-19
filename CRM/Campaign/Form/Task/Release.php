@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,21 +40,21 @@
 class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
 
   /**
-   * survet id
+   * Survet id
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * number of voters
+   * Number of voters
    *
    * @var int
    */
   protected $_interviewerId;
 
   /**
-   * survey details
+   * Survey details
    *
    * @var object
    */
@@ -63,16 +63,19 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   protected $_surveyActivities;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
       //user came from interview form.
       foreach (array(
-        'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId',
+               ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
 
@@ -104,7 +107,8 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusIds = array();
     foreach (array(
-      'Scheduled') as $name) {
+               'Scheduled',
+             ) as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -132,18 +136,17 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     $this->addDefaultButtons(ts('Release Respondents'), 'done');
   }
 
-  function postProcess() {
+  public function postProcess() {
     $deleteActivityIds = array();
     foreach ($this->_contactIds as $cid) {
       if (array_key_exists($cid, $this->_surveyActivities)) {
@@ -165,5 +168,5 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       CRM_Core_Session::setStatus(implode('&nbsp;', $status), '', 'info');
     }
   }
-}
 
+}

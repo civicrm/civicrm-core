@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,7 +39,7 @@
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
   /**
-   * @param null $compID
+   * @param int $compID
    * @param null $grouping
    *
    * @return array
@@ -54,7 +53,8 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
     if ($compID) {
       if ($compID == 99) {
         $compClause = " AND v.component_id IS NULL ";
-      } else {
+      }
+      else {
         $compClause = " AND v.component_id = {$compID} ";
       }
     }
@@ -84,8 +84,8 @@ LEFT  JOIN civicrm_component comp
     }
     $sql .= " ORDER BY  v.weight ";
 
-    $dao    = CRM_Core_DAO::executeQuery($sql);
-    $rows   = array();
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $rows = array();
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
@@ -107,11 +107,11 @@ LEFT  JOIN civicrm_component comp
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
     $grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
     $rows = self::info($compID, $grouping);
@@ -119,5 +119,5 @@ LEFT  JOIN civicrm_component comp
 
     return parent::run();
   }
-}
 
+}

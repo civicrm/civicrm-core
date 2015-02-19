@@ -7,32 +7,23 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Rule Test',
-      'description' => 'Test the validation rules',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * @dataProvider integerDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
-  function testInteger($inputData, $expectedResult) {
+  public function testInteger($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
   }
 
   /**
    * @return array
    */
-  function integerDataProvider() {
+  public function integerDataProvider() {
     return array(
       array(10, TRUE),
       array('145E+3', FALSE),
@@ -45,15 +36,17 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider positiveDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
-  function testPositive($inputData, $expectedResult) {
+  public function testPositive($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::positiveInteger($inputData));
   }
 
   /**
    * @return array
    */
-  function positiveDataProvider() {
+  public function positiveDataProvider() {
     return array(
       array(10, TRUE),
       array('145.0E+3', FALSE),
@@ -66,15 +59,17 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider numericDataProvider
+   * @param $inputData
+   * @param $expectedResult
    */
-  function testNumeric($inputData, $expectedResult) {
+  public function testNumeric($inputData, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData));
   }
 
   /**
    * @return array
    */
-  function numericDataProvider() {
+  public function numericDataProvider() {
     return array(
       array(10, TRUE),
       array('145.0E+3', FALSE),

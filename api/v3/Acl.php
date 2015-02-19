@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,59 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 acl functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_acl
- *
  */
 
 /**
- * Save an acl
+ * This api exposes CiviCRM acl.
  *
- * Allowed @params array keys are:
- * {@getfields acl_create}
- * @example aclCreate.php
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save an acl.
  *
- * @param $params
+ * @param array $params
  *
- * @return array of newly created acl property values.
- * @access public
+ * @return array
+ *   Array of newly created acl property values.
  */
 function civicrm_api3_acl_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get an acl
+ * Get an acl.
  *
- * Allowed @params array keys are:
- * {@getfields acl_get}
- * @example aclCreate.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of retrieved acl property values.
- * @access public
+ * @return array
+ *   Array of retrieved acl property values.
  */
 function civicrm_api3_acl_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete an acl
+ * Delete an acl.
  *
- * Allowed @params array keys are:
- * {@getfields acl_delete}
- * @example aclCreate.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_acl_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

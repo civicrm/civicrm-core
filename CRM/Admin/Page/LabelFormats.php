@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,28 +42,29 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_LabelFormat';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       self::$_links = array(
@@ -92,20 +93,22 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_LabelFormats';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Mailing Label Formats';
   }
 
@@ -114,9 +117,10 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/labelFormats';
   }
 
@@ -126,13 +130,11 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @param null $action
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // Get list of configured Label Formats
-    $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
-    $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');
+    $labelFormatList = CRM_Core_BAO_LabelFormat::getList();
+    $nameFormatList = CRM_Core_BAO_LabelFormat::getList(FALSE, 'name_badge');
 
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {
@@ -165,5 +167,5 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
     $this->assign('rows', $labelFormatList);
   }
-}
 
+}

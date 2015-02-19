@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -48,35 +48,35 @@
 class CRM_Utils_Sort {
 
   /**
-   * constants to determine what direction each variable
+   * Constants to determine what direction each variable
    * is to be sorted
    *
    * @var int
    */
-  CONST ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
+  const ASCENDING = 1, DESCENDING = 2, DONTCARE = 4,
+
+    /**
+     * The name for the sort GET/POST param
+     *
+     * @var string
+     */
+    SORT_ID = 'crmSID', SORT_DIRECTION = 'crmSortDirection', SORT_ORDER = 'crmSortOrder';
 
   /**
-   * the name for the sort GET/POST param
-   *
-   * @var string
-   */
-  SORT_ID = 'crmSID', SORT_DIRECTION = 'crmSortDirection', SORT_ORDER = 'crmSortOrder';
-
-  /**
-   * name of the sort function. Used to isolate session variables
+   * Name of the sort function. Used to isolate session variables
    * @var string
    */
   protected $_name;
 
   /**
-   * array of variables that influence the query
+   * Array of variables that influence the query
    *
    * @var array
    */
   public $_vars;
 
   /**
-   * the newly formulated base url to be used as links
+   * The newly formulated base url to be used as links
    * for various table elements
    *
    * @var string
@@ -84,7 +84,7 @@ class CRM_Utils_Sort {
   protected $_link;
 
   /**
-   * what's the name of the sort variable in a REQUEST
+   * What's the name of the sort variable in a REQUEST
    *
    * @var string
    */
@@ -116,13 +116,14 @@ class CRM_Utils_Sort {
    * key names of variable (which should be the same as the column name)
    * value: ascending or descending
    *
-   * @param mixed $vars - assoc array as described above
-   * @param string $defaultSortOrder - order to sort
+   * @param mixed $vars
+   *   Assoc array as described above.
+   * @param string $defaultSortOrder
+   *   Order to sort.
    *
    * @return \CRM_Utils_Sort
-  @access public
    */
-  function __construct(&$vars, $defaultSortOrder = NULL) {
+  public function __construct(&$vars, $defaultSortOrder = NULL) {
     $this->_vars = array();
     $this->_response = array();
 
@@ -145,12 +146,12 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * Function returns the string for the order by clause
+   * Function returns the string for the order by clause.
    *
-   * @return string the order by clause
-   * @access public
+   * @return string
+   *   the order by clause
    */
-  function orderBy() {
+  public function orderBy() {
     if (empty($this->_vars[$this->_currentSortID])) {
       return '';
     }
@@ -168,28 +169,29 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * create the sortID string to be used in the GET param
+   * Create the sortID string to be used in the GET param.
    *
-   * @param int $index the field index
-   * @param int $dir   the direction of the sort
+   * @param int $index
+   *   The field index.
+   * @param int $dir
+   *   The direction of the sort.
    *
-   * @return string  the string to append to the url
-   * @static
-   * @access public
+   * @return string
+   *   the string to append to the url
    */
-  static function sortIDValue($index, $dir) {
+  public static function sortIDValue($index, $dir) {
     return ($dir == self::DESCENDING) ? $index . '_d' : $index . '_u';
   }
 
   /**
-   * init the sort ID values in the object
+   * Init the sort ID values in the object.
    *
-   * @param string $defaultSortOrder the sort order to use by default
+   * @param string $defaultSortOrder
+   *   The sort order to use by default.
    *
-   * @return returns null if $url- (sort url) is not found
-   * @access public
+   * @return void
    */
-  function initSortID($defaultSortOrder) {
+  public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);
 
     if (empty($url)) {
@@ -219,14 +221,14 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * init the object
+   * Init the object.
    *
-   * @param string $defaultSortOrder the sort order to use by default
+   * @param string $defaultSortOrder
+   *   The sort order to use by default.
    *
    * @return void
-   * @access public
    */
-  function initialize($defaultSortOrder) {
+  public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
 
     $this->_response = array();
@@ -255,36 +257,51 @@ class CRM_Utils_Sort {
   }
 
   /**
-   * getter for currentSortID
+   * Getter for currentSortID.
    *
-   * @return int returns of the current sort id
+   * @return int
+   *   returns of the current sort id
    * @acccess public
    */
-  function getCurrentSortID() {
+  public function getCurrentSortID() {
     return $this->_currentSortID;
   }
 
   /**
-   * getter for currentSortDirection
+   * Getter for currentSortDirection.
    *
-   * @return int returns of the current sort direction
+   * @return int
+   *   returns of the current sort direction
    * @acccess public
    */
-  function getCurrentSortDirection() {
+  public function getCurrentSortDirection() {
     return $this->_currentSortDirection;
   }
 
   /**
-   * Universal callback function for sorting by weight
+   * Universal callback function for sorting by weight, id, title or name
    *
    * @param $a
    * @param $b
    *
-   * @return array of items sorted by weight
-   * @access public
+   * @return int
+   *   (-1 or 1)
    */
-  static function cmpFunc($a, $b) {
-    return ($a['weight'] <= $b['weight']) ? -1 : 1;
+  public static function cmpFunc($a, $b) {
+    $cmp_order = array('weight', 'id', 'title', 'name');
+    foreach ($cmp_order as $attribute) {
+      if (isset($a[$attribute]) && isset($b[$attribute])) {
+        if ($a[$attribute] < $b[$attribute]) {
+          return -1;
+        }
+        elseif ($a[$attribute] > $b[$attribute]) {
+          return 1;
+        } // else: $a and $b are equal wrt to this attribute, try next...
+      }
+    }
+    // if we get here, $a and $b es equal for all we know
+    // however, as I understand we don't want equality here:
+    return -1;
   }
-}
 
+}

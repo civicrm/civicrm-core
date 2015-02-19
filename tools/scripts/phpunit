@@ -47,6 +47,11 @@ ini_set('include_path',
         "$civi_pkgs_dir"        . PATH_SEPARATOR
         . ini_get( 'include_path') );
 
+if (!is_dir("$civi_pkgs_dir/PHPUnit")) {
+  fwrite(STDERR, "PHPUnit is not embedded with this copy of CiviCRM. Perhaps you should use the standalone phpunit command?\n\nExample: \"phpunit tests/phpunit/CRM/Core/RegionTest.php\"\n");
+  exit(1);
+}
+
 #  Relying on system timezone setting produces a warning,
 #  doing the following prevents the warning message
 if ( file_exists( '/etc/timezone' ) ) {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,17 +34,25 @@
  */
 class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
-  function __construct() {
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     parent::__construct('Case', ts('Cases'));
   }
 
-  function isActive() {
+  /**
+   * Is CiviCase active?
+   *
+   * @return bool
+   */
+  public function isActive() {
     $config = CRM_Core_Config::singleton();
     return in_array('CiviCase', $config->enableComponents);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
@@ -57,11 +65,15 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
   }
 
   /**
+   * Prepare queries.
+   *
    * @param string $queryText
    * @param string $entityIDTableName
-   * @return array list tables/queries (for runQueries)
+   *
+   * @return array
+   *   list tables/queries (for runQueries)
    */
-  function prepareQueries($queryText, $entityIDTableName) {
+  public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -107,6 +119,13 @@ GROUP BY   et.entity_id
     return $tables;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}

@@ -1,6 +1,6 @@
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 function selectActivity(i)
 {
   // deselect current selection
-  j = document.forms["Report"].currentSelection.value;
+  j = document.forms.Report.currentSelection.value;
   ele = document.getElementById("civicase-audit-activity-" + j);
   ele.className = "activity";
   ele = document.getElementById("civicase-audit-header-" + j);
@@ -49,5 +49,5 @@ function selectActivity(i)
   ele.style.display = "block";
   ele = document.getElementById("civicase-audit-body-" + i);
   ele.style.display = "block";
-  document.forms["Report"].currentSelection.value = i;
+  document.forms.Report.currentSelection.value = i;
 }

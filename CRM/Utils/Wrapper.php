@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The Contact Wrapper is a wrapper class which is called by
@@ -40,11 +40,9 @@
 class CRM_Utils_Wrapper {
 
   /**
-   * Simple Controller
+   * Simple Controller.
    *
    * The controller which will handle the display and processing of this page.
-   *
-   * @access protected
    */
   protected $_controller;
 
@@ -54,26 +52,26 @@ class CRM_Utils_Wrapper {
    * The heart of the callback processing is done by this method.
    * forms are of different type and have different operations.
    *
-   * @param string  formName    name of the form processing this action
-   * @param string  formLabel   label for the above form
-   * @param int     mode        mode of operation.
-   * @param boolean addSequence should we add a unique sequence number to the end of the key
-   * @param boolean ignoreKey   should we not set a qfKey for this controller (for standalone forms)
+   * @param string $formName name of the form processing this action
+   * @param string $formLabel label for the above form
+   * @param array $arguments
+   *  - int mode: mode of operation.
+   *  - bool addSequence: should we add a unique sequence number to the end of the key
+   *  - bool ignoreKey: should we not set a qfKey for this controller (for standalone forms)
    *
-   * @return void.
-   * @access public
+   * @return void
    */
-  function run($formName, $formLabel = NULL, $arguments = NULL) {
+  public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
-      $mode         = CRM_Utils_Array::value('mode', $arguments);
-      $imageUpload  = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
-      $addSequence  = (bool) CRM_Utils_Array::value('addSequence', $arguments, FALSE);
+      $mode = CRM_Utils_Array::value('mode', $arguments);
+      $imageUpload = (bool) CRM_Utils_Array::value('imageUpload', $arguments, FALSE);
+      $addSequence = (bool) CRM_Utils_Array::value('addSequence', $arguments, FALSE);
       $attachUpload = (bool) CRM_Utils_Array::value('attachUpload', $arguments, FALSE);
-      $ignoreKey    = (bool) CRM_Utils_Array::value('ignoreKey', $arguments, FALSE);
+      $ignoreKey = (bool) CRM_Utils_Array::value('ignoreKey', $arguments, FALSE);
     }
     else {
-      $arguments   = array();
-      $mode        = NULL;
+      $arguments = array();
+      $mode = NULL;
       $addSequence = $ignoreKey = $imageUpload = $attachUpload = FALSE;
     }
 
@@ -90,11 +88,11 @@ class CRM_Utils_Wrapper {
     if (array_key_exists('urlToSession', $arguments)) {
       if (is_array($arguments['urlToSession'])) {
         foreach ($arguments['urlToSession'] as $params) {
-          $urlVar     = CRM_Utils_Array::value('urlVar', $params);
+          $urlVar = CRM_Utils_Array::value('urlVar', $params);
           $sessionVar = CRM_Utils_Array::value('sessionVar', $params);
-          $type       = CRM_Utils_Array::value('type', $params);
-          $default    = CRM_Utils_Array::value('default', $params);
-          $abort      = CRM_Utils_Array::value('abort', $params, FALSE);
+          $type = CRM_Utils_Array::value('type', $params);
+          $default = CRM_Utils_Array::value('default', $params);
+          $abort = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;
           $value = CRM_Utils_Request::retrieve(
@@ -116,5 +114,5 @@ class CRM_Utils_Wrapper {
     $this->_controller->process();
     return $this->_controller->run();
   }
-}
 
+}

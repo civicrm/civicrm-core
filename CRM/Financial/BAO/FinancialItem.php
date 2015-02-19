@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -32,31 +32,26 @@
  * $Id$
  *
  */
-
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct( ) {
-    parent::__construct( );
+  public function __construct() {
+    parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Contribute_BAO_FinancialItem object
-   * @access public
-   * @static
+   * @return CRM_Contribute_BAO_FinancialItem
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -67,71 +62,93 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * function to add the financial items and financial trxn
+   * Add the financial items and financial trxn.
    *
-   * @param object $lineItem     line item object
-   * @param object $contribution contribution object
+   * @param object $lineItem
+   *   Line item object.
+   * @param object $contribution
+   *   Contribution object.
+   * @param bool $taxTrxnID
    *
-   * @access public
-   * @static
    * @return void
    */
-  static function add($lineItem, $contribution) {
+  public static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)) {
+      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)
+    ) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
     elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)) {
+      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)
+    ) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
     elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = array(
-      'transaction_date'  => CRM_Utils_Date::isoToMysql($contribution->receive_date),
-      'contact_id'        => $contribution->contact_id,
-      'amount'            => $lineItem->line_total,
-      'currency'          => $contribution->currency,
-      'entity_table'      => 'civicrm_line_item',
-      'entity_id'         => $lineItem->id,
-      'description'       => ( $lineItem->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $lineItem->label,
-      'status_id'         => $itemStatus,
+      'transaction_date' => CRM_Utils_Date::isoToMysql($contribution->receive_date),
+      'contact_id' => $contribution->contact_id,
+      'amount' => $lineItem->line_total,
+      'currency' => $contribution->currency,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem->id,
+      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . ' ' . $lineItem->label,
+      'status_id' => $itemStatus,
     );
 
+    if ($taxTrxnID) {
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $params['amount'] = $lineItem->tax_amount;
+      $params['description'] = $taxTerm;
+      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+    }
+    else {
+      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
+    }
     if ($lineItem->financial_type_id) {
       $searchParams = array(
-        'entity_table'         => 'civicrm_financial_type',
-        'entity_id'            => $lineItem->financial_type_id,
-        'account_relationship' => 1,
+        'entity_table' => 'civicrm_financial_type',
+        'entity_id' => $lineItem->financial_type_id,
+        'account_relationship' => $accountRel,
       );
 
       $result = array();
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
-      $params['financial_account_id'] = CRM_Utils_Array::value( 'financial_account_id', $result );
+      CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+      $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
-
     $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
     $trxnId['id'] = $trxn['financialTrxnId'];
+
     return self::create($params, NULL, $trxnId);
   }
 
   /**
-   * function to create the financial Items and financial enity trxn
+   * Create the financial Items and financial enity trxn.
    *
-   * @param array $params  associated array to create financial items
-   * @param array $ids financial item ids
-   * @param array $trxnIds financial item ids
+   * @param array $params
+   *   Associated array to create financial items.
+   * @param array $ids
+   *   Financial item ids.
+   * @param array $trxnIds
+   *   Financial item ids.
    *
-   * @access public
-   * @static
    * @return object
    */
-  static function create(&$params, $ids = NULL, $trxnIds = NULL) {
+  public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
+
+    if (!empty($ids['id'])) {
+      CRM_Utils_Hook::pre('edit', 'FinancialItem', $ids['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'FinancialItem', NULL, $params);
+    }
+
     $financialItem->copyValues($params);
     if (!empty($ids['id'])) {
       $financialItem->id = $ids['id'];
@@ -140,10 +157,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialItem->save();
     if (!empty($trxnIds['id'])) {
       $entity_financial_trxn_params = array(
-        'entity_table'      => "civicrm_financial_item",
-        'entity_id'         => $financialItem->id,
+        'entity_table' => "civicrm_financial_item",
+        'entity_id' => $financialItem->id,
         'financial_trxn_id' => $trxnIds['id'],
-        'amount'            => $params['amount'],
+        'amount' => $params['amount'],
       );
 
       $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
@@ -153,19 +170,24 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       }
       $entity_trxn->save();
     }
+    if (!empty($ids['id'])) {
+      CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'FinancialItem', $financialItem->id, $financialItem);
+    }
     return $financialItem;
   }
 
   /**
-   * takes an associative array and creates a entity financial transaction object
+   * Takes an associative array and creates a entity financial transaction object.
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Core_BAO_FinancialTrxn object
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_FinancialTrxn
    */
-  static function createEntityTrxn($params) {
+  public static function createEntityTrxn($params) {
     $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
     $entity_trxn->copyValues($params);
     $entity_trxn->save();
@@ -173,19 +195,16 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * retrive entity financial trxn details
+   * Retrive entity financial trxn details.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    * @param bool $maxId
-   *
-   * @internal param bool $maxID to retrive max id
+   *   To retrive max id.
    *
    * @return array
-   * @access public
-   * @static
    */
-  static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+  public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
     //retrieve last entry from civicrm_entity_financial_trxn
@@ -196,35 +215,35 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $financialItem->find();
     while ($financialItem->fetch()) {
       $financialItems[$financialItem->id] = array(
-        'id'                => $financialItem->id,
-        'entity_table'      => $financialItem->entity_table,
-        'entity_id'         => $financialItem->entity_id,
+        'id' => $financialItem->id,
+        'entity_table' => $financialItem->entity_table,
+        'entity_id' => $financialItem->entity_id,
         'financial_trxn_id' => $financialItem->financial_trxn_id,
-        'amount'            => $financialItem->amount,
+        'amount' => $financialItem->amount,
       );
     }
     if (!empty($financialItems)) {
       return $financialItems;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
   /**
-   * check if contact is present in financial_item table
+   * Check if contact is present in financial_item table.
    *
    * CRM-12929
    *
-   * @param array $contactIds  an array contact id's
+   * @param array $contactIds
+   *   An array contact id's.
    *
-   * @param array $error error to display
+   * @param array $error
+   *   Error to display.
    *
    * @return array
-   * @access public
-   * @static
    */
-  static function checkContactPresent($contactIds, &$error) {
+  public static function checkContactPresent($contactIds, &$error) {
     if (empty($contactIds)) {
       return FALSE;
     }
@@ -234,7 +253,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if (!$allowPermDelete) {
       $sql = 'SELECT DISTINCT(cc.id), cc.display_name FROM civicrm_contact cc
 INNER JOIN civicrm_contribution con ON con.contact_id = cc.id
-WHERE cc.id IN (' . implode (',', $contactIds) . ') AND con.is_test = 0';
+WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->N) {
         while ($dao->fetch()) {
@@ -247,10 +266,11 @@ WHERE cc.id IN (' . implode (',', $contactIds) . ') AND con.is_test = 0';
           $errorStatus = '<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>';
         }
 
-        $error['_qf_default'] = $errorStatus .  ts('This contact(s) can not be permanently deleted because the contact record is linked to one or more live financial transactions. Deleting this contact would result in the loss of financial data.');
+        $error['_qf_default'] = $errorStatus . ts('This contact(s) can not be permanently deleted because the contact record is linked to one or more live financial transactions. Deleting this contact would result in the loss of financial data.');
         return $error;
       }
     }
     return FALSE;
   }
+
 }

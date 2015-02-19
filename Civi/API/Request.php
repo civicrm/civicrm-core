@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 namespace Civi\API;
 
 /**
@@ -37,12 +37,17 @@ class Request {
    * Create a formatted/normalized request object.
    *
    * @param string $entity
+   *   API entity name.
    * @param string $action
+   *   API action name.
    * @param array $params
+   *   API parameters.
    * @param mixed $extra
+   *   Who knows? ...
    *
    * @throws \API_Exception
-   * @return array the request descriptor; keys:
+   * @return array
+   *   the request descriptor; keys:
    *   - version: int
    *   - entity: string
    *   - action: string
@@ -145,11 +150,12 @@ class Request {
    * We must be sure that every request uses only one version of the API.
    *
    * @param array $params
+   *   API parameters.
    * @return int
    */
   protected static function parseVersion($params) {
     $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-    if (isset($desired_version) && is_integer($desired_version)) {
+    if (isset($desired_version) && is_int($desired_version)) {
       return $desired_version;
     }
     else {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,7 +42,7 @@ class CRM_Utils_Sunlight {
    * @return SimpleXMLElement
    * @throws Exception
    */
-  static function makeAPICall($uri) {
+  public static function makeAPICall($uri) {
     require_once 'HTTP/Request.php';
     $params = array(
       'method' => HTTP_REQUEST_METHOD_GET,
@@ -56,8 +56,8 @@ class CRM_Utils_Sunlight {
     }
     if ($request->getResponseCode() != 200) {
       CRM_Core_Error::fatal(ts('Invalid response code received from Sunlight servers: %1',
-          array(1 => $request->getResponseCode())
-        ));
+        array(1 => $request->getResponseCode())
+      ));
     }
     $string = $request->getResponseBody();
     return simplexml_load_string($string);
@@ -68,7 +68,7 @@ class CRM_Utils_Sunlight {
    *
    * @return array
    */
-  static function getCityState($zipcode) {
+  public static function getCityState($zipcode) {
     $key = self::$_apiKey;
     $uri = "places.getCityStateFromZip.php?zip={$zipcode}&apikey={$key}&output=xml";
     $xml = self::makeAPICall($uri);
@@ -77,11 +77,11 @@ class CRM_Utils_Sunlight {
   }
 
   /**
-   * @param $peopleID
+   * @param int $peopleID
    *
    * @return array
    */
-  static function getDetailedInfo($peopleID) {
+  public static function getDetailedInfo($peopleID) {
     $key = self::$_apiKey;
     $uri = "people.getPersonInfo.php?id={$peopleID}&apikey={$key}&output=xml";
     $xml = self::makeAPICall($uri);
@@ -115,7 +115,7 @@ class CRM_Utils_Sunlight {
    *
    * @return array
    */
-  static function getPeopleInfo($uri) {
+  public static function getPeopleInfo($uri) {
     $xml = self::makeAPICall($uri);
 
     $result = array();
@@ -131,15 +131,15 @@ class CRM_Utils_Sunlight {
    *
    * @return array|null
    */
-  static function getRepresentativeInfo($city, $state) {
+  public static function getRepresentativeInfo($city, $state) {
     if (!$city ||
       !$state
     ) {
       return NULL;
     }
-    $key  = self::$_apiKey;
+    $key = self::$_apiKey;
     $city = urlencode($city);
-    $uri  = "people.reps.getRepsFromCityState.php?city={$city}&state={$state}&apikey={$key}&output=xml";
+    $uri = "people.reps.getRepsFromCityState.php?city={$city}&state={$state}&apikey={$key}&output=xml";
     return self::getPeopleInfo($uri);
   }
 
@@ -148,7 +148,7 @@ class CRM_Utils_Sunlight {
    *
    * @return array|null
    */
-  static function getSenatorInfo($state) {
+  public static function getSenatorInfo($state) {
     if (!$state) {
       return NULL;
     }
@@ -165,7 +165,7 @@ class CRM_Utils_Sunlight {
    *
    * @return array
    */
-  static function getInfo($city, $state, $zipcode = NULL) {
+  public static function getInfo($city, $state, $zipcode = NULL) {
     if ($zipcode) {
       list($city, $state) = self::getCityState($zipcode);
     }
@@ -183,5 +183,5 @@ class CRM_Utils_Sunlight {
 
     return $result;
   }
-}
 
+}

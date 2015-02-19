@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -53,12 +53,11 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
    *
-   * @return  array   array of action links that we need to display for the browse screen
-   * @access public
+   * @return array
+   *   array of action links that we need to display for the browse screen
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       self::$_actionLinks = array(
@@ -108,13 +107,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @param null
-   *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -155,15 +150,16 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * edit custom group
+   * Edit custom group.
    *
-   * @param int    $id       custom group id
-   * @param string $action   the action to be invoked
+   * @param int $id
+   *   Custom group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function edit($id, $action) {
+  public function edit($id, $action) {
     // create a simple controller for editing custom data
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Group', ts('Custom Set'), $action);
 
@@ -177,14 +173,14 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Preview custom group
+   * Preview custom group.
    *
-   * @param int $id custom group id
+   * @param int $id
+   *   Custom group id.
    *
    * @return void
-   * @access public
    */
-  function preview($id) {
+  public function preview($id) {
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), NULL);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group', 'action=browse'));
@@ -197,12 +193,12 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Browse all custom data groups.
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // get all custom groups sorted by weight
     $customGroup = array();
     $dao = new CRM_Core_DAO_CustomGroup();
@@ -245,7 +241,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $subTypes = array();
 
     $subTypes['Activity'] = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
-        $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType( );
+    $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
     $subTypes['Membership'] = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $subTypes['Event'] = CRM_Core_OptionGroup::values('event_type');
     $subTypes['Grant'] = CRM_Core_OptionGroup::values('grant_type');
@@ -257,7 +253,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $subTypes['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
     $subTypes['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
     $subTypes['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
-
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
     $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
@@ -290,8 +285,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
 
     foreach ($customGroup as $key => $values) {
       $subValue = CRM_Utils_Array::value('extends_entity_column_value', $customGroup[$key]);
-      $subName  = CRM_Utils_Array::value('extends_entity_column_id', $customGroup[$key]);
-      $type     = CRM_Utils_Array::value('extends', $customGroup[$key]);
+      $subName = CRM_Utils_Array::value('extends_entity_column_id', $customGroup[$key]);
+      $type = CRM_Utils_Array::value('extends', $customGroup[$key]);
       if ($subValue) {
         $subValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($subValue, 1, -1)
@@ -337,5 +332,5 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
 
     $this->assign('rows', $customGroup);
   }
-}
 
+}

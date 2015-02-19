@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,9 +47,13 @@
 class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param string $title
+   * @param bool $modal
+   * @param int|mixed|null $action
    */
-  function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
+  public function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
     parent::__construct($title, $modal);
 
     $this->_stateMachine = new CRM_Contact_StateMachine_Search($this, $action);
@@ -75,17 +79,17 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     // see if we can figure out the url and redirect to the right search form
     // note that this happens really early on, so we cant use any of the form or controller
     // variables
-    $config  = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $qString = $_GET[$config->userFrameworkURLVar];
     $args = "reset=1";
     $path = 'civicrm/contact/search/advanced';
     if (strpos($qString, 'basic') !== FALSE) {
       $path = 'civicrm/contact/search/basic';
     }
-    else if (strpos($qString, 'builder') !== FALSE) {
+    elseif (strpos($qString, 'builder') !== FALSE) {
       $path = 'civicrm/contact/search/builder';
     }
-    else if (
+    elseif (
       strpos($qString, 'custom') !== FALSE &&
       isset($_REQUEST['csid'])
     ) {
@@ -98,4 +102,3 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
   }
 
 }
-

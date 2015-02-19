@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,32 +39,30 @@
 class CRM_Mailing_Form_Settings extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //when user come from search context.
     $ssID = $this->get('ssID');
-    $this->assign('ssid',$ssID);
+    $this->assign('ssid', $ssID);
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
-    if(CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID){
-    $params = array();
-    $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
-    $this->assign("value", $result);
+    if (CRM_Contact_Form_Search::isSearchContext($this->get('context')) && !$ssID) {
+      $params = array();
+      $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
+      $this->assign("value", $result);
     }
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
     // CRM-14716 - Pick up mailingID from session since most of the time it's not in the URL
     if (!$mailingID) {
@@ -96,15 +94,14 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
       $dao->storeValues($dao, $defaults);
       $defaults['visibility'] = $dao->visibility;
     }
-    
+
     return $defaults;
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -145,12 +142,13 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     );
 
     $buttons = array(
-      array('type' => 'back',
-        'name' => ts('<< Previous'),
+      array(
+        'type' => 'back',
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'next',
-        'name' => ts('Next >>'),
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
@@ -251,13 +249,13 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
   public function getTitle() {
     return ts('Track and Respond');
   }
+
 }

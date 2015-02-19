@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -169,7 +169,7 @@
           <tr class="crm-membership-form-block-total_amount">
             <td class="label">{$form.total_amount.label}</td>
             <td>{$form.total_amount.html}<br />
-              <span class="description">{ts}Membership payment amount.{/ts}</span></td>
+              <span class="description">{ts}Membership payment amount.{/ts}</span><div class="totaltaxAmount"></div></td>
           </tr>
           <tr class="crm-membership-form-block-contribution-contact">
             <td class="label">{$form.is_different_contribution_contact.label}</td>
@@ -180,8 +180,9 @@
             <td>
               <table class="compressed">
                 <tr class="crm-membership-form-block-soft-credit-type">
-                  <td class="label">{$form.soft_credit_type.label}</td>
-                  <td>{$form.soft_credit_type.html}</td>
+                {*CRM-15366*}
+                  <td class="label">{$form.soft_credit_type_id.label}</td>
+                  <td>{$form.soft_credit_type_id.html}</td>
                 </tr>
                 <tr class="crm-membership-form-block-soft-credit-contact-id">
                   <td class="label">{$form.soft_credit_contact_id.label}</td>
@@ -232,7 +233,7 @@
                 <tr class="crm-membership-form-block-total_amount">
                   <td class="label">{$form.total_amount.label}</td>
                   <td>{$form.total_amount.html}<br />
-                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span></td>
+                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span><div class="totaltaxAmount"></div></td>
                 </tr>
                 <tr class="crm-membership-form-block-receive_date">
                   <td class="label">{$form.receive_date.label}</td>
@@ -340,7 +341,6 @@
 
     {literal}
     <script type="text/javascript">
-
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
@@ -373,13 +373,34 @@
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
         var term = cj('#num_terms').val();
+        var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
+        var taxRates = JSON.parse(taxRates);
+        var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
+        var currency = '{/literal}{$currency}{literal}';
+	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if ( term ) {
-          var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          if (!taxRate) {
+            var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          }
+          else {
+      var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
+          }
           cj("#total_amount").val( feeTotal.toFixed(2) );
         }
         else {
-          cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+    if (taxRate) {
+            var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
+      cj("#total_amount").val( feeTotal );
+          }
+          else {
+      var feeTotal = allMemberships[memType]['total_amount'];
+      cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+          }
         }
+        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+        cj('.totaltaxAmount').html(taxMessage);
       }
 
 

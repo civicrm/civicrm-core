@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,23 +40,22 @@
 class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Page action
+   * Page action.
    */
   public $_action;
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $parentDefaults = parent::setDefaultValues();
 
-    $eventId  = $this->_id;
-    $params   = array();
+    $eventId = $this->_id;
+    $params = array();
     $defaults = array();
     if (isset($eventId)) {
       $params = array('id' => $eventId);
@@ -71,10 +70,9 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $slots = CRM_Core_OptionGroup::values('conference_slot');
@@ -83,11 +81,12 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
       'slot_label_id',
       ts('Conference Slot'),
       array(
-        '' => ts('- select -')) + $slots,
+        '' => ts('- select -'),
+      ) + $slots,
       FALSE
     );
 
-    $this->addEntityRef('parent_event_id', ts('Parent Event'),  array(
+    $this->addEntityRef('parent_event_id', ts('Parent Event'), array(
         'entity' => 'event',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),
@@ -116,10 +115,9 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Conference Slots');
   }
-}
 
+}

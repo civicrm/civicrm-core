@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,10 +40,9 @@
 class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -85,33 +84,33 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_ssl', ts('Use SSL?'));
 
-    $usedfor = array(1 => ts('Bounce Processing'),
+    $usedfor = array(
+      1 => ts('Bounce Processing'),
       0 => ts('Email-to-Activity Processing'),
     );
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Admin_Form_MailSettings', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     // Check for default from email address and organization (domain) name. Force them to change it.
     if ($fields['domain'] == 'EXAMPLE.ORG') {
@@ -122,13 +121,12 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_MailSettings::deleteMailSettings($this->_id);
       CRM_Core_Session::setStatus("", ts('Mail Setting Deleted.'), "success");
@@ -157,7 +155,9 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     $params = array();
     foreach ($fields as $f) {
       if (in_array($f, array(
-        'is_default', 'is_ssl'))) {
+        'is_default',
+        'is_ssl',
+      ))) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
       }
       else {
@@ -185,4 +185,3 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   }
 
 }
-

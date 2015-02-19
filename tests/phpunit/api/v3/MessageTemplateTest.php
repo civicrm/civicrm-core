@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,27 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Test class for Template API - civicrm_msg_template*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   /**
-   * Assume empty database with just civicrm_data
+   * Assume empty database with just civicrm_data.
    */
   protected $entity = 'MessageTemplate';
   protected $params;
 
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->quickCleanup(array('civicrm_msg_template'));
+    $this->useTransaction(TRUE);
     $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplate')->toArray();
     $this->params = array(
       'msg_title' => $template['msg_title'],
@@ -55,10 +55,9 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'is_reserved' => $template['is_reserved'],
     );
   }
-  function tearDown() {}
 
-   /**
-   * test create function succeeds
+  /**
+   * Test create function succeeds.
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -66,10 +65,12 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get function succeeds (this is actually largely tested in the get
-   * action on create. Add extra checks for any 'special' return values or
-   * behaviours
+   * Test get function succeeds.
    *
+   * This is actually largely tested in the get action on create.
+   *
+   * Add extra checks for any 'special' return values or
+   * behaviours
    */
   public function testGet() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'get', $this->params, __FUNCTION__, __FILE__);
@@ -77,17 +78,16 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
 
-/**
- * Check the delete function succeeds
- */
+  /**
+   * Check the delete function succeeds.
+   */
   public function testDelete() {
     $entity = $this->createTestEntity();
     $result = $this->callAPIAndDocument('MessageTemplate', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
-      'id' => $entity['id']
+      'id' => $entity['id'],
     ));
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,21 +35,21 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     parent::setUp();
   }
 
-  function testAddPledgePaymentWithAdjustPledgePaymentSchedule() {
+  public function testAddPledgePaymentWithAdjustPledgePaymentSchedule() {
     $this->webtestLogin();
     $this->openCiviPage('admin/setting/localization', 'reset=1');
-    $this->select("currencyLimit-f","value=FJD");
+    $this->select("currencyLimit-f", "value=FJD");
     $this->click("add");
     $this->click("_qf_Localization_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
 
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
-    $lastName  = 'Jones' . $name;
+    $lastName = 'Jones' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName, $firstName . "@example.com");
@@ -71,17 +71,16 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // check contact name on pledge form
     $this->assertElementContainsText('css=tr.crm-pledge-form-block-displayName', "$firstName $lastName");
 
-    $this->select("currency","value=FJD");
+    $this->select("currency", "value=FJD");
     $this->type("amount", "30");
     $this->type("installments", "3");
     $this->select("frequency_unit", "value=week");
     $this->type("frequency_day", "2");
 
     $this->webtestFillDate('acknowledge_date', 'now');
-        $this->select( "financial_type_id", "label=Donation");
+    $this->select("financial_type_id", "label=Donation");
 
     $this->select("contribution_page_id", "value=3");
-
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -198,7 +197,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
       )
     );
     $this->openCiviPage('admin/setting/localization', 'reset=1');
-    $this->select("currencyLimit-t","value=FJD");
+    $this->select("currencyLimit-t", "value=FJD");
     $this->click("remove");
     $this->click("_qf_Localization_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -206,15 +205,15 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 
-  function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
+  public function testAddPledgePaymentWithAdjustTotalPledgeAmount() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
 
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
-    $lastName  = 'Jones' . $name;
+    $lastName = 'Jones' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName, $firstName . "@example.com");
@@ -244,8 +243,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->webtestFillDate('acknowledge_date', 'now');
 
     $this->select("contribution_page_id", "value=3");
-
-
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -353,15 +350,15 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->enableDisablePopups(TRUE);
   }
 
-  function testAddPledgePayment() {
+  public function testAddPledgePayment() {
     $this->webtestLogin();
     // Disable pop-ups for this test. Running test w/ pop-ups causes a spurious failure. dgg
     $this->enableDisablePopups(FALSE);
 
     // create unique name
-    $name      = substr(sha1(rand()), 0, 7);
+    $name = substr(sha1(rand()), 0, 7);
     $firstName = 'Adam' . $name;
-    $lastName  = 'Jones' . $name;
+    $lastName = 'Jones' . $name;
 
     // create new contact
     $this->webtestAddContact($firstName, $lastName, $firstName . "@example.com");
@@ -391,7 +388,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->webtestFillDate('acknowledge_date', 'now');
 
     $this->select("contribution_page_id", "value=3");
-
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -448,5 +444,5 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     // Re-enable pop-ups to leave things in the same state
     $this->enableDisablePopups(TRUE);
   }
-}
 
+}

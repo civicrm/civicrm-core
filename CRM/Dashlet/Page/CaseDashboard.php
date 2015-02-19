@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -40,13 +40,11 @@
 class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
 
   /**
-   * Case dashboard as dashlet
+   * Case dashboard as dashlet.
    *
    * @return void
-   *
-   * @access public
    */
-  function run() {
+  public function run() {
 
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
@@ -54,7 +52,7 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
     }
 
     $session = &CRM_Core_Session::singleton();
-    $userID  = $session->get('userID');
+    $userID = $session->get('userID');
     $summary = CRM_Case_BAO_Case::getCasesSummary(TRUE, $userID);
 
     if (!empty($summary)) {
@@ -63,5 +61,5 @@ class CRM_Dashlet_Page_CaseDashboard extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

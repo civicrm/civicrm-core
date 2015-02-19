@@ -4,16 +4,12 @@
  * Class AuthorizeNet
  */
 class AuthorizeNet extends PHPUnit_Framework_Testcase {
-  /*
-     * Helper function to create
-     * a payment processor of type Authorize.net
-     *
-     * @return $paymentProcessor id of created payment processor
-     */
   /**
+   * Helper function to create
+   * a payment processor of type Authorize.net
    * @return CRM_Financial_DAO_PaymentProcessor
    */
-  function create() {
+  public function create() {
 
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentParams = array(
@@ -35,20 +31,16 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
     return $paymentProcessor;
   }
 
-  /*
-     * Helper function to delete a PayPal Pro
-     * payment processor
-     * @param  int $id - id of the PayPal Pro payment processor
-     * to be deleted
-     * @return boolean true if payment processor deleted, false otherwise
-     *
-     */
   /**
-   * @param $id
-   *
-   * @return mixed
+   * Helper function to delete a PayPal Pro
+   * payment processor
+   * @param int $id
+   *   Id of the PayPal Pro payment processor.
+   *   to be deleted
+   * @return bool
+   *   true if payment processor deleted, false otherwise
    */
-  function delete($id) {
+  public function delete($id) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->id = $id;
     if ($paymentProcessor->find(TRUE)) {
@@ -56,7 +48,5 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
     }
     return $result;
   }
+
 }
-
-
-

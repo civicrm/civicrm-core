@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -38,9 +38,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
               <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -81,9 +81,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
                 <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -168,4 +168,3 @@ CRM.$(function($) {
 {/literal}
 
 {/if}
-{include file="CRM/common/crmeditable.tpl"}

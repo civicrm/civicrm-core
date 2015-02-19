@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,21 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Test class for Domain API - civicrm_domain_*
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Domain
+ * @package CiviCRM_APIv3
+ * @subpackage API_Domain
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
   /* This test case doesn't require DB reset - apart from
-       where cleanDB() is called. */
-
+  where cleanDB() is called. */
 
 
   public $DBResetRequired = FALSE;
@@ -45,23 +44,14 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
 
-
-  /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */ function __construct() {
-    parent::__construct();
-  }
-
   /**
    * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
    *
-   * @access protected
+   * This method is called before a test is executed.
    */
   protected function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     // taken from form code - couldn't find good method to use
     $params['entity_id'] = 1;
@@ -70,27 +60,27 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $location = array();
     $domContact = $this->callAPISuccess('contact', 'create', array(
-      'contact_type' => 'Organization',
-      'organization_name' => 'new org',
-      'api.phone.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'phone_type_id' => 1,
-        'phone' => '456-456',
-       ),
-      'api.address.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'street_address' => '45 Penny Lane',
+        'contact_type' => 'Organization',
+        'organization_name' => 'new org',
+        'api.phone.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'phone_type_id' => 1,
+          'phone' => '456-456',
         ),
-      'api.email.create' => array(
-        'location_type_id' => $defaultLocationType->id,
-        'email' => 'my@email.com',
-      )
+        'api.address.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'street_address' => '45 Penny Lane',
+        ),
+        'api.email.create' => array(
+          'location_type_id' => $defaultLocationType->id,
+          'email' => 'my@email.com',
+        ),
       )
     );
 
-    $this->callAPISuccess('domain','create',array(
-      'id' => 1,
-      'contact_id' => $domContact['id'],
+    $this->callAPISuccess('domain', 'create', array(
+        'id' => 1,
+        'contact_id' => $domContact['id'],
       )
     );
     $this->params = array(
@@ -102,24 +92,14 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
+   * Test civicrm_domain_get.
    *
-   * @access protected
-   */
-  protected function tearDown() {
-
-  }
-
-  ///////////////// civicrm_domain_get methods
-
-  /**
-   * Test civicrm_domain_get. Takes no params.
+   * Takes no params.
    * Testing mainly for format.
    */
   public function testGet() {
 
-    $params = array('sequential' => 1,);
+    $params = array('sequential' => 1);
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
     $this->assertType('array', $result);
@@ -157,29 +137,27 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('domain_email', $domain);
       $this->assertArrayHasKey('domain_phone', $domain);
       $this->assertArrayHasKey('domain_address', $domain);
-      $this->assertEquals("my@email.com",$domain['domain_email']);
-      $this->assertEquals("456-456",$domain['domain_phone']['phone']);
-      $this->assertEquals("45 Penny Lane",$domain['domain_address']['street_address']);
+      $this->assertEquals("my@email.com", $domain['domain_email']);
+      $this->assertEquals("456-456", $domain['domain_phone']['phone']);
+      $this->assertEquals("45 Penny Lane", $domain['domain_address']['street_address']);
     }
   }
 
   ///////////////// civicrm_domain_create methods
-  /*
-    * This test checks for a memory leak observed when doing 2 gets on current domain
-    */
 
-
-
+  /**
+   * This test checks for a memory leak observed when doing 2 gets on current domain
+   */
   public function testGetCurrentDomainTwice() {
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
-        'current_domain' => 1,
-        'return' => 'name',
-      ));
+      'current_domain' => 1,
+      'return' => 'name',
+    ));
     $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 
@@ -196,10 +174,11 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_domain_create with empty params.
+   *
    * Error expected.
    */
   public function testCreateWithEmptyParams() {
-    $result = $this->callAPIFailure('domain', 'create', array());
+    $this->callAPIFailure('domain', 'create', array());
   }
-}
 
+}

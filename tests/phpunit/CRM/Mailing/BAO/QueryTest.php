@@ -6,29 +6,19 @@ require_once 'CiviTest/Contact.php';
  *  Include dataProvider for tests
  */
 class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailing BAO Query',
-      'description' => 'Test all Mailing_BAO_Query methods.',
-      'group' => 'CiviMail BAO Query Tests',
-    );
-  }
 
   /**
    * @return CRM_Mailing_BAO_QueryTestDataProvider
    */
   public function dataProvider() {
-    return new CRM_Mailing_BAO_QueryTestDataProvider;
+    return new CRM_Mailing_BAO_QueryTestDataProvider();
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_mailing_event_bounce',
       'civicrm_mailing_event_delivered',
@@ -48,9 +38,13 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
   /**
    *  Test CRM_Contact_BAO_Query::searchQuery()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
    */
-  function testSearch($fv, $count, $ids, $full) {
+  public function testSearch($fv, $count, $ids, $full) {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -59,12 +53,12 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     );
 
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-    $obj    = new CRM_Contact_BAO_Query($params);
+    $obj = new CRM_Contact_BAO_Query($params);
 
     // let's set useGroupBy=true, to prevent duplicate records
     $obj->_useGroupBy = TRUE;
 
-    $dao    = $obj->searchQuery();
+    $dao = $obj->searchQuery();
 
     $contacts = array();
     while ($dao->fetch()) {
@@ -75,5 +69,5 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
     $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,15 +32,13 @@ require_once 'CiviTest/Contact.php';
 /**
  * Test class for CRM_Contact_BAO_GroupContact BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -49,32 +47,34 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
-   * test case for add( )
+   * Test case for add( )
    */
-  function testAdd() {
+  public function testAdd() {
 
     //creates a test group contact by recursively creation
     //lets create 10 groupContacts for fun
     $groupContacts = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_GroupContact', NULL, 10);
 
     //check the group contact id is not null for each of them
-    foreach ($groupContacts as $gc) $this->assertNotNull($gc->id);
+    foreach ($groupContacts as $gc) {
+      $this->assertNotNull($gc->id);
+    }
 
     //cleanup
-    foreach ($groupContacts as $gc) $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
+    foreach ($groupContacts as $gc) {
+      $gc->deleteTestObjects('CRM_Contact_DAO_GroupContact');
+    }
   }
 
   /**
-   * test case for getGroupId( )
+   * Test case for getGroupId( )
    */
-  function testGetGroupId() {
-
+  public function testGetGroupId() {
 
     //creates a test groupContact object
     //force group_id to 1 so we can compare
@@ -94,7 +94,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    *  Test case for contact search: CRM-6706, CRM-6586 Parent Group search should return contacts from child groups too.
    */
-  function testContactSearchByParentGroup() {
+  public function testContactSearchByParentGroup() {
     // create a parent group
     // TODO: This is not an API test!!
     $groupParams1 = array(
@@ -137,8 +137,8 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'group' => array($parentGroup->id => 1),
       'version' => 3,
     );
-    $result           = civicrm_api('contact', 'get', $searchParams);
-    $validContactIds  = array($parentContact, $childContact);
+    $result = civicrm_api('contact', 'get', $searchParams);
+    $validContactIds = array($parentContact, $childContact);
     $resultContactIds = array();
     foreach ($result['values'] as $k => $v) {
       $resultContactIds[] = $v['contact_id'];
@@ -160,5 +160,5 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($resultChildContactIds), 'Check the count of returned values');
     $this->assertEquals(array(), array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
@@ -36,12 +36,10 @@
 class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
 
   /**
-   *
    */
-  CONST CUSTOM_SEARCH_GROUP_NAME = 'custom_search';
+  const CUSTOM_SEARCH_GROUP_NAME = 'custom_search';
 
   /**
-   *
    */
   public function __construct() {
     parent::__construct(TRUE);
@@ -94,8 +92,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
       CRM_Core_Error::fatal('This custom search is not registered.');
     }
 
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::del($id);
 
     return TRUE;
@@ -106,8 +104,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function onPreDisable(CRM_Extension_Info $info) {
     $customSearchesByName = $this->getCustomSearchesByName();
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 0);
   }
 
@@ -116,8 +114,8 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function onPreEnable(CRM_Extension_Info $info) {
     $customSearchesByName = $this->getCustomSearchesByName();
-    $cs          = $this->getCustomSearchesById();
-    $id          = $cs[$customSearchesByName[$info->key]];
+    $cs = $this->getCustomSearchesById();
+    $id = $cs[$customSearchesByName[$info->key]];
     $optionValue = CRM_Core_BAO_OptionValue::setIsActive($id, 1);
   }
 
@@ -134,4 +132,5 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
   protected function getCustomSearchesById() {
     return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
   }
+
 }

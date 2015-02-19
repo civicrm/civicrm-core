@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -38,7 +38,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    * Test Signature in TinyMC.
    */
-  function testTinyMCE() {
+  public function testTinyMCE() {
     $this->webtestLogin();
 
     $this->openCiviPage('dashboard', 'reset=1', 'crm-recently-viewed');
@@ -71,8 +71,8 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
-    //after clicking on 'Send an Email', wait for the text in tinymce editor to load
-    $this->clickLink('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]", FALSE);
+    // the other test checks this in a popup, we'll try it full-page here
+    $this->clickLinkSuppressPopup('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]");
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
@@ -93,7 +93,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   /**
    *  Test Signature in CKEditor.
    */
-  function testCKEditor() {
+  public function testCKEditor() {
     $this->webtestLogin();
 
     $this->openCiviPage('dashboard', 'reset=1', 'crm-recently-viewed');
@@ -143,8 +143,9 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function to select Editor.
+   * @param $editor
    */
-  function _selectEditor($editor) {
+  public function _selectEditor($editor) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
 
     // Change editor if not already selected
@@ -158,8 +159,11 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function for Check Signature in Editor.
+   * @param $fieldName
+   * @param $signature
+   * @param $editor
    */
-  function _checkSignature($fieldName, $signature, $editor) {
+  public function _checkSignature($fieldName, $signature, $editor) {
     if ($editor == 'CKEditor') {
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->selectFrame("xpath=//div[@id='cke_{$fieldName}']//iframe");
@@ -174,8 +178,10 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
   /**
    * Helper function for Check Signature in Activity.
+   * @param $subject
+   * @param $signature
    */
-  function _checkActivity($subject, $signature) {
+  public function _checkActivity($subject, $signature) {
     $this->openCiviPage('activity/search', 'reset=1', '_qf_Search_refresh');
 
     $this->type('activity_subject', $subject);
@@ -188,5 +194,5 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     // Is signature correct? in Activity
     $this->assertTextPresent($signature);
   }
-}
 
+}

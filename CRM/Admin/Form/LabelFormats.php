@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,7 +41,7 @@
 class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
 
   /**
-   * Label Format ID
+   * Label Format ID.
    */
   protected $_id = NULL;
 
@@ -50,7 +50,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    */
   protected $_group = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_group = CRM_Utils_Request::retrieve('group', 'String', $this, FALSE, 'label_format');
     $this->_values = array();
@@ -61,10 +61,9 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -91,29 +90,29 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     // currently we support only mailing label creation, hence comment below code
     /*
     $options = array(
-      'label_format' => ts('Mailing Label'),
-      'name_badge'   => ts('Name Badge'),
+    'label_format' => ts('Mailing Label'),
+    'name_badge'   => ts('Name Badge'),
     );
 
     $labelType = $this->addRadio('label_type', ts('Used For'), $options, null, '&nbsp;&nbsp;');
 
     if ($this->_action != CRM_Core_Action::ADD) {
-      $labelType->freeze();
+    $labelType->freeze();
     }
-    */
+     */
 
     $this->add('select', 'paper_size', ts('Sheet Size'),
       array(
-        0 => ts('- default -')
+        0 => ts('- default -'),
       ) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
       array(
-        'onChange' => "selectPaper( this.value );"
+        'onChange' => "selectPaper( this.value );",
       ) + $disabled
     );
     $this->add('static', 'paper_dimensions', NULL, ts('Sheet Size (w x h)'));
     $this->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_LabelFormat::getPageOrientations(), FALSE,
       array(
-        'onChange' => "updatePaperDimensions();"
+        'onChange' => "updatePaperDimensions();",
       ) + $disabled
     );
     $this->add('select', 'font_name', ts('Font Name'), CRM_Core_BAO_LabelFormat::getFontNames($this->_group));
@@ -134,11 +133,11 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $this->add('text', 'SpaceY', ts('Vertical Spacing'), array('size' => 8, 'maxlength' => 8) + $disabled, $required);
     $this->add('text', 'lPadding', ts('Left Padding'), array('size' => 8, 'maxlength' => 8), $required);
     $this->add('text', 'tPadding', ts('Top Padding'), array('size' => 8, 'maxlength' => 8), $required);
-    $this->add('text', 'weight', ts('Weight'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_LabelFormat', 'weight'), TRUE);
+    $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_LabelFormat', 'weight'), TRUE);
 
     $this->addRule('label', ts('Name already exists in Database.'), 'objectExists', array(
       'CRM_Core_BAO_LabelFormat',
-      $this->_id
+      $this->_id,
     ));
     $this->addRule('NX', ts('Must be an integer'), 'integer');
     $this->addRule('NY', ts('Must be an integer'), 'integer');
@@ -150,13 +149,13 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $this->addRule('tPadding', ts('Must be numeric'), 'numeric');
     $this->addRule('width', ts('Must be numeric'), 'numeric');
     $this->addRule('height', ts('Must be numeric'), 'numeric');
-    $this->addRule('weight', ts('Weight must be integer'), 'integer');
+    $this->addRule('weight', ts('Must be integer'), 'integer');
   }
 
   /**
    * @return int
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['weight'] = CRM_Utils_Array::value('weight', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), 0);
     }
@@ -180,9 +179,8 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -252,4 +250,5 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     }
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
+
 }

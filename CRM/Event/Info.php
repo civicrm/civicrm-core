@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -37,11 +37,13 @@
  */
 class CRM_Event_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'event';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -54,8 +56,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @param bool $getAllUnconditionally
    *
    * @return array
@@ -81,54 +83,58 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getUserDashboardElement() {
-    return array('name' => ts('Events'),
+    return array(
+      'name' => ts('Events'),
       'title' => ts('Your Event(s)'),
       'perm' => array('register for events'),
       'weight' => 20,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'id' => 'participant',
       'url' => 'participant',
       'weight' => 40,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'weight' => 40,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getActivityTypes() {
     $types = array();
-    $types['Event'] = array('title' => ts('Event'),
+    $types['Event'] = array(
+      'title' => ts('Event'),
       'callback' => 'CRM_Event_Page_EventInfo::run()',
     );
     return $types;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New.
    * @param $shortCuts
    * @param $newCredit
    */
@@ -154,5 +160,5 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
       $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
-}
 
+}

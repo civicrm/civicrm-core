@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -47,22 +47,21 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -70,7 +69,10 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'name'), TRUE
     );
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Mailing_DAO_Component', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Mailing_DAO_Component',
+        $this->_id,
+      ));
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
@@ -106,13 +108,12 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array();
 
@@ -127,9 +128,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -143,26 +143,25 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
     $component = CRM_Mailing_BAO_Component::add($params);
     CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', array(
-        1 => $component->name
+        1 => $component->name,
       )
     ), ts('Saved'), 'success');
 
   }
-  //end of function
 
   /**
-   * Function for validation
+   * Validation.
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $options
    *
-   * @return mixed true or array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   mixed true or array of errors
    */
-  static function dataRule($params, $files, $options) {
+  public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {
       $InvalidTokens = array();
     }
@@ -171,23 +170,28 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
     $errors = array();
     foreach (array(
-      'text', 'html') as $type) {
+               'text',
+               'html',
+             ) as $type) {
       $dataErrors = array();
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
             $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', array(
-              1 => $token, 2 => $desc)) . '</li>';
+                1 => $token,
+                2 => $desc,
+              )) . '</li>';
           }
         }
       }
       if (!empty($dataErrors)) {
         $errors['body_' . $type] = ts('The following errors were detected in %1 message:', array(
-          1 => $type)) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
+            1 => $type,
+          )) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
       }
     }
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

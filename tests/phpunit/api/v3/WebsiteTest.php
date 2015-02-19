@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,10 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_website_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
-
 class api_v3_WebsiteTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
@@ -43,23 +42,17 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction();
 
-    $this->_entity     = 'website';
-    $this->_contactID  = $this->organizationCreate();
-    $this->params  = array(
+    $this->_entity = 'website';
+    $this->_contactID = $this->organizationCreate();
+    $this->params = array(
       'contact_id' => $this->_contactID,
       'url' => 'website.com',
       'website_type_id' => 1,
     );
-  }
-
-  function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_website',
-      'civicrm_contact'
-    ));
   }
 
   public function testCreateWebsite() {
@@ -84,6 +77,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   public function testDeleteWebsiteInvalid() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);
@@ -91,21 +85,25 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
+
   /**
-   * Test retrieval of metadata
+   * Test retrieval of metadata.
    */
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
-      'options' => array('metadata' => array('fields')
-    )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
+      'options' => array(
+        'metadata' => array('fields'),
+      ),
+    ), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }
+
   /**
-   * Test retrieval of label metadata
+   * Test retrieval of label metadata.
    */
   public function testGetFields() {
     $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('url', $result['values']);
   }
-}
 
+}

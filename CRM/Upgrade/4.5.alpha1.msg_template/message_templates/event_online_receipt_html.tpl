@@ -35,15 +35,12 @@
     {if $isOnWaitlist}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
      {if $isPrimary}
-       <p>{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}</p>
+       <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif $isRequireApproval}
      <p>{ts}Your registration has been submitted.{/ts}</p>
      {if $isPrimary}
-      <p>{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}</p>
+      <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif $is_pay_later && !$isAmountzero && !$isAdditionalParticipant}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
@@ -158,8 +155,8 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
-	 
-     {if $event.is_public} 
+
+     {if $event.is_public}
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
@@ -167,7 +164,7 @@ registration process.{/ts}</p>
        </td>
       </tr>
      {/if}
-	 
+
     {if $event.is_share}
         <tr>
             <td colspan="2" {$valueStyle}>

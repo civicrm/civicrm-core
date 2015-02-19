@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -36,12 +36,11 @@
  */
 class CRM_UpdateMembershipReminderDate {
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
-      require_once ("cli.php");
+      require_once "cli.php";
       $cli = new civicrm_cli();
       //if it doesn't die, it's authenticated
     }
@@ -59,7 +58,7 @@ class CRM_UpdateMembershipReminderDate {
     }
   }
 
-  function initialize() {
+  public function initialize() {
     require_once '../civicrm.config.php';
     require_once 'CRM/Core/Config.php';
 
@@ -107,6 +106,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
     CRM_Core_DAO::executeQuery($query);
   }
+
 }
 
 $reminderDate = new CRM_UpdateMembershipReminderDate();
@@ -114,4 +114,3 @@ $reminderDate = new CRM_UpdateMembershipReminderDate();
 echo "\n Updating... ";
 $reminderDate->updateMembershipReminderDate();
 echo "\n\n Membership(s) reminder date updated. (Done) \n";
-

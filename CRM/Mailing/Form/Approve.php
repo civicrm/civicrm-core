@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
@@ -44,10 +44,9 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled()) {
@@ -58,7 +57,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     else {
       $this->redirectToListing();
     }
-
 
     // when user come from search context.
     $this->_searchBasedMailing = CRM_Contact_Form_Search::isSearchContext($this->get('context'));
@@ -82,13 +80,12 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_mailingID) {
       $defaults['approval_status_id'] = $this->_mailing->approval_status_id;
@@ -99,12 +96,11 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
   }
 
   /**
-   * Build the form for the approval/rejection mailing
+   * Build the form object for the approval/rejection mailing
    *
    * @param
    *
    * @return void
-   * @access public
    */
   public function buildQuickform() {
     $title = ts('Approve/Reject Mailing') . " - {$this->_mailing->name}";
@@ -126,7 +122,8 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, TRUE, NULL, TRUE);
 
     $buttons = array(
-      array('type' => 'next',
+      array(
+        'type' => 'next',
         'name' => ts('Save'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
@@ -165,7 +162,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -212,7 +208,6 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
     CRM_Mailing_BAO_Mailing::create($params, $ids);
 
-
     //when user perform mailing from search context
     //redirect it to search result CRM-3711
     $ssID = $this->get('ssID');
@@ -245,19 +240,18 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
-        'reset=1&scheduled=true'
-      ));
+      'reset=1&scheduled=true'
+    ));
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
   public function getTitle() {
     return ts('Approve/Reject Mailing');
   }
-}
 
+}

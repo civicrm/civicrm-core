@@ -11,7 +11,7 @@
   <tr class="columnheader">
     <th>{ts}Display Name{/ts}</th>
     <th>{ts}Pledge Amount{/ts}</th>
-    <th>{ts}Pledge made{/ts}</th>
+    <th>{ts}Pledge Made{/ts}</th>
   </tr>
 
   {foreach from=$rows item=row}

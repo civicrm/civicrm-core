@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -39,44 +39,46 @@
 class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Batch_BAO_Batch';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
    */
-  function &links() {}
+  public function &links() {
+  }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Batch_Form_Batch';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return ts('Batch Processing');
   }
 
@@ -85,29 +87,26 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
 
   /**
-   * browse all entities.
-   *
-   * @internal param int $action
+   * Browse all entities.
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
     $this->assign('status', $status);
     $this->search();
   }
 
-  function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -121,5 +120,5 @@ class CRM_Batch_Page_Batch extends CRM_Core_Page_Basic {
     $form->process();
     $form->run();
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -44,34 +44,30 @@
 class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   /**
-   * The contact id of the person we are viewing
+   * The contact id of the person we are viewing.
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
   /**
-   * the profile group are are interested in
+   * The profile group are are interested in.
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
   /**
-   * The profile types we restrict this page to display
+   * The profile types we restrict this page to display.
    *
    * @var string
-   * @access protected
    */
   protected $_restrict;
 
   /**
-   * Should we bypass permissions
+   * Should we bypass permissions.
    *
    * @var boolean
-   * @access protected
    */
   protected $_skipPermission;
 
@@ -89,7 +85,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_isContactActivityProfile = FALSE;
 
   /**
-   * Activity Id connected to the profile
+   * Activity Id connected to the profile.
    *
    * @var string
    */
@@ -105,19 +101,20 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_allFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param int $id the contact id
-   * @param int $gid the group id
+   * @param int $id
+   *   The contact id.
+   * @param int $gid
+   *   The group id.
    *
    * @param $restrict
    * @param bool $skipPermission
    * @param null $profileIds
    *
    * @return \CRM_Profile_Page_Dynamic
-   * @access public
    */
-  function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();
 
     $this->_id = $id;
@@ -138,14 +135,13 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     //specifies the action being done on a multi record field
     $multiRecordAction = CRM_Utils_Request::retrieve('multiRecord', 'String', $this);
 
-    $this->_multiRecord = (!is_numeric($multiRecordAction)) ?
-      CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
+    $this->_multiRecord = (!is_numeric($multiRecordAction)) ? CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
     if ($this->_multiRecord) {
       $this->set('multiRecord', $this->_multiRecord);
     }
 
     if ($this->_multiRecord & CRM_Core_Action::VIEW) {
-      $this->_recordId  = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
+      $this->_recordId = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
       $this->_allFields = CRM_Utils_Request::retrieve('allFields', 'Integer', $this);
     }
 
@@ -169,10 +165,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
+   * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     return NULL;
   }
 
@@ -183,10 +178,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * type of action and executes that action.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     $template = CRM_Core_Smarty::singleton();
     if ($this->_id && $this->_gid) {
 
@@ -199,8 +192,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($limitListingsGroupsID) {
 
         if (!CRM_Contact_BAO_GroupContact::isContactInGroup($this->_id,
-            $limitListingsGroupsID
-          )) {
+          $limitListingsGroupsID
+        )
+        ) {
           CRM_Utils_System::setTitle(ts('Profile View - Permission Denied'));
           return CRM_Core_Session::setStatus(ts('You do not have permission to view this contact record. Contact the site administrator if you need assistance.'), ts('Permission Denied'), 'error');
         }
@@ -305,7 +299,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
             $copyFields = $fields;
             CRM_Core_BAO_UFGroup::shiftMultiRecordFields($copyFields, $multiRecordFields);
             $fieldKey = key($multiRecordFields);
-          } else {
+          }
+          else {
             $fieldKey = key($fields);
           }
           if ($fieldID = CRM_Core_BAO_CustomField::getKeyID($fieldKey)) {
@@ -325,9 +320,12 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         //CRM-14338
         // Create a unique, non-empty index for each field.
         $index = $field['title'];
-        if ($index === '') $index = ' ';
-        while (array_key_exists($index, $labels))
+        if ($index === '') {
+          $index = ' ';
+        }
+        while (array_key_exists($index, $labels)) {
           $index .= ' ';
+        }
 
         $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
@@ -356,7 +354,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
       $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
       $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
-    } else {
+    }
+    else {
       $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
     }
 
@@ -391,7 +390,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -412,15 +411,14 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -430,14 +428,13 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
-}
 
+}

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,19 +41,18 @@
 class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $selector = &new CRM_Mailing_Selector_Event(
       CRM_Utils_Request::retrieve('event', 'String', $this),
       CRM_Utils_Request::retrieve('distinct', 'Boolean', $this),
@@ -111,5 +109,5 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

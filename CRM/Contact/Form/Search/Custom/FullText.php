@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -78,7 +78,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_partialQueries = array(
       new CRM_Contact_Form_Search_Custom_FullText_Contact(),
       new CRM_Contact_Form_Search_Custom_FullText_Activity(),
@@ -131,10 +131,10 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
     return $value;
   }
 
-  function __destruct() {
+  public function __destruct() {
   }
 
-  function initialize() {
+  public function initialize() {
     static $initialized = FALSE;
 
     if (!$initialized) {
@@ -146,7 +146,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
     }
   }
 
-  function buildTempTable() {
+  public function buildTempTable() {
     $randomNum = md5(uniqid());
     $this->_tableName = "civicrm_temp_custom_details_{$randomNum}";
 
@@ -194,7 +194,6 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'membership_end_date' => 'datetime',
       'membership_source' => 'varchar(255)',
       'membership_status' => 'varchar(255)',
-
       // We may have multiple files to list on one record.
       // The temporary-table approach can't store full details for all of them
       'file_ids' => 'varchar(255)', // comma-separate id listing
@@ -227,7 +226,7 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
     CRM_Core_DAO::executeQuery($sql);
   }
 
-  function fillTable() {
+  public function fillTable() {
     foreach ($this->_partialQueries as $partialQuery) {
       /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if (!$this->_table || $this->_table == $partialQuery->getName()) {
@@ -241,7 +240,7 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
     $this->filterACLContacts();
   }
 
-  function filterACLContacts() {
+  public function filterACLContacts() {
     if (CRM_Core_Permission::check('view all contacts')) {
       CRM_Core_DAO::executeQuery("DELETE FROM {$this->_tableName} WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)");
       return;
@@ -290,7 +289,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     $config = CRM_Core_Config::singleton();
 
     $form->applyFilter('__ALL__', 'trim');
@@ -309,7 +308,7 @@ WHERE      t.table_name = 'Activity' AND
       }
     }
 
-    $form->add('select', 'table', ts('Tables'), $tables );
+    $form->add('select', 'table', ts('Tables'), $tables);
 
     $form->assign('csID', $form->get('csid'));
 
@@ -344,7 +343,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @return array
    */
-  function &columns() {
+  public function &columns() {
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
@@ -356,7 +355,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @return array
    */
-  function summary() {
+  public function summary() {
     $this->initialize();
 
     $summary = array();
@@ -423,7 +422,7 @@ WHERE      t.table_name = 'Activity' AND
   /**
    * @return null|string
    */
-  function count() {
+  public function count() {
     $this->initialize();
 
     if ($this->_table) {
@@ -442,7 +441,7 @@ WHERE      t.table_name = 'Activity' AND
    *
    * @return null|string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
 
     if ($returnSQL) {
@@ -462,7 +461,7 @@ WHERE      t.table_name = 'Activity' AND
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     $this->initialize();
 
     if ($justIDs) {
@@ -486,7 +485,7 @@ FROM   {$this->_tableName} contact_a
   /**
    * @return null
    */
-  function from() {
+  public function from() {
     return NULL;
   }
 
@@ -495,34 +494,34 @@ FROM   {$this->_tableName} contact_a
    *
    * @return null
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     return NULL;
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/FullText.tpl';
   }
 
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return array();
   }
 
   /**
    * @param $row
    */
-  function alterRow(&$row) {
+  public function alterRow(&$row) {
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -530,7 +529,8 @@ FROM   {$this->_tableName} contact_a
 
   /**
    * @param int|array $limit
-   * @return string SQL
+   * @return string
+   *   SQL
    * @see CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery::toLimit
    */
   public function toLimit($limit) {
@@ -546,4 +546,5 @@ FROM   {$this->_tableName} contact_a
     }
     return $result;
   }
+
 }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -73,24 +73,26 @@
     <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
+  {if $newCredit AND $contributionMode EQ null}
+    {if $contactId}
+      {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
+    {/if}
+    {if $paymentType eq 'owed'}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+      </div>
+    {/if}
+  {/if}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
-    {if $newCredit AND $contributionMode EQ null}
-      {if $contactId}
-        {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
-       {/if}
-      {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a></span>
-      {/if}
-    {/if}
   </div>
-  <table class="form-layout-compressed">    
+  <table class="form-layout-compressed">
     <tr>
       <td class="font-size12pt label"><strong>{ts}Participant{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
     {if $contributionMode}
       <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {/if}   
+    {/if}
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
     </tr>
@@ -147,7 +149,7 @@
                 </span><br />
                 {$form.receipt_text.html|crmAddClass:huge}
             </td>
-          </tr>   
+          </tr>
            <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
            <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td{$valueStyle}>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
@@ -194,7 +196,7 @@
   {literal}
   <script type="text/javascript">
   function verify( ) {
-    if (cj('#is_email_receipt').attr( 'checked' )) {
+    if (cj('#is_email_receipt').prop('checked')) {
       var ok = confirm( '{/literal}{ts escape='js'}Click OK to save this payment record AND send a receipt to the contributor now{/ts}{literal}.' );
       if (!ok) {
         return false;

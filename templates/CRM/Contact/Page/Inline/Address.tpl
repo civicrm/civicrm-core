@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -57,8 +57,8 @@
     {foreach from=$add.custom item=customGroup key=cgId} {* start of outer foreach *}
       {assign var="isAddressCustomPresent" value=1}
       {foreach from=$customGroup item=customValue key=cvId}
-        <div id="address_custom_{$cgId}_{$locationIndex}" 
-        class="crm-collapsible crm-address-custom-{$cgId}-{$locationIndex}-accordion 
+        <div id="address_custom_{$cgId}_{$locationIndex}"
+        class="crm-collapsible crm-address-custom-{$cgId}-{$locationIndex}-accordion
         {if $customValue.collapse_display}collapsed{/if}">
         <div class="collapsible-title">
           {$customValue.title}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class captures the encoding practices of CRM-5667 in a reusable
@@ -39,7 +39,6 @@
  * $Id$
  *
  */
-
 class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   private $skipFields = NULL;
 
@@ -98,7 +97,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'pay_later_text',
         'pay_later_receipt',
         'label', // This is needed for FROM Email Address configuration. dgg
-        'url',  // This is needed for navigation items urls
+        'url', // This is needed for navigation items urls
         'details',
         'msg_text', // message templates’ text versions
         'text_message', // (send an) email to contact’s and CiviMail’s text version
@@ -107,17 +106,19 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'pcp_title',
         'pcp_intro_text',
         'new', // The 'new' text in word replacements
+        'replyto_email', // e.g. '"Full Name" <user@example.org>'
       );
     }
     return $this->skipFields;
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
+   * @param bool $castToString
+   *   If TRUE, all scalars will be filtered (and therefore cast to strings).
    *    If FALSE, then non-string values will be preserved
    */
   public function encodeInput(&$values, $castToString = FALSE) {
@@ -125,24 +126,25 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       foreach ($values as &$value) {
         $this->encodeInput($value, TRUE);
       }
-    } elseif ($castToString || is_string($values)) {
+    }
+    elseif ($castToString || is_string($values)) {
       $values = str_replace(array('<', '>'), array('&lt;', '&gt;'), $values);
     }
   }
 
   /**
-   * @param $values
+   * @param array $values
    * @param bool $castToString
-   *
-   * @return mixed|void
    */
   public function decodeOutput(&$values, $castToString = FALSE) {
     if (is_array($values)) {
       foreach ($values as &$value) {
         $this->decodeOutput($value, TRUE);
       }
-    } elseif ($castToString || is_string($values)) {
+    }
+    elseif ($castToString || is_string($values)) {
       $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
     }
   }
+
 }

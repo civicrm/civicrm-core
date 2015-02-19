@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,16 +38,16 @@
  */
 class CRM_Report_Page_Instance extends CRM_Core_Page {
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $instanceId = CRM_Report_Utils_Report::getInstanceID();
     if (!$instanceId) {
       $instanceId = CRM_Report_Utils_Report::getInstanceIDForPath();
     }
-    $action    = CRM_Utils_Request::retrieve('action', 'String', $this);
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $optionVal = CRM_Report_Utils_Report::getValueFromUrl($instanceId);
     $reportUrl = CRM_Utils_System::url('civicrm/report/list', "reset=1");
 
@@ -72,8 +71,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     else {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
       if (empty($templateInfo)) {
-        CRM_Core_Session::setStatus(ts('Could not find template for this report instance.'), ts('Template Not Found'), 'error');
-        return;
+        CRM_Core_Error::statusBounce('You have tried to access a report that does not exist.');
       }
 
       $extKey = strpos($templateInfo['name'], '.');
@@ -107,5 +105,5 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     }
     return CRM_Utils_System::redirect($reportUrl);
   }
-}
 
+}

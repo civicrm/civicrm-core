@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -36,8 +36,8 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newJob" class="button"><span><div class="icon add-icon"></div>{ts}Add New Scheduled Job{/ts}</span></a>
-          <a href="{crmURL p='civicrm/admin/joblog' q="reset=1"}" id="jobLog" class="button"><span><div class="icon preview-icon"></div>{ts}View Log (all jobs){/ts}</span></a>
+          {crmButton q="action=add&reset=1" id="newJob"  icon="circle-plus"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog"  icon="zoomin"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
       {/if}
 
@@ -45,7 +45,6 @@
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
         <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name (Frequency)/Description{/ts}</th>
@@ -72,8 +71,8 @@
 
     {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newJob-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add New Scheduled Job{/ts}</span></a>
-          <a href="{crmURL p='civicrm/admin/joblog' q="reset=1"}" id="jobLog-bottom" class="button"><span><div class="icon preview-icon"></div>{ts}View Log (all jobs){/ts}</span></a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newJob-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
+          <a href="{crmURL p='civicrm/admin/joblog' q="reset=1"}" id="jobLog-bottom" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}View Log (all jobs){/ts}</span></a>
         </div>
     {/if}
 </div>
@@ -83,7 +82,7 @@
         {ts}There are no jobs configured.{/ts}
      </div>
      <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><div class="icon add-icon"></div>{ts}Add New Scheduled Job{/ts}</span></a>
+       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
      </div>
 
 {/if}

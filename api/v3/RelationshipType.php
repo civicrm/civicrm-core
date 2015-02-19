@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -26,25 +26,18 @@
  */
 
 /**
- * new version of civicrm apis. See blog post at
- * http://civicrm.org/node/131
+ * This api exposes CiviCRM relationship types.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: Contact.php 30415 2010-10-29 12:02:47Z shot $
- *
  */
 
 /**
- * Function to create relationship type
+ * Create relationship type.
  *
- * @param  array $params   Associative array of property name/value pairs to insert in new relationship type.
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return Newly created Relationship_type object
- * {@getfields RelationshipType_create}
- * @access public
- * {@schema Contact/RelationshipType.xml}
+ * @return array
  */
 function civicrm_api3_relationship_type_create($params) {
 
@@ -66,7 +59,6 @@ function civicrm_api3_relationship_type_create($params) {
     $ids['relationshipType'] = CRM_Utils_Array::value('id', $params);
   }
 
-  $relationType = new CRM_Contact_BAO_RelationshipType();
   $relationType = CRM_Contact_BAO_RelationshipType::add($params, $ids);
 
   $relType = array();
@@ -77,10 +69,12 @@ function civicrm_api3_relationship_type_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_relationship_type_create_spec(&$params) {
   $params['contact_type_a']['api.required'] = 1;
@@ -91,27 +85,40 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
 }
 
 /**
- * Function to get all relationship type
- * retruns  An array of Relationship_type
- * @access  public
- * {@getfields RelationshipType_get}
- * @example RelationshipTypeGet.php
+ * Get all relationship types.
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_relationship_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a relationship type delete
+ * Delete a relationship type.
  *
- * @param  id of relationship type  $id
+ * @param array $params
  *
- * @return array API Result Array
- * {@getfields RelationshipType_delete}
- * @static void
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_relationship_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Get list defaults for relationship types.
+ *
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_relationship_type_getlist_defaults($request) {
+  return array(
+    'label_field' => 'label_a_b',
+    'search_field' => 'label_a_b',
+  );
+}

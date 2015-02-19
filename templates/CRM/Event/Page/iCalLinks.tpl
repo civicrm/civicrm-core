@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -27,5 +27,5 @@
 {capture assign=icalFile}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" fe=1 a=1}{/capture}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&id=`$event.id`" fe=1 a=1}{/capture}
 <div class="action-link section iCal_links-section">
-    <a href="{$icalFile}" title="{ts}Download iCalendar entry for this event.{/ts}"><img src="{$config->resourceBase}i/office-calendar.png" alt="{ts}Download iCalendar entry for this event.{/ts}"></a>&nbsp;&nbsp;<a href="{$icalFeed}" title="{ts}iCalendar feed for this event.{/ts}"><img src="{$config->resourceBase}i/ical_feed.gif" alt="{ts}iCalendar feed for this event.{/ts}" style="margin-bottom: 4px;" /></a> 
+    <a href="{$icalFile}" title="{ts}Download iCalendar entry for this event.{/ts}"><img src="{$config->resourceBase}i/office-calendar.png" alt="{ts}Download iCalendar entry for this event.{/ts}"></a>&nbsp;&nbsp;<a href="{$icalFeed}" title="{ts}iCalendar feed for this event.{/ts}"><img src="{$config->resourceBase}i/ical_feed.gif" alt="{ts}iCalendar feed for this event.{/ts}" style="margin-bottom: 4px;" /></a>
 </div>

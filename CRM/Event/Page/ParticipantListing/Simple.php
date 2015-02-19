@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,7 +42,7 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
 
   protected $_pager;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
     // retrieve Event Title and include it in page title
@@ -59,7 +59,7 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $fromClause = "
@@ -110,9 +110,9 @@ LIMIT    $offset, $rowCount";
   /**
    * @param $fromClause
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
-  function pager($fromClause, $whereClause, $whereParams) {
+  public function pager($fromClause, $whereClause, $whereParams) {
 
     $params = array();
 
@@ -139,16 +139,18 @@ SELECT count( civicrm_contact.id )
   /**
    * @return string
    */
-  function orderBy() {
+  public function orderBy() {
     static $headers = NULL;
     if (!$headers) {
       $headers = array();
-      $headers[1] = array('name' => ts('Name'),
+      $headers[1] = array(
+        'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
       );
       if ($this->_participantListingType == 'Name and Email') {
-        $headers[2] = array('name' => ts('Email'),
+        $headers[2] = array(
+          'name' => ts('Email'),
           'sort' => 'civicrm_email.email',
           'direction' => CRM_Utils_Sort::DONTCARE,
         );
@@ -172,5 +174,5 @@ SELECT count( civicrm_contact.id )
 
     return $sort->orderBy();
   }
-}
 
+}

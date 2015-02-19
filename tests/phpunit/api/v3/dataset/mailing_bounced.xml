@@ -60,7 +60,7 @@
     <value>1</value> <!--  is_completed       -->
     <null /> <!--  msg_template_id    -->
     <null /> <!--  override_verp      -->
-    <value>1</value> <!--  created_id         -->
+    <value>3</value> <!--  created_id         -->
     <null /> <!--  created_date       -->
     <null /> <!--  scheduled_id       -->
     <null /> <!--  scheduled_date     -->

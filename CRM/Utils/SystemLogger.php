@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -39,17 +39,10 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
    * @param mixed $level
    * @param string $message
    * @param array $context
-   * @return null
-   */
-  /**
-   * @param mixed $level
-   * @param string $message
-   * @param array $context
    *
-   * @return null
    */
   public function log($level, $message, array $context = array()) {
-    if(!isset($context['hostname'])) {
+    if (!isset($context['hostname'])) {
       $context['hostname'] = CRM_Utils_System::ipAddress();
     }
     $rec = new CRM_Core_DAO_SystemLog();
@@ -65,4 +58,5 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
     $rec->context = json_encode($context);
     $rec->save();
   }
+
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,20 +35,19 @@
 class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Create a new delivery event
+   * Create a new delivery event.
    *
-   * @param array $params     Associative array of delivery event values
+   * @param array $params
+   *   Associative array of delivery event values.
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
@@ -71,9 +70,9 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     $queue->find(TRUE);
 
     while ($queue->fetch()) {
-      $email             = new CRM_Core_BAO_Email();
-      $email->id         = $queue->email_id;
-      $email->hold_date  = '';
+      $email = new CRM_Core_BAO_Email();
+      $email->id = $queue->email_id;
+      $email->hold_date = '';
       $email->reset_date = date('YmdHis');
       $email->save();
     }
@@ -82,24 +81,26 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           Optional ID of a job to filter on
-   * @param boolean $is_distinct  Group by queue ID?
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of a job to filter on.
+   * @param bool $is_distinct
+   *   Group by queue ID?.
    *
-   * @return int                  Number of rows in result set
-   * @access public
-   * @static
+   * @return int
+   *   Number of rows in result set
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE) {
+  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
 
     $delivered = self::getTableName();
-    $bounce    = CRM_Mailing_Event_BAO_Bounce::getTableName();
-    $queue     = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $mailing   = CRM_Mailing_BAO_Mailing::getTableName();
-    $job       = CRM_Mailing_BAO_MailingJob::getTableName();
+    $bounce = CRM_Mailing_Event_BAO_Bounce::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $query = "
             SELECT      COUNT($delivered.id) as delivered
@@ -115,6 +116,10 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null
                 AND     $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $delivered.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -135,35 +140,42 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param bool $is_distinct
+   *   Group by queue id?.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
-   * @return array                Result set
-   * @access public
-   * @static
+   * @return array
+   *   Result set
    */
-  public static function &getRows($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
+  public static function &getRows(
+    $mailing_id, $job_id = NULL,
+    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = 0
   ) {
 
     $dao = new CRM_Core_Dao();
 
     $delivered = self::getTableName();
-    $bounce    = CRM_Mailing_Event_BAO_Bounce::getTableName();
-    $queue     = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $mailing   = CRM_Mailing_BAO_Mailing::getTableName();
-    $job       = CRM_Mailing_BAO_MailingJob::getTableName();
-    $contact   = CRM_Contact_BAO_Contact::getTableName();
-    $email     = CRM_Core_BAO_Email::getTableName();
+    $bounce = CRM_Mailing_Event_BAO_Bounce::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
+    $contact = CRM_Contact_BAO_Contact::getTableName();
+    $email = CRM_Core_BAO_Email::getTableName();
 
     $query = "
-            SELECT      $contact.display_name as display_name,
+            SELECT      $delivered.id as id,
+                        $contact.display_name as display_name,
                         $contact.id as contact_id,
                         $email.email as email,
                         $delivered.time_stamp as date
@@ -178,7 +190,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $bounce.event_queue_id = $queue.id
             INNER JOIN  $job
                     ON  $queue.job_id = $job.id
-                    AND $job.is_test = 0
+                    AND $job.is_test = $is_test
             INNER JOIN  $mailing
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null
@@ -218,7 +230,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[$dao->id] = array(
+        'contact_id' => $dao->contact_id,
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'date' => CRM_Utils_Date::customFormat($dao->date),
@@ -231,7 +244,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @param $eventQueueIDs
    * @param null $time
    */
-  static function bulkCreate($eventQueueIDs, $time = NULL) {
+  public static function bulkCreate($eventQueueIDs, $time = NULL) {
     if (!$time) {
       $time = date('YmdHis');
     }
@@ -244,8 +257,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
     while (!empty($values)) {
       $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str   = implode(',', $input);
-      $sql   = "INSERT INTO civicrm_mailing_event_delivered ( event_queue_id, time_stamp ) VALUES $str;";
+      $str = implode(',', $input);
+      $sql = "INSERT INTO civicrm_mailing_event_delivered ( event_queue_id, time_stamp ) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
   }
@@ -261,12 +274,13 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * This function rectifies that by considering all non-test mailing jobs which have completed between $minDays and $maxDays
    * and setting the resetDate to the date that an email was delivered
    *
-   * @param integer $minDays consider mailings that were completed at least $minDays ago
-   * @param integer $maxDays consider mailings that were completed not more than $maxDays ago
+   * @param int $minDays
+   *   Consider mailings that were completed at least $minDays ago.
+   * @param int $maxDays
+   *   Consider mailings that were completed not more than $maxDays ago.
    *
    * @return void
-   * @static
-   **/
+   */
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
     $dao = new CRM_Core_Dao();
 
@@ -305,4 +319,3 @@ SET        e.on_hold = 0,
   }
 
 }
-
