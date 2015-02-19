@@ -179,6 +179,51 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
+  angular.module('crmMailing').controller('ViewRecipCtrl', function EditRecipCtrl($scope) {
+    $scope.getIncludesAsString = function(mailing) {
+      var first = true;
+      var names = '';
+      _.each(mailing.recipients.groups.include, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each(mailing.recipients.mailings.include, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+    $scope.getExcludesAsString = function (mailing) {
+      var first = true;
+      var names = '';
+      _.each(mailing.recipients.groups.exclude, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
+        names = names + group[0].title;
+        first = false;
+      });
+      _.each(mailing.recipients.mailings.exclude, function (id) {
+        if (!first) {
+          names = names + ', ';
+        }
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
+        names = names + oldMailing[0].name;
+        first = false;
+      });
+      return names;
+    };
+  });
+
   // Controller for the edit-recipients fields (
   // WISHLIST: Move most of this to a (cache-enabled) service
   // Scope members:
@@ -202,48 +247,6 @@
         return ts('>%1 recipients', {1: RECIPIENTS_PREVIEW_LIMIT});
       }
       return ts('~%1 recipients', {1: $scope.recipients.length});
-    };
-    $scope.getIncludesAsString = function () {
-      var first = true;
-      var names = '';
-      _.each($scope.mailing.recipients.groups.include, function (id) {
-        if (!first) {
-          names = names + ', ';
-        }
-        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-        names = names + group[0].title;
-        first = false;
-      });
-      _.each($scope.mailing.recipients.mailings.include, function (id) {
-        if (!first) {
-          names = names + ', ';
-        }
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-        names = names + oldMailing[0].name;
-        first = false;
-      });
-      return names;
-    };
-    $scope.getExcludesAsString = function () {
-      var first = true;
-      var names = '';
-      _.each($scope.mailing.recipients.groups.exclude, function (id) {
-        if (!first) {
-          names = names + ', ';
-        }
-        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-        names = names + group[0].title;
-        first = false;
-      });
-      _.each($scope.mailing.recipients.mailings.exclude, function (id) {
-        if (!first) {
-          names = names + ', ';
-        }
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-        names = names + oldMailing[0].name;
-        first = false;
-      });
-      return names;
     };
 
     // We monitor four fields -- use debounce so that changes across the

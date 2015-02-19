@@ -211,11 +211,11 @@
       if ($scope.abtest.ab.status != activeMailingStatus) {
         activeMailingStatus = $scope.abtest.ab.status;
         activeMailings = [
-          {name: 'a', title: ts('Mailing A'), mailing: $scope.abtest.mailings.a},
-          {name: 'b', title: ts('Mailing B'), mailing: $scope.abtest.mailings.b}
+          {name: 'a', title: ts('Mailing A'), mailing: $scope.abtest.mailings.a, attachments: $scope.abtest.attachments.a},
+          {name: 'b', title: ts('Mailing B'), mailing: $scope.abtest.mailings.b, attachments: $scope.abtest.attachments.b}
         ];
         if ($scope.abtest.ab.status == 'Final') {
-          activeMailings.push({name: 'c', title: ts('Final'), mailing: $scope.abtest.mailings.c});
+          activeMailings.push({name: 'c', title: ts('Final'), mailing: $scope.abtest.mailings.c, attachments: $scope.abtest.attachments.c});
         }
       }
       return activeMailings;
