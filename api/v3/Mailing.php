@@ -63,7 +63,6 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   // should be able to default to 'user_contact_id' & have it work but it didn't work in test so
   // making required for simplicity
   $params['created_id']['api.required'] = 1;
-  $params['api.mailing_job.create']['api.default'] = 1;
 }
 
 /**
