@@ -3,48 +3,34 @@
     <thead>
     <tr>
       <th>{{ts('Details')}}</th>
-      <th class="crm-mailing-ab-col">{{ts('Mailing A')}}</th>
-      <th class="crm-mailing-ab-col">{{ts('Mailing B')}}</th>
-      <th class="crm-mailing-ab-col" ng-show="abtest.ab.status == 'Final'">{{ts('Final')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
     </tr>
     </thead>
     <tbody>
     <tr ng-show="abtest.mailings.a.body_html || abtest.mailings.b.body_html">
       <td>{{ts('HTML')}}</td>
-      <td><a ng-click="previewMailing('a','html')" ng-show="abtest.mailings.a.body_html">{{ts('View')}}</a></td>
-      <td><a ng-click="previewMailing('b','html')" ng-show="abtest.mailings.b.body_html">{{ts('View')}}</a></td>
-      <td><a ng-click="previewMailing('c','html')" ng-show="abtest.mailings.c.body_html && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a class="crm-hover-button" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('View')}}</a>
+      </td>
     </tr>
     <tr ng-show="abtest.mailings.a.body_text || abtest.mailings.b.body_text">
       <td>{{ts('Text')}}</td>
-      <td><a ng-click="previewMailing('a','text')" ng-show="abtest.mailings.a.body_text">{{ts('View')}}</a></td>
-      <td><a ng-click="previewMailing('b','text')" ng-show="abtest.mailings.b.body_text">{{ts('View')}}</a></td>
-      <td><a ng-click="previewMailing('c','text')" ng-show="abtest.mailings.c.body_text && abtest.ab.status == 'Final'">{{ts('View')}}</a></td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a class="crm-hover-button" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('View')}}</a>
+      </td>
     </tr>
     <tr ng-repeat="statType in statTypes">
       <td>{{statType.title}}</td>
-      <td>
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.a, statType, 'events')}}" title="{{statType.title}}">{{stats.a[statType.name] || ts('n/a')}}</a>
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.a, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
-      </td>
-      <td>
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.b, statType, 'events')}}" title="{{statType.title}}">{{stats.b[statType.name] || ts('n/a')}}</a>
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.b, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
-      </td>
-      <td ng-show="abtest.ab.status == 'Final'">
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.c, statType, 'events')}}" title="{{statType.title}}">{{stats.a[statType.name] || ts('n/a')}}</a>
-        <a class="crm-hover-button" ng-href="{{statUrl(abtest.mailings.c, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
+      <td ng-repeat="am in getActiveMailings()">
+        <a class="crm-hover-button" ng-href="{{statUrl(am.mailing, statType, 'events')}}" title="{{statType.title}}">{{stats[am.name][statType.name] || ts('n/a')}}</a>
+        <a class="crm-hover-button" ng-href="{{statUrl(am.mailing, statType, 'search')}}" title="{{ts('Search for contacts')}}" crm-icon="search"></a>
       </td>
     </tr>
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
-      <td>
-        <button ng-click="selectWinner('a')">{{ts('Select as Winner')}}</button>
+      <td ng-repeat="am in getActiveMailings()">
+        <button ng-click="selectWinner(am.name)">{{ts('Select as Winner')}}</button>
       </td>
-      <td>
-        <button ng-click="selectWinner('b')">{{ts('Select as Winner')}}</button>
-      </td>
-      <!-- Final column is n/a -->
     </tr>
     </tbody>
   </table>
