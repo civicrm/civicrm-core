@@ -1433,13 +1433,17 @@ class Installer extends InstallRequirements {
 
       //change the default language to one chosen
       if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
-        $domain = new CRM_Core_DAO_Domain();
-        $domain->id = CRM_Core_Config::domainID();
-        $domain->find(TRUE);
-        $configSettings = unserialize($domain->config_backend);
-        $configSettings['lcMessages'] = $config['seedLanguage'];
-        $domain->config_backend = serialize($configSettings);
-        $domain->save();
+        $domainID = CRM_Core_Config::domainID();
+        $configBackend = civicrm_api3('Domain', 'getvalue', array('id' => $domainID, 'return'=> 'config_backend'));
+        $configBackend = unserialize($config_backend);
+
+        //TODO: Scope to set default attributes like for now e.g. Default Launguage
+        $configBackend['lcMessages'] = $config['seedLanguage'];
+        $result = civicrm_api3('Domain', 'setvalue', array(
+                    'id' => $domainID,
+                    'field' => 'config_backend',
+                    'value' => serialize($configBackend),
+                  ));
       }
     }
 
