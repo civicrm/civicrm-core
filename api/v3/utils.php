@@ -266,7 +266,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   if ($deprecated) {
     // Metadata-level deprecations or wholesale entity deprecations.
-    if ($entity == 'entity' || $action == 'getactions' || is_string($deprecated)) {
+    if ($entity == 'Entity' || $action == 'getactions' || is_string($deprecated)) {
       $result['deprecated'] = $deprecated;
     }
     // Action-specific deprecations
@@ -310,7 +310,7 @@ function _civicrm_api3_get_DAO($name) {
     $name = substr($name, 13, $last - 13);
   }
 
-  $name = _civicrm_api_get_camel_name($name, 3);
+  $name = _civicrm_api_get_camel_name($name);
 
   if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
     $name = 'Contact';
@@ -746,6 +746,8 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  *   options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
+  // Entity should be l-case so it can be concatenated into field names
+  $entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
   $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
