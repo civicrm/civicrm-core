@@ -163,12 +163,15 @@ function civicrm_api3_create_error($msg, $data = array()) {
  */
 function civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = array()) {
   $result = array();
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+  // TODO: This shouldn't be necessary but this fn sometimes gets called with lowercase entity
+  $entity = _civicrm_api_get_camel_name($entity);
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
-  if (is_array($values) && !empty($entity) && $action != 'getfields') {
+  if (is_array($values) && $entity && $action != 'getfields') {
     foreach ($values as $key => $item) {
-      if (empty($item['id']) && !empty($item[$entity . "_id"])) {
-        $values[$key]['id'] = $item[$entity . "_id"];
+      if (empty($item['id']) && !empty($item[$lowercase_entity . "_id"])) {
+        $values[$key]['id'] = $item[$lowercase_entity . "_id"];
       }
       if (!empty($item['financial_type_id'])) {
         //4.3 legacy handling
@@ -746,8 +749,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  *   options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
-  // Entity should be l-case so it can be concatenated into field names
-  $entity = _civicrm_api_get_entity_name_from_camel($entity);
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
   $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
@@ -783,14 +785,14 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   }
   if ($entity && $action == 'get') {
     if (!empty($returnProperties['id'])) {
-      $returnProperties[$entity . '_id'] = 1;
+      $returnProperties[$lowercase_entity . '_id'] = 1;
       unset($returnProperties['id']);
     }
     switch (trim(strtolower($sort))) {
       case 'id':
       case 'id desc':
       case 'id asc':
-        $sort = str_replace('id', $entity . '_id', $sort);
+        $sort = str_replace('id', $lowercase_entity . '_id', $sort);
     }
   }
 
@@ -821,7 +823,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
     elseif ($n == 'id') {
-      $inputParams[$entity . '_id'] = $v;
+      $inputParams[$lowercase_entity . '_id'] = $v;
     }
     elseif (in_array($n, $otherVars)) {
     }
@@ -874,9 +876,9 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   $fields = $bao->fields();
   if ($unique) {
     if (empty($fields['id'])) {
-      $entity = _civicrm_api_get_entity_name_from_dao($bao);
-      $fields['id'] = $fields[$entity . '_id'];
-      unset($fields[$entity . '_id']);
+      $lowercase_entity = _civicrm_api_get_entity_name_from_camel(_civicrm_api_get_entity_name_from_dao($bao));
+      $fields['id'] = $fields[$lowercase_entity . '_id'];
+      unset($fields[$lowercase_entity . '_id']);
     }
     return $fields;
   }
@@ -2197,12 +2199,12 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
  */
 function _civicrm_api3_deprecation_check($entity, $result = array()) {
   if ($entity) {
-    $apiFile = 'api/v3/' . _civicrm_api_get_camel_name($entity) . '.php';
+    $apiFile = "api/v3/$entity.php";
     if (CRM_Utils_File::isIncludable($apiFile)) {
       require_once $apiFile;
     }
-    $entity = _civicrm_api_get_entity_name_from_camel($entity);
-    $fnName = "_civicrm_api3_{$entity}_deprecation";
+    $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+    $fnName = "_civicrm_api3_{$lowercase_entity}_deprecation";
     if (function_exists($fnName)) {
       return $fnName($result);
     }
