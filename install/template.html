@@ -51,7 +51,7 @@
        window.location = location;
      }
      else {
-       window.location += '?seedLanguage=' + language;
+       window.location += (location.indexOf('?') < 0 ? '?' : '&') + 'seedLanguage=' + language;
      }
   }
 </script>
