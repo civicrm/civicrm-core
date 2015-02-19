@@ -877,4 +877,16 @@ AND
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
   }
 
+  /**
+   * Resets the singleton, so that the next call to CRM_Core_Config::singleton()
+   * reloads completely.
+   *
+   * While normally we could call the singleton function with $force = TRUE,
+   * this function addresses a very specific use-case in the CiviCRM installer,
+   * where we cannot yet force a reload, but we want to make sure that the next
+   * call to this object gets a fresh start (ex: to initialize the DAO).
+   */
+  public function free() {
+    self::$_singleton = NULL;
+  }
 }
