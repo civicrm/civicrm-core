@@ -790,7 +790,9 @@
             $parse($scope.crmUiWizard).assign($scope.$parent, this);
           }
         },
-        link: function (scope, element, attrs) {}
+        link: function (scope, element, attrs) {
+          scope.ts = CRM.ts(null);
+        }
       };
     })
 
