@@ -445,4 +445,65 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Given this task's list of targets, produce a hidden group.
+   *
+   * @return array
+   *   Array(0 => int $groupID, 1 => int|NULL $ssID).
+   * @throws Exception
+   */
+  public function createHiddenGroup() {
+    // Did the user select "All" matches or cherry-pick a few records?
+    $searchParams = $this->controller->exportValues();
+    if ($searchParams['radio_ts'] == 'ts_sel') {
+      // Create a static group.
+
+      $randID = md5(time() . rand(1, 1000)); // groups require a unique name
+      $grpTitle = "Hidden Group {$randID}";
+      $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
+
+      if (!$grpID) {
+        $groupParams = array(
+          'title' => $grpTitle,
+          'is_active' => 1,
+          'is_hidden' => 1,
+          'group_type' => array('2' => 1),
+        );
+
+        $group = CRM_Contact_BAO_Group::create($groupParams);
+        $grpID = $group->id;
+
+        CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $group->id);
+
+        $newGroupTitle = "Hidden Group {$grpID}";
+        $groupParams = array(
+          'id' => $grpID,
+          'name' => CRM_Utils_String::titleToVar($newGroupTitle),
+          'title' => $newGroupTitle,
+          'group_type' => array('2' => 1),
+        );
+        $group = CRM_Contact_BAO_Group::create($groupParams);
+      }
+
+      // note at this point its a static group
+      return array($grpID, NULL);
+    }
+    else {
+      // Create a smart group.
+
+      $ssId = $this->get('ssID');
+      $hiddenSmartParams = array(
+        'group_type' => array('2' => 1),
+        'form_values' => $this->get('formValues'),
+        'saved_search_id' => $ssId,
+        'search_custom_id' => $this->get('customSearchID'),
+        'search_context' => $this->get('context'),
+      );
+
+      list($smartGroupId, $savedSearchId) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+      return array($smartGroupId, $savedSearchId);
+    }
+
+  }
+
 }
