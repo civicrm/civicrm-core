@@ -26,6 +26,9 @@ span.crmMailing-exclude {
   color: #600;
   text-decoration: line-through;
 }
+span.crmMailing-mandatory {
+  color: #866304;
+}
 
 .crmMailing input[name=preview_test_email], .crmMailing-preview select[name=preview_test_group] {
   width: 80%;

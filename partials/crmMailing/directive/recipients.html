@@ -2,6 +2,9 @@
 Directive: crmMailingRecipients
 -->
 <select multiple>
+  <optgroup label="{{ts('Mandatory Group')}}">
+    <option ng-repeat="grp in mandatoryGroups" value="{{grp.id}} civicrm_group include">{{ts('Search Results')}}</option>
+  </optgroup>
   <optgroup label="{{ts('Include Group')}}">
     <option ng-repeat="grp in groups" value="{{grp.id}} civicrm_group include">{{grp.title}}</option>
   </optgroup>

@@ -237,32 +237,45 @@ class CRM_Contact_Task {
         );
       }
 
-      if (CRM_Core_Permission::access('CiviMail')) {
-        self::$_tasks[self::CREATE_MAILING] = array(
-          'title' => ts('Schedule/Send a Mass Mailing'),
-          'class' => array(
-            'CRM_Mailing_Form_Group',
-            'CRM_Mailing_Form_Settings',
-            'CRM_Mailing_Form_Upload',
-            'CRM_Mailing_Form_Test',
-            'CRM_Mailing_Form_Schedule',
-          ),
-          'result' => FALSE,
-        );
+      if (defined('CIVICRM_CIVIMAIL_UI_LEGACY')) {
+        if (CRM_Core_Permission::access('CiviMail')) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Schedule/Send a Mass Mailing'),
+            'class' => array(
+              'CRM_Mailing_Form_Group',
+              'CRM_Mailing_Form_Settings',
+              'CRM_Mailing_Form_Upload',
+              'CRM_Mailing_Form_Test',
+              'CRM_Mailing_Form_Schedule',
+            ),
+            'result' => FALSE,
+          );
+        }
+        elseif (CRM_Mailing_Info::workflowEnabled() &&
+          CRM_Core_Permission::check('create mailings')
+        ) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Create a Mass Mailing'),
+            'class' => array(
+              'CRM_Mailing_Form_Group',
+              'CRM_Mailing_Form_Settings',
+              'CRM_Mailing_Form_Upload',
+              'CRM_Mailing_Form_Test',
+            ),
+            'result' => FALSE,
+          );
+        }
       }
-      elseif (CRM_Mailing_Info::workflowEnabled() &&
-        CRM_Core_Permission::check('create mailings')
-      ) {
-        self::$_tasks[self::CREATE_MAILING] = array(
-          'title' => ts('Create a Mass Mailing'),
-          'class' => array(
-            'CRM_Mailing_Form_Group',
-            'CRM_Mailing_Form_Settings',
-            'CRM_Mailing_Form_Upload',
-            'CRM_Mailing_Form_Test',
-          ),
-          'result' => FALSE,
-        );
+      else {
+        if (CRM_Core_Permission::access('CiviMail')
+          || (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'))
+        ) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Schedule/Send a Mass Mailing'),
+            'class' => 'CRM_Mailing_Form_Task_AdhocMailing',
+            'result' => FALSE,
+          );
+        }
       }
 
       self::$_tasks += CRM_Core_Component::taskList();
