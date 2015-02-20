@@ -26,39 +26,38 @@
  */
 
 /**
- * This api exposes CiviCRM acl_role.
+ * This api exposes CiviCRM AclRole.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save an acl_role.
+ * Save an AclRole.
  *
  * Allowed @params array keys are:
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created acl_role property values.
  */
 function civicrm_api3_acl_role_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get an acl_role.
+ * Get an AclRole.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved acl_role property values.
+ *   Array of retrieved AclRole property values.
  */
 function civicrm_api3_acl_role_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete an acl_role.
+ * Delete an AclRole.
  *
  * @param array $params
  *

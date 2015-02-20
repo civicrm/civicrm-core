@@ -27,16 +27,19 @@
 
 
 /**
- * This api exposes CiviCRM price sets.
+ * This api exposes CiviCRM price field values.
+ *
+ * PriceFields may contain zero or more PriceFieldValues.
+ * Use chaining to create PriceFields and values in one api call.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Create or update a price_field_value.
+ * Create or update a PriceFieldValue.
  *
  * @param array $params
- *   name/value pairs to insert in new 'price_field_value'
+ *   name/value pairs to insert in new 'PriceFieldValue'
  *
  * @return array
  *   API result array.
@@ -51,7 +54,7 @@ function civicrm_api3_price_field_value_create($params) {
 
   $values = array();
   _civicrm_api3_object_to_array($bao, $values[$bao->id]);
-  return civicrm_api3_create_success($values, $params, 'price_field_value', 'create', $bao);
+  return civicrm_api3_create_success($values, $params, 'PriceFieldValue', 'create', $bao);
 
 }
 
@@ -71,7 +74,7 @@ function _civicrm_api3_price_field_value_create_spec(&$params) {
 }
 
 /**
- * Returns array of price_field_values  matching a set of one or more group properties.
+ * Returns array of PriceFieldValues  matching a set of one or more group properties.
  *
  * @param array $params
  *   Array of one or more valid property_name=>value pairs. If $params is set.
@@ -85,10 +88,9 @@ function civicrm_api3_price_field_value_get($params) {
 }
 
 /**
- * Delete an existing price_field_value.
+ * Delete an existing PriceFieldValue.
  *
- * This method is used to delete any existing price_field_value. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing PriceFieldValue given its id.
  *
  * @param array $params
  *   Array containing id of the group to be deleted.

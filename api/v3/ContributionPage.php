@@ -33,7 +33,7 @@
  */
 
 /**
- * Create or update a contribution_page.
+ * Create or update a ContributionPage.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -63,7 +63,7 @@ function _civicrm_api3_contribution_page_create_spec(&$params) {
 }
 
 /**
- * Returns array of contribution_pages matching a set of one or more group properties.
+ * Returns array of ContributionPage(s) matching a set of one or more group properties.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -76,10 +76,9 @@ function civicrm_api3_contribution_page_get($params) {
 }
 
 /**
- * Delete an existing contribution_page.
+ * Delete an existing ContributionPage.
  *
- * This method is used to delete any existing contribution_page. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing ContributionPage given its id.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -92,7 +91,7 @@ function civicrm_api3_contribution_page_delete($params) {
 }
 
 /**
- * Submit a contribution_page.
+ * Submit a ContributionPage.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -102,5 +101,5 @@ function civicrm_api3_contribution_page_delete($params) {
  */
 function civicrm_api3_contribution_page_submit($params) {
   $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);
-  return civicrm_api3_create_success($result, $params, 'contribution_page', 'submit');
+  return civicrm_api3_create_success($result, $params, 'ContributionPage', 'submit');
 }

@@ -26,7 +26,7 @@
  */
 
 /**
- * The activity_type api is deprecated. Please use the option_value api instead.
+ * The ActivityType api is deprecated. Please use the OptionValue api instead.
  *
  * @deprecated
  *
@@ -41,7 +41,7 @@
  *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_activity_type_deprecation() {
-  return 'The activity_type api is deprecated. Please use the option_value api instead.';
+  return 'The ActivityType api is deprecated. Please use the OptionValue api instead.';
 }
 
 /**
@@ -51,7 +51,7 @@ function _civicrm_api3_activity_type_deprecation() {
  *
  * @return array
  *   activity types keyed by id
- * @deprecated - use getoptions
+ * @deprecated - use the getoptions action instead
  */
 function civicrm_api3_activity_type_get($params) {
 
@@ -67,7 +67,7 @@ function civicrm_api3_activity_type_get($params) {
  * @return array
  *   created / updated activity type
  *
- * @deprecated use option_value api
+ * @deprecated use the OptionValue api instead
  */
 function civicrm_api3_activity_type_create($params) {
 
@@ -100,7 +100,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
 }
 
 /**
- * Delete activity type.
+ * Delete ActivityType.
  *
  * @param array $params
  *   Array including id of activity_type to delete.
@@ -108,7 +108,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @return array
  *   API result array
  *
- * @deprecated use option_value api
+ * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
   return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);

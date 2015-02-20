@@ -26,37 +26,36 @@
  */
 
 /**
- * This api exposes CiviCRM financial_account.
+ * This api exposes CiviCRM FinancialAccount.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save a financial_account.
+ * Save a FinancialAccount.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created financial_account property values.
  */
 function civicrm_api3_financial_account_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a financial_account.
+ * Get a FinancialAccount.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved financial_account property values.
+ *   Array of retrieved FinancialAccount property values.
  */
 function civicrm_api3_financial_account_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a financial_account.
+ * Delete a FinancialAccount.
  *
  * @param array $params
  *

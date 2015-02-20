@@ -65,7 +65,7 @@ function civicrm_api3_relationship_type_create($params) {
 
   _civicrm_api3_object_to_array($relationType, $relType[$relationType->id]);
 
-  return civicrm_api3_create_success($relType, $params, 'relationship_type', 'create', $relationType);
+  return civicrm_api3_create_success($relType, $params, 'RelationshipType', 'create', $relationType);
 }
 
 /**

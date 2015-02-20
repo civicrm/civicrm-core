@@ -50,7 +50,7 @@ function civicrm_api3_payment_processor_type_create($params) {
 
   _civicrm_api3_object_to_array($paymentProcessorType, $relType[$paymentProcessorType->id]);
 
-  return civicrm_api3_create_success($relType, $params, 'payment_processor_type', 'create', $paymentProcessorType);
+  return civicrm_api3_create_success($relType, $params, 'PaymentProcessorType', 'create', $paymentProcessorType);
 }
 
 /**
@@ -100,5 +100,5 @@ function civicrm_api3_payment_processor_type_delete($params) {
   if (!$result) {
     return civicrm_api3_create_error('Could not delete payment processor type');
   }
-  return civicrm_api3_create_success($result, $params, 'payment_processor_type', 'delete', $payProcTypeBAO);
+  return civicrm_api3_create_success($result, $params, 'PaymentProcessorType', 'delete', $payProcTypeBAO);
 }

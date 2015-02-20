@@ -27,7 +27,8 @@
 
 /**
  * This api exposes CiviCRM option groups.
- * Each group contains option values.
+ *
+ * OptionGroups are containers for option values.
  *
  * @package CiviCRM_APIv3
  */
@@ -70,8 +71,7 @@ function _civicrm_api3_option_group_create_spec(&$params) {
 /**
  * Delete an existing Option Group.
  *
- * This method is used to delete any existing Option Group. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing OptionGroup given its id.
  *
  * @param array $params
  *   [id]

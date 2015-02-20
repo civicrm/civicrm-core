@@ -55,7 +55,6 @@ function civicrm_api3_custom_search_get($params) {
  * @param array $params
  *
  * @return array
- *   Array of newly created option_value property values.
  */
 function civicrm_api3_custom_search_create($params) {
   require_once 'api/v3/OptionValue.php';

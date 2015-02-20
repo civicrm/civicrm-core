@@ -26,13 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM location type.
+ * This api exposes CiviCRM LocationType records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Add a Location Type.
+ * Add a LocationType.
  *
  * @param array $params
  *
@@ -62,7 +62,7 @@ function _civicrm_api3_location_type_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Location Type.
+ * Deletes an existing LocationType.
  *
  * @param array $params
  *
@@ -74,7 +74,7 @@ function civicrm_api3_location_type_delete($params) {
 }
 
 /**
- * Retrieve one or more Location Types.
+ * Retrieve one or more LocationTypes.
  *
  * @param array $params
  *   An associative array of name/value pairs.

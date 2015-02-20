@@ -50,7 +50,6 @@ function civicrm_api3_report_instance_get($params) {
  * @param array $params
  *
  * @return array
- *   Array of newly created report instance property values.
  */
 function civicrm_api3_report_instance_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

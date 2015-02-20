@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM email.
+ * This api exposes CiviCRM email records.
  *
  * @package CiviCRM_APIv3
  */
@@ -82,6 +82,5 @@ function civicrm_api3_email_delete($params) {
  *   api result array
  */
 function civicrm_api3_email_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

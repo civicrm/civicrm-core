@@ -43,6 +43,7 @@
 function civicrm_api3_mailing_contact_get($params) {
   return civicrm_api3_create_success(_civicrm_api3_mailing_contact_getresults($params, FALSE));
 }
+
 /**
  * This is a wrapper for the functions that return the results from the 'quasi-entity' mailing contact.
  *

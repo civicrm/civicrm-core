@@ -60,7 +60,7 @@ function civicrm_api3_pledge_delete($params) {
   if (CRM_Pledge_BAO_Pledge::deletePledge($params['id'])) {
     return civicrm_api3_create_success(array(
       'id' => $params['id'],
-    ), $params, 'pledge', 'delete');
+    ), $params, 'Pledge', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete pledge');
@@ -122,16 +122,15 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  */
 function civicrm_api3_pledge_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;
-  $entity = 'pledge';
 
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Pledge');
 
   $pledge = array();
   while ($dao->fetch()) {
     $pledge[$dao->pledge_id] = $query->store($dao);
   }
 
-  return civicrm_api3_create_success($pledge, $params, 'pledge', 'get', $dao);
+  return civicrm_api3_create_success($pledge, $params, 'Pledge', 'get', $dao);
 }
 
 /**

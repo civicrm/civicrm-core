@@ -32,7 +32,7 @@
  */
 
 /**
- * Add or update a contribution.
+ * Add or update a Contribution.
  *
  * @param array $params
  *   Input parameters.
@@ -166,7 +166,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 }
 
 /**
- * Delete a contribution.
+ * Delete a Contribution.
  *
  * @param array $params
  *   Input parameters.
@@ -207,8 +207,7 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 function civicrm_api3_contribution_get($params) {
 
   $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
-  $entity = 'contribution';
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Contribution');
 
   $contribution = array();
   while ($dao->fetch()) {
@@ -219,7 +218,7 @@ function civicrm_api3_contribution_get($params) {
     // format soft credit for backward compatibility
     _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }
-  return civicrm_api3_create_success($contribution, $params, 'contribution', 'get', $dao);
+  return civicrm_api3_create_success($contribution, $params, 'Contribution', 'get', $dao);
 }
 
 /**
@@ -282,7 +281,7 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_transact_spec(&$params) {
-  $fields = civicrm_api3('contribution', 'getfields', array('action' => 'create'));
+  $fields = civicrm_api3('Contribution', 'getfields', array('action' => 'create'));
   $params = array_merge($params, $fields['values']);
   $params['receive_date']['api.default'] = 'now';
 }
@@ -327,7 +326,7 @@ function civicrm_api3_contribution_transact($params) {
   $transaction = $payment->doPayment($params);
 
   $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
-  return civicrm_api('contribution', 'create', $params);
+  return civicrm_api('Contribution', 'create', $params);
 }
 
 /**

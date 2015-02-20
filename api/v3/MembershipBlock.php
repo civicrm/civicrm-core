@@ -26,16 +26,16 @@
  */
 
 /**
- * This api exposes CiviCRM membership block.
+ * This api exposes CiviCRM MembershipBlock records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * API to Create or update a Membership Block.
+ * API to Create or update a MembershipBlock.
  *
  * @param array $params
- *   An associative array of name/value property values of civicrm_membership_block.
+ *   An associative array of name/value property values of MembershipBlock.
  *
  * @return array
  *   newly created or updated membership block property values.

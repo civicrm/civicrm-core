@@ -32,10 +32,10 @@
  */
 
 /**
- * Create or update a mail_settings.
+ * Create or update a MailSettings.
  *
  * @param array $params
- *   name/value pairs to insert in new 'mail_settings'
+ *   name/value pairs to insert in new 'MailSettings'
  *
  * @return array
  *   API result array.
@@ -53,15 +53,14 @@ function civicrm_api3_mail_settings_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mail_settings_create_spec(&$params) {
-
 }
 
 /**
- * Returns array of mail_settings  matching a set of one or more group properties.
+ * Returns array of MailSettings matching a set of one or more properties.
  *
  * @param array $params
  *   Array of one or more property_name=>value pairs.
- *   If $params is set as null, all mail_settings will be returned
+ *   If $params is set as null, all MailSettings will be returned.
  *
  * @return array
  *   API result array.
@@ -71,7 +70,7 @@ function civicrm_api3_mail_settings_get($params) {
 }
 
 /**
- * Delete an existing mail_settings.
+ * Delete an existing MailSettings.
  *
  * @param array $params
  *   [id]
