@@ -13,15 +13,17 @@ describe('crmAutosave', function() {
       $interval,
       $timeout,
       fakeCtrl,
+      CrmAutosaveCtrl,
       model,
       element;
 
-    beforeEach(inject(function(_$compile_, _$rootScope_, _$interval_, _$timeout_, _$q_) {
+    beforeEach(inject(function(_$compile_, _$rootScope_, _$interval_, _$timeout_, _$q_, _CrmAutosaveCtrl_) {
       // The injector unwraps the underscores (_) from around the parameter names when matching
       $compile = _$compile_;
       $rootScope = _$rootScope_;
       $interval = _$interval_;
       $timeout = _$timeout_;
+      CrmAutosaveCtrl = _CrmAutosaveCtrl_;
 
       $rootScope.fakeCtrl = fakeCtrl = {
         doSave: function() {
@@ -74,7 +76,15 @@ describe('crmAutosave', function() {
     };
     angular.forEach(fakeSaves, function(saveFunc, saveFuncExpr) {
       it('calls ' + saveFuncExpr + ' twice over the course of three changes', function() {
-        element = $compile('<form name="myForm" crm-autosave="' + saveFuncExpr + '" crm-autosave-model="model" crm-autosave-interval="{poll: 25, save: 50}"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" ng-model="model.fieldB"></form>')($rootScope);
+        var myAutosave = $rootScope.myAutosave = new CrmAutosaveCtrl({
+          save: fakeCtrl[saveFunc],
+          model: function(){ return model; },
+          interval: {poll: 25, save: 50},
+          form: function(){ return $rootScope.myForm; }
+        });
+        myAutosave.start();
+        $rootScope.$on('$destroy', myAutosave.stop);
+        element = $compile('<form name="myForm"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" ng-model="model.fieldB"></form>')($rootScope);
         $rootScope.$digest();
 
         // check that we load pristine data and don't do any saving
@@ -122,7 +132,15 @@ describe('crmAutosave', function() {
     });
 
     it('does not save an invalid form', function() {
-      element = $compile('<form name="myForm" crm-autosave="fakeCtrl.doSave()" crm-autosave-model="model" crm-autosave-interval="{poll: 25, save: 50}"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" required ng-model="model.fieldB"></form>')($rootScope);
+      var myAutosave = $rootScope.myAutosave = new CrmAutosaveCtrl({
+        save: fakeCtrl.doSave,
+        model: function(){ return model; },
+        interval: {poll: 25, save: 50},
+        form: function(){ return $rootScope.myForm; }
+      });
+      myAutosave.start();
+      $rootScope.$on('$destroy', myAutosave.stop);
+      element = $compile('<form name="myForm"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" required ng-model="model.fieldB"></form>')($rootScope);
       $rootScope.$digest();
 
       // check that we load pristine data and don't do any saving
@@ -165,7 +183,15 @@ describe('crmAutosave', function() {
     });
 
     it('defers saving new changes when a save is already pending', function() {
-      element = $compile('<form name="myForm" crm-autosave="fakeCtrl.doSaveSlowly()" crm-autosave-model="model" crm-autosave-interval="{poll: 25, save: 50}"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" ng-model="model.fieldB"></form>')($rootScope);
+      var myAutosave = $rootScope.myAutosave = new CrmAutosaveCtrl({
+        save: fakeCtrl.doSaveSlowly,
+        model: function(){ return model; },
+        interval: {poll: 25, save: 50},
+        form: function(){ return $rootScope.myForm; }
+      });
+      myAutosave.start();
+      $rootScope.$on('$destroy', myAutosave.stop);
+      element = $compile('<form name="myForm"><input class="fieldA" ng-model="model.fieldA"><input class="fieldB" ng-model="model.fieldB"></form>')($rootScope);
       $rootScope.$digest();
 
       // check that we load pristine data and don't do any saving
