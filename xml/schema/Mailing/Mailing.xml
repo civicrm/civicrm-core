@@ -407,6 +407,13 @@
     </pseudoconstant>
     <add>4.6</add>
   </field>
+  <foreignKey>
+    <name>location_type_id</name>
+    <table>civicrm_location_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.6</add>
+  </foreignKey>
   <field>
     <name>email_selection_method</name>
     <type>varchar</type>
