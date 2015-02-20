@@ -26,11 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * Class CRM_Core_Payment_BaseIPN.
  */
 class CRM_Core_Payment_BaseIPN {
 
@@ -69,7 +65,9 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Validate incoming data. This function is intended to ensure that incoming data matches
+   * Validate incoming data.
+   *
+   * This function is intended to ensure that incoming data matches
    * It provides a form of pseudo-authentication - by checking the calling fn already knows
    * the correct contact id & contribution id (this can be problematic when that has changed in
    * the meantime for transactions that are delayed & contacts are merged in-between. e.g
@@ -86,6 +84,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Boolean Return FALSE if the relevant objects don't exist.
    * @param int $paymentProcessorID
    *   Id of the payment processor ID in use.
+   *
    * @return bool
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
@@ -265,8 +264,10 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Handled pending contribution status.
+   *
    * @param array $objects
    * @param object $transaction
+   *
    * @return bool
    */
   public function pending(&$objects, &$transaction) {
@@ -277,6 +278,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Process cancelled payment outcome.
+   *
    * @param $objects
    * @param $transaction
    * @param array $input
@@ -353,6 +356,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Rollback unhandled outcomes.
+   *
    * @param $objects
    * @param $transaction
    *
@@ -366,6 +371,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Complete successful transaction.
+   *
    * @param $input
    * @param $ids
    * @param $objects
@@ -382,7 +389,7 @@ class CRM_Core_Payment_BaseIPN {
       $memberships = array($objects['membership']);
     }
     $participant = &$objects['participant'];
-    $event = &$objects['event'];
+
     $changeToday = CRM_Utils_Array::value('trxn_date', $input, self::$_now);
     $recurContrib = &$objects['contributionRecur'];
 
@@ -723,14 +730,16 @@ LIMIT 1;";
   }
 
   /**
-   * @param $ids
+   * Get site billing ID.
+   *
+   * @param array $ids
    *
    * @return bool
    */
   public function getBillingID(&$ids) {
     // get the billing location type
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    // CRM-8108 remove the ts around the Billing locationtype
+    // CRM-8108 remove the ts around the Billing location type
     //$ids['billing'] =  array_search( ts('Billing'),  $locationTypes );
     $ids['billing'] = array_search('Billing', $locationTypes);
     if (!$ids['billing']) {
@@ -742,7 +751,9 @@ LIMIT 1;";
   }
 
   /**
-   * Send receipt from contribution. Note that the compose message part has been moved to contribution
+   * Send receipt from contribution.
+   *
+   * Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
    * @param array $input
@@ -778,7 +789,8 @@ LIMIT 1;";
 
   /**
    * Send start or end notification for recurring payments.
-   * @param $ids
+   *
+   * @param array $ids
    * @param $recur
    */
   public function sendRecurringStartOrEndNotification($ids, $recur) {
@@ -801,10 +813,14 @@ LIMIT 1;";
   }
 
   /**
-   * Update contribution status - this is only called from one place in the code &
+   * Update contribution status.
+   *
+   * @deprecated
+   * This is only called from one place in the code &
    * it is unclear whether it is a function on the way in or on the way out
    *
    * @param array $params
+   *
    * @return void|NULL|int
    */
   public function updateContributionStatus(&$params) {
@@ -993,6 +1009,8 @@ LIMIT 1;";
   }
 
   /**
+   * Add line items for recurring contribution.
+   *
    * @param int $recurId
    * @param $contribution
    *
@@ -1030,7 +1048,8 @@ LIMIT 1;";
   }
 
   /**
-   * copy custom data of the initial contribution into its recurring contributions.
+   * Copy custom data of the initial contribution into its recurring contributions.
+   *
    * @param int $recurId
    * @param int $targetContributionId
    */
@@ -1074,6 +1093,8 @@ LIMIT 1;";
   }
 
   /**
+   * Add soft credit to for recurring payment.
+   *
    * copy soft credit record of first recurring contribution.
    * and add new soft credit against $targetContributionId
    *
@@ -1081,12 +1102,10 @@ LIMIT 1;";
    * @param int $targetContributionId
    */
   public function addrecurSoftCredit($recurId, $targetContributionId) {
-    $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-
     $soft_contribution = new CRM_Contribute_DAO_ContributionSoft();
-    $soft_contribution->contribution_id = $contriID;
+    $soft_contribution->contribution_id = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
 
-    //check if first recurring contribution has any associated soft credit
+    // Check if first recurring contribution has any associated soft credit.
     if ($soft_contribution->find(TRUE)) {
       $soft_contribution->contribution_id = $targetContributionId;
       unset($soft_contribution->id);
