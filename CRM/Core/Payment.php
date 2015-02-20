@@ -589,7 +589,7 @@ abstract class CRM_Core_Payment {
         }
       }
 
-      $processorInstance = $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
+      $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
 
       // Should never be empty - we already established this processor_id exists and is active.
       if (empty($processorInstance)) {
