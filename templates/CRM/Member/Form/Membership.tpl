@@ -510,7 +510,7 @@
       }
     }
     {/literal}{/if}
-    
+
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
