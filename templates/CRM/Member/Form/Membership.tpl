@@ -135,9 +135,19 @@
           <br />
           <span class="description">{ts}First day of current continuous membership period. Start Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
         <tr class="crm-membership-form-block-end_date"><td class="label">{$form.end_date.label}</td>
-          <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
+          <td id="end-date-readonly">
+              {$endDate|crmDate}
+              <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
+                {ts}Over-ride end date{/ts}
+              </a>
+              {help id="override_end_date"}
+          </td>
+          <td id="end-date-editable">
+            {include file="CRM/common/jcalendar.tpl" elementName=end_date}
             <br />
-            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
+            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
+          </td>
+        </tr>
         {if !empty($form.auto_renew)}
           <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
             <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
@@ -432,6 +442,24 @@
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
       });
+      
+      // give option to override end-date for auto-renew memberships
+      {/literal}
+      {if $isRecur && $endDate}
+        cj('#end-date-readonly').show();
+        cj('#end-date-editable').hide();
+      {else}
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-end-date').click( function( e ) {
+        e.preventDefault();
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      });
+
     });
 
     function setDifferentContactBlock( ) {
@@ -443,6 +471,7 @@
         cj('#record-different-contact').hide();
       }
     }
+    
     </script>
     {/literal}
 
