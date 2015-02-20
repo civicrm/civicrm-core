@@ -407,7 +407,7 @@
     </pseudoconstant>
     <add>4.6</add>
   </field>
-<field>
+  <field>
     <name>email_selection_method</name>
     <type>varchar</type>
     <length>20</length>
