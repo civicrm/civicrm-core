@@ -149,6 +149,29 @@ class CRM_Core_Resources {
   }
 
   /**
+   * Export permission data to the client to enable smarter GUIs.
+   *
+   * Note: Application security stems from the server's enforcement
+   * of the security logic (e.g. in the API permissions). There's no way
+   * the client can use this info to make the app more secure; however,
+   * it can produce a better-tuned (non-broken) UI.
+   *
+   * @param array $permNames
+   *   List of permission names to check/export.
+   * @return CRM_Core_Resources
+   */
+  public function addPermissions($permNames) {
+    $permNames = (array) $permNames;
+    $perms = array();
+    foreach ($permNames as $permName) {
+      $perms[$permName] = CRM_Core_Permission::check($permName);
+    }
+    return $this->addSetting(array(
+      'permissions' => $perms,
+    ));
+  }
+
+  /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
    * @param string $ext
