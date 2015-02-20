@@ -133,7 +133,7 @@
         return crmApi('MailingGroup', 'get', {mailing_id: mailing.id})
           .then(function (groupResult) {
             mailing.recipients = {};
-            mailing.recipients.groups = {include: [], exclude: []};
+            mailing.recipients.groups = {include: [], exclude: [], base: []};
             mailing.recipients.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function (mailingGroup) {
               var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
@@ -155,8 +155,8 @@
         var defaults = {
           jobs: {}, // {jobId: JobRecord}
           recipients: {
-            groups: {include: [], exclude: []},
-            mailings: {include: [], exclude: []},
+            groups: {include: [], exclude: [], base: []},
+            mailings: {include: [], exclude: []}
           },
           name: "",
           campaign_id: null,

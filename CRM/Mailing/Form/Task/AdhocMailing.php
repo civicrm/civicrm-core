@@ -51,6 +51,7 @@ class CRM_Mailing_Form_Task_AdhocMailing extends CRM_Contact_Form_Task {
       'groups' => array(
         'include' => array($groupId),
         'exclude' => array(),
+        'base' => array(),
       ),
       'mailings' => array(
         'include' => array(),
