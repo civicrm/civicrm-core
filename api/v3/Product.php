@@ -26,7 +26,10 @@
  */
 
 /**
- * This api exposes CiviCRM product.
+ * This api exposes CiviCRM premium products.
+ *
+ * Premiums are used as incentive gifts on contribution pages.
+ * Use chaining to create a premium and related products in one api call.
  *
  * @package CiviCRM_APIv3
  */
@@ -38,7 +41,6 @@
  *
  * @throws API_Exception
  * @return array
- *   Array of newly created product property values.
  */
 function civicrm_api3_product_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

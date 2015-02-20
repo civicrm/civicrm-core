@@ -106,7 +106,7 @@ function _civicrm_api3_case_type_get_formatResult(&$result) {
  * Function to delete case type.
  *
  * @param array $params
- *   Array including id of case_type to delete.
+ *   Array including id of CaseType to delete.
  *
  * @return array
  *   API result array

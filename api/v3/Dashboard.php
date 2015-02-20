@@ -73,9 +73,9 @@ function _civicrm_api3_dashboard_create_spec(&$params) {
  */
 function civicrm_api3_dashboard_get($params) {
   $bao = new CRM_Core_BAO_Dashboard();
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'Dashboard');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
   $dashlets = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Dashboard');
-  return civicrm_api3_create_success($dashlets, $params, 'dashboard', 'get', $bao);
+  return civicrm_api3_create_success($dashlets, $params, 'Dashboard', 'get', $bao);
 }
 
 /**
@@ -88,7 +88,7 @@ function civicrm_api3_dashboard_get($params) {
  */
 function civicrm_api3_dashboard_delete($params) {
   if (CRM_Core_BAO_Dashboard::deleteDashlet($params['id'])) {
-    return civicrm_api3_create_success(1, $params, 'dashboard', 'delete');
+    return civicrm_api3_create_success(1, $params, 'Dashboard', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete dashlet');

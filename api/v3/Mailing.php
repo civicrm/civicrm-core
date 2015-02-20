@@ -235,8 +235,7 @@ function civicrm_api3_mailing_event_bounce($params) {
     return civicrm_api3_create_success($params);
   }
   else {
-    throw new API_Exception(ts('Queue event could not be found'), 'no_queue_event
-      ');
+    throw new API_Exception(ts('Queue event could not be found'), 'no_queue_event');
   }
 }
 
@@ -269,7 +268,7 @@ function _civicrm_api3_mailing_event_bounce_spec(&$params) {
  * @return array
  */
 function civicrm_api3_mailing_event_confirm($params) {
-  return civicrm_api('mailing_event_confirm', 'create', $params);
+  return civicrm_api('MailingEventConfirm', 'create', $params);
 }
 
 /**

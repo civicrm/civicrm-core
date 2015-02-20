@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM soft credit.
+ * This api exposes CiviCRM soft credits.
  *
  * @package CiviCRM_APIv3
  */

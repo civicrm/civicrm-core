@@ -96,12 +96,11 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
 }
 
 /**
- * Create an attachment.
+ * Create an Attachment.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created file property values.
  * @throws API_Exception validation errors
  * @see Civi\API\Subscriber\DynamicFKAuthorization
  */
@@ -189,7 +188,7 @@ function _civicrm_api3_attachment_get_spec(&$spec) {
 }
 
 /**
- * Get attachment.
+ * Get Attachment.
  *
  * @param array $params
  *
@@ -209,7 +208,7 @@ function civicrm_api3_attachment_get($params) {
 }
 
 /**
- * Adjust metadata for attachment delete action.
+ * Adjust metadata for Attachment delete action.
  *
  * @param $spec
  */
@@ -223,7 +222,7 @@ function _civicrm_api3_attachment_delete_spec(&$spec) {
 }
 
 /**
- * Delete attachment.
+ * Delete Attachment.
  *
  * @param array $params
  *

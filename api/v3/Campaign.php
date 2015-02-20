@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM campaign records.
+ * This api exposes CiviCRM Campaign records.
  *
  * @note Campaign component must be enabled.
  *
@@ -34,7 +34,7 @@
  */
 
 /**
- * Create/update campaign.
+ * Create/update Campaign.
  *
  * This API is used to create new campaign or update any of the existing
  * In case of updating existing campaign, id of that particular campaign must
@@ -61,7 +61,7 @@ function _civicrm_api3_campaign_create_spec(&$params) {
 }
 
 /**
- * Returns array of campaigns  matching a set of one or more group properties.
+ * Returns array of campaigns matching a set of one or more properties.
  *
  * @param array $params
  *   Array per getfields
@@ -76,8 +76,8 @@ function civicrm_api3_campaign_get($params) {
 /**
  * Delete an existing campaign.
  *
- * This method is used to delete any existing campaign. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing campaign.
+ * Id of the campaign to be deleted is required field in $params array
  *
  * @param array $params
  *   array containing id of the group to be deleted

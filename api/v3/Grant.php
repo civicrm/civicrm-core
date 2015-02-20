@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM grant records.
+ * This api exposes CiviCRM Grant records.
  *
  * @note Grant component must be enabled.
  *
@@ -34,13 +34,12 @@
  */
 
 /**
- * Create/update grant.
+ * Create/update Grant.
  *
  * @param array $params
  *   Array per getfields metadata.
  *
  * @return array
- *   grant array
  */
 function civicrm_api3_grant_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
@@ -73,10 +72,10 @@ function civicrm_api3_grant_get($params) {
 }
 
 /**
- * This method is used to delete an existing grant.
+ * This method is used to delete an existing Grant.
  *
  * @param array $params
- *   Id of the grant to be deleted is required.
+ *   Id of the Grant to be deleted is required.
  *
  * @return array
  *   API Result Array

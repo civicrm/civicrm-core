@@ -27,6 +27,7 @@
 
 /**
  * This api exposes CiviCRM option values.
+ *
  * Values are grouped by "OptionGroup"
  *
  * @package CiviCRM_APIv3
@@ -61,7 +62,6 @@ function civicrm_api3_option_value_get($params) {
  *
  * @throws API_Exception
  * @return array
- *   Array of newly created option_value property values.
  */
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

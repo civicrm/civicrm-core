@@ -26,13 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM group contacts.
+ * This api exposes CiviCRM GroupContact records.
  *
  * This api is for adding/removing contacts from a group,
  * or fetching a list of groups for a contact.
  *
  * Important note: This api does not fetch smart groups for a contact.
- * To fetch all contacts in a smart group, use the contact api
+ * To fetch all contacts in a smart group, use the Contact api
  * passing a contact_id and group_id.
  *
  * To create/delete groups, use the group api instead.
@@ -40,11 +40,12 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
- * This API will give list of the groups for particular contact.
+ * Fetch a list of groups for a contact, or contacts for a group.
  *
- * Particular status can be sent in params array.
+ * @Note: this only applies to static groups, not smart groups.
+ * To fetch all contacts in a smart group, use the Contact api
+ * passing a contact_id and group_id.
  *
  * If no status mentioned in params, by default 'added' will be used
  * to fetch the records
@@ -69,7 +70,7 @@ function civicrm_api3_group_contact_get($params) {
 
   $groupId = CRM_Utils_Array::value('group_id', $params);
   $values = &CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE, FALSE, TRUE, $groupId);
-  return civicrm_api3_create_success($values, $params);
+  return civicrm_api3_create_success($values, $params, 'GroupContact');
 }
 
 /**
@@ -230,8 +231,9 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
       $extraReturnValues['not_removed'] += $nr;
     }
   }
-  $dao = NULL;// can't pass this by reference
-  return civicrm_api3_create_success(1, $params, 'group_contact', 'create', $dao, $extraReturnValues);
+  // can't pass this by reference
+  $dao = NULL;
+  return civicrm_api3_create_success(1, $params, 'GroupContact', 'create', $dao, $extraReturnValues);
 }
 
 /**

@@ -70,7 +70,7 @@ function civicrm_api3_pledge_payment_create($params) {
   //update pledge status
   CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($dao->pledge_id);
 
-  return civicrm_api3_create_success($result, $params, 'pledge_payment', 'create', $dao);
+  return civicrm_api3_create_success($result, $params, 'PledgePayment', 'create', $dao);
 }
 
 /**
@@ -98,7 +98,7 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 function civicrm_api3_pledge_payment_delete($params) {
 
   if (CRM_Pledge_BAO_PledgePayment::del($params['id'])) {
-    return civicrm_api3_create_success(array('id' => $params['id']), $params, 'pledge_payment', 'delete');
+    return civicrm_api3_create_success(array('id' => $params['id']), $params, 'PledgePayment', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete payment');

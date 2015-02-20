@@ -38,10 +38,10 @@
  *
  * @deprecated api notice
  * @return string
- *   to indicate this entire api entity is deprecated
+ *   String output indicates this entire api entity as deprecated
  */
 function _civicrm_api3_survey_respondant_deprecation() {
-  return 'The survey_respondant api is not currently supported.';
+  return 'The SurveyRespondant api is not currently supported.';
 }
 
 /**

@@ -29,6 +29,10 @@
 /**
  * This api exposes CiviCRM price set fields.
  *
+ * PriceSets contain PriceFields, which may contain PriceFieldValues.
+ * Each has its own api.
+ * Use chaining to create a PriceSet and associated PriceFields and values in one api call.
+ *
  * @package CiviCRM_APIv3
  */
 
@@ -74,8 +78,7 @@ function civicrm_api3_price_field_get($params) {
 /**
  * Delete an existing price_field.
  *
- * This method is used to delete any existing price_field. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing price_field given its id.
  *
  * @param array $params
  *   Array containing id of the group to be deleted.

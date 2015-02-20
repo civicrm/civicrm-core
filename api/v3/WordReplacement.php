@@ -26,9 +26,9 @@
  */
 
 /**
- * This api exposes CiviCRM word replacement.
+ * This api exposes CiviCRM WordReplacement records.
  *
- * Word-replacements are used to globally alter strings in the CiviCRM UI.
+ * Word replacements are used to globally alter strings in the CiviCRM UI.
  * Note that the original source string is always English, regardless of language settings.
  *
  * @package CiviCRM_APIv3
@@ -44,10 +44,10 @@
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'WordReplacement');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
   $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'WordReplacement');
 
-  return civicrm_api3_create_success($wordReplacements, $params, 'word_replacement', 'get', $bao);
+  return civicrm_api3_create_success($wordReplacements, $params, 'WordReplacement', 'get', $bao);
 }
 
 
@@ -75,10 +75,10 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
 }
 
 /**
- * Delete an existing word_replacement.
+ * Delete an existing WordReplacement.
  *
  * @param array $params
- *   Array containing id of the word_replacement to be deleted.
+ *   Array containing id of the WordReplacement to be deleted.
  *
  * @return array
  *   API result array

@@ -51,7 +51,7 @@ function civicrm_api3_setting_getfields($params) {
         'description' => 'Settings Group. This is required if the setting is not stored in config',
         'type' => CRM_Utils_Type::T_STRING),
     );
-    return civicrm_api3_create_success($result, $params, 'setting', 'getfields');
+    return civicrm_api3_create_success($result, $params, 'Setting', 'getfields');
   }
   if (!empty($params['name'])) {
     //am of two minds about special handling for 'name' as opposed to other filters - but is does make most common
@@ -71,7 +71,7 @@ function civicrm_api3_setting_getfields($params) {
       $specFunction($result);
     }
   }
-  return civicrm_api3_create_success($result, $params, 'setting', 'getfields');
+  return civicrm_api3_create_success($result, $params, 'Setting', 'getfields');
 }
 
 /**
@@ -99,7 +99,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * @throws \Exception
  */
 function civicrm_api3_setting_getdefaults(&$params) {
-  $settings = civicrm_api3('setting', 'getfields', $params);
+  $settings = civicrm_api3('Setting', 'getfields', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $defaults = array();
   foreach ($domains as $domainID) {
@@ -118,10 +118,10 @@ function civicrm_api3_setting_getdefaults(&$params) {
       print_r($noDefaults);
     }
   }
-  return civicrm_api3_create_success($defaults, $params, 'setting', 'getfields');
+  return civicrm_api3_create_success($defaults, $params, 'Setting', 'getfields');
 }
 /**
- * Metadata for setting create function.
+ * Metadata for Setting create function.
  *
  * @param array $params
  *   Parameters as passed to the API.
@@ -144,8 +144,8 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
  * @throws \Exception
  */
 function civicrm_api3_setting_revert(&$params) {
-  $defaults = civicrm_api('setting', 'getdefaults', $params);
-  $fields = civicrm_api('setting', 'getfields', $params);
+  $defaults = civicrm_api('Setting', 'getdefaults', $params);
+  $fields = civicrm_api('Setting', 'getfields', $params);
   $fields = $fields['values'];
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = array();
@@ -155,11 +155,11 @@ function civicrm_api3_setting_revert(&$params) {
       $valuesToRevert['version'] = $params['version'];
       $valuesToRevert['domain_id'] = $domainID;
       // note that I haven't looked at how the result would appear with multiple domains in play
-      $result = array_merge($result, civicrm_api('setting', 'create', $valuesToRevert));
+      $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToRevert));
     }
   }
 
-  return civicrm_api3_create_success($result, $params, 'setting', 'revert');
+  return civicrm_api3_create_success($result, $params, 'Setting', 'revert');
 }
 
 /**
@@ -188,7 +188,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * @throws \Exception
  */
 function civicrm_api3_setting_fill(&$params) {
-  $defaults = civicrm_api3('setting', 'getdefaults', $params);
+  $defaults = civicrm_api3('Setting', 'getdefaults', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = array();
   foreach ($domains as $domainID) {
@@ -196,13 +196,13 @@ function civicrm_api3_setting_fill(&$params) {
       'version' => $params['version'],
       'domain_id' => $domainID,
     );
-    $existing = civicrm_api3('setting', 'get', $apiArray);
+    $existing = civicrm_api3('Setting', 'get', $apiArray);
     $valuesToFill = array_diff_key($defaults['values'][$domainID], $existing['values'][$domainID]);
     if (!empty($valuesToFill)) {
-      $result = array_merge($result, civicrm_api('setting', 'create', $valuesToFill + $apiArray));
+      $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToFill + $apiArray));
     }
   }
-  return civicrm_api3_create_success($result, $params, 'setting', 'fill');
+  return civicrm_api3_create_success($result, $params, 'Setting', 'fill');
 }
 
 /**
@@ -233,7 +233,7 @@ function _civicrm_api3_setting_fill_spec(&$params) {
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = CRM_Core_BAO_Setting::setItems($params, $domains);
-  return civicrm_api3_create_success($result, $params, 'setting', 'create');
+  return civicrm_api3_create_success($result, $params, 'Setting', 'create');
 }
 
 /**
@@ -267,7 +267,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, array()));
-  return civicrm_api3_create_success($result, $params, 'setting', 'get');
+  return civicrm_api3_create_success($result, $params, 'Setting', 'get');
 }
 /**
  * Metadata for setting create function.

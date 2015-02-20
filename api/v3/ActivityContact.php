@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM activity contact.
+ * This api exposes the CiviCRM ActivityContact join table.
  *
  * @package CiviCRM_APIv3
  */

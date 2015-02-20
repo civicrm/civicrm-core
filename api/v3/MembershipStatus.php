@@ -38,7 +38,6 @@
  *   Array of name/value property values of civicrm_membership_status.
  *
  * @return array
- *   Array of newly created membership status property values.
  */
 function civicrm_api3_membership_status_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
