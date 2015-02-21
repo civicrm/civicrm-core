@@ -26,11 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * Class CRM_Core_Payment_BaseIPN.
  */
 class CRM_Core_Payment_BaseIPN {
 
@@ -69,7 +65,9 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Validate incoming data. This function is intended to ensure that incoming data matches
+   * Validate incoming data.
+   *
+   * This function is intended to ensure that incoming data matches
    * It provides a form of pseudo-authentication - by checking the calling fn already knows
    * the correct contact id & contribution id (this can be problematic when that has changed in
    * the meantime for transactions that are delayed & contacts are merged in-between. e.g
@@ -86,6 +84,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Boolean Return FALSE if the relevant objects don't exist.
    * @param int $paymentProcessorID
    *   Id of the payment processor ID in use.
+   *
    * @return bool
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
@@ -265,8 +264,10 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Handled pending contribution status.
+   *
    * @param array $objects
    * @param object $transaction
+   *
    * @return bool
    */
   public function pending(&$objects, &$transaction) {
@@ -277,6 +278,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Process cancelled payment outcome.
+   *
    * @param $objects
    * @param $transaction
    * @param array $input
@@ -353,6 +356,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Rollback unhandled outcomes.
+   *
    * @param $objects
    * @param $transaction
    *
@@ -366,9 +371,55 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $input
-   * @param $ids
-   * @param $objects
+   * Jumbled up function.
+   *
+   * The purpose of this function is to transition a pending transaction to Completed including updating any
+   * related entities.
+   *
+   * It has been overloaded to also add recurring transactions to the database, cloning the original transaction and
+   * updating related entities.
+   *
+   * It is recommended to avoid calling this function directly and call the api functions:
+   *  - contribution.completetransaction
+   *  - contribution.repeattransaction
+   *
+   * These functions are the focus of testing efforts and more accurately reflect the division of roles
+   * (the job of the IPN class is to determine the outcome, transaction id, invoice id & to validate the source
+   * and from there it should be possible to pass off transaction management.)
+   *
+   * This function has been problematic for some time but there are now several tests via the api_v3_Contribution test
+   * and the Paypal & Authorize.net IPN tests so any refactoring should be done in conjunction with those.
+   *
+   * This function needs to have the 'body' moved to the CRM_Contribution_BAO_Contribute class and to undergo
+   * refactoring to separate the complete transaction and repeat transaction functionality into separate functions with
+   * a shared function that updates related components.
+   *
+   * Note that it is not necessary payment processor extension to implement an IPN class now. In general the code on the
+   * IPN class is better accessed through the api which de-jumbles it a bit.
+   *
+   * e.g the payment class can have a function like (based on Omnipay extension):
+   *
+   *   public function handlePaymentNotification() {
+   *     $response = $this->getValidatedOutcome();
+   *     if ($response->isSuccessful()) {
+   *      try {
+   *        // @todo check if it is a repeat transaction & call repeattransaction instead.
+   *        civicrm_api3('contribution', 'completetransaction', array('id' => $this->transaction_id));
+   *      }
+   *     catch (CiviCRM_API3_Exception $e) {
+   *     if (!stristr($e->getMessage(), 'Contribution already completed')) {
+   *       $this->handleError('error', $this->transaction_id  . $e->getMessage(), 'ipn_completion', 9000, 'An error may
+   *         have occurred. Please check your receipt is correct');
+   *       $this->redirectOrExit('success');
+   *     }
+   *     elseif ($this->transaction_id) {
+   *        civicrm_api3('contribution', 'create', array('id' => $this->transaction_id, 'contribution_status_id' =>
+   *        'Failed'));
+   *     }
+   *
+   * @param array $input
+   * @param array $ids
+   * @param array $objects
    * @param $transaction
    * @param bool $recur
    */
@@ -382,7 +433,7 @@ class CRM_Core_Payment_BaseIPN {
       $memberships = array($objects['membership']);
     }
     $participant = &$objects['participant'];
-    $event = &$objects['event'];
+
     $changeToday = CRM_Utils_Array::value('trxn_date', $input, self::$_now);
     $recurContrib = &$objects['contributionRecur'];
 
@@ -572,9 +623,12 @@ LIMIT 1;";
     ) {
       $input['net_amount'] = $input['amount'] - $input['fee_amount'];
     }
-    $addLineItems = FALSE;
+    // This complete transaction function is being overloaded to create new contributions too.
+    // here we record if it is a new contribution.
+    // @todo separate the 2 more appropriately.
+    $isNewContribution = FALSE;
     if (empty($contribution->id)) {
-      $addLineItems = TRUE;
+      $isNewContribution = TRUE;
     }
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
@@ -609,7 +663,7 @@ LIMIT 1;";
       $contribution->payment_instrument_id = $input['payment_instrument_id'];
     }
 
-    if ($contribution->id) {
+    if (!empty($contribution->id)) {
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
@@ -620,10 +674,10 @@ LIMIT 1;";
       $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
 
-    //add lineitems for recurring payments
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      if ($addLineItems) {
-        $input['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+    //add line items for recurring payments
+    if (!empty($contribution->contribution_recur_id)) {
+      if ($isNewContribution) {
+        $input['line_item'] = $this->addRecurLineItems($contribution->contribution_recur_id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
@@ -723,14 +777,16 @@ LIMIT 1;";
   }
 
   /**
-   * @param $ids
+   * Get site billing ID.
+   *
+   * @param array $ids
    *
    * @return bool
    */
   public function getBillingID(&$ids) {
     // get the billing location type
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    // CRM-8108 remove the ts around the Billing locationtype
+    // CRM-8108 remove the ts around the Billing location type
     //$ids['billing'] =  array_search( ts('Billing'),  $locationTypes );
     $ids['billing'] = array_search('Billing', $locationTypes);
     if (!$ids['billing']) {
@@ -742,7 +798,9 @@ LIMIT 1;";
   }
 
   /**
-   * Send receipt from contribution. Note that the compose message part has been moved to contribution
+   * Send receipt from contribution.
+   *
+   * Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
    * @param array $input
@@ -778,7 +836,8 @@ LIMIT 1;";
 
   /**
    * Send start or end notification for recurring payments.
-   * @param $ids
+   *
+   * @param array $ids
    * @param $recur
    */
   public function sendRecurringStartOrEndNotification($ids, $recur) {
@@ -801,10 +860,14 @@ LIMIT 1;";
   }
 
   /**
-   * Update contribution status - this is only called from one place in the code &
+   * Update contribution status.
+   *
+   * @deprecated
+   * This is only called from one place in the code &
    * it is unclear whether it is a function on the way in or on the way out
    *
    * @param array $params
+   *
    * @return void|NULL|int
    */
   public function updateContributionStatus(&$params) {
@@ -993,6 +1056,8 @@ LIMIT 1;";
   }
 
   /**
+   * Add line items for recurring contribution.
+   *
    * @param int $recurId
    * @param $contribution
    *
@@ -1030,7 +1095,8 @@ LIMIT 1;";
   }
 
   /**
-   * copy custom data of the initial contribution into its recurring contributions.
+   * Copy custom data of the initial contribution into its recurring contributions.
+   *
    * @param int $recurId
    * @param int $targetContributionId
    */
@@ -1074,6 +1140,8 @@ LIMIT 1;";
   }
 
   /**
+   * Add soft credit to for recurring payment.
+   *
    * copy soft credit record of first recurring contribution.
    * and add new soft credit against $targetContributionId
    *
@@ -1081,12 +1149,10 @@ LIMIT 1;";
    * @param int $targetContributionId
    */
   public function addrecurSoftCredit($recurId, $targetContributionId) {
-    $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-
     $soft_contribution = new CRM_Contribute_DAO_ContributionSoft();
-    $soft_contribution->contribution_id = $contriID;
+    $soft_contribution->contribution_id = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
 
-    //check if first recurring contribution has any associated soft credit
+    // Check if first recurring contribution has any associated soft credit.
     if ($soft_contribution->find(TRUE)) {
       $soft_contribution->contribution_id = $targetContributionId;
       unset($soft_contribution->id);
