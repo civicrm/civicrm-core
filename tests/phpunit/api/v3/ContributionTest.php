@@ -51,6 +51,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $_pageParams = array();
 
   /**
+   * Parameters to create payment processor.
+   *
+   * @var array
+   */
+  protected $_processorParams = array();
+
+  /**
+   * ID of created event.
+   *
+   * @var int
+   */
+  protected $_eventID;
+
+  /**
    * Setup function.
    */
   public function setUp() {
@@ -276,7 +290,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -856,8 +871,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when online contribution with pending option.
-   * is created
+   * Function tests that additional financial records are created for online contribution with pending option.
    */
   public function testCreateContributionPendingOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
@@ -901,7 +915,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that line items, financial records are updated when contribution amount is changed
+   * Function tests that line items, financial records are updated when contribution amount is changed.
    */
   public function testCreateUpdateContributionChangeTotal() {
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
@@ -940,7 +954,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that line items, financial records are updated when pay later contribution is received
+   * Function tests that line items, financial records are updated when pay later contribution is received.
    */
   public function testCreateUpdateContributionPayLater() {
     $contribParams = array(
@@ -1089,7 +1103,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that update does not change status id CRM-15105
+   * Test that update does not change status id CRM-15105.
    */
   public function testCreateUpdateWithoutChangingPendingStatus() {
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_params, array('contribution_status_id' => 2)));
@@ -1208,6 +1222,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_contribution_search with empty params.
+   *
    * All available contributions expected.
    */
   public function testSearchEmptyParams() {
@@ -1326,7 +1341,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeat contribution successfully creates line items.
    */
-  function testRepeatTransaction() {
+  public function testRepeatTransaction() {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
       'contact_id' => $this->_individualId,
@@ -1362,7 +1377,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'deductible_amount',
         'price_field_value_id',
         'price_field_id',
-        ),
+      ),
     );
     $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'],
@@ -1394,10 +1409,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-14151
-   * Test completing a transaction via the API
-   *
-   * tests.
+   * CRM-14151 - Test completing a transaction via the API.
    */
   public function testCompleteTransactionWithReceiptDateSet() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -1474,8 +1486,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
 
   /**
+   * Create price set with contribution test for test setup.
+   *
    * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
    * on parent class at some point (fn is not in 4.4).
+   *
    * @param $entity
    * @param array $params
    */
@@ -1533,6 +1548,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Set up a pending transaction with a specific price field id.
+   *
    * @param int $priceFieldValueID
    */
   public function setUpPendingContribution($priceFieldValueID) {
@@ -1639,13 +1655,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * This function does a GET & compares the result against the $params
-   * Use as a double check on Creates
-   * @param $params
-   * @param $id
-   * @param int $delete
+   * This function does a GET & compares the result against the $params.
+   *
+   * Use as a double check on Creates.
+   *
+   * @param array $params
+   * @param int $id
+   * @param bool int $delete
    */
-  public function contributionGetnCheck($params, $id, $delete = 1) {
+  public function contributionGetnCheck($params, $id, $delete = TRUE) {
 
     $contribution = $this->callAPISuccess('Contribution', 'Get', array(
       'id' => $id,
@@ -1668,8 +1686,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create a pending contribution & linked pending participant record
-   * (along with an event)
+   * Create a pending contribution & linked pending participant record (along with an event).
    */
   public function createPendingParticipantContribution() {
     $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org'));
@@ -1693,6 +1710,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get financial transaction amount.
+   *
    * @param int $contId
    *
    * @return null|string
