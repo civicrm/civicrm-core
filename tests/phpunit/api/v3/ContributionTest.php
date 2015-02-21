@@ -1226,6 +1226,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test repeat contribution successfully creates line items.
+   */
+  function testRepeatTransaction() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+    ));
+    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+      $this->_params,
+      array('contribution_recur_id' => $contributionRecur['id']))
+    );
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+    ));
+    $this->cleanUpAfterPriceSets();
+  }
+
+  /**
    * Test completing a transaction does not 'mess' with net amount (CRM-15960).
    */
   public function testCompleteTransactionNetAmountOK() {
@@ -1306,7 +1331,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->setUpPendingContribution($this->_ids['price_field_value'][1]);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' =>  $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
-    print_r($membership);
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years')), $membership['end_date']);
     $this->cleanUpAfterPriceSets();
   }

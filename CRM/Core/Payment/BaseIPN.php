@@ -509,9 +509,12 @@ LIMIT 1;";
     ) {
       $input['net_amount'] = $input['amount'] - $input['fee_amount'];
     }
-    $addLineItems = FALSE;
+    // This complete transaction function is being overloaded to create new contributions too.
+    // here we record if it is a new contribution.
+    // @todo separate the 2 more appropriately.
+    $isNewContribution = FALSE;
     if (empty($contribution->id)) {
-      $addLineItems = TRUE;
+      $isNewContribution = TRUE;
     }
 
     $contribution->contribution_status_id = 1;
@@ -545,10 +548,10 @@ LIMIT 1;";
     }
     $contribution->save();
 
-    //add lineitems for recurring payments
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      if ($addLineItems) {
-        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+    //add line items for recurring payments
+    if (!empty($contribution->contribution_recur_id)) {
+      if ($isNewContribution) {
+        $input['line_item'] = $this->addRecurLineItems($contribution->contribution_recur_id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
