@@ -414,7 +414,8 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
       throw new API_Exception(ts('Contribution already completed'));
     }
-    $params = _ipn_complete_transaction($params, $contribution, $input, $ids);
+    $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+    $params = _ipn_process_transaction($params, $contribution, $input, $ids);
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -465,14 +466,19 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     throw new API_Exception(
       'A valid original contribution ID is required', 'invalid_data');
   }
+  $original_contribution = clone $contribution;
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
-    unset($contribution->id, $contribution->trxn_id, $contribution->receive_date, $contribution->invoice_id);
-    $contribution->contribution_status_id = $params->contribution_status_id;
+
+    unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
+    $contribution->contribution_status_id = $params['contribution_status_id'];
     $contribution->receive_date = $params['receive_date'];
-    $params = _ipn_complete_transaction($params, $contribution, $input, $ids);
+    // Have not set trxn_id to required but an e-notice if not provided seems appropriate.
+    $input['trxn_id'] = $params['trxn_id'];
+
+    $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -491,14 +497,19 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
  *
  * @param array $ids
  *
+ * @param CRM_Contribute_BAO_Contribution $firstContribution
+ *
  * @return mixed
  */
-function _ipn_complete_transaction(&$params, $contribution, $input, $ids) {
+function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstContribution = NULL) {
   $objects = $contribution->_relatedObjects;
   $objects['contribution'] = &$contribution;
+
+  if ($firstContribution) {
+    $objects['first_contribution'] = $firstContribution;
+  }
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
-  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
   $input['amount'] = $contribution->total_amount;
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
@@ -531,6 +542,7 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   );
   $params['contribution_status_id'] = array(
     'title' => 'Contribution Status ID',
+    'name' => 'contribution_status_id',
     'type' => CRM_Utils_Type::T_INT,
     'pseudoconstant' => array(
       'optionGroupName' => 'contribution_status',
@@ -539,7 +551,19 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   );
   $params['receive_date'] = array(
     'title' => 'Contribution Receive Date',
+    'name' => 'receive_date',
     'type' => CRM_Utils_Type::T_DATE,
     'api.default' => 'now',
+  );
+  $params['trxn_id'] = array(
+    'title' => 'Transaction ID',
+    'name' => 'trxn_id',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['payment_processor_id'] = array(
+    'description' => ts('Payment processor ID, will be loaded from contribution_recur if not provided'),
+    'title' => 'Payment processor ID',
+    'name' => 'payment_processor_id',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
