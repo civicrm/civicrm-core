@@ -96,7 +96,7 @@ class CRM_Contact_Page_AJAX {
     $result = civicrm_api('Contact', 'getquick', $params);
     if (empty($result['is_error']) && !empty($result['values'])) {
       foreach ($result['values'] as $key => $val) {
-        echo "{$val['data']}|{$val['id']}\n";
+        echo htmlspecialchars("{$val['data']}|{$val['id']}\n");
       }
     }
     CRM_Utils_System::civiExit();
@@ -113,7 +113,7 @@ class CRM_Contact_Page_AJAX {
     $fldValues        = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] = !'ContactReference') {
-      echo "$name|error\n";
+      echo htmlspecialchars("$name|error\n");
       CRM_Utils_System::civiExit();
     }
 
@@ -126,7 +126,7 @@ class CRM_Contact_Page_AJAX {
       if (!empty($action) &&
         !in_array($action, array('get', 'lookup'))
       ) {
-        echo "$name|error\n";
+        echo htmlspecialchars("$name|error\n");
         CRM_Utils_System::civiExit();
       }
     }
@@ -180,7 +180,7 @@ class CRM_Contact_Page_AJAX {
     $contact = civicrm_api('Contact', 'Get', $params);
 
     if (CRM_Utils_Array::value('is_error', $contact)) {
-      echo "$name|error\n";
+      echo htmlspecialchars("$name|error\n");
       CRM_Utils_System::civiExit();
     }
 
@@ -192,11 +192,12 @@ class CRM_Contact_Page_AJAX {
           $view[] = $value[$fld];
         }
       }
-      echo $contactList = implode(' :: ', $view) . "|" . $value['id'] . "\n";
+      $contactList = implode(' :: ', $view) . "|" . $value['id'] . "\n";
+      echo htmlspecialchars($contactList);
     }
 
     if (!$contactList) {
-      echo "$name|$name\n";
+      echo htmlspecialchars("$name|$name\n");
     }
 
     CRM_Utils_System::civiExit();
@@ -251,7 +252,8 @@ class CRM_Contact_Page_AJAX {
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
-      echo $pcpList = "$dao->data|$dao->id\n";
+      $pcpList = "$dao->data|$dao->id\n";
+      echo htmlspecialchars($pcpList);
     }
 
     CRM_Utils_System::civiExit();
@@ -277,7 +279,8 @@ class CRM_Contact_Page_AJAX {
     $completeList = NULL;
     foreach ($selectOption as $id => $value) {
       if (strtolower($label) == strtolower(substr($value, 0, strlen($label)))) {
-        echo $completeList = "$value|$id\n";
+        $completeList = "$value|$id\n";
+        echo htmlspecialchars($completeList);
       }
     }
     CRM_Utils_System::civiExit();
@@ -337,6 +340,7 @@ class CRM_Contact_Page_AJAX {
     }
 
     $relation['status'] = $status;
+    header('Content-Type: text/json');
     echo json_encode($relation);
     CRM_Utils_System::civiExit();
   }
@@ -351,6 +355,7 @@ class CRM_Contact_Page_AJAX {
     $values           = array();
 
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $values, $returnProperties);
+    header('Content-Type: text/json');
     echo json_encode($values);
     CRM_Utils_System::civiExit();
   }
@@ -367,7 +372,8 @@ class CRM_Contact_Page_AJAX {
 
     if (!empty($elements)) {
       foreach ($elements as $cid => $name) {
-        echo $element = $name['name'] . "|$cid\n";
+        $element = $name['name'] . "|$cid\n";
+        echo htmlspecialchars($element);
       }
     }
     CRM_Utils_System::civiExit();
@@ -376,6 +382,7 @@ class CRM_Contact_Page_AJAX {
 
   static function groupTree() {
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
+    header('Content-Type: text/json');
     echo CRM_Contact_BAO_GroupNestingCache::json($gids);
     CRM_Utils_System::civiExit();
   }
@@ -518,7 +525,7 @@ ORDER BY sort_name ";
 
       if ($shared) {
         while ($dao->fetch()) {
-          echo $dao->sort_name;
+          echo htmlspecialchars($dao->sort_name);
           CRM_Utils_System::civiExit();
         }
       }
@@ -530,12 +537,13 @@ ORDER BY sort_name ";
             );
           }
           else {
-            echo $elements = "$dao->sort_name|$dao->id|$dao->location_type_id|$dao->is_primary|$dao->is_billing\n";
+            $elements = "$dao->sort_name|$dao->id|$dao->location_type_id|$dao->is_primary|$dao->is_billing\n";
+            echo htmlspecialchars($elements);
           }
         }
         //for adding new household address / organization
         if (empty($elements) && !$json && ($hh || $organization)) {
-          echo CRM_Utils_Array::value('s', $_GET);
+          echo htmlspecialchars(CRM_Utils_Array::value('s', $_GET));
         }
       }
     }
@@ -554,6 +562,7 @@ ORDER BY sort_name ";
     }
 
     if ($json) {
+      header('Content-Type: text/json');
       echo json_encode($elements);
     }
     CRM_Utils_System::civiExit();
@@ -639,6 +648,7 @@ WHERE sort_name LIKE '%$name%'";
           CRM_Utils_Hook::enableDisable($recordBAO, $recordID, $isActive);
         }
       }
+      header('Content-Type: text/json');
       echo json_encode($status);
       CRM_Utils_System::civiExit();
     }
@@ -668,6 +678,7 @@ WHERE sort_name LIKE '%$name%'";
     $errors = array();
     $config->userSystem->checkUserNameEmailExists($params, $errors);
 
+    header('Content-Type: text/json');
     if (isset($errors['cms_name']) || isset($errors['name'])) {
       //user name is not availble
       $user = array('name' => 'no');
@@ -694,7 +705,7 @@ WHERE sort_name LIKE '%$name%'";
         $userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       if ($userEmail) {
-        echo $userEmail;
+        echo htmlspecialchars($userEmail);
       }
     }
     else {
@@ -784,6 +795,7 @@ LIMIT {$offset}, {$rowCount}
         }
 
         if ($result) {
+          header('Content-Type: text/json');
           echo json_encode($result);
         }
       }
@@ -851,6 +863,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($result) {
+      header('Content-Type: text/json');
       echo json_encode($result);
     }
     CRM_Utils_System::civiExit();
@@ -876,6 +889,7 @@ LIMIT {$offset}, {$rowCount}
 
     $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($contactType, FALSE, NULL);
     asort($subTypes);
+    header('Content-Type: text/json');
     echo json_encode($subTypes);
     CRM_Utils_System::civiExit();
   }
@@ -898,7 +912,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     $dedupeRules = CRM_Dedupe_BAO_RuleGroup::getByType($contactType);
-
+    header('Content-Type: text/json');
     echo json_encode($dedupeRules);
     CRM_Utils_System::civiExit();
   }
@@ -932,6 +946,7 @@ LIMIT {$offset}, {$rowCount}
         CRM_Utils_System::civiExit();
     }
 
+    header('Content-Type: text/json');
     echo json_encode($dashlets);
     CRM_Utils_System::civiExit();
   }
@@ -952,6 +967,7 @@ LIMIT {$offset}, {$rowCount}
       );
     }
 
+    header('Content-Type: text/json');
     echo json_encode($signatures);
     CRM_Utils_System::civiExit();
   }
@@ -1059,6 +1075,7 @@ LIMIT {$offset}, {$rowCount}
     $selectorElements = array_merge($selectorElements, array('city', 'state', 'email', 'phone'));
 
     $iFilteredTotal = $iTotal;
+    header('Content-Type: text/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -1093,6 +1110,7 @@ LIMIT {$offset}, {$rowCount}
       $status = $exception->delete();
     }
 
+    header('Content-Type: text/json');
     echo json_encode(array('status' => ($status) ? $oper : $status));
     CRM_Utils_System::civiExit();
   }
@@ -1143,6 +1161,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
+    header('Content-Type: text/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
 
     CRM_Utils_System::civiExit();
@@ -1156,6 +1175,7 @@ LIMIT {$offset}, {$rowCount}
 
     $pdfFormat = CRM_Core_BAO_PdfFormat::getById($formatId);
 
+    header('Content-Type: text/json');
     echo json_encode($pdfFormat);
     CRM_Utils_System::civiExit();
   }
@@ -1168,6 +1188,7 @@ LIMIT {$offset}, {$rowCount}
 
     $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
 
+    header('Content-Type: text/json');
     echo json_encode($paperSize);
     CRM_Utils_System::civiExit();
   }
@@ -1185,6 +1206,7 @@ LIMIT {$offset}, {$rowCount}
       );
     }
 
+    header('Content-Type: text/json');
     echo json_encode($elements);
     CRM_Utils_System::civiExit();
   }
@@ -1245,6 +1267,7 @@ LIMIT {$offset}, {$rowCount}
       $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
     }
 
+    header('Content-Type: text/json');
     echo json_encode($addressVal);
     CRM_Utils_System::civiExit();
   }
