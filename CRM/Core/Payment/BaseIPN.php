@@ -371,11 +371,55 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Complete successful transaction.
+   * Jumbled up function.
    *
-   * @param $input
-   * @param $ids
-   * @param $objects
+   * The purpose of this function is to transition a pending transaction to Completed including updating any
+   * related entities.
+   *
+   * It has been overloaded to also add recurring transactions to the database, cloning the original transaction and
+   * updating related entities.
+   *
+   * It is recommended to avoid calling this function directly and call the api functions:
+   *  - contribution.completetransaction
+   *  - contribution.repeattransaction
+   *
+   * These functions are the focus of testing efforts and more accurately reflect the division of roles
+   * (the job of the IPN class is to determine the outcome, transaction id, invoice id & to validate the source
+   * and from there it should be possible to pass off transaction management.)
+   *
+   * This function has been problematic for some time but there are now several tests via the api_v3_Contribution test
+   * and the Paypal & Authorize.net IPN tests so any refactoring should be done in conjunction with those.
+   *
+   * This function needs to have the 'body' moved to the CRM_Contribution_BAO_Contribute class and to undergo
+   * refactoring to separate the complete transaction and repeat transaction functionality into separate functions with
+   * a shared function that updates related components.
+   *
+   * Note that it is not necessary payment processor extension to implement an IPN class now. In general the code on the
+   * IPN class is better accessed through the api which de-jumbles it a bit.
+   *
+   * e.g the payment class can have a function like (based on Omnipay extension):
+   *
+   *   public function handlePaymentNotification() {
+   *     $response = $this->getValidatedOutcome();
+   *     if ($response->isSuccessful()) {
+   *      try {
+   *        // @todo check if it is a repeat transaction & call repeattransaction instead.
+   *        civicrm_api3('contribution', 'completetransaction', array('id' => $this->transaction_id));
+   *      }
+   *     catch (CiviCRM_API3_Exception $e) {
+   *     if (!stristr($e->getMessage(), 'Contribution already completed')) {
+   *       $this->handleError('error', $this->transaction_id  . $e->getMessage(), 'ipn_completion', 9000, 'An error may
+   *         have occurred. Please check your receipt is correct');
+   *       $this->redirectOrExit('success');
+   *     }
+   *     elseif ($this->transaction_id) {
+   *        civicrm_api3('contribution', 'create', array('id' => $this->transaction_id, 'contribution_status_id' =>
+   *        'Failed'));
+   *     }
+   *
+   * @param array $input
+   * @param array $ids
+   * @param array $objects
    * @param $transaction
    * @param bool $recur
    */
