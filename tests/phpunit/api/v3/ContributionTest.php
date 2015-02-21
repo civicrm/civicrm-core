@@ -1229,6 +1229,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test repeat contribution successfully creates line items.
    */
   function testRepeatTransaction() {
+    $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
       'contact_id' => $this->_individualId,
       'installments' => '12',
@@ -1238,6 +1239,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'start_date' => '2012-01-01 00:00:00',
       'currency' => 'USD',
       'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessorID,
     ));
     $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
       $this->_params,
@@ -1246,8 +1248,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
     ));
-    $this->cleanUpAfterPriceSets();
+    $lineItemParams = array(
+      'entity_id' => $originalContribution['id'],
+      'sequential' => 1,
+      'return' => array(
+        'entity_table',
+        'qty',
+        'unit_price',
+        'line_total',
+        'label',
+        'financial_type_id',
+        'deductible_amount',
+        'price_field_value_id',
+        'price_field_id',
+        ),
+    );
+    $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'],
+    )));
+    $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'] + 1,
+    )));
+    unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
+    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
+
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
