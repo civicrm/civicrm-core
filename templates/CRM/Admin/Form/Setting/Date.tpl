@@ -25,7 +25,8 @@
 *}
 <div class="crm-block crm-form-block crm-date-form-block">
 <div id="help">
-    {ts}Use this screen to configure formats for date display and date input fields. Defaults are provided for standard United States formats. Settings use standard POSIX specifiers.{/ts} {help id='date-format'}
+  {capture assign=crmURL}{crmURL p='civicrm/admin/setting/preferences/date' q='action=reset=1'}{/capture}
+    {ts 1=$crmURL}Use this screen to configure default formats for date display and date input fields throughout your site. Settings use standard POSIX specifiers. New installations are preconfigured with standard United States formats. You can override this default setting and define the range of allowed dates for specific field types at <a href="%1">Administer > Customize Data and Screens > Date Preferences</a>{/ts} {help id='date-format'}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <fieldset><legend>{ts}Date Display{/ts}</legend>
@@ -63,9 +64,6 @@
           <td>{$form.timeInputFormat.html}</td>
        </tr>
    </table>
-      <div class="action-link">
-      <a href="{crmURL p="civicrm/admin/setting/preferences/date" q="reset=1"}" id="advDateSetting" title="{ts}Manage available date ranges and input formats for different types of date fields.{/ts}">&raquo; {ts}Advanced Date Input Settings{/ts}</a>
-    </div>
 </fieldset>
 <fieldset><legend>{ts}Fiscal Year{/ts}</legend>
    <table class="form-layout-compressed">
