@@ -414,19 +414,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
       throw new API_Exception(ts('Contribution already completed'));
     }
-    $objects = $contribution->_relatedObjects;
-    $objects['contribution'] = &$contribution;
-    $input['component'] = $contribution->_component;
-    $input['is_test'] = $contribution->is_test;
-    $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
-    $input['amount'] = $contribution->total_amount;
-    if (isset($params['is_email_receipt'])) {
-      $input['is_email_receipt'] = $params['is_email_receipt'];
-    }
-    // @todo required for base ipn but problematic as api layer handles this
-    $transaction = new CRM_Core_Transaction();
-    $ipn = new CRM_Core_Payment_BaseIPN();
-    $ipn->completeTransaction($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id));
+    $params = _ipn_complete_transaction($params, $contribution, $input, $ids);
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -451,5 +439,107 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['is_email_receipt'] = array(
     'title' => 'Send email Receipt?',
     'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+}
+
+/**
+ * Complete an existing (pending) transaction.
+ *
+ * This will update related entities (participant, membership, pledge etc)
+ * and take any complete actions from the contribution page (e.g. send receipt).
+ *
+ * @todo - most of this should live in the BAO layer but as we want it to be an addition
+ * to 4.3 which is already stable we should add it to the api layer & re-factor into the BAO layer later
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @throws API_Exception
+ *   Api result array.
+ */
+function civicrm_api3_contribution_repeattransaction(&$params) {
+  $input = $ids = array();
+  $contribution = new CRM_Contribute_BAO_Contribution();
+  $contribution->id = $params['original_contribution_id'];
+  if (!$contribution->find(TRUE)) {
+    throw new API_Exception(
+      'A valid original contribution ID is required', 'invalid_data');
+  }
+  try {
+    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+      throw new API_Exception('failed to load related objects');
+    }
+    unset($contribution->id, $contribution->trxn_id, $contribution->receive_date, $contribution->invoice_id);
+    $contribution->contribution_status_id = $params->contribution_status_id;
+    $contribution->receive_date = $params['receive_date'];
+    $params = _ipn_complete_transaction($params, $contribution, $input, $ids);
+  }
+  catch(Exception $e) {
+    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
+  }
+}
+
+/**
+ * Calls IPN complete transaction for completing or repeating a transaction.
+ *
+ * The IPN function is overloaded with two purposes - this is simply a wrapper for that
+ * when separating them in the api layer.
+ *
+ * @param array $params
+ * @param CRM_Contribute_BAO_Contribution $contribution
+ * @param array $input
+ *
+ * @param array $ids
+ *
+ * @return mixed
+ */
+function _ipn_complete_transaction(&$params, $contribution, $input, $ids) {
+  $objects = $contribution->_relatedObjects;
+  $objects['contribution'] = &$contribution;
+  $input['component'] = $contribution->_component;
+  $input['is_test'] = $contribution->is_test;
+  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $input['amount'] = $contribution->total_amount;
+  if (isset($params['is_email_receipt'])) {
+    $input['is_email_receipt'] = $params['is_email_receipt'];
+  }
+  // @todo required for base ipn but problematic as api layer handles this
+  $transaction = new CRM_Core_Transaction();
+  $ipn = new CRM_Core_Payment_BaseIPN();
+  $ipn->completeTransaction($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id));
+  return $params;
+}
+
+/**
+ * Provide function metadata.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
+  $params['original_contribution_id'] = array(
+    'title' => 'Original Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  );
+  $params['trxn_id'] = array(
+    'title' => 'Transaction ID',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['is_email_receipt'] = array(
+    'title' => 'Send email Receipt?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['contribution_status_id'] = array(
+    'title' => 'Contribution Status ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'optionGroupName' => 'contribution_status',
+    ),
+    'api.required' => TRUE,
+  );
+  $params['receive_date'] = array(
+    'title' => 'Contribution Receive Date',
+    'type' => CRM_Utils_Type::T_DATE,
+    'api.default' => 'now',
   );
 }
