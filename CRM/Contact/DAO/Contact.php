@@ -542,7 +542,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO
           'name' => 'external_identifier',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('External Identifier') ,
-          'maxlength' => 32,
+          'maxlength' => 64,
           'size' => CRM_Utils_Type::EIGHT,
           'import' => true,
           'where' => 'civicrm_contact.external_identifier',
