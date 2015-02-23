@@ -61,7 +61,7 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'misconfigured forwarding address'),
       (@bounceTypeID, 'account is not allowed'),
       (@bounceTypeID, 'Address .<[^>]*>. not known here'),
-      (@bounceTypeID, 'Recipient address rejected: ([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}'),
+      (@bounceTypeID, '{literal}Recipient address rejected: ([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}{/literal}'),
       (@bounceTypeID, 'Non sono riuscito a trovare l.indirizzo e-mail'),
       (@bounceTypeID, 'nadie con esta direcci..?n'),
       (@bounceTypeID, 'ni bilo mogo..?e najti prejemnikovega e-po..?tnega naslova'),
