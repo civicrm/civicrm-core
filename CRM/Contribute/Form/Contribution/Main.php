@@ -404,7 +404,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         return;
       }
     }
-
+    
+    $contactID = $this->getContactID();
+    $this->assign('contact_id', $contactID);
+    $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
+    
     $config = CRM_Core_Config::singleton();
 
     if ($this->_onbehalf) {
