@@ -335,7 +335,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     if ($contactDetails[$contactId]['isDeceased']) {
       $title .= '  <font color=red>(deceased)</font>';
     }
-    
     if ($isDeleted) {
       $title = "<del>{$title}</del>";
     }
