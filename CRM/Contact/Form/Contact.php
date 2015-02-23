@@ -216,7 +216,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         if ($defaults['is_deceased']) {
           $displayName .= '  <font color=red>(deceased)</font>';
         }
-        
         $displayName = ts('Edit %1', array(1 => $displayName));
 
         // Check if this is default domain contact CRM-10482
