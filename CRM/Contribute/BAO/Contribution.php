@@ -2847,6 +2847,7 @@ WHERE  contribution_id = %1 ";
 
         //Update contribution status
         $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
+        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
         if (!empty($params['contribution_status_id']) &&
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
