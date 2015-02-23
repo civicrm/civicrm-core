@@ -117,6 +117,14 @@ CRM.$(function($) {
     $($form).ajaxSubmit(options);
   });
 
+  cj('input[id*="primary_contact_id_"]').change(function() {
+    var temp = this.id.split('_');
+    var ROWID = temp[3];
+    if (cj(this).val()) {
+      updateContactInfo(ROWID,'primary_');
+    }
+  });
+
   $('#crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
     checkColumns($(this));
@@ -288,7 +296,7 @@ function formatMoney(amount) {
 }
 
 function updateContactInfo(blockNo, prefix) {
-  var contactHiddenElement = 'input[name="' + prefix + 'contact_select_id[' + blockNo + ']"]';
+  var contactHiddenElement = 'input[id="' + prefix + 'contact_id_' + blockNo + '"]';
   var contactId = cj(contactHiddenElement).val();
 
   var returnProperties = '';
