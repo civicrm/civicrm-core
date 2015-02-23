@@ -51,13 +51,8 @@ class CRM_Contact_Page_AJAX {
       return self::contactReference();
     }
 
-    $json = CRM_Utils_Request::retrieve('json', 'Integer');
-    if ($json) {
-      header('Content-Type: text/json');
-    }
-    else {
-      header('Content-Type: text/plain');
-    }
+    header('Content-Type: text/plain');
+
     $params = array('version' => 3, 'check_permissions' => TRUE);
 
     // String params
