@@ -32,13 +32,19 @@
   <title>{$pageTitle}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
-  <style type="text/css" media="screen">@import url({$config->resourceBase}css/civicrm.css);</style>
+  <style type="text/css" media="screen">
+    @import url({$config->resourceBase}css/civicrm.css);
+    @import url({$config->resourceBase}bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css);
+  </style>
 </head>
 <body>
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 {else}
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-  <style type="text/css" media="screen">@import url({$config->resourceBase}css/civicrm.css);</style>
+  <style type="text/css" media="screen">
+    @import url({$config->resourceBase}css/civicrm.css);
+    @import url({$config->resourceBase}bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css);
+  </style>
 {/if}
 <div class="messages status no-popup">  <div class="icon red-icon ui-icon-alert"></div>
  <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>
