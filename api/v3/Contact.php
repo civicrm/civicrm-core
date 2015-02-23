@@ -27,6 +27,7 @@
 
 /**
  * This api exposes CiviCRM contacts.
+ *
  * Contacts are the main entity in CiviCRM and this api is more robust than most.
  *   - Get action allows all params supported by advanced search.
  *   - Create action allows creating several related entities at once (e.g. email).
@@ -37,7 +38,7 @@
  */
 
 /**
- * Create or update a contact.
+ * Create or update a Contact.
  *
  * @param array $params
  *   Input parameters.
@@ -142,12 +143,12 @@ function _civicrm_api3_contact_create_spec(&$params) {
 function civicrm_api3_contact_get($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
-  $contacts = _civicrm_api3_get_using_query_object('contact', $params, $options);
-  return civicrm_api3_create_success($contacts, $params, 'contact');
+  $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
+  return civicrm_api3_create_success($contacts, $params, 'Contact');
 }
 
 /**
- * Get count of contact.
+ * Get number of contacts matching the supplied criteria.
  *
  * @param array $params
  *
@@ -156,7 +157,7 @@ function civicrm_api3_contact_get($params) {
 function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
-  $count = _civicrm_api3_get_using_query_object('contact', $params, $options, 1);
+  $count = _civicrm_api3_get_using_query_object('Contact', $params, $options, 1);
   return (int) $count;
 }
 
@@ -211,7 +212,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
 /**
  * Support for historical oddities.
  *
- * We are supporting 'showAll' = 'all', 'trash' or 'active' for contact get
+ * We are supporting 'showAll' = 'all', 'trash' or 'active' for Contact get
  * and for getcount
  * - hopefully some day we'll come up with a std syntax for the 3-way-boolean of
  * 0, 1 or not set
@@ -256,7 +257,7 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
 }
 
 /**
- * Delete a contact with given contact id.
+ * Delete a Contact with given contact_id.
  *
  * @param array $params
  *   input parameters per getfields
@@ -379,7 +380,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck) {
       $params['employer_id'] = $dupeIds[0];
     }
     else {
-      $result = civicrm_api3('contact', 'create', array(
+      $result = civicrm_api3('Contact', 'create', array(
         'organization_name' => $params['current_employer'],
         'contact_type' => 'Organization',
       ));
@@ -391,7 +392,7 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck) {
 }
 
 /**
- * Helper function for contact create.
+ * Helper function for Contact create.
  *
  * @param array $params
  *   (reference ) an assoc array of name/value pairs.
@@ -535,7 +536,7 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
- * Old contact quick search api.
+ * Old Contact quick search api.
  *
  * @deprecated
  *
@@ -686,7 +687,7 @@ function civicrm_api3_contact_getquick($params) {
     $where .= " AND cc.contact_type LIKE '{$contactType}'";
   }
 
-  //set default for current_employer or return contact with particular id
+  // Set default for current_employer or return contact with particular id
   if (!empty($params['id'])) {
     $where .= " AND cc.id = " . (int) $params['id'];
   }
@@ -695,7 +696,7 @@ function civicrm_api3_contact_getquick($params) {
     $where .= " AND cc.id <> " . (int) $params['cid'];
   }
 
-  //contact's based of relationhip type
+  // Contact's based of relationhip type
   $relType = NULL;
   if (!empty($params['rel'])) {
     $relation = explode('_', CRM_Utils_Array::value('rel', $params));
@@ -833,7 +834,7 @@ LIMIT    0, {$limit}
     }
   }
 
-  return civicrm_api3_create_success($contactList, $params, 'contact', 'getquick');
+  return civicrm_api3_create_success($contactList, $params, 'Contact', 'getquick');
 }
 
 /**
@@ -941,7 +942,7 @@ WHERE     $whereClause
     $contacts[] = $dao->toArray();
   }
 
-  return civicrm_api3_create_success($contacts, $params, 'contact', 'get_by_location', $dao);
+  return civicrm_api3_create_success($contacts, $params, 'Contact', 'get_by_location', $dao);
 }
 
 

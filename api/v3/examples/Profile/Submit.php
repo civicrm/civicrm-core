@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using profile submit API.
+ * Test Generated example demonstrating the Profile.submit API.
  *
  * @return array
  *   API result array
@@ -18,7 +18,7 @@ function profile_submit_example() {
   );
 
   try{
-    $result = civicrm_api3('profile', 'submit', $params);
+    $result = civicrm_api3('Profile', 'submit', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -106,11 +106,10 @@ function profile_submit_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testProfileSubmit
-* and can be found in
+* The test that created it is called "testProfileSubmit"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
 *
 * You can see the outcome of the API tests at

@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using setting getdefaults API.
+ * Test Generated example demonstrating the Setting.getdefaults API.
  *
  * Gets defaults setting a variable for a given domain - if no domain is set current is assumed.
  *
@@ -13,7 +13,7 @@ function setting_getdefaults_example() {
   );
 
   try{
-    $result = civicrm_api3('setting', 'getdefaults', $params);
+    $result = civicrm_api3('Setting', 'getdefaults', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -58,11 +58,10 @@ function setting_getdefaults_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetDefaults
-* and can be found in
+* The test that created it is called "testGetDefaults"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SettingTest.php
 *
 * You can see the outcome of the API tests at

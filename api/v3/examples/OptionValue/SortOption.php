@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using option_value getsingle API.
+ * Test Generated example demonstrating the OptionValue.getsingle API.
  *
  * Demonstrates use of Sort param (available in many api functions). Also, getsingle.
  *
@@ -17,7 +17,7 @@ function option_value_getsingle_example() {
   );
 
   try{
-    $result = civicrm_api3('option_value', 'getsingle', $params);
+    $result = civicrm_api3('OptionValue', 'getsingle', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -57,11 +57,10 @@ function option_value_getsingle_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetSingleValueOptionValueSort
-* and can be found in
+* The test that created it is called "testGetSingleValueOptionValueSort"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/OptionValueTest.php
 *
 * You can see the outcome of the API tests at

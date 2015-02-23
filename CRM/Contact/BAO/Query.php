@@ -1517,6 +1517,8 @@ class CRM_Contact_BAO_Query {
     static $skipWhere = NULL;
     static $likeNames = NULL;
     $result = NULL;
+    // Change camelCase EntityName to lowercase with underscores
+    $apiEntity = _civicrm_api_get_entity_name_from_camel($apiEntity);
 
     if (CRM_Utils_System::isNull($values)) {
       return $result;

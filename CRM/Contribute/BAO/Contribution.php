@@ -1776,6 +1776,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $query = "
       SELECT    c.id                 as contribution_id,
                 c.contact_id         as contact_id,
+                c.contribution_recur_id,
                 mp.membership_id     as membership_id,
                 m.membership_type_id as membership_type_id,
                 pp.participant_id    as participant_id,
@@ -1810,6 +1811,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
       if ($dao->pledge_payment_id) {
         $pledgePayment[] = $dao->pledge_payment_id;
+      }
+      if ($dao->contribution_recur_id) {
+        $componentDetails['contributionRecur'] = $dao->contribution_recur_id;
       }
     }
 
@@ -2843,6 +2847,7 @@ WHERE  contribution_id = %1 ";
 
         //Update contribution status
         $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
+        $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
         if (!empty($params['contribution_status_id']) &&
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {

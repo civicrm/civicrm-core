@@ -26,7 +26,9 @@
  */
 
 /**
- * This api exposes CiviCRM activity profile.
+ * This api exposes CiviCRM profiles.
+ *
+ * Profiles are collections of fields used as forms, listings, search columns, etc.
  *
  * @package CiviCRM_APIv3
  */
@@ -172,7 +174,7 @@ function civicrm_api3_profile_submit($params) {
 
   $contactParams = $activityParams = $missingParams = array();
 
-  $profileFields = civicrm_api3('profile', 'getfields', array('action' => 'submit', 'profile_id' => $profileID));
+  $profileFields = civicrm_api3('Profile', 'getfields', array('action' => 'submit', 'profile_id' => $profileID));
   $profileFields = $profileFields['values'];
   if ($isContactActivityProfile) {
     civicrm_api3_verify_mandatory($params, NULL, array('activity_id'));
@@ -332,15 +334,14 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
 }
 
 /**
- * Set profile - deprecated.
+ * Update Profile field values.
  *
  * @deprecated - calling this function directly is deprecated as 'set' is not a clear action
  * use submit
- * Update Profile field values.
  *
  * @param array $params
  *   Array of property name/value.
- *                             pairs to update profile field values
+ *   pairs to update profile field values
  *
  * @return array
  *   Updated Contact/ Activity object|CRM_Error
@@ -350,14 +351,14 @@ function civicrm_api3_profile_set($params) {
 }
 
 /**
- * Apply profile - deprecated.
+ * Apply profile.
  *
  * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
  * @param array $params
  *   Array of property name/value.
- *                             pairs to profile field values
+ *   pairs to profile field values
  *
  * @throws API_Exception
  * @return array
@@ -366,7 +367,6 @@ function civicrm_api3_profile_set($params) {
  * @todo add test cases
  */
 function civicrm_api3_profile_apply($params) {
-
   $profileFields = CRM_Core_BAO_UFGroup::getFields($params['profile_id'],
     FALSE,
     NULL,

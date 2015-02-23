@@ -27,7 +27,9 @@
 
 
 /**
- * This api exposes CiviCRM line item.
+ * This api exposes CiviCRM LineItem records.
+ *
+ * Line items are sub-components of a complete financial transaction record.
  *
  * @package CiviCRM_APIv3
  */
@@ -77,10 +79,9 @@ function civicrm_api3_line_item_get($params) {
 }
 
 /**
- * Delete an existing line_item.
+ * Delete an existing LineItem.
  *
- * This method is used to delete any existing line_item. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing LineItem given its id.
  *
  * @param array $params
  *   Array containing id of the group to be deleted.

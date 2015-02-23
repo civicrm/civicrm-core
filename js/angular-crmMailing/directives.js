@@ -175,7 +175,7 @@
         crmOn: '@',
         crmTitle: '@'
       },
-      template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{crmTitle}} </span>',
+      template: '<span ng-class="spanClasses"><span class="icon" ng-class="iconClasses"></span>{{evalTitle}} </span>',
       link: function (scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
@@ -186,7 +186,7 @@
             scope.spanClasses = {'crmMailing-inactive': true};
             scope.iconClasses = {'ui-icon-close': true};
           }
-          scope.crmTitle = scope.$parent.$eval(attrs.crmTitle);
+          scope.evalTitle = scope.$parent.$eval(attrs.crmTitle);
         }
 
         refresh();
@@ -225,13 +225,14 @@
 
   // example: <select multiple crm-mailing-recipients crm-mailing="mymailing" crm-avail-groups="myGroups" crm-avail-mailings="myMailings"></select>
   // FIXME: participate in ngModel's validation cycle
-  angular.module('crmMailing').directive('crmMailingRecipients', function () {
+  angular.module('crmMailing').directive('crmMailingRecipients', function (crmUiAlert) {
     return {
       restrict: 'AE',
       require: 'ngModel',
       scope: {
         crmAvailGroups: '@', // available groups
         crmAvailMailings: '@', // available mailings
+        crmMandatoryGroups: '@', // hard-coded/mandatory groups
         ngRequired: '@'
       },
       templateUrl: '~/crmMailing/directive/recipients.html',
@@ -239,8 +240,9 @@
         scope.recips = ngModel.$viewValue;
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
         scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
+        refreshMandatory();
 
-        scope.ts = CRM.ts(null);
+        var ts = scope.ts = CRM.ts(null);
 
         /// Convert MySQL date ("yyyy-mm-dd hh:mm:ss") to JS date object
         scope.parseDate = function (date) {
@@ -285,11 +287,31 @@
           return r;
         }
 
+        function refreshMandatory() {
+          if (ngModel.$viewValue.groups) {
+            scope.mandatoryGroups = _.filter(scope.$parent.$eval(attrs.crmMandatoryGroups), function(grp) {
+              return _.contains(ngModel.$viewValue.groups.include, parseInt(grp.id));
+            });
+            scope.mandatoryIds = _.map(_.pluck(scope.$parent.$eval(attrs.crmMandatoryGroups), 'id'), function(n) {
+              return parseInt(n);
+            });
+          }
+          else {
+            scope.mandatoryGroups = [];
+            scope.mandatoryIds = [];
+          }
+        }
+
+        function isMandatory(grpId) {
+          return _.contains(scope.mandatoryIds, parseInt(grpId));
+        }
+
         var refreshUI = ngModel.$render = function refresuhUI() {
           scope.recips = ngModel.$viewValue;
           if (ngModel.$viewValue) {
             $(element).select2('val', convertMailingToValues(ngModel.$viewValue));
             validate();
+            refreshMandatory();
           }
         };
 
@@ -302,6 +324,9 @@
           var option = convertValueToObj(item.id);
           var icon = (option.entity_type === 'civicrm_mailing') ? 'EnvelopeIn.gif' : 'group.png';
           var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
+          if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
+            spanClass = 'crmMailing-mandatory';
+          }
           return "<img src='../../sites/all/modules/civicrm/i/" + icon + "' height=12 width=12 /> <span class='" + spanClass + "'>" + item.text + "</span>";
         }
 
@@ -344,6 +369,14 @@
         $(element).on("select2-removing", function (e) {
           var option = convertValueToObj(e.val);
           var typeKey = option.entity_type == 'civicrm_mailing' ? 'mailings' : 'groups';
+          if (typeKey == 'groups' && isMandatory(option.entity_id)) {
+            crmUiAlert({
+              text: ts('This mailing was generated based on search results. The search results cannot be removed.'),
+              title: ts('Required')
+            });
+            e.preventDefault();
+            return;
+          }
           scope.$parent.$apply(function () {
             arrayRemove(ngModel.$viewValue[typeKey][option.mode], option.entity_id);
           });
@@ -357,11 +390,14 @@
         scope.$watchCollection("recips.mailings.exclude", refreshUI);
         setTimeout(refreshUI, 50);
 
-        scope.$watchCollection(attrs.crmAvailGroups, function(){
+        scope.$watchCollection(attrs.crmAvailGroups, function() {
           scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
         });
-        scope.$watchCollection(attrs.crmAvailMailings, function(){
+        scope.$watchCollection(attrs.crmAvailMailings, function() {
           scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
+        });
+        scope.$watchCollection(attrs.crmMandatoryGroups, function() {
+          refreshMandatory();
         });
       }
     };

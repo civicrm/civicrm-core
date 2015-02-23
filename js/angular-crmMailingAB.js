@@ -29,21 +29,11 @@
         }
       });
       $routeProvider.when('/abtest/:id', {
-        templateUrl: '~/crmMailingAB/edit.html',
+        templateUrl: '~/crmMailingAB/main.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
-            return abtest.load();
-          }
-        }
-      });
-      $routeProvider.when('/abtest/:id/report', {
-        templateUrl: '~/crmMailingAB/report.html',
-        controller: 'CrmMailingABReportCtrl',
-        resolve: {
-          abtest: function ($route, CrmMailingAB) {
-            var abtest = new CrmMailingAB($route.current.params.id);
             return abtest.load();
           }
         }
@@ -68,10 +58,12 @@
     $location.replace();
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function ($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
+    $scope.crmUrl = CRM.url;
+    var myAutosave = null;
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
 
@@ -82,7 +74,7 @@
     $scope.sync = function sync() {
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
-      abtest.mailings.c.name = ts('Winner (%1)', {1: abtest.ab.name});
+      abtest.mailings.c.name = ts('Final (%1)', {1: abtest.ab.name});
 
       if (abtest.ab.testing_criteria) {
         // TODO review fields exposed in UI and make sure the sync rules match
@@ -153,11 +145,11 @@
       }
       return block(crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
           .then(function() {
-            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, abtest.submitTest());
+            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, myAutosave.suspend(abtest.submitTest()));
             // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
             // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
           })
-      ).then($scope.leave);
+      );
     };
 
     $scope.leave = function leave() {
@@ -165,47 +157,75 @@
       $location.replace();
     };
 
+    $scope.selectWinner = function selectWinner(mailingName) {
+      var model = {
+        abtest: $scope.abtest,
+        mailingName: mailingName
+      };
+      var options = CRM.utils.adjustDialogDefaults({
+        autoOpen: false,
+        title: ts('Select Final Mailing (Test %1)', {
+          1: mailingName.toUpperCase()
+        })
+      });
+      return myAutosave.suspend(dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options));
+    };
+
     // initialize
     var syncJob = $interval($scope.sync, 333);
     $scope.$on('$destroy', function(){
       $interval.cancel(syncJob);
     });
+
+    myAutosave = new CrmAutosaveCtrl({
+      save: $scope.save,
+      saveIf: function(){
+        return abtest.ab.status == 'Draft' && $scope.sync();
+      },
+      model: function(){
+        return abtest.getAutosaveSignature();
+      },
+      form: function() {
+        return $scope.crmMailingAB;
+      }
+    });
+    $timeout(myAutosave.start);
+    $scope.$on('$destroy', myAutosave.stop);
   });
 
-  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, abtest, crmApi, crmMailingPreviewMgr, dialogService) {
+  angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function ($scope, crmApi, crmMailingStats) {
     var ts = $scope.ts = CRM.ts(null);
 
-    $scope.abtest = abtest;
-
-    $scope.stats = {};
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_a}).then(function(data){
-      $scope.stats.a = data.values[abtest.ab.mailing_id_a];
-    });
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_b}).then(function(data){
-      $scope.stats.b = data.values[abtest.ab.mailing_id_b];
-    });
-    crmApi('Mailing', 'stats', {mailing_id: abtest.ab.mailing_id_c}).then(function(data){
-      $scope.stats.c = data.values[abtest.ab.mailing_id_c];
-    });
-
-    $scope.previewMailing = function previewMailing(mailingName, mode) {
-      return crmMailingPreviewMgr.preview(abtest.mailings[mailingName], mode);
+    var CrmMailingABReportCnt = 1, activeMailings = null;
+    $scope.getActiveMailings = function() {
+      if ($scope.abtest.$CrmMailingABReportCnt != CrmMailingABReportCnt) {
+        $scope.abtest.$CrmMailingABReportCnt = ++CrmMailingABReportCnt;
+        activeMailings = [
+          {name: 'a', title: ts('Mailing A'), mailing: $scope.abtest.mailings.a, attachments: $scope.abtest.attachments.a},
+          {name: 'b', title: ts('Mailing B'), mailing: $scope.abtest.mailings.b, attachments: $scope.abtest.attachments.b}
+        ];
+        if ($scope.abtest.ab.status == 'Final') {
+          activeMailings.push({name: 'c', title: ts('Final'), mailing: $scope.abtest.mailings.c, attachments: $scope.abtest.attachments.c});
+        }
+      }
+      return activeMailings;
     };
-    $scope.selectWinner = function selectWinner(mailingName) {
-      var model = {
-        abtest: abtest,
-        mailingName: mailingName
-      };
-      var options = CRM.utils.adjustDialogDefaults({
-        autoOpen: false,
-        title: ts('Select Winner (%1)', {
-          1: mailingName.toUpperCase()
-        })
-      });
-      return dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options);
+
+    crmMailingStats.getStats({
+      a: $scope.abtest.ab.mailing_id_a,
+      b: $scope.abtest.ab.mailing_id_b,
+      c: $scope.abtest.ab.mailing_id_c
+    }).then(function(stats) {
+      $scope.stats = stats;
+    });
+
+    $scope.statTypes = crmMailingStats.getStatTypes();
+    $scope.statUrl = function statUrl(mailing, statType, view) {
+      return crmMailingStats.getUrl(mailing, statType, view);
     };
+
+    $scope.checkPerm = CRM.checkPerm;
   });
-
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function ($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
     var ts = $scope.ts = CRM.ts(null);
@@ -220,7 +240,7 @@
       // need to be registered with the dialog widget (and not embedded in
       // the body of the dialog).
       var buttons = {};
-      buttons[ts('Select Winner')] = function () {
+      buttons[ts('Submit final mailing')] = function () {
         crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
           'name',
           'recipients',
@@ -229,8 +249,9 @@
         crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
           .then(function () {
             return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
-              abtest.submitFinal().then(function(){
-                return abtest.load();
+              abtest.submitFinal().then(function(r){
+                delete abtest.$CrmMailingABReportCnt;
+                return r;
               }));
           })
           .then(function(){

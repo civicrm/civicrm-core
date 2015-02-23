@@ -1,24 +1,21 @@
 <?php
 /**
- * Test Generated example of using price_set create API.
+ * Test Generated example demonstrating the PriceSet.create API.
  *
  * @return array
  *   API result array
  */
 function price_set_create_example() {
   $params = array(
-    'name' => 'some_price_set',
-    'title' => 'Some Price Set',
-    'is_active' => 1,
-    'financial_type_id' => 1,
-    'extends' => array(
-      '0' => 1,
-      '1' => 2,
-    ),
+    'entity_table' => 'civicrm_event',
+    'entity_id' => 1,
+    'name' => 'event price',
+    'title' => 'event price',
+    'extends' => 1,
   );
 
   try{
-    $result = civicrm_api3('price_set', 'create', $params);
+    $result = civicrm_api3('PriceSet', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -47,22 +44,19 @@ function price_set_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 16,
+    'id' => 18,
     'values' => array(
-      '16' => array(
-        'id' => '16',
+      '18' => array(
+        'id' => '18',
         'domain_id' => '',
-        'name' => 'some_price_set',
-        'title' => 'Some Price Set',
-        'is_active' => '1',
+        'name' => 'event price',
+        'title' => 'event price',
+        'is_active' => '',
         'help_pre' => '',
         'help_post' => '',
         'javascript' => '',
-        'extends' => array(
-          '0' => '1',
-          '1' => '2',
-        ),
-        'financial_type_id' => '1',
+        'extends' => '1',
+        'financial_type_id' => '',
         'is_quick_config' => '',
         'is_reserved' => '',
       ),
@@ -72,11 +66,10 @@ function price_set_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreatePriceSetForEventAndContribution
-* and can be found in
+* The test that created it is called "testEventPriceSet"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PriceSetTest.php
 *
 * You can see the outcome of the API tests at

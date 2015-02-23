@@ -77,7 +77,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
   }
   $getFieldsParams = array('action' => $apiRequest['action']);
   $entity = $apiRequest['entity'];
-  if ($entity == 'profile' && array_key_exists('profile_id', $apiRequest['params'])) {
+  if ($entity == 'Profile' && array_key_exists('profile_id', $apiRequest['params'])) {
     $getFieldsParams['profile_id'] = $apiRequest['params']['profile_id'];
   }
   $fields = civicrm_api3($entity, 'getfields', $getFieldsParams);
@@ -105,14 +105,14 @@ function civicrm_error($result) {
 }
 
 /**
- * Get camel case version of entity or action name.
+ * Get camel case version of entity name.
  *
- * @param $entity
+ * @param string|null $entity
  *
- * @return string
+ * @return string|null
  */
 function _civicrm_api_get_camel_name($entity) {
-  return CRM_Utils_String::convertStringToCamel($entity);
+  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
 }
 
 /**
@@ -171,11 +171,9 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
  *
  * @return string
  *   Entity name in underscore separated format.
- *
- * @fixme Why isn't this called first thing in civicrm_api wrapper?
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
-  if ($entity == strtolower($entity)) {
+  if (!$entity || $entity === strtolower($entity)) {
     return $entity;
   }
   else {
@@ -198,5 +196,5 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
+  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 }

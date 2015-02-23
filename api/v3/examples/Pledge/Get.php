@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using pledge get API.
+ * Test Generated example demonstrating the Pledge.get API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function pledge_get_example() {
   );
 
   try{
-    $result = civicrm_api3('pledge', 'get', $params);
+    $result = civicrm_api3('Pledge', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -50,10 +50,10 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '1',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2015-02-16 00:00:00',
+        'pledge_create_date' => '2015-02-22 00:00:00',
         'pledge_status' => 'Pending',
         'pledge_total_paid' => '',
-        'pledge_next_pay_date' => '2015-02-18 00:00:00',
+        'pledge_next_pay_date' => '2015-02-24 00:00:00',
         'pledge_next_pay_amount' => '20.00',
         'pledge_outstanding_amount' => '',
         'pledge_financial_type' => 'Donation',
@@ -71,11 +71,10 @@ function pledge_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetPledge
-* and can be found in
+* The test that created it is called "testGetPledge"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PledgeTest.php
 *
 * You can see the outcome of the API tests at

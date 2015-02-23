@@ -66,24 +66,7 @@ class Request {
     $apiRequest['extra'] = $extra;
     $apiRequest['fields'] = NULL;
 
-    if ($apiRequest['version'] <= 3) {
-      // APIv1-v3 munges entity/action names, which means that the same name can be written
-      // multiple ways. That makes it harder to work with.
-      $apiRequest['entity'] = \CRM_Utils_String::munge($entity);
-      $action = \CRM_Utils_String::munge($action);
-      $apiRequest['action'] = strtolower($action{0}) . substr($action, 1);
-    }
-    else {
-      // APIv4 requires exact entity/action name; deviations should cause errors
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $entity)) {
-        throw new \API_Exception("Malformed entity");
-      }
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $action)) {
-        throw new \API_Exception("Malformed action");
-      }
-      $apiRequest['entity'] = $entity;
-      $apiRequest['action'] = strtolower($action{0}) . substr($action, 1);
-    }
+    self::normalizeNames($entity, $action, $apiRequest);
 
     // APIv1-v3 mix data+options in $params which means that each API callback is responsible
     // for splitting the two. In APIv4, the split is done systematically so that we don't
@@ -144,6 +127,35 @@ class Request {
     }
 
     return $apiRequest;
+  }
+
+  /**
+   * Normalize/validate entity and action names
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $apiRequest
+   * @throws \API_Exception
+   */
+  protected static function normalizeNames(&$entity, &$action, &$apiRequest) {
+    if ($apiRequest['version'] <= 3) {
+      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
+      // We normalize entity to be CamelCase and action to be lowercase.
+      $apiRequest['entity'] = $entity = \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
+      $apiRequest['action'] = $action = strtolower(\CRM_Utils_String::munge($action));
+    }
+    else {
+      // APIv4 requires exact spelling & capitalization of entity/action name; deviations should cause errors
+      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $entity)) {
+        throw new \API_Exception("Malformed entity");
+      }
+      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $action)) {
+        throw new \API_Exception("Malformed action");
+      }
+      $apiRequest['entity'] = $entity;
+      // TODO: Not sure about camelCase actions - in v3 they are all lowercase.
+      $apiRequest['action'] = strtolower($action{0}) . substr($action, 1);
+    }
   }
 
   /**

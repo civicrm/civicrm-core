@@ -26,37 +26,36 @@
  */
 
 /**
- * This api exposes CiviCRM print_label.
+ * This api exposes CiviCRM PrintLabel.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save a print_label.
+ * Save a PrintLabel.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created print_label property values.
  */
 function civicrm_api3_print_label_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a print_label.
+ * Get a PrintLabel.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved print_label property values.
+ *   Array of retrieved PrintLabel property values.
  */
 function civicrm_api3_print_label_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a print_label.
+ * Delete a PrintLabel.
  *
  * @param array $params
  *

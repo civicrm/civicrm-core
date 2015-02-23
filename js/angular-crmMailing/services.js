@@ -133,7 +133,7 @@
         return crmApi('MailingGroup', 'get', {mailing_id: mailing.id})
           .then(function (groupResult) {
             mailing.recipients = {};
-            mailing.recipients.groups = {include: [], exclude: []};
+            mailing.recipients.groups = {include: [], exclude: [], base: []};
             mailing.recipients.mailings = {include: [], exclude: []};
             _.each(groupResult.values, function (mailingGroup) {
               var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
@@ -155,8 +155,8 @@
         var defaults = {
           jobs: {}, // {jobId: JobRecord}
           recipients: {
-            groups: {include: [], exclude: []},
-            mailings: {include: [], exclude: []},
+            groups: {include: [], exclude: [], base: []},
+            mailings: {include: [], exclude: []}
           },
           name: "",
           campaign_id: null,
@@ -423,6 +423,71 @@
             })
           ;
         return crmStatus({start: ts('Sending...'), success: ts('Sent')}, promise);
+      }
+    };
+  });
+
+  angular.module('crmMailing').factory('crmMailingStats', function (crmApi, crmLegacy) {
+    var statTypes = [
+      // {name: 'Recipients', title: ts('Intended Recipients'),   searchFilter: '',                           eventsFilter: '&event=queue'},
+      {name: 'Delivered',     title: ts('Successful Deliveries'), searchFilter: '&mailing_delivery_status=Y', eventsFilter: '&event=delivered'},
+      {name: 'Opened',        title: ts('Tracked Opens'),         searchFilter: '&mailing_open_status=Y',     eventsFilter: '&event=opened'},
+      {name: 'Unique Clicks', title: ts('Click-throughs'),        searchFilter: '&mailing_click_status=Y',    eventsFilter: '&event=click&distinct=1'},
+      // {name: 'Forward',    title: ts('Forwards'),              searchFilter: '&mailing_forward=1',         eventsFilter: '&event=forward'},
+      // {name: 'Replies',    title: ts('Replies'),               searchFilter: '&mailing_reply_status=Y',    eventsFilter: '&event=reply'},
+      {name: 'Bounces',       title: ts('Bounces'),               searchFilter: '&mailing_delivery_status=N', eventsFilter: '&event=bounce'},
+      {name: 'Unsubscribers', title: ts('Unsubscribes'),          searchFilter: '&mailing_unsubscribe=1',     eventsFilter: '&event=unsubscribe'}
+      // {name: 'OptOuts',    title: ts('Opt-Outs'),              searchFilter: '&mailing_optout=1',          eventsFilter: '&event=optout'}
+    ];
+
+    return {
+      getStatTypes: function() {
+        return statTypes;
+      },
+
+      /**
+       * @param mailingIds object
+       *   List of mailing IDs ({a: 123, b: 456})
+       * @return Promise
+       *   List of stats for each mailing
+       *   ({a: ...object..., b: ...object...})
+       */
+      getStats: function(mailingIds) {
+        var params = {};
+        angular.forEach(mailingIds, function(mailingId, name) {
+          params[name] = ['Mailing', 'stats', {mailing_id: mailingId}];
+        });
+        return crmApi(params).then(function(result) {
+          var stats = {};
+          angular.forEach(mailingIds, function(mailingId, name) {
+            stats[name] = result[name].values[mailingId];
+          });
+          return stats;
+        });
+      },
+
+      /**
+       * Determine the legacy URL for a report about a given mailing and stat.
+       *
+       * @param mailing object
+       * @param statType object (see statTypes above)
+       * @param view string ('search', 'event', 'report')
+       * @return string|null
+       */
+      getUrl: function getUrl(mailing, statType, view) {
+        switch (view) {
+          case 'events':
+            return crmLegacy.url('civicrm/mailing/report/event',
+              'reset=1&mid=' + mailing.id + statType.eventsFilter);
+
+          case 'search':
+            return crmLegacy.url('civicrm/contact/search/advanced',
+              'force=1&mailing_id=' + mailing.id + statType.searchFilter);
+
+          // TODO: case 'report':
+          default:
+            return null;
+        }
       }
     };
   });

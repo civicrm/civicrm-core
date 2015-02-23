@@ -44,7 +44,6 @@
  *   Array per getfields metadata.
  *
  * @return array
- *   Array of newly created file property values.
  */
 function civicrm_api3_file_create($params) {
 
@@ -76,11 +75,11 @@ function civicrm_api3_file_create($params) {
   $file = array();
   _civicrm_api3_object_to_array($fileDAO, $file);
 
-  return civicrm_api3_create_success($file, $params, 'file', 'create', $fileDAO);
+  return civicrm_api3_create_success($file, $params, 'File', 'create', $fileDAO);
 }
 
 /**
- * Get a file.
+ * Get a File.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -94,7 +93,7 @@ function civicrm_api3_file_get($params) {
 }
 
 /**
- * Update an existing file.
+ * Update an existing File.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -122,7 +121,7 @@ function civicrm_api3_file_update($params) {
 }
 
 /**
- * Delete an existing file.
+ * Delete an existing File.
  *
  * @param array $params
  *   Array per getfields metadata.

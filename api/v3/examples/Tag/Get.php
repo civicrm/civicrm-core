@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using tag get API.
+ * Test Generated example demonstrating the Tag.get API.
  *
  * @return array
  *   API result array
@@ -12,7 +12,7 @@ function tag_get_example() {
   );
 
   try{
-    $result = civicrm_api3('tag', 'get', $params);
+    $result = civicrm_api3('Tag', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -59,11 +59,10 @@ function tag_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGet
-* and can be found in
+* The test that created it is called "testGet"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
 *
 * You can see the outcome of the API tests at

@@ -37,7 +37,6 @@
  * @param array $params
  *
  * @return array
- *   Array of newly created sms_provider property values.
  */
 function civicrm_api3_sms_provider_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -64,8 +64,7 @@ function civicrm_api3_participant_status_type_get($params) {
 /**
  * Delete an existing participant_status.
  *
- * This method is used to delete any existing participant_status. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing participant_status given its id.
  *
  * @param array $params
  *   [id]

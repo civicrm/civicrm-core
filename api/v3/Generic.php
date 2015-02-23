@@ -71,10 +71,10 @@ function civicrm_api3_generic_getfields($apiRequest) {
       }
     }
   }
-  $entity       = _civicrm_api_get_camel_name($apiRequest['entity']);
-  $lcase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+  $entity = $apiRequest['entity'];
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $subentity    = CRM_Utils_Array::value('contact_type', $apiRequest['params']);
-  $action       = strtolower(CRM_Utils_Array::value('action', $apiRequest['params']));
+  $action = CRM_Utils_Array::value('action', $apiRequest['params']);
   $sequential = empty($apiRequest['params']) ? 0 : 1;
   $apiOptions = CRM_Utils_Array::value('options', $apiRequest['params'], array());
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
@@ -103,9 +103,9 @@ function civicrm_api3_generic_getfields($apiRequest) {
       if (empty($metadata['id'])) {
         // if id is not set we will set it eg. 'id' from 'case_id', case_id will be an alias
         if (!empty($metadata[strtolower($apiRequest['entity']) . '_id'])) {
-          $metadata['id'] = $metadata[$lcase_entity . '_id'];
-          unset($metadata[$lcase_entity . '_id']);
-          $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
+          $metadata['id'] = $metadata[$lowercase_entity . '_id'];
+          unset($metadata[$lowercase_entity . '_id']);
+          $metadata['id']['api.aliases'] = array($lowercase_entity . '_id');
         }
       }
       else {
@@ -114,7 +114,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
         // (note) or setting for all api where fields is returning 'id' & we want to accept 'note_id' @ the api layer
         // nb we don't officially accept note_id anyway - rationale here is more about centralising a now-tested
         // inconsistency
-        $metadata['id']['api.aliases'] = array($lcase_entity . '_id');
+        $metadata['id']['api.aliases'] = array($lowercase_entity . '_id');
       }
       break;
 
@@ -124,7 +124,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'title' => $entity . ' ID',
           'name' => 'id',
           'api.required' => 1,
-          'api.aliases' => array($lcase_entity . '_id'),
+          'api.aliases' => array($lowercase_entity . '_id'),
           'type' => CRM_Utils_Type::T_INT,
         ));
       break;

@@ -26,13 +26,12 @@
  */
 
 /**
- * This api exposes CiviCRM entity tag.
+ * This api exposes CiviCRM EntityTag records.
+ *
+ * Use this api to add/remove tags from a contact/activity/etc.
+ * To create/update/delete the tags themselves, use the Tag api.
  *
  * @package CiviCRM_APIv3
- */
-
-/**
- * Include utility functions
  */
 
 /**
@@ -54,7 +53,7 @@ function civicrm_api3_entity_tag_get($params) {
     foreach ($values as $v) {
       $result[$v] = array('tag_id' => $v);
     }
-    return civicrm_api3_create_success($result, $params);
+    return civicrm_api3_create_success($result, $params, 'EntityTag');
   }
 }
 

@@ -29,7 +29,7 @@
  * CiviCRM APIv3 pseudoconstants
  *
  * @deprecated
- *   The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.
+ *   The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.
  * @package CiviCRM_APIv3
  */
 
@@ -41,7 +41,7 @@
  *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_constant_deprecation() {
-  return 'The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.';
+  return 'The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.';
 }
 
 /**
@@ -53,48 +53,46 @@ function _civicrm_api3_constant_deprecation() {
  * @param array $params
  *  Name of a public static method of
  *  CRM_Core_PseudoConstant: one of
- *  <ul>
- *    <li>activityStatus</li>
- *    <li>activityType</li>
- *    <li>addressee</li>
- *    <li>allGroup</li>
- *    <li>country</li>
- *    <li>countryIsoCode</li>
- *    <li>county</li>
- *    <li>currencyCode</li>
- *    <li>currencySymbols</li>
- *    <li>customGroup</li>
- *    <li>emailGreeting</li>
- *    <li>fromEmailAddress</li>
- *    <li>gender</li>
- *    <li>group</li>
- *    <li>groupIterator</li>
- *    <li>honor</li>
- *    <li>IMProvider</li>
- *    <li>individualPrefix</li>
- *    <li>individualSuffix</li>
- *    <li>locationType</li>
- *    <li>locationVcardName</li>
- *    <li>mailProtocol</li>
- *    <li>mappingTypes</li>
- *    <li>paymentProcessor</li>
- *    <li>paymentProcessorType</li>
- *    <li>pcm</li>
- *    <li>phoneType</li>
- *    <li>postalGreeting</li>
- *    <li>priority</li>
- *    <li>relationshipType</li>
- *    <li>stateProvince</li>
- *    <li>stateProvinceAbbreviation</li>
- *    <li>stateProvinceForCountry</li>
- *    <li>staticGroup</li>
- *    <li>tag</li>
- *    <li>tasks</li>
- *    <li>ufGroup</li>
- *    <li>visibility</li>
- *    <li>worldRegion</li>
- *    <li>wysiwygEditor</li>
- *  </ul>
+ *    activityStatus
+ *    activityType
+ *    addressee
+ *    allGroup
+ *    country
+ *    countryIsoCode
+ *    county
+ *    currencyCode
+ *    currencySymbols
+ *    customGroup
+ *    emailGreeting
+ *    fromEmailAddress
+ *    gender
+ *    group
+ *    groupIterator
+ *    honor
+ *    IMProvider
+ *    individualPrefix
+ *    individualSuffix
+ *    locationType
+ *    locationVcardName
+ *    mailProtocol
+ *    mappingTypes
+ *    paymentProcessor
+ *    paymentProcessorType
+ *    pcm
+ *    phoneType
+ *    postalGreeting
+ *    priority
+ *    relationshipType
+ *    stateProvince
+ *    stateProvinceAbbreviation
+ *    stateProvinceForCountry
+ *    staticGroup
+ *    tag
+ *    tasks
+ *    ufGroup
+ *    visibility
+ *    worldRegion
+ *    wysiwygEditor
  *
  * @return array
  */
@@ -126,12 +124,12 @@ function civicrm_api3_constant_get($params) {
       //@TODO XAV take out the param the COOKIE, Entity, Action and so there are only the "real param" in it
       //$values = call_user_func_array( array( $className, $name ), $params );
     }
-    return civicrm_api3_create_success($values, $params, 'constant');
+    return civicrm_api3_create_success($values, $params, 'Constant');
   }
   else {
     $values = call_user_func(array('CRM_Utils_PseudoConstant', 'getConstant'), $name);
     if (!empty($values)) {
-      return civicrm_api3_create_success($values, $params, 'constant');
+      return civicrm_api3_create_success($values, $params, 'Constant');
     }
   }
   return civicrm_api3_create_error('Unknown civicrm constant or method not callable');

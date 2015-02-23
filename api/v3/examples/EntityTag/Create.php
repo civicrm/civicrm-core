@@ -1,18 +1,18 @@
 <?php
 /**
- * Test Generated example of using entity_tag create API.
+ * Test Generated example demonstrating the EntityTag.create API.
  *
  * @return array
  *   API result array
  */
 function entity_tag_create_example() {
   $params = array(
-    'contact_id' => 12,
-    'tag_id' => '9',
+    'contact_id' => 3,
+    'tag_id' => '6',
   );
 
   try{
-    $result = civicrm_api3('entity_tag', 'create', $params);
+    $result = civicrm_api3('EntityTag', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -47,11 +47,10 @@ function entity_tag_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testContactEntityTagCreate
-* and can be found in
+* The test that created it is called "testIndividualEntityTagGet"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EntityTagTest.php
 *
 * You can see the outcome of the API tests at

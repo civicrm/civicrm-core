@@ -32,7 +32,7 @@
  */
 
 /**
- * Create or update a contribution_recur.
+ * Create or update a ContributionRecur.
  *
  * @param array $params
  *   Array per getfields metadata.
@@ -73,7 +73,7 @@ function civicrm_api3_contribution_recur_get($params) {
 }
 
 /**
- * Cancel a recurring contribution of existing contribution_recur.id.
+ * Cancel a recurring contribution of existing ContributionRecur given its id.
  *
  * @param array $params
  *   Array containing id of the recurring contribution.
@@ -87,10 +87,9 @@ function civicrm_api3_contribution_recur_cancel($params) {
 }
 
 /**
- * Delete an existing contribution_recur.
+ * Delete an existing ContributionRecur.
  *
- * This method is used to delete any existing contribution_recur. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete an existing ContributionRecur given its id.
  *
  * @param array $params
  *   [id]

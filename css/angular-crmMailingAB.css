@@ -15,3 +15,11 @@
     stroke: #000;
     shape-rendering: crispEdges;
 }
+
+.crm-mailing-ab-col {
+  width: 18em;
+}
+
+.crm-mailing-ab-table tbody tr:last-child td {
+  padding-bottom: 2em;
+}
