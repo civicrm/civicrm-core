@@ -73,12 +73,6 @@ elseif ($installType == 'wordpress') {
 
 $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
-set_include_path(
-  $crmPath . PATH_SEPARATOR .
-  $pkgPath . PATH_SEPARATOR .
-  get_include_path()
-);
-
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
