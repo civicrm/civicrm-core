@@ -26,14 +26,14 @@
  */
 
 /**
- * APIv3 functions for registering/processing mailing recipients.
+ * API for retrieving mailing recipients.
  *
  * @package CiviCRM_APIv3
  */
 
 
 /**
- * Returns array of Mailing Recipients.
+ * Returns array of MailingRecipients.
  *
  * @param array $params
  *   Array per getfields metadata.

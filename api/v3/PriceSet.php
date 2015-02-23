@@ -27,16 +27,19 @@
 
 
 /**
- * This api exposes CiviCRM price sets.
+ * This api exposes CiviCRM Price Sets.
+ *
+ * PriceSets contain PriceFields (which have their own api).
+ * Use chaining to create a PriceSet and associated PriceFields in one api call.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Create or update a price_set.
+ * Create or update a PriceSet.
  *
  * @param array $params
- *   name/value pairs to insert in new 'price_set'
+ *   name/value pairs to insert in new 'PriceSet'
  *
  * @return array
  *   api result array
@@ -96,10 +99,9 @@ function civicrm_api3_price_set_get($params) {
 }
 
 /**
- * Delete an existing price_set.
+ * Delete an existing PriceSet.
  *
- * This method is used to delete any existing price_set. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing PriceSet given its id.
  *
  * @param array $params
  *   Array containing id of the group to be deleted.

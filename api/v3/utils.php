@@ -163,12 +163,15 @@ function civicrm_api3_create_error($msg, $data = array()) {
  */
 function civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = array()) {
   $result = array();
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+  // TODO: This shouldn't be necessary but this fn sometimes gets called with lowercase entity
+  $entity = _civicrm_api_get_camel_name($entity);
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
-  if (is_array($values) && !empty($entity) && $action != 'getfields') {
+  if (is_array($values) && $entity && $action != 'getfields') {
     foreach ($values as $key => $item) {
-      if (empty($item['id']) && !empty($item[$entity . "_id"])) {
-        $values[$key]['id'] = $item[$entity . "_id"];
+      if (empty($item['id']) && !empty($item[$lowercase_entity . "_id"])) {
+        $values[$key]['id'] = $item[$lowercase_entity . "_id"];
       }
       if (!empty($item['financial_type_id'])) {
         //4.3 legacy handling
@@ -266,7 +269,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   if ($deprecated) {
     // Metadata-level deprecations or wholesale entity deprecations.
-    if ($entity == 'entity' || $action == 'getactions' || is_string($deprecated)) {
+    if ($entity == 'Entity' || $action == 'getactions' || is_string($deprecated)) {
       $result['deprecated'] = $deprecated;
     }
     // Action-specific deprecations
@@ -310,7 +313,7 @@ function _civicrm_api3_get_DAO($name) {
     $name = substr($name, 13, $last - 13);
   }
 
-  $name = _civicrm_api_get_camel_name($name, 3);
+  $name = _civicrm_api_get_camel_name($name);
 
   if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
     $name = 'Contact';
@@ -475,10 +478,10 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @return array
  */
 function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL) {
-
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   // Convert id to e.g. contact_id
-  if (empty($params[$entity . '_id']) && isset($params['id'])) {
-    $params[$entity . '_id'] = $params['id'];
+  if (empty($params[$lowercase_entity . '_id']) && isset($params['id'])) {
+    $params[$lowercase_entity . '_id'] = $params['id'];
   }
   unset($params['id']);
 
@@ -499,7 +502,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     // we will filter query object against getfields
     $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     // we need to add this in as earlier in this function 'id' was unset in favour of $entity_id
-    $fields['values'][$entity . '_id'] = array();
+    $fields['values'][$lowercase_entity . '_id'] = array();
     $varsToFilter = array('returnProperties', 'inputParams');
     foreach ($varsToFilter as $varToFilter) {
       if (!is_array($$varToFilter)) {
@@ -524,7 +527,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   }
 
   if (substr($sort, 0, 2) == 'id') {
-    $sort = $entity . "_" . $sort;
+    $sort = $lowercase_entity . "_" . $sort;
   }
 
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
@@ -610,16 +613,16 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
  * @param CRM_Core_DAO $dao
  * @param array $params
  * @param bool $unique
- * @param string $entity
  *
  * @throws API_Exception
  * @throws Exception
  */
-function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
-  $entity = substr($dao->__table, 8);
-  if (!empty($params[$entity . "_id"]) && empty($params['id'])) {
+function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE) {
+  $entity = _civicrm_api_get_entity_name_from_dao($dao);
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+  if (!empty($params[$lowercase_entity . "_id"]) && empty($params['id'])) {
     //if entity_id is set then treat it as ID (will be overridden by id if set)
-    $params['id'] = $params[$entity . "_id"];
+    $params['id'] = $params[$lowercase_entity . "_id"];
   }
   $allfields = _civicrm_api3_build_fields_array($dao, $unique);
   $fields = array_intersect(array_keys($allfields), array_keys($params));
@@ -746,6 +749,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  *   options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
+  $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
   $sort = CRM_Utils_Array::value('option.sort', $params, $sort);
@@ -781,14 +785,14 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   }
   if ($entity && $action == 'get') {
     if (!empty($returnProperties['id'])) {
-      $returnProperties[$entity . '_id'] = 1;
+      $returnProperties[$lowercase_entity . '_id'] = 1;
       unset($returnProperties['id']);
     }
     switch (trim(strtolower($sort))) {
       case 'id':
       case 'id desc':
       case 'id asc':
-        $sort = str_replace('id', $entity . '_id', $sort);
+        $sort = str_replace('id', $lowercase_entity . '_id', $sort);
     }
   }
 
@@ -819,7 +823,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
     elseif ($n == 'id') {
-      $inputParams[$entity . '_id'] = $v;
+      $inputParams[$lowercase_entity . '_id'] = $v;
     }
     elseif (in_array($n, $otherVars)) {
     }
@@ -872,9 +876,9 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   $fields = $bao->fields();
   if ($unique) {
     if (empty($fields['id'])) {
-      $entity = _civicrm_api_get_entity_name_from_dao($bao);
-      $fields['id'] = $fields[$entity . '_id'];
-      unset($fields[$entity . '_id']);
+      $lowercase_entity = _civicrm_api_get_entity_name_from_camel(_civicrm_api_get_entity_name_from_dao($bao));
+      $fields['id'] = $fields[$lowercase_entity . '_id'];
+      unset($fields[$lowercase_entity . '_id']);
     }
     return $fields;
   }
@@ -1174,7 +1178,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  *
  * @param array $params
  *   Associative array of property name/value.
- *                             pairs to insert in new history.
+ *   pairs to insert in new history.
  * @param string $daoName
  * @param bool $return
  *
@@ -1243,7 +1247,7 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  */
 function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "") {
   $bao = new $bao_name();
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE, $entity);
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
   if ($returnAsSuccess) {
     return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
   }
@@ -1268,7 +1272,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   _civicrm_api3_format_params_for_create($params, $entity);
   $args = array(&$params);
-  if (!empty($entity)) {
+  if ($entity) {
     $ids = array($entity => CRM_Utils_Array::value('id', $params));
     $args[] = &$ids;
   }
@@ -2195,12 +2199,12 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
  */
 function _civicrm_api3_deprecation_check($entity, $result = array()) {
   if ($entity) {
-    $apiFile = 'api/v3/' . _civicrm_api_get_camel_name($entity) . '.php';
+    $apiFile = "api/v3/$entity.php";
     if (CRM_Utils_File::isIncludable($apiFile)) {
       require_once $apiFile;
     }
-    $entity = _civicrm_api_get_entity_name_from_camel($entity);
-    $fnName = "_civicrm_api3_{$entity}_deprecation";
+    $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
+    $fnName = "_civicrm_api3_{$lowercase_entity}_deprecation";
     if (function_exists($fnName)) {
       return $fnName($result);
     }

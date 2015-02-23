@@ -26,7 +26,7 @@
  */
 
 /**
- * This api is used for triggering scheduled "cron" jobs.
+ * This api is used for working with scheduled "cron" jobs.
  *
  * @package CiviCRM_APIv3
  */
@@ -99,7 +99,7 @@ function civicrm_api3_job_execute($params) {
   $facility->execute(FALSE);
 
   // Always creates success - results are handled elsewhere.
-  return civicrm_api3_create_success(1, $params);
+  return civicrm_api3_create_success(1, $params, 'Job');
 }
 
 /**
@@ -302,7 +302,7 @@ function civicrm_api3_job_process_mailing($params) {
   }
   else {
     $values = array();
-    return civicrm_api3_create_success($values, $params, 'mailing', 'process');
+    return civicrm_api3_create_success($values, $params, 'Job', 'process_mailing');
   }
 }
 
@@ -319,7 +319,7 @@ function civicrm_api3_job_process_sms($params) {
   }
   else {
     $values = array();
-    return civicrm_api3_create_success($values, $params, 'mailing', 'process');
+    return civicrm_api3_create_success($values, $params, 'Job', 'process_sms');
   }
 }
 
@@ -343,7 +343,7 @@ function civicrm_api3_job_fetch_bounces($params) {
 
   // FIXME: processBounces doesn't return true/false on success/failure
   $values = array();
-  return civicrm_api3_create_success($values, $params, 'mailing', 'bounces');
+  return civicrm_api3_create_success($values, $params, 'Job', 'fetch_bounces');
 }
 
 /**
@@ -363,7 +363,7 @@ function civicrm_api3_job_fetch_activities($params) {
     CRM_Utils_Mail_EmailProcessor::processActivities();
     $values = array();
     $lock->release();
-    return civicrm_api3_create_success($values, $params, 'mailing', 'activities');
+    return civicrm_api3_create_success($values, $params, 'Job', 'fetch_activities');
   }
   catch (Exception $e) {
     $lock->release();
@@ -416,7 +416,7 @@ function civicrm_api3_job_process_membership($params) {
   $lock->release();
 
   if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success($result['messages'], $params);
+    return civicrm_api3_create_success($result['messages'], $params, 'Job', 'process_membership');
   }
   else {
     return civicrm_api3_create_error($result['messages']);
@@ -576,7 +576,7 @@ function civicrm_api3_job_disable_expired_relationships($params) {
   if (!$result) {
     throw new API_Exception('Failed to disable all expired relationships.');
   }
-  return civicrm_api3_create_success(1, $params);
+  return civicrm_api3_create_success(1, $params, 'Job', 'disable_expired_relationships');
 }
 
 /**

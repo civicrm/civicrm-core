@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using uf_field get API.
+ * Test Generated example demonstrating the UFField.get API.
  *
  * @return array
  *   API result array
@@ -9,7 +9,7 @@ function uf_field_get_example() {
   $params = array();
 
   try{
-    $result = civicrm_api3('uf_field', 'get', $params);
+    $result = civicrm_api3('UFField', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -63,11 +63,10 @@ function uf_field_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetUFFieldSuccess
-* and can be found in
+* The test that created it is called "testGetUFFieldSuccess"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/UFFieldTest.php
 *
 * You can see the outcome of the API tests at

@@ -32,7 +32,7 @@
  */
 
 /**
- * Handle a confirm event.
+ * Handle a queue event.
  *
  * @param array $params
  *   Array of property.

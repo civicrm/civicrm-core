@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using mail_settings create API.
+ * Test Generated example demonstrating the MailSettings.create API.
  *
  * @return array
  *   API result array
@@ -18,7 +18,7 @@ function mail_settings_create_example() {
   );
 
   try{
-    $result = civicrm_api3('mail_settings', 'create', $params);
+    $result = civicrm_api3('MailSettings', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -47,10 +47,10 @@ function mail_settings_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 5,
     'values' => array(
-      '2' => array(
-        'id' => '2',
+      '5' => array(
+        'id' => '5',
         'domain_id' => '1',
         'name' => 'my mail setting',
         'is_default' => '1',
@@ -71,11 +71,10 @@ function mail_settings_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateMailSettings
-* and can be found in
+* The test that created it is called "testDeleteMailSettings"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailSettingsTest.php
 *
 * You can see the outcome of the API tests at

@@ -1,19 +1,25 @@
 <?php
 /**
- * Test Generated example of using contact getoptions API.
- *
- * Demonstrates retrieving options for a custom field.
+ * Test Generated example demonstrating the Membership.create API.
  *
  * @return array
  *   API result array
  */
-function contact_getoptions_example() {
+function membership_create_example() {
   $params = array(
-    'field' => 'custom_1',
+    'contact_id' => 106,
+    'membership_type_id' => 65,
+    'join_date' => '2009-01-21',
+    'start_date' => '2009-01-21',
+    'end_date' => '2009-12-21',
+    'source' => 'Payment',
+    'is_override' => 1,
+    'status_id' => 39,
+    'custom_1' => 'custom string',
   );
 
   try{
-    $result = civicrm_api3('contact', 'getoptions', $params);
+    $result = civicrm_api3('Membership', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -36,27 +42,42 @@ function contact_getoptions_example() {
  * @return array
  *   API result array
  */
-function contact_getoptions_expectedresult() {
+function membership_create_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 2,
+    'count' => 1,
+    'id' => 1,
     'values' => array(
-      '1' => 'Label1',
-      '2' => 'Label2',
+      '1' => array(
+        'id' => '1',
+        'contact_id' => '106',
+        'membership_type_id' => '65',
+        'join_date' => '20090121000000',
+        'start_date' => '2013-07-29 00:00:00',
+        'end_date' => '2013-08-04 00:00:00',
+        'source' => 'Payment',
+        'status_id' => '39',
+        'is_override' => '1',
+        'owner_membership_id' => '',
+        'max_related' => '',
+        'is_test' => 0,
+        'is_pay_later' => '',
+        'contribution_recur_id' => '',
+        'campaign_id' => '',
+      ),
     ),
   );
 
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCustomFieldCreateWithOptionValues
-* and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
+* The test that created it is called "testUpdateWithCustom"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

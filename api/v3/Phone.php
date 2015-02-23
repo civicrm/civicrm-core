@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM phone.
+ * This api exposes CiviCRM phone records.
  *
  * @package CiviCRM_APIv3
  */
@@ -38,7 +38,6 @@
  *   Array per getfields metadata.
  *
  * @return array
- *   Array of newly created phone property values.
  */
 function civicrm_api3_phone_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Phone');

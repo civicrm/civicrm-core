@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM group nesting.
+ * This api exposes CiviCRM GroupNesting.
  *
  * This defines parent/child relationships between nested groups.
  *
@@ -43,7 +43,6 @@
  *   list of group nesting records
  */
 function civicrm_api3_group_nesting_get($params) {
-
   return _civicrm_api3_basic_get('CRM_Contact_DAO_GroupNesting', $params);
 }
 
@@ -60,12 +59,11 @@ function civicrm_api3_group_nesting_get($params) {
  * @todo Work out the return value.
  */
 function civicrm_api3_group_nesting_create($params) {
-
   CRM_Contact_BAO_GroupNesting::add($params['parent_group_id'], $params['child_group_id']);
 
   // FIXME: CRM_Contact_BAO_GroupNesting requires some work
   $result = array('is_error' => 0);
-  return civicrm_api3_create_success($result, $params);
+  return civicrm_api3_create_success($result, $params, 'GroupNesting');
 }
 
 /**
@@ -92,6 +90,5 @@ function _civicrm_api3_group_nesting_create_spec(&$params) {
  * @todo Work out the return value.
  */
 function civicrm_api3_group_nesting_delete($params) {
-
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

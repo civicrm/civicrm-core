@@ -59,14 +59,14 @@ function civicrm_api3_custom_field_create($params) {
   $customField = CRM_Core_BAO_CustomField::create($params);
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
   _civicrm_api3_custom_field_flush_static_caches();
-  return civicrm_api3_create_success($values, $params, 'custom_field', $customField);
+  return civicrm_api3_create_success($values, $params, 'CustomField', $customField);
 }
 
 /**
  * Flush static caches in functions that might have stored available custom fields.
  */
 function _civicrm_api3_custom_field_flush_static_caches() {
-  civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  civicrm_api('CustomField', 'getfields', array('version' => 3, 'cache_clear' => 1));
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
 
@@ -102,7 +102,7 @@ function civicrm_api3_custom_field_delete($params) {
   $field->id = $params['id'];
   $field->find(TRUE);
   $customFieldDelete = CRM_Core_BAO_CustomField::deleteField($field);
-  civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  civicrm_api('CustomField', 'getfields', array('version' => 3, 'cache_clear' => 1));
   return $customFieldDelete ? civicrm_api3_create_error('Error while deleting custom field') : civicrm_api3_create_success();
 }
 
@@ -253,7 +253,7 @@ SELECT count(*)
  */
 function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
-  $result = civicrm_api3_generic_setValue(array("entity" => 'custom_field', 'params' => $params));
+  $result = civicrm_api3_generic_setValue(array("entity" => 'CustomField', 'params' => $params));
   if (empty($result['is_error'])) {
     CRM_Utils_System::flushCache();
   }

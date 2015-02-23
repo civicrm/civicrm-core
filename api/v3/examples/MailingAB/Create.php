@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using mailing_a_b create API.
+ * Test Generated example demonstrating the MailingAB.create API.
  *
  * @return array
  *   API result array
@@ -10,14 +10,14 @@ function mailing_a_b_create_example() {
     'mailing_id_a' => 1,
     'mailing_id_b' => 2,
     'mailing_id_c' => 3,
-    'testing_criteria_id' => 1,
-    'winner_criteria_id' => 1,
+    'testing_criteria' => 'subject',
+    'winner_criteria' => 'open',
     'declare_winning_time' => '+2 days',
     'group_percentage' => 10,
   );
 
   try{
-    $result = civicrm_api3('mailing_a_b', 'create', $params);
+    $result = civicrm_api3('MailingAB', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -56,10 +56,10 @@ function mailing_a_b_create_expectedresult() {
         'mailing_id_b' => '2',
         'mailing_id_c' => '3',
         'domain_id' => '1',
-        'testing_criteria_id' => '1',
-        'winner_criteria_id' => '1',
+        'testing_criteria_id' => '',
+        'winner_criteria_id' => '',
         'specific_url' => '',
-        'declare_winning_time' => '20150218114218',
+        'declare_winning_time' => '20150224231452',
         'group_percentage' => '10',
       ),
     ),
@@ -68,11 +68,10 @@ function mailing_a_b_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testMailingABCreateSuccess
-* and can be found in
+* The test that created it is called "testMailingABCreateSuccess"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingABTest.php
 *
 * You can see the outcome of the API tests at

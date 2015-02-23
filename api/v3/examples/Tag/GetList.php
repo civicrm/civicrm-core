@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using tag getlist API.
+ * Test Generated example demonstrating the Tag.getlist API.
  *
  * Demonstrates use of api.getlist for autocomplete and quicksearch applications.
  *
@@ -16,7 +16,7 @@ function tag_getlist_example() {
   );
 
   try{
-    $result = civicrm_api3('tag', 'getlist', $params);
+    $result = civicrm_api3('Tag', 'getlist', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -65,11 +65,10 @@ function tag_getlist_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testTagGetList
-* and can be found in
+* The test that created it is called "testTagGetList"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
 *
 * You can see the outcome of the API tests at

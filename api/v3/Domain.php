@@ -26,13 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM domain.
+ * This api exposes CiviCRM Domain configuration settings.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Get CiviCRM domain details.
+ * Get CiviCRM Domain details.
  *
  * @param array $params
  *
@@ -53,8 +53,8 @@ function civicrm_api3_domain_get($params) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'domain');
-  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'domain');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
 
   foreach ($domains as $domain) {
     if (!empty($domain['contact_id'])) {
@@ -105,7 +105,7 @@ function civicrm_api3_domain_get($params) {
     }
   }
 
-  return civicrm_api3_create_success($domains, $params, 'domain', 'get', $bao);
+  return civicrm_api3_create_success($domains, $params, 'Domain', 'get', $bao);
 }
 
 /**
@@ -121,7 +121,7 @@ function _civicrm_api3_domain_get_spec(&$params) {
 }
 
 /**
- * Create a new domain.
+ * Create a new Domain.
  *
  * @param array $params
  *

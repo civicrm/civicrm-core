@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using setting create API.
+ * Test Generated example demonstrating the Setting.create API.
  *
  * Shows setting a variable for specified domains.
  *
@@ -17,7 +17,7 @@ function setting_create_example() {
   );
 
   try{
-    $result = civicrm_api3('setting', 'create', $params);
+    $result = civicrm_api3('Setting', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -59,11 +59,10 @@ function setting_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateSettingMultipleDomains
-* and can be found in
+* The test that created it is called "testCreateSettingMultipleDomains"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SettingTest.php
 *
 * You can see the outcome of the API tests at

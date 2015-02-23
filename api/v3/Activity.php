@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM activity.
+ * This api exposes CiviCRM Activity records.
  *
  * @package CiviCRM_APIv3
  */
@@ -165,7 +165,7 @@ function civicrm_api3_activity_create($params) {
     }
 
     _civicrm_api3_object_to_array($activityBAO, $activityArray[$activityBAO->id]);
-    return civicrm_api3_create_success($activityArray, $params, 'activity', 'get', $activityBAO);
+    return civicrm_api3_create_success($activityArray, $params, 'Activity', 'get', $activityBAO);
   }
 }
 
@@ -228,14 +228,14 @@ function civicrm_api3_activity_get($params) {
   else {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
-  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'activity', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
-    return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
 
   $activities = _civicrm_api3_activity_get_formatResult($params, $activities);
   //legacy custom data get - so previous formatted response is still returned too
-  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+  return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
 }
 
 /**
@@ -314,10 +314,10 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
 function civicrm_api3_activity_delete($params) {
 
   if (CRM_Activity_BAO_Activity::deleteActivity($params)) {
-    return civicrm_api3_create_success(1, $params, 'activity', 'delete');
+    return civicrm_api3_create_success(1, $params, 'Activity', 'delete');
   }
   else {
-    throw new API_Exception('Could not delete activity');
+    throw new API_Exception('Could not delete Activity');
   }
 }
 

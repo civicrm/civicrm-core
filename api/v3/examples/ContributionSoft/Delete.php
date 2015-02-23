@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using contribution_soft delete API.
+ * Test Generated example demonstrating the ContributionSoft.delete API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function contribution_soft_delete_example() {
   );
 
   try{
-    $result = civicrm_api3('contribution_soft', 'delete', $params);
+    $result = civicrm_api3('ContributionSoft', 'delete', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -41,11 +41,10 @@ function contribution_soft_delete_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testDeleteContributionSoft
-* and can be found in
+* The test that created it is called "testDeleteContributionSoft"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionSoftTest.php
 *
 * You can see the outcome of the API tests at

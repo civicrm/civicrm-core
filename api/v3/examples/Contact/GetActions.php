@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using contact getactions API.
+ * Test Generated example demonstrating the Contact.getactions API.
  *
  * Getting the available actions for an entity.
  *
@@ -11,7 +11,7 @@ function contact_getactions_example() {
   $params = array();
 
   try{
-    $result = civicrm_api3('contact', 'getactions', $params);
+    $result = civicrm_api3('Contact', 'getactions', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -39,26 +39,31 @@ function contact_getactions_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 18,
+    'count' => 23,
     'values' => array(
       '0' => 'create',
       '1' => 'delete',
-      '2' => 'get',
-      '3' => 'getactions',
-      '4' => 'getcount',
-      '5' => 'getfields',
-      '6' => 'getlist',
-      '7' => 'getoptions',
-      '8' => 'getquick',
-      '9' => 'getrefcount',
-      '10' => 'getsingle',
-      '11' => 'getstat',
-      '12' => 'getvalue',
-      '13' => 'merge',
-      '14' => 'proximity',
-      '15' => 'replace',
-      '16' => 'setvalue',
-      '17' => 'update',
+      '2' => 'example_action1',
+      '3' => 'example_action2',
+      '4' => 'get',
+      '5' => 'getactions',
+      '6' => 'getcount',
+      '7' => 'getfields',
+      '8' => 'getlist',
+      '9' => 'getoptions',
+      '10' => 'getquick',
+      '11' => 'getrefcount',
+      '12' => 'getsingle',
+      '13' => 'getstat',
+      '14' => 'getvalue',
+      '15' => 'merge',
+      '16' => 'proximity',
+      '17' => 'replace',
+      '18' => 'setvalue',
+      '19' => 'type_create',
+      '20' => 'type_delete',
+      '21' => 'type_get',
+      '22' => 'update',
     ),
     'deprecated' => array(
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',
@@ -69,11 +74,10 @@ function contact_getactions_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetActions
-* and can be found in
+* The test that created it is called "testGetActions"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at

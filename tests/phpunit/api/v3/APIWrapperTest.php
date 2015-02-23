@@ -94,7 +94,7 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
    * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
-    if ($apiRequest['entity'] == 'contact' && $apiRequest['action'] == 'create') {
+    if ($apiRequest['entity'] == 'Contact' && $apiRequest['action'] == 'create') {
       if ('Invalid' == CRM_Utils_Array::value('contact_type', $apiRequest['params'])) {
         $apiRequest['params']['contact_type'] = 'Individual';
       }
@@ -106,7 +106,7 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
    * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
-    if ($apiRequest['entity'] == 'contact' && $apiRequest['action'] == 'create') {
+    if ($apiRequest['entity'] == 'Contact' && $apiRequest['action'] == 'create') {
       if (isset($result['id'], $result['values'][$result['id']]['display_name'])) {
         $result['values'][$result['id']]['display_name_munged'] = 'MUNGE! ' . $result['values'][$result['id']]['display_name'];
         unset($result['values'][$result['id']]['display_name']);

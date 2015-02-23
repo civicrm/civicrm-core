@@ -27,13 +27,13 @@
 
 /**
  *
- * This api exposes CiviCRM membership contact.
+ * This api exposes CiviCRM membership contact records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Deletes an existing contact membership.
+ * Deletes an existing contact Membership.
  *
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
@@ -131,7 +131,7 @@ function civicrm_api3_membership_create($params) {
   $membership = array();
   _civicrm_api3_object_to_array($membershipBAO, $membership[$membershipBAO->id]);
 
-  return civicrm_api3_create_success($membership, $params, 'membership', 'create', $membershipBAO);
+  return civicrm_api3_create_success($membership, $params, 'Membership', 'create', $membershipBAO);
 
 }
 
@@ -175,7 +175,7 @@ function _civicrm_api3_membership_get_spec(&$params) {
 }
 
 /**
- * Get contact membership record.
+ * Get contact Membership record.
  *
  * This api will return the membership records for the contacts
  * having membership based on the relationship with the direct members.
@@ -201,7 +201,7 @@ function civicrm_api3_membership_get($params) {
     $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
   }
 
-  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'membership', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'Membership', 'get');
   if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
@@ -214,11 +214,11 @@ function civicrm_api3_membership_get($params) {
       && !array_key_exists('relationship_name', $return)
     )
     ) {
-    return civicrm_api3_create_success($membershipValues, $params, 'membership', 'get');
+    return civicrm_api3_create_success($membershipValues, $params, 'Membership', 'get');
   }
 
   $members = _civicrm_api3_membership_relationsship_get_customv2behaviour($params, $membershipValues, $contactID);
-  return civicrm_api3_create_success($members, $params, 'membership', 'get');
+  return civicrm_api3_create_success($members, $params, 'Membership', 'get');
 }
 
 /**

@@ -3,6 +3,8 @@
 /**
  * Get list of deprecated entities.
  *
+ * This is called by the api wrapper when returning the result of api.Entity.get.
+ *
  * @param array $entities
  *
  * @return array

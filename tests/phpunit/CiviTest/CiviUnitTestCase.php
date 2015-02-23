@@ -1050,14 +1050,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $file
    *   Pass this in to create a generated example.
    * @param string $description
-   * @param string|null $subfile
-   * @param string|null $actionName
+   * @param string|null $exampleName
+   *
    * @return array|int
    */
-  public function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL) {
+  public function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $exampleName = NULL) {
     $params['version'] = $this->_apiversion;
     $result = $this->callAPISuccess($entity, $action, $params);
-    $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
+    $this->documentMe($entity, $action, $params, $result, $function, $file, $description, $exampleName);
     return $result;
   }
 
@@ -2249,99 +2249,49 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
    * in your settings file
    *
+   * @param string $entity
+   * @param string $action
    * @param array $params
    *   Array as passed to civicrm_api function.
    * @param array $result
    *   Array as received from the civicrm_api function.
-   * @param string $function
+   * @param string $testFunction
    *   Calling function - generally __FUNCTION__.
-   * @param string $filename
+   * @param string $testFile
    *   Called from file - generally __FILE__.
    * @param string $description
    *   Descriptive text for the example file.
-   * @param string $subfile
-   *   Name for subfile - if this is completed the example will be put in a subfolder (named by the entity).
-   * @param string $action
-   *   Optional action - otherwise taken from function name.
+   * @param string $exampleName
+   *   Name for this example file (CamelCase) - if ommitted the action name will be substituted.
    */
-  public function documentMe($params, $result, $function, $filename, $description = "", $subfile = NULL, $action = NULL) {
+  private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
       return;
     }
-    $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    //todo - this is a bit cludgey
-    if (empty($action)) {
-      if (strstr($function, 'Create')) {
-        $action = empty($action) ? 'create' : $action;
-        $entityAction = 'Create';
+    $entity = _civicrm_api_get_camel_name($entity);
+    $action = strtolower($action);
+
+    if (empty($exampleName)) {
+      // Attempt to convert lowercase action name to CamelCase.
+      // This is clunky/imperfect due to the convention of all lowercase actions.
+      $exampleName = CRM_Utils_String::convertStringToCamel($action);
+      $knownPrefixes = array(
+        'Get',
+        'Set',
+        'Create',
+        'Update',
+        'Send',
+      );
+      foreach ($knownPrefixes as $prefix) {
+        if (strpos($exampleName, $prefix) === 0 && $prefix != $exampleName) {
+          $exampleName[strlen($prefix)] = strtoupper($exampleName[strlen($prefix)]);
+        }
       }
-      elseif (strstr($function, 'GetSingle')) {
-        $action = empty($action) ? 'getsingle' : $action;
-        $entityAction = 'GetSingle';
-      }
-      elseif (strstr($function, 'GetValue')) {
-        $action = empty($action) ? 'getvalue' : $action;
-        $entityAction = 'GetValue';
-      }
-      elseif (strstr($function, 'GetCount')) {
-        $action = empty($action) ? 'getcount' : $action;
-        $entityAction = 'GetCount';
-      }
-      elseif (strstr($function, 'GetFields')) {
-        $action = empty($action) ? 'getfields' : $action;
-        $entityAction = 'GetFields';
-      }
-      elseif (strstr($function, 'GetList')) {
-        $action = empty($action) ? 'getlist' : $action;
-        $entityAction = 'GetList';
-      }
-      elseif (strstr($function, 'GetActions')) {
-        $action = empty($action) ? 'getactions' : $action;
-        $entityAction = 'GetActions';
-      }
-      elseif (strstr($function, 'Get')) {
-        $action = empty($action) ? 'get' : $action;
-        $entityAction = 'Get';
-      }
-      elseif (strstr($function, 'Delete')) {
-        $action = empty($action) ? 'delete' : $action;
-        $entityAction = 'Delete';
-      }
-      elseif (strstr($function, 'Update')) {
-        $action = empty($action) ? 'update' : $action;
-        $entityAction = 'Update';
-      }
-      elseif (strstr($function, 'Subscribe')) {
-        $action = empty($action) ? 'subscribe' : $action;
-        $entityAction = 'Subscribe';
-      }
-      elseif (strstr($function, 'Submit')) {
-        $action = empty($action) ? 'submit' : $action;
-        $entityAction = 'Submit';
-      }
-      elseif (strstr($function, 'Apply')) {
-        $action = empty($action) ? 'apply' : $action;
-        $entityAction = 'Apply';
-      }
-      elseif (strstr($function, 'Replace')) {
-        $action = empty($action) ? 'replace' : $action;
-        $entityAction = 'Replace';
-      }
-    }
-    else {
-      $entityAction = ucwords($action);
     }
 
     $this->tidyExampleResult($result);
     if (isset($params['version'])) {
       unset($params['version']);
-    }
-    // a cleverer person than me would do it in a single regex
-    if (strstr($entity, 'UF')) {
-      $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)(?<=UF)[A-Z]/', '_$0', $entity));
-    }
-    else {
-      $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)[A-Z]/', '_$0', $entity));
     }
     // Format multiline description as array
     $desc = array();
@@ -2351,25 +2301,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       }
     }
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('testfunction', $function);
-    $function = $fnPrefix . "_" . strtolower($action);
-    $smarty->assign('function', $function);
-    $smarty->assign('fnPrefix', $fnPrefix);
+    $smarty->assign('testFunction', $testFunction);
+    $smarty->assign('function', _civicrm_api_get_entity_name_from_camel($entity) . "_$action");
     $smarty->assign('params', $params);
     $smarty->assign('entity', $entity);
-    $smarty->assign('filename', basename($filename));
+    $smarty->assign('testFile', basename($testFile));
     $smarty->assign('description', $desc);
     $smarty->assign('result', $result);
-
     $smarty->assign('action', $action);
-    if (empty($subfile)) {
-      $subfile = $entityAction;
-    }
+
     if (file_exists('../tests/templates/documentFunction.tpl')) {
       if (!is_dir("../api/v3/examples/$entity")) {
         mkdir("../api/v3/examples/$entity");
       }
-      $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
+      $f = fopen("../api/v3/examples/$entity/$exampleName.php", "w+b");
       fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
       fclose($f);
     }

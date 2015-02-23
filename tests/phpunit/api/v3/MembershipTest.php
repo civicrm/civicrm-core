@@ -340,7 +340,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testGetOnlyActive() {
     $description = "Demonstrates use of 'filter' active_only' param.";
     $this->_membershipID = $this->contactMembershipCreate($this->_params);
-    $subfile = 'filterIsCurrent';
     $params = array(
       'contact_id' => $this->_contactID,
       'active_only' => 1,
@@ -356,7 +355,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       ),
     );
 
-    $membership = $this->callAPIAndDocument('membership', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $membership = $this->callAPIAndDocument('membership', 'get', $params, __FUNCTION__, __FILE__, $description, 'FilterIsCurrent');
     $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
     $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
 
@@ -675,7 +674,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, NULL, 'CreateWithCustomData');
     $check = $this->callAPISuccess($this->_entity, 'get', array(
       'id' => $result['id'],
       'contact_id' => $this->_contactID,
@@ -811,7 +810,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, NULL, 'UpdateCustomData');
     $result = $this->callAPISuccess($this->_entity, 'create', array(
       'id' => $result['id'],
       'custom_' . $ids['custom_field_id'] => "new custom",

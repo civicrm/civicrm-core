@@ -26,37 +26,36 @@
  */
 
 /**
- * This api exposes CiviCRM financial_type.
+ * This api exposes CiviCRM FinancialType.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save a financial_type.
+ * Save a FinancialType.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created financial_type property values.
  */
 function civicrm_api3_financial_type_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a financial_type.
+ * Get a FinancialType.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved financial_type property values.
+ *   Array of retrieved FinancialType property values.
  */
 function civicrm_api3_financial_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a financial_type.
+ * Delete a FinancialType.
  *
  * @param array $params
  *
