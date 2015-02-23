@@ -153,7 +153,7 @@ $installTypeToUF = array(
   'drupal' => 'Drupal',
 );
 
-$uf = (! isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
+$uf = (isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
 define('CIVICRM_UF', $uf);
 
 global $tsLocale;

@@ -889,4 +889,5 @@ AND
   public function free() {
     self::$_singleton = NULL;
   }
+
 }
