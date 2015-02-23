@@ -126,7 +126,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ));
     }
     $mailGrp = civicrm_api3('MailingGroup', 'get', array());
-    $mailTokens = civicrm_api3('Mailing', 'get_token', array('usage' => 'Mailing'));
+    $mailTokens = civicrm_api3('Mailing', 'gettokens', array('entity' => array('contact', 'mailing'), 'sequential' => 1));
     $fromAddress = civicrm_api3('OptionGroup', 'get', array(
       'sequential' => 1,
       'name' => "from_email_address",
@@ -143,7 +143,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mesTemplate' => array_values($mesTemplate['values']),
         'emailAdd' => array_values($emailAdd['values']),
         'mailGrp' => array_values($mailGrp['values']),
-        'mailTokens' => array_values($mailTokens),
+        'mailTokens' => $mailTokens['values'],
         'contactid' => $contactID,
         'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
         'enableReplyTo' => isset($config->replyTo) ? $config->replyTo : 0,
