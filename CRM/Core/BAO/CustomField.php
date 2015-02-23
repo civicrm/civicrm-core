@@ -278,7 +278,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customField->is_searchable = CRM_Utils_Array::value('is_searchable', $params, FALSE);
     $customField->in_selector = CRM_Utils_Array::value('in_selector', $params, FALSE);
     $customField->is_search_range = CRM_Utils_Array::value('is_search_range', $params, FALSE);
-    $customField->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    //CRM-15792 - Custom field gets disabled if is_active not set
+    $customField->is_active = CRM_Utils_Array::value('is_active', $params, TRUE);
     $customField->is_view = CRM_Utils_Array::value('is_view', $params, FALSE);
     $customField->save();
 
