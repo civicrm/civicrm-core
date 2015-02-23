@@ -9,7 +9,7 @@
 <body>
 
 <div id="All">
-  <div style="float: right"><strong>Version <?php echo "{$civicrm_version['version']} {$civicrm_version['cms']}" ?></strong><br/>
+  <div style="float: right"><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version['version']} {$civicrm_version['cms']}")); ?></strong><br/>
     <span><img src=<?php echo $installURLPath . "block_small.png"?> /></span>
   </div>
 
@@ -78,9 +78,9 @@
 </span>
 </p>
 
-<h4><?php echo ts('CiviCRM Database Settings'); ?></h4>
 <input type="hidden" name="database" value="MySQLDatabase" />
 
+<h2><?php echo ts('Database Version and Connection Settings'); ?></h2>
 <p>
 <?php echo ts('CiviCRM stores its content in a MySQL database. Please provide the username and password to connect to the server here.  If this account has permission to create databases, then we will create the database for you; otherwise, you must give the name of a database that already exists.'); ?>
 </p>
@@ -91,7 +91,8 @@
   <p class="good"><?php echo ts("Database version and connection settings have been verified and look correct!"); ?></p>
 <?php } ?>
 
-<p style="margin-left: 2em" id="mysql_credentials" >
+<h4><?php echo ts('CiviCRM Database Settings'); ?></h4>
+<p style="margin-left: 2em" id="mysql_credentials">
   <label for="mysql_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="mysql_server" type="text" name="mysql[server]" value="<?php echo $databaseConfig['server'] ?>" /></label> <br />
   <label for="mysql_username"> <span><?php echo ts('MySQL username:'); ?></span> <input id="mysql_username" type="text" name="mysql[username]" value="<?php echo $databaseConfig['username'] ?>"  /></label> <br />
   <label for="mysql_password"> <span><?php echo ts('MySQL password:'); ?></span> <input id="mysql_password" type="password" name="mysql[password]" value="<?php echo $databaseConfig['password'] ?>" /></label> <br />
@@ -116,19 +117,22 @@
     <span class="testResults">Check this box to pre-populate CiviCRM with sample English contact records, online contribution pages, profile forms, etc. These examples can help you learn about CiviCRM features.</span><br />
 </p>
 
-<p style="margin-left: 2em"><input type="submit" value="Re-check requirements" /></p>
+<p style="margin-left: 2em"><input type="submit" value="<?php echo ts('Re-check requirements', array('escape' => 'js')); ?>" /></p>
 
 <a name="dbDetails">
-<h4>CiviCRM Database Details</h4>
-<?php $dbReq->showTable("MySQL CiviCRM Configuration"); ?>
+
+<?php
+  echo '<h4>' . ts('CiviCRM Database Details') . '</h4>';
+  $dbReq->showTable(ts("MySQL %1 Configuration", array(1 => 'CiviCRM')));
+?>
 
 <?php if ($installType == 'drupal') {
-echo "<h4>Drupal Database Details</h4>";
-$dbReq->showTable("MySQL Drupal Configuration");
+echo "<h4>" . ts('Drupal Database Details') . "</h4>";
+$dbReq->showTable(ts("MySQL %1 Configuration", array(1 => 'Drupal')));
 }?>
 <br /><hr />
 
-<h2 id="requirements">Requirements</h2>
+<h2 id="requirements"><?php echo ts('Requirements'); ?></h2>
 <?php
 $req->showTable();
 ?>
