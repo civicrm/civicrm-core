@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using survey_respondant get API.
+ * Test Generated example demonstrating the SurveyRespondant.get API.
  *
  * @deprecated
- * The survey_respondant api is not currently supported.
+ * The SurveyRespondant api is not currently supported.
  *
  * @return array
  *   API result array
@@ -15,7 +15,7 @@ function survey_respondant_get_example() {
   );
 
   try{
-    $result = civicrm_api3('survey_respondant', 'get', $params);
+    $result = civicrm_api3('SurveyRespondant', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -45,17 +45,16 @@ function survey_respondant_get_expectedresult() {
     'version' => 3,
     'count' => 0,
     'values' => array(),
-    'deprecated' => 'The survey_respondant api is not currently supported.',
+    'deprecated' => 'The SurveyRespondant api is not currently supported.',
   );
 
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetSurveyRespondants
-* and can be found in
+* The test that created it is called "testGetSurveyRespondants"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SurveyRespondantTest.php
 *
 * You can see the outcome of the API tests at

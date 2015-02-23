@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using uf_group create API.
+ * Test Generated example demonstrating the UFGroup.create API.
  *
  * @return array
  *   API result array
@@ -30,7 +30,7 @@ function uf_group_create_example() {
   );
 
   try{
-    $result = civicrm_api3('uf_group', 'create', $params);
+    $result = civicrm_api3('UFGroup', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -92,11 +92,10 @@ function uf_group_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testUFGroupCreate
-* and can be found in
+* The test that created it is called "testUFGroupCreate"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/UFGroupTest.php
 *
 * You can see the outcome of the API tests at

@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using uf_join get API.
+ * Test Generated example demonstrating the UFJoin.get API.
  *
  * @return array
  *   API result array
@@ -13,7 +13,7 @@ function uf_join_get_example() {
   );
 
   try{
-    $result = civicrm_api3('uf_join', 'get', $params);
+    $result = civicrm_api3('UFJoin', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -59,11 +59,10 @@ function uf_join_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetUFJoinId
-* and can be found in
+* The test that created it is called "testGetUFJoinId"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/UFJoinTest.php
 *
 * You can see the outcome of the API tests at

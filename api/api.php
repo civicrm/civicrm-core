@@ -105,7 +105,7 @@ function civicrm_error($result) {
 }
 
 /**
- * Get camel case version of entity or action name.
+ * Get camel case version of entity name.
  *
  * @param string|null $entity
  *

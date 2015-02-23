@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using system flush API.
+ * Test Generated example demonstrating the System.flush API.
  *
  * Flush all system caches
  *
@@ -11,7 +11,7 @@ function system_flush_example() {
   $params = array();
 
   try{
-    $result = civicrm_api3('system', 'flush', $params);
+    $result = civicrm_api3('System', 'flush', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -46,11 +46,10 @@ function system_flush_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testFlush
-* and can be found in
+* The test that created it is called "testFlush"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SystemTest.php
 *
 * You can see the outcome of the API tests at

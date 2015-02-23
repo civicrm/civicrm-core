@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using membership delete API.
+ * Test Generated example demonstrating the Membership.delete API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function membership_delete_example() {
   );
 
   try{
-    $result = civicrm_api3('membership', 'delete', $params);
+    $result = civicrm_api3('Membership', 'delete', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -46,11 +46,10 @@ function membership_delete_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testMembershipDelete
-* and can be found in
+* The test that created it is called "testMembershipDelete"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
 *
 * You can see the outcome of the API tests at

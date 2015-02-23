@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using pledge get API.
+ * Test Generated example demonstrating the Pledge.get API.
  *
  * demonstrates high date filter
  *
@@ -9,11 +9,11 @@
  */
 function pledge_get_example() {
   $params = array(
-    'pledge_start_date_high' => '20150214114707',
+    'pledge_start_date_high' => '20150220231942',
   );
 
   try{
-    $result = civicrm_api3('pledge', 'get', $params);
+    $result = civicrm_api3('Pledge', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -52,7 +52,7 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '2',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2015-02-16 00:00:00',
+        'pledge_create_date' => '2015-02-22 00:00:00',
         'pledge_status' => 'Overdue',
         'pledge_total_paid' => '',
         'pledge_next_pay_date' => '2014-03-07 00:00:00',
@@ -73,11 +73,10 @@ function pledge_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testPledgeGetReturnFilters
-* and can be found in
+* The test that created it is called "testPledgeGetReturnFilters"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PledgeTest.php
 *
 * You can see the outcome of the API tests at

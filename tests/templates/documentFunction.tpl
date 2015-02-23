@@ -1,6 +1,6 @@
 {literal}<?php{/literal}
 /**
- * Test Generated example of using {$fnPrefix} {$action} API.
+ * Test Generated example demonstrating the {$entity}.{$action} API.
  *
 {if !empty($result.deprecated) && is_string($result.deprecated)}
  * @deprecated
@@ -22,7 +22,7 @@ function {$function}_example() {literal}{{/literal}
   $params = {$params|@print_array};
 {literal}
   try{{/literal}
-    $result = civicrm_api3('{$fnPrefix}', '{$action}', $params);
+    $result = civicrm_api3('{$entity}', '{$action}', $params);
 {literal}  }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -52,12 +52,11 @@ function {$function}_expectedresult() {literal}{{/literal}
   return $expectedResult;
 {literal}}{/literal}
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* {$testfunction}
-* and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/{$filename}
+* The test that created it is called "{$testFunction}"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/{$testFile}
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

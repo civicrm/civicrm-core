@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using contact getcount API.
+ * Test Generated example demonstrating the Contact.getcount API.
  *
  * This demonstrates use of the 'getCount' action.
  * This param causes the count of the only function to be returned as an integer.
@@ -14,7 +14,7 @@ function contact_getcount_example() {
   );
 
   try{
-    $result = civicrm_api3('contact', 'getcount', $params);
+    $result = civicrm_api3('Contact', 'getcount', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -44,11 +44,10 @@ function contact_getcount_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testContactGetFormatCountOnly
-* and can be found in
+* The test that created it is called "testContactGetFormatCountOnly"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at

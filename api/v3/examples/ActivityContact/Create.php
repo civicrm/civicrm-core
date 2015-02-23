@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using activity_contact create API.
+ * Test Generated example demonstrating the ActivityContact.create API.
  *
  * @return array
  *   API result array
@@ -13,7 +13,7 @@ function activity_contact_create_example() {
   );
 
   try{
-    $result = civicrm_api3('activity_contact', 'create', $params);
+    $result = civicrm_api3('ActivityContact', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -56,11 +56,10 @@ function activity_contact_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateActivityContact
-* and can be found in
+* The test that created it is called "testCreateActivityContact"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityContactTest.php
 *
 * You can see the outcome of the API tests at

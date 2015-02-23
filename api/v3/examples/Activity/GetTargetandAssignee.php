@@ -1,13 +1,13 @@
 <?php
 /**
- * Test Generated example of using activity  API.
+ * Test Generated example demonstrating the Activity.create API.
  *
  * Demonstrates setting & retrieving activity target & source.
  *
  * @return array
  *   API result array
  */
-function activity__example() {
+function activity_create_example() {
   $params = array(
     'source_contact_id' => 1,
     'subject' => 'Make-it-Happen Meeting',
@@ -23,7 +23,7 @@ function activity__example() {
   );
 
   try{
-    $result = civicrm_api3('activity', '', $params);
+    $result = civicrm_api3('Activity', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -46,7 +46,7 @@ function activity__example() {
  * @return array
  *   API result array
  */
-function activity__expectedresult() {
+function activity_create_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
@@ -86,11 +86,10 @@ function activity__expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testActivityReturnTargetAssignee
-* and can be found in
+* The test that created it is called "testActivityReturnTargetAssignee"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
 *
 * You can see the outcome of the API tests at

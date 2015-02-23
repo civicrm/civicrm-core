@@ -1,18 +1,17 @@
 <?php
 /**
- * Test Generated example demonstrating the ParticipantPayment.create API.
+ * Test Generated example demonstrating the Address.getoptions API.
  *
  * @return array
  *   API result array
  */
-function participant_payment_create_example() {
+function address_getoptions_example() {
   $params = array(
-    'participant_id' => 13,
-    'contribution_id' => 1,
+    'field' => 'location_type_id',
   );
 
   try{
-    $result = civicrm_api3('ParticipantPayment', 'create', $params);
+    $result = civicrm_api3('Address', 'getoptions', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -35,19 +34,18 @@ function participant_payment_create_example() {
  * @return array
  *   API result array
  */
-function participant_payment_create_expectedresult() {
+function address_getoptions_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 1,
-    'id' => 1,
+    'count' => 5,
     'values' => array(
-      '1' => array(
-        'id' => '1',
-        'participant_id' => '13',
-        'contribution_id' => '1',
-      ),
+      '5' => 'Billing',
+      '1' => 'Home',
+      '3' => 'Main',
+      '4' => 'Other',
+      '2' => 'Work',
     ),
   );
 
@@ -56,9 +54,9 @@ function participant_payment_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testPaymentCreate"
+* The test that created it is called "testLocationTypeGet"
 * and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantPaymentTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ConstantTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

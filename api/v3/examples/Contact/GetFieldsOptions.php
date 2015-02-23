@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using contact GetFields API.
+ * Test Generated example demonstrating the Contact.getfields API.
  *
  * Demonstrates retrieving metadata with custom field options.
  *
@@ -16,7 +16,7 @@ function contact_getfields_example() {
   );
 
   try{
-    $result = civicrm_api3('contact', 'GetFields', $params);
+    $result = civicrm_api3('Contact', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -770,11 +770,10 @@ function contact_getfields_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCustomFieldCreateWithOptionValues
-* and can be found in
+* The test that created it is called "testCustomFieldCreateWithOptionValues"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at

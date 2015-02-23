@@ -1,34 +1,20 @@
 <?php
 /**
- * Test Generated example of using loc_block create API.
+ * Test Generated example demonstrating the LocBlock.get API.
  *
- * Create entities and locBlock in 1 api call.
+ * Get entities and location block in 1 api call
  *
  * @return array
  *   API result array
  */
-function loc_block_create_example() {
+function loc_block_get_example() {
   $params = array(
-    'email' => array(
-      'location_type_id' => 1,
-      'email' => 'test2@loc.block',
-    ),
-    'phone' => array(
-      'location_type_id' => 1,
-      'phone' => '987654321',
-    ),
-    'phone_2' => array(
-      'location_type_id' => 1,
-      'phone' => '456-7890',
-    ),
-    'address' => array(
-      'location_type_id' => 1,
-      'street_address' => '987654321',
-    ),
+    'id' => 3,
+    'return' => 'all',
   );
 
   try{
-    $result = civicrm_api3('loc_block', 'create', $params);
+    $result = civicrm_api3('LocBlock', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -51,7 +37,7 @@ function loc_block_create_example() {
  * @return array
  *   API result array
  */
-function loc_block_create_expectedresult() {
+function loc_block_get_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
@@ -60,6 +46,11 @@ function loc_block_create_expectedresult() {
     'id' => 3,
     'values' => array(
       '3' => array(
+        'id' => '3',
+        'address_id' => '3',
+        'email_id' => '4',
+        'phone_id' => '3',
+        'phone_2_id' => '4',
         'address' => array(
           'id' => '3',
           'location_type_id' => '1',
@@ -70,51 +61,29 @@ function loc_block_create_expectedresult() {
         ),
         'email' => array(
           'id' => '4',
-          'contact_id' => '',
           'location_type_id' => '1',
           'email' => 'test2@loc.block',
           'is_primary' => 0,
-          'is_billing' => '',
-          'on_hold' => '',
-          'is_bulkmail' => '',
-          'hold_date' => '',
-          'reset_date' => '',
-          'signature_text' => '',
-          'signature_html' => '',
+          'is_billing' => 0,
+          'on_hold' => 0,
+          'is_bulkmail' => 0,
         ),
         'phone' => array(
           'id' => '3',
-          'contact_id' => '',
           'location_type_id' => '1',
           'is_primary' => 0,
-          'is_billing' => '',
-          'mobile_provider_id' => '',
+          'is_billing' => 0,
           'phone' => '987654321',
-          'phone_ext' => '',
-          'phone_numeric' => '',
-          'phone_type_id' => '',
+          'phone_numeric' => '987654321',
         ),
         'phone_2' => array(
           'id' => '4',
-          'contact_id' => '',
           'location_type_id' => '1',
           'is_primary' => 0,
-          'is_billing' => '',
-          'mobile_provider_id' => '',
+          'is_billing' => 0,
           'phone' => '456-7890',
-          'phone_ext' => '',
-          'phone_numeric' => '',
-          'phone_type_id' => '',
+          'phone_numeric' => '4567890',
         ),
-        'id' => '3',
-        'address_id' => '3',
-        'email_id' => '4',
-        'phone_id' => '3',
-        'im_id' => '',
-        'address_2_id' => '',
-        'email_2_id' => '',
-        'phone_2_id' => '4',
-        'im_2_id' => '',
       ),
     ),
   );
@@ -122,11 +91,10 @@ function loc_block_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateLocBlockEntities
-* and can be found in
+* The test that created it is called "testCreateLocBlockEntities"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/LocBlockTest.php
 *
 * You can see the outcome of the API tests at

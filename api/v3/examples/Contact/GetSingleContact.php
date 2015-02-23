@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using contact getsingle API.
+ * Test Generated example demonstrating the Contact.getsingle API.
  *
  * This demonstrates use of the 'format.single_entity_array' param.
  * This param causes the only contact to be returned as an array without the other levels.
@@ -15,7 +15,7 @@ function contact_getsingle_example() {
   );
 
   try{
-    $result = civicrm_api3('contact', 'getsingle', $params);
+    $result = civicrm_api3('Contact', 'getsingle', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -112,11 +112,10 @@ function contact_getsingle_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testContactGetSingleEntityArray
-* and can be found in
+* The test that created it is called "testContactGetSingleEntityArray"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at

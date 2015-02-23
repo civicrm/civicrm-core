@@ -1728,7 +1728,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       It will be ignored if there is not exactly 1 result";
     $subFile = "FormatSingleValue";
     $params = array('id' => 17, 'return' => 'display_name');
-    $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile, 'getvalue');
+    $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals('Test Contact', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }

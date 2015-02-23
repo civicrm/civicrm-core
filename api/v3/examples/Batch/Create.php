@@ -1,22 +1,22 @@
 <?php
 /**
- * Test Generated example of using batch create API.
+ * Test Generated example demonstrating the Batch.create API.
  *
  * @return array
  *   API result array
  */
 function batch_create_example() {
   $params = array(
-    'name' => 'New_Batch_03',
-    'title' => 'New Batch 03',
-    'description' => 'This is description for New Batch 03',
-    'total' => '300.33',
-    'item_count' => 3,
-    'status_id' => 1,
+    'name' => 'New_Batch_04',
+    'title' => 'New Batch 04',
+    'description' => 'This is description for New Batch 04',
+    'total' => '400.44',
+    'item_count' => 4,
+    'id' => 3,
   );
 
   try{
-    $result = civicrm_api3('batch', 'create', $params);
+    $result = civicrm_api3('Batch', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -45,23 +45,23 @@ function batch_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => array(
-      '2' => array(
-        'id' => '2',
-        'name' => 'New_Batch_03',
-        'title' => 'New Batch 03',
-        'description' => 'This is description for New Batch 03',
+      '3' => array(
+        'id' => '3',
+        'name' => 'New_Batch_04',
+        'title' => 'New Batch 04',
+        'description' => 'This is description for New Batch 04',
         'created_id' => '',
         'created_date' => '',
         'modified_id' => '',
-        'modified_date' => '2012-11-14 16:02:35',
+        'modified_date' => '',
         'saved_search_id' => '',
-        'status_id' => '1',
+        'status_id' => '',
         'type_id' => '',
         'mode_id' => '',
-        'total' => '300.33',
-        'item_count' => '3',
+        'total' => '400.44',
+        'item_count' => '4',
         'payment_instrument_id' => '',
         'exported_date' => '',
         'data' => '',
@@ -72,11 +72,10 @@ function batch_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreate
-* and can be found in
+* The test that created it is called "testUpdate"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/BatchTest.php
 *
 * You can see the outcome of the API tests at
