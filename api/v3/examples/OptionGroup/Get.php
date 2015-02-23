@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using option_group get API.
+ * Test Generated example demonstrating the OptionGroup.get API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function option_group_get_example() {
   );
 
   try{
-    $result = civicrm_api3('option_group', 'get', $params);
+    $result = civicrm_api3('OptionGroup', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -56,11 +56,10 @@ function option_group_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetOptionGroupByName
-* and can be found in
+* The test that created it is called "testGetOptionGroupByName"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/OptionGroupTest.php
 *
 * You can see the outcome of the API tests at

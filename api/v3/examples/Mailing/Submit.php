@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using mailing submit API.
+ * Test Generated example demonstrating the Mailing.submit API.
  *
  * @return array
  *   API result array
@@ -8,11 +8,12 @@
 function mailing_submit_example() {
   $params = array(
     'scheduled_date' => '2014-12-13 10:00:00',
-    'id' => 9,
+    'approval_date' => '2014-12-13 00:00:00',
+    'id' => 16,
   );
 
   try{
-    $result = civicrm_api3('mailing', 'submit', $params);
+    $result = civicrm_api3('Mailing', 'submit', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -41,13 +42,13 @@ function mailing_submit_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 9,
+    'id' => 16,
     'values' => array(
-      '9' => array(
-        'id' => '9',
+      '16' => array(
+        'id' => '16',
         'domain_id' => '1',
         'header_id' => '',
-        'footer_id' => '',
+        'footer_id' => '24',
         'reply_id' => '8',
         'unsubscribe_id' => '5',
         'resubscribe_id' => '6',
@@ -59,7 +60,7 @@ function mailing_submit_expectedresult() {
         'subject' => 'Hello {contact.display_name}',
         'body_text' => 'This is {contact.display_name}.
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<p>Look ma, magic tokens in the markup!</p>',
         'url_tracking' => '1',
         'forward_replies' => 0,
         'auto_responder' => 0,
@@ -67,13 +68,13 @@ function mailing_submit_expectedresult() {
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '22',
+        'created_id' => '35',
         'created_date' => '2013-07-28 08:49:19',
-        'scheduled_id' => '22',
+        'scheduled_id' => '36',
         'scheduled_date' => '20130728085413',
-        'approver_id' => '',
-        'approval_date' => '',
-        'approval_status_id' => '',
+        'approver_id' => '36',
+        'approval_date' => '20130728085413',
+        'approval_status_id' => '1',
         'approval_note' => '',
         'is_archived' => 0,
         'visibility' => 'Public Pages',
@@ -90,11 +91,10 @@ function mailing_submit_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testMailerSubmit
-* and can be found in
+* The test that created it is called "testMailerSubmit"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
 *
 * You can see the outcome of the API tests at

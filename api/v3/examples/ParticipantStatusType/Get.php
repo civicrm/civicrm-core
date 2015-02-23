@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using participant_status_type get API.
+ * Test Generated example demonstrating the ParticipantStatusType.get API.
  *
  * @return array
  *   API result array
@@ -18,7 +18,7 @@ function participant_status_type_get_example() {
   );
 
   try{
-    $result = civicrm_api3('participant_status_type', 'get', $params);
+    $result = civicrm_api3('ParticipantStatusType', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -66,11 +66,10 @@ function participant_status_type_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetParticipantStatusType
-* and can be found in
+* The test that created it is called "testGetParticipantStatusType"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantStatusTypeTest.php
 *
 * You can see the outcome of the API tests at

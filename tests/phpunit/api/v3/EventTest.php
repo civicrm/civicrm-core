@@ -255,7 +255,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
         'contact_id' => $contactID,
         'event_id' => $this->_eventIds[0],
       ));
-    $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile, 'getsingle');
+    $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 

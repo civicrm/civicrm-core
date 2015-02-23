@@ -411,11 +411,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $customField['id']] = "$this->_contactID";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile, 'Create');
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
       'return.custom_' . $customField['id'] => 1,
       'id' => $result['id'],
-    ), __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet', 'get');
+    ), __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet');
 
     $this->assertEquals('Anderson, Anthony', $result['values'][$result['id']]['custom_' . $customField['id']]);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
@@ -501,7 +501,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityGetGoodID1() {
     // Insert rows in civicrm_activity creating activities 4 and 13
-    $description = "Demonstrates getting asignee_contact_id & using it to get the contact.";
+    $description = "Demonstrates getting assignee_contact_id & using it to get the contact.";
     $subfile = 'ReturnAssigneeContact';
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);
 
@@ -794,8 +794,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
 
-    $result = $this->callAPISuccess('activity', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('activity', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -1176,7 +1175,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetFields() {
     $params = array('action' => 'create');
-    $result = $this->callAPIAndDocument('activity', 'getfields', $params, __FUNCTION__, __FILE__, NULL, NULL, 'getfields');
+    $result = $this->callAPIAndDocument('activity', 'getfields', $params, __FUNCTION__, __FILE__, NULL, NULL);
     $this->assertTrue(is_array($result['values']), 'get fields doesn\'t return values array');
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(is_array($value), $key . " is not an array");

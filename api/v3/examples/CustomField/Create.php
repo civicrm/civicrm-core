@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using custom_field create API.
+ * Test Generated example demonstrating the CustomField.create API.
  *
  * @return array
  *   API result array
@@ -20,7 +20,7 @@ function custom_field_create_example() {
   );
 
   try{
-    $result = civicrm_api3('custom_field', 'create', $params);
+    $result = civicrm_api3('CustomField', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -89,11 +89,10 @@ function custom_field_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCustomFieldCreateWithEdit
-* and can be found in
+* The test that created it is called "testCustomFieldCreateWithEdit"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CustomFieldTest.php
 *
 * You can see the outcome of the API tests at

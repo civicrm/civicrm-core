@@ -693,7 +693,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participants = $this->callAPISuccess('Participant', 'Get', array());
     $this->assertEquals($participants['count'], 3);
     $params = array('contact_id' => $this->_contactID2, 'api.participant.delete' => 1);
-    $participants = $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile, 'Get');
+    $participants = $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $check = $this->callAPISuccess('participant', 'getcount', array());
     $this->assertEquals(1, $check, "only one participant should be left. line " . __LINE__);
   }

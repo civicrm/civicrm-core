@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using participant_status_type create API.
+ * Test Generated example demonstrating the ParticipantStatusType.create API.
  *
  * @return array
  *   API result array
@@ -18,7 +18,7 @@ function participant_status_type_create_example() {
   );
 
   try{
-    $result = civicrm_api3('participant_status_type', 'create', $params);
+    $result = civicrm_api3('ParticipantStatusType', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -47,10 +47,10 @@ function participant_status_type_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 16,
+    'id' => 17,
     'values' => array(
-      '16' => array(
-        'id' => '16',
+      '17' => array(
+        'id' => '17',
         'name' => 'test status',
         'label' => 'I am a test',
         'class' => 'Positive',
@@ -66,11 +66,10 @@ function participant_status_type_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateParticipantStatusType
-* and can be found in
+* The test that created it is called "testGetParticipantStatusType"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantStatusTypeTest.php
 *
 * You can see the outcome of the API tests at

@@ -101,7 +101,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $params = array(
       'field' => 'location_type_id',
     );
-    $result = $this->callAPISuccess('address', 'getoptions', $params);
+    $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
     $this->assertContains('Work', $result['values'], "In line " . __LINE__);
@@ -116,7 +116,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $params = array(
       'field' => 'phone_type_id',
     );
-    $result = $this->callAPISuccess('phone', 'getoptions', $params);
+    $result = $this->callAPIAndDocument('phone', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
     $this->assertContains('Phone', $result['values'], "In line " . __LINE__);
@@ -133,7 +133,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $params = array(
       'field' => 'protocol',
     );
-    $result = $this->callAPISuccess('mail_settings', 'getoptions', $params);
+    $result = $this->callAPIAndDocument('mail_settings', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);
     $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);

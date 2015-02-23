@@ -1,18 +1,17 @@
 <?php
 /**
- * Test Generated example demonstrating the ParticipantPayment.create API.
+ * Test Generated example demonstrating the MailSettings.getoptions API.
  *
  * @return array
  *   API result array
  */
-function participant_payment_create_example() {
+function mail_settings_getoptions_example() {
   $params = array(
-    'participant_id' => 13,
-    'contribution_id' => 1,
+    'field' => 'protocol',
   );
 
   try{
-    $result = civicrm_api3('ParticipantPayment', 'create', $params);
+    $result = civicrm_api3('MailSettings', 'getoptions', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -35,19 +34,17 @@ function participant_payment_create_example() {
  * @return array
  *   API result array
  */
-function participant_payment_create_expectedresult() {
+function mail_settings_getoptions_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 1,
-    'id' => 1,
+    'count' => 4,
     'values' => array(
-      '1' => array(
-        'id' => '1',
-        'participant_id' => '13',
-        'contribution_id' => '1',
-      ),
+      '1' => 'IMAP',
+      '2' => 'Maildir',
+      '3' => 'POP3',
+      '4' => 'Localdir',
     ),
   );
 
@@ -56,9 +53,9 @@ function participant_payment_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testPaymentCreate"
+* The test that created it is called "testmailProtocol"
 * and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantPaymentTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ConstantTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

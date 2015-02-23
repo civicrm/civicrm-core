@@ -312,7 +312,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     );
     // we'll check it with a 'get'
     $description = "Shows getting a variable for all domains.";
-    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetAllDomains', 'Get');
+    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetAllDomains');
 
     $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
     $this->assertEquals(1, $result['values'][1]['uniq_email_per_site']);
@@ -332,7 +332,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'return' => array('uniq_email_per_site'),
     );
     $description = "Shows getting a variable for specified domains.";
-    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSpecifiedDomains', 'Get');
+    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSpecifiedDomains');
     $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
     $this->assertEquals(0, $result['values'][1]['uniq_email_per_site']);
 
@@ -459,7 +459,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $params = array(
       'name' => 'address_format',
     );
-    $result = $this->callAPIAndDocument('setting', 'getdefaults', $params, __FUNCTION__, __FILE__, $description, 'GetDefaults', 'getdefaults');
+    $result = $this->callAPIAndDocument('setting', 'getdefaults', $params, __FUNCTION__, __FILE__, $description, 'GetDefaults');
     $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $params = array('name' => 'mailing_format');
     $result = $this->callAPISuccess('setting', 'getdefaults', $params);
@@ -484,7 +484,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     //make sure it's set
     $this->assertEquals('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $description = "Demonstrates reverting a parameter to default value.";
-    $result = $this->callAPIAndDocument('setting', 'revert', $revertParams, __FUNCTION__, __FILE__, $description, '', 'revert');
+    $result = $this->callAPIAndDocument('setting', 'revert', $revertParams, __FUNCTION__, __FILE__, $description, '');
     //make sure it's reverted
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);

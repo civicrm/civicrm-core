@@ -1,22 +1,17 @@
 <?php
 /**
- * Test Generated example of using membership get API.
- *
- * Demonstrates use of 'filter' active_only' param.
+ * Test Generated example demonstrating the Phone.getoptions API.
  *
  * @return array
  *   API result array
  */
-function membership_get_example() {
+function phone_getoptions_example() {
   $params = array(
-    'contact_id' => 44,
-    'filters' => array(
-      'is_current' => 1,
-    ),
+    'field' => 'phone_type_id',
   );
 
   try{
-    $result = civicrm_api3('membership', 'get', $params);
+    $result = civicrm_api3('Phone', 'getoptions', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -39,41 +34,29 @@ function membership_get_example() {
  * @return array
  *   API result array
  */
-function membership_get_expectedresult() {
+function phone_getoptions_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 1,
-    'id' => 1,
+    'count' => 5,
     'values' => array(
-      '1' => array(
-        'id' => '1',
-        'contact_id' => '44',
-        'membership_type_id' => '27',
-        'join_date' => '2009-01-21',
-        'start_date' => '2013-07-29 00:00:00',
-        'end_date' => '2013-08-04 00:00:00',
-        'source' => 'Payment',
-        'status_id' => '21',
-        'is_override' => '1',
-        'is_test' => 0,
-        'is_pay_later' => 0,
-        'membership_name' => 'General',
-        'relationship_name' => 'Child of',
-      ),
+      '1' => 'Phone',
+      '2' => 'Mobile',
+      '3' => 'Fax',
+      '4' => 'Pager',
+      '5' => 'Voicemail',
     ),
   );
 
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetOnlyActive
-* and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
+* The test that created it is called "testPhoneType"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ConstantTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

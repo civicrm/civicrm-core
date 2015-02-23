@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using domain create API.
+ * Test Generated example demonstrating the Domain.create API.
  *
  * @return array
  *   API result array
@@ -14,7 +14,7 @@ function domain_create_example() {
   );
 
   try{
-    $result = civicrm_api3('domain', 'create', $params);
+    $result = civicrm_api3('Domain', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -61,11 +61,10 @@ function domain_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreate
-* and can be found in
+* The test that created it is called "testCreate"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/DomainTest.php
 *
 * You can see the outcome of the API tests at
