@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using campaign create API.
+ * Test Generated example demonstrating the Campaign.create API.
  *
  * Create a campaign - Note use of relative dates here:
  * @link http://www.php.net/manual/en/datetime.formats.relative.php.
@@ -16,7 +16,7 @@ function campaign_create_example() {
   );
 
   try{
-    $result = civicrm_api3('campaign', 'create', $params);
+    $result = civicrm_api3('Campaign', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -72,11 +72,10 @@ function campaign_create_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testCreateCampaign
-* and can be found in
+* The test that created it is called "testCreateCampaign"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CampaignTest.php
 *
 * You can see the outcome of the API tests at

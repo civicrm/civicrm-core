@@ -73,7 +73,6 @@ function _civicrm_api3_note_create_spec(&$params) {
  * @return array
  */
 function civicrm_api3_note_delete($params) {
-
   $result = new CRM_Core_BAO_Note();
   return $result->del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting Note');
 }
@@ -89,7 +88,6 @@ function civicrm_api3_note_delete($params) {
  *   if error an array with an error id and error message
  */
 function civicrm_api3_note_get($params) {
-
   return _civicrm_api3_basic_get('CRM_Core_BAO_Note', $params);
 }
 
@@ -115,7 +113,6 @@ function _civicrm_api3_note_get_spec(&$params) {
  *   Nested associative array beginning with direct children of given note.
  */
 function &civicrm_api3_note_tree_get($params) {
-
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
   if (!is_numeric($params['id'])) {

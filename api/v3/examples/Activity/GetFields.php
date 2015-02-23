@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using activity getfields API.
+ * Test Generated example demonstrating the Activity.getfields API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function activity_getfields_example() {
   );
 
   try{
-    $result = civicrm_api3('activity', 'getfields', $params);
+    $result = civicrm_api3('Activity', 'getfields', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -352,11 +352,10 @@ function activity_getfields_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetFields
-* and can be found in
+* The test that created it is called "testGetFields"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
 *
 * You can see the outcome of the API tests at

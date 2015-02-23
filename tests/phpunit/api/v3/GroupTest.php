@@ -142,7 +142,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   public function testgetfields() {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
-    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description, 'getfields', 'getfields');
+    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 

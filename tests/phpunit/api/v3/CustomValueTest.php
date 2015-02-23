@@ -108,7 +108,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, $description);
     $params['format.field_names'] = 1;
-    $resultformatted = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, "utilises field names", 'formatFieldName');
+    $resultformatted = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, "utilises field names", 'FormatFieldName');
     // delete the contact
     $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
     $this->assertEquals('coffee', $result['values'][$secondCustomField]['2']);

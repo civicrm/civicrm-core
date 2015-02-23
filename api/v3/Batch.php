@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM batch.
+ * This api exposes CiviCRM Batch records.
  *
  * @package CiviCRM_APIv3
  */
@@ -37,7 +37,6 @@
  * @param array $params
  *
  * @return array
- *   Array of newly created batch property values.
  */
 function civicrm_api3_batch_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

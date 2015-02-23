@@ -91,7 +91,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'tag_id' => $this->_tagID,
     );
 
-    $result = $this->callAPIAndDocument('entity_tag', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('entity_tag', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['added'], 1);
   }
 
@@ -150,7 +150,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $paramsEntity = array(
       'contact_id' => $contactId,
     );
-    $entity = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
+    $entity = $this->callAPIAndDocument('entity_tag', 'get', $paramsEntity, __FUNCTION__, __FILE__);
   }
 
   public function testHouseholdEntityGet() {

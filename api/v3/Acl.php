@@ -26,37 +26,36 @@
  */
 
 /**
- * This api exposes CiviCRM acl.
+ * This api exposes CiviCRM Acl records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save an acl.
+ * Save an Acl.
  *
  * @param array $params
  *
  * @return array
- *   Array of newly created acl property values.
  */
 function civicrm_api3_acl_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get an acl.
+ * Get an Acl.
  *
  * @param array $params
  *
  * @return array
- *   Array of retrieved acl property values.
+ *   Array of retrieved Acl property values.
  */
 function civicrm_api3_acl_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete an acl.
+ * Delete an Acl.
  *
  * @param array $params
  *

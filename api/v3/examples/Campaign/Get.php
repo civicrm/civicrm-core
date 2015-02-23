@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using campaign get API.
+ * Test Generated example demonstrating the Campaign.get API.
  *
  * @return array
  *   API result array
@@ -13,7 +13,7 @@ function campaign_get_example() {
   );
 
   try{
-    $result = civicrm_api3('campaign', 'get', $params);
+    $result = civicrm_api3('Campaign', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -58,11 +58,10 @@ function campaign_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetCampaign
-* and can be found in
+* The test that created it is called "testGetCampaign"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CampaignTest.php
 *
 * You can see the outcome of the API tests at

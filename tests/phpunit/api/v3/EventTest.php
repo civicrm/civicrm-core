@@ -255,7 +255,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
         'contact_id' => $contactID,
         'event_id' => $this->_eventIds[0],
       ));
-    $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile, 'getsingle');
+    $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 
@@ -518,7 +518,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('event', 'create', $params);
-    $this->assertEquals('API permission check failed for event/create call; insufficient permission: require access CiviCRM and access CiviEvent and edit all events', $result['error_message'], 'lacking permissions should not be enough to create an event');
+    $this->assertEquals('API permission check failed for Event/create call; insufficient permission: require access CiviCRM and access CiviEvent and edit all events', $result['error_message'], 'lacking permissions should not be enough to create an event');
 
     $config->userPermissionClass->permissions = array(
       'access CiviEvent',

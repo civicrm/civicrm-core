@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using activity_type get API.
+ * Test Generated example demonstrating the ActivityType.get API.
  *
  * @deprecated
- * The activity_type api is deprecated. Please use the option_value api instead.
+ * The ActivityType api is deprecated. Please use the OptionValue api instead.
  *
  * @return array
  *   API result array
@@ -12,7 +12,7 @@ function activity_type_get_example() {
   $params = array();
 
   try{
-    $result = civicrm_api3('activity_type', 'get', $params);
+    $result = civicrm_api3('ActivityType', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -93,17 +93,16 @@ function activity_type_get_expectedresult() {
       '49' => 'Downloaded Invoice',
       '50' => 'Emailed Invoice',
     ),
-    'deprecated' => 'The activity_type api is deprecated. Please use the option_value api instead.',
+    'deprecated' => 'The ActivityType api is deprecated. Please use the OptionValue api instead.',
   );
 
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testActivityTypeGet
-* and can be found in
+* The test that created it is called "testActivityTypeGet"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTypeTest.php
 *
 * You can see the outcome of the API tests at

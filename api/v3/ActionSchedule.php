@@ -32,19 +32,19 @@
  */
 
 /**
- * Get CiviCRM Action Schedule details.
+ * Get CiviCRM ActionSchedule details.
  *
  * @param array $params
  *
  * @return array
  */
 function civicrm_api3_action_schedule_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'action_schedule');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
 }
 
 
 /**
- * Create a new Action Schedule.
+ * Create a new ActionSchedule.
  *
  * @param array $params
  *
@@ -55,7 +55,7 @@ function civicrm_api3_action_schedule_create($params) {
   if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
     $params['name'] = CRM_Utils_String::munge($params['title']);
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'action_schedule');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
 }
 
 /**
@@ -73,7 +73,7 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
 }
 
 /**
- * Delete an existing action_schedule.
+ * Delete an existing ActionSchedule.
  *
  * @param array $params
  *   Array containing id of the action_schedule to be deleted.

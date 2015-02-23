@@ -46,7 +46,7 @@ function civicrm_api3_website_create($params) {
   $websiteBAO = CRM_Core_BAO_Website::add($params);
   $values = array();
   _civicrm_api3_object_to_array($websiteBAO, $values[$websiteBAO->id]);
-  return civicrm_api3_create_success($values, $params, 'website', 'get');
+  return civicrm_api3_create_success($values, $params, 'Website', 'get');
 }
 
 /**
@@ -81,11 +81,11 @@ function civicrm_api3_website_delete($params) {
   if ($websiteDAO->find()) {
     while ($websiteDAO->fetch()) {
       $websiteDAO->delete();
-      return civicrm_api3_create_success(1, $params, 'website', 'delete');
+      return civicrm_api3_create_success(1, $params, 'Website', 'delete');
     }
   }
   else {
-    throw new API_Exception('Could not delete website with id ' . $websiteID);
+    throw new API_Exception('Could not delete Website with id ' . $websiteID);
   }
 }
 
@@ -98,5 +98,5 @@ function civicrm_api3_website_delete($params) {
  *   details of found websites
  */
 function civicrm_api3_website_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Website');
 }

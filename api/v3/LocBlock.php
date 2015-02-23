@@ -27,16 +27,16 @@
 
 
 /**
- * This api exposes CiviCRM loc_block.
+ * This api exposes CiviCRM LocBlock records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Create or update a loc_block.
+ * Create or update a LocBlock.
  *
  * @param array $params
- *   name/value pairs to insert in new 'loc_block'
+ *   name/value pairs to insert in new 'LocBlock'
  *
  * @return array
  *   API result array.
@@ -76,7 +76,7 @@ function civicrm_api3_loc_block_create($params) {
   if (!empty($dao->id)) {
     $values = array($dao->id => $entities);
     _civicrm_api3_object_to_array($dao, $values[$dao->id]);
-    return civicrm_api3_create_success($values, $params, 'loc_block', 'create', $dao);
+    return civicrm_api3_create_success($values, $params, 'LocBlock', 'create', $dao);
   }
   return civicrm_api3_create_error('Unable to create LocBlock. Please check your params.');
 }
@@ -111,13 +111,13 @@ function civicrm_api3_loc_block_get($params) {
       }
       $values[$val['id']] = $val;
     }
-    return civicrm_api3_create_success($values, $params, 'loc_block', 'get');
+    return civicrm_api3_create_success($values, $params, 'LocBlock', 'get');
   }
   return _civicrm_api3_basic_get('CRM_Core_DAO_LocBlock', $params);
 }
 
 /**
- * Delete an existing loc_block.
+ * Delete an existing LocBlock.
  *
  * @param array $params
  *   Array containing id of the record to be deleted.

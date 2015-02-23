@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using report_template getstatistics API.
+ * Test Generated example demonstrating the ReportTemplate.getstatistics API.
  *
  * Get Statistics from a report (note there isn't much data to get in the test DB).
  *
@@ -13,7 +13,7 @@ function report_template_getstatistics_example() {
   );
 
   try{
-    $result = civicrm_api3('report_template', 'getstatistics', $params);
+    $result = civicrm_api3('ReportTemplate', 'getstatistics', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -56,11 +56,10 @@ function report_template_getstatistics_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testReportTemplateGetStatisticsAllReports
-* and can be found in
+* The test that created it is called "testReportTemplateGetStatisticsAllReports"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ReportTemplateTest.php
 *
 * You can see the outcome of the API tests at

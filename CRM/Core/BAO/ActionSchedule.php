@@ -591,7 +591,7 @@ AND   cas.entity_value = $id AND
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $ids
-   *   The array that holds all the db ids.
+   *   Unused variable.
    *
    * @return CRM_Core_DAO_ActionSchedule
    */
@@ -947,7 +947,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
     if (!empty($params)) {
-      _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE, 'ActionSchedule');
+      _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE);
     }
     $actionSchedule->find();
 

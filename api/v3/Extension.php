@@ -29,7 +29,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
 
 
 /**
- * This api exposes CiviCRM extension.
+ * This provides an api interface for CiviCRM extension management.
  *
  * @package CiviCRM_APIv3
  */
@@ -97,9 +97,9 @@ function civicrm_api3_extension_upgrade() {
  *
  * @param array $params
  *   Input parameters.
- *                          - key: string, eg "com.example.myextension"
- *                          - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
- *                            using 'keys' should be more performant than making multiple API calls with 'key'
+ *   - key: string, eg "com.example.myextension"
+ *   - keys: mixed; array of string, eg array("com.example.myextension1", "com.example.myextension2") or string with comma-delimited list
+ *     using 'keys' should be more performant than making multiple API calls with 'key'
  *
  * @return array
  *   API result
@@ -165,8 +165,8 @@ function civicrm_api3_extension_uninstall($params) {
  *
  * @param array $params
  *   Input parameters.
- *                          - key: string, eg "com.example.myextension"
- *                          - url: string eg "http://repo.com/myextension-1.0.zip"
+ *   - key: string, eg "com.example.myextension"
+ *   - url: string eg "http://repo.com/myextension-1.0.zip"
  *
  * @throws API_Exception
  * @return array
@@ -215,8 +215,8 @@ function civicrm_api3_extension_download($params) {
  *
  * @param array $params
  *   Input parameters.
- *                          - local: bool, whether to rescan local filesystem (default: TRUE)
- *                          - remote: bool, whether to rescan remote repository (default: TRUE)
+ *   - local: bool, whether to rescan local filesystem (default: TRUE)
+ *   - remote: bool, whether to rescan remote repository (default: TRUE)
  *
  * @return array
  *   API result

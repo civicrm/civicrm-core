@@ -62,7 +62,7 @@ function civicrm_api3_group_organization_create($params) {
   }
 
   _civicrm_api3_object_to_array($groupOrgBAO, $values);
-  return civicrm_api3_create_success($values, $params, 'group_organization', 'get', $groupOrgBAO);
+  return civicrm_api3_create_success($values, $params, 'GroupOrganization', 'get', $groupOrgBAO);
 }
 
 /**

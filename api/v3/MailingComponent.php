@@ -26,13 +26,13 @@
  */
 
 /**
- * This api exposes CiviCRM mailing_component.
+ * This api exposes CiviCRM MailingComponent.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Save a mailing_component.
+ * Save a MailingComponent.
  *
  * @param array $params
  *
@@ -45,7 +45,7 @@ function civicrm_api3_mailing_component_create($params) {
 }
 
 /**
- * Get a mailing_component.
+ * Get a MailingComponent.
  *
  * @param array $params
  *
@@ -57,7 +57,7 @@ function civicrm_api3_mailing_component_get($params) {
 }
 
 /**
- * Delete a mailing_component.
+ * Delete a MailingComponent.
  *
  * @param array $params
  *

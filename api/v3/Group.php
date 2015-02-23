@@ -26,10 +26,10 @@
  */
 
 /**
- * This api exposes CiviCRM groups.
+ * This api exposes CiviCRM Groups.
  *
  * This api is for creating/deleting groups or fetching a list of existing groups.
- * To add/remove contacts to a group, use the groupContact api instead.
+ * To add/remove contacts to a group, use the GroupContact api instead.
  *
  * @package CiviCRM_APIv3
  */
@@ -38,7 +38,7 @@
  * Create/update group.
  *
  * @param array $params
- *   name/value pairs to insert in new 'group'
+ *   name/value pairs to insert in new 'Group'
  *
  * @return array
  *   API result array
@@ -61,7 +61,7 @@ function _civicrm_api3_group_create_spec(&$params) {
 }
 
 /**
- * Returns array of groups matching a set of one or more group properties.
+ * Returns array of groups matching a set of one or more Group properties.
  *
  * @param array $params
  *   Array of properties. If empty, all records will be returned.
@@ -70,7 +70,7 @@ function _civicrm_api3_group_create_spec(&$params) {
  *   Array of matching groups
  */
 function civicrm_api3_group_get($params) {
-  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'Group', 'get');
   if (empty($options['return']) || !in_array('member_count', $options['return'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Group');
   }
@@ -79,11 +79,11 @@ function civicrm_api3_group_get($params) {
   foreach ($groups as $id => $group) {
     $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
   }
-  return civicrm_api3_create_success($groups, $params, 'group', 'get');
+  return civicrm_api3_create_success($groups, $params, 'Group', 'get');
 }
 
 /**
- * Delete an existing group.
+ * Delete an existing Group.
  *
  * @param array $params
  *   [id]

@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM address records.
+ * This api exposes CiviCRM Address records.
  *
  * @package CiviCRM_APIv3
  */
@@ -38,7 +38,6 @@
  *   Array per getfields metadata.
  *
  * @return array
- *   Array of newly created tag property values.
  */
 function civicrm_api3_address_create(&$params) {
   /**
@@ -79,7 +78,7 @@ function civicrm_api3_address_create(&$params) {
   }
   else {
     $values = _civicrm_api3_dao_to_array($addressBAO, $params);
-    return civicrm_api3_create_success($values, $params, 'address', $addressBAO);
+    return civicrm_api3_create_success($values, $params, 'Address', $addressBAO);
   }
 }
 

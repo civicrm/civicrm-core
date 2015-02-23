@@ -27,7 +27,7 @@
 
 /**
  *
- * This api exposes CiviCRM event.
+ * This api exposes CiviCRM Event.
  *
  * @package CiviCRM_APIv3
  */
@@ -115,7 +115,7 @@ function civicrm_api3_event_get($params) {
   }
 
   $eventDAO = new CRM_Event_BAO_Event();
-  _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
+  _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE);
 
   if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
@@ -141,7 +141,7 @@ function civicrm_api3_event_get($params) {
     }
   }
 
-  return civicrm_api3_create_success($event, $params, 'event', 'get', $eventDAO);
+  return civicrm_api3_create_success($event, $params, 'Event', 'get', $eventDAO);
 }
 
 /**
@@ -176,9 +176,9 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
 }
 
 /**
- * Delete an existing event.
+ * Delete an existing Event.
  *
- * This API is used for deleting a event.
+ * This API is used for deleting a event given its id.
  *
  * @param array $params
  *

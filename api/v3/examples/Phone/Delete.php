@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using phone delete API.
+ * Test Generated example demonstrating the Phone.delete API.
  *
  * @return array
  *   API result array
@@ -11,7 +11,7 @@ function phone_delete_example() {
   );
 
   try{
-    $result = civicrm_api3('phone', 'delete', $params);
+    $result = civicrm_api3('Phone', 'delete', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -46,11 +46,10 @@ function phone_delete_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testDeletePhone
-* and can be found in
+* The test that created it is called "testDeletePhone"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PhoneTest.php
 *
 * You can see the outcome of the API tests at

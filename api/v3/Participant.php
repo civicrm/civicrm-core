@@ -60,7 +60,7 @@ function civicrm_api3_participant_create($params) {
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);
 
-  return civicrm_api3_create_success($participant, $params, 'participant', 'create', $participantBAO);
+  return civicrm_api3_create_success($participant, $params, 'Participant', 'create', $participantBAO);
 }
 
 /**
@@ -158,9 +158,8 @@ function _civicrm_api3_participant_create_spec(&$params) {
  */
 function civicrm_api3_participant_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_EVENT;
-  $entity = 'participant';
 
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Participant');
 
   $participant = array();
   while ($dao->fetch()) {
@@ -169,7 +168,7 @@ function civicrm_api3_participant_get($params) {
     _civicrm_api3_custom_data_get($participant[$dao->participant_id], 'Participant', $dao->participant_id, NULL);
   }
 
-  return civicrm_api3_create_success($participant, $params, 'participant', 'get', $dao);
+  return civicrm_api3_create_success($participant, $params, 'Participant', 'get', $dao);
 }
 
 /**

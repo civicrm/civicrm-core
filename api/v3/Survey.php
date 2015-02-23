@@ -77,8 +77,7 @@ function civicrm_api3_survey_get($params) {
 /**
  * Delete an existing survey.
  *
- * This method is used to delete any existing survey. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing survey given its id.
  *
  * @param array $params
  *   [id]

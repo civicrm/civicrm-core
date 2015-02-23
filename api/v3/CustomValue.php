@@ -102,7 +102,7 @@ function civicrm_api3_custom_value_create($params) {
   if ($result['is_error']) {
     throw new Exception($result['error_message']);
   }
-  return civicrm_api3_create_success(TRUE, $params);
+  return civicrm_api3_create_success(TRUE, $params, 'CustomValue');
 }
 
 /**
@@ -169,7 +169,7 @@ function civicrm_api3_custom_value_get($params) {
   if ($result['is_error']) {
     if ($result['error_message'] == "No values found for the specified entity ID and custom field(s).") {
       $values = array();
-      return civicrm_api3_create_success($values, $params);
+      return civicrm_api3_create_success($values, $params, 'CustomValue');
     }
     else {
       throw new API_Exception($result['error_message']);
@@ -217,7 +217,7 @@ function civicrm_api3_custom_value_get($params) {
       $values[$id]['id'] = $id;
       $values[$id][$n] = $value;
     }
-    return civicrm_api3_create_success($values, $params);
+    return civicrm_api3_create_success($values, $params, 'CustomValue');
   }
 }
 

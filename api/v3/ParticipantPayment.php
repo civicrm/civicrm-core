@@ -41,7 +41,6 @@
  *   An associative array of name/value property values of civicrm_participant_payment.
  *
  * @return array
- *   Array of newly created payment property values.
  */
 function civicrm_api3_participant_payment_create($params) {
 

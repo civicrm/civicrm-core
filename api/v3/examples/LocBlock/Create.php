@@ -1,23 +1,21 @@
 <?php
 /**
- * Test Generated example of using tag get API.
+ * Test Generated example demonstrating the LocBlock.create API.
  *
- * Demonstrates use of Return as an array.
+ * Create locBlock with existing entities
  *
  * @return array
  *   API result array
  */
-function tag_get_example() {
+function loc_block_create_example() {
   $params = array(
-    'id' => '8',
-    'name' => 'New Tag3',
-    'return' => array(
-      '0' => 'name',
-    ),
+    'address_id' => 2,
+    'phone_id' => 2,
+    'email_id' => 3,
   );
 
   try{
-    $result = civicrm_api3('tag', 'get', $params);
+    $result = civicrm_api3('LocBlock', 'create', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -40,17 +38,24 @@ function tag_get_example() {
  * @return array
  *   API result array
  */
-function tag_get_expectedresult() {
+function loc_block_create_expectedresult() {
 
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 8,
+    'id' => 2,
     'values' => array(
-      '8' => array(
-        'id' => '8',
-        'name' => 'New Tag3',
+      '2' => array(
+        'id' => '2',
+        'address_id' => '2',
+        'email_id' => '3',
+        'phone_id' => '2',
+        'im_id' => '',
+        'address_2_id' => '',
+        'email_2_id' => '',
+        'phone_2_id' => '',
+        'im_2_id' => '',
       ),
     ),
   );
@@ -58,12 +63,11 @@ function tag_get_expectedresult() {
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testGetReturnArray
-* and can be found in
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
+* The test that created it is called "testCreateLocBlock"
+* and can be found at:
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/LocBlockTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

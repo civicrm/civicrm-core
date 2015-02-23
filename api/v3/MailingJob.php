@@ -33,7 +33,7 @@
  */
 
 /**
- * Handle creation of a Mailing Job for a Mailing.
+ * Handle creation of a MailingJob for a Mailing.
  *
  * @param array $params
  *

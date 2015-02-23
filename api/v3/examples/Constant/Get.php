@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using constant get API.
+ * Test Generated example demonstrating the Constant.get API.
  *
  * @deprecated
- * The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.
+ * The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.
  *
  * @return array
  *   API result array
@@ -14,7 +14,7 @@ function constant_get_example() {
   );
 
   try{
-    $result = civicrm_api3('constant', 'get', $params);
+    $result = civicrm_api3('Constant', 'get', $params);
   }
   catch (CiviCRM_API3_Exception $e) {
     // Handle error here.
@@ -77,17 +77,16 @@ function constant_get_expectedresult() {
       '49' => 'Downloaded Invoice',
       '50' => 'Emailed Invoice',
     ),
-    'deprecated' => 'The constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.',
+    'deprecated' => 'The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.',
   );
 
   return $expectedResult;
 }
 
-/**
+/*
 * This example has been generated from the API test suite.
-* The test that created it is called
-* testActivityType
-* and can be found in
+* The test that created it is called "testActivityType"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ConstantTest.php
 *
 * You can see the outcome of the API tests at

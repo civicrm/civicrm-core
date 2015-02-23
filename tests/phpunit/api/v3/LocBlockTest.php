@@ -66,7 +66,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'email_id' => $email['id'],
     );
     $description = 'Create locBlock with existing entities';
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'simpleCreate');
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
     $id = $result['id'];
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$id]['id']);
@@ -96,7 +96,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       ),
     );
     $description = "Create entities and locBlock in 1 api call.";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'createEntities');
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateEntities');
     $id = $result['id'];
     $this->assertEquals(1, $result['count']);
 
@@ -106,7 +106,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'return' => 'all',
     );
     // Can't use callAPISuccess with getsingle.
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', 'getEntities', 'get');
+    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call');
     $result = array_pop($result['values']);
     $this->assertNotNull($result['email_id']);
     $this->assertNotNull($result['phone_id']);

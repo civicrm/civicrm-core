@@ -57,7 +57,6 @@ function civicrm_api3_report_template_get($params) {
  * @param array $params
  *
  * @return array
- *   Array of newly created option_value property values.
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -115,7 +114,7 @@ function civicrm_api3_report_template_delete($params) {
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
   list($rows, $instance, $metadata) = _civicrm_api3_report_template_getrows($params);
-  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
+  return civicrm_api3_create_success($rows, $params, 'ReportTemplate', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
 }
 
 /**
@@ -148,7 +147,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
-  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'report_template', 'get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'ReportTemplate', 'get');
   $reportInstance->setLimitValue($options['limit']);
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
@@ -182,7 +181,7 @@ function _civicrm_api3_report_template_getrows($params) {
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
-  return civicrm_api3_create_success($stats, $params, 'report_template', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
+  return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**
  * Adjust metadata for template getrows action.
