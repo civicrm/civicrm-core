@@ -383,7 +383,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
     );
 
-
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
     $customFldId = $result['values'][$result['id']]['api.CustomField.create']['id'];
     $this->assertNotNull($result['id'], 'in line ' . __LINE__);
