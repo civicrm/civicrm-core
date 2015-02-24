@@ -349,8 +349,8 @@ class CRM_Event_BAO_Query {
           if ($name == 'is_pay_later') {
             $qillName = $name;
           }
-          if ($name == 'participant_role_id') {
-            $qillName = str_replace('_id', '', $name);
+          if ($name == 'role_id') {
+            $qillName = 'participant_role';
           }
         }
 
