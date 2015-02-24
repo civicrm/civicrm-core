@@ -221,7 +221,7 @@
 
     $scope.statTypes = crmMailingStats.getStatTypes();
     $scope.statUrl = function statUrl(mailing, statType, view) {
-      return crmMailingStats.getUrl(mailing, statType, view);
+      return crmMailingStats.getUrl(mailing, statType, view, 'abtest/' + $scope.abtest.ab.id);
     };
 
     $scope.checkPerm = CRM.checkPerm;
