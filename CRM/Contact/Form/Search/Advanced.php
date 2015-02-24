@@ -367,6 +367,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'financial_type_id',
       'contribution_soft_credit_type_id',
       'contribution_status',
+      'contribution_status_id',
       'contribution_source',
       'contribution_trxn_id',
       'activity_type_id',

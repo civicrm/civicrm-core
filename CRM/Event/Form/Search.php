@@ -253,12 +253,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-      foreach (array('participant_status_id', 'participant_role_id') as $element) {
-        $value = CRM_Utils_Array::value($element, $this->_formValues);
-        if ($value && is_array($value)) {
-          $this->_formValues[$element] = array('IN' => $value);
-        }
-      }
     }
 
     if (empty($this->_formValues)) {
@@ -380,20 +374,15 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (isset($status)) {
       if ($status === 'true') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
+        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1"));
       }
       elseif ($status === 'false') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
+        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0"));
       }
       elseif (is_numeric($status)) {
-        $status = (int) $status;
-        $statusTypes = array($status => CRM_Event_PseudoConstant::participantStatus($status));
+        $statusTypes = (int) $status;
       }
-      $status = array();
-      foreach ($statusTypes as $key => $value) {
-        $status[$key] = 1;
-      }
-      $this->_formValues['participant_status_id'] = $status;
+      $this->_formValues['participant_status_id'] = $statusTypes;
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String',
@@ -408,14 +397,16 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
       }
       elseif (is_numeric($role)) {
-        $role = (int) $role;
-        $roleTypes = array($role => CRM_Event_PseudoConstant::participantRole($role));
+        $roleTypes = (int) $role;
       }
-      $role = array();
-      foreach ($roleTypes as $key => $value) {
-        $role[$key] = 1;
+      $this->_formValues['participant_role_id'] = $roleTypes;
+    }
+
+    foreach (array('participant_status_id', 'participant_role_id') as $element) {
+      $value = CRM_Utils_Array::value($element, $this->_formValues);
+      if ($value && is_array($value)) {
+        $this->_formValues[$element] = array('IN' => $value);
       }
-      $this->_formValues['participant_role_id'] = $role;
     }
 
     $type = CRM_Utils_Request::retrieve('type', 'Positive',
