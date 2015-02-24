@@ -109,6 +109,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
         'sequential' => 1,
         'return' => array("msg_html", "id", "msg_title", "msg_subject"),
+        'is_active' => 1,
         'id' => array('>' => 58),
       ));
     }
@@ -122,6 +123,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
         'sequential' => 1,
         'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
+        'is_active' => 1,
         'workflow_id' => array('IS NULL' => ""),
       ));
     }
