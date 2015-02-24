@@ -8,7 +8,7 @@
     crm-mailing-recipients
     ng-model="mailing.recipients"
     crm-mandatory-groups="crmMailingConst.groupNames | filter:{is_hidden:1}"
-    crm-avail-groups="crmMailingConst.groupNames | filter:{visibility:'Public pages'}"
+    crm-avail-groups="crmMailingConst.groupNames | filter:isMailingList"
     crm-avail-mailings="crmMailingConst.civiMails | filter:{is_completed:1}"
     crm-ui-id="{{crmMailingBlockRecipients.id}}"
     name="{{crmMailingBlockRecipients.name}}"
