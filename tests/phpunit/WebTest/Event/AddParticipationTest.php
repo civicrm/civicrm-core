@@ -93,7 +93,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
     $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
@@ -282,7 +282,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
     $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
