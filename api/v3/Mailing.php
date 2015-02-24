@@ -97,6 +97,7 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
   $params['entity'] = array(
     'api.default' => array('contact'),
     'api.required' => 1,
+    'api.multiple' => 1,
     'title' => 'Entity',
     'options' => array(),
   );

@@ -22,16 +22,8 @@
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
+    SINGLE = ['>', '>=', '<', '<=', '<>', '!='],
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
-
-  /**
-   * Call prettyPrint function if it successfully loaded from the cdn
-   */
-  function prettyPrint() {
-    if (window.prettyPrint) {
-      window.prettyPrint();
-    }
-  }
 
   /**
    * Add a "fields" row
@@ -125,9 +117,10 @@
           fields.push({
             id: field.name,
             text: field.title || field.name,
-            required: field['api.required'] || false
+            multi: !!field['api.multiple'],
+            required: !(!field['api.required'] || field['api.required'] === '0')
           });
-          if (field['api.required']) {
+          if (field['api.required'] && field['api.required'] !== '0') {
             required.push(field.name);
           }
           if (field.options) {
@@ -227,6 +220,11 @@
     }
   }
 
+  function isMultiSelect(fieldName, operator) {
+    var field = fieldName && _.find(fields, 'id', fieldName);
+    return ($.inArray(operator, MULTI) > -1) || (field && field.multi);
+  }
+
   /**
    * Render value input as a textfield, option list, entityRef, or hidden,
    * Depending on selected param name and operator
@@ -235,11 +233,11 @@
     var $row = $(this).closest('tr'),
       name = $('input.api-param-name', $row).val(),
       operator = $('.api-param-op', $row).val(),
-      operatorType = $.inArray(operator, MULTI) > -1 ? 'multi' : ($.inArray(operator, BOOL) > -1 ? 'bool' : 'single'),
       $valField = $('input.api-param-value', $row),
+      multiSelect = isMultiSelect(name, operator),
       currentVal = $valField.val();
     // Boolean fields only have 1 possible value
-    if (operatorType == 'bool') {
+    if ($.inArray(operator, BOOL) > -1) {
       if ($valField.data('select2')) {
         $valField.select2('destroy');
       }
@@ -254,13 +252,13 @@
         $valField.val('');
       }
       // When switching from multi-select to single select
-      else if (operatorType == 'single' && currentVal.indexOf(',') > -1) {
+      else if (!multiSelect && currentVal.indexOf(',') > -1) {
         $valField.val(currentVal.split(',')[0]);
       }
       // Select options
       if (options[name]) {
         $valField.select2({
-          multiple: (operatorType === 'multi'),
+          multiple: multiSelect,
           data: _.map(options[name], function (value, key) {
             return {id: key, text: value};
           })
@@ -268,11 +266,10 @@
       }
       // EntityRef
       else {
-        console.log($.inArray(getFieldData[name].FKApiName, OPEN_IMMEDIATELY));
         $valField.crmEntityRef({
           entity: getFieldData[name].FKApiName,
           select: {
-            multiple: (operatorType === 'multi'),
+            multiple: multiSelect,
             minimumInputLength: $.inArray(getFieldData[name].FKApiName, OPEN_IMMEDIATELY) > -1 ? 0 : 1
           }
         });
@@ -376,7 +373,7 @@
       var $row = $(this).closest('tr'),
         op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
-        val = evaluate($(this).val(), $.inArray(op, MULTI) > -1);
+        val = evaluate($(this).val(), isMultiSelect(name, op));
 
       // Ignore blank values for the return field
       if ($(this).is('#api-return-value') && !val) {
