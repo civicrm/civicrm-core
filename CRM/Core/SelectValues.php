@@ -617,7 +617,7 @@ class CRM_Core_SelectValues {
         }
       }
 
-      // might as well get all the hook tokens to
+      // Get all the hook tokens too
       $hookTokens = array();
       CRM_Utils_Hook::tokens($hookTokens);
       foreach ($hookTokens as $tokenValues) {

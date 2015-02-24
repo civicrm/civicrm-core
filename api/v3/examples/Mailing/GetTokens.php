@@ -2,7 +2,7 @@
 /**
  * Test Generated example demonstrating the Mailing.gettokens API.
  *
- * Demonstrates fetching tokens for one or more entities (in this case "contact" and "mailing").
+ * Demonstrates fetching tokens for one or more entities (in this case "Contact" and "Mailing").
  * Optionally pass sequential=1 to have output ready-formatted for the select2 widget.
  *
  * @return array
@@ -11,8 +11,8 @@
 function mailing_gettokens_example() {
   $params = array(
     'entity' => array(
-      '0' => 'contact',
-      '1' => 'mailing',
+      '0' => 'Contact',
+      '1' => 'Mailing',
     ),
   );
 

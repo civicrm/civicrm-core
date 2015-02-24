@@ -1808,6 +1808,7 @@ class CRM_Utils_Token {
 
   /**
    * Formats a token list for the select2 widget
+   *
    * @param $tokens
    * @return array
    */
