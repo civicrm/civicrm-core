@@ -2,7 +2,7 @@
 
   angular.module('crmMailing', [
     'crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'
-  ]); // TODO ngSanitize, unsavedChanges
+  ]);
 
   // Time to wait before triggering AJAX update to recipients list
   var RECIPIENTS_DEBOUNCE_MS = 100;
