@@ -70,29 +70,43 @@ function civicrm_api3_mailing_create($params) {
  * @return array
  * @throws \API_Exception
  */
-function civicrm_api3_mailing_get_token($params) {
-  if (!array_key_exists("usage", $params)) {
-    throw new API_Exception('Mandatory keys missing from params array: entity');
+function civicrm_api3_mailing_gettokens($params) {
+  $tokens = array();
+  foreach ((array) $params['entity'] as $ent) {
+    $func = $ent . 'Tokens';
+    if (!method_exists('CRM_Core_SelectValues', $func)) {
+      throw new API_Exception('Unknown token entity: ' . $ent);
+    }
+    $tokens = array_merge(CRM_Core_SelectValues::$func(), $tokens);
   }
-
-  $tokens = CRM_Core_SelectValues::contactTokens();
-  switch ($params['usage']) {
-    case 'Mailing':
-      $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
-      break;
-
-    case 'ScheduleEventReminder':
-      $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
-      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
-      $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
-      break;
-
-    case 'ManageEventScheduleReminder':
-      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
-      break;
+  if (!empty($params['sequential'])) {
+    $tokens = CRM_Utils_Token::formatTokensForDisplay($tokens);
   }
+  return civicrm_api3_create_success($tokens, $params, 'Mailing', 'gettokens');
+}
 
-  return CRM_Utils_Token::formatTokensForDisplay($tokens);
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_mailing_gettokens_spec(&$params) {
+  $params['entity'] = array(
+    'api.default' => array('contact'),
+    'api.required' => 1,
+    'api.multiple' => 1,
+    'title' => 'Entity',
+    'options' => array(),
+  );
+  foreach (get_class_methods('CRM_Core_SelectValues') as $func) {
+    if (strpos($func, 'Tokens')) {
+      $ent = str_replace('Tokens', '', $func);
+      $params['entity']['options'][$ent] = $ent;
+    }
+  }
 }
 
 /**
