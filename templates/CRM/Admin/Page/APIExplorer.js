@@ -131,8 +131,8 @@
         CRM.alert(data.deprecated, entity + ' Deprecated');
       }
       showFields(required);
-      if (action === 'get' || action === 'getsingle') {
-        showReturn();
+      if (action === 'get' || action === 'getsingle' || action === 'getstat') {
+        showReturn(action === 'getstat' ? ts('Group by') : ts('Fields to return'));
       }
     });
   }
@@ -140,8 +140,8 @@
   /**
    * For "get" actions show the "return" options
    */
-  function showReturn() {
-    $('#api-params').prepend($(returnTpl({})));
+  function showReturn(title) {
+    $('#api-params').prepend($(returnTpl({title: title})));
     $('#api-return-value').crmSelect2({data: fields, multiple: true});
   }
 
