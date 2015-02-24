@@ -1,6 +1,6 @@
 (function (angular, $, _) {
 
-  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
+  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
   angular.module('crmMailingAB').config([
     '$routeProvider',
     function ($routeProvider) {

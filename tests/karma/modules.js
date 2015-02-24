@@ -9,6 +9,5 @@ CRM.angular = {
     'crmAttachment',
     'crmUi',
     'crmUtil',
-    'ngSanitize',
   ]
 };
