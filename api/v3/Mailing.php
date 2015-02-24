@@ -63,9 +63,13 @@ function civicrm_api3_mailing_create($params) {
 }
 
 /**
- * Get mailing token.
+ * Get tokens for one or more entity type
+ *
+ * Output will be formatted either as a flat list,
+ * or pass sequential=1 to retrieve as a hierarchy formatted for select2.
  *
  * @param array $params
+ *   Should contain an array of entities to retrieve tokens for.
  *
  * @return array
  * @throws \API_Exception
@@ -73,7 +77,7 @@ function civicrm_api3_mailing_create($params) {
 function civicrm_api3_mailing_gettokens($params) {
   $tokens = array();
   foreach ((array) $params['entity'] as $ent) {
-    $func = $ent . 'Tokens';
+    $func = lcfirst($ent) . 'Tokens';
     if (!method_exists('CRM_Core_SelectValues', $func)) {
       throw new API_Exception('Unknown token entity: ' . $ent);
     }
@@ -101,9 +105,10 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
     'title' => 'Entity',
     'options' => array(),
   );
+  // Fetch a list of token functions and format to look like entity names
   foreach (get_class_methods('CRM_Core_SelectValues') as $func) {
     if (strpos($func, 'Tokens')) {
-      $ent = str_replace('Tokens', '', $func);
+      $ent = ucfirst(str_replace('Tokens', '', $func));
       $params['entity']['options'][$ent] = $ent;
     }
   }

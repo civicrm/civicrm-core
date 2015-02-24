@@ -500,10 +500,15 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
    * Test Mailing.gettokens.
    */
   public function testMailGetTokens() {
-    $description = "Demonstrates fetching tokens for one or more entities (in this case \"contact\" and \"mailing\").
+    $description = "Demonstrates fetching tokens for one or more entities (in this case \"Contact\" and \"Mailing\").
       Optionally pass sequential=1 to have output ready-formatted for the select2 widget.";
-    $result = $this->callAPIAndDocument($this->_entity, 'gettokens', array('entity' => array('contact', 'mailing')), __FUNCTION__, __FILE__, $description);
-    $this->assertContains('Contact Type', $result);
+    $result = $this->callAPIAndDocument($this->_entity, 'gettokens', array('entity' => array('Contact', 'Mailing')), __FUNCTION__, __FILE__, $description);
+    $this->assertContains('Contact Type', $result['values']);
+
+    // Check that passing "sequential" correctly outputs a hierarchical array
+    $result = $this->callAPISuccess($this->_entity, 'gettokens', array('entity' => 'contact', 'sequential' => 1));
+    $this->assertArrayHasKey('text', $result['values'][0]);
+    $this->assertArrayHasKey('id', $result['values'][0]['children'][0]);
   }
 
   //@ todo tests below here are all failure tests which are not hugely useful - need success tests
