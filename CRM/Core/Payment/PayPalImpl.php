@@ -615,9 +615,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'invoice' => $params['invoiceID'],
       'lc' => substr($config->lcMessages, -2),
       'charset' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'UTF-8',
-      'custom' => CRM_Utils_Array::value('accountingCode',
-        $params
-      ),
+      'custom' => CRM_Utils_Array::value('accountingCode', $params),
+      'bn' => 'CiviCRM_SP',
     );
 
     // add name and address if available, CRM-3130
