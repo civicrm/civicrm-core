@@ -472,13 +472,15 @@
        * @param mailing object
        * @param statType object (see statTypes above)
        * @param view string ('search', 'event', 'report')
+       * @param returnPath string|null Return path (relative to Angular base)
        * @return string|null
        */
-      getUrl: function getUrl(mailing, statType, view) {
+      getUrl: function getUrl(mailing, statType, view, returnPath) {
         switch (view) {
           case 'events':
+            var retParams = returnPath ? '&context=angPage&angPage=' + returnPath : '';
             return crmLegacy.url('civicrm/mailing/report/event',
-              'reset=1&mid=' + mailing.id + statType.eventsFilter);
+              'reset=1&mid=' + mailing.id + statType.eventsFilter + retParams);
 
           case 'search':
             return crmLegacy.url('civicrm/contact/search/advanced',
