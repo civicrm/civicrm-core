@@ -197,10 +197,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Mailings");
     $this->clickLink("css=ul#civicrm-menu li.crm-New_Mailing a");
 
-    $this->assertTextPresent("New Mailing");
-    $this->assertElementPresent("name");
-    $this->assertElementPresent("includeGroups");
-    $this->assertElementPresent("excludeGroups");
+    $this->assertTextPresent("Mailing");
   }
 
   public function testConstituentReportSummary() {
