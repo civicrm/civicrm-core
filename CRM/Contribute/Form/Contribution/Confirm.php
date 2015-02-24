@@ -187,7 +187,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
         $expressParams = $payment->getExpressCheckoutDetails($this->get('token'));
 
-        $this->_params['payer'] = $expressParams['payer'];
+        $this->_params['payer'] = CRM_Utils_Array::value('payer', $expressParams);
         $this->_params['payer_id'] = $expressParams['payer_id'];
         $this->_params['payer_status'] = $expressParams['payer_status'];
 

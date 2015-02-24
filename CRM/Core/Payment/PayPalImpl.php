@@ -204,6 +204,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['cancelURL'] = CRM_Utils_Array::value('cancelURL', $params);
     $args['desc'] = $params['description'];
 
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
+
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
@@ -331,6 +334,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['zip'] = $params['postal_code'];
     $args['desc'] = substr(CRM_Utils_Array::value('description', $params), 0, 127);
     $args['custom'] = CRM_Utils_Array::value('accountingCode', $params);
+
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
     if (CRM_Utils_Array::value('is_recur', $params) == 1) {
       $start_time = strtotime(date('m/d/Y'));
