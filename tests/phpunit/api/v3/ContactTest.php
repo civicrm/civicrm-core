@@ -357,6 +357,76 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * CRM-15792 - create/update datetime field for contact.
+   */
+  public function testCreateContactCustomFldDateTime() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'datetime_test_group'));
+    $dateTime = CRM_Utils_Date::currentDBDate();
+    //check date custom field is saved along with time when time_format is set
+    $params = array(
+      'first_name' => 'abc3',
+      'last_name' => 'xyz3',
+      'contact_type' => 'Individual',
+      'email' => 'man3@yahoo.com',
+      'api.CustomField.create' => array(
+        'custom_group_id' => $customGroup['id'],
+        'name' => 'test_datetime',
+        'label' => 'Demo Date',
+        'html_type' => 'Select Date',
+        'data_type' => 'Date',
+        'time_format' => 2,
+        'weight' => 4,
+        'is_required' => 1,
+        'is_searchable' => 0,
+        'is_active' => 1,
+      ),
+    );
+
+    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $customFldId = $result['values'][$result['id']]['api.CustomField.create']['id'];
+    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($customFldId, 'in line ' . __LINE__);
+
+    $params = array(
+      'id' => $result['id'],
+      "custom_{$customFldId}" => $dateTime,
+      'api.CustomValue.get' => 1,
+    );
+
+    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $customFldDate = date("YmdHis", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
+    $this->assertNotNull($customFldDate, 'in line ' . __LINE__);
+    $this->assertEquals($dateTime, $customFldDate);
+    $customValueId = $result['values'][$result['id']]['api.CustomValue.get']['values'][0]['id'];
+    $dateTime = date('Ymd');
+    //date custom field should not contain time part when time_format is null
+    $params = array(
+      'id' => $result['id'],
+      'api.CustomField.create' => array(
+        'id' => $customFldId,
+        'html_type' => 'Select Date',
+        'data_type' => 'Date',
+        'time_format' => '',
+      ),
+      'api.CustomValue.create' => array(
+        'id' => $customValueId,
+        'entity_id' => $result['id'],
+        "custom_{$customFldId}" => $dateTime,
+      ),
+      'api.CustomValue.get' => 1,
+    );
+    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $customFldDate = date("Ymd", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
+    $customFldTime = date("His", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
+    $this->assertNotNull($customFldDate, 'in line ' . __LINE__);
+    $this->assertEquals($dateTime, $customFldDate);
+    $this->assertEquals(000000, $customFldTime);
+    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+  }
+
 
   /**
    * Test creating a current employer through API.

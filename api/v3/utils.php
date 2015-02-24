@@ -1461,7 +1461,20 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
  * @throws Exception
  */
 function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = FALSE) {
+  //CRM-15792 handle datetime for custom fields below code handles chain api call
+  $chainApikeys = array_flip(preg_grep("/^api./", array_keys($params)));
+  if (!empty($chainApikeys) && is_array($chainApikeys)) {
+    foreach ($chainApikeys as $key => $value) {
+      if (is_array($params[$key])) {
+        $chainApiParams = array_intersect_key($fields, $params[$key]);
+        $customFields = array_fill_keys(array_keys($params[$key]), $key);
+      }
+    }
+  }
   $fields = array_intersect_key($fields, $params);
+  if (!empty($chainApiParams)) {
+    $fields = array_merge($fields, $chainApiParams);
+  }
   foreach ($fields as $fieldName => $fieldInfo) {
     switch (CRM_Utils_Array::value('type', $fieldInfo)) {
       case CRM_Utils_Type::T_INT:
@@ -1469,11 +1482,17 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
         _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
         break;
 
-      case 4:
-      case 12:
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
       case CRM_Utils_Type::T_TIMESTAMP:
         //field is of type date or datetime
-        _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
+        if (!empty($customFields) && array_key_exists($fieldName, $customFields)) {
+          $dateParams = &$params[$customFields[$fieldName]];
+        }
+        else {
+          $dateParams = &$params;
+        }
+        _civicrm_api3_validate_date($dateParams, $fieldName, $fieldInfo);
         break;
 
       case 32:
@@ -1819,7 +1838,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['title'] = $value['label'];
-    $value['type'] = _getStandardTypeFromCustomDataType($value['data_type']);
+    $value['type'] = _getStandardTypeFromCustomDataType($value);
     $ret['custom_' . $key] = $value;
   }
   return $ret;
@@ -1832,7 +1851,12 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
  *
  * @return int
  */
-function _getStandardTypeFromCustomDataType($dataType) {
+function _getStandardTypeFromCustomDataType($value) {
+  $dataType = $value['data_type'];
+  //CRM-15792 - If date custom field contains timeformat change type to DateTime
+  if ($value['data_type'] == 'Date' && isset($value['time_format']) && $value['time_format'] > 0) {
+    $dataType = 'DateTime';
+  }
   $mapping = array(
     'String' => CRM_Utils_Type::T_STRING,
     'Int' => CRM_Utils_Type::T_INT,
@@ -1840,6 +1864,7 @@ function _getStandardTypeFromCustomDataType($dataType) {
     'Memo' => CRM_Utils_Type::T_LONGTEXT,
     'Float' => CRM_Utils_Type::T_FLOAT,
     'Date' => CRM_Utils_Type::T_DATE,
+    'DateTime' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'Boolean' => CRM_Utils_Type::T_BOOLEAN,
     'StateProvince' => CRM_Utils_Type::T_INT,
     'File' => CRM_Utils_Type::T_STRING,
