@@ -34,8 +34,6 @@
 /**
  * Save an AclRole.
  *
- * Allowed @params array keys are:
- *
  * @param array $params
  *
  * @return array
