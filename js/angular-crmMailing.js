@@ -231,6 +231,12 @@
   //  - [output] recipients: array of recipient records
   angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr, $q, crmMetadata) {
     var ts = $scope.ts = CRM.ts(null);
+
+    $scope.isMailingList = function isMailingList(group) {
+      var GROUP_TYPE_MAILING_LIST = '2';
+      return _.contains(group.group_type, GROUP_TYPE_MAILING_LIST);
+    };
+
     $scope.recipients = null;
     $scope.getRecipientsEstimate = function () {
       var ts = $scope.ts;
