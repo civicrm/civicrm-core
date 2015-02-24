@@ -102,31 +102,17 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $groupNames = civicrm_api3('Group', 'get', array());
     $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
 
-    // FIXME: The following two items differ between GSOC CiviMail and ABTest branches
-    if (FALSE) {
-      // AB Test
-      $emailAdd = civicrm_api3('Email', 'get', array());
-      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
-        'sequential' => 1,
-        'return' => array("msg_html", "id", "msg_title", "msg_subject"),
-        'is_active' => 1,
-        'id' => array('>' => 58),
-      ));
-    }
-    else {
-      // CiviMail UI
-      $emailAdd = civicrm_api3('Email', 'get', array(
-        'sequential' => 1,
-        'return' => "email",
-        'contact_id' => $contactID,
-      ));
-      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
-        'sequential' => 1,
-        'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
-        'is_active' => 1,
-        'workflow_id' => array('IS NULL' => ""),
-      ));
-    }
+    $emailAdd = civicrm_api3('Email', 'get', array(
+      'sequential' => 1,
+      'return' => "email",
+      'contact_id' => $contactID,
+    ));
+    $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+      'sequential' => 1,
+      'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
+      'is_active' => 1,
+      'workflow_id' => array('IS NULL' => ""),
+    ));
     $mailGrp = civicrm_api3('MailingGroup', 'get', array());
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array('entity' => array('contact', 'mailing'), 'sequential' => 1));
     $fromAddress = civicrm_api3('OptionGroup', 'get', array(
