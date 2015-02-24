@@ -76,6 +76,14 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
       $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=mailing");
       $backUrlTitle = ts('Back to Mailing');
     }
+    elseif ($context == 'angPage') {
+      $angPage = CRM_Utils_Request::retrieve('angPage', 'String', $this);
+      if (!preg_match(':^[a-zA-Z0-9\-_/]+$:', $angPage)) {
+        CRM_Core_Error::fatal('Malformed return URL');
+      }
+      $backUrl = CRM_Utils_System::url('civicrm/a/#/' . $angPage);
+      $backUrlTitle = ts('Back to Report');
+    }
     else {
       $backUrl = CRM_Utils_System::url('civicrm/mailing/report', "reset=1&mid={$mailing_id}");
       $backUrlTitle = ts('Back to Report');
