@@ -60,7 +60,7 @@
     {/if}
 
     {if $contact_id}
-      <div class="messages status no-popup" id="crm-event-register-different">
+      <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
           href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
           title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
