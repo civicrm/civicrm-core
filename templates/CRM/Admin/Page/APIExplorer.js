@@ -22,7 +22,6 @@
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
-    SINGLE = ['>', '>=', '<', '<=', '<>', '!='],
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
 
   /**
@@ -220,9 +219,40 @@
     }
   }
 
+  /**
+   * Should we render a select or textfield?
+   *
+   * @param fieldName
+   * @param operator
+   * @returns boolean
+   */
+  function isSelect(fieldName, operator) {
+    return (options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && ($.inArray(operator, TEXT) < 0);
+  }
+
+  /**
+   * Should we render a select as single or multi?
+   *
+   * @param fieldName
+   * @param operator
+   * @returns boolean
+   */
   function isMultiSelect(fieldName, operator) {
-    var field = fieldName && _.find(fields, 'id', fieldName);
-    return ($.inArray(operator, MULTI) > -1) || (field && field.multi);
+    if ($.inArray(operator, MULTI) > -1) {
+      return true;
+    }
+    // The = operator is ambiguous but all others can be safely assumed to be single
+    if (operator !== '=') {
+      return false;
+    }
+    return true;
+    /*
+     * Attempt to resolve the ambiguity of the = operator using metadata
+     * commented out because there is not enough metadata in the api at this time
+     * to accurately figure it out.
+     */
+    // var field = fieldName && _.find(fields, 'id', fieldName);
+    // return field && field.multi;
   }
 
   /**
@@ -246,7 +276,7 @@
     }
     $valField.css('visibility', '');
     // Option list or entityRef input
-    if ((options[name] || (getFieldData[name] && getFieldData[name].FKApiName)) && $.inArray(operator, TEXT) < 0) {
+    if (isSelect(name, operator)) {
       // Reset value before switching to a select from something else
       if ($(this).is('.api-param-name') || !$valField.data('select2')) {
         $valField.val('');
@@ -351,6 +381,7 @@
   /**
    * Smarty doesn't support array literals so we provide a stub
    * @param js string
+   * @param key string
    */
   function smartyFormat(js, key) {
     if (js.indexOf('[') > -1 || js.indexOf('{') > -1) {
@@ -371,9 +402,12 @@
     });
     $('input.api-param-value, input.api-option-value').each(function() {
       var $row = $(this).closest('tr'),
+        input = $(this).val(),
         op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
-        val = evaluate($(this).val(), isMultiSelect(name, op));
+        // Workaround for ambiguity of the = operator
+        makeArray = (op === '=' && isSelect(name, op)) ? input.indexOf(',') > -1 : op !== '=' && isMultiSelect(name, op),
+        val = evaluate(input, makeArray);
 
       // Ignore blank values for the return field
       if ($(this).is('#api-return-value') && !val) {
