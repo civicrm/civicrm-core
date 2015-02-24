@@ -496,6 +496,16 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->assertAPIDeleted($this->_entity, $result['id']);
   }
 
+  /**
+   * Test Mailing.gettokens.
+   */
+  public function testMailGetTokens() {
+    $description = "Demonstrates fetching tokens for one or more entities (in this case \"contact\" and \"mailing\").
+      Optionally pass sequential=1 to have output ready-formatted for the select2 widget.";
+    $result = $this->callAPIAndDocument($this->_entity, 'gettokens', array('entity' => array('contact', 'mailing')), __FUNCTION__, __FILE__, $description);
+    $this->assertContains('Contact Type', $result);
+  }
+
   //@ todo tests below here are all failure tests which are not hugely useful - need success tests
 
   //------------ civicrm_mailing_event_bounce methods------------
