@@ -405,7 +405,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = array(
       'id' => $result['id'],
       'api.CustomField.create' => array(
-        'id' => $customValueId,
+        'id' => $customFldId,
         'html_type' => 'Select Date',
         'data_type' => 'Date',
         'time_format' => '',
