@@ -179,8 +179,11 @@ class CRM_Utils_PDF_Utils {
    * @return string
    */
   static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
-    require_once 'packages/dompdf/dompdf_config.inc.php';
-    spl_autoload_register('DOMPDF_autoload');
+    // CRM-12165 - Remote file support required for image handling.
+    define("DOMPDF_ENABLE_REMOTE", true);
+    define('DOMPDF_ENABLE_AUTOLOAD', false);
+    require_once 'packages/vendor/dompdf/dompdf/dompdf_config.inc.php';
+
     $dompdf = new DOMPDF();
     $dompdf->set_paper($paper_size, $orientation);
     $dompdf->load_html($html);
