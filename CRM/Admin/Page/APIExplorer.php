@@ -69,7 +69,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    *   user context.
    */
   public function userContext() {
-    return 'civicrm/api/explorer';
+    return 'civicrm/api';
   }
 
   /**
