@@ -714,7 +714,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           );
 
           // make contribution entry
-          CRM_Member_BAO_Membership::recordMembershipContribution( array_merge($value, array('membership_id' => $membership->id)));
+          $contrbutionParams = array_merge($value, array('membership_id' => $membership->id));
+          CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
         }
         else {
           $membership = CRM_Member_BAO_Membership::create($value, CRM_Core_DAO::$_nullArray);
