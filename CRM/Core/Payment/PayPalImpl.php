@@ -266,6 +266,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       "&b={$params['contributionID']}" .
       "&p={$params['contributionPageID']}";
 
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
+
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
@@ -273,7 +276,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-
     $params['trxn_id'] = $result['transactionid'];
     $params['gross_amount'] = $result['amt'];
     $params['fee_amount'] = $result['feeamt'];
