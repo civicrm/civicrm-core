@@ -358,7 +358,7 @@ class CRM_Core_PseudoConstant {
           }
           // onlyActive param will automatically filter on common flags
           if (!empty($params['onlyActive'])) {
-            foreach (array('is_active' => 1, 'is_deleted' => 0, 'is_test' => 0) as $flag => $val) {
+            foreach (array('is_active' => 1, 'is_deleted' => 0, 'is_test' => 0, 'is_hidden' => 0) as $flag => $val) {
               if (in_array($flag, $availableFields)) {
                 $wheres[] = "$flag = $val";
               }
