@@ -1,13 +1,17 @@
 <!--
   Implicit Controller: CrmMailingABEditCtrl
 -->
+<div class="messages help">
+  <div class="msg-title crm-title">{{ts('A/B Test Results')}}: {{abtest.ab.name}}</div>
+  {{ts('This report displays the current results for your A/B test. You can return to this page to view the latest statistics by clicking "Results" from the "Manage A/B Tests" listing.')}}
+</div>
 <div ng-controller="CrmMailingABReportCtrl">
   <table class="crm-mailing-ab-table">
     <thead>
     <tr ng-show="abtest.ab.status == 'Testing'">
       <td></td>
       <td ng-repeat="am in getActiveMailings()">
-        <button ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
+        <button crm-icon="mail-closed" ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
       </td>
       <td></td>
     </tr>
