@@ -99,6 +99,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
     case 'get':
     case 'getsingle':
     case 'getcount':
+    case 'getstat':
       $metadata = _civicrm_api_get_fields($apiRequest['entity'], $unique, $apiRequest['params']);
       if (empty($metadata['id'])) {
         // if id is not set we will set it eg. 'id' from 'case_id', case_id will be an alias
