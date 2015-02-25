@@ -97,8 +97,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $name = $firstName . " " . $lastName;
     $status = 'Registered';
 
-    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[1]/td[2]/a", preg_quote($name));
-    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[3]/td[2]/a", preg_quote($eventTitle));
+    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table[1]/tbody/tr[1]/td[2]/strong/a", preg_quote($name));
+    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table[1]/tbody/tr[3]/td[2]/a", preg_quote($eventTitle));
     $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
 
     // Find additional  Participant
@@ -110,9 +110,9 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $name = $participantfname . " " . $participantlname;
     $status = 'Registered';
 
-    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[1]/td[2]/a", preg_quote($name));
-    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[3]/td[2]/a", preg_quote($eventTitle));
-    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table/tbody/tr[6]/td[2]", preg_quote($status));
+    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table[1]/tbody/tr[1]/td[2]/strong/a", preg_quote($name));
+    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table[1]/tbody/tr[3]/td[2]/a", preg_quote($eventTitle));
+    $this->verifyText("xpath=//form[@id='ParticipantView']/div[2]/table[1]/tbody/tr[6]/td[2]", preg_quote($status));
 
     // delete all custom data
     if (isset($cfId)) {
