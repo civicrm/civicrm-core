@@ -165,7 +165,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
       "Start Date - greater than or equal to",
       '...AND...',
       "End Date - less than or equal to",
-      "Event Type - $eventTypeName",
+      "Event Type = $eventTypeName",
       'Select Records:',
       'Edit Search Criteria',
     );
