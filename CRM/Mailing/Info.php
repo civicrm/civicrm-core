@@ -134,7 +134,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mailTokens' => $mailTokens['values'],
         'contactid' => $contactID,
         'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
-        'enableReplyTo' => isset($config->replyTo) ? $config->replyTo : 0,
+        'enableReplyTo' => (int) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'replyTo'),
         'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
         'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
             'id' => 'user_contact_id',
