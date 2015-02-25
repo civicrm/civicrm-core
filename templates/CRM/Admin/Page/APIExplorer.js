@@ -25,6 +25,22 @@
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
 
   /**
+   * Call prettyPrint function and perform additional formatting
+   * @param ele
+   */
+  function prettyPrint(ele) {
+    if (typeof window.prettyPrint === 'function') {
+      $(ele).removeClass('prettyprinted').addClass('prettyprint');
+
+      window.prettyPrint();
+
+      // Highlight errors in api result
+      $('span:contains("error_code"),span:contains("error_message")', '#api-result')
+        .siblings('span.str').css('color', '#B00');
+    }
+  }
+
+  /**
    * Add a "fields" row
    * @param name
    */
@@ -131,8 +147,8 @@
         CRM.alert(data.deprecated, entity + ' Deprecated');
       }
       showFields(required);
-      if (action === 'get' || action === 'getsingle') {
-        showReturn();
+      if (action === 'get' || action === 'getsingle' || action === 'getstat') {
+        showReturn(action === 'getstat' ? ts('Group by') : ts('Fields to return'));
       }
     });
   }
@@ -140,8 +156,8 @@
   /**
    * For "get" actions show the "return" options
    */
-  function showReturn() {
-    $('#api-params').prepend($(returnTpl({})));
+  function showReturn(title) {
+    $('#api-params').prepend($(returnTpl({title: title})));
     $('#api-return-value').crmSelect2({data: fields, multiple: true});
   }
 
@@ -190,8 +206,8 @@
       formatResult: renderAction
     });
     // If previously selected action is not available, set it to 'get' if possible
-    if (_.indexOf(actions.values, val) < 0) {
-      $('#api-action').select2('val', _.indexOf(actions.values, 'get') < 0 ? actions.values[0] : 'get', true);
+    if (!_.includes(actions.values, val)) {
+      $('#api-action').select2('val', !_.includes(actions.values, 'get') ? actions.values[0] : 'get', true);
     }
   }
 
@@ -227,7 +243,7 @@
    * @returns boolean
    */
   function isSelect(fieldName, operator) {
-    return (options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && ($.inArray(operator, TEXT) < 0);
+    return (options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && !_.includes(TEXT, operator);
   }
 
   /**
@@ -238,7 +254,7 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
-    if ($.inArray(operator, MULTI) > -1) {
+    if (_.includes(MULTI, operator)) {
       return true;
     }
     // The = operator is ambiguous but all others can be safely assumed to be single
@@ -267,7 +283,7 @@
       multiSelect = isMultiSelect(name, operator),
       currentVal = $valField.val();
     // Boolean fields only have 1 possible value
-    if ($.inArray(operator, BOOL) > -1) {
+    if (_.includes(BOOL, operator)) {
       if ($valField.data('select2')) {
         $valField.select2('destroy');
       }
@@ -282,7 +298,7 @@
         $valField.val('');
       }
       // When switching from multi-select to single select
-      else if (!multiSelect && currentVal.indexOf(',') > -1) {
+      else if (!multiSelect && _.includes(currentVal, ',')) {
         $valField.val(currentVal.split(',')[0]);
       }
       // Select options
@@ -300,7 +316,7 @@
           entity: getFieldData[name].FKApiName,
           select: {
             multiple: multiSelect,
-            minimumInputLength: $.inArray(getFieldData[name].FKApiName, OPEN_IMMEDIATELY) > -1 ? 0 : 1
+            minimumInputLength: _.includes(OPEN_IMMEDIATELY, getFieldData[name].FKApiName) ? 0 : 1
           }
         });
       }
@@ -384,7 +400,7 @@
    * @param key string
    */
   function smartyFormat(js, key) {
-    if (js.indexOf('[') > -1 || js.indexOf('{') > -1) {
+    if (_.includes(js, '[') || _.includes(js, '{')) {
       smartyStub = true;
       return '$' + key.replace(/[. -]/g, '_');
     }
@@ -406,7 +422,7 @@
         op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
         // Workaround for ambiguity of the = operator
-        makeArray = (op === '=' && isSelect(name, op)) ? input.indexOf(',') > -1 : op !== '=' && isMultiSelect(name, op),
+        makeArray = (op === '=' && isSelect(name, op)) ? _.includes(input, ',') : op !== '=' && isMultiSelect(name, op),
         val = evaluate(input, makeArray);
 
       // Ignore blank values for the return field
@@ -506,15 +522,15 @@
     q.php += ");";
     q.json += ").done(function(result) {\n  // do something\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
-    if (action.indexOf('get') < 0) {
+    if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
     } else if (smartyStub) {
       q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
-      $('#api-' + type).addClass('prettyprint').removeClass('prettyprinted').text(val);
+      $('#api-' + type).text(val);
     });
-    prettyPrint();
+    prettyPrint('#api-generated pre');
   }
 
   /**
@@ -527,7 +543,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (action.indexOf('get') < 0 && action != 'check') {
+    if (!_.includes(action, 'get') && action != 'check') {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
@@ -549,11 +565,11 @@
         prettyprint: 1,
         json: JSON.stringify(params)
       },
-      type: action.indexOf('get') < 0 ? 'POST' : 'GET',
+      type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
     }).done(function(text) {
-      $('#api-result').addClass('prettyprint').removeClass('prettyprinted').text(text);
-      prettyPrint();
+      $('#api-result').text(text);
+      prettyPrint('#api-result');
     });
   }
 
@@ -579,8 +595,8 @@
       $('#example-result').block();
       $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
         .done(function(result) {
-          $('#example-result').unblock().addClass('prettyprint').removeClass('prettyprinted').text(result);
-          prettyPrint();
+          $('#example-result').unblock().text(result);
+          prettyPrint('#example-result');
         });
     } else {
       $('#example-result').text($('#example-result').attr('title'));
@@ -615,7 +631,7 @@
           if (result.code) {
             $('#doc-result').append(docCodeTpl(result));
           }
-          prettyPrint();
+          prettyPrint('.api-doc-code pre');
         });
     } else {
       $('#doc-result').html($('#doc-result').attr('title'));
