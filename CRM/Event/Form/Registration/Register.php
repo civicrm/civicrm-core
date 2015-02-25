@@ -340,8 +340,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $contactID = $this->getContactID();
-    $this->assign('contact_id', $contactID);
-    $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
+    if ($contactID) {
+      $this->assign('contact_id', $contactID);
+      $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));      
+    }
 
     $this->add('hidden', 'scriptFee', NULL);
     $this->add('hidden', 'scriptArray', NULL);

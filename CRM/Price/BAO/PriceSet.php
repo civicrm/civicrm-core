@@ -1370,7 +1370,7 @@ WHERE       ps.id = %1
     if ($priceSetId) {
       $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
       if ($isQuickConfig) {
-        $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($priceSetId);
+        $copyPriceSet = CRM_Price_BAO_PriceSet::copy($priceSetId);
         CRM_Price_BAO_PriceSet::addTo($baoName, $newId, $copyPriceSet->id);
       }
       else {
