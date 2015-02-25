@@ -335,7 +335,7 @@ class CRM_Event_BAO_Query {
 
       case 'participant_status_id':
       case 'participant_role_id':
-        if ($value && is_array($value) && strpos($op , 'IN') === FALSE) {
+        if ($value && is_array($value) && strpos($op, 'IN') === FALSE) {
           $op = 'IN';
         }
       case 'participant_status':
