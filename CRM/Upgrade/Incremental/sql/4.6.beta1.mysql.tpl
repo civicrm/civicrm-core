@@ -23,10 +23,10 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'exceeded storage allocation'),
       (@bounceTypeID, 'running out of disk space');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(disk(space)?|over the allowed|exceed(ed|s)?|storage) quota' WHERE `id` = 87;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail|in)(box|folder) ((for user \\w+ )?is )?full' WHERE `id` = 92;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'mailbox (has exceeded|is over) the limit' WHERE `id` = 93;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'quota ?(usage|violation|exceeded)' WHERE `id` = 98;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(disk(space)?|over the allowed|exceed(ed|s)?|storage) quota' WHERE `pattern` = '(disk|over the allowed|exceed(ed|s)?|storage) quota';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail|in)(box|folder) ((for user \\w+ )?is )?full' WHERE `pattern` = 'mailbox ((for user w+ )?is )?full';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'mailbox (has exceeded|is over) the limit' WHERE `pattern` = 'mailbox has exceeded the limit';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'quota ?(usage|violation|exceeded)' WHERE `pattern` = 'quota (usage|violation|exceeded)';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Inactive';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
@@ -34,11 +34,11 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'account that you tried to reach is disabled'),
       (@bounceTypeID, 'User banned');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'not accepting (mail|messages)' WHERE `id` = 37;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'not accepting (mail|messages)' WHERE `pattern` = 'not accepting mail';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Loop';
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail( forwarding)?|routing).loop' WHERE `id` = 81;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'too many (hops|recursive forwards)' WHERE `id` = 86;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail( forwarding)?|routing).loop' WHERE `pattern` = '(mail|routing) loop';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'too many (hops|recursive forwards)' WHERE `pattern` = 'too many hops';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Relay';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
@@ -49,7 +49,7 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'Rejected by next-hop'),
       (@bounceTypeID, 'not permitted to( *550)? relay through this server');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'relay(ing)? (not permitted|(access )?denied)' WHERE `id` = 104;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'relay(ing)? (not permitted|(access )?denied)' WHERE `pattern` = 'relay (not permitted|access denied)';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Host';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
@@ -57,7 +57,7 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'server requires authentication'),
       (@bounceTypeID, 'authentication (is )?required');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'server is (down or unreachable|not responding)' WHERE `id` = 20;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'server is (down or unreachable|not responding)' WHERE `pattern` = 'server is down or unreachable';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Invalid';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
@@ -76,13 +76,13 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'Elektronski naslov (je ukinjen|ne obstaja)'),
       (@bounceTypeID, 'nepravilno nastavljen predal');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(es)?( you (entered|specified))? (could|was)( not|n.t)( be)? found' WHERE `id` = 44;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(ee)? (unknown|invalid)' WHERE `id` = 45;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail )?delivery (to this user )?is not allowed' WHERE `id` = 59;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no such (mail drop|mailbox( \\w+)?|(e-?mail )?address|recipient|(local )?user|person)( here)?' WHERE `id` = 64;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no mailbox (here )?by that name' WHERE `id` = 65;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'recipient (does not exist|(is )?unknown|rejected|denied|not found)' WHERE `id` = 69;
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'unknown (local( |-)part|recipient|address error)' WHERE `id` = 73;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(es)?( you (entered|specified))? (could|was)( not|n.t)( be)? found' WHERE `pattern` = 'address(es)? could not be found';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'address(ee)? (unknown|invalid)' WHERE `pattern` = 'addressee unknown';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(mail )?delivery (to this user )?is not allowed' WHERE `pattern` = 'mail delivery to this user is not allowed';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no such (mail drop|mailbox( \\w+)?|(e-?mail )?address|recipient|(local )?user|person)( here)?' WHERE `pattern` = 'no such (mail drop|mailbox( w+)?|(e-?mail )?address|recipient|(local )?user)( here)?';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'no mailbox (here )?by that name' WHERE `pattern` = 'no mailbox here by that name';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'recipient (does not exist|(is )?unknown|rejected|denied|not found)' WHERE `pattern` = 'recipient (does not exist|(is )?unknown)';
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = 'unknown (local( |-)part|recipient|address error)' WHERE `pattern` = 'unknown (local( |-)part|recipient)';
 
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
@@ -96,4 +96,4 @@ INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern)
       (@bounceTypeID, 'Local Policy Violation'),
       (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
 
-UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(detected|rejected) as spam' WHERE `id` = 126;
+UPDATE `civicrm_mailing_bounce_pattern` SET `pattern` = '(detected|rejected) as spam' WHERE `pattern` = 'detected as spam';
