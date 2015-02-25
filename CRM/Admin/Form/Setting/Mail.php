@@ -38,6 +38,10 @@
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
+  protected $_settings = array(
+    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+  );
+
   /**
    * Build the form object.
    *
@@ -49,7 +53,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     $this->addElement('text', 'mailerBatchLimit', ts('Mailer Batch Limit'));
     $this->addElement('text', 'mailThrottleTime', ts('Mailer Throttle Time'));
     $this->addElement('text', 'mailerJobSize', ts('Mailer Job Size'));
-    $this->addElement('advcheckbox', 'replyTo', ts('Enable Custom Reply-To'));
     $this->addElement('text', 'mailerJobsMax', ts('Mailer CRON job limit'));
     $check = TRUE;
 

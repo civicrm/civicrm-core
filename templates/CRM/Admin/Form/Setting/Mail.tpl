@@ -52,7 +52,7 @@
         </tr>
         <tr class="crm-mail-form-block-replyTo">
             <td class="label">{$form.replyTo.label}</td><td>{$form.replyTo.html}<br />
-            <span class="description">{ts}Check to enable Reply To functionality for CiviMail.{/ts}</span></td>
+            <span class="description">{ts}Allow CiviMail users to send mailings with a custom Reply-To header.{/ts}</span></td>
         </tr>
       </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
