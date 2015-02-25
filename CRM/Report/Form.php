@@ -26,11 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * Class CRM_Report_Form
  */
 class CRM_Report_Form extends CRM_Core_Form {
   const ROW_COUNT_LIMIT = 50;
@@ -380,13 +376,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_createNew;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
 
     $this->addClass('crm-report-form');
 
-    // build tag filter
+    // Build tag filter.
     if ($this->_tagFilter) {
       $this->buildTagFilter();
     }
@@ -737,6 +734,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Set default values.
+   *
    * @param bool $freeze
    *
    * @return array
@@ -745,7 +744,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $freezeGroup = array();
 
     // FIXME: generalizing form field naming conventions would reduce
-    // lots of lines below.
+    // Lots of lines below.
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -885,6 +884,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get element from group.
+   *
    * @param string $group
    * @param string $grpFieldName
    *
@@ -901,7 +902,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_params
+   * Setter for $_params.
    *
    * @param array $params
    */
@@ -928,7 +929,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_limitValue
+   * Setter for $_limitValue.
    *
    * @param int $_limitValue
    */
@@ -937,7 +938,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_offsetValue
+   * Setter for $_offsetValue.
    *
    * @param int $_offsetValue
    */
@@ -946,13 +947,17 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Getter for $_defaultValues
+   * Getter for $_defaultValues.
+   *
    * @return array
    */
   public function getDefaultValues() {
     return $this->_defaults;
   }
 
+  /**
+   * Add columns to report.
+   */
   public function addColumns() {
     $options = array();
     $colGroups = NULL;
@@ -1756,7 +1761,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @param bool $relative
    * @param string $from
-   * @param string_type $to
+   * @param string $to
    *
    * @return string|NULL
    */
@@ -2294,7 +2299,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
-              // just to make sure these values are transfered to rows.
+              // just to make sure these values are transferred to rows.
               // since we 'll need them for calculation purpose,
               // e.g making subtotals look nicer or graphs
               $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = array('no_display' => TRUE);
@@ -2936,7 +2941,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param null $rows
+   * End post processing.
+   *
+   * @param array|null $rows
    */
   public function endPostProcess(&$rows = NULL) {
     if ($this->_storeResultSet) {
@@ -3057,7 +3064,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Set store result set indicator to TRUE
+   * Set store result set indicator to TRUE.
+   *
    * @todo explain what this does
    */
   public function storeResultSet() {
@@ -3065,6 +3073,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Get result set.
+   *
    * @return bool
    */
   public function getResultSet() {
