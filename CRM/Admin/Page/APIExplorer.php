@@ -210,7 +210,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     // Add unformatted code blocks back in
     if ($code && !empty($code[1])) {
       foreach ($code[1] as $block) {
-        $text = preg_replace('#<pre></pre>#', "<pre class='prettyprint'>$block</pre>", $text, 1);
+        $text = preg_replace('#<pre></pre>#', "<pre>$block</pre>", $text, 1);
       }
     }
     return $text;
