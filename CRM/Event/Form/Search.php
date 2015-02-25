@@ -409,7 +409,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       elseif (is_numeric($role)) {
         $roleTypes = (int) $role;
       }
-      $this->_formValues['participant_role_id'] = $roleTypes;
+      $this->_formValues['participant_role_id'] = array_keys($roleTypes);
     }
 
     $type = CRM_Utils_Request::retrieve('type', 'Positive',
