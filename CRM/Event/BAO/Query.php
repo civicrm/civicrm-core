@@ -333,10 +333,13 @@ class CRM_Event_BAO_Query {
         );
         return;
 
-      case 'participant_status':
       case 'participant_status_id':
-      case 'participant_role':
       case 'participant_role_id':
+        if ($value && is_array($value) && strpos($op, 'IN') === FALSE) {
+          $op = 'IN';
+        }
+      case 'participant_status':
+      case 'participant_role':
       case 'participant_source':
       case 'participant_id':
       case 'participant_contact_id':
@@ -349,8 +352,8 @@ class CRM_Event_BAO_Query {
           if ($name == 'is_pay_later') {
             $qillName = $name;
           }
-          if ($name == 'participant_role_id') {
-            $qillName = str_replace('_id', '', $name);
+          if ($name == 'role_id') {
+            $qillName = 'participant_role';
           }
         }
 
