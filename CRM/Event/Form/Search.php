@@ -193,16 +193,26 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = array();
+        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
+          $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
+        }
+        if (!empty($this->_formValues['participant_status_id'])) {
+          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $this->_formValues['participant_status_id']) . ' ) )';
+        }
+        if (!empty($this->_formValues['participant_role_id'])) {
+          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $this->_formValues['participant_role_id']) . ' ) )';
+        }
+
         // CRM-15379
-        $clause = NULL;
         if (!empty($this->_formValues['participant_fee_id'])) {
           $participant_fee_id = $this->_formValues['participant_fee_id'];
           $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $participant_fee_id, 'label');
           $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
-          $clause = " ( participant.fee_level LIKE '%$feeLabel%' ) ";
+          $seatClause[] = "( participant.fee_level LIKE '%$feeLabel%' )";
         }
 
-        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $clause);
+        $seatClause = implode(' AND ', $seatClause);
+        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $seatClause);
       }
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
@@ -400,13 +410,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $roleTypes = (int) $role;
       }
       $this->_formValues['participant_role_id'] = $roleTypes;
-    }
-
-    foreach (array('participant_status_id', 'participant_role_id') as $element) {
-      $value = CRM_Utils_Array::value($element, $this->_formValues);
-      if ($value && is_array($value)) {
-        $this->_formValues[$element] = array('IN' => $value);
-      }
     }
 
     $type = CRM_Utils_Request::retrieve('type', 'Positive',
