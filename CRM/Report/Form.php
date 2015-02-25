@@ -169,6 +169,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_drilldownReport = array();
 
   /**
+   * Tabs to display on report.
+   *
+   * @var array
+   */
+  protected $tabs = array();
+
+  /**
    * An attribute for checkbox/radio form field layout
    *
    * @var array
@@ -986,9 +993,16 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->addCheckBox("fields", ts('Select Columns'), $options, NULL,
       NULL, NULL, NULL, $this->_fourColumnAttribute, TRUE
     );
+    $this->tabs[] = 'FieldSelection';
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
     $this->assign('colGroups', $colGroups);
   }
 
+  /**
+   * Add filters to report.
+   */
   public function addFilters() {
     $filters = array();
     $count = 1;
@@ -1100,9 +1114,16 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
+    $this->tabs[] = 'Filters';
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
     $this->assign('filters', $filters);
   }
 
+  /*
+   * Add options defined in $this->_options to the report.
+   */
   public function addOptions() {
     if (!empty($this->_options)) {
       // FIXME: For now lets build all elements as checkboxes.
@@ -1122,9 +1143,16 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
+    $this->tabs[] = 'OrderBy';
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
     $this->assign('otherOptions', $this->_options);
   }
 
+  /**
+   * Add chart options to the report.
+   */
   public function addChartOptions() {
     if (!empty($this->_charts)) {
       $this->addElement('select', "charts", ts('Chart'), $this->_charts);
@@ -1133,6 +1161,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Add group by options to the report.
+   */
   public function addGroupBys() {
     $options = $freqElements = array();
 
@@ -1152,6 +1183,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       NULL, NULL, NULL, $this->_fourColumnAttribute
     );
     $this->assign('groupByElements', $options);
+    $this->tabs[] = 'GroupBy';
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
 
     foreach ($freqElements as $name) {
       $this->addElement('select', "group_bys_freq[$name]",
@@ -1190,6 +1225,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     asort($options);
 
     $this->assign('orderByOptions', $options);
+    $this->tabs[] = 'OrderBy.tpl';
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
 
     if (!empty($options)) {
       $options = array(
@@ -1278,6 +1317,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     ))) {
       $this->addFormRule(array(get_class($this), 'formRule'), $this);
     }
+    // Note this assignment is only really required in buildForm. It is being 'over-called'
+    // to reduce risk of being missed due to overridden functions.
+    $this->assign('tabs', $this->tabs);
   }
 
   /**
