@@ -401,10 +401,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (isset($role)) {
       if ($role === 'true') {
-        $roleTypes =  CRM_Event_PseudoConstant::participantRole(NULL, "filter = 1");
+        $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 1");
       }
       elseif ($role === 'false') {
-        $roleTypes =  CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
+        $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
       }
       elseif (is_numeric($role)) {
         $roleTypes = (int) $role;
