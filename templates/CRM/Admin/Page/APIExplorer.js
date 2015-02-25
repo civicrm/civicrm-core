@@ -614,6 +614,7 @@
         entityDoc = result.doc;
         CRM.utils.setOptions($('#doc-action').prop('disabled', false).removeClass('loading'), result.actions);
         $('#doc-result').html(result.doc);
+        prettyPrint('#doc-result pre');
       });
   }
 
@@ -632,10 +633,11 @@
           if (result.code) {
             $('#doc-result').append(docCodeTpl(result));
           }
-          prettyPrint('.api-doc-code pre');
+          prettyPrint('#doc-result pre');
         });
     } else {
       $('#doc-result').html(entityDoc);
+      prettyPrint('#doc-result pre');
     }
   }
 
