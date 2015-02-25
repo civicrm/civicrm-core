@@ -144,6 +144,14 @@ CRM.$(function($) {
     }
   });
 
+  cj('input[id*="primary_contact_id_"]').change(function() {
+    var temp = this.id.split('_');
+    var ROWID = temp[3];
+    if (cj(this).val()) {
+      updateContactInfo(ROWID,'primary_');
+    }
+  });
+
   $('#crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
     checkColumns($(this));
