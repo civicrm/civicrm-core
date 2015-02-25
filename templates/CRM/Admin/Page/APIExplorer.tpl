@@ -311,7 +311,7 @@
     <div class="collapsible-title">{ts}Source Code{/ts}</div>
     <div>
       <div class="doc-filename"><%- file %></div>
-      <pre class="prettyprint lang-php linenums"><%- code %></pre>
+      <pre class="lang-php linenums"><%- code %></pre>
     </div>
   </div>
 </script>

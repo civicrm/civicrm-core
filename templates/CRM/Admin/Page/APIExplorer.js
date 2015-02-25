@@ -25,6 +25,22 @@
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
 
   /**
+   * Call prettyPrint function and perform additional formatting
+   * @param ele
+   */
+  function prettyPrint(ele) {
+    if (typeof window.prettyPrint === 'function') {
+      $(ele).removeClass('prettyprinted').addClass('prettyprint');
+
+      window.prettyPrint();
+
+      // Highlight errors in api result
+      $('span:contains("error_code"),span:contains("error_message")', '#api-result')
+        .siblings('span.str').css('color', '#B00');
+    }
+  }
+
+  /**
    * Add a "fields" row
    * @param name
    */
@@ -512,9 +528,9 @@
       q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
-      $('#api-' + type).addClass('prettyprint').removeClass('prettyprinted').text(val);
+      $('#api-' + type).text(val);
     });
-    prettyPrint();
+    prettyPrint('#api-generated pre');
   }
 
   /**
@@ -552,8 +568,8 @@
       type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
     }).done(function(text) {
-      $('#api-result').addClass('prettyprint').removeClass('prettyprinted').text(text);
-      prettyPrint();
+      $('#api-result').text(text);
+      prettyPrint('#api-result');
     });
   }
 
@@ -579,8 +595,8 @@
       $('#example-result').block();
       $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
         .done(function(result) {
-          $('#example-result').unblock().addClass('prettyprint').removeClass('prettyprinted').text(result);
-          prettyPrint();
+          $('#example-result').unblock().text(result);
+          prettyPrint('#example-result');
         });
     } else {
       $('#example-result').text($('#example-result').attr('title'));
@@ -615,7 +631,7 @@
           if (result.code) {
             $('#doc-result').append(docCodeTpl(result));
           }
-          prettyPrint();
+          prettyPrint('.api-doc-code pre');
         });
     } else {
       $('#doc-result').html($('#doc-result').attr('title'));
