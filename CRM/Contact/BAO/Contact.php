@@ -1859,6 +1859,9 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if ($contactID) {
+      // CRM-10551: Allow deletion of blanked location-based fields
+      $params['updateBlankLocInfo'] = TRUE;
+      
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
     }
