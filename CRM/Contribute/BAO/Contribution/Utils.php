@@ -188,7 +188,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     elseif ($form->_contributeMode == 'express') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0) {
         // determine if express + recurring and direct accordingly
-        if (isset($paymentParams['is_recur']) && $paymentParams['is_recur'] == 1) {
+        if (!empty($paymentParams['is_recur']) && $paymentParams['is_recur'] == 1) {
           if (is_object($payment)) {
             $result = $payment->createRecurringPayments($paymentParams);
           }
