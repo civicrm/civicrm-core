@@ -195,6 +195,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['returnURL'] = $params['returnURL'];
     $args['cancelURL'] = $params['cancelURL'];
 
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
+
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
@@ -249,6 +252,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       "&b={$params['contributionID']}" .
       "&p={$params['contributionPageID']}";
 
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
+
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
@@ -256,7 +262,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-
     $params['trxn_id'] = $result['transactionid'];
     $params['gross_amount'] = $result['amt'];
     $params['fee_amount'] = $result['feeamt'];
@@ -312,6 +317,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['zip'] = $params['postal_code'];
     $args['desc'] = substr(CRM_Utils_Array::value('description', $params), 0, 127);
     $args['custom'] = CRM_Utils_Array::value('accountingCode', $params);
+
+    // add CiviCRM BN code
+    $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
     if (CRM_Utils_Array::value('is_recur', $params) == 1) {
       $start_time = strtotime(date('m/d/Y'));
@@ -555,9 +563,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'invoice' => $params['invoiceID'],
       'lc' => substr($config->lcMessages, -2),
       'charset' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'UTF-8',
-      'custom' => CRM_Utils_Array::value('accountingCode',
-        $params
-      ),
+      'custom' => CRM_Utils_Array::value('accountingCode', $params),
+      'bn' => 'CiviCRM_SP',
     );
 
     // add name and address if available, CRM-3130
