@@ -372,7 +372,7 @@ class InstallRequirements {
         array(
           ts("MySQL %1 Configuration", array(1 => $dbName)),
           ts("Can I access/create the database?"),
-          ts("I can't create new databases and the database '%1' doesn't exist.", array(1 => $databaseConfig[database])),
+          ts("I can't create new databases and the database '%1' doesn't exist.", array(1 => $databaseConfig['database'])),
         ),
         $onlyRequire
       );
