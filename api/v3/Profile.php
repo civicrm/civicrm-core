@@ -245,47 +245,7 @@ function civicrm_api3_profile_submit($params) {
     $profileParams['api.activity.create'] = $activityParams;
   }
 
-  $groups = $tags = array();
-  if (isset($profileParams['group'])) {
-    $groups = $profileParams['group'];
-    unset($profileParams['group']);
-  }
-
-  if (isset($profileParams['tag'])) {
-    $tags = $profileParams['tag'];
-    unset($profileParams['tag']);
-  }
-
   return civicrm_api3('contact', 'create', $profileParams);
-
-  $ufGroupDetails = array();
-  $ufGroupParams = array('id' => $profileID);
-  CRM_Core_BAO_UFGroup::retrieve($ufGroupParams, $ufGroupDetails);
-
-  if (isset($profileFields['group'])) {
-    CRM_Contact_BAO_GroupContact::create($groups,
-      $params['contact_id'],
-      FALSE,
-      'Admin'
-    );
-  }
-
-  if (isset($profileFields['tag'])) {
-    CRM_Core_BAO_EntityTag::create($tags,
-      'civicrm_contact',
-      $params['contact_id']
-    );
-  }
-
-  if (!empty($ufGroupDetails['add_to_group_id'])) {
-    $contactIds = array($params['contact_id']);
-    CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds,
-      $ufGroupDetails['add_to_group_id']
-    );
-  }
-
-  return $result;
-
 }
 
 /**
