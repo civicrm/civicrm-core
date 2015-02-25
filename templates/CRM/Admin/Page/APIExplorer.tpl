@@ -39,11 +39,13 @@
     font-size: 1.1em;
     margin-bottom: .6em;
   }
+  pre#api-result {
+    max-height: 50em;
+  }
   pre#api-result,
   div#doc-result,
   pre#example-result {
     padding:1em;
-    max-height: 50em;
     border: 1px solid lightgrey;
     margin-top: 1em;
     overflow: auto;
@@ -210,7 +212,7 @@
       <select class="crm-form-select big crm-select2" id="example-action" name="action">
         <option value="" selected="selected">{ts}Choose{/ts}...</option>
       </select>
-<pre id="example-result" class="linenums lang-php" title="{ts escape='html'}Results are displayed here.{/ts}">
+<pre id="example-result" class="linenums lang-php" placeholder="{ts escape='html'}Results are displayed here.{/ts}">
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>
@@ -232,7 +234,7 @@
       <select class="crm-form-select big crm-select2" id="doc-action" name="action">
         <option value="" selected="selected">{ts}Choose{/ts}...</option>
       </select>
-      <div id="doc-result" title="{ts escape='html'}Results are displayed here.{/ts}">
+      <div id="doc-result">
         {ts}Results are displayed here.{/ts}
       </div>
     </form>

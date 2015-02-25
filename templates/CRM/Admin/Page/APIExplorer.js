@@ -10,6 +10,7 @@
     options = {},
     params = {},
     smartyStub,
+    entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
     returnTpl = _.template($('#api-return-tpl').html()),
@@ -599,7 +600,7 @@
           prettyPrint('#example-result');
         });
     } else {
-      $('#example-result').text($('#example-result').attr('title'));
+      $('#example-result').text($('#example-result').attr('placeholder'));
     }
   }
 
@@ -610,9 +611,9 @@
     CRM.utils.setOptions($('#doc-action').prop('disabled', true).addClass('loading'), []);
     $.getJSON(CRM.url('civicrm/ajax/apidoc', {entity: $(this).val()}))
       .done(function(result) {
+        entityDoc = result.doc;
         CRM.utils.setOptions($('#doc-action').prop('disabled', false).removeClass('loading'), result.actions);
         $('#doc-result').html(result.doc);
-        prettyPrint();
       });
   }
 
@@ -634,7 +635,7 @@
           prettyPrint('.api-doc-code pre');
         });
     } else {
-      $('#doc-result').html($('#doc-result').attr('title'));
+      $('#doc-result').html(entityDoc);
     }
   }
 
