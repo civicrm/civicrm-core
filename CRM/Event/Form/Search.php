@@ -197,10 +197,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
-          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $this->_formValues['participant_status_id']) . ' ) )';
+          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_status_id']) . ' ) )';
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $this->_formValues['participant_role_id']) . ' ) )';
+          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_role_id']) . ' ) )';
         }
 
         // CRM-15379
@@ -384,15 +384,15 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (isset($status)) {
       if ($status === 'true') {
-        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1"));
+        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
       }
       elseif ($status === 'false') {
-        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0"));
+        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
       }
       elseif (is_numeric($status)) {
         $statusTypes = (int) $status;
       }
-      $this->_formValues['participant_status_id'] = $statusTypes;
+      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String',
@@ -401,15 +401,15 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     if (isset($role)) {
       if ($role === 'true') {
-        $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 1");
+        $roleTypes =  CRM_Event_PseudoConstant::participantRole(NULL, "filter = 1");
       }
       elseif ($role === 'false') {
-        $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
+        $roleTypes =  CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
       }
       elseif (is_numeric($role)) {
         $roleTypes = (int) $role;
       }
-      $this->_formValues['participant_role_id'] = array_keys($roleTypes);
+      $this->_formValues['participant_role_id'] = is_array($roleTypes) ? array_keys($roleTypes) : $roleTypes;
     }
 
     $type = CRM_Utils_Request::retrieve('type', 'Positive',
