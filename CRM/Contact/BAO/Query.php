@@ -5669,7 +5669,7 @@ AND   displayRelType.is_active = 1
     }
     elseif (is_array($fieldValue)) {
       $qillString = array();
-      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
         $op = key($fieldValue);
         $fieldValue = $fieldValue[$op];
       }
