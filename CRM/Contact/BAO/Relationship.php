@@ -206,7 +206,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
-    self::setContactABFromIDs($params);
+    self::setContactABFromIDs($params, $ids);
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
     // explode the string with _ to get the relationship type id
