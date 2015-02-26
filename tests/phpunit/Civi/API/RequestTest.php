@@ -120,11 +120,19 @@ class RequestTest extends \CiviUnitTestCase {
     $cases = array();
     $cases[] = array(
       array('MyEntity', 'MyAction', 3),
-      array('MyEntity', 'myAction', 3),
+      array('MyEntity', 'myaction', 3),
     );
     $cases[] = array(
       array('my+entity', 'MyAction', 3),
-      array('my_entity', 'myAction', 3),
+      array('MyEntity', 'myaction', 3),
+    );
+    $cases[] = array(
+      array('my entity with under_scores', 'My_Action', 3),
+      array('MyEntityWithUnderScores', 'my_action', 3),
+    );
+    $cases[] = array(
+      array('u_f_match', 'get Something', 3),
+      array('UFMatch', 'get_something', 3),
     );
     $cases[] = array(
       array('MyEntity', 'MyAction', 4),
