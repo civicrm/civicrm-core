@@ -554,4 +554,5 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
     $this->assertTrue(($this->getText('page-title') != $dname));
   }
+
 }
