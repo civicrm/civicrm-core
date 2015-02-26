@@ -91,16 +91,13 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->openCiviPage('activity/search', 'reset=1', "_qf_Search_refresh");
 
     $this->type("sort_name", $contactName);
-    $this->click('activity_type_id[35]');
-    $this->click('activity_type_id[36]');
+    $this->select('activity_type_id', 'value=35');
+    $this->select('activity_type_id', 'value=36');
     $this->clickLink("_qf_Search_refresh");
 
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[2][text()='Change Membership Status']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[3][text()='Status changed from New to Current']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[2][text()='Change Membership Type']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[3][text()='Type changed from {$membershipTypes['membership_type']} to General']"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[5]/a[text()='{$contactName}']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[2][text()='Change Membership Type']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[3][text()='Type changed from {$membershipTypes['membership_type']} to General']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[5]/a[text()='{$contactName}']"));
   }
 
 }
