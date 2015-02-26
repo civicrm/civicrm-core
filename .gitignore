@@ -1,7 +1,6 @@
 *~
 *.bak
 bower_components
-composer.lock
 CRM/ACL/DAO
 CRM/Activity/DAO
 CRM/Auction/DAO
