@@ -15,15 +15,16 @@
     crmMailingBodyText: '~/crmMailing/body_text.html'
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
-    angular.module('crmMailing').directive(directiveName, function ($parse) {
+    angular.module('crmMailing').directive(directiveName, function () {
       return {
         scope: {
           crmMailing: '@'
         },
         templateUrl: templateUrl,
         link: function (scope, elm, attr) {
-          var model = $parse(attr.crmMailing);
-          scope.mailing = model(scope.$parent);
+          scope.$parent.$watch(attr.crmMailing, function(newValue){
+            scope.mailing = newValue;
+          });
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
@@ -34,12 +35,13 @@
 
   // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
-  angular.module('crmMailing').directive('crmMailingBlockPreview', function ($parse) {
+  angular.module('crmMailing').directive('crmMailingBlockPreview', function () {
     return {
       templateUrl: '~/crmMailing/preview.html',
       link: function (scope, elm, attr) {
-        var mailingModel = $parse(attr.crmMailing);
-        scope.mailing = mailingModel(scope);
+        scope.$watch(attr.crmMailing, function(newValue){
+          scope.mailing = newValue;
+        });
         scope.crmMailingConst = CRM.crmMailing;
         scope.ts = CRM.ts(null);
         scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
@@ -59,15 +61,16 @@
     };
   });
 
-  angular.module('crmMailing').directive('crmMailingBlockReview', function ($parse, crmMailingPreviewMgr) {
+  angular.module('crmMailing').directive('crmMailingBlockReview', function (crmMailingPreviewMgr) {
     return {
       scope: {
         crmMailing: '@'
       },
       templateUrl: '~/crmMailing/review.html',
       link: function (scope, elm, attr) {
-        var mailingModel = $parse(attr.crmMailing);
-        scope.mailing = mailingModel(scope.$parent);
+        scope.$parent.$watch(attr.crmMailing, function(newValue){
+          scope.mailing = newValue;
+        });
         scope.crmMailingConst = CRM.crmMailing;
         scope.ts = CRM.ts(null);
         scope.previewMailing = function previewMailing(mailing, mode) {
@@ -81,15 +84,17 @@
   // example: <span crm-mailing-from-address="myPlaceholder" crm-mailing="myMailing"><select ng-model="myPlaceholder.label"></select></span>
   // NOTE: This really doesn't belong in a directive. I've tried (and failed) to make this work with a getterSetter binding, eg
   // <select ng-model="mailing.convertFromAddress" ng-model-options="{getterSetter: true}">
-  angular.module('crmMailing').directive('crmMailingFromAddress', function ($parse, crmFromAddresses) {
+  angular.module('crmMailing').directive('crmMailingFromAddress', function (crmFromAddresses) {
     return {
       link: function (scope, element, attrs) {
         var placeholder = attrs.crmMailingFromAddress;
-        var model = $parse(attrs.crmMailing);
-        var mailing = model(scope.$parent);
-        scope[placeholder] = {
-          label: crmFromAddresses.getByAuthorEmail(mailing.from_name, mailing.from_email, true).label
-        };
+        var mailing = null;
+        scope.$watch(attrs.crmMailing, function(newValue){
+          mailing = newValue;
+          scope[placeholder] = {
+            label: crmFromAddresses.getByAuthorEmail(mailing.from_name, mailing.from_email, true).label
+          };
+        });
         scope.$watch(placeholder + '.label', function (newValue) {
           var addr = crmFromAddresses.getByLabel(newValue);
           mailing.from_name = addr.author;
@@ -102,7 +107,7 @@
 
   // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
   // example: <div crm-mailing-radio-date="mySchedule" ng-model="mailing.scheduled_date">...</div>
-  angular.module('crmMailing').directive('crmMailingRadioDate', function ($parse) {
+  angular.module('crmMailing').directive('crmMailingRadioDate', function () {
     return {
       require: 'ngModel',
       link: function ($scope, element, attrs, ngModel) {
@@ -288,7 +293,7 @@
         }
 
         function refreshMandatory() {
-          if (ngModel.$viewValue.groups) {
+          if (ngModel.$viewValue && ngModel.$viewValue.groups) {
             scope.mandatoryGroups = _.filter(scope.$parent.$eval(attrs.crmMandatoryGroups), function(grp) {
               return _.contains(ngModel.$viewValue.groups.include, parseInt(grp.id));
             });
