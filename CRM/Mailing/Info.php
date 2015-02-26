@@ -144,10 +144,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           array('value' => 'Public Pages', 'label' => ts('Public Pages')),
           array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
         ),
+        'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
       ),
     ));
     CRM_Core_Resources::singleton()->addPermissions(array(
       'view all contacts',
+      'create mailings',
+      'schedule mailings',
+      'approve mailings',
     ));
 
     return $result;
