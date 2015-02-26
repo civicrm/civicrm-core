@@ -228,14 +228,29 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL
   ) {
 
+    $overrideGroup = array();
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
-      return $override;
+      if (isset($name)) {
+        return $override;
+      }
+      else {
+        $overrideGroup = $override;
+      }
     }
 
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
     }
     $cacheKey = self::inCache($group, $name, $componentID, $contactID, TRUE, $domainID);
+
+    if ($group && !isset($name) && $cacheKey) {
+      // check value against the cache, and unset key if values are different
+      $valueDifference = array_diff($overrideGroup, self::$_cache[$cacheKey]);
+      if (!empty($valueDifference)) {
+        $cacheKey = '';
+      }
+    }
+
     if (!$cacheKey) {
       $dao = self::dao($group, NULL, $componentID, $contactID, $domainID);
       $dao->find();
@@ -253,6 +268,16 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         }
       }
       $dao->free();
+
+      if (!isset($name)) {
+        // merge db and override group values
+        // When no $name is present, the getItem() function should return an array
+        // consisting of the sum of all override settings + all settings present in
+        // the database for the given $group (with the overrides taking precedence,
+        // and applying even if the setting is not defined in the database).
+        //
+        $values = array_merge($values, $overrideGroup);
+      }
 
       $cacheKey = self::setCache($values, $group, $componentID, $contactID, $domainID);
     }
@@ -1105,6 +1130,9 @@ AND domain_id = %3
     global $civicrm_setting;
     if ($group && $name && isset($civicrm_setting[$group][$name])) {
       return $civicrm_setting[$group][$name];
+    }
+    elseif ($group && !isset($name) && isset($civicrm_setting[$group])) {
+      return $civicrm_setting[$group];
     }
     else {
       return $default;
