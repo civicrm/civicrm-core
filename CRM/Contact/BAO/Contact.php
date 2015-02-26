@@ -1859,8 +1859,14 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if ($contactID) {
-      // CRM-10551: Allow deletion of blanked location-based fields
+      // CRM-10551
+      // If a user has logged in, or accessed via a checksum
+      // Then deliberately 'blanking' a value in the profile should remove it from their record
+      $session = CRM_Core_Session::singleton();
       $params['updateBlankLocInfo'] = TRUE;
+      if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+        $params['updateBlankLocInfo'] = FALSE;
+      }
       
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
