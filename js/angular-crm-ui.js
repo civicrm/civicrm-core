@@ -734,7 +734,7 @@
           this.$last = function() { return this.$index() === steps.length -1; };
           this.$maxVisit = function() { return maxVisited; };
           this.$validStep = function() {
-            return steps[selectedIndex].isStepValid();
+            return steps[selectedIndex] && steps[selectedIndex].isStepValid();
           };
           this.iconFor = function(index) {
             if (index < this.$index()) return '√';
