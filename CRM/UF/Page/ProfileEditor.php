@@ -23,6 +23,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
+            'websiteType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
             'phoneType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
           ),
           'initialProfileList' => civicrm_api('UFGroup', 'get', array(
@@ -228,6 +229,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       );
       if (in_array($fieldName, $locationFields)) {
         $result['schema'][$fieldName]['civiIsLocation'] = TRUE;
+      }
+      if ($fieldName == 'url') {
+        $result['schema'][$fieldName]['civiIsWebsite'] = TRUE;
       }
       if (in_array($fieldName, array('phone', 'phone_and_ext'))) {
         // FIXME what about phone_ext?
