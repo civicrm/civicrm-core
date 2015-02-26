@@ -317,6 +317,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
 
+    $system = new CRM_Utils_System_UnitTests();
+    $system->setMySQLTimeZone();
     $env = new CRM_Utils_Check_Env();
     CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
   }
@@ -352,6 +354,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // when running unit tests, use mockup user framework
     $config->setUserFramework('UnitTests');
+    $config->userSystem->setMySQLTimeZone();
 
     // also fix the fatal error handler to throw exceptions,
     // rather than exit
