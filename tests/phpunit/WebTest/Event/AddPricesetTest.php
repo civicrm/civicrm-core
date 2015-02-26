@@ -216,7 +216,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $validStrings = array();
     $fields = array(
       'Full Conference' => 'Text',
-      'Meal Choice' => 'Select',
       'Pre-conference Meetup?' => 'Radio',
       'Evening Sessions' => 'CheckBox',
     );
@@ -263,7 +262,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload_done-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
-    $this->click("xpath=//tbale[@id='paymentProcessor']/tbody/tr[1]/td[2]/label[text()='$processorName']");
+    $this->click("xpath=//table[@id='paymentProcessor']/tbody/tr[1]/td[2]/label[text()='$processorName']");
     $this->select('financial_type_id', 'label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
@@ -376,7 +375,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $validStrings = array();
     $fields = array(
       'Full Conference' => 'Text',
-      'Meal Choice' => 'Select',
       'Pre-conference Meetup?' => 'Radio',
       'Evening Sessions' => 'CheckBox',
     );
