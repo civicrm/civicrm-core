@@ -67,7 +67,8 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
 
       CRM_Utils_Hook::pre('create', 'Campaign', NULL, $params);
-    } else {
+    } 
+    else {
       CRM_Utils_Hook::pre('edit', 'Campaign', $params['id'], $params);
     }
 
