@@ -129,7 +129,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         $this->_processors, TRUE,
         array('onChange' => "buildAutoRenew( null, this.value );")
       );
-      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE);
+      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE);
     }
     if ($this->_action & CRM_Core_Action::RENEW) {
       $this->addButtons(array(
