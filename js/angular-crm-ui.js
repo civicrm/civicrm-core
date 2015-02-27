@@ -54,6 +54,26 @@
       };
     })
 
+    // Simple wrapper around $.crmDatepicker.
+    // example: <input crm-ui-datepicker="{time: true}" ng-model="myobj.datefield"/>
+    .directive('crmUiDatepicker', function () {
+      return {
+        restrict: 'AE',
+        require: 'ngModel',
+        scope: {
+          crmUiDatepicker: '='
+        },
+        link: function (scope, element, attrs, ngModel) {
+          element
+            .crmDatepicker(scope.crmUiDatepicker)
+            .on('change', function() {
+              var requiredLength = scope.crmUiDatepicker && scope.crmUiDatepicker.time ? 16 : 10;
+              ngModel.$setValidity('incompleteDateTime', !!$(this).val().length && $(this).val().length === requiredLength);
+            });
+        }
+      };
+    })
+
     // Display a date widget.
     // example: <input crm-ui-date ng-model="myobj.datefield" />
     // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
