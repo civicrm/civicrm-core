@@ -418,7 +418,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       ) {
       $priceSetErrors = self::validatePriceSet($self, $self->_params);
       if (!empty($priceSetErrors)) {
-        CRM_Core_Session::setStatus(ts('You have been returned to the start of the registration process and any sold out events have been removed from your selections. You will not be able to continue until you review your booking and select different events if you wish. The following events were sold out:'), ts('Unfortunately some of your options have now sold out for one or more participants.'), 'error');
+        CRM_Core_Session::setStatus(ts('You have been returned to the start of the registration process and any sold out events have been removed from your selections. You will not be able to continue until you review your booking and select different events if you wish.'), ts('Unfortunately some of your options have now sold out for one or more participants.'), 'error');
         CRM_Core_Session::setStatus(ts('Please note that the options which are marked or selected are sold out for participant being viewed.'), ts('Sold out:'), 'error');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "_qf_Register_display=true&qfKey={$fields['qfKey']}"));
       }

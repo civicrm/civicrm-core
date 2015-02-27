@@ -564,7 +564,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate supplied payment instrument values (e.g. credit card number and cvv)
-    $payment_processor_id = $self->params[0]['payment_processor_id'];
+    $payment_processor_id = $self->_params[0]['payment_processor'];
     CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, $self);
 
     if (!empty($errors)) {
@@ -579,6 +579,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         }
       }
     }
+    return TRUE;
   }
 
   /**
