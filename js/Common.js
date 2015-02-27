@@ -561,6 +561,61 @@ CRM.strings = CRM.strings || {};
     return combined;
   }
 
+  $.fn.crmDatepicker = function(options) {
+    return $(this).each(function() {
+      var
+        $dataField = $(this),
+        settings = $.extend({}, $dataField.data('datepicker') || {}, options || {}),
+        $dateField = $('<input>').attr('style', $dataField.attr('style')).addClass('crm-form-text crm-form-date ' + $dataField.attr('class')).insertAfter($dataField.hide()),
+        $timeField = settings.time ? $('<input class="crm-form-text crm-form-time">').insertAfter($dateField) : $(),
+        $clearLink = $();
+      settings.dateFormat = settings.dateFormat || CRM.config.dateInputFormat;
+      settings.changeMonth = _.includes('m', settings.dateFormat);
+      settings.changeYear = _.includes('y', settings.dateFormat);
+      if ($timeField.length) {
+        $timeField.change(updateDataField).timeEntry({
+          spinnerImage: '',
+          show24Hours: settings.time === true ? CRM.timeIs24Hr : settings.time == '24'
+        });
+      }
+      if (!$dataField.hasClass('required') && settings.allowClear !== false) {
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
+          .insertAfter($timeField.length ? $timeField : $dateField)
+          .css('visibility', $dataField.val() ? 'visible' : 'hidden');
+      }
+      $dateField.datepicker(settings).change(updateDataField);
+      $dataField.on('change', function(e, context) {
+        if (context !== 'userInput' && context !== 'crmClear') {
+          if ($(this).val()) {
+            var date = $.datepicker.parseDate('yy-mm-dd', $(this).val());
+            $dateField.datepicker('setDate', date);
+            if ($timeField.length) {
+              $timeField.timeEntry('setTime', $(this).val().split(' ')[1] || null);
+            }
+          } else {
+            $dateField.add($timeField).val('');
+          }
+        }
+        $clearLink.css('visibility', $(this).val() ? 'visible' : 'hidden');
+      });
+      if ($dataField.val()) {
+        $dataField.change();
+      }
+      function updateDataField(e, context) {
+        if (context !== 'crmClear') {
+          var val = '';
+          if ($dateField.val()) {
+            val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
+          }
+          if ($timeField.val()) {
+            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 5);
+          }
+          $dataField.val(val).trigger('change', ['userInput']);
+        }
+      }
+    });
+  };
+
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -1225,8 +1280,8 @@ CRM.strings = CRM.strings || {};
 
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
-        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
-        $(this).siblings('input:text').val('').change();
+        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).trigger('change', ['crmClear']);
+        $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
       .on('change', 'input.crm-form-radio:checked', function() {
