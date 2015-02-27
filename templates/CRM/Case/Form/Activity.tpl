@@ -76,6 +76,9 @@
               {ts}Activity Details{/ts}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
+    {else}
+      <tr class="crm-case-activity-form-block-activity-details">
+        <td colspan="2">
     {/if}
     {* End block for change status, case type and start date. *}
             <table class="form-layout-compressed">
@@ -245,7 +248,7 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
-      <tr>
+            <tr>
               <td class="label">
                 {$form.followup_assignee_contact_id.label}
                 {edit}
@@ -264,14 +267,18 @@
     {if $activityTypeFile NEQ 'ChangeCaseStatus'
     && $activityTypeFile NEQ 'ChangeCaseType'
     && $activityTypeFile NEQ 'ChangeCaseStartDate'}
-    <table class="form-layout-compressed">
-      <tr class="crm-case-activity-form-block-status_id">
-        <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+      <tr>
+        <td colspan="2">
+          <table class="form-layout-compressed">
+            <tr class="crm-case-activity-form-block-status_id">
+              <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+            </tr>
+            <tr class="crm-case-activity-form-block-priority_id">
+              <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
+            </tr>
+          </table>
+        </td>
       </tr>
-      <tr class="crm-case-activity-form-block-priority_id">
-        <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
-      </tr>
-    </table>
     {/if}
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
