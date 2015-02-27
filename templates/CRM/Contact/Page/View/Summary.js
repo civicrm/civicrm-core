@@ -59,7 +59,7 @@
       o.trigger('crmFormSuccess', [response]);
       $('.crm-inline-edit-container').addClass('crm-edit-ready');
       var data = o.data('edit-params');
-      var dependent = o.data('dependent-fields') || [];
+      var dependent = $((o.data('dependent-fields') || []).join(','));
       // Clone the add-new link if replacing it, and queue the clone to be refreshed as a dependent block
       if (o.hasClass('add-new') && response.addressId) {
         data.aid = response.addressId;
@@ -77,7 +77,7 @@
         var locNo = clData.locno++;
         cl.attr('id', cl.attr('id').replace(locNo, clData.locno)).removeClass('form');
         o.closest('.crm-summary-block').after(clone);
-        $.merge(dependent, $('.crm-inline-edit', clone));
+        dependent = dependent.add($('.crm-inline-edit', clone));
       }
       $('a.ui-notify-close', '#crm-notification-container').click();
       // Delete an address
@@ -87,8 +87,7 @@
       }
       else {
         // Reload this block plus all dependent blocks
-        var update = $.merge([o], dependent);
-        _.each(update, reloadBlock);
+        reloadBlock(dependent.add(o));
         CRM.status(ts('Saved'));
       }
     }
@@ -245,22 +244,18 @@
         e.preventDefault();
       })
       // Delete an address
-      .on('click', '.crm-inline-edit.address .delete-button', function() {
+      .on('click', '.crm-inline-edit.address .delete-button', function(e) {
          var $block = $(this).closest('.crm-inline-edit.address');
-         CRM.confirm(function() {
-            CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
-              function(data) {
-                CRM.status(ts('Address Deleted'));
+         CRM.confirm({message: ts('Are you sure you want to delete this address?')})
+           .on('crmConfirm:yes', function() {
+            CRM.api3('address', 'delete', {id: $block.data('edit-params').aid}, true)
+              .done(function(data) {
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
                 $block.remove();
-              }
+                reloadBlock('.crm-inline-edit.address:not(.add-new)');
+              });
             });
-          },
-          {
-          message: ts('Are you sure you want to delete this address?')
-          }
-        );
-        return false;
+        e.preventDefault();
       })
       // add more and set focus to new row
       .on('click', '.add-more-inline', function(e) {
@@ -334,7 +329,7 @@
         }
         // Refresh dependent blocks
         if (data && data.reloadBlocks) {
-          _.each(data.reloadBlocks, reloadBlock);
+          reloadBlock(data.reloadBlocks.join(','));
         }
       });
   });
