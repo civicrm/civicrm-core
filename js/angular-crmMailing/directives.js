@@ -3,6 +3,7 @@
   // The following directives have the same simple implementation -- load
   // a template and export a "mailing" object into scope.
   var simpleBlocks = {
+    crmMailingBlockApprove: '~/crmMailing/approve.html',
     crmMailingBlockHeaderFooter: '~/crmMailing/headerFooter.html',
     crmMailingBlockMailing: '~/crmMailing/mailing.html',
     crmMailingBlockPublication: '~/crmMailing/publication.html',
@@ -15,7 +16,7 @@
     crmMailingBodyText: '~/crmMailing/body_text.html'
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
-    angular.module('crmMailing').directive(directiveName, function () {
+    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata) {
       return {
         scope: {
           crmMailing: '@'
@@ -28,6 +29,9 @@
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
+          $q.when(crmMetadata.getFields('Mailing'), function(fields) {
+            scope.mailingFields = fields;
+          });
         }
       };
     });
