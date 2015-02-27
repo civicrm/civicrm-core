@@ -276,9 +276,8 @@
 </div>
 {elseif ($action eq 16)}
    <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        {capture assign=link}class="action-item medium-popup" accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}"{/capture}
-        {ts 1=$link}There are no Notes for this contact. You can <a %1>add one</a>.{/ts}
+      <div class="icon inform-icon"></div>
+      {ts}There are no Notes for this contact.{/ts}
    </div>
 {/if}
 </div>
