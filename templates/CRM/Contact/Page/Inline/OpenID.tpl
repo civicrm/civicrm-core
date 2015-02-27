@@ -39,9 +39,9 @@
     {/if}
     {foreach from=$openid item=item}
       {if $item.openid}
-      <div class="crm-summary-row">
+      <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
         <div class="crm-label">{$item.location_type}&nbsp;{ts}OpenID{/ts}</div>
-        <div class="crm-content crm-contact_openid {if $item.is_primary eq 1} primary{/if}">
+        <div class="crm-content crm-contact_openid">
           <a href="{$item.openid}">{$item.openid|mb_truncate:40}</a>
         </div>
       </div>
