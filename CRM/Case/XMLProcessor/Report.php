@@ -588,6 +588,7 @@ WHERE      a.id = %1
             'label' => $typeValue['label'],
             'value' => $value,
             'type' => $typeValue['type'],
+            'fieldID' => $typeValue['fieldID'],
           );
         }
         $customGroups[$dao->groupTitle] = $customGroup;
