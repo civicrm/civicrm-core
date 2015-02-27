@@ -190,17 +190,19 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           array(
             'title' => ts('Application Received'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'money_transfer_date' =>
           array(
             'title' => ts('Money Transfer Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'grant_due_date' =>
           array(
             'title' => ts('Grant Report Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'decision_date' =>
           array(
