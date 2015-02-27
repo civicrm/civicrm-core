@@ -228,7 +228,10 @@ CRM.strings = CRM.strings || {};
       }
       // Sync button enabled status with dialog button
       if ($(el).is('.ui-dialog input.crm-form-submit')) {
-        $(el).closest('.ui-dialog').find('.ui-dialog-buttonset button[data-identifier='+ $(el).attr('name') +']').prop('disabled', !!value);
+        $(el).closest('.ui-dialog').find('.ui-dialog-buttonset button[data-identifier='+ $(el).attr('name') +']').prop('disabled', value);
+      }
+      if ($(el).is('.crm-form-date-wrapper .crm-hidden-date')) {
+        $(el).siblings().prop('disabled', value);
       }
     }
   };
@@ -560,6 +563,84 @@ CRM.strings = CRM.strings || {};
     }
     return combined;
   }
+
+  function copyAttributes($source, $target, attributes) {
+    _.each(attributes, function(name) {
+      if ($source.attr(name)) {
+        $target.attr(name, $source.attr(name));
+      }
+    });
+  }
+
+  $.fn.crmDatepicker = function(options) {
+    return $(this).each(function() {
+      if ($(this).is('.crm-form-date-wrapper .crm-hidden-date')) {
+        // Already initialized
+        return;
+      }
+      var
+        $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
+        settings = $.extend({}, $dataField.data('datepicker') || {}, options || {}),
+        $dateField = $(),
+        $timeField = $(),
+        $clearLink = $();
+
+      if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.hasClass('required')) {
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
+          .insertAfter($dataField);
+      }
+      if (settings.time !== false) {
+        $timeField = $('<input>').insertAfter($dataField);
+        copyAttributes($dataField, $timeField, ['class', 'disabled']);
+        $timeField
+          .addClass('crm-form-text crm-form-time')
+          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          .change(updateDataField)
+          .timeEntry({
+            spinnerImage: '',
+            show24Hours: settings.time === true ? CRM.timeIs24Hr : settings.time == '24'
+          });
+      }
+      if (settings.date !== false) {
+        $dateField = $('<input>').insertAfter($dataField);
+        copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
+        $dateField.addClass('crm-form-text crm-form-date');
+        settings.dateFormat = settings.dateFormat || CRM.config.dateInputFormat;
+        settings.changeMonth = _.includes('m', settings.dateFormat);
+        settings.changeYear = _.includes('y', settings.dateFormat);
+        $dateField.datepicker(settings).change(updateDataField);
+      }
+      function updateInputFields(e, context) {
+        if (context !== 'userInput' && context !== 'crmClear') {
+          if ($(this).val()) {
+            if ($dateField.length) {
+              $dateField.datepicker('setDate', $.datepicker.parseDate('yy-mm-dd', $(this).val()));
+            }
+            if ($timeField.length) {
+              $timeField.timeEntry('setTime', ($dateField.length ? $(this).val().split(' ')[1] : $(this).val()) || null);
+            }
+          } else {
+            $dateField.add($timeField).val('');
+          }
+        }
+        $clearLink.css('visibility', $(this).val() ? 'visible' : 'hidden');
+      }
+      function updateDataField(e, context) {
+        if (context !== 'crmClear') {
+          var val = '';
+          if ($dateField.val()) {
+            val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
+          }
+          if ($timeField.val()) {
+            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 5);
+          }
+          $dataField.val(val).trigger('change', ['userInput']);
+        }
+      }
+      $dataField.hide().addClass('crm-hidden-date').on('change', updateInputFields);
+      updateInputFields();
+    });
+  };
 
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
@@ -1230,8 +1311,8 @@ CRM.strings = CRM.strings || {};
 
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
-        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
-        $(this).siblings('input:text').val('').change();
+        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).trigger('change', ['crmClear']);
+        $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
       .on('change', 'input.crm-form-radio:checked', function() {
