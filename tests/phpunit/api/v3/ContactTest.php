@@ -637,7 +637,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * https://issues.civicrm.org/jira/browse/CRM-15983
    */
   public function testSortLimitChainedRelationshipGetCRM15983() {
-    // Create a contact with two relationships.
+    // Some contact
+    $create_result_1 = $this->callAPISuccess('contact', 'create', array(
+      'first_name' => 'Jules',
+      'last_name' => 'Smos',
+      'contact_type' => 'Individual',
+    ));
+
+    // Create another contact with two relationships.
     $create_params = array(
       'first_name' => 'Jos',
       'last_name' => 'Smos',
@@ -646,17 +653,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         array(
           'contact_id_a' => '$value.id',
           // default organization:
-          'contact_id_b' => 1,
-          // employee of:
-          'relationship_type_id' => 5,
+          'contact_id_b' => $create_result_1['id'],
+          // spouse of:
+          'relationship_type_id' => 2,
           'start_date' => '2005-01-12',
           'end_date' => '2006-01-11',
           'description' => 'old',
         ),
         array(
           'contact_id_a' => '$value.id',
-          'contact_id_b' => 1,
-          'relationship_type_id' => 5,
+          'contact_id_b' => $create_result_1['id'],
+          'relationship_type_id' => 2,
           'start_date' => '2006-07-01',
           'end_date' => '2010-07-01',
           'description' => 'new',
@@ -682,7 +689,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('new', $get_result['api.relationship.get']['values'][0]['description']);
 
     // Clean up.
-    $this->callAPISuccess('contact', 'delete', $create_result['id']);
+    $this->callAPISuccess('contact', 'delete', array(
+      'id' => $create_result['id'],
+      ));
   }
 
   /**
