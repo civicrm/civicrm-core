@@ -657,7 +657,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           'contact_id_a' => '$value.id',
           'contact_id_b' => 1,
           'relationship_type_id' => 5,
-          'start_date' => '2005-07-01',
+          'start_date' => '2006-07-01',
           'end_date' => '2010-07-01',
           'description' => 'new',
         ),
