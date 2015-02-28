@@ -673,7 +673,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'options' => array(
           'limit' => '1',
           'sort' => 'start_date DESC',
-      )),
+        )),
     );
     $get_result = $this->callAPISuccess('contact', 'getsingle', $get_params);
 
