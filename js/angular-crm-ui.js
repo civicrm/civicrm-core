@@ -54,26 +54,6 @@
       };
     })
 
-    // Simple wrapper around $.crmDatepicker.
-    // example: <input crm-ui-datepicker="{time: true}" ng-model="myobj.datefield"/>
-    .directive('crmUiDatepicker', function () {
-      return {
-        restrict: 'AE',
-        require: 'ngModel',
-        scope: {
-          crmUiDatepicker: '='
-        },
-        link: function (scope, element, attrs, ngModel) {
-          element
-            .crmDatepicker(scope.crmUiDatepicker)
-            .on('change', function() {
-              var requiredLength = scope.crmUiDatepicker && scope.crmUiDatepicker.time ? 16 : 10;
-              ngModel.$setValidity('incompleteDateTime', !!$(this).val().length && $(this).val().length === requiredLength);
-            });
-        }
-      };
-    })
-
     // Display a date widget.
     // example: <input crm-ui-date ng-model="myobj.datefield" />
     // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
@@ -106,66 +86,29 @@
       };
     })
 
-    // Display a date-time widget.
-    // example: <div crm-ui-date-time ng-model="myobj.mydatetimefield"></div>
-    .directive('crmUiDateTime', function ($parse) {
+    // Display a date-time widget. Simple wrapper around $.crmDatepicker.
+    // example: <input crm-ui-date-time ng-model="myobj.datefield"/>
+    .directive('crmUiDateTime', function () {
       return {
         restrict: 'AE',
         require: 'ngModel',
         scope: {
           ngRequired: '@'
         },
-        templateUrl: '~/crmUi/datetime.html',
         link: function (scope, element, attrs, ngModel) {
-          var ts = scope.ts = CRM.ts(null);
-          scope.dateLabel = ts('Date');
-          scope.timeLabel = ts('Time');
-          element.addClass('crm-ui-datetime');
-
-          ngModel.$render = function $render() {
-            if (!_.isEmpty(ngModel.$viewValue)) {
-              var dtparts = ngModel.$viewValue.split(/ /);
-              scope.dtparts = {date: dtparts[0], time: dtparts[1]};
-            }
-            else {
-              scope.dtparts = {date: '', time: ''};
-            }
-            validate();
-          };
-
           function updateParent() {
             validate();
-
-            if (_.isEmpty(scope.dtparts.date) && _.isEmpty(scope.dtparts.time)) {
-              ngModel.$setViewValue(' ');
-            }
-            else {
-              //ngModel.$setViewValue(scope.dtparts.date + ' ' + scope.dtparts.time);
-              ngModel.$setViewValue((scope.dtparts.date ? scope.dtparts.date : '') + ' ' + (scope.dtparts.time ? scope.dtparts.time : ''));
-            }
+            ngModel.$setViewValue(element.val());
           }
-
-          scope.$watch('dtparts.date', updateParent);
-          scope.$watch('dtparts.time', updateParent);
 
           function validate() {
-            var incompleteDateTime = _.isEmpty(scope.dtparts.date) ^ _.isEmpty(scope.dtparts.time);
-            ngModel.$setValidity('incompleteDateTime', !incompleteDateTime);
+            var requiredLength = 16;
+            ngModel.$setValidity('incompleteDateTime', element.val().length === 0 ||  element.val().length === requiredLength);
           }
 
-          function updateRequired() {
-            scope.required = scope.$parent.$eval(attrs.ngRequired);
-          }
-
-          if (attrs.ngRequired) {
-            updateRequired();
-            scope.$parent.$watch(attrs.ngRequired, updateRequired);
-          }
-
-          scope.reset = function reset() {
-            scope.dtparts = {date: '', time: ''};
-            ngModel.$setViewValue('');
-          };
+          element
+            .crmDatepicker({time: true})
+            .on('change', updateParent);
         }
       };
     })

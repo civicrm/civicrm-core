@@ -1,5 +1,5 @@
 'use strict';
-
+/* global CRM:true */
 describe('crmMailingRadioDate', function() {
 
   beforeEach(function() {
@@ -30,6 +30,11 @@ describe('crmMailingRadioDate', function() {
       $interval = _$interval_;
       $timeout = _$timeout_;
 
+      CRM = CRM || {};
+      CRM.config = CRM.config || {};
+      CRM.config.dateInputFormat = 'mm/dd/yy';
+      CRM.config.timeIs24Hr = true;
+
       $rootScope.model = model = {
         the_date: ''
       };
@@ -43,7 +48,7 @@ describe('crmMailingRadioDate', function() {
       expect($rootScope.myForm.$valid).toBe(true);
       expect(element.find('.radio-now').prop('checked')).toBe(true);
       expect(element.find('.radio-at').prop('checked')).toBe(false);
-      expect(element.find('.dateplugin').datepicker('getDate')).toBe(null);
+      expect(element.find('.hasDatepicker').datepicker('getDate')).toBe(null);
       expect(element.find('.hasTimeEntry').timeEntry('getTime')).toBe(null);
 
       model.the_date = ' ';
@@ -51,7 +56,7 @@ describe('crmMailingRadioDate', function() {
       expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
-      expect(element.find('.dateplugin').datepicker('getDate')).toBe(null);
+      expect(element.find('.hasDatepicker').datepicker('getDate')).toBe(null);
       expect(element.find('.hasTimeEntry').timeEntry('getTime')).toBe(null);
 
       model.the_date = '2014-01-01 ';
@@ -59,7 +64,7 @@ describe('crmMailingRadioDate', function() {
       expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
-      expect(element.find('.dateplugin').datepicker('getDate').toDateString()).toEqual('Wed Jan 01 2014');
+      expect(element.find('.hasDatepicker').datepicker('getDate').toDateString()).toEqual('Wed Jan 01 2014');
       expect(element.find('.hasTimeEntry').timeEntry('getTime')).toBe(null);
 
       model.the_date = ' 02:03:04';
@@ -67,7 +72,7 @@ describe('crmMailingRadioDate', function() {
       expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
-      expect(element.find('.dateplugin').datepicker('getDate')).toBe(null);
+      expect(element.find('.hasDatepicker').datepicker('getDate')).toBe(null);
       expect(element.find('.hasTimeEntry').timeEntry('getTime').getMinutes()).toBe(3);
 
       model.the_date = '2014-01-02 02:03:04';
@@ -75,7 +80,7 @@ describe('crmMailingRadioDate', function() {
       expect($rootScope.myForm.$valid).toBe(true);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
-      expect(element.find('.dateplugin').datepicker('getDate').toDateString()).toEqual('Thu Jan 02 2014');
+      expect(element.find('.hasDatepicker').datepicker('getDate').toDateString()).toEqual('Thu Jan 02 2014');
       expect(element.find('.hasTimeEntry').timeEntry('getTime').getMinutes()).toBe(3);
     });
 
@@ -87,9 +92,9 @@ describe('crmMailingRadioDate', function() {
       expect(element.find('.radio-now').prop('checked')).toBe(true);
       expect(element.find('.radio-at').prop('checked')).toBe(false);
 
-      element.find('.dateplugin').datepicker('setDate', '2014-01-03').trigger('change');
+      element.find('.hasDatepicker').datepicker('setDate', '01/03/2014').trigger('change');
       $rootScope.$digest();
-      expect(model.the_date).toBe('2014-01-03 ');
+      expect(model.the_date).toBe('2014-01-03');
       expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
@@ -101,9 +106,9 @@ describe('crmMailingRadioDate', function() {
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
 
-      element.find('.dateplugin').datepicker('setDate', '').trigger('change');
+      element.find('.hasDatepicker').datepicker('setDate', '').trigger('change');
       $rootScope.$digest();
-      expect(model.the_date).toBe(' 04:05');
+      expect(model.the_date).toBe('04:05');
       expect($rootScope.myForm.$valid).toBe(false);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
