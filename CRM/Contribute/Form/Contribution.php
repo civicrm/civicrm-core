@@ -923,6 +923,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (empty($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Payment Processor is a required field.');
       }
+      else {
+        // validate payment instrument (e.g. credit card number)
+        CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, $self);
+      }
     }
 
     // Do the amount validations.
