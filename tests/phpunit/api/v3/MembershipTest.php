@@ -553,6 +553,33 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
+    // Set up params for enable/disable checks
+    $relationship1 = $this->callAPISuccess('relationship', 'get', array('contact_id_a' => $memberContactId[1]));
+    $params = array(
+      'contact_id' => $memberContactId[1],
+      'membership_type_id' => $membershipTypeId,
+    );
+
+    // Deactivate relationship using create and assert membership is not inherited
+    $this->callAPISuccess('relationship', 'create', array('id' => $relationship1['id'], 'is_active' => 0));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
+    // Re-enable relationship using create and assert membership is inherited
+    $this->callAPISuccess('relationship', 'create', array('id' => $relationship1['id'], 'is_active' => 1));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+
+    // Deactivate relationship using setvalue and assert membership is not inherited
+    $this->callAPISuccess('relationship', 'setvalue', array('id' => $relationship1['id'], 'field' => 'is_active', 'value' => 0));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
+    // Re-enable relationship using setvalue and assert membership is inherited
+    $this->callAPISuccess('relationship', 'setvalue', array('id' => $relationship1['id'], 'field' => 'is_active', 'value' => 1));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+
     // Tear down - reverse of creation to be safe
     $this->contactDelete($memberContactId[2]);
     $this->contactDelete($memberContactId[1]);

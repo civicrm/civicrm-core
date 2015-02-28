@@ -66,7 +66,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     //alter related membership if the is_active param is changed
-    if (!empty($params['id'])) {
+    if (!empty($params['id']) && array_key_exists('is_active', $params)) {
       $action = CRM_Core_Action::DISABLE;
       if (!empty($params['is_active'])) {
         $action = CRM_Core_Action::ENABLE;
