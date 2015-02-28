@@ -44,22 +44,19 @@
  */
 function civicrm_api3_mailing_create($params) {
   if (CRM_Mailing_Info::workflowEnabled()) {
-    if (!CRM_Core_Permission::check('create mailings')) {
-      throw new \Civi\API\Exception\UnauthorizedException("This system uses advanced CiviMail workflows which require additional permissions");
-    }
-    if (!CRM_Core_Permission::check('schedule mailings')) {
-      unset($params['scheduled_date']);
-      unset($params['scheduled_id']);
-    }
-    if (!CRM_Core_Permission::check('approve mailings')) {
-      unset($params['approval_date']);
-      unset($params['approver_id']);
-      unset($params['approval_status_id']);
-      unset($params['approval_note']);
+    $safeParams = array();
+    $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
+    foreach (array_keys($params) as $field) {
+      if (CRM_Core_Permission::check($fieldPerms[$field])) {
+        $safeParams[$field] = $params[$field];
+      }
     }
   }
-  $params['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  else {
+    $safeParams = $params;
+  }
+  $safeParams['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams);
 }
 
 /**

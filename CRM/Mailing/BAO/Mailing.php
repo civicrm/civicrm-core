@@ -3132,4 +3132,31 @@ AND        m.id = %1
     return civicrm_api('MailingContact', 'getcount', $params);
   }
 
+  /**
+   * Get a list of permissions required for CRUD'ing each field
+   * (when workflow is enabled).
+   *
+   * @return array
+   *   Array (string $fieldName => string $permName)
+   */
+  public static function getWorkflowFieldPerms() {
+    $fieldNames = array_keys(CRM_Mailing_DAO_Mailing::fields());
+    $fieldPerms = array();
+    foreach ($fieldNames as $fieldName) {
+      if ($fieldName == 'id') {
+        $fieldPerms[$fieldName] = 'access CiviMail';
+      }
+      if (in_array($fieldName, array('scheduled_date', 'scheduled_id'))) {
+        $fieldPerms[$fieldName] = 'schedule mailings';
+      }
+      elseif (in_array($fieldName, array('approval_date', 'approver_id', 'approval_status_id', 'approval_note'))) {
+        $fieldPerms[$fieldName] = 'approve mailings';
+      }
+      else {
+        $fieldPerms[$fieldName] = 'create mailings';
+      }
+    }
+    return $fieldPerms;
+  }
+
 }
