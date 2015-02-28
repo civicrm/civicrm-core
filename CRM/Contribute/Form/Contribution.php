@@ -602,6 +602,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('billingPanes', $billingPanes);
     $this->assign('allPanes', $allPanes);
 
+    $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
+
     if ($this->_formType) {
       $this->assign('formType', $this->_formType);
       return;
@@ -883,8 +885,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $trxnId->freeze();
       $financialType->freeze();
     }
-
-    $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
 
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id && isset($this->_values['tax_amount'])) {
