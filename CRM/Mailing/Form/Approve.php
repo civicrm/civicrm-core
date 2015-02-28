@@ -119,7 +119,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       unset($mailApprovalStatus[$noneOptionID]);
     }
 
-    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, TRUE, NULL, TRUE);
+    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, array(), NULL, TRUE);
 
     $buttons = array(
       array(
