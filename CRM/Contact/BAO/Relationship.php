@@ -64,6 +64,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $ids = array('contactTarget' => $relationship->contact_id_b, 'contact' => $params['contact_id_a']);
       CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, (empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
     }
+
+    //alter related membership if the is_active param is changed
+    if (!empty($params['id']) && array_key_exists('is_active', $params)) {
+      $action = CRM_Core_Action::DISABLE;
+      if (!empty($params['is_active'])) {
+        $action = CRM_Core_Action::ENABLE;
+      }
+      CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
+    }
     self::addRecent($params, $relationship);
     return $relationship;
   }
@@ -206,7 +215,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
-    self::setContactABFromIDs($params);
+    self::setContactABFromIDs($params, $ids);
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
     // explode the string with _ to get the relationship type id
