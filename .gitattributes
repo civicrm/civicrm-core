@@ -1,0 +1,6 @@
+*.php eol=lf
+*.txt eol=lf
+*.tpl eol=lf
+*.hlp eol=lf
+*.js eol=lf
+*.json eol=lf
