@@ -670,6 +670,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'sequential' => 1,
       'id' => $create_result['id'],
       'api.relationship.get' => array(
+        'contact_id_a' => '$value.id',
         'options' => array(
           'limit' => '1',
           'sort' => 'start_date DESC',
