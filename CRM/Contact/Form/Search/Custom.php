@@ -116,7 +116,13 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   function buildTaskList() {
     // call the parent method to populate $this->_taskList for the custom search
     parent::buildTaskList();
-    return $this->_customClass->buildTaskList($this);
+
+    // @todo: When CRM_Contact_Form_Search_Interface is updated in 4.6, remove this check
+    if (is_callable(array($this->_customClass, 'buildTaskList'))) {
+      return $this->_customClass->buildTaskList($this);
+    } else {
+      return $this->_taskList;
+    }
   }
 
   function buildQuickForm() {
