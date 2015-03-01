@@ -373,10 +373,11 @@ ORDER BY contact_a.sort_name';
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 

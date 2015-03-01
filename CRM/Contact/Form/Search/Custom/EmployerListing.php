@@ -261,10 +261,11 @@ class CRM_Contact_Form_Search_Custom_EmployerListing extends CRM_Contact_Form_Se
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort);
   }
 
