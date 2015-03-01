@@ -93,6 +93,8 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+
     $('#repetition_start_date_display').closest("tr").hide();
     /****** On load "Repeats By" and "Repeats On" blocks should be hidden if dropdown value is not week or month****** (Edit Mode)***/
     switch ($('#repetition_frequency_unit').val()) {
@@ -198,25 +200,16 @@
       $('#entity_status_1, #entity_status_2').prop('disabled', $(this).val() != 2);
     });
 
-    //Select all options in selectbox before submitting
-    $(this).submit(function() {
+    $form.submit(function() {
       //Check form for values submitted
       if ($('input[name=ends]:checked').val() == 1) {
         if ($('#start_action_offset').val() == "") {
-          if (!$('span#start_action_offset-error').length) {
-            $('#start_action_offset').after('<span id ="start_action_offset-error" class="crm-error"> This is a required field.</span>');
-            //Check if other message already present, hide it
-            $('span#repeat_absolute_date_display-error').toggle();
-          }
+          $('#start_action_offset').crmError();
           return false;
         }
       } else if ($('input[name=ends]:checked').val() == 2) {
         if ($('#repeat_absolute_date_display').val() == "") {
-          if (!$('span#repeat_absolute_date_display-error').length) {
-            $('#repeat_absolute_date_display').after('<span id="repeat_absolute_date_display-error" class="crm-error"> This is a required field.</span>');
-            //Check if other message already present, hide it
-            $('span#start_action_offset-error').toggle();
-          }
+          $('#repeat_absolute_date_display').crmError();
           return false;
         }
       }
@@ -270,108 +263,20 @@
 
     //If there are changes in repeat configuration, enable save button
     //Dialog for preview repeat Configuration dates
-    $('#preview-dialog').dialog({ autoOpen: false });
     function previewDialog() {
-      $('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
-      $('#preview-dialog').dialog('open');
-      $('#preview-dialog').dialog({
-        title: 'Confirm dates',
-        width: '650',
-        position: 'center',
-        //draggable: false,
-        buttons: {
-          Ok: function() {
-            $(this).dialog( "close" );
-            $('form#Repeat, form#Activity').submit();
-          },
-          Cancel: function() { //cancel
-            $(this).dialog( "close" );
-          }
-        }
-      });
-      var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
-      var entityID = parseInt('{/literal}{$currentEntityId}{literal}');
-      var entityTable = '{/literal}{$entityTable}{literal}';
-      if (entityTable != "") {
-        ajaxurl += "?entity_table="+entityTable;
-      }
-      if (entityID != "") {
-        ajaxurl += "&entity_id="+entityID;
-      }
-      var formData = $('form').serializeArray();
-      $.ajax({
-        dataType: "json",
-        type: "POST",
-        data: formData,
-        url:  ajaxurl,
-        success: function (result) {
-          if (Object.keys(result).length > 0) {
-            var errors = [];
-            var participantData = [];
-            var html = 'Based on your repeat configuration, here is the list of dates. Do you wish to create a recurring set with these dates?<br/><table id="options" class="display"><thead><tr><th></th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
-            var count = 1;
-            for(var i in result) {
-              if (i != 'errors') {
-                if (i == 'participantData') {
-                  participantData = result.participantData;
-                  break;
-                }
-                var start_date = result[i].start_date;
-                var end_date = result[i].end_date;
-
-                var end_date_text = '';
-                if (end_date !== undefined) {
-                  end_date_text = '<td>'+end_date+'</td>';
-                }
-                html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
-                count = count + 1;
-              } else {
-                errors = result.errors;
-              }
-            }
-            html += '</table>';
-            var warningHtml = '';
-            if (Object.keys(participantData).length > 0) {
-              warningHtml += '<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;There are registrations for the repeating events already present in the set, continuing with the process would unlink them and repeating events without registration would be trashed. </div><table id="options" class="display"><thead><tr><th>Event ID</th><th>Event</th><th>Participant Count</th></tr><thead>';
-              for (var id in participantData) {
-                for(var data in participantData[id]) {
-                  warningHtml += '<tr><td>'+id+'</td><td> <a href="{/literal}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id="}{literal}'+id+'{/literal}{literal}">'+data+'</a></td><td><a href="{/literal}{crmURL p='civicrm/event/search' q="reset=1&force=1&status=true&event="}{literal}'+id+'{/literal}{literal}">'+participantData[id][data]+'</a></td></tr>';
-                }
-              }
-              warningHtml += '</table><br/>';
-            }
-            if (errors.length > 0) {
-              html = '';
-              for (var j = 0; j < errors.length; j++) {
-                html += '<span class="crm-error">*&nbsp;' + errors[j] + '</span><br/>';
-              }
-            }
-            if (warningHtml != "") {
-              $('#generated_dates').append(warningHtml).append(html);
-            } else {
-              $('#generated_dates').html(html);
-            }
-            if (end_date_text == "") {
-              $('#th-end-date').hide();
-            }
-            if ($("#preview-dialog").height() >= 300) {
-              $('#preview-dialog').css('height', '300');
-              $('#preview-dialog').css('overflow-y', 'auto');
-            }
-          } else {
-            $('div.ui-dialog-buttonset button span:contains(Ok)').hide();
-            $('#generated_dates').append("<span class='crm-error'>Sorry, no dates could be generated for the given criteria!</span>");
-          }
-        },
-        complete: function() {
-          $('div.crm-loading-element').hide();
-        }
-      });
-      return false;
+      var payload = $form.serialize() + '&entity_table={/literal}{$entityTable}{literal}&entity_id={/literal}{$currentEntityId}{literal}',
+        settings = CRM.utils.adjustDialogDefaults({
+          url: CRM.url("civicrm/recurringentity/preview", payload)
+        });
+      CRM.confirm(settings)
+        .on('crmConfirm:yes', function() {
+          $form.submit();
+        });
     }
 
-    $('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function () {
-      return previewDialog();
+    $('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click(function (e) {
+      previewDialog();
+      e.preventDefault();
     });
 
     $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function () {
