@@ -74,11 +74,8 @@
         </td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-exclude_date">
-        <td class="label">{$form.exclude_date.label} {help id="id-exclude-date" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
-        <td>&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=exclude_date}
-          &nbsp;{$form.add_to_exclude_list.html}&nbsp;{$form.remove_from_exclude_list.html}
-          {$form.exclude_date_list.html}
-        </td>
+        <td class="label">{$form.exclude_date_list.label} {help id="id-exclude-date" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+        <td>{$form.exclude_date_list.html}</td>
       </tr>
       <tr>
         <td class="label bold">{ts}Summary:{/ts}</td>
@@ -203,8 +200,6 @@
 
     //Select all options in selectbox before submitting
     $(this).submit(function() {
-      $('#exclude_date_list option').attr('selected',true);
-
       //Check form for values submitted
       if ($('input[name=ends]:checked').val() == 1) {
         if ($('#start_action_offset').val() == "") {
@@ -225,8 +220,47 @@
           return false;
         }
       }
-
     });
+
+    function getDisplayDate(date) {
+      return $.datepicker.formatDate(CRM.config.dateInputFormat, $.datepicker.parseDate('yy-mm-dd', date));
+    }
+
+    // Combine select2 and datepicker into a multi-select-date widget
+    $('#exclude_date_list').crmSelect2({
+      multiple: true,
+      data: [],
+      initSelection: function(element, callback) {
+        var values = [];
+        $.each($(element).val().split(','), function(k, v) {
+          values.push({
+            text: getDisplayDate(v),
+            id: v
+          });
+        });
+        callback(values);
+      }
+    })
+      // Prevent select2 from opening and show a datepicker instead
+      .on('select2-opening', function(e) {
+        var $el = $(this);
+        e.preventDefault();
+        $('.select2-search-field input', $el.select2('container'))
+          .datepicker({dateFormat: CRM.config.dateInputFormat})
+          .datepicker('show')
+          .off('.crmDate')
+          .on('change.crmDate', function() {
+            if ($(this).val()) {
+              var date = $(this).datepicker('getDate'),
+                data = $el.select2('data') || [];
+              data.push({
+                text: $.datepicker.formatDate(CRM.config.dateInputFormat, date),
+                id: $.datepicker.formatDate('yy-mm-dd', date)
+              });
+              $el.select2('data', data);
+            }
+          });
+      });
 
     //Detect changes in Repeat configuration field
     var unsavedChanges = false;
@@ -238,15 +272,6 @@
     //Dialog for preview repeat Configuration dates
     $('#preview-dialog').dialog({ autoOpen: false });
     function previewDialog() {
-      $('#exclude_date_list option').attr('selected', true);
-      //Copy exclude dates
-      var dateTxt=[];
-      $('#exclude_date_list option:selected').each(function() {
-        dateTxt.push($(this).text());
-      });
-      var completeDateText = dateTxt.join(',');
-      $('#copyExcludeDates').val(completeDateText);
-
       $('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
       $('#preview-dialog').dialog('open');
       $('#preview-dialog').dialog({
@@ -436,34 +461,6 @@
 
   });
 
-  //Exclude list function
-  function addToExcludeList(val) {
-    if (val !== "") {
-      var exists = false;
-      for(var i = 0, opts = document.getElementById('exclude_date_list').options; i < opts.length; ++i) {
-        if (opts[i].text == val) {
-          exists = true;
-          break;
-        }
-      }
-      if (exists == false) {
-        cj('#exclude_date_list').append('<option>'+val+'</option>');
-      }
-    }
-  }
-
-  function removeFromExcludeList(sourceID) {
-    var src = document.getElementById(sourceID);
-    for(var count= src.options.length-1; count >= 0; count--) {
-      if (src.options[count].selected == true) {
-        try{
-          src.remove(count, null);
-        }catch(error) {
-          src.remove(count);
-        }
-      }
-    }
-  }
 </script>
 {/literal}
 {*Hide Summary*}

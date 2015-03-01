@@ -63,7 +63,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
       }
       $recursion->scheduleFormValues = $formValues;
       if (!empty($formValues['exclude_date_list'])) {
-        $recursion->excludeDates = $formValues['exclude_date_list'];
+        $recursion->excludeDates = explode(',', $formValues['exclude_date_list']);
       }
       if (CRM_Utils_Array::value('excludeDateRangeColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
         $recursion->excludeDateRangeColumns = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['excludeDateRangeColumns'];

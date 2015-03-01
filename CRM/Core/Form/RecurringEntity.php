@@ -101,7 +101,7 @@ class CRM_Core_Form_RecurringEntity {
       $excludeOptionValues = array();
       if (!empty($optionValue)) {
         foreach ($optionValue as $key => $val) {
-          $excludeOptionValues[$val['value']] = date('m/d/Y', strtotime($val['value']));
+          $excludeOptionValues[$val['value']] = CRM_Utils_Date::customFormat($val['value']);
         }
         self::$_excludeDateInfo = $excludeOptionValues;
       }
@@ -146,6 +146,9 @@ class CRM_Core_Form_RecurringEntity {
       if (self::$_scheduleReminderDetails->entity_status) {
         $defaults['repeats_by'] = 2;
       }
+      if (self::$_excludeDateInfo) {
+        $defaults['exclude_date_list'] = implode(',', self::$_excludeDateInfo);
+      }
     }
     return $defaults;
   }
@@ -153,7 +156,7 @@ class CRM_Core_Form_RecurringEntity {
   /**
    * Build form.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
     if (self::$_entityTable) {
@@ -216,15 +219,9 @@ class CRM_Core_Form_RecurringEntity {
     $form->add('text', 'start_action_offset', ts(''), array('size' => 3, 'maxlength' => 2));
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
-    $form->addDate('exclude_date', ts('Exclude Date(s)'), FALSE);
-    $select = $form->add('select', 'exclude_date_list', ts(''), self::$_excludeDateInfo, FALSE, array(
-        'style' => 'width:150px;',
-        'size' => 4,
+    $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array(
+        'class' => 'twenty',
       ));
-    $select->setMultiple(TRUE);
-    $form->addElement('button', 'add_to_exclude_list', '>>', 'onClick="addToExcludeList(document.getElementById(\'exclude_date\').value);"');
-    $form->addElement('button', 'remove_from_exclude_list', '<<', 'onClick="removeFromExcludeList(\'exclude_date_list\')"');
-    $form->addElement('hidden', 'copyExcludeDates', '', array('id' => 'copyExcludeDates'));
     $form->addElement('hidden', 'allowRepeatConfigToSubmit', '', array('id' => 'allowRepeatConfigToSubmit'));
     $form->addButtons(array(
         array(
@@ -363,10 +360,9 @@ class CRM_Core_Form_RecurringEntity {
 
         //exclude dates
         $excludeDateList = array();
-        if (CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_entity_id', $params) && $actionScheduleObj->entity_value) {
+        if (CRM_Utils_Array::value('exclude_date_list', $params) && CRM_Utils_Array::value('parent_entity_id', $params) && $actionScheduleObj->entity_value) {
           //Since we get comma separated values lets get them in array
-          $excludeDates = array();
-          $excludeDates = explode(",", $params['copyExcludeDates']);
+          $excludeDates = explode(",", $params['exclude_date_list']);
 
           //Check if there exists any values for this option group
           $optionGroupIdExists = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
