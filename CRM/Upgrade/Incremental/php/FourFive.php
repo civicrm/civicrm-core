@@ -326,13 +326,34 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $formValues = unserialize($dao->form_values);
-      while (list($field, $data_value) = each($formValues)) {
-        if (preg_match('/^custom_/', $field) && is_array($data_value)) {
+        foreach ($formValues as $field => &$data_value) {
+        if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
           // This indicates old-style data format. We need to fix it.
           $op = 'and';
-          if ($key = array_search('CiviCRM_OP_OR', $data_value)) {
-            $op = 'or';
-            unset($formValues[$field][$key]);
+          $fieldID = end(explode('_', $field));
+          $htmlType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldID, 'html_type');
+
+          switch ($htmlType) {
+            case 'CheckBox':
+              if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
+                $op = 'or';
+                unset($data_value['CiviCRM_OP_OR']);
+              }
+              $data_value = array_keys($data_value, 1);
+              break;
+
+            default:
+              $key = array_search('CiviCRM_OP_OR', $data_value);
+              if (!is_null($key)) {
+                $op = 'or';
+                unset($data_value[$key]);
+                if (count($data_value) == 0) {
+                  $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
+                  foreach ($customOption as $option) {
+                    $data_value[] = CRM_Utils_Array::value('value', $option);
+                  }
+                }
+              }
           }
 
           // Add new key for the operator.
