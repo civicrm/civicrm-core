@@ -83,9 +83,6 @@
     </div>
   </div>
 </div>
-<div id="preview-dialog" class="hiddenElement">
-  <div id="generated_dates" class="show-block"></div>
-</div>
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
@@ -251,15 +248,10 @@
           });
       });
 
-    //Detect changes in Repeat configuration field
-    var unsavedChanges = false;
-    $('div.crm-core-form-recurringentity-block').on('change', function() {
-      unsavedChanges = true;
-    });
-
     //If there are changes in repeat configuration, enable save button
     //Dialog for preview repeat Configuration dates
     function previewDialog() {
+      $('#allowRepeatConfigToSubmit').val(CRM.utils.initialValueChanged('.crm-core-form-recurringentity-block') ? '1' : '0');
       var payload = $form.serialize() + '&entity_table={/literal}{$entityTable}{literal}&entity_id={/literal}{$currentEntityId}{literal}',
         settings = CRM.utils.adjustDialogDefaults({
           url: CRM.url("civicrm/recurringentity/preview", payload)
@@ -275,26 +267,10 @@
       e.preventDefault();
     });
 
-    $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function () {
-      //Process this only when repeat is configured. We need to do this test here as there is a common save for activity.
-      var isRepeatConfigured = '{/literal}{$scheduleReminderId}{literal}';
-      if (isRepeatConfigured) {
-        if (unsavedChanges) {
-          $('#allowRepeatConfigToSubmit').val('1');
-          //Set this variable to decide which dialog box to show
-          $.data( document.body, "preview-dialog", true );
-          return previewDialog();
-        }
-        else {
-          $.data( document.body, "preview-dialog", false );
-          return false;
-        }
-      }
-      else {
-        if (unsavedChanges) {
-          $('#allowRepeatConfigToSubmit').val('1');
-          return previewDialog();
-        }
+    $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function (e) {
+      if (CRM.utils.initialValueChanged('.crm-core-form-recurringentity-block')) {
+        e.preventDefault();
+        previewDialog();
       }
     });
 

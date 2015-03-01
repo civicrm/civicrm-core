@@ -23,115 +23,81 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{if $hasParent || $isRepeatingEntity || $scheduleReminderId}
+  <script type="text/template" id="recurring-dialog-tpl">
+    <div class="crm-form-block recurring-dialog">
+      <h4>{ts}How would you like this change to affect other entities in the repetition set?{/ts}</h4>
+      <div class="crm-block">
+        <input type="radio" id="recur-only-this-entity" name="recur_mode" value="1">
+        <label for="recur-only-this-entity">{ts}Only this entity{/ts}</label>
+        <div class="description">{ts}All other entities in the series will remain unchanged.{/ts}</div>
 
-<div id="recurring-dialog" class="hiddenElement">
-    {ts}How would you like this change to affect other entities in the repetition set?{/ts}<br/><br/>
-    <div class="show-block">
-        <div class="recurring-dialog-inner-wrapper">
-            <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button only-this-event">{ts}Only this entity{/ts}</button>
-            </div>
-          <div class="recurring-dialog-inner-right">{ts}All other entities in the series will remain same.{/ts}</div>
-        </div>
-        <div class="recurring-dialog-inner-wrapper">
-            <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button this-and-all-following-event">{ts}This and Following entities{/ts}</button>
-            </div>
-            <div class="recurring-dialog-inner-right">{ts}Change applies to this and all the following entities.{/ts}</div>
-        </div>
-        <div class="recurring-dialog-inner-wrapper">
-            <div class="recurring-dialog-inner-left">
-                <button class="recurring-dialog-button all-events">{ts}All the entities{/ts}</button>
-            </div>
-            <div class="recurring-dialog-inner-right">{ts}Change applies to all the entities in the series.{/ts}</div>
-        </div>
+        <input type="radio" id="recur-this-and-all-following-entity" name="recur_mode" value="2">
+        <label for="recur-this-and-all-following-entity">{ts}This and Following entities{/ts}</label>
+        <div class="description">{ts}Change applies to this and all the following entities.{/ts}</div>
+
+        <input type="radio" id="recur-all-entity" name="recur_mode" value="3">
+        <label for="recur-all-entity">{ts}All the entities{/ts}</label>
+        <div class="description">{ts}Change applies to all the entities in the series.{/ts}</div>
+      </div>
+      <div class="status help"><div class="icon ui-icon-lightbulb"></div>{ts}Changes to date or time will NOT be applied to other entities in the series.{/ts}</div>
     </div>
-    <div class="status"><div class="icon ui-icon-lightbulb"></div> Changes to date or time will NOT be applied to other entities in the series.</div>
-</div>
-{if $hasParent || $isRepeatingEntity}
+  </script>
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      var $dialog;
-      /** Add your linked entity mapper here **/
-      var mapper = {'CRM_Event_Form_ManageEvent_EventInfo': '',
-                'CRM_Event_Form_ManageEvent_Location': '',
-                'CRM_Event_Form_ManageEvent_Fee': '',
-                'CRM_Event_Form_ManageEvent_Registration': '',
-                'CRM_Friend_Form_Event': 'civicrm_tell_friend',
-                'CRM_PCP_Form_Event': 'civicrm_pcp_block',
-                'CRM_Activity_Form_Activity': ''
-                };
+      var $form, formClass,
+        /** Add your linked entity mapper here **/
+        mapper = {
+          'CRM_Event_Form_ManageEvent_EventInfo': '',
+          'CRM_Event_Form_ManageEvent_Location': '',
+          'CRM_Event_Form_ManageEvent_Fee': '',
+          'CRM_Event_Form_ManageEvent_Registration': '',
+          'CRM_Friend_Form_Event': 'civicrm_tell_friend',
+          'CRM_PCP_Form_Event': 'civicrm_pcp_block',
+          'CRM_Activity_Form_Activity': ''
+        };
+
       function cascadeChangesDialog() {
-        $dialog =  $("#recurring-dialog").dialog({
-          title: 'How does this change affect other repeating entities in the set?',
-          modal: true,
-          width: '650',
-          buttons: {
-            Cancel: function() { //cancel
-              $( this ).dialog( "close" );
-            }
-          }
-        }).dialog('open');
+        CRM.confirm({
+          message: $('#recurring-dialog-tpl').html()
+        })
+          .on('crmConfirm:yes', updateMode)
+          .on('click change', 'input[name=recur_mode]', function() {
+            $('button[data-op=yes]').prop('disabled', false);
+          })
+          .parent().find('button[data-op=yes]').prop('disabled', true)
       }
-      var form = '';
-      $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
-          form = $(this).parents('form:first').attr('class');
-          if( form != "" && mapper.hasOwnProperty(form) ){
-            cascadeChangesDialog();
-            return false;
-          }
+
+      $('#crm-main-content-wrapper').on('click', '.crm-form-submit.validate', function(e) {
+        $form = $(this).closest('form');
+        var className = ($form.attr('class') || '').match(/CRM_\S*/);
+        formClass = className && className[0];
+        if (formClass && mapper.hasOwnProperty(formClass) &&
+            // For activities, only show this if the changes were not made to the recurring settings
+          (formClass !== 'CRM_Activity_Form_Activity' || !CRM.utils.initialValueChanged('.crm-core-form-recurringentity-block'))
+        ) {
+          cascadeChangesDialog();
+          e.preventDefault();
+        }
       });
 
-      $("#_qf_Activity_upload-top, #_qf_Activity_upload-bottom").click(function() {
-          form = $(this).parents('form:first').attr('class');
-          if( form != "" && mapper.hasOwnProperty(form) ){
-            var showPreviewDialog = $.data( document.body, "preview-dialog");
-            if (showPreviewDialog == false) {
-              cascadeChangesDialog();
-            }
-            return false;
-          }
-      });
-
-      $(".only-this-event").click(function() {
-        updateMode(1);
-      });
-
-      $(".this-and-all-following-event").click(function() {
-        updateMode(2);
-      });
-
-      $(".all-events").click(function() {
-        updateMode(3);
-      });
-
-      function updateMode(mode) {
-        var entityID = parseInt('{/literal}{$entityID}{literal}');
-        var entityTable = '{/literal}{$entityTable}{literal}';
-        if (entityID != "" && mode && mapper.hasOwnProperty(form) && entityTable !="") {
-          var ajaxurl = CRM.url("civicrm/ajax/recurringentity/update-mode");
-          var data    = {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable: mapper[form]};
-          $.ajax({
-            dataType: "json",
-            data: data,
-            url:  ajaxurl,
-            success: function (result) {
+      function updateMode() {
+        var mode = $('input[name=recur_mode]:checked', this).val(),
+          entityID = parseInt('{/literal}{$entityID}{literal}'),
+          entityTable = '{/literal}{$entityTable}{literal}';
+        if (entityID != "" && mode && mapper.hasOwnProperty(formClass) && entityTable !="") {
+          $.getJSON(CRM.url("civicrm/ajax/recurringentity/update-mode",
+              {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable: mapper[formClass]})
+          ).done(function (result) {
               if (result.status != "" && result.status == 'Done') {
-                $('#mainTabContainer div:visible Form, form.'+form).submit();
-                $dialog.dialog('close');
+                $form.submit();
               } else if (result.status != "" && result.status == 'Error') {
-                var errorBox = confirm(ts("Mode could not be updated, save only this event?"));
-                if (errorBox == true) {
-                  $('#mainTabContainer div:visible Form, form.'+form).submit();
-                  $dialog.dialog('close');
-                } else {
-                  $dialog.dialog('close');
-                  return false;
+                if (confirm(ts("Mode could not be updated, save only this event?"))) {
+                  $form.submit();
                 }
               }
-            }
-          });
+            });
         }
       }
     });
