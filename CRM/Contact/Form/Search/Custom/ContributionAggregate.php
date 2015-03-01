@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
   public $_permissionedComponent;
