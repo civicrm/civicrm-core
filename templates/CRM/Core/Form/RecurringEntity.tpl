@@ -77,10 +77,6 @@
         <td class="label">{$form.exclude_date_list.label} {help id="id-exclude-date" entityType=$entityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
         <td>{$form.exclude_date_list.html}</td>
       </tr>
-      <tr>
-        <td class="label bold">{ts}Summary:{/ts}</td>
-        <td><span id="rec-summary"></span></td>
-      </tr>
     </table>
     <div class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
@@ -302,81 +298,7 @@
       }
     });
 
-    //Build Summary
-    var finalSummary = '';
-    var numberText = '';
-    var interval = $('#repetition_frequency_interval').val() + ' ';
-    if ($('#repetition_frequency_interval').val() == 1) {
-      interval = '';
-    } else {
-      numberText = 's';
-    }
-    finalSummary = "Every " + interval + $('#repetition_frequency_unit option:selected').val() + numberText;
-
-    //Case Week
-    var dayOfWeek = [];
-    if ($('#repetition_frequency_unit option:selected').val() == "week") {
-      $("input[name^='start_action_condition']:checked").each(function() {
-        var tempArray = [];
-        var thisID = $(this).attr('id');
-        tempArray = thisID.split('_');
-        dayOfWeek.push(tempArray[3].substr(0, 1).toUpperCase() + tempArray[3].substr(1).toLowerCase());
-      });
-      finalSummary += ' on ' + dayOfWeek.join();
-    }
-
-    //Case Monthly
-    if ($('#repetition_frequency_unit option:selected').val() == "month") {
-      if ($('input:radio[name=repeats_by]:checked').val() == 1) {
-        finalSummary += ' on day ' + $('#limit_to').val();
-      }
-      if ($('input:radio[name=repeats_by]:checked').val() == 2) {
-        finalSummary += ' on ' + $('#entity_status_1').val().substr(0, 1).toUpperCase() + $('#entity_status_1').val().substr(1).toLowerCase() + ' ' + $('#entity_status_2').val().substr(0, 1).toUpperCase() + $('#entity_status_2').val().substr(1).toLowerCase();
-      }
-    }
-
-    //Case Ends
-    if ($('input:radio[name=ends]:checked').val() == 1) {
-      var timeText = ''
-      if ($('#start_action_offset').val() != 1) {
-        timeText = $('#start_action_offset').val() + ' times';
-      } else {
-        timeText = ' once';
-      }
-      finalSummary += ', ' + timeText;
-    }
-    if ($('input:radio[name=ends]:checked').val() == 2) {
-      var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      var date = new Date($('#repeat_absolute_date_display').val());
-      function addOrdinal(d) {
-        if (d>3 && d<21) return 'th';
-        switch (d % 10) {
-          case 1:  return "st";
-          case 2:  return "nd";
-          case 3:  return "rd";
-          default: return "th";
-        }
-      }
-      var newDate = monthNames[(date.getMonth())] + ' ' + date.getDate()+ addOrdinal() + ' ' +  date.getFullYear();
-      finalSummary += ', untill '+ newDate;
-    }
-
-    //Build/Attach final Summary
-    $('#rec-summary').html(finalSummary);
-
   });
 
 </script>
 {/literal}
-{*Hide Summary*}
-{if empty($scheduleReminderId)}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      if ($('#rec-summary').length) {
-        $('#rec-summary').parent().parent().hide();
-      }
-    });
-  </script>
-{/literal}
-{/if}
