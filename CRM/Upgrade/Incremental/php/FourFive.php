@@ -347,13 +347,16 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
               if (!is_null($key)) {
                 $op = 'or';
                 unset($data_value[$key]);
-                if (count($data_value) == 0) {
-                  $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
-                  foreach ($customOption as $option) {
-                    $data_value[] = CRM_Utils_Array::value('value', $option);
-                  }
-                }
               }
+          }
+
+          //If only Or operator has been chosen means we need to select all values and
+          //so to execute OR operation between these values according to new data structure
+          if (count($data_value) == 0) {
+            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
+            foreach ($customOption as $option) {
+              $data_value[] = CRM_Utils_Array::value('value', $option);
+            }
           }
 
           // Add new key for the operator.
