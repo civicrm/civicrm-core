@@ -398,7 +398,7 @@ class CRM_Core_Form_RecurringEntity {
                 'is_active' => 1,
               );
               $excludeDateList[] = $optionGroupValue['value'];
-              CRM_Core_BAO_OptionValue::add($optionGroupValue);
+              CRM_Core_BAO_OptionValue::create($optionGroupValue);
             }
           }
         }
