@@ -638,10 +638,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
-      $this->_fields['followup_activity_type_id']['attributes'],
+      array('' => '- ' . ts('select') . ' -') + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, array(
         'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
-        'class' => 'crm-select2',
+        'class' => 'crm-select2 required',
       )
     );
 
@@ -836,13 +836,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       return TRUE;
     }
     $errors = array();
-    if (!$self->_single && !$fields['activity_type_id']) {
+    if ((array_key_exists('activity_type_id', $fields) || !$self->_single) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
-    }
-
-    //Activity type is mandatory if creating new activity, CRM-4515
-    if (array_key_exists('activity_type_id', $fields) && empty($fields['activity_type_id'])) {
-      $errors['activity_type_id'] = ts('Activity Type is required field.');
     }
 
     if (CRM_Utils_Array::value('activity_type_id', $fields) == 3 &&
