@@ -361,8 +361,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $recursionDates[$count][$col] = CRM_Utils_Date::processDate($newDate->format('Y-m-d H:i:s'));
         }
         if ($exRangeStart) {
-          $exRangeStartDate = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeStart], NULL, FALSE, 'Ymd');
-          $exRangeEndDate = CRM_Utils_Date::processDate($recursionDates[$count][$exRangeEnd], NULL, FALSE, 'Ymd');
+          $exRangeStartDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value($exRangeStart, $recursionDates[$count]), NULL, FALSE, 'Ymd');
+          $exRangeEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value($exRangeEnd, $recursionDates[$count]), NULL, FALSE, 'Ymd');
         }
 
         foreach ($this->excludeDates as $exDate) {
