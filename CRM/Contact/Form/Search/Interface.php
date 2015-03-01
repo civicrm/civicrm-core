@@ -45,7 +45,8 @@ interface CRM_Contact_Form_Search_Interface {
    * @param CRM_Core_Form_Search $form
    * @return array
    */
-  function buildTaskList(CRM_Core_Form_Search $form);
+  // @todo: This interface change should not go into a minor version; save for 4.6
+  // function buildTaskList(CRM_Core_Form_Search $form);
 
   /**
    * Builds the quickform for this search
