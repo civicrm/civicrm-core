@@ -311,10 +311,12 @@
     // Create new dialog
     if (settings.dialog) {
       settings.dialog = CRM.utils.adjustDialogDefaults(settings.dialog);
-      $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
+      $('<div id="' + settings.target.substring(1) + '"></div>').dialog(settings.dialog);
+    }
+    if ($(settings.target).data('uiDialog')) {
       $(settings.target)
         .on('dialogclose', function() {
-          if ($(this).attr('data-unsaved-changes') !== 'true') {
+          if (settings.dialog && $(this).attr('data-unsaved-changes') !== 'true') {
             $(this).crmSnippet('destroy').dialog('destroy').remove();
           }
         })
