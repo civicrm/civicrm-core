@@ -26,8 +26,8 @@
 {* Report form criteria section *}
 
 {foreach from=$tabs item=tab}
-  $region = {"report-tab"|cat:$tab}
-  $fileName = {"Criteria/"|cat:$tab|cat:".tpl"}
+  {assign var = 'region' value = "report-tab"|cat:$tab.div_label}
+  {assign var = 'fileName' value = "CRM/Report/Form/Tabs/"|cat:$tab.tpl|cat:".tpl"}
   {crmRegion name=$region}
     {include file=$fileName}
   {/crmRegion}
