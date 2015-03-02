@@ -164,7 +164,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $options = array();
     $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $options[] = $this->createElement('radio', NULL, NULL, ts('Required'), 2);
-    $this->addGroup($options, 'is_for_organization', ts(''));
+    $this->addGroup($options, 'is_for_organization', '');
     $this->add('textarea', 'for_organization', ts('On behalf of Label'), $attributes['for_organization']);
 
     // collect goal amount

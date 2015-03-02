@@ -47,7 +47,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
     $this->normalize();
     $this->_columns = array(
-      ts('') => 'contact_type',
+      '' => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Address') => 'street_address',
       ts('City') => 'city',
