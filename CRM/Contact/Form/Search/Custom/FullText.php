@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   const LIMIT = 10;
 

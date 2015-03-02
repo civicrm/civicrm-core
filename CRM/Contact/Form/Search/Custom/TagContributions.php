@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
   public $_permissionedComponent;
@@ -225,10 +225,11 @@ WHERE  $where
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
