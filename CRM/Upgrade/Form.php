@@ -232,7 +232,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @return string
    */
   public function getFieldsetTitle() {
-    return ts('');
+    return '';
   }
 
   /**

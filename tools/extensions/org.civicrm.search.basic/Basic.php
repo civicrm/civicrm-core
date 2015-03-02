@@ -49,8 +49,9 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     parent::__construct($formValues);
 
     $this->normalize();
-    $this->_columns = array(ts('') => 'contact_type',
-      ts('') => 'contact_sub_type',
+    $this->_columns = array(
+      '' => 'contact_type',
+      '' => 'contact_sub_type',
       ts('Name') => 'sort_name',
       ts('Address') => 'street_address',
       ts('City') => 'city',
