@@ -941,7 +941,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_force,
+   * Setter for $_force.
    *
    * @param $isForce
    */
@@ -1320,7 +1320,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * This adds the tab referred to as Title and Format, rendered through Instance.tpl.
    *
+   * @todo call this tab into the report template in the same way as OrderBy etc, ie
+   * by adding a description of the tab to $this->tabs, causing the tab to be added in
+   * Criteria.tpl.
    */
   public function buildInstanceAndButtons() {
     CRM_Report_Form_Instance::buildForm($this);
@@ -1521,6 +1525,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Build the tag filter field to display on the filters tab.
+   */
   public function buildTagFilter() {
     $contactTags = CRM_Core_BAO_Tag::getTags($this->_tagFilterTable);
     if (!empty($contactTags)) {
@@ -1561,6 +1568,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get SQL operator from form text version.
+   *
    * @param string $operator
    *
    * @return string
@@ -1609,6 +1618,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Generate where clause.
+   *
    * This can be overridden in reports for special treatment of a field
    *
    * @param array $field Field specifications
@@ -1792,13 +1802,15 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get SQL where clause for a date field.
+   *
    * @param string $fieldName
    * @param $relative
    * @param string $from
    * @param string $to
-   * @param null $type
-   * @param null $fromTime
-   * @param null $toTime
+   * @param string $type
+   * @param string $fromTime
+   * @param string $toTime
    *
    * @return null|string
    */
