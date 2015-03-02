@@ -213,7 +213,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
         foreach ($emailAdd as $key => $value) {
           $email = trim($value);
           $testParams['emails'][] = $email;
-          $emails .= $emails ? ",'$email'" : "'$email'";
+          $emails .= ($emails ? ',' : '') . "'" . CRM_Core_DAO::escapeString($email)  . "'";
           if (!CRM_Utils_Rule::email($email)) {
             CRM_Core_Session::setStatus(ts('Please enter a valid email addresses.'), ts('Test not sent.'), 'error');
             $error = TRUE;
