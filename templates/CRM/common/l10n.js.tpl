@@ -30,6 +30,8 @@
   CRM.config.userFramework = {$config->userFramework|@json_encode};
   CRM.config.resourceBase = {$config->resourceBase|@json_encode};
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
+  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$config->dateInputFormat|@json_encode};
+  CRM.config.timeIs24Hr = {if $config->timeInputFormat eq 2}true{else}false{/if};
 
   // Merge entityRef settings
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
