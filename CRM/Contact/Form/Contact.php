@@ -196,7 +196,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       if ($this->_contactId) {
         $defaults = array();
         $params = array('id' => $this->_contactId);
-        $returnProperities = array('id', 'contact_type', 'contact_sub_type', 'modified_date');
+        $returnProperities = array('id', 'contact_type', 'contact_sub_type', 'modified_date', 'is_deceased');
         CRM_Core_DAO::commonRetrieve('CRM_Contact_DAO_Contact', $params, $defaults, $returnProperities);
 
         if (empty($defaults['id'])) {
@@ -213,6 +213,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
+        if ($defaults['is_deceased']) {
+          $displayName .= '  <span class="crm-contact-deceased">(deceased)</span>';
+        }
         $displayName = ts('Edit %1', array(1 => $displayName));
 
         // Check if this is default domain contact CRM-10482

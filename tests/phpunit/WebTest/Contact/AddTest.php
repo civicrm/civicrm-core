@@ -498,4 +498,61 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
 
+  public function testContactDeceased() {
+    $this->webtestLogin();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
+    //contact details section
+    //fill in first name
+    $fname = substr(sha1(rand()), 0, 7) . "John";
+    $lname = substr(sha1(rand()), 0, 7) . "Smith";
+    $this->type("first_name", $fname);
+    //fill in last name
+    $this->type("last_name", $lname);
+    //fill in email
+    $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
+    // Clicking save.
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Contact Saved");
+    //Edit Contact
+    $cid = $this->urlArg('cid');
+    $dname = $fname . ' ' . $lname . ' (deceased)';
+    foreach (array('', 'deceased') as $val) {
+      $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
+      if ($val) {
+        $this->assertElementContainsText('page-title', 'Edit ' . $dname);
+      }
+      // Click on the Demographics tab
+      $this->click('demographics');
+      $this->waitForElementPresent('is_deceased');
+      $this->click('is_deceased');
+      // Click on Save
+      $this->click('_qf_Contact_upload_view-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      if (!$val) {
+        $this->assertElementContainsText('css=div.crm-summary-display_name', $dname);
+      }
+      else {
+        $this->assertTrue(($this->getText('css=div.crm-summary-display_name') != $dname));
+      }
+    }
+    foreach (array('', 'deceased') as $val) {
+      $this->mouseDown('crm-demographic-content');
+      $this->mouseUp('crm-demographic-content');
+      $this->waitForElementPresent("css=#crm-demographic-content .crm-container-snippet form");
+      $this->click('is_deceased');
+      $this->click("css=#crm-demographic-content input.crm-form-submit");
+      $this->waitForElementPresent("css=#crm-demographic-content > .crm-inline-block-content");
+      if (!$val) {
+        $this->assertElementContainsText('css=div.crm-summary-display_name', $dname);
+      }
+      else {
+        $this->assertTrue(($this->getText('css=div.crm-summary-display_name') != $dname));
+      }
+    }
+    $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
+    $this->assertTrue(($this->getText('page-title') != $dname));
+  }
+
 }
