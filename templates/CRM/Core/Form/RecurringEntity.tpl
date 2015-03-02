@@ -24,14 +24,16 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-core-form-recurringentity-block crm-accordion-wrapper" id="recurring-entity-block">
+<div class="crm-core-form-recurringentity-block crm-accordion-wrapper{if $recurringFormIsEmbedded && !$scheduleReminderId} collapsed{/if}" id="recurring-entity-block">
   <div class="crm-accordion-header">
     {ts 1=$recurringEntityType}Repeat %1{/ts}
   </div>
   <div class="crm-accordion-body">
-    <div class="crm-submit-buttons">
-      {include file="CRM/common/formButtons.tpl" location="top"}
-    </div>
+    {if !$recurringFormIsEmbedded}
+      <div class="crm-submit-buttons">
+        {include file="CRM/common/formButtons.tpl" location="top"}
+      </div>
+    {/if}
     <table class="form-layout-compressed">
       <tr class="crm-core-form-recurringentity-block-repetition_start_date" id="tr-repetition_start_date">
         <td class="label">{$form.repetition_start_date.label}</td>
@@ -60,7 +62,7 @@
         </td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-ends">
-        <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker" title="This field is required.">*</span> {help id="id-ends-after" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+        <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker">*</span> {help id="id-ends-after" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
         <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html} {ts}occurrences{/ts}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-absolute_date">
@@ -73,9 +75,11 @@
         <td>{$form.exclude_date_list.html}</td>
       </tr>
     </table>
-    <div class="crm-submit-buttons">
-      {include file="CRM/common/formButtons.tpl" location="bottom"}
-    </div>
+    {if !$recurringFormIsEmbedded}
+      <div class="crm-submit-buttons">
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+      </div>
+    {/if}
   </div>
 </div>
 {literal}
@@ -83,126 +87,51 @@
   CRM.$(function($) {
     var $form = $('form.{/literal}{$form.formClass}{literal}');
 
-    $('#repetition_start_date_display').closest("tr").hide();
-    /****** On load "Repeats By" and "Repeats On" blocks should be hidden if dropdown value is not week or month****** (Edit Mode)***/
-    switch ($('#repetition_frequency_unit').val()) {
-      case 'week':
-        $('.crm-core-form-recurringentity-block-start_action_condition').show();
-        $('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        break;
-      case 'month':
-        $('.crm-core-form-recurringentity-block-repeats_by td').show();
-        $('.crm-core-form-recurringentity-block-start_action_condition').hide();
-        break;
-      default:
-        $('.crm-core-form-recurringentity-block-start_action_condition').hide();
-        $('.crm-core-form-recurringentity-block-repeats_by td').hide();
-        break;
-    }
+    // Prevent html5 errors
+    $form.attr('novalidate', 'novalidate');
 
-    /***********On Load Set Ends Value (Edit Mode) **********/
-    switch ($('input:radio[name=ends]:checked').val()) {
-      case '1':
-        $('#start_action_offset').prop('disabled', false);
-        $('#repeat_absolute_date_display').prop('disabled', true).val('');
-        break;
-      case '2':
-        $('#repeat_absolute_date_display').prop('disabled', false);
-        $('#start_action_offset').prop('disabled', true).val('');
-        break;
-      default:
-        $('#start_action_offset').prop('disabled', true);
-        $('#repeat_absolute_date_display').prop('disabled', true);
-        break;
-    }
-
-    /******On Load set Repeats by section******************/
-    switch ($('input:radio[name=repeats_by]:checked').val()) {
-      case '1':
-        $('#limit_to').prop('disabled', false);
-        $('#entity_status_1, #entity_status_2').prop('disabled', true);
-        break;
-      case '2':
-        $('#entity_status_1, #entity_status_2').prop('disabled', false);
-        $('#limit_to').prop('disabled', true);
-        break;
-      default:
-          //Just in-case block shows up, disable it
-          $('#limit_to, #entity_status_1, #entity_status_2').prop('disabled', true);
-        break;
-    }
-
-    $('#repetition_frequency_unit').change(function () {
+    function changeFrequencyUnit() {
       switch ($(this).val()) {
-        case 'hour':
-          $('.crm-core-form-recurringentity-block-start_action_condition').hide();
-          $('.crm-core-form-recurringentity-block-repeats_by td').hide();
-          break;
-        case 'day':
-          $('.crm-core-form-recurringentity-block-start_action_condition').hide();
-          $('.crm-core-form-recurringentity-block-repeats_by td').hide();
-          break;
         case 'week':
           //Show "Repeats On" block when week is selected
-          $('.crm-core-form-recurringentity-block-start_action_condition').show();
-          $('.crm-core-form-recurringentity-block-repeats_by td').hide();
+          $('.crm-core-form-recurringentity-block-start_action_condition', $form).show();
+          $('.crm-core-form-recurringentity-block-repeats_by td', $form).hide();
           break;
         case 'month':
-          $('.crm-core-form-recurringentity-block-start_action_condition').hide();
           //Show "Repeats By" block when month is selected
-          $('.crm-core-form-recurringentity-block-repeats_by td').show();
-          break;
-        case 'year':
-          $('.crm-core-form-recurringentity-block-start_action_condition').hide();
-          $('.crm-core-form-recurringentity-block-repeats_by td').hide();
-          break;
-      }
-    });
-
-    // For "Ends" block
-    $('input:radio[name=ends]').click(function() {
-      switch ($(this).val()) {
-        case '1':
-          $('#start_action_offset').prop('disabled', false);
-          $('#repeat_absolute_date_display').val('');
-          break;
-        case '2':
-          $('#repeat_absolute_date_display').prop('disabled', false);
-          $('#start_action_offset').val('');
+          $('.crm-core-form-recurringentity-block-start_action_condition', $form).hide();
+          $('.crm-core-form-recurringentity-block-repeats_by td', $form).show();
           break;
         default:
-          $('#repeat_absolute_date_display').prop('disabled', true);
-          break;
+          $('.crm-core-form-recurringentity-block-start_action_condition', $form).hide();
+          $('.crm-core-form-recurringentity-block-repeats_by td', $form).hide();
       }
+    }
+    $('#repetition_frequency_unit', $form).each(changeFrequencyUnit).change(changeFrequencyUnit);
+
+    function disableUnselected() {
+      $('input:radio[name=ends], input[name=repeats_by]', $form).not(':checked').siblings(':input').prop('disabled', true);
+    }
+    disableUnselected();
+
+    $('input:radio[name=ends], input[name=repeats_by]', $form).click(function() {
+      $(this).siblings(':input').prop('disabled', false).filter(':visible').addClass('required').focus();
+      disableUnselected();
     });
 
-    //For "Repeats By" block
-    $('input:radio[name=repeats_by]').click(function() {
-      $('#limit_to').prop('disabled', $(this).val() != 1);
-      $('#entity_status_1, #entity_status_2').prop('disabled', $(this).val() != 2);
-    });
-
-    $form.submit(function() {
-      //Check form for values submitted
-      if ($('input[name=ends]:checked').val() == 1) {
-        if ($('#start_action_offset').val() == "") {
-          $('#start_action_offset').crmError();
-          return false;
-        }
-      } else if ($('input[name=ends]:checked').val() == 2) {
-        if ($('#repeat_absolute_date_display').val() == "") {
-          $('#repeat_absolute_date_display').crmError();
-          return false;
-        }
-      }
-    });
+    function validate() {
+      var valid = $(':input', '#recurring-entity-block').valid(),
+        modified = CRM.utils.initialValueChanged('#recurring-entity-block');
+      $('#allowRepeatConfigToSubmit', $form).val(valid && modified ? '1' : '0');
+      return valid;
+    }
 
     function getDisplayDate(date) {
       return $.datepicker.formatDate(CRM.config.dateInputFormat, $.datepicker.parseDate('yy-mm-dd', date));
     }
 
     // Combine select2 and datepicker into a multi-select-date widget
-    $('#exclude_date_list').crmSelect2({
+    $('#exclude_date_list', $form).crmSelect2({
       multiple: true,
       data: [],
       initSelection: function(element, callback) {
@@ -216,12 +145,12 @@
         callback(values);
       }
     })
-      // Prevent select2 from opening and show a datepicker instead
       .on('select2-opening', function(e) {
         var $el = $(this);
+        // Prevent select2 from opening and show a datepicker instead
         e.preventDefault();
         $('.select2-search-field input', $el.select2('container'))
-          .datepicker({dateFormat: CRM.config.dateInputFormat})
+          .datepicker()
           .datepicker('show')
           .off('.crmDate')
           .on('change.crmDate', function() {
@@ -240,9 +169,9 @@
     //If there are changes in repeat configuration, enable save button
     //Dialog for preview repeat Configuration dates
     function previewDialog() {
-      $('#allowRepeatConfigToSubmit').val(CRM.utils.initialValueChanged('.crm-core-form-recurringentity-block') ? '1' : '0');
       var payload = $form.serialize() + '&entity_table={/literal}{$entityTable}{literal}&entity_id={/literal}{$currentEntityId}{literal}',
         settings = CRM.utils.adjustDialogDefaults({
+          width: '50%',
           url: CRM.url("civicrm/recurringentity/preview", payload)
         });
       CRM.confirm(settings)
@@ -252,14 +181,18 @@
     }
 
     $('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click(function (e) {
-      previewDialog();
+      if (validate()) {
+        previewDialog();
+      }
       e.preventDefault();
     });
 
-    $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click( function (e) {
-      if (CRM.utils.initialValueChanged('.crm-core-form-recurringentity-block')) {
+    $('#_qf_Activity_upload-top, #_qf_Activity_upload-bottom').click(function (e) {
+      if (CRM.utils.initialValueChanged('#recurring-entity-block')) {
         e.preventDefault();
-        previewDialog();
+        if (validate()) {
+          previewDialog();
+        }
       }
     });
 

@@ -75,7 +75,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * the default values are retrieved from the database
    *
    *
-   * @return void
+   * @return array
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -84,8 +84,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $currentEventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'start_date', 'id');
     list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($currentEventStartDate, 'activityDateTime');
     $recurringEntityDefaults = CRM_Core_Form_RecurringEntity::setDefaultValues();
-    $defaults = array_merge($defaults, $recurringEntityDefaults);
-    return $defaults;
+    return array_merge($defaults, $recurringEntityDefaults);
   }
 
   public function buildQuickForm() {

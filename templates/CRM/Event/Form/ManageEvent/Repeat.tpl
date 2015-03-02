@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-event-manage-repeat-form-block">
-{include file="CRM/Core/Form/RecurringEntity.tpl"}
+{include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=false}
 {if $rows}
 <div class="crm-block crm-manage-events crm-accordion-wrapper">
   <div class="crm-accordion-header">{ts}Connected Repeating Events{/ts}</div>

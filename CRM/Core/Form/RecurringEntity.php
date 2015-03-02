@@ -123,7 +123,12 @@ class CRM_Core_Form_RecurringEntity {
    * @return array
    */
   public static function setDefaultValues() {
-    $defaults = array();
+    // Defaults for new entity
+    $defaults = array(
+      'repetition_frequency_unit' => 'week',
+    );
+
+    // Default for existing entity
     if (self::$_scheduleReminderID) {
       $defaults['repetition_frequency_unit'] = self::$_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = self::$_scheduleReminderDetails->repetition_frequency_interval;
@@ -144,7 +149,6 @@ class CRM_Core_Form_RecurringEntity {
       if (self::$_scheduleReminderDetails->limit_to) {
         $defaults['repeats_by'] = 1;
       }
-      $explodeStartActionCondition = array();
       if (self::$_scheduleReminderDetails->entity_status) {
         $explodeStartActionCondition = explode(" ", self::$_scheduleReminderDetails->entity_status);
         $defaults['entity_status_1'] = $explodeStartActionCondition[0];
@@ -180,9 +184,9 @@ class CRM_Core_Form_RecurringEntity {
       'saturday',
     );
     $dayOfTheWeek = array_combine($dayOfTheWeek, CRM_Utils_Date::getAbbrWeekdayNames());
-    $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), $freqUnitsDisplay);
+    $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), $freqUnitsDisplay, FALSE, array('class' => 'required'));
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
-    $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions);
+    $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions, FALSE, array('class' => 'required'));
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     foreach ($dayOfTheWeek as $key => $val) {
       $startActionCondition[] = $form->createElement('checkbox', $key, NULL, $val);
@@ -192,9 +196,8 @@ class CRM_Core_Form_RecurringEntity {
       '1' => ts('day of the month'),
       '2' => ts('day of the week'),
     );
-    $form->addRadio('repeats_by', ts("Repeats By"), $roptionTypes, array(), NULL);
-    $getMonths = CRM_Core_SelectValues::getNumericOptions(1, 31);
-    $form->add('select', 'limit_to', '', $getMonths);
+    $form->addRadio('repeats_by', ts("Repeats by"), $roptionTypes, array('required' => TRUE), NULL);
+    $form->add('select', 'limit_to', '', CRM_Core_SelectValues::getNumericOptions(1, 31));
     $dayOfTheWeekNo = array(
       'first' => ts('First'),
       'second' => ts('Second'),
@@ -208,8 +211,8 @@ class CRM_Core_Form_RecurringEntity {
       '1' => ts('After'),
       '2' => ts('On'),
     );
-    $form->addRadio('ends', ts("Ends"), $eoptionTypes, array(), NULL);
-    $form->add('text', 'start_action_offset', '', array('size' => 3, 'maxlength' => 2));
+    $form->addRadio('ends', ts("Ends"), $eoptionTypes, array('class' => 'required'), NULL);
+    $form->add('select', 'start_action_offset', NULL, CRM_Core_SelectValues::getNumericOptions(1, 30), FALSE);
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
     $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array(

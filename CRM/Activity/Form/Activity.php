@@ -524,7 +524,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $defaults = $this->_values;
+    $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...
     if (isset($this->_activityId)) {
       if (empty($defaults['activity_date_time'])) {
@@ -536,9 +536,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $defaults['activity_date_time_time']
           ) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
         list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
-        $recurringEntityDefaults = array();
-        $recurringEntityDefaults = CRM_Core_Form_RecurringEntity::setDefaultValues();
-        $defaults = array_merge($defaults, $recurringEntityDefaults);
       }
 
       if ($this->_context != 'standalone') {
