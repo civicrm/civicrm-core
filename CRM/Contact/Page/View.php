@@ -322,6 +322,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $contactDetails[$contactId] = array(
         'displayName' => $displayName,
         'contactImage' => $contactImage,
+        'isDeceased' => (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'is_deceased'),
       );
     }
     else {
@@ -331,6 +332,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     // set page title
     $title = "{$contactImage} {$displayName}";
+    if ($contactDetails[$contactId]['isDeceased']) {
+      $title .= '  <span class="crm-contact-deceased">(deceased)</span>';
+    }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";
     }

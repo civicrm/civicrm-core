@@ -3000,6 +3000,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .status-fatal,
 .crm-container .status-hold,
 .crm-container .status-past,
+.crm-contact-deceased,
 .crm-container .status-warning {
   color: #E43D2B !important;
 }
