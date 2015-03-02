@@ -170,9 +170,6 @@ class CRM_Core_Form_RecurringEntity {
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
-
-    $freqUnitsDisplay = array('hour' => ts('hour')) + CRM_Core_OptionGroup::values('recur_frequency_units');
-
     // For some reason this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
     $dayOfTheWeek = array(
       'sunday',
@@ -184,7 +181,7 @@ class CRM_Core_Form_RecurringEntity {
       'saturday',
     );
     $dayOfTheWeek = array_combine($dayOfTheWeek, CRM_Utils_Date::getAbbrWeekdayNames());
-    $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), $freqUnitsDisplay, FALSE, array('class' => 'required'));
+    $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), CRM_Core_SelectValues::getRecurringFrequencyUnits(), FALSE, array('class' => 'required'));
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
     $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions, FALSE, array('class' => 'required'));
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
@@ -231,6 +228,11 @@ class CRM_Core_Form_RecurringEntity {
         ),
       )
     );
+    // For client-side pluralization
+    $form->assign('recurringFrequencyOptions', array(
+      'single' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::getRecurringFrequencyUnits()),
+      'plural' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::getRecurringFrequencyUnits(2)),
+    ));
   }
 
   /**
