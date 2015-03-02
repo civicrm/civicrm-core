@@ -29,23 +29,8 @@
   {ts}Repeats{/ts}
 {/htxt}
 {htxt id="id-repeats"}
-  {ts 1=$entityType}Access the drop-down menu here to select how frequently your %1 occurs. Options are:{/ts}
-  <ul>
-    <li>{ts}Hourly: repeats hourly or after every few hours{/ts}</li>
-    <li>{ts 1=$entityType}Daily: repeats daily or after every few days{/ts}</li>
-    <li>{ts 1=$entityType}Weekly: repeats on one or more days every week{/ts}</li>
-    <li>{ts 1=$entityType}Monthly: repeats on one or more days every month{/ts}</li>
-    <li>{ts 1=$entityType}Yearly: repeats yearly or after every few years{/ts}</li>
-  </ul>
-  {ts 1=$entityType}Example: You would select option "monthly", if your %1 occurs every month.{/ts}
-{/htxt}
-
-{htxt id="id-repeats-every-title"}
-  {ts}Repeats every{/ts}
-{/htxt}
-{htxt id="id-repeats-every"}
-  {ts}This option decides the repetition interval.{/ts}<br/>
-  {ts 1=$entityType}Example: If your %1 repeats every 5 months, then you would select option 5.{/ts}
+  {ts 1=$entityType}Access the drop-down menus here to select how frequently your %1 occurs.{/ts}
+  {ts 1=$entityType}Example: You would select options "1 month", if your %1 occurs every month.{/ts}
 {/htxt}
 
 {htxt id="id-repeats-on-title"}
@@ -76,7 +61,7 @@
 {/htxt}
 {htxt id="id-ends-after"}
   {ts 1=$entityType}Use this field to limit/end the repetition of the %1.{/ts}<br/>
-  {ts 1=$entityType}Example: If you want to repeat an %1 for six months (i.e it repeats 6 times), then set 6 as a value for this field.{/ts}
+  {ts 1=$entityType}Example: If you want to repeat an %1 6 times, then set 6 as a value for this field.{/ts}
 {/htxt}
 
 {htxt id="id-ends-on-title"}

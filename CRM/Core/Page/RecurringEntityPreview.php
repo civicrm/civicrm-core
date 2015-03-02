@@ -80,10 +80,10 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
 
       foreach ($dates as $key => &$value) {
         if ($startDateColumnName) {
-          $value['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value[$startDateColumnName]));
+          $value['start_date'] = CRM_Utils_Date::customFormat($value[$startDateColumnName]);
         }
         if ($endDateColumnName && !empty($value[$endDateColumnName])) {
-          $value['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value[$endDateColumnName]));
+          $value['end_date'] = CRM_Utils_Date::customFormat($value[$endDateColumnName]);
           $endDates = TRUE;
         }
       }

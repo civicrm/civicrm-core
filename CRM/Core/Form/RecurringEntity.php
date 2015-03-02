@@ -96,16 +96,23 @@ class CRM_Core_Form_RecurringEntity {
         self::$_scheduleReminderID = self::$_scheduleReminderDetails->id;
       }
     }
-    if ($entityTable) {
-      CRM_Core_OptionValue::getValues(array('name' => $entityTable . '_repeat_exclude_dates_' . self::$_parentEntityId), $optionValue);
-      $excludeOptionValues = array();
-      if (!empty($optionValue)) {
-        foreach ($optionValue as $key => $val) {
-          $excludeOptionValues[$val['value']] = CRM_Utils_Date::customFormat($val['value']);
-        }
-        self::$_excludeDateInfo = $excludeOptionValues;
+    CRM_Core_OptionValue::getValues(array('name' => $entityTable . '_repeat_exclude_dates_' . self::$_parentEntityId), $optionValue);
+    $excludeOptionValues = array();
+    if (!empty($optionValue)) {
+      foreach ($optionValue as $key => $val) {
+        $excludeOptionValues[$val['value']] = CRM_Utils_Date::customFormat($val['value']);
       }
+      self::$_excludeDateInfo = $excludeOptionValues;
     }
+
+    // Assign variables
+    $entityType = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable));
+    $tpl = CRM_Core_Smarty::singleton();
+    $tpl->assign('recurringEntityType', ts($entityType));
+    $tpl->assign('currentEntityId', self::$_entityId);
+    $tpl->assign('entityTable', self::$_entityTable);
+    $tpl->assign('scheduleReminderId', self::$_scheduleReminderID);
+    $tpl->assign('hasParent', self::$_hasParent);
   }
 
   /**
@@ -159,63 +166,49 @@ class CRM_Core_Form_RecurringEntity {
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
-    if (self::$_entityTable) {
-      $entityType = explode("_", self::$_entityTable);
-      if ($entityType[1]) {
-        $form->assign('entityType', ucwords($entityType[1]));
-      }
-    }
-    $form->assign('currentEntityId', self::$_entityId);
-    $form->assign('entityTable', self::$_entityTable);
-    $form->assign('scheduleReminderId', self::$_scheduleReminderID);
-    $form->assign('hasParent', self::$_hasParent);
 
-    $form->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
-    foreach ($form->_freqUnits as $val => $label) {
-      if ($label == "day") {
-        $label = "dai";
-      }
-      $freqUnitsDisplay[$val] = ts('%1ly', array(1 => $label));
-    }
-    // echo "<pre>";print_r($freqUnitsDisplay);
+    $freqUnitsDisplay = array('hour' => ts('hour')) + CRM_Core_OptionGroup::values('recur_frequency_units');
+
+    // For some reason this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
     $dayOfTheWeek = array(
-      'monday' => 'Monday',
-      'tuesday' => 'Tuesday',
-      'wednesday' => 'Wednesday',
-      'thursday' => 'Thursday',
-      'friday' => 'Friday',
-      'saturday' => 'Saturday',
-      'sunday' => 'Sunday',
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
     );
-    $form->add('select', 'repetition_frequency_unit', ts('Repeats:'), $freqUnitsDisplay);
+    $dayOfTheWeek = array_combine($dayOfTheWeek, CRM_Utils_Date::getAbbrWeekdayNames());
+    $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), $freqUnitsDisplay);
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
-    $form->add('select', 'repetition_frequency_interval', ts('Repeats every:'), $numericOptions, '', array('style' => 'width:55px;'));
+    $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions);
     $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     foreach ($dayOfTheWeek as $key => $val) {
-      $startActionCondition[] = $form->createElement('checkbox', $key, NULL, substr($val . "&nbsp;", 0, 3));
+      $startActionCondition[] = $form->createElement('checkbox', $key, NULL, $val);
     }
     $form->addGroup($startActionCondition, 'start_action_condition', ts('Repeats on'));
     $roptionTypes = array(
       '1' => ts('day of the month'),
       '2' => ts('day of the week'),
     );
-    $form->addRadio('repeats_by', ts("Repeats By:"), $roptionTypes, array(), NULL);
+    $form->addRadio('repeats_by', ts("Repeats By"), $roptionTypes, array(), NULL);
     $getMonths = CRM_Core_SelectValues::getNumericOptions(1, 31);
-    $form->add('select', 'limit_to', '', $getMonths, FALSE, array('style' => 'width:55px;'));
+    $form->add('select', 'limit_to', '', $getMonths);
     $dayOfTheWeekNo = array(
-      'first' => 'First',
-      'second' => 'Second',
-      'third' => 'Third',
-      'fourth' => 'Fourth',
-      'last' => 'Last',
+      'first' => ts('First'),
+      'second' => ts('Second'),
+      'third' => ts('Third'),
+      'fourth' => ts('Fourth'),
+      'last' => ts('Last'),
     );
-    $form->add('select', 'entity_status_1', ts(''), $dayOfTheWeekNo);
-    $form->add('select', 'entity_status_2', ts(''), $dayOfTheWeek);
+    $form->add('select', 'entity_status_1', '', $dayOfTheWeekNo);
+    $form->add('select', 'entity_status_2', '', $dayOfTheWeek);
     $eoptionTypes = array(
       '1' => ts('After'),
       '2' => ts('On'),
     );
-    $form->addRadio('ends', ts("Ends:"), $eoptionTypes, array(), NULL);
+    $form->addRadio('ends', ts("Ends"), $eoptionTypes, array(), NULL);
     $form->add('text', 'start_action_offset', ts(''), array('size' => 3, 'maxlength' => 2));
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
@@ -400,7 +393,6 @@ class CRM_Core_Form_RecurringEntity {
         }
 
         //Set type for API
-        $apiEntityType = array();
         $apiEntityType = explode("_", $type);
         if (!empty($apiEntityType[1])) {
           $apiType = $apiEntityType[1];
@@ -480,7 +472,7 @@ class CRM_Core_Form_RecurringEntity {
           $recursion->linkedEntities = $linkedEntities;
         }
 
-        $recurResult = $recursion->generate();
+        $recursion->generate();
 
         $status = ts('Repeat Configuration has been saved');
         CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
