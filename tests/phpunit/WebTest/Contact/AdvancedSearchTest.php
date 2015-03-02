@@ -126,7 +126,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       'location' => array('state_province', 'addAddressSearchDetail'),
       'demographics' => array('civicrm_gender_Transgender_3', 'addDemographicSearchDetail'),
       'notes' => array('note', ''),
-      'activity' => array('activity_status[5]', 'addActivitySearchDetail'),
+      'activity' => array('activity_type_id', 'addActivitySearchDetail'),
       'CiviContribute' => array('contribution_currency_type', 'addContributionSearchDetail'),
       'CiviEvent' => array('participant_fee_amount_high', 'addParticipantSearchDetail'),
       'CiviMember' => array('member_end_date_high', 'addMemberSearchDetail'),
@@ -178,7 +178,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->clickAjaxLink("activity", 'activity_subject');
-    $this->check("xpath=//div[@id='Activity']//div/label[text()='Tell a Friend']/../input");
+    $this->multiselect2("activity_type_id", array('Tell a Friend'));
     $this->clickLink("_qf_Advanced_refresh");
     $count = explode(" ", trim($this->getText("xpath=//div[@id='search-status']/table/tbody/tr/td")));
     $count = $count[0];
@@ -311,20 +311,16 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    * @param $firstName
    */
   public function addActivitySearchDetail($firstName) {
-    // check activity types
-    $checkActivityTypes = array("Contribution", "Event Registration", "Membership Signup");
-    foreach ($checkActivityTypes as $labels) {
-      $this->click("xpath=//div[@id='activity']/table/tbody/tr[2]/td[1]/div[1]//div/label[text()=\"$labels\"]");
-    }
+    // select activity types
+    $activityTypes = array("Contribution", "Event Registration", "Membership Signup");
+    $this->multiselect2('activity_type_id', $activityTypes);
     // fill date range
     $this->select("activity_date_relative", "value=0");
     $this->webtestFillDate("activity_date_low", "-1 day");
     $this->webtestFillDate("activity_date_high", "+1 day");
     $this->type("activity_subject", "Student - membership source$firstName - Status: New");
     // fill activity status
-
-    $this->click("xpath=//div[@id='activity']/table/tbody//tr/td[2]/label[text()='Activity Status']/../label[text()='Scheduled']");
-    $this->click("xpath=//div[@id='activity']/table/tbody//tr/td[2]/label[text()='Activity Status']/../label[text()='Completed']");
+    $this->multiselect2('status_id', array('Scheduled', 'Completed'));
   }
 
   /**
@@ -357,16 +353,16 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("contribution_amount_low", "1");
     $this->type("contribution_amount_high", "200");
     // check for completed
-    $this->check("contribution_status_id[1]");
+    $this->multiselect2("contribution_status_id", array('Completed'));
     // enter check number
-    $this->select("contribution_payment_instrument_id", "Check");
+    $this->select2("payment_instrument_id", "Check");
     $this->type("contribution_check_number", "chqNo$firstName");
     // fill transaction id
-    $this->type("contribution_transaction_id", "trid$firstName");
+    $this->type("contribution_trxn_id", "trid$firstName");
     // fill financial type
     $this->select("financial_type_id", "Event Fee");
     // fill currency type
-    $this->select("contribution_currency_type", "USD");
+    $this->select2("contribution_currency_type", "USD");
   }
 
   /**
