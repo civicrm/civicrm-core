@@ -196,6 +196,14 @@
       }
     });
 
+    // Pluralize frequency options
+    var recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode}{literal};
+    function pluralizeUnits() {
+      CRM.utils.setOptions($('[name=repetition_frequency_unit]', $form),
+        $(this).val() === '1' ? recurringFrequencyOptions.single : recurringFrequencyOptions.plural);
+    }
+    $('[name=repetition_frequency_interval]', $form).each(pluralizeUnits).change(pluralizeUnits);
+
   });
 
 </script>
