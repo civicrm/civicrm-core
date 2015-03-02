@@ -250,7 +250,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
         ),
         'demographics' => array(
           'headerLocator' => 'div#demographics',
-          'bodyLocator' => 'input#birth_date_low_display',
+          'bodyLocator' => 'input#birth_date_low',
           'title' => 'Demographics',
           'fields' => array(
             'Deceased Dates' => array(
