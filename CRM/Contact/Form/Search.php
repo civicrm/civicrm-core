@@ -313,8 +313,34 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the common elements between the search/advanced form
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
+   * @return array
+   */
+  public function buildTaskList() {
+    if ($this->_context !== 'amtg') {
+      $permission = CRM_Core_Permission::getPermission();
+
+      if ($this->_componentMode == 1 || $this->_componentMode == 7) {
+        $this->_taskList += CRM_Contact_Task::permissionedTaskTitles($permission,
+          CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
+        );
+      } else {
+        $className = $this->_modeValue['taskClassName'];
+        $this->_taskList += $className::permissionedTaskTitles($permission, false);
+      }
+
+      // Only offer the "Update Smart Group" task if a smart group/saved search is already in play
+      if (isset($this->_ssID) && $permission == CRM_Core_Permission::EDIT) {
+        $this->_taskList += CRM_Contact_Task::optionalTaskTitle();
+      }
+    }
+
+    return $this->_taskList;
+  }
+
+  /**
+   * Build the common elements between the search/advanced form.
    *
    * @return void
    */
@@ -436,9 +462,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
       $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
-    }
-    else {
-      $this->addTaskMenu($tasks);
     }
 
     $selectedContactIds = array();
