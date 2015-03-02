@@ -52,7 +52,7 @@
 
         {*settings*}
         {if $instanceForm OR $instanceFormError}
-          {include file="CRM/Report/Form/Instance.tpl"}
+          {include file="CRM/Report/Form/Tabs/Instance.tpl"}
         {/if}
       </div> {* end mainTabContainer *}
 
