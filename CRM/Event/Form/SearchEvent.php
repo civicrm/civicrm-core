@@ -61,10 +61,8 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
       array(CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title'))
     );
 
-    $event_type = CRM_Core_OptionGroup::values('event_type', FALSE);
-
-    $this->add('select', 'event_type_id', ts('Event type'), $event_type, FALSE, array('class' => 'crm-select2 huge', 'multiple' => TRUE));
-
+    $this->addSelect('event_type_id', array('multiple' => TRUE));
+    
     $eventsByDates = array();
     $searchOption = array(ts('Show Current and Upcoming Events'), ts('Search All or by Date Range'));
     $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, array('onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"), "<br />");
