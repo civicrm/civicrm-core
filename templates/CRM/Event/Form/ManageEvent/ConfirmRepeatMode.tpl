@@ -24,23 +24,24 @@
  +--------------------------------------------------------------------+
 *}
 {if $hasParent || $isRepeatingEntity || $scheduleReminderId}
+  {capture assign='entity_type'}{$recurringEntityType|lower}{/capture}
   <script type="text/template" id="recurring-dialog-tpl">
-    <div class="crm-form-block recurring-dialog">
-      <h4>{ts}How would you like this change to affect other entities in the repetition set?{/ts}</h4>
-      <div class="crm-block">
+    <div class="recurring-dialog">
+      <h4>{ts}How should this change affect others in the series?{/ts}</h4>
+      <div>
         <input type="radio" id="recur-only-this-entity" name="recur_mode" value="1">
-        <label for="recur-only-this-entity">{ts}Only this entity{/ts}</label>
-        <div class="description">{ts}All other entities in the series will remain unchanged.{/ts}</div>
+        <label for="recur-only-this-entity">{ts 1=$entity_type}Only this %1{/ts}</label>
+        <div class="description">{ts}All others in the series will remain unchanged.{/ts}</div>
 
         <input type="radio" id="recur-this-and-all-following-entity" name="recur_mode" value="2">
-        <label for="recur-this-and-all-following-entity">{ts}This and Following entities{/ts}</label>
-        <div class="description">{ts}Change applies to this and all the following entities.{/ts}</div>
+        <label for="recur-this-and-all-following-entity">{ts 1=$entity_type}This %1 onwards{/ts}</label>
+        <div class="description">{ts 1=$entity_type}Change applies to this %1 and all that come after it.{/ts}</div>
 
         <input type="radio" id="recur-all-entity" name="recur_mode" value="3">
-        <label for="recur-all-entity">{ts}All the entities{/ts}</label>
-        <div class="description">{ts}Change applies to all the entities in the series.{/ts}</div>
+        <label for="recur-all-entity">{ts 1=$entity_type}Every %1{/ts}</label>
+        <div class="description">{ts 1=$entity_type}Change applies to every %1 in the series.{/ts}</div>
       </div>
-      <div class="status help"><div class="icon ui-icon-lightbulb"></div>{ts}Changes to date or time will NOT be applied to other entities in the series.{/ts}</div>
+      <div class="status help"><div class="icon ui-icon-lightbulb"></div>{ts}Changes to date or time will <em>not</em> be applied to others in the series.{/ts}</div>
     </div>
   </script>
 {literal}
@@ -60,6 +61,7 @@
 
       function cascadeChangesDialog() {
         CRM.confirm({
+          title: "{/literal}{ts escape='js' 1=$entity_type}Update recurring %1{/ts}{literal}",
           message: $('#recurring-dialog-tpl').html()
         })
           .on('crmConfirm:yes', updateMode)
@@ -93,7 +95,7 @@
               if (result.status != "" && result.status == 'Done') {
                 $form.submit();
               } else if (result.status != "" && result.status == 'Error') {
-                if (confirm(ts("Mode could not be updated, save only this event?"))) {
+                if (confirm("{/literal}{ts escape='js' 1=$entity_type}Mode could not be updated, save only this %1?{/ts}{literal}")) {
                   $form.submit();
                 }
               }

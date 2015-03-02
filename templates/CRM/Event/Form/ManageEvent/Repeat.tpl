@@ -26,7 +26,7 @@
 <div class="crm-block crm-form-block crm-event-manage-repeat-form-block">
 {include file="CRM/Core/Form/RecurringEntity.tpl"}
 {if $rows}
-<div id="event_status_id" class="crm-block crm-manage-events crm-accordion-wrapper">
+<div class="crm-block crm-manage-events crm-accordion-wrapper">
   <div class="crm-accordion-header">{ts}Connected Repeating Events{/ts}</div>
   <div class="crm-accordion-body">
   {strip}
@@ -51,7 +51,7 @@
           {else}
               {assign var="highlight" value=""}
           {/if}
-          <tr id="row_{$row.id}" class="{if NOT $row.is_active} disabled{/if}">
+          <tr class="row_{$row.id}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}{$highlight}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
                title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
@@ -63,7 +63,7 @@
             {if $row.is_active eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}
           </td>
           <td class="{$highlight}">
-            <a href="{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$row.id`"}">Manage Event</a>
+            <a class="action-item no-popup crm-hover-button" href="{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$row.id`"}">{ts}Settings{/ts}</a>
           </td>
           <td class="crm-event-start_date hiddenElement">{$row.start_date|crmDate}</td>
           <td class="crm-event-end_date hiddenElement">{$row.end_date|crmDate}</td>
@@ -71,7 +71,6 @@
         {/if}
       {/foreach}
     </table>
-  {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
   </div>
 </div>
