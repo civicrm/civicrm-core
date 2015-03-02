@@ -63,9 +63,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
 
     $event_type = CRM_Core_OptionGroup::values('event_type', FALSE);
 
-    foreach ($event_type as $eventId => $eventName) {
-      $this->addElement('checkbox', "event_type_id[$eventId]", 'Event Type', $eventName);
-    }
+    $this->add('select', 'event_type_id', ts('Event type'), $event_type, FALSE, array('class' => 'crm-select2 huge', 'multiple' => TRUE));
 
     $eventsByDates = array();
     $searchOption = array(ts('Show Current and Upcoming Events'), ts('Search All or by Date Range'));
