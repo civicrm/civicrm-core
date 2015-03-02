@@ -214,7 +214,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         if ($defaults['is_deceased']) {
-          $displayName .= '  <font color=red>(deceased)</font>';
+          $displayName .= '  <span class="crm-contact-deceased">(deceased)</span>';
         }
         $displayName = ts('Edit %1', array(1 => $displayName));
 
