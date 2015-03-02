@@ -40,6 +40,15 @@ interface CRM_Contact_Form_Search_Interface {
   function __construct(&$formValues);
 
   /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * @param CRM_Core_Form_Search $form
+   * @return array
+   */
+  // @todo: This interface change should not go into a minor version; save for 4.6
+  // function buildTaskList(CRM_Core_Form_Search $form);
+
+  /**
    * Builds the quickform for this search
    */
   function buildForm(&$form);
