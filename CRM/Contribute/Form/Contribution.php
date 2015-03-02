@@ -602,6 +602,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('billingPanes', $billingPanes);
     $this->assign('allPanes', $allPanes);
 
+    $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
+
     if ($this->_formType) {
       $this->assign('formType', $this->_formType);
       return;
@@ -884,8 +886,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $financialType->freeze();
     }
 
-    $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
-
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id && isset($this->_values['tax_amount'])) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
@@ -923,6 +923,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (empty($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Payment Processor is a required field.');
       }
+      else {
+        // validate payment instrument (e.g. credit card number)
+        CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, $self);
+      }
     }
 
     // Do the amount validations.
@@ -946,7 +950,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-    if (!empty($fields['fee_amount']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
+    if (!empty($fields['fee_amount']) && !empty($fields['financial_type_id']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
 
