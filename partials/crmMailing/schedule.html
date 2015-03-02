@@ -7,7 +7,7 @@
     <div>
       <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
       <label for="schedule-send-at">{{ts('Send at:')}}</label>
-      <span crm-ui-date-time ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"></span>
+      <input crm-ui-date-time ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"/>
     </div>
   </div>
 </div>
