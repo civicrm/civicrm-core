@@ -1299,7 +1299,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->tabs['OrderBy'] = array(
         'title' => ts('Sorting'),
         'tpl' => 'OrderBy',
-        'div_label' => 'order-by',
+        'div_label' => 'order-by-elements',
       );
     }
 
