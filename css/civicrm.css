@@ -282,11 +282,19 @@ input.crm-form-entityref {
 }
 
 .crm-container input.crm-form-text[disabled],
+.crm-container input.dateplugin[disabled],
+.crm-container select.crm-form-select[disabled],
 .crm-container input.crm-form-text[readonly] {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
   background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+}
+
+.crm-container input.crm-form-text[disabled],
+.crm-container input.dateplugin[disabled],
+.crm-container select.crm-form-select[disabled] {
+  color: #a9a9a9;
 }
 
 .crm-container .crm-form-submit {
