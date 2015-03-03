@@ -166,8 +166,7 @@
           });
       });
 
-    //If there are changes in repeat configuration, enable save button
-    //Dialog for preview repeat Configuration dates
+    // Dialog for preview repeat Configuration dates
     function previewDialog() {
       // Set default value for start date on activity forms before generating preview
       if (!$('#repetition_start_date', $form).val() && $('#activity_date_time', $form).val()) {
@@ -176,13 +175,11 @@
           .next().val($('#activity_date_time', $form).next().val())
           .siblings('.hasTimeEntry').val($('#activity_date_time', $form).siblings('.hasTimeEntry').val());
       }
-      var payload = $form.serialize() + '{/literal}&entity_table={$entityTable}&entity_id={$currentEntityId}{literal}',
-        settings = CRM.utils.adjustDialogDefaults({
-          width: '50%',
-          url: CRM.url("civicrm/recurringentity/preview", payload)
-        });
-      CRM.confirm(settings)
-        .on('crmConfirm:yes', function() {
+      var payload = $form.serialize() + '{/literal}&entity_table={$entityTable}&entity_id={$currentEntityId}{literal}';
+      CRM.confirm({
+        width: '50%',
+        url: CRM.url("civicrm/recurringentity/preview", payload)
+      }).on('crmConfirm:yes', function() {
           $form.submit();
         });
     }
