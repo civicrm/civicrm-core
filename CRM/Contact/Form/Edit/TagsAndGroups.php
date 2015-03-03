@@ -159,8 +159,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $tree = $tags->getTree('civicrm_contact', TRUE);
       // let's not load jstree if there are not children. This also fixes blank
       // display at the beginning of checkboxes
+      $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
       $form->assign('loadjsTree', FALSE);
-      if (!empty(CRM_Utils_Array::retrieveValueRecursive($tree, 'children'))) {
+      if (!empty($loadJsTree)) {
         // CODE FROM CRM/Tag/Form/Tag.php //
         CRM_Core_Resources::singleton()
           ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
