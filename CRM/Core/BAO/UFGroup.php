@@ -1932,7 +1932,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'membership_end_date',
       'join_date',
     ))) {
-      $form->addDate($name, $title, $required, array('formatType' => 'custom'));
+      $form->addDate($name, $title, $required, array('formatType' => 'activityDate'));
     }
     elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
