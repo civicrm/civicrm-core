@@ -516,6 +516,8 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
+   *
+   * @param string $xml_response
    */
   public static function main($xml_response) {
     require_once 'Google/library/googleresponse.php';

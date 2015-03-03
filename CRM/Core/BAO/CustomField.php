@@ -2358,6 +2358,10 @@ WHERE      ( f.label = %1 OR f.name = %1 )
 
   /**
    * Given ID of a custom field, return its name as well as the name of the custom group it belongs to.
+   *
+   * @param array $ids
+   *
+   * @return array
    */
   public static function getNameFromID($ids) {
     if (is_array($ids)) {
