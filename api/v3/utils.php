@@ -457,6 +457,59 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
 /**
  * Get function for query object api.
  *
+ * This is a simple get function, but it should be usable for any kind of
+ * entity. I created it to work around CRM-16036.
+ * 
+ * @param string $dao_name
+ *   Name of DAO
+ * @param array $params
+ *  As passed into api get function.
+ * @return array
+ */
+function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
+  $dao = new $dao_name();
+  $entity = _civicrm_api_get_entity_name_from_dao($dao);
+  $entity_fields = _civicrm_api3_build_fields_array($dao, TRUE);
+  $where_fields = array_intersect(array_keys($entity_fields), array_keys($params));
+
+  // TODO: find out which fields to select
+  $select_fields = "title,id";
+
+  $select = "SELECT $select_fields ";
+  $from = "FROM " . $dao->tableName() . " ";
+  $where = "WHERE 1=1 ";
+
+  $query_params = array();
+
+  foreach($params as $key => $value) {
+    // TODO: values of the form array("op" => "value")
+    if (in_array($key, $where_fields)) {
+      $param_nr = count($query_params) + 1;
+      $query_params[$param_nr] = array($value, 'String');
+      $where .= "AND $key = %$param_nr ";
+    }
+  };
+
+  $query = "$select $from $where";
+
+  // TODO: limit, sort,...
+
+  $result_entities = array();
+
+  $result_dao = CRM_Core_DAO::executeQuery($query, $query_params);
+  while ($result_dao->fetch()) {
+    $result_entities[$result_dao->id] = array();
+    foreach (explode(",", $select_fields) as $field) {
+      $result_entities[$result_dao->id][$field] = $result_dao->$field;
+    };
+  }
+
+  return civicrm_api3_create_success($result_entities, $params, $entity, 'get', $dao);
+}
+
+/**
+ * Get function for query object api.
+ *
  * The API supports 2 types of get request. The more complex uses the BAO query object.
  *  This is a generic function for those functions that call it
  *
@@ -700,6 +753,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE) {
   }
   $dao->setApiFilter($params);
 }
+
 
 /**
  * Apply filters (e.g. high, low) to DAO object (prior to find).
