@@ -1661,7 +1661,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $params
    * @param int $id
-   * @param bool int $delete
+   * @param bool $delete
    */
   public function contributionGetnCheck($params, $id, $delete = TRUE) {
 

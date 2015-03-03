@@ -184,11 +184,15 @@ class ResolverApi {
   }
 
   /**
+   * Create placeholders.
+   *
+   * @param string $prefix
    * @param array $args
    *   Positional arguments.
+   *
    * @return array
    *   Named placeholders based on the positional arguments
-   *   (e.g. "@1" => "firstValue").
+   * (e.g. "@1" => "firstValue").
    */
   protected function createPlaceholders($prefix, $args) {
     $result = array();

@@ -1847,7 +1847,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
 /**
  * Translate the custom field data_type attribute into a std 'type'.
  *
- * @param $dataType
+ * @param array $value
  *
  * @return int
  */
