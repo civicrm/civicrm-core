@@ -1610,7 +1610,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public static function create(&$params, $ids = array()) {
     // WTH $ids
     if (empty($ids) && isset($params['id'])) {
-      $ids['id'] = $params['id'];
+      $ids['mailing_id'] = $ids['id'] = $params['id'];
     }
 
     // CRM-12430
@@ -3144,16 +3144,24 @@ AND        m.id = %1
     $fieldPerms = array();
     foreach ($fieldNames as $fieldName) {
       if ($fieldName == 'id') {
-        $fieldPerms[$fieldName] = 'access CiviMail';
+        $fieldPerms[$fieldName] = array(
+          array('access CiviMail', 'schedule mailings', 'approve mailings', 'create mailings'), // OR
+        );
       }
-      if (in_array($fieldName, array('scheduled_date', 'scheduled_id'))) {
-        $fieldPerms[$fieldName] = 'schedule mailings';
+      elseif (in_array($fieldName, array('scheduled_date', 'scheduled_id'))) {
+        $fieldPerms[$fieldName] = array(
+          array('access CiviMail', 'schedule mailings'), // OR
+        );
       }
       elseif (in_array($fieldName, array('approval_date', 'approver_id', 'approval_status_id', 'approval_note'))) {
-        $fieldPerms[$fieldName] = 'approve mailings';
+        $fieldPerms[$fieldName] = array(
+          array('access CiviMail', 'approve mailings'), // OR
+        );
       }
       else {
-        $fieldPerms[$fieldName] = 'create mailings';
+        $fieldPerms[$fieldName] = array(
+          array('access CiviMail', 'create mailings'), // OR
+        );
       }
     }
     return $fieldPerms;

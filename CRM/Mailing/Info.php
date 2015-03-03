@@ -149,6 +149,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     CRM_Core_Resources::singleton()->addPermissions(array(
       'view all contacts',
+      'access CiviMail',
       'create mailings',
       'schedule mailings',
       'approve mailings',

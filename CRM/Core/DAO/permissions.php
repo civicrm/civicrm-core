@@ -238,19 +238,31 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['group_organization'] = $permissions['group'];
 
   // CiviMail Permissions
+  $civiMailBasePerms = array(
+    // To get/preview/update, one must have least one of these perms:
+    // Mailing API implementations enforce nuances of create/approve/schedule permissions.
+    'access CiviMail',
+    'create mailings',
+    'schedule mailings',
+    'approve mailings',
+  );
   $permissions['mailing'] = array(
     'get' => array(
       'access CiviCRM',
-      'access CiviMail',
+      $civiMailBasePerms,
     ),
     'delete' => array(
       'access CiviCRM',
-      'access CiviMail',
+      $civiMailBasePerms,
       'delete in CiviMail',
+    ),
+    'submit' => array(
+      'access CiviCRM',
+      array('access CiviMail', 'schedule mailings'),
     ),
     'default' => array(
       'access CiviCRM',
-      'access CiviMail',
+      $civiMailBasePerms,
     ),
   );
   $permissions['mailing_a_b'] = $permissions['mailing'];
