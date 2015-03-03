@@ -64,7 +64,11 @@ function civicrm_api3_mailing_create($params) {
     $safeParams = $params;
   }
   $safeParams['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
+  if (empty($params['mailing_type'])) {
+    $params['mailing_type'] = 'standalone';
+  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams);
+
 }
 
 /**
