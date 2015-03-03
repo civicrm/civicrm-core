@@ -164,7 +164,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $contactID = CRM_Core_Session::singleton()->get('userID');
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
-    if (CRM_Utils_Array::value('blog', $allDashlets)) {
+    if (!empty($allDashlets['blog'])) {
       $defaultDashlets['blog'] = array(
         'dashboard_id' => $allDashlets['blog']['id'],
         'is_active' => 1,

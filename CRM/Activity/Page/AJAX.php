@@ -486,7 +486,7 @@ class CRM_Activity_Page_AJAX {
 
     foreach ($activities as $key => $value) {
       //Check if recurring activity
-      if (CRM_Utils_Array::value('is_recurring_activity', $value)) {
+      if (!empty($value['is_recurring_activity'])) {
         if ($key == $value['is_recurring_activity']) {
           $activities[$key]['activity_type'] = $activities[$key]['activity_type'] . '<br/><span class="bold">Recurring Activity - (Parent)</span>';
         }

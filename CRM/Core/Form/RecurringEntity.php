@@ -250,15 +250,15 @@ class CRM_Core_Form_RecurringEntity {
     if ($values['allowRepeatConfigToSubmit'] == 1) {
       $dayOfTheWeek = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
       //Repeats
-      if (!CRM_Utils_Array::value('repetition_frequency_unit', $values)) {
+      if (empty($values['repetition_frequency_unit'])) {
         $errors['repetition_frequency_unit'] = ts('This is a required field');
       }
       //Repeats every
-      if (!CRM_Utils_Array::value('repetition_frequency_interval', $values)) {
+      if (empty($values['repetition_frequency_interval'])) {
         $errors['repetition_frequency_interval'] = ts('This is a required field');
       }
       //Ends
-      if (CRM_Utils_Array::value('ends', $values)) {
+      if (!empty($values['ends'])) {
         if ($values['ends'] == 1) {
           if (empty($values['start_action_offset'])) {
             $errors['start_action_offset'] = ts('This is a required field');
@@ -268,7 +268,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
         if ($values['ends'] == 2) {
-          if (CRM_Utils_Array::value('repeat_absolute_date', $values)) {
+          if (!empty($values['repeat_absolute_date'])) {
             $entityStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
             $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
             if (($end < $entityStartDate) && ($end != 0)) {
@@ -285,9 +285,9 @@ class CRM_Core_Form_RecurringEntity {
       }
 
       //Repeats BY
-      if (CRM_Utils_Array::value('repeats_by', $values)) {
+      if (!empty($values['repeats_by'])) {
         if ($values['repeats_by'] == 1) {
-          if (CRM_Utils_Array::value('limit_to', $values)) {
+          if (!empty($values['limit_to'])) {
             if ($values['limit_to'] < 1 && $values['limit_to'] > 31) {
               $errors['limit_to'] = ts('Invalid day of the month');
             }
@@ -297,7 +297,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
         if ($values['repeats_by'] == 2) {
-          if (CRM_Utils_Array::value('entity_status_1', $values)) {
+          if (!empty($values['entity_status_1'])) {
             $dayOfTheWeekNo = array('first', 'second', 'third', 'fourth', 'last');
             if (!in_array($values['entity_status_1'], $dayOfTheWeekNo)) {
               $errors['entity_status_1'] = ts('Invalid option');
@@ -306,7 +306,7 @@ class CRM_Core_Form_RecurringEntity {
           else {
             $errors['entity_status_1'] = ts('Invalid option');
           }
-          if (CRM_Utils_Array::value('entity_status_2', $values)) {
+          if (!empty($values['entity_status_2'])) {
             if (!in_array($values['entity_status_2'], $dayOfTheWeek)) {
               $errors['entity_status_2'] = ts('Invalid day name');
             }
@@ -328,17 +328,17 @@ class CRM_Core_Form_RecurringEntity {
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable
-    if (!CRM_Utils_Array::value('entity_id', $params)) {
+    if (empty($params['entity_id'])) {
       $params['entity_id'] = self::$_entityId;
     }
     //Process this function only when you get this variable
     if ($params['allowRepeatConfigToSubmit'] == 1) {
       if (CRM_Utils_Array::value('entity_table', $params) && CRM_Utils_Array::value('entity_id', $params) && $type) {
         $params['used_for'] = $type;
-        if (!CRM_Utils_Array::value('parent_entity_id', $params)) {
+        if (empty($params['parent_entity_id'])) {
           $params['parent_entity_id'] = self::$_parentEntityId;
         }
-        if (CRM_Utils_Array::value('schedule_reminder_id', $params)) {
+        if (!empty($params['schedule_reminder_id'])) {
           $params['id'] = $params['schedule_reminder_id'];
         }
         else {
@@ -350,7 +350,7 @@ class CRM_Core_Form_RecurringEntity {
         $dbParams = $recurobj->mapFormValuesToDB($params);
 
         //Delete repeat configuration and rebuild
-        if (CRM_Utils_Array::value('id', $params)) {
+        if (!empty($params['id'])) {
           CRM_Core_BAO_ActionSchedule::del($params['id']);
           unset($params['id']);
         }
@@ -468,7 +468,7 @@ class CRM_Core_Form_RecurringEntity {
           $recursion->excludeDates = $excludeDateList;
           $recursion->excludeDateRangeColumns = $params['excludeDateRangeColumns'];
         }
-        if (CRM_Utils_Array::value('intervalDateColumns', $params)) {
+        if (!empty($params['intervalDateColumns'])) {
           $recursion->intervalDateColumns = $params['intervalDateColumns'];
         }
         $recursion->entity_id = $params['entity_id'];

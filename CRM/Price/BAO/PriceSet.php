@@ -1068,7 +1068,7 @@ WHERE  id = %1";
     foreach ($params['price_set_id'] as $priceSetID) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $entityName, $entity->id, $priceSetID);
       //@todo - how should we do this - copied from form
-      //if (CRM_Utils_Array::value('price_field_id', $params)) {
+      //if (!empty($params['price_field_id'])) {
       //  $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
       //  CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID, 0);
       //}
