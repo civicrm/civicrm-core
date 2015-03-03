@@ -155,7 +155,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return object
    */
   public static function add(&$params) {
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'RecurringEntity', $params['id'], $params);
     }
     else {
@@ -167,7 +167,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $daoRecurringEntity->find(TRUE);
     $result = $daoRecurringEntity->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'RecurringEntity', $daoRecurringEntity->id, $daoRecurringEntity);
     }
     else {
@@ -843,39 +843,39 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    */
   public function mapFormValuesToDB($formParams = array()) {
     $dbParams = array();
-    if (CRM_Utils_Array::value('used_for', $formParams)) {
+    if (!empty($formParams['used_for'])) {
       $dbParams['used_for'] = $formParams['used_for'];
     }
 
-    if (CRM_Utils_Array::value('entity_id', $formParams)) {
+    if (!empty($formParams['entity_id'])) {
       $dbParams['entity_value'] = $formParams['entity_id'];
     }
 
-    if (CRM_Utils_Array::value('repetition_start_date', $formParams)) {
-      if (CRM_Utils_Array::value('repetition_start_date_display', $formParams)) {
+    if (!empty($formParams['repetition_start_date'])) {
+      if (!empty($formParams['repetition_start_date_display'])) {
         $repetitionStartDate = $formParams['repetition_start_date_display'];
       }
       else {
         $repetitionStartDate = $formParams['repetition_start_date'];
       }
-      if (CRM_Utils_Array::value('repetition_start_date_time', $formParams)) {
+      if (!empty($formParams['repetition_start_date_time'])) {
         $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
       $dbParams['start_action_date'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
     }
 
-    if (CRM_Utils_Array::value('repetition_frequency_unit', $formParams)) {
+    if (!empty($formParams['repetition_frequency_unit'])) {
       $dbParams['repetition_frequency_unit'] = $formParams['repetition_frequency_unit'];
     }
 
-    if (CRM_Utils_Array::value('repetition_frequency_interval', $formParams)) {
+    if (!empty($formParams['repetition_frequency_interval'])) {
       $dbParams['repetition_frequency_interval'] = $formParams['repetition_frequency_interval'];
     }
 
     //For Repeats on:(weekly case)
     if ($formParams['repetition_frequency_unit'] == 'week') {
-      if (CRM_Utils_Array::value('start_action_condition', $formParams)) {
+      if (!empty($formParams['start_action_condition'])) {
         $repeats_on = CRM_Utils_Array::value('start_action_condition', $formParams);
         $dbParams['start_action_condition'] = implode(",", array_keys($repeats_on));
       }
@@ -884,7 +884,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     //For Repeats By:(monthly case)
     if ($formParams['repetition_frequency_unit'] == 'month') {
       if ($formParams['repeats_by'] == 1) {
-        if (CRM_Utils_Array::value('limit_to', $formParams)) {
+        if (!empty($formParams['limit_to'])) {
           $dbParams['limit_to'] = $formParams['limit_to'];
         }
       }
@@ -897,14 +897,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     //For "Ends" - After:
     if ($formParams['ends'] == 1) {
-      if (CRM_Utils_Array::value('start_action_offset', $formParams)) {
+      if (!empty($formParams['start_action_offset'])) {
         $dbParams['start_action_offset'] = $formParams['start_action_offset'];
       }
     }
 
     //For "Ends" - On:
     if ($formParams['ends'] == 2) {
-      if (CRM_Utils_Array::value('repeat_absolute_date', $formParams)) {
+      if (!empty($formParams['repeat_absolute_date'])) {
         $dbParams['absolute_date'] = CRM_Utils_Date::processDate($formParams['repeat_absolute_date']);
       }
     }
@@ -1046,7 +1046,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $r->count($scheduleReminderDetails['start_action_offset']);
       }
 
-      if (CRM_Utils_Array::value('absolute_date', $scheduleReminderDetails)) {
+      if (!empty($scheduleReminderDetails['absolute_date'])) {
         $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
         $endDate = new DateTime($absoluteDate[0] . ' ' . $absoluteDate[1]);
         $endDate->modify('+1 day');
@@ -1140,7 +1140,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       );
       $defaults = array();
       CRM_Core_DAO::commonRetrieve($dao, $params, $defaults);
-      if (CRM_Utils_Array::value('id', $defaults)) {
+      if (!empty($defaults['id'])) {
         $result['entityId'] = $defaults['id'];
         $result['entityTable'] = $entityTable;
       }

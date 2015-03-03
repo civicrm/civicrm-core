@@ -208,7 +208,7 @@ class CRM_Badge_BAO_Badge {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
 
-    if (CRM_Utils_Array::value('participant_image', $formattedRow)) {
+    if (!empty($formattedRow['participant_image'])) {
       $imageAlign = 0;
       switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)) {
         case 'R':

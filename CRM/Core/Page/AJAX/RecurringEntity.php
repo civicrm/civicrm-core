@@ -20,7 +20,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
       $entityId = CRM_Utils_Type::escape($_REQUEST['entityId'], 'Integer');
       $entityTable = CRM_Utils_Type::escape($_REQUEST['entityTable'], 'String');
 
-      if (CRM_Utils_Array::value('linkedEntityTable', $_REQUEST)) {
+      if (!empty($_REQUEST['linkedEntityTable'])) {
         $result = CRM_Core_BAO_RecurringEntity::updateModeLinkedEntity($entityId, $_REQUEST['linkedEntityTable'], $entityTable);
       }
 
