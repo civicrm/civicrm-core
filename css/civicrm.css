@@ -3312,6 +3312,13 @@ div.m ul#civicrm-menu,
   background: none repeat scroll 0 0 transparent;
 }
 
+/* unset the styling for the li in jstree */
+#tagtree ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
 /* Class for successful upgrade */
 .crm-container .upgrade-success {
   background-color: #00CC00;

@@ -57,17 +57,19 @@
         highlightSelected();
       });
 
-      //load js tree.
-      $("#tagtree").jstree({
-        plugins : ["themes", "html_data"],
-        themes: {
-          "theme": 'classic',
-          "dots": false,
-          "icons": false,
-          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
-        }
-      });
-
+      var childTag = {/literal}{$loadjsTree}{literal};
+      if (childTag) {
+        //load js tree.
+        $("#tagtree").jstree({
+          plugins : ["themes", "html_data"],
+          themes: {
+            "theme": 'classic',
+            "dots": false,
+            "icons": false,
+            "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          }
+        });
+      }
 	  {/literal}
       {if !empty($permission) && $permission neq 'edit'}
         {literal}
@@ -95,19 +97,16 @@
             {$form.group.html}
           </td>
         {/if}
+        {if !$type || $type eq 'tag'}
+          <td width="70%">{if $title}<span class="label">{$form.tag.label}</span>{/if}
+            <div id="tagtree">
+              {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
+            </div>
+          </td>
+          <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
+        {/if}
       </tr>
-
-    {if !$type || $type eq 'tag'}
-      <tr>
-        <td width="70%"><span class="label">{if $title}{$form.$key.label}{/if}</span>
-          <div id="tagtree">
-            {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
-          </div>
-        </td>
-      </tr>
-      <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
-    {/if}
-  </table>
+    </table>
 {if $title}
   </div>
 </div><!-- /.crm-accordion-wrapper -->

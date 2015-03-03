@@ -148,11 +148,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
-      // CODE FROM CRM/Tag/Form/Tag.php //
-      CRM_Core_Resources::singleton()
-        ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-        ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
-
       $fName = 'tag';
       if ($fieldName) {
         $fName = $fieldName;
@@ -162,6 +157,16 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       // get the list of all the categories
       $tags = new CRM_Core_BAO_Tag();
       $tree = $tags->getTree('civicrm_contact', TRUE);
+      // let's not load jstree if there are not children. This also fixes blank
+      // display at the beginning of checkboxes
+      $form->assign('loadjsTree', FALSE);
+      if (!empty(CRM_Utils_Array::retrieveValueRecursive($tree, 'children'))) {
+        // CODE FROM CRM/Tag/Form/Tag.php //
+        CRM_Core_Resources::singleton()
+          ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+          ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
+        $form->assign('loadjsTree', TRUE);
+      }
 
       $elements = array();
       self::climbtree($form, $tree, $elements);
