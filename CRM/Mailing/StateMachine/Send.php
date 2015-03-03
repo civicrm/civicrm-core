@@ -58,11 +58,11 @@ class CRM_Mailing_StateMachine_Send extends CRM_Core_StateMachine {
     );
 
     if (CRM_Mailing_Info::workflowEnabled()) {
-      if (CRM_Core_Permission::check('schedule mailings')) {
+      if (CRM_Core_Permission::check('schedule mailings') || CRM_Core_Permission::check('access CiviMail')) {
         $this->_pages['CRM_Mailing_Form_Schedule'] = NULL;
       }
 
-      if (CRM_Core_Permission::check('approve mailings')) {
+      if (CRM_Core_Permission::check('approve mailings') || CRM_Core_Permission::check('access CiviMail')) {
         $this->_pages['CRM_Mailing_Form_Approve'] = NULL;
       }
     }

@@ -45,7 +45,8 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled() &&
-      !CRM_Core_Permission::check('schedule mailings')
+      !CRM_Core_Permission::check('schedule mailings') &&
+      !CRM_Core_Permission::check('access CiviMail')
     ) {
       $url = CRM_Utils_System::url('civicrm/mailing/browse/unscheduled', 'reset=1&scheduled=false');
       CRM_Utils_System::redirect($url);
