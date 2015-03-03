@@ -71,7 +71,9 @@
           .parent().find('button[data-op=yes]').prop('disabled', true)
       }
 
-      $('#crm-main-content-wrapper').on('click', '.crm-form-submit.validate', function(e) {
+      // Intercept form submissions and check if they will impact the recurring entity
+      // This ought to attach the handler to the the dialog if we're in a popup, or the page wrapper if we're not
+      $('#recurring-dialog-tpl').closest('.crm-container').on('click', '.crm-form-submit.validate', function(e) {
         $form = $(this).closest('form');
         var className = ($form.attr('class') || '').match(/CRM_\S*/);
         formClass = className && className[0];

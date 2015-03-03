@@ -961,7 +961,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // set params for repeat configuration in create mode
       $params['entity_id'] = $activityId;
       $params['entity_table'] = 'civicrm_activity';
-      $scheduleReminderDetails = array();
       if (!empty($params['entity_id']) && !empty($params['entity_table'])) {
         $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);
         if ($checkParentExistsForThisId) {
@@ -977,6 +976,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         }
       }
       $params['dateColumns'] = array('activity_date_time');
+
+      // Set default repetition start if it was not provided.
+      if (empty($params['repetition_start_date'])) {
+        $params['repetition_start_date'] = $params['activity_date_time'];
+      }
 
       // unset activity id
       unset($params['id']);
