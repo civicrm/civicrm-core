@@ -50,7 +50,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled()) {
-      if (!CRM_Core_Permission::check('approve mailings')) {
+      if (!CRM_Core_Permission::check('approve mailings') && !CRM_Core_Permission::check('access CiviMail')) {
         $this->redirectToListing();
       }
     }
