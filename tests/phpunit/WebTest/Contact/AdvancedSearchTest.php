@@ -355,7 +355,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // check for completed
     $this->multiselect2("contribution_status_id", array('Completed'));
     // enter check number
-    $this->select2("payment_instrument_id", "Check");
+    $this->select("payment_instrument_id", "Check");
     $this->type("contribution_check_number", "chqNo$firstName");
     // fill transaction id
     $this->type("contribution_trxn_id", "trid$firstName");
@@ -373,10 +373,10 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("event_id", "Fall Fundraiser Dinner");
     // fill event type
     $this->select2("event_type_id", "Fundraiser");
-    // check participant status (registered)
-    $this->click("xpath=//div[@id='participantForm']/table/tbody//tr/td/label[text()='Participant Status']/../div//div/label[text()='Registered']");
-    // check participant role (Volunteer)
-    $this->click("xpath=//div[@id='participantForm']/table/tbody//tr/td/label[text()='Participant Role']/../div//div/label[text()='Volunteer']");
+    // select participant status (registered)
+    $this->multiselect2('participant_status_id', array('Registered'));
+    // select participant role (Volunteer)
+    $this->multiselect2('participant_role_id', array('Volunteer'));
     // fill participant fee level (couple)
     $this->select2("participant_fee_id", "Couple");
     // fill amount range
