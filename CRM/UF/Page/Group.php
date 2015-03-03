@@ -252,7 +252,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       else {
         $wpbase = 'index.php';
       }
-      $profile = str_replace('/wp-admin/admin.php', '/'. $wpbase .'/', $profile);
+      $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
     }
 
     // add header files
