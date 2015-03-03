@@ -15,9 +15,6 @@
       <td>{{exName}}</td>
       <td>{{example.value}}</td>
       <td>
-        <!--<input crm-ui-date ng-model="example.value" name="{{exName}}" ng-required="example.required"/> -->
-        <!--<input crm-ui-time ng-model="example.value" name="{{exName}}" ng-required="example.required"/> -->
-        <!-- <div crm-ui-date-time ng-model="example.value" name="{{exName}}" ng-required="example.required"/> -->
         <div class="crmMailing-schedule-outer" crm-mailing-radio-date="schedule" ng-model="example.value"
              name="{{exName}}">
 
@@ -29,7 +26,7 @@
             <div>
               <input ng-model="schedule.mode" type="radio" name="send_{{exName}}" value="at" id="schedule-send-at"/>
               <label for="schedule-send-at">{{ts('Send at:')}}</label>
-              <span crm-ui-date-time ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"></span>
+              <input crm-ui-datepicker ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"/>
             </div>
           </div>
         </div>
