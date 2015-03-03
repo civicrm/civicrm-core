@@ -1303,9 +1303,9 @@ AND civicrm_membership.is_test = %2";
    * @param int $defaultContributionTypeID
    * @param array $membershipLineItems
    *   Line items specific to membership payment that is separate to contribution.
-   * @throws CRM_Core_Exception
+   * @param $isPayLater
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,

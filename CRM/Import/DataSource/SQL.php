@@ -46,6 +46,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
   /**
    * Set variables up before form is built.
+   *
+   * @param CRM_Core_Form $form
    */
   public function preProcess(&$form) {
   }
