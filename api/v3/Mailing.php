@@ -44,6 +44,14 @@
  */
 function civicrm_api3_mailing_create($params) {
   if (CRM_Mailing_Info::workflowEnabled()) {
+    // Note: 'schedule mailings' and 'approve mailings' can update certain fields, but can't create.
+
+    if (empty($params['id'])) {
+      if (!CRM_Core_Permission::check('access CiviMail') && !CRM_Core_Permission::check('create mailings')) {
+        throw new \Civi\API\Exception\UnauthorizedException("Cannot create new mailing. Required permission: 'access CiviMail' or 'create mailings'");
+      }
+    }
+
     $safeParams = array();
     $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
     foreach (array_keys($params) as $field) {

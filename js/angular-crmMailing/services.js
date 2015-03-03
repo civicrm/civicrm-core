@@ -262,7 +262,7 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
-        if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings')) {
+        if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
           return crmApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
             return result.values;
           });
