@@ -356,6 +356,10 @@ Order By  camp.title";
   /**
    * Retrieve campaigns for dashboard.
    *
+   * @param array $params
+   * @param bool $onlyCount
+   *
+   * @return array|int
    */
   public static function getCampaignSummary($params = array(), $onlyCount = FALSE) {
     $campaigns = array();

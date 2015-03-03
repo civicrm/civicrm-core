@@ -285,9 +285,16 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
   /**
    * Hash_call: Function to perform the API call to PayPal using API signature
+   *
    * @paymentProcessor is the array of payment processor settings value.
    * @searchParamsnvpStr is the array of search params.
    * returns an associtive array containing the response from the server.
+   *
+   * @param $paymentProcessor
+   * @param $searchParams
+   *
+   * @return array|object
+   * @throws \Exception
    */
   public function invokeAPI($paymentProcessor, $searchParams) {
     $merchantID = $paymentProcessor['user_name'];

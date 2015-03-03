@@ -34,6 +34,8 @@ class Resolver {
   protected static $_singleton;
 
   /**
+   * Singleton function.
+   *
    * @return Resolver
    */
   public static function singleton() {
@@ -48,6 +50,7 @@ class Resolver {
    *
    * @param string|array $id
    *   A callback expression; any of the following.
+   *
    * @return array
    *   A PHP callback. Do not serialize (b/c it may include an object).
    * @throws \RuntimeException
@@ -102,6 +105,7 @@ class Resolver {
    * @param string|callable $id
    * @param array $args
    *   Ordered parameters. To call-by-reference, set an array-parameter by reference.
+   *
    * @return mixed
    */
   public function call($id, $args) {
@@ -123,6 +127,8 @@ class ResolverConstantCallback {
   private $value;
 
   /**
+   * Class constructor.
+   *
    * @param mixed $value
    *   The value to be returned by the dummy callback.
    */
@@ -131,6 +137,8 @@ class ResolverConstantCallback {
   }
 
   /**
+   * Invoke function.
+   *
    * @return mixed
    */
   public function __invoke() {
@@ -155,8 +163,11 @@ class ResolverApi {
   private $url;
 
   /**
+   * Class constructor.
+   *
    * @param array $url
    *   Parsed URL (e.g. "api3://EntityName/action?foo=bar").
+   *
    * @see parse_url
    */
   public function __construct($url) {
@@ -192,7 +203,7 @@ class ResolverApi {
    *
    * @return array
    *   Named placeholders based on the positional arguments
-   * (e.g. "@1" => "firstValue").
+   *   (e.g. "@1" => "firstValue").
    */
   protected function createPlaceholders($prefix, $args) {
     $result = array();
