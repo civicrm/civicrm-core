@@ -188,7 +188,7 @@ class CRM_Contact_Form_Search_Criteria {
         'component_mode',
         ts('Display Results As'),
         $componentModes,
-        FALSE, 
+        FALSE,
         array('class' => 'crm-select2')
       );
     }
