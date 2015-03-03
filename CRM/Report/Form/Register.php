@@ -62,9 +62,6 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
    * @return array
    *   reference to the array of default values
    */
-  /**
-   * @return array
-   */
   public function setDefaultValues() {
     $defaults = array();
     if ($this->_action & CRM_Core_Action::DELETE) {
