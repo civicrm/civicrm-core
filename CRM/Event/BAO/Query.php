@@ -347,13 +347,23 @@ class CRM_Event_BAO_Query {
       case 'participant_fee_amount':
       case 'participant_fee_level':
         $qillName = $name;
-        if (in_array($name, array('participant_status_id', 'participant_role_id', 'participant_source', 'participant_id', 'participant_contact_id', 'participant_fee_amount', 'participant_fee_level', 'participant_is_pay_later'))) {
+        if (in_array($name, array(
+              'participant_status_id',
+              'participant_role_id',
+              'participant_source',
+              'participant_id',
+              'participant_contact_id',
+              'participant_fee_amount',
+              'participant_fee_level',
+              'participant_is_pay_later',
+            ))) {
           $name = str_replace('participant_', '', $name);
           if ($name == 'is_pay_later') {
             $qillName = $name;
           }
           if ($name == 'role_id') {
             $qillName = 'participant_role';
+            $query->_where[$grouping][] = " civicrm_participant.$name REGEXP '[[:<:]]" . implode('[[:>:]]|[[:<:]]', (array) $value) . "[[:>:]]' ";
           }
         }
 
@@ -362,7 +372,7 @@ class CRM_Event_BAO_Query {
         if (in_array($name, array('participant_status', 'participant_role'))) {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, $dataType);
         }
-        else {
+        elseif ($name != 'role_id') {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $op, $value, $dataType);
         }
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
