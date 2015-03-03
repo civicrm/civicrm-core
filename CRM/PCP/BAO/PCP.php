@@ -289,6 +289,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       self::$_pcpLinks['add'] = array(
         CRM_Core_Action::ADD => array(
           'name' => ts('Create a Personal Campaign Page'),
+          'class' => 'no-popup',
           'url' => 'civicrm/contribute/campaign',
           'qs' => 'action=add&reset=1&pageId=%%pageId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
