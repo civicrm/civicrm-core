@@ -54,98 +54,29 @@
       };
     })
 
-    // Display a date widget.
-    // example: <input crm-ui-date ng-model="myobj.datefield" />
-    // example: <input crm-ui-date ng-model="myobj.datefield" crm-ui-date-format="yy-mm-dd" />
-    .directive('crmUiDate', function ($parse, $timeout) {
+    // Simple wrapper around $.crmDatepicker.
+    // example with no time input: <input crm-ui-datepicker="{time: false}" ng-model="myobj.datefield"/>
+    // example with custom date format: <input crm-ui-datepicker="{dateFormat: 'm/d/y'}" ng-model="myobj.datefield"/>
+    .directive('crmUiDatepicker', function () {
       return {
         restrict: 'AE',
         require: 'ngModel',
         scope: {
-          crmUiDateFormat: '@' // expression, date format (default: "yy-mm-dd")
+          crmUiDatepicker: '='
         },
         link: function (scope, element, attrs, ngModel) {
-          var fmt = attrs.crmUiDateFormat ? $parse(attrs.crmUiDateFormat)() : "yy-mm-dd";
-
-          element.addClass('dateplugin');
-          $(element).datepicker({
-            dateFormat: fmt
-          });
-
-          ngModel.$render = function $render() {
-            $(element).datepicker('setDate', ngModel.$viewValue);
-          };
-          var updateParent = (function() {
-            $timeout(function () {
-              ngModel.$setViewValue(element.val());
+          element
+            .crmDatepicker(scope.crmUiDatepicker)
+            .on('change', function() {
+              var requiredLength = 16;
+              if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                requiredLength = 10;
+              }
+              if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                requiredLength = 5;
+              }
+              ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
             });
-          });
-
-          element.on('change', updateParent);
-        }
-      };
-    })
-
-    // Display a date-time widget.
-    // example: <div crm-ui-date-time ng-model="myobj.mydatetimefield"></div>
-    .directive('crmUiDateTime', function ($parse) {
-      return {
-        restrict: 'AE',
-        require: 'ngModel',
-        scope: {
-          ngRequired: '@'
-        },
-        templateUrl: '~/crmUi/datetime.html',
-        link: function (scope, element, attrs, ngModel) {
-          var ts = scope.ts = CRM.ts(null);
-          scope.dateLabel = ts('Date');
-          scope.timeLabel = ts('Time');
-          element.addClass('crm-ui-datetime');
-
-          ngModel.$render = function $render() {
-            if (!_.isEmpty(ngModel.$viewValue)) {
-              var dtparts = ngModel.$viewValue.split(/ /);
-              scope.dtparts = {date: dtparts[0], time: dtparts[1]};
-            }
-            else {
-              scope.dtparts = {date: '', time: ''};
-            }
-            validate();
-          };
-
-          function updateParent() {
-            validate();
-
-            if (_.isEmpty(scope.dtparts.date) && _.isEmpty(scope.dtparts.time)) {
-              ngModel.$setViewValue(' ');
-            }
-            else {
-              //ngModel.$setViewValue(scope.dtparts.date + ' ' + scope.dtparts.time);
-              ngModel.$setViewValue((scope.dtparts.date ? scope.dtparts.date : '') + ' ' + (scope.dtparts.time ? scope.dtparts.time : ''));
-            }
-          }
-
-          scope.$watch('dtparts.date', updateParent);
-          scope.$watch('dtparts.time', updateParent);
-
-          function validate() {
-            var incompleteDateTime = _.isEmpty(scope.dtparts.date) ^ _.isEmpty(scope.dtparts.time);
-            ngModel.$setValidity('incompleteDateTime', !incompleteDateTime);
-          }
-
-          function updateRequired() {
-            scope.required = scope.$parent.$eval(attrs.ngRequired);
-          }
-
-          if (attrs.ngRequired) {
-            updateRequired();
-            scope.$parent.$watch(attrs.ngRequired, updateRequired);
-          }
-
-          scope.reset = function reset() {
-            scope.dtparts = {date: '', time: ''};
-            ngModel.$setViewValue('');
-          };
         }
       };
     })
@@ -635,32 +566,6 @@
           };
         },
         link: function (scope, element, attrs) {}
-      };
-    })
-
-    // Display a time-entry field.
-    // example: <input crm-ui-time ng-model="myobj.mytimefield" />
-    .directive('crmUiTime', function ($parse, $timeout) {
-      return {
-        restrict: 'AE',
-        require: 'ngModel',
-        scope: {
-        },
-        link: function (scope, element, attrs, ngModel) {
-          element.addClass('crm-form-text six');
-          element.timeEntry({show24Hours: true});
-
-          ngModel.$render = function $render() {
-            element.timeEntry('setTime', ngModel.$viewValue);
-          };
-
-          var updateParent = (function () {
-            $timeout(function () {
-              ngModel.$setViewValue(element.val());
-            });
-          });
-          element.on('change', updateParent);
-        }
       };
     })
 

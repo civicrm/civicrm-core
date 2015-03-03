@@ -50,7 +50,7 @@
           <div>
             <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
             <label for="schedule-send-at">{{ts('Send A/B test at:')}}</label>
-            <span crm-ui-date-time ng-model="schedule.datetime"></span>
+            <input crm-ui-datepicker ng-model="schedule.datetime"/>
           </div>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <div>
           <input ng-model="assessSched.mode" type="radio" name="assess" value="at" id="schedule-assess-at"/>
           <label for="schedule-assess-at">{{ts('Assess A/B test at:')}}</label>
-          <span crm-ui-date-time ng-model="assessSched.datetime"></span>
+          <input crm-ui-datepicker ng-model="assessSched.datetime"/>
         </div>
       </div>
     </div>

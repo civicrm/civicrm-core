@@ -122,22 +122,14 @@
         };
 
         ngModel.$render = function $render() {
-          var sched = ngModel.$viewValue;
-          if (!_.isEmpty(sched)) {
-            schedule.mode = 'at';
-            schedule.datetime = sched;
-          }
-          else {
-            schedule.mode = 'now';
-          }
           validate();
         };
-
+        // Update time value based on radio selection
         var updateParent = (function () {
           switch (schedule.mode) {
             case 'now':
               ngModel.$setViewValue(null);
-              schedule.datetime = ' ';
+              schedule.datetime = '';
               break;
             case 'at':
               ngModel.$setViewValue(schedule.datetime);
@@ -146,6 +138,9 @@
               throw 'Unrecognized schedule mode: ' + schedule.mode;
           }
           validate();
+          // Angular model changes don't seem to trigger the "change" event.
+          // Redundantly setting the value here to ensure it happens before the event and not after
+          $('.crm-hidden-date', element).val(schedule.datetime).trigger('change');
         });
 
         function validate() {
@@ -154,7 +149,7 @@
               ngModel.$setValidity('empty', true);
               break;
             case 'at':
-              ngModel.$setValidity('empty', !_.isEmpty(schedule.datetime) && schedule.datetime !== ' ');
+              ngModel.$setValidity('empty', !_.isEmpty(schedule.datetime));
               break;
             default:
               throw 'Unrecognized schedule mode: ' + schedule.mode;
@@ -162,17 +157,14 @@
         }
 
         $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
-        $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {
-          // automatically switch mode based on datetime entry
-          if (oldValue != newValue) {
-            if (_.isEmpty(newValue) || newValue == " ") {
-              schedule.mode = 'now';
-            }
-            else {
-              schedule.mode = 'at';
-            }
+
+        // Watch changes in the date element, but only those initiated by the user
+        // (model-based changes to this field should not force-update other parts of the model)
+        $(element).on('change', '.crm-hidden-date', function(e, context) {
+          if (context === 'userInput' || context === 'crmClear') {
+            schedule.mode = $(this).val() ? 'at' : 'now';
+            updateParent();
           }
-          updateParent();
         });
       }
     };
