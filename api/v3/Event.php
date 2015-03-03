@@ -95,6 +95,14 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
  *   Array of all found event property values.
  */
 function civicrm_api3_event_get($params) {
+  // If $params refers to a custom field, use a hack for
+  // CRM-16036
+  foreach (array_keys($params) as $key) {
+    if (substr($key, 0, 7) === 'custom_') {
+      return _civicrm_api3_get_using_query_object_simple(
+        _civicrm_api3_get_BAO(__FUNCTION__), $params);
+    }
+  }
 
   //legacy support for $params['return.sort']
   if (!empty($params['return.sort'])) {
