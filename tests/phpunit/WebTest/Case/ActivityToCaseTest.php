@@ -320,14 +320,13 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
     $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div[text()='Scheduled']");
 
-    $this->waitForElementPresent("xpath=//html/body/div[7]");
-    $this->waitForElementPresent('activity_change_status');
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/select");
 
     // change activity status
-    $this->select('activity_change_status', 'value=2');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
+    $this->select("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/select", 'value=2');
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/button[@type='submit']");
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
