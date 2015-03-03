@@ -11,7 +11,7 @@
 
     <div crm-ui-wizard>
 
-      <div crm-ui-wizard-step crm-title="ts('Content')" ng-form="contentForm">
+      <div crm-ui-wizard-step="10" crm-title="ts('Content')" ng-form="contentForm" ng-if="checkPerm('create mailings') || checkPerm('access CiviMail')">
         <div crm-mailing-block-summary crm-mailing="mailing"/>
         <div crm-mailing-block-mailing crm-mailing="mailing"/>
         <div crm-ui-accordion crm-title="ts('HTML')">
@@ -32,11 +32,7 @@
         </div>
       </div>
 
-      <div crm-ui-wizard-step crm-title="ts('Options')" ng-form="optionsForm">
-        <div crm-ui-accordion crm-title="ts('Schedule')">
-          <div crm-mailing-block-schedule crm-mailing="mailing"/>
-        </div>
-
+      <div crm-ui-wizard-step="20" crm-title="ts('Options')" ng-form="optionsForm" ng-if="checkPerm('create mailings') || checkPerm('access CiviMail')">
         <div crm-ui-accordion crm-title="ts('Responses')" crm-collapsed="true">
           <div crm-mailing-block-responses crm-mailing="mailing"/>
         </div>
@@ -48,13 +44,24 @@
         </div>
       </div>
 
-      <div crm-ui-wizard-step crm-title="ts('Review')" ng-form="reviewForm">
+      <div crm-ui-wizard-step="40" crm-title="ts('Review')" ng-form="schedForm" ng-if="checkPerm('schedule mailings') || checkPerm('access CiviMail')">
         <div crm-ui-accordion crm-title="ts('Review')">
           <div crm-mailing-block-review crm-mailing="mailing"/>
         </div>
-        <center>
+        <div crm-ui-accordion crm-title="ts('Schedule')">
+          <div crm-mailing-block-schedule crm-mailing="mailing"/>
+        </div>
+        <div crm-ui-accordion crm-title="ts('Approval')" ng-if="checkPerm('approve mailings') || checkPerm('access CiviMail')">
+          <div crm-mailing-block-approve crm-mailing="mailing"/>
+        </div>
+        <center ng-if="!checkPerm('approve mailings') && !checkPerm('access CiviMail')">
           <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
             <div>{{ts('Submit Mailing')}}</div>
+          </a>
+        </center>
+        <center ng-if="checkPerm('approve mailings') || checkPerm('access CiviMail')">
+          <a class="button crmMailing-submit-button" ng-click="approve('Approved')" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
+            <div>{{ts('Submit and Approve Mailing')}}</div>
           </a>
         </center>
       </div>

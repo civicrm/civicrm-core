@@ -881,7 +881,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = $attributes ? $attributes : array();
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
-    $attributes += array('id_suffix' => $name);
+    $attributes['id_suffix'] = $name;
     foreach ($values as $key => $var) {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
     }
