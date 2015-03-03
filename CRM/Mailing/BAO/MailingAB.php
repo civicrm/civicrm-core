@@ -172,7 +172,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @return int
    */
-
   public static function getABTest($mailingID) {
     $query = "SELECT * FROM `civicrm_mailing_abtest` ab
       where (ab.mailing_id_a = %1
