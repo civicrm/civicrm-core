@@ -242,7 +242,17 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $profile = str_replace('/administrator/', '/index.php', $profile);
     }
     elseif ($config->userFramework == 'WordPress') {
-      $profile = str_replace('/wp-admin/admin.php', '/index.php', $profile);
+      //@todo remove this part when it is OK to deprecate CIVICRM_UF_WP_BASEPAGE-CRM-15933
+      if (defined('CIVICRM_UF_WP_BASEPAGE')) {
+        $wpbase = CIVICRM_UF_WP_BASEPAGE;
+      }
+      elseif (!empty($config->wpBasePage)) {
+        $wpbase = $config->wpBasePage;
+      }
+      else {
+        $wpbase = 'index.php';
+      }
+      $profile = str_replace('/wp-admin/admin.php', '/'.$wpbase.'/', $profile);
     }
 
     // add header files
