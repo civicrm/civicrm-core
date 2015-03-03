@@ -474,21 +474,62 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
 
   // TODO: find out which fields to select
   $select_fields = "title,id";
+  $quantified_select_fields = "a.title,a.id";
 
-  $select = "SELECT $select_fields ";
-  $from = "FROM " . $dao->tableName() . " ";
+  $select = "SELECT $quantified_select_fields ";
+  $from = "FROM " . $dao->tableName() . " a ";
   $where = "WHERE 1=1 ";
 
   $query_params = array();
+  $custom_field_wheres = array();
 
   foreach($params as $key => $value) {
     // TODO: values of the form array("op" => "value")
     if (in_array($key, $where_fields)) {
       $param_nr = count($query_params) + 1;
+      // TODO: handle e.g. DateTime, null, ...
       $query_params[$param_nr] = array($value, 'String');
-      $where .= "AND $key = %$param_nr ";
+      $where .= "AND a.$key = %$param_nr ";
+    }
+    else {
+      $cf_id = CRM_Core_BAO_CustomField::getKeyID($key);
+      if ($cf_id) {
+        $custom_field_where[$cf_id] = $value;
+      }
     }
   };
+
+  // find details of the relevant custom fields
+  $id_string = implode(',', array_keys($custom_field_where));
+  $cf_query = "
+SELECT f.id, f.label, f.data_type,
+       f.html_type, f.is_search_range,
+       f.option_group_id, f.custom_group_id,
+       f.column_name, g.table_name,
+       f.date_format,f.time_format
+  FROM civicrm_custom_field f,
+       civicrm_custom_group g
+ WHERE f.custom_group_id = g.id
+   AND g.is_active = 1
+   AND f.is_active = 1
+   AND f.id IN ( $id_string )";
+
+  $tables_to_join = array();
+  $cf_dao = CRM_Core_DAO::executeQuery($cf_query);
+  while ($cf_dao->fetch()) {
+    $column_name = $cf_dao->column_name;
+    if (!in_array($cf_dao->table_name, $tables_to_join)) {
+      $tables_to_join[] = $cf_dao->table_name;
+    }
+    $param_nr = count($query_params) + 1;
+    // TODO: handle e.g. DateTimes, null, ...
+    $query_params[$param_nr] = array($custom_field_where[$cf_dao->id], 'String');
+    $where .= "AND $cf_dao->table_name.$cf_dao->column_name = %$param_nr ";
+  }
+
+  foreach($tables_to_join as $table_name) {
+    $from .= "LEFT OUTER JOIN $table_name ON $table_name.entity_id = a.id ";
+  }
 
   $query = "$select $from $where";
 
