@@ -262,17 +262,25 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
-        var params = angular.extend({}, mailing, mailing.recipients, {
-          options: {force_rollback: 1},
-          'api.Mailing.preview': {
-            id: '$value.id'
-          }
-        });
-        delete params.recipients; // the content was merged in
-        return crmApi('Mailing', 'create', params).then(function (result) {
-          // changes rolled back, so we don't care about updating mailing
-          return result.values[result.id]['api.Mailing.preview'].values;
-        });
+        if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
+          return crmApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
+            return result.values;
+          });
+        }
+        else {
+          // Protect against races in saving and previewing by chaining create+preview.
+          var params = angular.extend({}, mailing, mailing.recipients, {
+            options: {force_rollback: 1},
+            'api.Mailing.preview': {
+              id: '$value.id'
+            }
+          });
+          delete params.recipients; // the content was merged in
+          return crmApi('Mailing', 'create', params).then(function(result) {
+            // changes rolled back, so we don't care about updating mailing
+            return result.values[result.id]['api.Mailing.preview'].values;
+          });
+        }
       },
 
       // @param mailing Object (per APIv3)

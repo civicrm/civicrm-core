@@ -56,6 +56,16 @@
   //     console.log('The fields are:', options);
   //   });
   angular.module('crmUtil').factory('crmMetadata', function($q, crmApi) {
+
+    // Convert {key:$,value:$} sequence to unordered {$key: $value} map.
+    function convertOptionsToMap(options) {
+      var result = {};
+      angular.forEach(options, function(o) {
+        result[o.key] = o.value;
+      });
+      return result;
+    }
+
     var cache = {}; // cache[entityName+'::'+action][fieldName].title
     var deferreds = {}; // deferreds[cacheKey].push($q.defer())
     var crmMetadata = {
@@ -92,6 +102,11 @@
             // on success:
             function(fields) {
               cache[cacheKey] = _.indexBy(fields.values, 'name');
+              angular.forEach(cache[cacheKey],function (field){
+                if (field.options) {
+                  field.optionsMap = convertOptionsToMap(field.options);
+                }
+              });
               angular.forEach(deferreds[cacheKey], function(dfr) {
                 dfr.resolve(cache[cacheKey]);
               });

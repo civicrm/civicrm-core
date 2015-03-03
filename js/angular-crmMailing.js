@@ -8,6 +8,8 @@
   var RECIPIENTS_DEBOUNCE_MS = 100;
   var RECIPIENTS_PREVIEW_LIMIT = 10000;
 
+  var APPROVAL_STATUSES = {'Approved': 1, 'Rejected': 2, 'None': 3};
+
   angular.module('crmMailing').config([
     '$routeProvider',
     function ($routeProvider) {
@@ -23,6 +25,9 @@
         '/wizard': '~/crmMailing/edit-wizard.html'
       };
       angular.forEach(editorPaths, function(editTemplate, pathSuffix) {
+        if (CRM && CRM.crmMailing && CRM.crmMailing.workflowEnabled) {
+          editTemplate = '~/crmMailing/edit-workflow.html'; // override
+        }
         $routeProvider.when('/mailing/new' + pathSuffix, {
           template: '<p>' + ts('Initializing...') + '</p>',
           controller: 'CreateMailingCtrl',
@@ -71,12 +76,20 @@
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
+    $scope.checkPerm = CRM.checkPerm;
 
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
+    var myAutosave = null;
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size($scope.mailing.jobs) > 0;
+    };
+
+    // usage: approve('Approved')
+    $scope.approve = function approve(status, options) {
+      $scope.mailing.approval_status_id = APPROVAL_STATUSES[status];
+      return myAutosave.suspend($scope.submit(options));
     };
 
     // @return Promise
@@ -97,7 +110,8 @@
     };
 
     // @return Promise
-    $scope.submit = function submit() {
+    $scope.submit = function submit(options) {
+      options = options || {};
       if (block.check() || $scope.crmMailing.$invalid) {
         return;
       }
@@ -111,7 +125,9 @@
             return crmMailingMgr.submit($scope.mailing);
           })
           .then(function () {
-            $scope.leave('scheduled');
+            if (!options.stay) {
+              $scope.leave('scheduled');
+            }
           })
         ;
       return block(crmStatus({start: ts('Submitting...'), success: ts('Submitted')}, promise));
@@ -163,7 +179,7 @@
       }
     };
 
-    var myAutosave = new CrmAutosaveCtrl({
+    myAutosave = new CrmAutosaveCtrl({
       save: $scope.save,
       saveIf: function() {
         return true;
@@ -260,6 +276,7 @@
     var refreshRecipients = _.debounce(function () {
       $scope.$apply(function () {
         $scope.recipients = null;
+        if (!$scope.mailing) return;
         crmMailingMgr.previewRecipients($scope.mailing, RECIPIENTS_PREVIEW_LIMIT).then(function (recipients) {
           $scope.recipients = recipients;
         });

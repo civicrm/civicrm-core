@@ -50,7 +50,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    */
   public function preProcess() {
     if (CRM_Mailing_Info::workflowEnabled()) {
-      if (!CRM_Core_Permission::check('approve mailings')) {
+      if (!CRM_Core_Permission::check('approve mailings') && !CRM_Core_Permission::check('access CiviMail')) {
         $this->redirectToListing();
       }
     }
@@ -119,7 +119,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       unset($mailApprovalStatus[$noneOptionID]);
     }
 
-    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, TRUE, NULL, TRUE);
+    $this->addRadio('approval_status_id', ts('Approval Status'), $mailApprovalStatus, array(), NULL, TRUE);
 
     $buttons = array(
       array(
