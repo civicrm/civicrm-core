@@ -200,6 +200,11 @@
       }
     });
 
+    // Enable/disable form buttons when not embedded in another form
+    $form.on('change', function() {
+      $('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').prop('disabled', !CRM.utils.initialValueChanged('#recurring-entity-block'));
+    });
+
     // Pluralize frequency options
     var recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode}{literal};
     function pluralizeUnits() {
