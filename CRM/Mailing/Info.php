@@ -153,6 +153,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'create mailings',
       'schedule mailings',
       'approve mailings',
+      'delete in CiviMail',
     ));
 
     return $result;

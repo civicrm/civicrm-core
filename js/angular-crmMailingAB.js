@@ -66,6 +66,7 @@
     var myAutosave = null;
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
+    $scope.checkPerm = CRM.checkPerm;
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
