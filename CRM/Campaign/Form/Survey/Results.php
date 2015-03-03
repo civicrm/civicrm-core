@@ -204,6 +204,12 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
   /**
    * Global validation rules for the form.
+   *
+   * @param $fields
+   * @param $files
+   * @param $form
+   *
+   * @return array|bool
    */
   public static function formRule($fields, $files, $form) {
     $errors = array();
