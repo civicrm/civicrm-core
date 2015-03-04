@@ -57,7 +57,7 @@
         highlightSelected();
       });
 
-      var childTag = {/literal}{$loadjsTree}{literal};
+      var childTag = "{/literal}{$loadjsTree}{literal}";
       if (childTag) {
         //load js tree.
         $("#tagtree").jstree({
