@@ -265,10 +265,29 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       $civiMailBasePerms,
     ),
   );
-  $permissions['mailing_a_b'] = $permissions['mailing'];
   $permissions['mailing_group'] = $permissions['mailing'];
   $permissions['mailing_job'] = $permissions['mailing'];
   $permissions['mailing_recipients'] = $permissions['mailing'];
+
+  $permissions['mailing_a_b'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'access CiviMail',
+      'delete in CiviMail',
+    ),
+    'submit' => array(
+      'access CiviCRM',
+      array('access CiviMail', 'schedule mailings'),
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+  );
 
   // Membership permissions
   $permissions['membership'] = array(
