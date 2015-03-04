@@ -471,7 +471,9 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   $dao = new $dao_name();
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $entity_fields = _civicrm_api3_build_fields_array($dao, TRUE);
-  $where_fields = array_intersect(array_keys($entity_fields), array_keys($params));
+  $entity_field_names = _civicrm_api3_field_names($entity_fields);
+  $where_fields = array_intersect($entity_field_names, array_keys($params));
+  $options = _civicrm_api3_get_options_from_params($params);
 
   // $select_fields will contain information about the colum names we need to
   // select. E.g. 
@@ -484,22 +486,15 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   // prefixed by the source table. This source table is either a,
   // referring to the entity we are querying, either the name of a
   // custom field table we need to join.
-  $select_fields = array(
-    "id" => "a.id",
-    "title" => "a.title",
-    "custom_7" => "civicrm_value_event_custom_things_4.some_id_7",
-  );
 
-  $select = "SELECT 1";
-  foreach ($select_fields as $name => $column) {
-    $select .= ", $column as $name";
-  }
+
 
   $from = "FROM " . $dao->tableName() . " a ";
   $where = "WHERE 1=1 ";
 
   $query_params = array();
   $custom_field_wheres = array();
+  $custom_field_selects = array();
 
   foreach($params as $key => $value) {
     // TODO: values of the form array("op" => "value")
@@ -515,13 +510,39 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
       // a where clause later.
       $cf_id = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($cf_id) {
-        $custom_field_where[$cf_id] = $value;
+        $custom_field_wheres[$cf_id] = $value;
       }
     }
   };
 
+  // select.
+
+  $select_fields = array();
+  // always select id.
+  $select_fields["id"] = "a.id";
+
+  // find out which other fields to select
+
+  if (!empty($options['return']) && is_array($options['return'])) {
+    foreach ($options['return'] as $field_name => $value) {
+      if (in_array($field_name, $entity_field_names)) {
+        // select entity field
+        $select_fields[$field_name] = "a.$field_name";
+      }
+      else {
+        $cf_id = CRM_Core_BAO_CustomField::getKeyID($field_name);
+        if ($cf_id) {
+          $custom_field_selects[]=$cf_id;
+        }
+      }
+    }
+  }
+
+  $relevant_fields = array_unique(
+    array_merge(array_keys($custom_field_wheres), $custom_field_selects));
+
   // query to find the relevant custom fields
-  $id_string = implode(',', array_keys($custom_field_where));
+  $id_string = implode(',', $relevant_fields);
   $cf_query = "
 SELECT f.id, f.label, f.data_type,
        f.html_type, f.is_search_range,
@@ -535,7 +556,7 @@ SELECT f.id, f.label, f.data_type,
    AND f.is_active = 1
    AND f.id IN ( $id_string )";
 
-  // process custom fields on which to filter.
+  // process custom fields needed for select or where.
   $tables_to_join = array();
   $cf_dao = CRM_Core_DAO::executeQuery($cf_query);
   while ($cf_dao->fetch()) {
@@ -543,17 +564,27 @@ SELECT f.id, f.label, f.data_type,
     if (!in_array($cf_dao->table_name, $tables_to_join)) {
       $tables_to_join[] = $cf_dao->table_name;
     }
-    $param_nr = count($query_params) + 1;
-    // TODO: handle e.g. DateTimes, null, ...
-    $query_params[$param_nr] = array($custom_field_where[$cf_dao->id], 'String');
-    $where .= "AND $cf_dao->table_name.$cf_dao->column_name = %$param_nr ";
+    if (!empty($custom_field_wheres[$cf_dao->id])) {
+      // add to where
+      $param_nr = count($query_params) + 1;
+      // TODO: handle e.g. DateTimes, null, ...
+      $query_params[$param_nr] = array($custom_field_wheres[$cf_dao->id], 'String');
+      $where .= "AND $cf_dao->table_name.$cf_dao->column_name = %$param_nr ";
+    }
+    if (in_array($cf_dao->id, $custom_field_selects)) {
+      // add to select.
+      $select_fields["custom_$cf_dao->id"] = "$cf_dao->table_name.$cf_dao->column_name";
+    }
   }
 
   foreach($tables_to_join as $table_name) {
     $from .= "LEFT OUTER JOIN $table_name ON $table_name.entity_id = a.id ";
   }
 
-  // TODO: also join the tables we need for the custom fields to select.
+  $select = "SELECT 1";
+  foreach ($select_fields as $name => $column) {
+    $select .= ", $column as $name";
+  }
 
   $query = "$select $from $where";
 
@@ -572,6 +603,21 @@ SELECT f.id, f.label, f.data_type,
   }
 
   return civicrm_api3_create_success($result_entities, $params, $entity, 'get', $dao);
+}
+
+/**
+ * Returns field names of the given entity fields.
+ *
+ * @param string $fields
+ *   Fields array to retrieve the field names for.
+ * @return array
+ */
+function _civicrm_api3_field_names($fields) {
+  $result = array();
+  foreach ($fields as $key=>$value) {
+    $result[]=$value['name'];
+  }
+  return $result;
 }
 
 /**
