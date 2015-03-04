@@ -75,18 +75,19 @@
         highlightSelected();
         CRM.updateContactSummaryTags();
       });
-
-      //load js tree.
-      $("#tagtree").jstree({
-        plugins : ["themes", "html_data"],
-        themes: {
-          "theme": 'classic',
-          "dots": false,
-          "icons": false,
-          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
-        }
-      });
-
+      var childTag = "{/literal}{$loadjsTree}{literal}";
+      if (childTag) {
+        //load js tree.
+        $("#tagtree").jstree({
+          plugins : ["themes", "html_data"],
+          themes: {
+            "theme": 'classic',
+            "dots": false,
+            "icons": false,
+            "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          }
+        });
+      }
       {/literal}
       {if $permission neq 'edit'}
         {literal}
