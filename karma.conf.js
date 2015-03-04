@@ -1,7 +1,6 @@
 module.exports = function(config) {
   config.set({
     autoWatch: true,
-    basePath: '..',
     browsers: ['PhantomJS'],
     exclude: [
     ],
