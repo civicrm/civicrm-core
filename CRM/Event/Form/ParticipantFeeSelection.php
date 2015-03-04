@@ -241,7 +241,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     CRM_Event_BAO_Participant::changeFeeSelections($params, $this->_participantId, $this->_contributionId, $feeBlock, $lineItems, $this->_paidAmount, $params['priceSetId']);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount');
     // email sending
-    if (CRM_Utils_Array::value('send_receipt', $params)) {
+    if (!empty($params['send_receipt'])) {
       $fetchParticipantVals = array('id' => $this->_participantId);
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails, CRM_Core_DAO::$_nullArray);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);

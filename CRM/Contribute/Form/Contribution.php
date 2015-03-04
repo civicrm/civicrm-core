@@ -1357,7 +1357,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $this->assign('dataArray', $taxRate);
         }
         else {
-          if (CRM_Utils_Array::value('price_set_id', $submittedValues)) {
+          if (!empty($submittedValues['price_set_id'])) {
             $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
             $this->assign('getTaxDetails', $getTaxDetails);
             $this->assign('dataArray', $taxRate);

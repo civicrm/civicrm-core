@@ -1008,7 +1008,7 @@ CRM.strings = CRM.strings || {};
       message: ts('Are you sure you want to continue?'),
       url: null,
       width: 'auto',
-      modal: true,
+      height: 'auto',
       resizable: false,
       dialogClass: 'crm-container crm-confirm',
       close: function () {
@@ -1019,7 +1019,12 @@ CRM.strings = CRM.strings || {};
         yes: ts('Continue')
       }
     };
+    if (options && options.url) {
+      settings.resizable = true;
+      settings.height = '50%';
+    }
     $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
+    settings = CRM.utils.adjustDialogDefaults(settings);
     if (!settings.buttons && $.isPlainObject(settings.options)) {
       $.each(settings.options, function(op, label) {
         buttons.push({
