@@ -100,7 +100,7 @@ class CRM_Core_Form_RecurringEntity {
     $excludeOptionValues = array();
     if (!empty($optionValue)) {
       foreach ($optionValue as $key => $val) {
-        $excludeOptionValues[$val['value']] = CRM_Utils_Date::customFormat($val['value']);
+        $excludeOptionValues[$val['value']] = substr(CRM_Utils_Date::mysqlToIso($val['value']), 0, 10);
       }
       self::$_excludeDateInfo = $excludeOptionValues;
     }
