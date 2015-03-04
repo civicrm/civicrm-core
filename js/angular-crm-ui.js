@@ -65,15 +65,19 @@
           crmUiDatepicker: '='
         },
         link: function (scope, element, attrs, ngModel) {
+          ngModel.$render = function () {
+            element.val(ngModel.$viewValue).change();
+          };
+
           element
             .crmDatepicker(scope.crmUiDatepicker)
             .on('change', function() {
-              var requiredLength = 16;
+              var requiredLength = 19;
               if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
                 requiredLength = 10;
               }
               if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                requiredLength = 5;
+                requiredLength = 8;
               }
               ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
             });

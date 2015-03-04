@@ -611,19 +611,22 @@ CRM.strings = CRM.strings || {};
         $dateField.datepicker(settings).change(updateDataField);
       }
       function updateInputFields(e, context) {
+        var val = $dataField.val(),
+          time = null;
         if (context !== 'userInput' && context !== 'crmClear') {
-          if ($(this).val()) {
-            if ($dateField.length) {
-              $dateField.datepicker('setDate', $.datepicker.parseDate('yy-mm-dd', $(this).val()));
+          if ($dateField.length) {
+            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+          }
+          if ($timeField.length) {
+            if (val.length === 8) {
+              time = val;
+            } else if (val.length === 19) {
+              time = val.split(' ')[1];
             }
-            if ($timeField.length) {
-              $timeField.timeEntry('setTime', ($dateField.length ? $(this).val().split(' ')[1] : $(this).val()) || null);
-            }
-          } else {
-            $dateField.add($timeField).val('');
+            $timeField.timeEntry('setTime', time);
           }
         }
-        $clearLink.css('visibility', $(this).val() ? 'visible' : 'hidden');
+        $clearLink.css('visibility', val ? 'visible' : 'hidden');
       }
       function updateDataField(e, context) {
         if (context !== 'crmClear') {
@@ -632,7 +635,7 @@ CRM.strings = CRM.strings || {};
             val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
           }
           if ($timeField.val()) {
-            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 5);
+            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 8);
           }
           $dataField.val(val).trigger('change', ['userInput']);
         }
