@@ -524,7 +524,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $defaults = $this->_values;
+    $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...
     if (isset($this->_activityId)) {
       if (empty($defaults['activity_date_time'])) {
@@ -536,9 +536,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $defaults['activity_date_time_time']
           ) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
         list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
-        $recurringEntityDefaults = array();
-        $recurringEntityDefaults = CRM_Core_Form_RecurringEntity::setDefaultValues();
-        $defaults = array_merge($defaults, $recurringEntityDefaults);
       }
 
       if ($this->_context != 'standalone') {
@@ -638,10 +635,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
-      $this->_fields['followup_activity_type_id']['attributes'],
+      array('' => '- ' . ts('select') . ' -') + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, array(
         'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
-        'class' => 'crm-select2',
+        'class' => 'crm-select2 required',
       )
     );
 
@@ -836,13 +833,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       return TRUE;
     }
     $errors = array();
-    if (!$self->_single && !$fields['activity_type_id']) {
+    if ((array_key_exists('activity_type_id', $fields) || !$self->_single) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
-    }
-
-    //Activity type is mandatory if creating new activity, CRM-4515
-    if (array_key_exists('activity_type_id', $fields) && empty($fields['activity_type_id'])) {
-      $errors['activity_type_id'] = ts('Activity Type is required field.');
     }
 
     if (CRM_Utils_Array::value('activity_type_id', $fields) == 3 &&
@@ -969,7 +961,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // set params for repeat configuration in create mode
       $params['entity_id'] = $activityId;
       $params['entity_table'] = 'civicrm_activity';
-      $scheduleReminderDetails = array();
       if (!empty($params['entity_id']) && !empty($params['entity_table'])) {
         $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($params['entity_id'], $params['entity_table']);
         if ($checkParentExistsForThisId) {
@@ -985,6 +976,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         }
       }
       $params['dateColumns'] = array('activity_date_time');
+
+      // Set default repetition start if it was not provided.
+      if (empty($params['repetition_start_date'])) {
+        $params['repetition_start_date'] = $params['activity_date_time'];
+      }
 
       // unset activity id
       unset($params['id']);

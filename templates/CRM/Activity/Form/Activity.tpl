@@ -211,38 +211,7 @@
   {if $action eq 2 OR $action eq 1}
     <tr class="crm-activity-form-block-recurring_activity">
       <td colspan="2">
-        {include file="CRM/Core/Form/RecurringEntity.tpl"}
-        {literal}
-          <script type="text/javascript">
-            CRM.$(function($) {
-              if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
-                $('#repetition_start_date, input[id^="repetition_start_date_display_"]').val($('#activity_date_time').val());
-                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
-              }
-
-              $('input[id^="activity_date_time_display_"]').change(function() {
-                $('#repetition_start_date, input[id^="repetition_start_date_display_"]').val($('#activity_date_time').val());
-              });
-
-              $('#activity_date_time_time').change(function() {
-                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
-              });
-
-              if ($('#start_action_offset').val() == "" && $('input[id^="repeat_absolute_date_display_"]').val() == "") {
-                $('#recurring-entity-block').addClass('collapsed');
-              }
-            });
-          </script>
-        {/literal}
-        {if $action eq 1}
-          {literal}
-            <script type="text/javascript">
-              CRM.$(function($) {
-                $('#recurring-entity-block div.crm-submit-buttons').css('display', 'none');
-              });
-            </script>
-          {/literal}
-        {/if}
+        {include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=true}
       </td>
     </tr>
   {/if}
