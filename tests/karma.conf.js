@@ -2,7 +2,7 @@ module.exports = function(config) {
   config.set({
     autoWatch: true,
     basePath: '..',
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
     exclude: [
     ],
     files: [
