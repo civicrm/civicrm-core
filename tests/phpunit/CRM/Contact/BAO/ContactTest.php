@@ -668,8 +668,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contact = CRM_Contact_BAO_Contact::create($contactParams);
     $contactId = $contact->id;
 
-    //delete contact.
-    CRM_Contact_BAO_Contact::deleteContact($contactId);
+    //delete contact permanently.
+    CRM_Contact_BAO_Contact::deleteContact($contactId, FALSE, TRUE);
 
     //Now check DB for location elements.
     //Now check DB for Address
