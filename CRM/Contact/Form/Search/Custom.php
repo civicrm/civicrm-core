@@ -122,7 +122,6 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::buildTaskList();
 
     return $this->_customClass->buildTaskList($this);
-    }
   }
 
   public function buildQuickForm() {
