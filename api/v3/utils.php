@@ -467,7 +467,6 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @return array
  */
 function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
-  // TODO: count() query
   $dao = new $dao_name();
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $custom_fields = _civicrm_api3_custom_fields_for_entity($entity);
@@ -557,6 +556,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   $select = "SELECT 1";
   $from = "FROM " . $dao->tableName() . " a";
   $where = "WHERE 1=1";
+  $misc = "";
   $query_params = array();
 
   foreach ($select_fields as $column => $alias) {
@@ -580,9 +580,33 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
     }
   };
 
-  // TODO: limit, sort
 
-  $query = "$select $from $where";
+  // order by
+  if (!empty($options['sort'])) {
+    $sort_fiels=array();
+    foreach (explode(',', $options['sort']) as $sort_option) {
+      $words = preg_split("/[\s]+/", $sort_option);
+      if (count($words) > 0 && in_array($words[0], array_values($select_fields))) {
+        $tmp = $words[0];
+        if (strtoupper($words[1]) == 'DESC') {
+          $tmp .= " DESC";
+        }
+        $sort_fields[] = $tmp;
+      }
+    }
+    if (count($sort_fields) > 0) {
+      $misc .= " ORDER BY ".implode(",", $sort_fields);
+    }
+  }
+
+  // limit
+  if (!empty($options['limit'])) {
+    ++$param_nr;
+    $misc .= " LIMIT %$param_nr";
+    $query_params[$param_nr] = array($options['limit'], 'Integer');
+  }
+
+  $query = "$select $from $where $misc";
 
   $result_entities = array();
 
