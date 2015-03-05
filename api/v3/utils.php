@@ -479,9 +479,6 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   // $select_fields maps column names to the field names of the result
   // values.
   $select_fields = array();
-  // always select id.
-  // 'a' is an alias for the entity table we are selecting from.
-  $select_fields["a.id"] = "id";
 
   // array with elements {'column' => 'value'}
   // again, column is prefixed by 'a.' or the name of the custom field
@@ -493,15 +490,31 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   $tables_to_join=array();
 
   // populate $select_fields
-  // TODO: select some (all?) fields if the user didn't provide a
-  // 'return' option.
-  if (!empty($options['return']) && is_array($options['return'])) {
+  if (empty($options['return']) || !is_array($options['return'])) {
+    // return every field if no return option exists.
+    foreach ($entity_field_names as $field_name) {
+      // 'a.' is an alias for the entity table.
+      $select_fields["a.$field_name"] = $field_name;
+    }
+    foreach ($custom_fields as $cf_id => $custom_field) {
+      $table_name = $custom_field["table_name"];
+      $column_name = $custom_field["column_name"];
+      $select_fields["$table_name.$column_name"] = "custom_$cf_id";
+      if (!in_array($table_name, $tables_to_join)) {
+        $tables_to_join[] = $table_name;
+      }
+    }
+  }
+  else {
+    // look at return option.
     foreach ($options['return'] as $field_name => $value) {
       if (in_array($field_name, $entity_field_names)) {
         // select entity field
         $select_fields["a.$field_name"] = $field_name;
       }
       else {
+        // always select ID.
+        $select_fields["a.id"] = "id";
         $cf_id = CRM_Core_BAO_CustomField::getKeyID($field_name);
         if ($cf_id) {
           $table_name = $custom_fields[$cf_id]["table_name"];
@@ -585,7 +598,9 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
 function _civicrm_api3_field_names($fields) {
   $result = array();
   foreach ($fields as $key=>$value) {
-    $result[]=$value['name'];
+    if (!empty($value['name'])) {
+      $result[]=$value['name'];
+    }
   }
   return $result;
 }
