@@ -81,7 +81,7 @@
             // want to force-enable tracking.
             open_tracking: "1",
             url_tracking: "1",
-            mailing_type:"experiment",
+            mailing_type:"experiment"
           };
           crmMailingAB.mailings.a = crmMailingMgr.create(mailingDefaults);
           crmMailingAB.mailings.b = crmMailingMgr.create(mailingDefaults);

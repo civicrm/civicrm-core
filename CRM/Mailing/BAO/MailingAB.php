@@ -170,7 +170,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @param int $mailingID
    *   Mailing ID.
    *
-   * @return int
+   * @return object
    */
   public static function getABTest($mailingID) {
     $query = "SELECT * FROM `civicrm_mailing_abtest` ab
