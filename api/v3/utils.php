@@ -480,10 +480,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   // values.
   $select_fields = array();
 
-  // array with elements {'column' => 'value'}
-  // again, column is prefixed by 'a.' or the name of the custom field
-  // table.
-  // TODO: change this to something like {'column', 'operator', 'value'}
+  // array with elements array('colummn', 'operator', 'value');
   $where_clauses=array();
 
   // Tables we need to join with to retrieve the custom values.
@@ -520,15 +517,34 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
 
   // populate $where_clauses
   foreach($params as $key => $value) {
+    if (!is_array($value)) {
+      $operator = "=";
+      $rhs = $value;
+    }
+    else {
+      // We expect only one element in the array, of the form
+      // "operator" => "rhs".
+      $operator = array_keys($value)[0];
+      if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+        // if operator not found, use = as default.
+        $operator = "=";
+      }
+      $rhs = $value[$operator];
+    }
+
     if (in_array($key, $entity_field_names)) {
-      $where_clauses["a.$key"] = $value;
+      $where_clauses[] = array("a.$key", $operator, $rhs);
     }
     else {
       $cf_id = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($cf_id) {
         $table_name = $custom_fields[$cf_id]["table_name"];
         $column_name = $custom_fields[$cf_id]["column_name"];
-        $where_clauses["$table_name.$column_name"] = $value;
+        $where_clauses[] = array(
+          "$table_name.$column_name",
+          $operator,
+          $rhs,
+        );
         if (!in_array($table_name, $tables_to_join)) {
           $tables_to_join[] = $table_name;
         }
@@ -552,11 +568,16 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   }
 
   $param_nr = 0;
-  foreach ($where_clauses as $key => $value) {
-    ++$param_nr;
-    $where .= " AND $key = %$param_nr";
-    // TODO: check whether tis works with datetime, null,...
-    $query_params[$param_nr] = array($value, 'String');
+  foreach ($where_clauses as $clause) {
+    if (substr($clause[1], -4) == "NULL") {
+      $where .= " AND $clause[0] $clause[1]";
+    }
+    else {
+      ++$param_nr;
+      $where .= " AND $clause[0] $clause[1] %$param_nr";
+      // TODO: check whether tis works with datetime, null,...
+      $query_params[$param_nr] = array($clause[2], 'String');
+    }
   };
 
   // TODO: limit, sort
