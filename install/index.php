@@ -9,7 +9,7 @@
  * Copyright (c) 2006-7, SilverStripe Limited - www.silverstripe.com
  * All rights reserved.
  *
- * Changes and modifications (c) 2007-8 by CiviCRM LLC
+ * Changes and modifications (c) 2007-2015 by CiviCRM LLC
  *
  */
 
@@ -48,18 +48,12 @@ else {
 }
 
 global $installType;
-$installType = strtolower($_SESSION['civicrm_install_type']);
-
-if (!in_array($installType, array('drupal', 'wordpress'))) {
-  $errorTitle = "Oops! Unsupported installation mode";
-  $errorMsg = "";
-  errorDisplayPage($errorTitle, $errorMsg);
-}
-
 global $crmPath;
 global $pkgPath;
 global $installDirPath;
 global $installURLPath;
+
+$installType = strtolower($_SESSION['civicrm_install_type']);
 
 if ($installType == 'drupal') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
@@ -70,31 +64,16 @@ elseif ($installType == 'wordpress') {
   $installDirPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
   $installURLPath = WP_PLUGIN_URL . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
 }
+else {
+  $errorTitle = "Oops! Unsupported installation mode";
+  $errorMsg = sprintf('%s: unknown installation mode. Please refer to the online documentation for more information.', $installType);
+  errorDisplayPage($errorTitle, $errorMsg, FALSE);
+}
 
 $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
-
-$docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
-
-if ($installType == 'drupal') {
-  //lets check only /modules/.
-  $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
-
-  if (!preg_match($pattern,
-    str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME'])
-  )
-  ) {
-    $errorTitle = "Oops! Please Correct Your Install Location";
-    $errorMsg = "Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-        'sites',
-        'all',
-        'modules',
-      )) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
-    errorDisplayPage($errorTitle, $errorMsg);
-  }
-}
 
 // Load civicrm database config
 if (isset($_REQUEST['mysql'])) {
@@ -187,21 +166,34 @@ elseif ($installType == 'wordpress') {
   );
 }
 
+if ($installType == 'drupal') {
+  // Lets check only /modules/.
+  $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
+
+  if (!preg_match($pattern, str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME']))) {
+    $directory = implode(CIVICRM_DIRECTORY_SEPARATOR, array('sites', 'all', 'modules'));
+    $errorTitle = ts("Oops! Please correct your install location");
+    $errorMsg = ts("Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>%1</strong> directory below your Drupal root directory.", array(1 => $directory));
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
 // Exit with error if CiviCRM has already been installed.
 if ($alreadyInstalled) {
-  $errorTitle = "Oops! CiviCRM is Already Installed";
-  if ($installType == 'drupal') {
+  $errorTitle = ts("Oops! CiviCRM is already installed");
+  $settings_directory = $cmsPath;
 
-    $errorMsg = "CiviCRM has already been installed in this Drupal site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
-        '[your Drupal root directory]',
-        'sites',
-        $siteDir,
-      )) . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
+  if ($installType == 'drupal') {
+    $settings_directory = implode(CIVICRM_DIRECTORY_SEPARATOR, array(
+      ts('[your Drupal root directory]'),
+      'sites',
+      $siteDir,
+    ));
   }
-  elseif ($installType == 'wordpress') {
-    $errorMsg = "CiviCRM has already been installed in this WordPress site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . $cmsPath . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
-  }
-  errorDisplayPage($errorTitle, $errorMsg);
+
+  $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, ts('Installation Guide'), NULL, NULL, "wiki");
+  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, <a href='%2'>refer to the online documentation</a>.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
+  errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
 $versionFile = $crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm-version.php';
@@ -215,11 +207,9 @@ else {
 
 if ($installType == 'drupal') {
   // Ensure that they have downloaded the correct version of CiviCRM
-  if ($civicrm_version['cms'] != 'Drupal' &&
-    $civicrm_version['cms'] != 'Drupal6'
-  ) {
-    $errorTitle = "Oops! Incorrect CiviCRM Version";
-    $errorMsg = "This installer can only be used for the Drupal version of CiviCRM. Refer to the online " . $docLink . " for information about installing CiviCRM on PHP4 servers OR installing CiviCRM for Joomla!";
+  if ($civicrm_version['cms'] != 'Drupal' && $civicrm_version['cms'] != 'Drupal6') {
+    $errorTitle = ts("Oops! Incorrect CiviCRM version");
+    $errorMsg = ts("This installer can only be used for the Drupal version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
   }
 
@@ -237,8 +227,8 @@ if ($installType == 'drupal') {
   }
 
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
-    $errorTitle = "Oops! Incorrect Drupal Version";
-    $errorMsg = "This version of CiviCRM can only be used with Drupal 6.x or 7.x. Please ensure that '" . implode("' or '", $drupalVersionFiles) . "' exists if you are running Drupal 7.0 and over. Refer to the online " . $docLink . " for information about installing CiviCRM.";
+    $errorTitle = ts("Oops! Incorrect Drupal version");
+    $errorMsg = ts("This version of CiviCRM can only be used with Drupal 6.x or 7.x. Please ensure that '%1' exists if you are running Drupal 7.0 and over.", array(1 => implode("' or '", $drupalVersionFiles)));
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -248,8 +238,8 @@ elseif ($installType == 'wordpress') {
 
   // Ensure that they have downloaded the correct version of CiviCRM
   if ($civicrm_version['cms'] != 'WordPress') {
-    $errorTitle = "Oops! Incorrect CiviCRM Version";
-    $errorMsg = "This installer can only be used for the WordPress version of CiviCRM. Refer to the online " . $docLink . " for information about installing CiviCRM for Drupal or Joomla!";
+    $errorTitle = ts("Oops! Incorrect CiviCRM version");
+    $errorMsg = ts("This installer can only be used for the WordPress version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -291,7 +281,7 @@ else {
  * This class checks requirements
  * Each of the requireXXX functions takes an argument which gives a user description of the test.  It's an array
  * of 3 parts:
- *  $description[0] - The test catetgory
+ *  $description[0] - The test category
  *  $description[1] - The test title
  *  $description[2] - The test error to show, if it goes wrong
  */
@@ -1242,8 +1232,8 @@ class Installer extends InstallRequirements {
     if (@mysql_query("CREATE DATABASE $database")) {
     }
     else {
-      $errorTitle = "Oops! Could not create Database $database";
-      $errorMsg = "We encountered an error when attempting to create the database. Please check your mysql server permissions and the database name and try again.";
+      $errorTitle = ts("Oops! Could not create database %1", array(1 => $database));
+      $errorMsg = ts("We encountered an error when attempting to create the database. Please check your MySQL server permissions and the database name and try again.");
       errorDisplayPage($errorTitle, $errorMsg);
     }
   }
@@ -1273,10 +1263,9 @@ class Installer extends InstallRequirements {
       global $installType, $installURLPath;
 
       $registerSiteURL = "https://civicrm.org/register-site";
-      $commonOutputMessage = "
-                      <li>Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
-                      <li>We have integrated KCFinder with CKEditor and TinyMCE. This allows a user to upload images. All uploaded images are public.</li>
-";
+      $commonOutputMessage =
+        "<li>" . ts("Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a %1>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume mailing list).", array(1 => "href='$registerSiteURL' target='_blank'")) . "</li>"
+      . "<li>" . ts("We have integrated KCFinder with CKEditor and TinyMCE. This allows a user to upload images. All uploaded images are public.") . "</li>";
 
       $output = NULL;
 
@@ -1292,22 +1281,20 @@ class Installer extends InstallRequirements {
         $output .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
         $output .= '<head>';
         $output .= '<title>' . ts('CiviCRM Installed') . '</title>';
+        $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
         $output .= '<link rel="stylesheet" type="text/css" href="template.css" />';
         $output .= '</head>';
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">' . ts('CiviCRM has been successfully installed') . '</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
-        if (!function_exists('ts')) {
-          $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
-        }
+
         $drupalURL = civicrm_cms_base();
         $drupalPermissionsURL = "{$drupalURL}index.php?q=admin/people/permissions";
         $drupalURL .= "index.php?q=civicrm/admin/configtask&reset=1";
 
-        $output .= "<li>Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$drupalPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
-                      <li>Use the <a target='_blank' href=\"$drupalURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-                      {$commonOutputMessage}";
+        $output .= "<li>" . ts("Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$drupalPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
+        $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$drupalURL'")) . "</li>";
+        $output .= $commonOutputMessage;
 
         // automatically enable CiviCRM module once it is installed successfully.
         // so we need to Bootstrap Drupal, so that we can call drupal hooks.
@@ -1378,23 +1365,21 @@ class Installer extends InstallRequirements {
         $output .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
         $output .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
         $output .= '<head>';
-        $output .= '<title>CiviCRM Installed</title>';
+        $output .= '<title>' . ts('CiviCRM Installed') . '</title>';
+        $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
         $output .= '<link rel="stylesheet" type="text/css" href="template.css" />';
         $output .= '</head>';
         $output .= '<body>';
         $output .= '<div style="padding: 1em;"><p class="good">' . ts("CiviCRM has been successfully installed") . '</p>';
         $output .= '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
-        if (!function_exists('ts')) {
-          $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
-        }
+
         $drupalURL = civicrm_cms_base();
         $drupalPermissionsURL = "{$drupalURL}index.php?q=admin/user/permissions";
         $drupalURL .= "index.php?q=civicrm/admin/configtask&reset=1";
 
-        $output .= "<li>Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$drupalPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
-                      <li>Use the <a target='_blank' href=\"$drupalURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-                      {$commonOutputMessage}";
+        $output .= "<li>" . ts("Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$drupalPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
+        $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$drupalURL'")) . "</li>";
+        $output .= $commonOutputMessage;
 
         // explicitly setting error reporting, since we cannot handle drupal related notices
         error_reporting(1);
@@ -1429,13 +1414,9 @@ class Installer extends InstallRequirements {
         echo $output;
       }
       elseif ($installType == 'wordpress') {
-        echo '<h1>CiviCRM Installed</h1>';
+        echo '<h1>' . ts('CiviCRM Installed') . '</h1>';
         echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">' . ts("CiviCRM has been successfully installed") . '</p>';
         echo '<ul>';
-        $docLinkConfig = CRM_Utils_System::docURL2('Configuring a New Site', FALSE, 'here', NULL, NULL, "wiki");
-        if (!function_exists('ts')) {
-          $docLinkConfig = "<a href=\"{$docLinkConfig}\">here</a>";
-        }
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
@@ -1444,11 +1425,9 @@ class Installer extends InstallRequirements {
         $cmsURL .= "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/configtask&reset=1";
         $wpPermissionsURL = "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/access/wp-permissions&reset=1";
 
-        $output .= "
-           <li>WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$wpPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
-           <li>Use the <a target='_blank' href=\"$cmsURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-          {$commonOutputMessage}
-";
+        $output .= "<li>" . ts("WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$wpPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
+        $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
+        $output .= $commonOutputMessage;
 
         echo '</ul>';
         echo '</div>';
@@ -1541,8 +1520,20 @@ function getSiteDir($cmsPath, $str) {
 /**
  * @param $errorTitle
  * @param $errorMsg
+ * @param $showRefer
  */
-function errorDisplayPage($errorTitle, $errorMsg) {
+function errorDisplayPage($errorTitle, $errorMsg, $showRefer = TRUE) {
+  if ($showRefer) {
+    $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
+
+    if (function_exists('ts')) {
+      $errorMsg .= '<p>' . ts("<a %1>Refer to the online documentation for more information</a>", array(1 => "href='$docLink'")) . '</p>';
+    }
+    else {
+      $errorMsg .= '<p>' . sprintf("<a %s>Refer to the online documentation for more information</a>", "href='$docLink'") . '</p>';
+    }
+  }
+
   include 'error.html';
   exit();
 }
