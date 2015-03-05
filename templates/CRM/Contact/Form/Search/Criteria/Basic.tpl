@@ -32,6 +32,19 @@
       <label>{ts}Complete OR Partial Email{/ts}</label><br />
       {$form.email.html}
     </td>
+    <td class="labels" rowspan="2">
+      <div class="crm-submit-buttons">
+        {include file="CRM/common/formButtons.tpl" location="top"}
+      </div>
+      <div class="crm-submit-buttons reset-advanced-search">
+        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+          <span class="icon ui-icon-circle-close"></span>
+          {ts}Reset Form{/ts}
+        </a>
+      </div>
+    </td>
+  </tr>
+  <tr>
     <td>
       {$form.uf_group_id.label} {help id="id-search-views"}<br />{$form.uf_group_id.html}
     </td>
@@ -46,17 +59,6 @@
       {else}
           &nbsp;
       {/if}
-    </td>
-    <td class="labels" rowspan="2">
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top"}
-      </div>
-      <div class="crm-submit-buttons reset-advanced-search">
-        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
-          <span class="icon ui-icon-circle-close"></span>
-          {ts}Reset Form{/ts}
-        </a>
-      </div>
     </td>
   </tr>
   <tr>
