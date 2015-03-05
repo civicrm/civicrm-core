@@ -106,7 +106,7 @@
     <length>8</length>
     <comment>Time units for repetition of reminder.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getScheduleReminderFrequencyUnits</callback>
+      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
     </pseudoconstant>
     <add>3.4</add>
     <html>
