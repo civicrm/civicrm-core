@@ -1286,11 +1286,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'File':
-        if ($contactID) {
-          $url = self::getFileURL($contactID, $fieldID, $value);
-          if ($url) {
-            $display = $url['file_url'];
-          }
+        if ($value) {
+          $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
+          $display = $icons[$value];
         }
         break;
 
