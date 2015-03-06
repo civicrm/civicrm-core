@@ -101,7 +101,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
     $groupNames = civicrm_api3('Group', 'get', array());
     $headerfooterList = civicrm_api3('MailingComponent', 'get', array(
-      'is_active' => 1,
       'options' => array(
         'limit' => 0,
       ),
@@ -115,7 +114,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
       'sequential' => 1,
       'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
-      'is_active' => 1,
       'workflow_id' => array('IS NULL' => ""),
     ));
     $mailGrp = civicrm_api3('MailingGroup', 'get', array());
