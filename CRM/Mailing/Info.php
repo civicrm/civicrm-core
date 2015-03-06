@@ -100,7 +100,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $mailingabNames = civicrm_api3('MailingAB', 'get', array());
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
     $groupNames = civicrm_api3('Group', 'get', array());
-    $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+    $headerfooterList = civicrm_api3('MailingComponent', 'get', array(
+      'is_active' => 1,
+      'options' => array(
+        'limit' => 0,
+      ),
+    ));
 
     $emailAdd = civicrm_api3('Email', 'get', array(
       'sequential' => 1,
