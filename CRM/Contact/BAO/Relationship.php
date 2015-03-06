@@ -141,8 +141,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $duplicate++;
           continue;
         }
-        self::setContactABFromIDs($params, $ids, $key);
-        $relationship = self::add($params);
+        $contactFields = self::setContactABFromIDs($params, $ids, $key);
+        $singleInstanceParams = array_merge($params,$contactFields);
+        $relationship = self::add($singleInstanceParams);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
         $valid++;
@@ -215,7 +216,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
-    self::setContactABFromIDs($params, $ids);
+    // Requirement to set fields in this function is historical & hopefully can go at some point.
+    $contactFields = self::setContactABFromIDs($params, $ids);
+    $params = array_merge($params, $contactFields);
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
     // explode the string with _ to get the relationship type id
@@ -231,6 +234,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $relationship = new CRM_Contact_BAO_Relationship();
     //@todo this code needs to be updated for the possibility that not all fields are set
+    // by using $relationship->copyValues($params);
     // (update)
     $relationship->contact_id_b = $params['contact_id_b'];
     $relationship->contact_id_a = $params['contact_id_a'];
@@ -310,14 +314,19 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Resolve passed in contact IDs to contact_id_a & contact_id_b
+   *
    * @param array $params
    * @param array $ids
    * @param null $contactID
+   *
+   * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function setContactABFromIDs(&$params, $ids = array(), $contactID = NULL) {
-    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b'])) {
-      return;
+  public static function setContactABFromIDs($params, $ids = array(), $contactID = NULL) {
+    $returnFields = array();
+    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b']) && is_numeric
+      ($params['relationship_type_id'])) {
+      return $returnFields;
     }
     if (empty($ids['contact'])) {
       if (!empty($params['id'])) {
@@ -331,28 +340,35 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         ));
         while ($result->fetch()) {
           foreach ($fieldsToFill as $field) {
-            $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+            $returnFields[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
           }
         }
-        return;
+        return $returnFields;
       }
       throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
     }
-    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-    list($relationshipTypeID, $first, $second) = explode('_', $relationshipTypes);
-    if (empty($params['relationship_type_id'])) {
-      $params['relationship_type_id'] = $relationshipTypeID;
+    if (!is_numeric($params['relationship_type_id'])) {
+      $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
+      list($relationshipTypeID, $first) = explode('_', $relationshipTypes);
+      if (empty($params['relationship_type_id'])) {
+        $returnFields['relationship_type_id'] = $relationshipTypeID;
+      }
+    }
+    else {
+      // if we haven't been given a relationship type to dis-entangle we assume that 'first' is a
+      $first = 'a';
     }
     foreach (array('a', 'b') as $contactLetter) {
       if (empty($params['contact_' . $contactLetter])) {
         if ($first == $contactLetter) {
-          $params['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
+          $returnFields['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
         }
         else {
-          $params['contact_id_' . $contactLetter] = $contactID;
+          $returnFields['contact_id_' . $contactLetter] = $contactID;
         }
       }
     }
+    return $returnFields;
   }
 
   /**
@@ -654,7 +670,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return \CRM_Contact_DAO_Relationship
    */
-  public static function getContactIds($id) {
+  public static function getRelationshipByID($id) {
     $relationship = new CRM_Contact_DAO_Relationship();
 
     $relationship->id = $id;
@@ -722,7 +738,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';
-    self::setContactABFromIDs($params, $ids, $contactId);
+    $contactParams = self::setContactABFromIDs($params, $ids, $contactId);
+    $params = array_merge($params, $contactParams);
     // get the string of relationship type
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
     list($type) = explode('_', $relationshipTypes);

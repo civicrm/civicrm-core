@@ -414,6 +414,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       return;
     }
 
+    $relationshipTypeParts = explode('_', $params['relationship_type_id']);
+    $params['relationship_type_id'] = $relationshipTypeParts[0];
+    if (!$this->_rtype) {
+      // Do we need to wrap this in an if - when is rtype used & is relationship_type_id always set then?
+      $this->_rtype = $params['relationship_type_id'];
+    }
+    $params['contact_id_' .  $relationshipTypeParts[1]] = $this->_contactId;
+
+
     $ids = array('contact' => $this->_contactId);
 
     $relationshipTypeId = str_replace(array('_', 'a', 'b'), '', $params['relationship_type_id']);
@@ -425,13 +434,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $ids['relationship'] = $this->_relationshipId;
-      $relation = CRM_Contact_BAO_Relationship::getContactIds($this->_relationshipId);
+      $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
       if ($this->_isCurrentEmployer) {
         // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
         // clear the current employer. CRM-3235.
-        $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
+        $relChanged = $params['relationship_type_id'] != $this->_values['relationship_type_id'];
         if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
           // Refresh contact summary if in ajax mode
@@ -451,7 +460,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $params['end_date'] = CRM_Utils_Date::processDate($params['end_date'], NULL, TRUE);
 
     // Process custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $relationshipTypeId);
+    $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $params['relationship_type_id']);
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
       $params,
       $customFields,
@@ -544,7 +553,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $employerParams = array();
       foreach ($relationshipIds as $id) {
         // Fixme this is dumb why do we have to look this up again?
-        $rel = CRM_Contact_BAO_Relationship::getContactIds($id);
+        $rel = CRM_Contact_BAO_Relationship::getRelationshipByID($id);
         $employerParams[$rel->contact_id_a] = $rel->contact_id_b;
       }
       CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($employerParams);
