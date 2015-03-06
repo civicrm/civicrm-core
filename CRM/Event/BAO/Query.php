@@ -292,7 +292,7 @@ class CRM_Event_BAO_Query {
           }
         }
         $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
-        $query->_qill[$grouping][] = ts('Include Repeating Events (If Any) ') . " = TRUE";
+        $query->_qill[$grouping][] = ts('Include Repeating Events');
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
 
@@ -560,7 +560,7 @@ class CRM_Event_BAO_Query {
     $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
-    $eventIncludeRepeatingEvents = &$form->addElement('checkbox', "event_include_repeating_events", NULL, ts(' Include Repeating Events (If Any) ? '));
+    $eventIncludeRepeatingEvents = &$form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include Repeating Events?'));
 
     $form->addSelect('participant_status_id',
       array('entity' => 'participant', 'label' => ts('Participant Status'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))

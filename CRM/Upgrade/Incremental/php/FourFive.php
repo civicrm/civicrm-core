@@ -90,7 +90,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
   public function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
-    $this->addTask(ts('Upgrade DB to 4.5.alpha1: SQL'), 'task_4_5_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'task_4_5_x_runSql', $rev);
     $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
@@ -127,7 +127,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * @return bool
    */
   public function upgrade_4_5_beta9($rev) {
-    $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'task_4_5_x_runSql', $rev);
 
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
