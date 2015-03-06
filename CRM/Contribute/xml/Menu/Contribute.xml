@@ -302,7 +302,7 @@
   </item>
   <item>
     <path>civicrm/contribute/invoice</path>
-    <title>CiviContribute PDF</title>
+    <title>PDF Invoice</title>
     <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
     <page_type>1</page_type>
@@ -311,7 +311,7 @@
   </item>
   <item>
     <path>civicrm/contribute/invoice/email</path>
-    <title>CiviContribute PDF</title>
+    <title>Email Invoice</title>
     <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
     <page_type>1</page_type>
