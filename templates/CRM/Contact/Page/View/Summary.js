@@ -1,10 +1,24 @@
 // http://civicrm.org/licensing
 (function($, _) {
+  // FIXME: Much of this code is redundant with CRM.loadForm
 
   var ajaxFormParams = {
     dataType:'json',
     beforeSubmit: function(arr, $form, options) {
       $form.block();
+    },
+    beforeSerialize: function(form, options) {
+      // Copied from crm.ajax.js
+      if (window.CKEDITOR && window.CKEDITOR.instances) {
+        $.each(CKEDITOR.instances, function() {
+          this.updateElement && this.updateElement();
+        });
+      }
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function() {
+          this.save();
+        });
+      }
     },
     success: requestHandler,
     error: errorHandler
