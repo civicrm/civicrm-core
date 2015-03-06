@@ -459,7 +459,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *
  * This is a simple get function, but it should be usable for any kind of
  * entity. I created it to work around CRM-16036.
- * 
+ *
  * @param string $dao_name
  *   Name of DAO
  * @param array $params
@@ -480,10 +480,10 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   $select_fields = array();
 
   // array with elements array('colummn', 'operator', 'value');
-  $where_clauses=array();
+  $where_clauses = array();
 
   // Tables we need to join with to retrieve the custom values.
-  $tables_to_join=array();
+  $tables_to_join = array();
 
   // populate $select_fields
   $return_all_fields = (empty($options['return']) || !is_array($options['return']));
@@ -515,7 +515,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   }
 
   // populate $where_clauses
-  foreach($params as $key => $value) {
+  foreach ($params as $key => $value) {
     if (!is_array($value)) {
       $operator = "=";
       $rhs = $value;
@@ -575,15 +575,14 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
     else {
       ++$param_nr;
       $where .= " AND $clause[0] $clause[1] %$param_nr";
-      // TODO: check whether tis works with datetime, null,...
+      // TODO: check whether tis works with datetime
       $query_params[$param_nr] = array($clause[2], 'String');
     }
   };
 
-
   // order by
   if (!empty($options['sort'])) {
-    $sort_fiels=array();
+    $sort_fiels = array();
     foreach (explode(',', $options['sort']) as $sort_option) {
       $words = preg_split("/[\s]+/", $sort_option);
       if (count($words) > 0 && in_array($words[0], array_values($select_fields))) {
@@ -595,7 +594,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
       }
     }
     if (count($sort_fields) > 0) {
-      $misc .= " ORDER BY ".implode(",", $sort_fields);
+      $misc .= " ORDER BY " . implode(",", $sort_fields);
     }
   }
 
@@ -633,9 +632,9 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
  */
 function _civicrm_api3_field_names($fields) {
   $result = array();
-  foreach ($fields as $key=>$value) {
+  foreach ($fields as $key => $value) {
     if (!empty($value['name'])) {
-      $result[]=$value['name'];
+      $result[] = $value['name'];
     }
   }
   return $result;
@@ -654,9 +653,9 @@ function _civicrm_api3_field_names($fields) {
  *   an array that maps the custom field ID's to table name and
  *   column name. E.g.:
  *   {
- *     '1' => array { 
- *       'table_name' => 'table_name_1', 
- *       'column_name' => ''column_name_1', 
+ *     '1' => array {
+ *       'table_name' => 'table_name_1',
+ *       'column_name' => ''column_name_1',
  *     },
  *   }
  */
@@ -676,7 +675,7 @@ SELECT f.id, f.label, f.data_type,
    AND g.extends = %1";
 
   $params = array(
-    '1' => array($entity, 'String')
+    '1' => array($entity, 'String'),
   );
 
   $dao = CRM_Core_DAO::executeQuery($query, $params);
