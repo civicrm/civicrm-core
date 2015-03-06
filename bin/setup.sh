@@ -151,6 +151,10 @@ if [ -n "$DO_DOWNLOAD" ]; then
     fi
 
     BOWER=$(pickcmd node_modules/bower/bin/bower bower)
+    if [ -f "$BOWER" ]; then
+      NODE=$(pickcmd node nodejs)
+      BOWER="$NODE $BOWER"
+    fi
     # Without the force flag bower won't check for new versions or verify that installed software matches version specified in bower.json
     $BOWER install -f
   popd
