@@ -325,54 +325,58 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $sql = "SELECT id, form_values FROM civicrm_saved_search";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
-      $formValues = unserialize($dao->form_values);
-        foreach ($formValues as $field => &$data_value) {
+      $copy = $formValues = unserialize($dao->form_values);
+      $update = FALSE;
+      foreach ($copy as $field => $data_value) {
         if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
-          // This indicates old-style data format. We need to fix it.
-          $op = 'and';
-          $fieldID = end(explode('_', $field));
-          $htmlType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldID, 'html_type');
-
-          switch ($htmlType) {
-            case 'CheckBox':
-              if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
-                $op = 'or';
-                unset($data_value['CiviCRM_OP_OR']);
-              }
-              $data_value = array_keys($data_value, 1);
-              break;
-
-            default:
-              $key = array_search('CiviCRM_OP_OR', $data_value);
-              if (!is_null($key)) {
-                $op = 'or';
-                unset($data_value[$key]);
-              }
-          }
-
-          //If only Or operator has been chosen means we need to select all values and
-          //so to execute OR operation between these values according to new data structure
-          if (count($data_value) == 0) {
-            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
-            foreach ($customOption as $option) {
-              $data_value[] = CRM_Utils_Array::value('value', $option);
+          // Now check for CiviCRM_OP_OR as either key or value in the data_value array.
+          // This is the conclusive evidence of an old-style data format.
+          if(array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
+            // We have old style data. Mark this record to be updated.
+            $update = TRUE;
+            $op = 'and';
+            if(!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
+              // fatal error?
+              continue;
             }
+            $fieldID= $matches[1];
+            if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
+              // This indicates data structure identified by jamie in the form:
+              // value1 => 1, value2 => , value3 => 1.
+              $data_value = array_keys($data_value, 1); 
+
+              // If CiviCRM_OP_OR - change OP from default to OR
+              if($data_value['CiviCRM_OP_OR'] == 1) {
+                $op = 'or';
+              }
+              unset($data_value['CiviCRM_OP_OR']);
+            }
+            else {
+              // The value is here, but it is not set as a key.
+              // This is using the style identified by Monish - the existence of the value
+              // indicates an OR search and values are set in the form of:
+              // 0 => value1, 1 => value1, 3 => value2.
+              $key = array_search('CiviCRM_OP_OR', $data_value);
+              $op = 'or';
+              unset($data_value[$key]);
+            }
+     
+            $formValues[$field] = $data_value;
+            $formValues["${field}_operator"] = $op;
           }
-
-          // Add new key for the operator.
-          $formValues["${field}_operator"] = $op;
-
-          $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
-          CRM_Core_DAO::executeQuery($sql,
-            array(
-              array(serialize($formValues), 'String'),
-              array($dao->id, 'Integer'),
-            )
-          );
         }
       }
-    }
 
+      if($update) { 
+        $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
+        CRM_Core_DAO::executeQuery($sql,
+          array(
+            array(serialize($formValues), 'String'),
+            array($dao->id, 'Integer'),
+          )
+        );
+      }
+    }
     return TRUE;
   }
 
