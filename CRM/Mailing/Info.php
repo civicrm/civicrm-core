@@ -143,10 +143,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
             'id' => 'user_contact_id',
             'return' => 'email',
           )),
-        'visibility' => array(
-          array('value' => 'Public Pages', 'label' => ts('Public Pages')),
-          array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
-        ),
+        'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
         'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
       ),
     ));
