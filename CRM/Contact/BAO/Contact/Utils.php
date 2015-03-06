@@ -330,7 +330,7 @@ UNION
         'contact_check' => array($organization => TRUE),
       );
       list($valid, $invalid, $duplicate, $saved, $relationshipIds)
-        = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
+        = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationshipParams, $cid);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
