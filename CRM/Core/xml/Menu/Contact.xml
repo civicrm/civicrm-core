@@ -250,11 +250,6 @@
      <title>CiviCRM Blog</title>
      <page_callback>CRM_Dashlet_Page_Blog</page_callback>
   </item>
-  <item>
-    <path>civicrm/ajax/search</path>
-    <page_callback>CRM_Contact_Page_AJAX::search</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-</item>
 <item>
      <path>civicrm/ajax/relation</path>
      <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
@@ -398,6 +393,6 @@
   <item>
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
-    <access_arguments>view all contacts;view my contact</access_arguments>
+    <access_arguments>access CiviCRM;view my contact</access_arguments>
   </item>
 </menu>

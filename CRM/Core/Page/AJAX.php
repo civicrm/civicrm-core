@@ -208,26 +208,5 @@ class CRM_Core_Page_AJAX {
     header("Cache-Control: max-age=$year, public");
   }
 
-  /**
-   * Send autocomplete results to the client. Input can be a simple or nested array.
-   * @param array $results - If nested array, also provide:
-   * @param string $val - array key to use as the value
-   * @param string $key - array key to use as the key
-   * @deprecated
-   */
-  static function autocompleteResults($results, $val='label', $key='id') {
-    $output = array();
-    if (is_array($results)) {
-      foreach ($results as $k => $v) {
-        if (is_array($v)) {
-          echo $v[$val] . '|' . $v[$key] . "\n";
-        }
-        else {
-          echo "$v|$k\n";
-        }
-      }
-    }
-    CRM_Utils_System::civiExit();
-  }
 }
 

@@ -66,6 +66,7 @@
 
     {if $rows}
           {include file="CRM/Case/Form/Selector.tpl"}
+          {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
     {else}
        <div class="messages status no-popup">
           <div class="icon inform-icon"></div>

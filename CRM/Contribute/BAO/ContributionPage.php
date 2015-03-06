@@ -658,6 +658,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'entity_table' => 'civicrm_contribution_page',
       ), array(
         'entity_id' => $copy->id,
+        'target_entity_id' => $copy->id,
       ));
 
     $copyPremium = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', array(
