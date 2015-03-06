@@ -619,6 +619,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
       }
     };
   }
+  $result_dao->free();
 
   return civicrm_api3_create_success($result_entities, $params, $entity, 'get', $dao);
 }
