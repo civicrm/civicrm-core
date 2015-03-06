@@ -499,7 +499,7 @@
       return {
         require: '?ngModel',
         scope: {
-          crmUiSelect: '@'
+          crmUiSelect: '='
         },
         link: function (scope, element, attrs, ngModel) {
           // In cases where UI initiates update, there may be an extra
@@ -523,8 +523,7 @@
 
           function init() {
             // TODO watch select2-options
-            var options = attrs.crmUiSelect ? scope.$parent.$eval(attrs.crmUiSelect) : {};
-            element.select2(options);
+            element.select2(scope.crmUiSelect || {});
             element.on('change', refreshModel);
             $timeout(ngModel.$render);
           }
