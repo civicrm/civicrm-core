@@ -169,7 +169,7 @@ DELETE FROM civicrm_contact_type
     );
     $ids = array('contact' => $this->individual);
 
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($invalid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), TRUE, 'In line ' . __LINE__);
@@ -196,7 +196,7 @@ DELETE FROM civicrm_contact_type
     );
     $ids = array('contact' => $this->indivi_parent);
 
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($invalid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), TRUE, 'In line ' . __LINE__);
@@ -221,7 +221,7 @@ DELETE FROM civicrm_contact_type
     );
     $ids = array('contact' => $this->indivi_parent);
 
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($invalid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), TRUE, 'In line ' . __LINE__);
@@ -249,7 +249,7 @@ DELETE FROM civicrm_contact_type
       'contact_check' => array($this->indivi_parent => $this->indivi_parent),
     );
     $ids = array('contact' => $this->individual);
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($valid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), FALSE, 'In line ' . __LINE__);
@@ -277,7 +277,7 @@ DELETE FROM civicrm_contact_type
       'contact_check' => array($this->indivi_student => 1),
     );
     $ids = array('contact' => $this->organization_sponsor);
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($valid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), FALSE, 'In line ' . __LINE__);
@@ -302,7 +302,7 @@ DELETE FROM civicrm_contact_type
       'contact_check' => array($this->organization_sponsor => 1),
     );
     $ids = array('contact' => $this->indivi_student);
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($params, $ids);
 
     $this->assertEquals($valid, 1, 'In line ' . __LINE__);
     $this->assertEquals(empty($relationshipIds), FALSE, 'In line ' . __LINE__);
