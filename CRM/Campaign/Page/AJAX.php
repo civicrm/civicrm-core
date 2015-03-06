@@ -347,6 +347,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -637,6 +638,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -735,6 +737,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -828,6 +831,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

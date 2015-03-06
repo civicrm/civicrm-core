@@ -2888,12 +2888,12 @@ WHERE  id IN ( $groupIDs )
       $groupIDsFiltered = implode(',', $groupsFiltered);
 
       if ($tableAlias == NULL) {
-        $tableAlias = "civicrm_group_contact_cache_{$groupIDsFiltered}";
+        $tableAlias = "`civicrm_group_contact_cache_{$groupIDsFiltered}`";
       }
 
-      $this->_tables["`{$tableAlias}`"] = $this->_whereTables["`{$tableAlias}`"] = " LEFT JOIN civicrm_group_contact_cache `{$tableAlias}` ON {$joinTable}.id = `{$tableAlias}`.contact_id ";
+      $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.id = {$tableAlias}.contact_id ";
 
-      return "`{$tableAlias}`.group_id IN (" . $groupIDsFiltered . ")";
+      return "{$tableAlias}.group_id IN (" . $groupIDsFiltered . ")";
     }
 
     return NULL;
