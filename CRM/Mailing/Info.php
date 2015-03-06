@@ -96,10 +96,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $contactID = $session->get('userID');
 
     $params = array('options' => array('limit' => 0));
-    $civiMails = civicrm_api3('Mailing', 'get', $params);
+    $civiMails = civicrm_api3('Mailing', 'get', $params + array('return' => array('id', 'name', 'scheduled_date')));
     $campNames = civicrm_api3('Campaign', 'get', $params);
-    $mailingabNames = civicrm_api3('MailingAB', 'get', $params);
-    $mailStatus = civicrm_api3('MailingJob', 'get', $params);
     $groupNames = civicrm_api3('Group', 'get', $params);
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params);
 
@@ -120,10 +118,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
-        'mailingabNames' => array_values($mailingabNames['values']),
         'civiMails' => array_values($civiMails['values']),
         'campNames' => array_values($campNames['values']),
-        'mailStatus' => array_values($mailStatus['values']),
         'groupNames' => array_values($groupNames['values']),
         'headerfooterList' => array_values($headerfooterList['values']),
         'mesTemplate' => array_values($mesTemplate['values']),
