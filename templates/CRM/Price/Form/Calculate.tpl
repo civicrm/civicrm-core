@@ -167,7 +167,8 @@ cj("input,#priceset select,#priceset").each(function () {
 
 //calculation for text box.
 function calculateText( object ) {
-   var textval = parseFloat( cj(object).val() );
+  //CRM-16034 - comma acts as decimal in price set text pricing
+  var textval = parseFloat( cj(object).val().replace(thousandMarker, '') );
 
    eval( 'var option = '+ cj(object).attr('price') );
    ele         = option[0];
