@@ -307,9 +307,9 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @param string $rev
    */
-  public function upgrade_4_5_6($rev) {
+  public function upgrade_4_5_9($rev) {
     // Task to process sql.
-    $this->addTask(ts('Upgrade DB to 4.5.6: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
+    $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
 
     return TRUE;
   }
