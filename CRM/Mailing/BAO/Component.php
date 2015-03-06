@@ -98,8 +98,13 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
       $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
     }
 
-    if ($component->is_default && !empty($id)) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}' AND id <> $id");
+    if ($component->is_default) {
+      if (!empty($id)) {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}' AND id <> $id");
+      }
+      else {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}'");
+      }
     }
 
     $component->save();
