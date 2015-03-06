@@ -46,63 +46,6 @@ class CRM_Contact_Page_AJAX {
   const AUTOCOMPLETE_TTL = 21600; // 6hr; 6*60*60
 
   /**
-   * @deprecated
-   */
-  static function getContactList() {
-    // if context is 'customfield'
-    if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
-      return self::contactReference();
-    }
-
-    $params = array('version' => 3, 'check_permissions' => TRUE);
-
-    // String params
-    // FIXME: param keys don't match input keys, using this array to translate
-    $whitelist = array(
-      's' => 'name',
-      'fieldName' => 'field_name',
-      'tableName' => 'table_name',
-      'context' => 'context',
-      'rel' => 'rel',
-      'contact_sub_type' => 'contact_sub_type',
-      'contact_type' => 'contact_type'
-    );
-    foreach ($whitelist as $key => $param) {
-      if (!empty($_GET[$key])) {
-        $params[$param] = $_GET[$key];
-      }
-    }
-
-    //CRM-10687: Allow quicksearch by multiple fields
-    if (!empty($params['field_name'])) {
-      if ($params['field_name'] == 'phone_numeric') {
-        $params['name'] = preg_replace('/[^\d]/', '', $params['name']);
-      }
-      if (!$params['name']) {
-        CRM_Utils_System::civiExit();
-      }
-    }
-
-    // Numeric params
-    $whitelist = array(
-      'limit',
-      'org',
-      'employee_id',
-      'cid',
-      'id',
-      'cmsuser',
-    );
-    foreach ($whitelist as $key) {
-      if (!empty($_GET[$key]) && is_numeric($_GET[$key])) {
-        $params[$key] = $_GET[$key];
-      }
-    }
-
-    $result = civicrm_api('Contact', 'getquick', $params);
-    CRM_Core_Page_AJAX::autocompleteResults(CRM_Utils_Array::value('values', $result), 'data');
-  }
-
-  /**
    * Ajax callback for custom fields of type ContactReference
    *
    * Todo: Migrate contact reference fields to use EntityRef
@@ -192,7 +135,7 @@ class CRM_Contact_Page_AJAX {
       $contactList[] = array('id' => $value['id'], 'text' => implode(' :: ', $view));
     }
 
-    CRM_Utils_System::civiExit(json_encode($contactList));
+    CRM_Utils_JSON::output($contactList);
   }
 
   /**
@@ -330,190 +273,9 @@ class CRM_Contact_Page_AJAX {
   }
 
   static function groupTree() {
+    header('Content-Type: application/json');
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
     echo CRM_Contact_BAO_GroupNestingCache::json($gids);
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * @deprecated
-   * Old quicksearch function. No longer used in core.
-   * @todo: Remove this function and associated menu entry in CiviCRM 5
-   */
-  static function search() {
-    $json = TRUE;
-    $name = CRM_Utils_Array::value('name', $_GET, '');
-    if (!array_key_exists('name', $_GET)) {
-      $name = CRM_Utils_Array::value('s', $_GET) . '%';
-      $json = FALSE;
-    }
-    $name = CRM_Utils_Type::escape($name, 'String');
-    $whereIdClause = '';
-    if (!empty($_GET['id'])) {
-      $json = TRUE;
-      if (is_numeric($_GET['id'])) {
-        $id = CRM_Utils_Type::escape($_GET['id'], 'Integer');
-        $whereIdClause = " AND civicrm_contact.id = {$id}";
-      }
-      else {
-        $name = $_GET['id'];
-      }
-    }
-
-    $elements = array();
-    if ($name || isset($id)) {
-      $name = $name . '%';
-
-      //contact's based of relationhip type
-      $relType = NULL;
-      if (isset($_GET['rel'])) {
-        $relation = explode('_', $_GET['rel']);
-        $relType  = CRM_Utils_Type::escape($relation[0], 'Integer');
-        $rel      = CRM_Utils_Type::escape($relation[2], 'String');
-      }
-
-      //shared household info
-      $shared = NULL;
-      if (isset($_GET['sh'])) {
-        $shared = CRM_Utils_Type::escape($_GET['sh'], 'Integer');
-        if ($shared == 1) {
-          $contactType = 'Household';
-          $cName = 'household_name';
-        }
-        else {
-          $contactType = 'Organization';
-          $cName = 'organization_name';
-        }
-      }
-
-      // contacts of type household
-      $hh = $addStreet = $addCity = NULL;
-      if (isset($_GET['hh'])) {
-        $hh = CRM_Utils_Type::escape($_GET['hh'], 'Integer');
-      }
-
-      //organization info
-      $organization = $street = $city = NULL;
-      if (isset($_GET['org'])) {
-        $organization = CRM_Utils_Type::escape($_GET['org'], 'Integer');
-      }
-
-      if (isset($_GET['org']) || isset($_GET['hh'])) {
-        $json = FALSE;
-        $splitName = explode(' :: ', $name);
-        if ($splitName) {
-          $contactName = trim(CRM_Utils_Array::value('0', $splitName));
-          $street      = trim(CRM_Utils_Array::value('1', $splitName));
-          $city        = trim(CRM_Utils_Array::value('2', $splitName));
-        }
-        else {
-          $contactName = $name;
-        }
-
-        if ($street) {
-          $addStreet = "AND civicrm_address.street_address LIKE '$street%'";
-        }
-        if ($city) {
-          $addCity = "AND civicrm_address.city LIKE '$city%'";
-        }
-      }
-
-      if ($organization) {
-
-        $query = "
-SELECT CONCAT_WS(' :: ',sort_name,LEFT(street_address,25),city) 'sort_name',
-civicrm_contact.id 'id'
-FROM civicrm_contact
-LEFT JOIN civicrm_address ON ( civicrm_contact.id = civicrm_address.contact_id
-                                AND civicrm_address.is_primary=1
-                             )
-WHERE civicrm_contact.contact_type='Organization' AND organization_name LIKE '%$contactName%'
-{$addStreet} {$addCity} {$whereIdClause}
-ORDER BY organization_name ";
-      }
-      elseif ($shared) {
-        $query = "
-SELECT CONCAT_WS(':::' , sort_name, supplemental_address_1, sp.abbreviation, postal_code, cc.name )'sort_name' , civicrm_contact.id 'id' , civicrm_contact.display_name 'disp' FROM civicrm_contact LEFT JOIN civicrm_address ON (civicrm_contact.id =civicrm_address.contact_id AND civicrm_address.is_primary =1 )LEFT JOIN civicrm_state_province sp ON (civicrm_address.state_province_id =sp.id )LEFT JOIN civicrm_country cc ON (civicrm_address.country_id =cc.id )WHERE civicrm_contact.contact_type ='{$contactType}' AND {$cName} LIKE '%$name%' {$whereIdClause} ORDER BY {$cName} ";
-      }
-      elseif ($hh) {
-        $query = "
-SELECT CONCAT_WS(' :: ' , sort_name, LEFT(street_address,25),city) 'sort_name' , location_type_id 'location_type_id', is_primary 'is_primary', is_billing 'is_billing', civicrm_contact.id 'id'
-FROM civicrm_contact
-LEFT JOIN civicrm_address ON (civicrm_contact.id =civicrm_address.contact_id AND civicrm_address.is_primary =1 )
-WHERE civicrm_contact.contact_type ='Household'
-AND household_name LIKE '%$contactName%' {$addStreet} {$addCity} {$whereIdClause} ORDER BY household_name ";
-      }
-      elseif ($relType) {
-        if (!empty($_GET['case'])) {
-          $query = "
-SELECT distinct(c.id), c.sort_name
-FROM civicrm_contact c
-LEFT JOIN civicrm_relationship ON civicrm_relationship.contact_id_{$rel} = c.id
-WHERE c.sort_name LIKE '%$name%'
-AND civicrm_relationship.relationship_type_id = $relType
-GROUP BY sort_name
-";
-        }
-      }
-      else {
-
-        $query = "
-SELECT sort_name, id
-FROM civicrm_contact
-WHERE sort_name LIKE '%$name'
-{$whereIdClause}
-ORDER BY sort_name ";
-      }
-
-      $limit = 10;
-      if (isset($_GET['limit'])) {
-        $limit = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
-      }
-
-      $query .= " LIMIT 0,{$limit}";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-
-      if ($shared) {
-        while ($dao->fetch()) {
-          echo $dao->sort_name;
-          CRM_Utils_System::civiExit();
-        }
-      }
-      else {
-        while ($dao->fetch()) {
-          if ($json) {
-            $elements[] = array('name' => addslashes($dao->sort_name),
-              'id' => $dao->id,
-            );
-          }
-          else {
-            echo $elements = "$dao->sort_name|$dao->id|$dao->location_type_id|$dao->is_primary|$dao->is_billing\n";
-          }
-        }
-        //for adding new household address / organization
-        if (empty($elements) && !$json && ($hh || $organization)) {
-          echo CRM_Utils_Array::value('s', $_GET);
-        }
-      }
-    }
-
-    if (isset($_GET['sh'])) {
-      echo "";
-      CRM_Utils_System::civiExit();
-    }
-
-    if (empty($elements)) {
-      $name = str_replace('%', '', $name);
-      $elements[] = array(
-        'name' => $name,
-        'id' => $name,
-      );
-    }
-
-    if ($json) {
-      echo json_encode($elements);
-    }
     CRM_Utils_System::civiExit();
   }
 
@@ -522,6 +284,7 @@ ORDER BY sort_name ";
    *
    */
   static function deleteCustomValue() {
+    header('Content-Type: text/plain');
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
 
@@ -592,8 +355,7 @@ ORDER BY sort_name ";
       || !$signer->validate($_REQUEST['sig'], $_REQUEST)
     ) {
       $user = array('name' => 'error');
-      echo json_encode($user);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($user);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -607,13 +369,15 @@ ORDER BY sort_name ";
     if (isset($errors['cms_name']) || isset($errors['name'])) {
       //user name is not availble
       $user = array('name' => 'no');
-      echo json_encode($user);
+      CRM_Utils_JSON::output($user);
     }
     else {
       //user name is available
       $user = array('name' => 'yes');
-      echo json_encode($user);
+      CRM_Utils_JSON::output($user);
     }
+
+    // Not reachable: JSON::output() above exits.
     CRM_Utils_System::civiExit();
   }
 
@@ -629,6 +393,8 @@ ORDER BY sort_name ";
       list($displayName,
         $userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+
+      header('Content-Type: text/plain');
       if ($userEmail) {
         echo $userEmail;
       }
@@ -723,7 +489,7 @@ LIMIT {$offset}, {$rowCount}
           }
         }
         if ($result) {
-          echo json_encode($result);
+          CRM_Utils_JSON::output($result);
         }
       }
     }
@@ -794,7 +560,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($result) {
-      echo json_encode($result);
+      CRM_Utils_JSON::output($result);
     }
     CRM_Utils_System::civiExit();
   }
@@ -974,6 +740,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
 
     CRM_Utils_System::civiExit();
@@ -1124,6 +891,7 @@ LIMIT {$offset}, {$rowCount}
       'is_active',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
