@@ -43,9 +43,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Create function. (Use the API instead)
-   * Note that the previous create function has been renamed 'createMultiple'
+   * Note that the previous create function has been renamed 'legacyCreateMultiple'
    * and this is new in 4.6
-   * All existing calls have been changed to createMultiple except the api call - however, it is recommended
+   * All existing calls have been changed to legacyCreateMultiple except the api call - however, it is recommended
    * that you call that as the end to end testing here is based on the api & refactoring may still be done
    * @param array $params
    * @return \CRM_Contact_BAO_Relationship
@@ -78,6 +78,47 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
+   * Create multiple relationships
+   *
+   * @param $params
+   * @param $primaryContactLetter
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function createMultiple($params, $primaryContactLetter) {
+    $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
+    $secondaryContactIDs = $params['contact_id_' . $secondaryContactLetter];
+    $valid = $invalid = $duplicate = $saved = 0;
+    $relationshipIds = array();
+    foreach ($secondaryContactIDs as $secondaryContactID) {
+      try {
+        $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
+        $relationship = civicrm_api3('relationship', 'create', $params);
+        $relationshipIds[] = $relationship['id'];
+        $valid ++;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        switch ($e->getMessage()) {
+          case 'Duplicate Relationship' :
+            $duplicate ++;
+            break;
+
+          case 'Invalid Relationship' :
+            $invalid ++;
+            break;
+
+          default:
+            throw new CRM_Core_Exception('unknown relationship create error ' . $e->getMessage());
+        }
+      }
+    }
+
+    return array($valid, $invalid, $duplicate, $saved, $relationshipIds);
+
+  }
+
+  /**
    * Takes an associative array and creates a relationship object.
    * @deprecated For single creates use the api instead (it's tested).
    * For multiple a new variant of this function needs to be written and migrated to as this is a bit
@@ -92,7 +133,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return CRM_Contact_BAO_Relationship
    */
-  public static function createMultiple(&$params, $ids = array()) {
+  public static function legacyCreateMultiple(&$params, $ids = array()) {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = array();
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
@@ -780,7 +821,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
      * supports date arrays BAO has increasingly standardised to ISO format
      * so I believe this function should support ISO rather than make API
      * format it - however, need to support array format for now to avoid breakage
-     * @ time of writing this function is called from Relationship::createMultiple (twice)
+     * @ time of writing this function is called from Relationship::legacyCreateMultiple (twice)
      * CRM_BAO_Contact_Utils::clearCurrentEmployer (seemingly without dates)
      * CRM_Contact_Form_Task_AddToOrganization::postProcess &
      * CRM_Contact_Form_Task_AddToHousehold::postProcess

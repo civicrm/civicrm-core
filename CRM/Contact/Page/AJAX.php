@@ -310,7 +310,7 @@ class CRM_Contact_Page_AJAX {
       }
 
       // create new or update existing relationship
-      $return = CRM_Contact_BAO_Relationship::createMultiple($relationParams, $relationIds);
+      $return = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
 
       if (!empty($return[4][0])) {
         $relationshipID = $return[4][0];
