@@ -155,8 +155,20 @@ if [ -n "$DO_DOWNLOAD" ]; then
       NODE=$(pickcmd node nodejs)
       BOWER="$NODE $BOWER"
     fi
-    # Without the force flag bower won't check for new versions or verify that installed software matches version specified in bower.json
-    $BOWER install -f
+    # Without the force flag, bower may not check for new versions or verify that installed software matches version specified in bower.json
+    # With the force flag, bower will ignore all caches and download all deps.
+    if [ -n "$OFFLINE" ]; then
+      BOWER_OPT=
+    elif [ ! -f "bower_components/.setupsh.ts" ]; then
+      ## First run -- or cleanup from failed run
+      BOWER_OPT=-f
+    elif [ "bower.json" -nt "bower_components/.setupsh.ts" ]; then
+      ## Bower.json has changed since last run
+      BOWER_OPT=-f
+    fi
+    [ -f "bower_components/.setupsh.ts" ] && rm -f "bower_components/.setupsh.ts"
+    $BOWER install $BOWER_OPT
+    touch bower_components/.setupsh.ts
   popd
 fi
 
