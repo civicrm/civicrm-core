@@ -598,7 +598,7 @@ CRM.strings = CRM.strings || {};
           .change(updateDataField)
           .timeEntry({
             spinnerImage: '',
-            show24Hours: settings.time === true ? CRM.timeIs24Hr : settings.time == '24'
+            show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
           });
       }
       if (settings.date !== false) {
