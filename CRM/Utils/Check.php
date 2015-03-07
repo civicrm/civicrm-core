@@ -137,6 +137,9 @@ class CRM_Utils_Check {
     foreach ($checks as $check) {
       $messages = array_merge($messages, $check->checkAll());
     }
+
+    CRM_Utils_Hook::check($messages);
+
     return $messages;
   }
 
