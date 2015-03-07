@@ -92,40 +92,37 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ),
     );
 
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-    $civiMails = civicrm_api3('Mailing', 'get', array());
-    $campNames = civicrm_api3('Campaign', 'get', array());
-    $mailingabNames = civicrm_api3('MailingAB', 'get', array());
-    $mailStatus = civicrm_api3('MailingJob', 'get', array());
-    $groupNames = civicrm_api3('Group', 'get', array());
-    $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+
+    $params = array('options' => array('limit' => 0));
+    $civiMails = civicrm_api3('Mailing', 'get', $params + array(
+      'is_completed' => 1,
+      'return' => array('id', 'name', 'scheduled_date'),
+    ));
+    $campNames = civicrm_api3('Campaign', 'get', $params);
+    $groupNames = civicrm_api3('Group', 'get', $params);
+    $headerfooterList = civicrm_api3('MailingComponent', 'get', $params);
 
     $emailAdd = civicrm_api3('Email', 'get', array(
       'sequential' => 1,
       'return' => "email",
       'contact_id' => $contactID,
     ));
-    $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+    $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + array(
       'sequential' => 1,
       'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
-      'is_active' => 1,
       'workflow_id' => array('IS NULL' => ""),
     ));
-    $mailGrp = civicrm_api3('MailingGroup', 'get', array());
+    $mailGrp = civicrm_api3('MailingGroup', 'get', $params);
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array('entity' => array('contact', 'mailing'), 'sequential' => 1));
-    $fromAddress = civicrm_api3('OptionGroup', 'get', array(
-      'sequential' => 1,
-      'name' => "from_email_address",
-      'api.OptionValue.get' => array(),
+    $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
+      'option_group_id' => "from_email_address",
     ));
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
-        'mailingabNames' => array_values($mailingabNames['values']),
         'civiMails' => array_values($civiMails['values']),
         'campNames' => array_values($campNames['values']),
-        'mailStatus' => array_values($mailStatus['values']),
         'groupNames' => array_values($groupNames['values']),
         'headerfooterList' => array_values($headerfooterList['values']),
         'mesTemplate' => array_values($mesTemplate['values']),
@@ -135,15 +132,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'contactid' => $contactID,
         'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
         'enableReplyTo' => (int) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'replyTo'),
-        'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values']),
+        'fromAddress' => array_values($fromAddress['values']),
         'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
             'id' => 'user_contact_id',
             'return' => 'email',
           )),
-        'visibility' => array(
-          array('value' => 'Public Pages', 'label' => ts('Public Pages')),
-          array('value' => 'User and User Admin Only', 'label' => ts('User and User Admin Only')),
-        ),
+        'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
         'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
       ),
     ));
