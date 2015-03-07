@@ -277,8 +277,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -438,8 +436,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     // Save relationships
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple ($params, $relationshipTypeParts[1]);
-    $this->setMessage($valid, $invalid, $duplicate, $saved);
+    $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = $outcome;
+    $this->setMessage($outcome);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
@@ -537,37 +536,39 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Set Status message to reflect outcome of the update action.
    *
-   * @param int $valid Number of valid relationships attempted.
-   * @param int $invalid Number of invalid relationships attempted.
-   * @param int $duplicate Number of duplicate relationships attempted.
-   * @param int $saved Number of relationships saved.
+   * @param array $outcome
+   *   Outcome of save action - including
+   *   - 'valid' : Number of valid relationships attempted.
+   *   - 'invalid' : Number of invalid relationships attempted.
+   *   - 'duplicate' : Number of duplicate relationships attempted.
+   *   - 'saved' : boolean of whether save was successful
    */
-  protected function setMessage($valid, $invalid, $duplicate, $saved) {
-    if ($valid) {
+  protected function setMessage($outcome) {
+    if (!empty($outcome['valid'])) {
       CRM_Core_Session::setStatus(ts('Relationship created.', array(
-        'count' => $valid,
+        'count' => $outcome['valid'],
         'plural' => '%count relationships created.',
       )), ts('Saved'), 'success');
     }
-    if ($invalid) {
+    if (!empty($outcome['invalid'])) {
       CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array(
-        'count' => $invalid,
+        'count' => $outcome['invalid'],
         'plural' => '%count relationship records were not created due to invalid contact types.',
       )), ts('%count invalid relationship record', array(
-        'count' => $invalid,
+        'count' => $outcome['invalid'],
         'plural' => '%count invalid relationship records',
       )));
     }
-    if ($duplicate) {
+    if (!empty($outcome['duplicate'])) {
       CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array(
-        'count' => $duplicate,
+        'count' => $outcome['duplicate'],
         'plural' => '%count relationships were not created because they already exist.',
       )), ts('%count duplicate relationship', array(
-        'count' => $duplicate,
+        'count' => $outcome['duplicate'],
         'plural' => '%count duplicate relationships',
       )));
     }
-    if ($saved) {
+    if (!empty($outcome['saved'])) {
       CRM_Core_Session::setStatus(ts('Relationship record has been updated.'), ts('Saved'), 'success');
     }
   }
