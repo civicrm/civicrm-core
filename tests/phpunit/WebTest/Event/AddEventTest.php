@@ -807,7 +807,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->multiselect2('participant_status_id', array('Pending from pay later'));
+    $this->multiselect2('participant_status_id', array('Pending (pay later)'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']");
 
@@ -835,7 +835,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->multiselect2('participant_status_id', array('Pending from pay later'));
+    $this->multiselect2('participant_status_id', array('Pending (pay later)'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
     $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']@href");
