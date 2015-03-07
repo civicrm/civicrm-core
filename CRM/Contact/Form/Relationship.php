@@ -26,16 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * This class generates form components for relationship
- *
+ * This class generates form components for relationship.
  */
 class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
@@ -212,9 +203,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Set default values for the form. Relationship that in edit/view mode
    * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -275,9 +263,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * add the rules for form.
-   *
-   * @return void
+   * Add the rules for form.
    */
   public function addRules() {
     if ($this->_cdType) {
@@ -399,13 +385,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   *  This function is called when the form is submitted.
-   *
-   *
-   * @return void
+   * This function is called when the form is submitted.
    */
   public function postProcess() {
-    // store the submitted values in an array
+    // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
     // action is taken depending upon the mode
@@ -442,7 +425,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     // Create mode (could be 1 or more relationships)
     else {
-      $params['contact_id_' .  $relationshipTypeParts[2]] =  explode(',', $params['related_contact_id']);
+      $params['contact_id_' .  $relationshipTypeParts[2]] = explode(',', $params['related_contact_id']);
     }
 
     // @todo create multiple probably does this - test!
@@ -455,8 +438,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     // Save relationships
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple
-    ($params, $relationshipTypeParts[1]);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple ($params, $relationshipTypeParts[1]);
     $this->setMessage($valid, $invalid, $duplicate, $saved);
 
     // if this is called from case view,
@@ -465,7 +447,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if ($this->_caseId) {
       CRM_Case_BAO_Case::createCaseRoleActivity($this->_caseId, $relationshipIds, $params['contact_check'], $this->_contactId);
     }
-
 
     // Save notes
     // @todo this belongs in the BAO.
