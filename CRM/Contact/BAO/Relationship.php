@@ -593,8 +593,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
+   * Delete current employer relationship.
+   *
    * @param int $id
-   * @param $action
+   * @param int $action
    *
    * @return CRM_Contact_DAO_Relationship
    */
@@ -604,7 +606,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->find(TRUE);
 
     //to delete relationship between household and individual                                                                                          \
-    //or between individual and orgnization
+    //or between individual and organization
     if (($action & CRM_Core_Action::DISABLE) || ($action & CRM_Core_Action::DELETE)) {
       $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
       if ($relationship->relationship_type_id == $relTypes['Employee of']['id'] ||
@@ -629,7 +631,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   Relationship id.
    *
    * @return null
-   *
    */
   public static function del($id) {
     // delete from relationship table
@@ -671,13 +672,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Disable/enable the relationship
+   * Disable/enable the relationship.
    *
    * @param int $id
    *   Relationship id.
    *
    * @param $action
-   *
    */
   public static function disableEnableRelationship($id, $action) {
     $relationship = self::clearCurrentEmployer($id, $action);
@@ -717,8 +717,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param int $contactId
    *   Id of the contact to delete.
-   *
-   * @return void
    */
   public static function deleteContact($contactId) {
     $relationship = new CRM_Contact_DAO_Relationship();
@@ -936,8 +934,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
+   * Fetch a relationship object and store the values in the values array.
    *
    * @param array $params
    *   Input parameters to find object.
@@ -1587,9 +1584,7 @@ SELECT count(*)
   }
 
   /**
-   * Helper function to check whether to delete the membership or
-   * not.
-   *
+   * Helper function to check whether to delete the membership or not.
    */
   public static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (in_array($relTypeId, $relTypeIds)) {
@@ -1659,7 +1654,6 @@ WHERE id IN ( {$contacts} )
    * @param string $name
    *   employers sort name.
    *
-   *
    * @return array
    *   array of employers.
    */
@@ -1681,7 +1675,6 @@ WHERE id IN ( {$contacts} )
    * @param string $relTypeId
    *   one or more relationship type id's.
    * @param string $name
-   *
    *
    * @return array
    *   Array of contacts
@@ -1734,7 +1727,6 @@ AND cc.sort_name LIKE '%$name%'";
    *   (reference) array of sql statements to append to.
    *
    * @see CRM_Dedupe_Merger::cpTables()
-   *
    */
   public static function mergeRelationships($mainId, $otherId, &$sqls) {
     // Delete circular relationships
@@ -1787,6 +1779,7 @@ AND cc.sort_name LIKE '%$name%'";
 
   /**
    * Function filters the query by possible relationships for the membership type.
+   *
    * It is intended to be called when constructing queries for the api (reciprocal & non-reciprocal)
    * and to add clauses to limit the return to those relationships which COULD inherit a membership type
    * (as opposed to those who inherit a particular membership
@@ -1838,7 +1831,7 @@ AND cc.sort_name LIKE '%$name%'";
 
 
   /**
-   * wrapper for contact relationship selector.
+   * Wrapper for contact relationship selector.
    *
    * @param array $params
    *   Associated array for params record id.
