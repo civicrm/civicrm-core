@@ -59,7 +59,7 @@
   <tbody>
     {foreach from=$dates item="row" key="count"}
       <tr class="{cycle values="odd-row,even-row"}">
-        <td>{$count + 1}</td>
+        <td>{if $count}{$count+1}{else}{ts}Original{/ts}{/if}</td>
         <td>{$row.start_date}</td>
         {if $endDates}<td>{$row.end_date}</td>{/if}
       </tr>
