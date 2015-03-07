@@ -5,4 +5,4 @@ ALTER TABLE  `civicrm_membership_block` CHANGE  `membership_types`  `membership_
 -- CRM-15578 Require access CiviMail permission for A/B Testing feature
 UPDATE civicrm_navigation
 SET permission = 'access CivMail', permission_operator = ''
-WHERE name = 'New A/B Test' OR name = 'Manage A/B Tests'
+WHERE name = 'New A/B Test' OR name = 'Manage A/B Tests';

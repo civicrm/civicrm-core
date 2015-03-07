@@ -56,8 +56,16 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/new'));
       }
       if ($mid && $continue) {
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid));
+        //CRM-15979 - check if abtest exist for mailing then redirect accordingly
+        $abtest = CRM_Mailing_BAO_MailingAB::getABTest($mid);
+        if (!empty($abtest) && !empty($abtest->id)) {
+          $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id);
+        }
+        else {
+          $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid);
+        }
       }
+      CRM_Utils_System::redirect($redirect);
       if ($mid && !$continue) {
         CRM_Core_Error::fatal('Not implemented: Re-use mailing');
         // CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid));
