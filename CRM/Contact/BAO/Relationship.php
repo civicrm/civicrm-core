@@ -38,9 +38,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
-   * Create function.
+   * Create function - use the API instead.
    *
-   * (Use the API instead)
    * Note that the previous create function has been renamed 'legacyCreateMultiple'
    * and this is new in 4.6
    * All existing calls have been changed to legacyCreateMultiple except the api call - however, it is recommended
@@ -52,7 +51,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
-    self::setContactABFromIDs($params);
+    $params = self::loadExistingRelationshipDetails($params);
     if (self::checkDuplicateRelationship($params, $params['contact_id_a'], $params['contact_id_b'], CRM_Utils_Array::value('id', $params, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
@@ -65,7 +64,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, (empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
     }
 
-    //alter related membership if the is_active param is changed
+    // Alter related membership if the is_active param is changed.
     if (!empty($params['id']) && array_key_exists('is_active', $params)) {
       $action = CRM_Core_Action::DISABLE;
       if (!empty($params['is_active'])) {
@@ -78,10 +77,18 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Create multiple relationships.
+   * Create multiple relationships for one contact.
    *
-   * @param $params
-   * @param $primaryContactLetter
+   * The relationship details are the same for each relationship except the secondary contact
+   * id can be an array.
+   *
+   * @param array $params
+   *   Parameters for creating multiple relationships.
+   *   The parameters are the same as for relationship create function except that the non-primary
+   *   end of the relationship should be an array of one or more contact IDs.
+   * @param string $primaryContactLetter
+   *   a or b to denote the primary contact for this action. The secondary may be multiple contacts
+   *   and should be an array.
    *
    * @return array
    * @throws \CRM_Core_Exception
@@ -90,12 +97,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
     $secondaryContactIDs = $params['contact_id_' . $secondaryContactLetter];
     $valid = $invalid = $duplicate = $saved = 0;
-    $relationshipIds = array();
+    $relationshipIDs = array();
     foreach ($secondaryContactIDs as $secondaryContactID) {
       try {
         $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
         $relationship = civicrm_api3('relationship', 'create', $params);
-        $relationshipIds[] = $relationship['id'];
+        $relationshipIDs[] = $relationship['id'];
         $valid++;
       }
       catch (CiviCRM_API3_Exception $e) {
@@ -114,8 +121,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
     }
 
-    return array($valid, $invalid, $duplicate, $saved, $relationshipIds);
-
+    return array(
+      'valid' => $valid,
+      'invalid' => $invalid,
+      'duplicate' => $duplicate,
+      'saved' => $saved,
+      'relationship_ids' => $relationshipIDs,
+    );
   }
 
   /**
@@ -355,6 +367,43 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
+   * Load contact ids and relationship type id when doing a create call if not provided.
+   *
+   * There are are various checks done in create which require this information which is optional
+   * when using id.
+   *
+   * @param array $params
+   *   Parameters passed to create call.
+   *
+   * @return array
+   *   Parameters with missing fields added if required.
+   */
+  public static function loadExistingRelationshipDetails($params) {
+    if (!empty($params['contact_id_a'])
+      && !empty($params['contact_id_b'])
+      && is_numeric($params['relationship_type_id'])) {
+      return $params;
+    }
+    if (empty($params['id'])) {
+      return $params;
+    }
+
+    $fieldsToFill = array('contact_id_a', 'contact_id_b', 'relationship_type_id');
+    $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array(
+      1 => array(
+        $params['id'],
+        'Integer',
+      ),
+    ));
+    while ($result->fetch()) {
+      foreach ($fieldsToFill as $field) {
+        $params[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
+      }
+    }
+    return $params;
+  }
+
+  /**
    * Resolve passed in contact IDs to contact_id_a & contact_id_b.
    *
    * @param array $params
@@ -366,27 +415,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function setContactABFromIDs($params, $ids = array(), $contactID = NULL) {
     $returnFields = array();
-    if (!empty($params['contact_id_a'])
-      && !empty($params['contact_id_b'])
-      && is_numeric($params['relationship_type_id'])) {
-      return $returnFields;
-    }
+
+    // $ids['contact'] is deprecated but comes from legacyCreateMultiple function.
     if (empty($ids['contact'])) {
       if (!empty($params['id'])) {
-        //let's load the missing ids here since other things tend to rely on them.
-        $fieldsToFill = array('contact_id_a', 'contact_id_b', 'relationship_type_id');
-        $result = CRM_Core_DAO::executeQuery("SELECT " . implode(',', $fieldsToFill) . " FROM civicrm_relationship WHERE id = %1", array(
-          1 => array(
-            $params['id'],
-            'Integer',
-          ),
-        ));
-        while ($result->fetch()) {
-          foreach ($fieldsToFill as $field) {
-            $returnFields[$field] = !empty($params[$field]) ? $params[$field] : $result->$field;
-          }
-        }
-        return $returnFields;
+        return self::loadExistingRelationshipDetails($params);
       }
       throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
     }
@@ -396,26 +429,23 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       if (empty($params['relationship_type_id'])) {
         $returnFields['relationship_type_id'] = $relationshipTypeID;
       }
-    }
-    else {
-      // if we haven't been given a relationship type to dis-entangle we assume that 'first' is a
-      $first = 'a';
-    }
-    foreach (array('a', 'b') as $contactLetter) {
-      if (empty($params['contact_' . $contactLetter])) {
-        if ($first == $contactLetter) {
-          $returnFields['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
-        }
-        else {
-          $returnFields['contact_id_' . $contactLetter] = $contactID;
+      foreach (array('a', 'b') as $contactLetter) {
+        if (empty($params['contact_' . $contactLetter])) {
+          if ($first == $contactLetter) {
+            $returnFields['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
+          }
+          else {
+            $returnFields['contact_id_' . $contactLetter] = $contactID;
+          }
         }
       }
     }
+
     return $returnFields;
   }
 
   /**
-   * Specifiy defaults for creating a relationship.
+   * Specify defaults for creating a relationship.
    *
    * @return array
    *   array of defaults for creating relationship
@@ -484,7 +514,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $contactSubType = NULL,
     $onlySubTypeRelationTypes = FALSE
   ) {
-    $allRelationshipType = array();
+
     $relationshipType = array();
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType($column);
 
