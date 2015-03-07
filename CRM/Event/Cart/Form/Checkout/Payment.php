@@ -46,7 +46,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $participant_status = 'On waitlist';
     }
     elseif (CRM_Utils_Array::value('is_pay_later', $params, FALSE)) {
-      $participant_status = 'Pending from pay later';
+      $participant_status = 'Pay Later(pending)';
     }
     else {
       $participant_status = 'Registered';

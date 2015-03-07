@@ -703,7 +703,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'onchange' => "checkCancelled( this.value, {$cancelledparticipantStatusId},{$cancelledContributionStatusId});",
       );
 
-      $participantStatusId = array_search('Pending from pay later',
+      $participantStatusId = array_search('Pay Later(pending)',
         CRM_Event_PseudoConstant::participantStatus()
       );
       $contributionStatusId = array_search('Completed',
