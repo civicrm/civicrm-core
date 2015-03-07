@@ -49,7 +49,10 @@
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
-      data: fields.concat({id: '-', text: ts('Other') + '...'})
+      data: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')}),
+      formatResult: function(field) {
+        return field.text + '<div class="api-field-desc">' + field.description + '</div>';
+      }
     }).change();
   }
 
@@ -134,6 +137,7 @@
             id: field.name,
             text: field.title || field.name,
             multi: !!field['api.multiple'],
+            description: field.description || '',
             required: !(!field['api.required'] || field['api.required'] === '0')
           });
           if (field['api.required'] && field['api.required'] !== '0') {

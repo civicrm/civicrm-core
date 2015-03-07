@@ -87,6 +87,17 @@
     background-image: url("{/literal}{$config->resourceBase}{literal}/i/icons/jquery-ui-52534D.png");
     opacity: .8;
   }
+  .api-field-desc {
+    font-size: .8em;
+    color: #828282;
+    line-height: 1.3em;
+  }
+  .select2-highlighted .api-field-desc {
+    color: #fcfcfc;
+  }
+  .api-param-op[readonly] {
+    width: 4em;
+  }
   pre ol.linenums li {
     list-style-type: decimal;
     color: #CFCFCF;
