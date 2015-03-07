@@ -610,6 +610,15 @@ CRM.strings = CRM.strings || {};
         settings.changeYear = _.includes('y', settings.dateFormat);
         $dateField.datepicker(settings).change(updateDataField);
       }
+      // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
+      function isValidDate() {
+        try {
+          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
       function updateInputFields(e, context) {
         var val = $dataField.val(),
           time = null;
@@ -629,10 +638,16 @@ CRM.strings = CRM.strings || {};
         $clearLink.css('visibility', val ? 'visible' : 'hidden');
       }
       function updateDataField(e, context) {
+        // The crmClear event wipes all the field values anyway, so no need to respond
         if (context !== 'crmClear') {
           var val = '';
           if ($dateField.val()) {
-            val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
+            if (isValidDate()) {
+              val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
+              $dateField.removeClass('crm-error');
+            } else {
+              $dateField.addClass('crm-error');
+            }
           }
           if ($timeField.val()) {
             val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 8);
