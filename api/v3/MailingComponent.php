@@ -32,6 +32,18 @@
  */
 
 /**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $spec
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_mailing_component_create_spec(&$spec) {
+  $spec['is_active']['api.default'] = 1;
+}
+
+/**
  * Save a MailingComponent.
  *
  * @param array $params
