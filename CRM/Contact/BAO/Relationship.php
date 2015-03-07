@@ -26,11 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * Class CRM_Contact_BAO_Relationship.
  */
 class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
@@ -42,12 +38,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
-   * Create function. (Use the API instead)
+   * Create function.
+   *
+   * (Use the API instead)
    * Note that the previous create function has been renamed 'legacyCreateMultiple'
    * and this is new in 4.6
    * All existing calls have been changed to legacyCreateMultiple except the api call - however, it is recommended
-   * that you call that as the end to end testing here is based on the api & refactoring may still be done
+   * that you call that as the end to end testing here is based on the api & refactoring may still be done.
+   *
    * @param array $params
+   *
    * @return \CRM_Contact_BAO_Relationship
    * @throws \CRM_Core_Exception
    */
@@ -78,7 +78,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Create multiple relationships
+   * Create multiple relationships.
    *
    * @param $params
    * @param $primaryContactLetter
@@ -96,16 +96,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
         $relationship = civicrm_api3('relationship', 'create', $params);
         $relationshipIds[] = $relationship['id'];
-        $valid ++;
+        $valid++;
       }
       catch (CiviCRM_API3_Exception $e) {
         switch ($e->getMessage()) {
-          case 'Duplicate Relationship' :
-            $duplicate ++;
+          case 'Duplicate Relationship':
+            $duplicate++;
             break;
 
-          case 'Invalid Relationship' :
-            $invalid ++;
+          case 'Invalid Relationship':
+            $invalid++;
             break;
 
           default:
@@ -183,7 +183,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           continue;
         }
         $contactFields = self::setContactABFromIDs($params, $ids, $key);
-        $singleInstanceParams = array_merge($params,$contactFields);
+        $singleInstanceParams = array_merge($params, $contactFields);
         $relationship = self::add($singleInstanceParams);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
@@ -236,7 +236,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * This is the function that check/add if the relationship created is valid
+   * This is the function that check/add if the relationship created is valid.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -317,6 +317,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Add relationship to recent links.
+   *
    * @param array $params
    * @param CRM_Contact_DAO_Relationship $relationship
    */
@@ -354,7 +355,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Resolve passed in contact IDs to contact_id_a & contact_id_b
+   * Resolve passed in contact IDs to contact_id_a & contact_id_b.
    *
    * @param array $params
    * @param array $ids
@@ -365,8 +366,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function setContactABFromIDs($params, $ids = array(), $contactID = NULL) {
     $returnFields = array();
-    if (!empty($params['contact_id_a']) && !empty($params['contact_id_b']) && is_numeric
-      ($params['relationship_type_id'])) {
+    if (!empty($params['contact_id_a'])
+      && !empty($params['contact_id_b'])
+      && is_numeric($params['relationship_type_id'])) {
       return $returnFields;
     }
     if (empty($ids['contact'])) {
@@ -463,11 +465,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   Name/label that going to retrieve from db.
    * @param bool $biDirectional
    * @param string $contactSubType
-   *   Includes relationshiptypes between this subtype.
+   *   Includes relationship types between this subtype.
    * @param bool $onlySubTypeRelationTypes
-   *   If set only subtype which is passed by $contactSubType.
-   *                                          related relationshiptypes get return
-   *
+   *   If set only subtype which is passed by $contactSubType
+   *   related relationship types get return
    *
    * @return array
    *   array reference of all relationship types with context to current contact.
@@ -1331,10 +1332,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *   array of values submitted by POST.
    * @param array $ids
    *   array of ids.
-   * @param \const|\which $action which action called this function
+   * @param \const|int $action which action called this function
    *
    * @param bool $active
    *
+   * @throws \CRM_Core_Exception
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
@@ -1691,6 +1693,7 @@ AND cc.sort_name LIKE '%$name%'";
 
   /**
    * Merge relationships from otherContact to mainContact.
+   *
    * Called during contact merge operation
    *
    * @param int $mainId
