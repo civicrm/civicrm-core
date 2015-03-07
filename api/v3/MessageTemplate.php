@@ -77,6 +77,8 @@ function civicrm_api3_message_template_delete($params) {
  * @param array $params
  */
 function _civicrm_api3_message_template_get_spec(&$params) {
+  // fetch active records by default
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
