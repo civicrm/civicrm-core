@@ -96,7 +96,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $contactID = $session->get('userID');
 
     $params = array('options' => array('limit' => 0));
-    $civiMails = civicrm_api3('Mailing', 'get', $params + array('return' => array('id', 'name', 'scheduled_date')));
+    $civiMails = civicrm_api3('Mailing', 'get', $params + array(
+      'is_completed' => 1,
+      'return' => array('id', 'name', 'scheduled_date'),
+    ));
     $campNames = civicrm_api3('Campaign', 'get', $params);
     $groupNames = civicrm_api3('Group', 'get', $params);
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params);
