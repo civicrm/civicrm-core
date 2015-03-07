@@ -257,11 +257,19 @@
   <tr class="api-param-row">
     <td><input style="width: 100%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" /></td>
     <td>
-      <select class="crm-form-select api-param-op">
-        {foreach from=$operators item='op'}
-          <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
-        {/foreach}
-      </select>
+      {literal}
+      <% if (noOps) { %>
+        <input class="crm-form-text api-param-op" value="=" readonly="true" title="{/literal}{ts}Other operators not available for this action.{/ts}{literal}" />
+      <% } else { %>
+      {/literal}
+        <select class="crm-form-select api-param-op">
+          {foreach from=$operators item='op'}
+            <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
+          {/foreach}
+        </select>
+      {literal}
+      <% } %>
+      {/literal}
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>

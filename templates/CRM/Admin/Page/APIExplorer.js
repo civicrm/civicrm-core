@@ -20,6 +20,9 @@
     // These types of entityRef don't require any input to open
     OPEN_IMMEDIATELY = ['RelationshipType', 'Event', 'Group', 'Tag'],
 
+    // Actions that don't support fancy operators
+    NO_OPERATORS = ['create', 'update', 'delete', 'setvalue', 'getoptions', 'getactions', 'getfields'],
+
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
@@ -46,7 +49,7 @@
    * @param name
    */
   function addField(name) {
-    $('#api-params').append($(fieldTpl({name: name || ''})));
+    $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')}),
