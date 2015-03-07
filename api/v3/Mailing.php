@@ -65,6 +65,7 @@ function civicrm_api3_mailing_create($params) {
   }
   $safeParams['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams);
+
 }
 
 /**
@@ -150,7 +151,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['reply_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
   $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
   $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
-
+  $params['mailing_type']['api.default'] = 'standalone';
   $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
   foreach ($defaultAddress as $id => $value) {
     if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {

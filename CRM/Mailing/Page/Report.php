@@ -97,7 +97,11 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
    */
   public function run() {
     $this->_mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-
+    //CRM-15979 - check if abtest exist for mailing then redirect accordingly
+    $abtest = CRM_Mailing_BAO_MailingAB::getABTest($this->_mailing_id);
+    if (!empty($abtest) && !empty($abtest->id)) {
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id));
+    }
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($this->_mailing_id);
 
