@@ -85,7 +85,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Check if repeating event.
    */
-  protected $_isRepeatingEvent;
+  public $_isRepeatingEvent;
 
   /**
    * Set variables up before form is built.
