@@ -84,8 +84,10 @@
 </div>
 {literal}
 <script type="text/javascript">
+(function (_) {
   CRM.$(function($) {
-    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    var $form = $('form.{/literal}{$form.formClass}{literal}'),
+      defaultDate = null;
 
     // Prevent html5 errors
     $form.attr('novalidate', 'novalidate');
@@ -150,25 +152,37 @@
       }
     })
       .on('select2-opening', function(e) {
-        var $el = $(this);
+        var $el = $(this),
+          data = $el.select2('data') || [],
+          existingSelections = _.pluck(data, 'id');
         // Prevent select2 from opening and show a datepicker instead
         e.preventDefault();
         $('.select2-search-field input', $el.select2('container'))
-          .datepicker()
+          .datepicker({changeMonth: true, changeYear: true})
+          .datepicker('option', 'defaultDate', defaultDate)
+          .datepicker('option', 'beforeShowDay', checkSelectedDates)
           .datepicker('show')
           .off('.crmDate')
           .on('change.crmDate', function() {
             if ($(this).val()) {
-              var date = $(this).datepicker('getDate'),
-                data = $el.select2('data') || [];
+              var date = defaultDate = $(this).datepicker('getDate');
               data.push({
                 text: $.datepicker.formatDate(CRM.config.dateInputFormat, date),
                 id: $.datepicker.formatDate('yy-mm-dd', date)
               });
-              $el.select2('data', data);
+              $el.select2('data', data, true);
             }
           });
+        // Don't allow the same date to be selected twice
+        function checkSelectedDates(date) {
+          var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
+          if (_.includes(existingSelections, dateStr)) {
+            return [false, '', '{/literal}{ts escape='js'}Already selected{/ts}{literal}'];
+          }
+          return [true, '', ''];
+        }
       });
+
 
     // Dialog for preview repeat Configuration dates
     function previewDialog() {
@@ -218,6 +232,6 @@
     $('[name=repetition_frequency_interval]', $form).each(pluralizeUnits).change(pluralizeUnits);
 
   });
-
+})(CRM._);
 </script>
 {/literal}
