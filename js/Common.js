@@ -316,9 +316,11 @@ CRM.strings = CRM.strings || {};
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
     $(':input:visible, .select2-container:visible+:input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
-      var initialValue = $(this).data('crm-initial-value');
+      var
+        initialValue = $(this).data('crm-initial-value'),
+        currentValue = $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val();
       // skip change of value for submit buttons
-      if (initialValue !== undefined && !_.isEqual(initialValue, $(this).val())) {
+      if (initialValue !== undefined && !_.isEqual(initialValue, currentValue)) {
         isDirty = true;
       }
     });
@@ -729,7 +731,7 @@ CRM.strings = CRM.strings || {};
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
-        $(this).data('crm-initial-value', $(this).val());
+        $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
     })
     .on('dialogopen', function(e) {
