@@ -153,34 +153,50 @@
     })
       .on('select2-opening', function(e) {
         var $el = $(this),
-          data = $el.select2('data') || [],
-          existingSelections = _.pluck(data, 'id');
+          $input = $('.select2-search-field input', $el.select2('container'));
         // Prevent select2 from opening and show a datepicker instead
         e.preventDefault();
-        $('.select2-search-field input', $el.select2('container'))
-          .datepicker({changeMonth: true, changeYear: true})
-          .datepicker('option', 'defaultDate', defaultDate)
-          .datepicker('option', 'beforeShowDay', checkSelectedDates)
-          .datepicker('show')
-          .off('.crmDate')
-          .on('change.crmDate', function() {
-            if ($(this).val()) {
-              var date = defaultDate = $(this).datepicker('getDate');
-              data.push({
-                text: $.datepicker.formatDate(CRM.config.dateInputFormat, date),
-                id: $.datepicker.formatDate('yy-mm-dd', date)
-              });
-              $el.select2('data', data, true);
-            }
-          });
-        // Don't allow the same date to be selected twice
-        function checkSelectedDates(date) {
-          var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
-          if (_.includes(existingSelections, dateStr)) {
-            return [false, '', '{/literal}{ts escape='js'}Already selected{/ts}{literal}'];
-          }
-          return [true, '', ''];
+        if (!$input.data('datepicker')) {
+          $input
+            .datepicker({
+              beforeShow: function() {
+                var existingSelections = _.pluck($el.select2('data') || [], 'id');
+                return {
+                  changeMonth: true,
+                  changeYear: true,
+                  defaultDate: defaultDate,
+                  beforeShowDay: function(date) {
+                    // Don't allow the same date to be selected twice
+                    var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
+                    if (_.includes(existingSelections, dateStr)) {
+                      return [false, '', '{/literal}{ts escape='js'}Already selected{/ts}{literal}'];
+                    }
+                    return [true, '', ''];
+                  }
+                };
+              }
+            })
+            .datepicker('show')
+            .on('change.crmDate', function() {
+              if ($(this).val()) {
+                var date = defaultDate = $(this).datepicker('getDate'),
+                data = $el.select2('data') || [];
+                data.push({
+                  text: $.datepicker.formatDate(CRM.config.dateInputFormat, date),
+                  id: $.datepicker.formatDate('yy-mm-dd', date)
+                });
+                $el.select2('data', data, true);
+              }
+            })
+            .on('keyup', function() {
+              $(this).val('').datepicker('show');
+            });
         }
+      })
+      // Don't leave datepicker open when clearing selections
+      .on('select2-removed', function() {
+        $('input.hasDatepicker', $(this).select2('container'))
+          .datepicker('hide');
       });
 
 
