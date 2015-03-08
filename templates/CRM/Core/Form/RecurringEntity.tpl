@@ -110,13 +110,17 @@
     $('#repetition_frequency_unit', $form).each(changeFrequencyUnit).change(changeFrequencyUnit);
 
     function disableUnselected() {
-      $('input:radio[name=ends], input[name=repeats_by]', $form).not(':checked').siblings(':input').prop('disabled', true);
+      $('input:radio[name=ends], input[name=repeats_by]', $form).not(':checked').siblings(':input').prop('disabled', true).removeClass('required');
     }
     disableUnselected();
 
     $('input:radio[name=ends], input[name=repeats_by]', $form).click(function() {
       $(this).siblings(':input').prop('disabled', false).filter(':visible').addClass('required').focus();
       disableUnselected();
+    });
+
+    $('input:radio[name=ends]').siblings('.crm-clear-link').click(function() {
+      $('input:radio[name=ends][value=1]').prop('checked', true).trigger('click');
     });
 
     function validate() {
