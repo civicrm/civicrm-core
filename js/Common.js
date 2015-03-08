@@ -315,7 +315,7 @@ CRM.strings = CRM.strings || {};
  */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
-    $(':input:visible, .select2-container:visible+:input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
+    $(':input:visible, .select2-container:visible+:input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu, :disabled').each(function () {
       var
         initialValue = $(this).data('crm-initial-value'),
         currentValue = $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val();
