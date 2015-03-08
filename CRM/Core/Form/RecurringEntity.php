@@ -333,7 +333,7 @@ class CRM_Core_Form_RecurringEntity {
     }
     //Process this function only when you get this variable
     if ($params['allowRepeatConfigToSubmit'] == 1) {
-      if (CRM_Utils_Array::value('entity_table', $params) && CRM_Utils_Array::value('entity_id', $params) && $type) {
+      if (!empty($params['entity_table']) && !empty($params['entity_id']) && $type) {
         $params['used_for'] = $type;
         if (empty($params['parent_entity_id'])) {
           $params['parent_entity_id'] = self::$_parentEntityId;

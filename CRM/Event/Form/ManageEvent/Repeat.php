@@ -101,6 +101,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $params['dateColumns'] = array('start_date');
       $params['excludeDateRangeColumns'] = array('start_date', 'end_date');
       $params['entity_table'] = 'civicrm_event';
+      $params['entity_id'] = $this->_id;
       //Unset event id
       unset($params['id']);
 
@@ -164,6 +165,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * @return array
    */
   static public function getParticipantCountforEvent($listOfRelatedEntities = array()) {
+    $participantDetails = array();
     if (!empty($listOfRelatedEntities)) {
       $implodeRelatedEntities = implode(',', array_map(function ($entity) {
         return $entity['id'];
@@ -176,7 +178,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
           WHERE p.event_id = e.id AND p.event_id IN ({$implodeRelatedEntities})
           GROUP BY p.event_id";
         $dao = CRM_Core_DAO::executeQuery($query);
-        $participantDetails = array();
         while ($dao->fetch()) {
           $participantDetails['countByID'][$dao->event_id] = $dao->participant_count;
           $participantDetails['countByName'][$dao->event_id][$dao->event_data] = $dao->participant_count;

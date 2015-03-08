@@ -39,7 +39,7 @@
 class CRM_Event_Form_ManageEvent_TabHeader {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_ManageEvent $form
    *
    * @return array
    */
@@ -62,7 +62,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_ManageEvent $form
    *
    * @return array
    * @throws Exception
@@ -92,6 +92,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['friend'] = array('title' => ts('Tell a Friend')) + $default;
     $tabs['pcp'] = array('title' => ts('Personal Campaigns')) + $default;
     $tabs['repeat'] = array('title' => ts('Repeat')) + $default;
+
+    // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
+    if (!$form->_isRepeatingEvent) {
+      unset($tabs['repeat']['class']);
+    }
 
     // check if we're in shopping cart mode for events
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
@@ -204,7 +209,7 @@ WHERE      e.id = %1
   }
 
   /**
-   * @param $form
+   * @param CRM_Event_Form_ManageEvent $form
    */
   public static function reset(&$form) {
     $tabs = self::process($form);
