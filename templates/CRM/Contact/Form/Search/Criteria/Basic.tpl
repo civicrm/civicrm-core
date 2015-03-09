@@ -23,6 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{literal}
+<style type="text/css">
+  .adv-search-top-submit span.crm-button {
+    float: right !important;
+  }
+</style>
+{/literal}
 <table class="form-layout">
   <tr>
     <td><label>{ts}Complete OR Partial Name{/ts}</label><br />
@@ -32,12 +39,12 @@
       <label>{ts}Complete OR Partial Email{/ts}</label><br />
       {$form.email.html}
     </td>
-    <td class="labels" rowspan="2">
+    <td class="adv-search-top-submit" colspan="2">
       <div class="crm-submit-buttons">
         {include file="CRM/common/formButtons.tpl" location="top"}
       </div>
       <div class="crm-submit-buttons reset-advanced-search">
-        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button css_right" title="{ts}Clear all search criteria{/ts}">
           <span class="icon ui-icon-circle-close"></span>
           {ts}Reset Form{/ts}
         </a>
