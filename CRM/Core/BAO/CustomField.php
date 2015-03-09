@@ -509,10 +509,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.option_group_id,
                             $cfTable.date_format,
                             $cfTable.time_format,
-                            $cgTable.is_multiple
+                            $cgTable.is_multiple,
+                            og.name as option_group_name
                      FROM $cfTable
                      INNER JOIN $cgTable
-                     ON $cfTable.custom_group_id = $cgTable.id
+                       ON $cfTable.custom_group_id = $cgTable.id
+                     LEFT JOIN civicrm_option_group og
+                       ON $cfTable.option_group_id = og.id
                      WHERE ( 1 ) ";
 
         if (!$showAll) {
@@ -577,6 +580,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['date_format'] = $dao->date_format;
           $fields[$dao->id]['time_format'] = $dao->time_format;
           $fields[$dao->id]['is_required'] = $dao->is_required;
+          self::getOptionsForField($fields[$dao->id], $dao->option_group_name);
         }
 
         CRM_Core_BAO_Cache::setItem($fields,
@@ -2530,6 +2534,39 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     $field = (array) $field;
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
     return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
+  }
+
+  /**
+   * @param array $field
+   * @param string|null $optionGroupName
+   */
+  private static function getOptionsForField(&$field, $optionGroupName) {
+    if ($optionGroupName) {
+      $field['pseudoconstant'] = array(
+        'optionGroupName' => $optionGroupName,
+        'optionEditPath' => 'civicrm/admin/options/' . $optionGroupName,
+      );
+    }
+    elseif ($field['data_type'] == 'Boolean') {
+      $field['pseudoconstant'] = array(
+        'callback' => 'CRM_Core_SelectValues::boolean',
+      );
+    }
+    elseif ($field['data_type'] == 'Country') {
+      $field['pseudoconstant'] = array(
+        'table' => 'civicrm_country',
+        'keyColumn' => 'id',
+        'labelColumn' => 'name',
+        'nameColumn' => 'iso_code',
+      );
+    }
+    elseif ($field['data_type'] == 'StateProvince') {
+      $field['pseudoconstant'] = array(
+        'table' => 'civicrm_state_province',
+        'keyColumn' => 'id',
+        'labelColumn' => 'name',
+      );
+    }
   }
 
 }
