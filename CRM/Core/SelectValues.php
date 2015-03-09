@@ -38,6 +38,18 @@
 class CRM_Core_SelectValues {
 
   /**
+   * Yes/No options
+   *
+   * @return array
+   */
+  public static function boolean() {
+    return array(
+      1 => ts('Yes'),
+      0 => ts('No'),
+    );
+  }
+
+  /**
    * Preferred mail format.
    *
    * @return array
@@ -231,7 +243,6 @@ class CRM_Core_SelectValues {
    * Styles for displaying the custom data group.
    *
    * @return array
-   *
    */
   public static function customGroupStyle() {
     return array(
@@ -265,7 +276,6 @@ class CRM_Core_SelectValues {
    * The status of a contact within a group.
    *
    * @return array
-   *
    */
   public static function groupContactStatus() {
     return array(
