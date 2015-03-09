@@ -510,6 +510,8 @@ class CRM_Core_I18n {
 
   /**
    * Static instance provider - return the instance for the current locale.
+   *
+   * @return CRM_Core_I18n
    */
   public static function &singleton() {
     static $singleton = array();
