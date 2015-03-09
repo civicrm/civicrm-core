@@ -318,7 +318,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 20,
           'autocomplete' => 'off',
-          'classs' => 'creditcard',
+          'class' => 'creditcard',
         ),
         'is_required' => TRUE,
       ),
