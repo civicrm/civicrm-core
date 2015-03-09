@@ -61,7 +61,7 @@
         <br />
         {$form.component_mode.html}
         {if $form.display_relationship_type}
-          <span id="crm-display_relationship_type">{$form.display_relationship_type.html}</span>
+          <div id="crm-display_relationship_type">{$form.display_relationship_type.html}</div>
         {/if}
       {else}
           &nbsp;
