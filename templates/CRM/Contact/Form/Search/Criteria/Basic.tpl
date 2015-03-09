@@ -52,23 +52,6 @@
     </td>
   </tr>
   <tr>
-    <td>
-      {$form.uf_group_id.label} {help id="id-search-views"}<br />{$form.uf_group_id.html}
-    </td>
-    <td>
-      {if $form.component_mode}
-        {$form.component_mode.label} {help id="id-display-results"}
-        <br />
-        {$form.component_mode.html}
-        {if $form.display_relationship_type}
-          <div id="crm-display_relationship_type">{$form.display_relationship_type.html}</div>
-        {/if}
-      {else}
-          &nbsp;
-      {/if}
-    </td>
-  </tr>
-  <tr>
   {if $form.contact_type}
             <td><label>{ts}Contact Type(s){/ts}</label><br />
                 {$form.contact_type.html}
@@ -117,10 +100,6 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-    <td>{$form.operator.label} {help id="id-search-operator"}<br />{$form.operator.html}</td>
-    <td>
-      {if $form.deleted_contacts}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{else}&nbsp;{/if}
-    </td>
   </tr>
   <tr>
     {if $form.contact_tags}
@@ -226,6 +205,36 @@
     <td colspan="3">
       {$form.preferred_language.label}<br />
       {$form.preferred_language.html}
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <fieldset>
+        <legend>{ts}Search Settings{/ts}</legend>
+        <table>
+          <tr>
+            <td>
+              {$form.uf_group_id.label} {help id="id-search-views"}<br />{$form.uf_group_id.html}
+            </td>
+            <td>
+              {if $form.component_mode}
+                {$form.component_mode.label} {help id="id-display-results"}
+                <br />
+                {$form.component_mode.html}
+                {if $form.display_relationship_type}
+                  <div id="crm-display_relationship_type">{$form.display_relationship_type.html}</div>
+                {/if}
+              {else}
+                &nbsp;
+              {/if}
+            </td>
+            <td>{$form.operator.label} {help id="id-search-operator"}<br />{$form.operator.html}</td>
+            <td>
+              {if $form.deleted_contacts}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{/if}
+            </td>
+          </tr>
+        </table>
+      </fieldset>
     </td>
   </tr>
 </table>
