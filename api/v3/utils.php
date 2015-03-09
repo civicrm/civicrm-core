@@ -552,31 +552,37 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   };
 
   // build query
+  $query = CRM_Utils_SQL_Select::from($dao->tableName() . " a");
 
-  $select = "SELECT 1";
-  $from = "FROM " . $dao->tableName() . " a";
-  $where = "WHERE 1=1";
-  $misc = "";
-  $query_params = array();
-
+  $i = 0;
   foreach ($select_fields as $column => $alias) {
-    $select .= ", $column as $alias";
+    ++$i;
+    $query = $query->select("!column_$i as !alias_$i", array("!column_$i" => $column, "!alias_$i" => $alias));
   }
 
   foreach ($tables_to_join as $table_name) {
-    $from .= " LEFT OUTER JOIN $table_name ON $table_name.entity_id = a.id";
+    ++$i;
+    $query = $query->join(
+      "!table_name_$i",
+      "LEFT OUTER JOIN !table_name_$i ON !table_name_$i.entity_id = a.id",
+      array("!table_name_$i" => $table_name)
+    );
   }
 
-  $param_nr = 0;
   foreach ($where_clauses as $clause) {
+    ++$i;
     if (substr($clause[1], -4) == "NULL") {
-      $where .= " AND $clause[0] $clause[1]";
+      $query->where("!columnName_$i !nullThing_$i", array(
+        "!columnName_$i" => $clause[0],
+        "!nullThing_$i" => $clause[1],
+      ));
     }
     else {
-      ++$param_nr;
-      $where .= " AND $clause[0] $clause[1] %$param_nr";
-      // TODO: check whether tis works with datetime
-      $query_params[$param_nr] = array($clause[2], 'String');
+      $query->where("!columnName_$i !operator_$i @value_$i", array(
+        "!columnName_$i" => $clause[0],
+        "!operator_$i" => $clause[1],
+        "@value_$i" => $clause[2],
+      ));
     }
   };
 
@@ -594,22 +600,17 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
       }
     }
     if (count($sort_fields) > 0) {
-      $misc .= " ORDER BY " . implode(",", $sort_fields);
+      $query->orderBy(implode(",", $sort_fields));
     }
   }
 
   // limit
-  if (!empty($options['limit'])) {
-    ++$param_nr;
-    $misc .= " LIMIT %$param_nr";
-    $query_params[$param_nr] = array($options['limit'], 'Integer');
+  if (!empty($options['limit']) || !empty($options['offset'])) {
+    $query->limit($options['limit'], $options['offset']);
   }
 
-  $query = "$select $from $where $misc";
-
   $result_entities = array();
-
-  $result_dao = CRM_Core_DAO::executeQuery($query, $query_params);
+  $result_dao = CRM_Core_DAO::executeQuery($query->toSQL());
   while ($result_dao->fetch()) {
     $result_entities[$result_dao->id] = array();
     foreach ($select_fields as $column => $alias) {
