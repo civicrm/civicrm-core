@@ -62,10 +62,12 @@
   {if $form.group}
     <td>
       <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a href="#" id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
+        <br />
         {$form.group.html}
     </div>
     <div id='grouptypeselect'>
       <label>{ts}Group Type(s){/ts} <span class="description"> (<a href="#" id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
+      <br />
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
