@@ -64,7 +64,8 @@
           url: CRM.url('civicrm/ajax/statusmsg', {entity: info.entity, id: info.id}),
           title: ts('{/literal}{ts escape="js" 1='%1'}Disable %1{/ts}{literal}', {1: fieldLabel}),
           options: {{/literal}yes: '{ts escape="js"}Yes{/ts}', no: '{ts escape="js"}No{/ts}'{literal}},
-          width: 300
+          width: 300,
+          height: 'auto'
         })
           .on('crmLoad', checkResponse)
           .on('crmConfirm:yes', save);
