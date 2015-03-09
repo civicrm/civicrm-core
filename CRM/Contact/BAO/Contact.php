@@ -1867,7 +1867,7 @@ ORDER BY civicrm_email.is_primary DESC";
       if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
         $params['updateBlankLocInfo'] = FALSE;
       }
-      
+
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
     }
