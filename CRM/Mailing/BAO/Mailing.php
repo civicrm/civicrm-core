@@ -1330,6 +1330,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     );
     $mailParams['toEmail'] = $email;
 
+    // Add job ID to mailParams for external email delivery service to utilise
+    $mailParams['job_id'] = $job_id;
+
     CRM_Utils_Hook::alterMailParams($mailParams, 'civimail');
 
     // CRM-10699 support custom email headers
