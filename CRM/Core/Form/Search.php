@@ -101,7 +101,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
+    $resources
+      ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
+      ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
     $this->addButtons(array(
       array(
