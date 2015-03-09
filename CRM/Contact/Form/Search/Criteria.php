@@ -219,7 +219,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'display_relationship_type',
       ts('Display Results as Relationship'),
-      $rSelect
+      $rSelect,
+      array('class' => 'crm-select2')
     );
 
     // checkboxes for DO NOT phone, email, mail
