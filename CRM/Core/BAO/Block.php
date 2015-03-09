@@ -378,16 +378,6 @@ class CRM_Core_BAO_Block {
       $blocks[] = $baoString::add($blockFields);
     }
 
-    // we need to delete blocks that were deleted during update
-    if ($updateBlankLocInfo && !empty($blockIds)) {
-      foreach ($blockIds as $deleteBlock) {
-        if (empty($deleteBlock['id'])) {
-          continue;
-        }
-        self::blockDelete($blockName, array('id' => $deleteBlock['id']));
-      }
-    }
-
     return $blocks;
   }
 
