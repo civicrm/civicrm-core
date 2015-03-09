@@ -164,6 +164,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.title}
                                                                       'title'     => ts('{$field.title}'),
 {/if}
+{if $field.comment}
+                                                                      'description'     => '{$field.comment|replace:"'":"\'"}',
+{/if}
 {if $field.required}
                                         'required'  => {$field.required},
 {/if} {* field.required *}
