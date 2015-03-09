@@ -204,7 +204,7 @@
     <title>Price Field Visibility</title>
     <type>int unsigned</type>
     <default>1</default>
-    <comment>Implicit FK to civicrm_option_group with name = \'visibility\'</comment>
+    <comment>Implicit FK to civicrm_option_group with name = 'visibility'</comment>
     <add>3.2</add>
     <pseudoconstant>
       <optionGroupName>visibility</optionGroupName>
