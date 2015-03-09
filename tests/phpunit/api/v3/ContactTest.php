@@ -1168,6 +1168,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test civicrm_contact_get() sort by id.
+   */
+  public function testContactGetOrderById() {
+    $params = array(
+      'sequential' => 1,
+      'options' => array(
+        'sort' => 'id DESC',
+        'limit' => 2,
+      ));
+    $result = $this->callAPISuccess('contact', 'get', $params);
+    $this->assertEquals(2, $result['count']);
+    // Please note that assertGreaterThan($expected, $actual)
+    // asserts that $actual is greater than $expected.
+    $this->assertGreaterThan($result['values'][1]['id'], $result['values'][0]['id']);
+  }
+
+  /**
    * Test civicrm_contact_get() return only first name & last name.
    *
    * Use comma separated string return with a space.
