@@ -1220,20 +1220,6 @@ input.crm-form-entityref {
   content: "\00BB";
 }
 
-.crm-container div#searchForm {
-  height: auto;
-  width: 100%;
-}
-
-.crm-container div#searchForm table.form-layout {
-  border-spacing: 0;
-}
-
-.crm-container div#searchForm table.form-layout td {
-  padding: 4px;
-  border: 1px solid #DDDDDD;
-}
-
 /* editor specific classes */
 #crm-container dd.editor {
   margin-top: 0.7em;

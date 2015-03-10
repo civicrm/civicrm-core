@@ -23,13 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{literal}
-<style type="text/css">
-  .adv-search-top-submit span.crm-button {
-    float: right !important;
-  }
-</style>
-{/literal}
 <table class="form-layout">
   <tr>
     <td><label>{ts}Complete OR Partial Name{/ts}</label><br />
