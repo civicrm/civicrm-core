@@ -297,6 +297,11 @@ input.crm-form-entityref {
   color: #a9a9a9;
 }
 
+.crm-container .crm-form-time {
+  width: 5em;
+  margin-left: 1em;
+}
+
 .crm-container .crm-form-submit {
   margin: .25em 0.5em 0.25em 0;
 }
@@ -2778,7 +2783,8 @@ div.crm-container form {
 }
 
 /* Date plugin */
-.crm-container input.dateplugin {
+.crm-container input.dateplugin,
+.crm-container input.crm-form-date {
   background: white url(../i/cal.gif) no-repeat scroll right center;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
