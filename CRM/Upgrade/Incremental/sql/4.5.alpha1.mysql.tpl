@@ -531,7 +531,7 @@ ALTER TABLE civicrm_line_item ADD contribution_id INT(10) unsigned COMMENT 'Cont
 -- FK to civicrm_contribution
 
 ALTER TABLE civicrm_line_item
-ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
+ADD CONSTRAINT `FK_civicrm_line_item_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `civicrm_line_item`
 DROP INDEX `UI_line_item_value`,

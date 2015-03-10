@@ -267,7 +267,7 @@
     <comment>FK to the message template.</comment>
   </field>
   <foreignKey>
-    <name>msg_template_id</name>
+    <name>sms_template_id</name>
     <table>civicrm_msg_template</table>
     <key>id</key>
     <onDelete>SET NULL</onDelete>
