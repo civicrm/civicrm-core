@@ -148,9 +148,18 @@
           }
         });
 
-        element.on('click', ':radio[value=at]', function() {
-          $('.crm-form-date', element).focus();
-        });
+        element
+          // Open datepicker when clicking "At" radio
+          .on('click', ':radio[value=at]', function() {
+            $('.crm-form-date', element).focus();
+          })
+          // Reset mode if user entered an invalid date
+          .on('change', '.crm-hidden-date', function(e, context) {
+            if (context === 'userInput' && $(this).val() === '' && $(this).siblings('.crm-form-date').val().length) {
+              schedule.mode = 'at';
+              schedule.datetime = '?';
+            }
+          });
 
         $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
         $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {
