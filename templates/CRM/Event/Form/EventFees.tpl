@@ -232,7 +232,7 @@
 {literal}
   function confirmStatus( pStatusId, cStatusId ) {
      if ( (pStatusId == cj("#status_id").val() ) && (cStatusId == cj("#contribution_status_id").val()) ) {
-         var allow = confirm( '{/literal}{ts escape='js'}The Payment Status for this participant is Completed. The Participant Status is set to Pay Later (pending). Click Cancel if you want to review or modify these values before saving this record{/ts}{literal}.' );
+         var allow = confirm( '{/literal}{ts escape='js'}The Payment Status for this participant is Completed. The Participant Status is set to Pending (pay later). Click Cancel if you want to review or modify these values before saving this record{/ts}{literal}.' );
          if ( !allow ) return false;
      }
   }
