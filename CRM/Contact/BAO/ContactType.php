@@ -933,7 +933,7 @@ WHERE ($subtypeClause)";
    *
    * @return void
    */
-  public function deleteCustomRowsForEntityID($customTable, $entityID) {
+  public static function deleteCustomRowsForEntityID($customTable, $entityID) {
     $customTable = CRM_Utils_Type::escape($customTable, 'String');
     $query = "DELETE FROM {$customTable} WHERE entity_id = %1";
     return CRM_Core_DAO::singleValueQuery($query, array(1 => array($entityID, 'Integer')));
