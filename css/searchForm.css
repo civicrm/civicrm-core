@@ -13,3 +13,8 @@
   padding: 4px;
   border: 1px solid #DDDDDD;
 }
+
+/* top submit button on advanced search */
+.adv-search-top-submit span.crm-button {
+  float: right !important;
+}
