@@ -308,8 +308,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
       $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
 
-      $this->_formValues['activity_type_id'][$activity_type_id] = 1;
-      $this->_defaults['activity_type_id'][$activity_type_id] = 1;
+      // since checkbox are replaced by multiple select option
+      $this->_formValues['activity_type_id'] = $activity_type_id;
+      $this->_defaults['activity_type_id'] = $activity_type_id;
     }
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
