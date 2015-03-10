@@ -710,6 +710,40 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Search on custom field value.
+   */
+  public function testSearchWithCustomDataCRM16036() {
+    // Create a custom field on membership
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Create a new membership, but don't assign anything to the custom field.
+    $params = $this->_params;
+    $result = $this->callAPIAndDocument(
+      $this->_entity,
+      'create',
+      $params,
+      __FUNCTION__,
+      __FILE__,
+      NULL,
+      'SearchWithCustomData');
+
+    // search memberships with CRM-16036 as custom field value.
+    // Since we did not touch the custom field of any membership,
+    // this should not return any results.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'custom_' . $ids['custom_field_id'] => "CRM-16036",
+    ));
+
+    // Cleanup.
+    $this->callAPISuccess($this->_entity, 'delete', array(
+      'id' => $result['id'],
+    ));
+
+    // Assert.
+    $this->assertEquals(0, $check['count']);
+  }
+
+  /**
    * Test civicrm_contact_memberships_create with membership id (edit
    * membership).
    * success expected.
