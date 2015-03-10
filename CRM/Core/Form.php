@@ -125,6 +125,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var CRM_Core_Controller
    */
   public $controller;
+  
+  /**
+   * Api entity name
+   * 
+   * @var string
+   */
+  public $entityName;
 
   /**
    * Constants for attributes for various form elements
@@ -1051,7 +1058,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addSelect($name, $props = array(), $required = FALSE) {
     if (!isset($props['entity'])) {
-      $props['entity'] = CRM_Utils_Api::getEntityName($this);
+      if(isset($this->entityName)){
+        $props['entity'] = $this->entityName;
+      }
+      else {
+        $props['entity'] = CRM_Utils_Api::getEntityName($this);
+      }
     }
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
