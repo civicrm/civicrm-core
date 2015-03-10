@@ -133,7 +133,21 @@ class ChainSubscriber implements EventSubscriberInterface {
             //set to the parent's id
             $subParams["entity_id"] = $parentAPIValues['id'];
             $subParams['entity_table'] = 'civicrm_' . $lowercase_entity;
-            $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
+
+            // If 'main' entity is contact and subentity is relationship,
+            // contact_id does not make a lot of
+            // sense, since there is a contact_id_a, and contact_id_b.
+            // But if contact_id is set, the relationship api behaves
+            // different, and just returns all relations, ignoring any
+            // filters.
+            //
+            // So we only set the main entity id for the chained call of
+            // main entity is not contact or sub entity is not relationship.
+            //
+            // See CRM-15983: https://issues.civicrm.org/jira/browse/CRM-15983
+            if ($subEntity != 'relationship' || $lowercase_entity != 'contact') {
+              $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
+            }
           }
           if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
             //e.g. if event_id is in the values returned & subentity is event
