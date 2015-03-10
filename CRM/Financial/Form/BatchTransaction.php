@@ -48,6 +48,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   protected $_batchStatusId;
 
   public function preProcess() {
+    // This reuses some styles from search forms
+    CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : $_POST['batch_id'];
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
