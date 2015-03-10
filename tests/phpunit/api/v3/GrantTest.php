@@ -119,19 +119,6 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
     $this->assertEquals($expectedValue, $savedValue);
 
-    // & check it will do the separating
-    $this->params[$customFieldLabel] = 'valley,goat';
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
-    $this->assertEquals($expectedValue, $savedValue);
-
-    //& here is the odd but previously supported (form-oriented) format
-    //& an array for good measure
-    $this->params[$customFieldLabel] = array('valley' => 1, 'goat' => 1);
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
-    $this->assertEquals($expectedValue, $savedValue);
-
     //& an array for good measure
     $this->params[$customFieldLabel] = array('valley', 'goat');
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);

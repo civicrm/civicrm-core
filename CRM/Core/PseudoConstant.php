@@ -249,7 +249,7 @@ class CRM_Core_PseudoConstant {
           $options = $context == 'validate' ? self::countryIsoCode() : self::country();
         }
         elseif ($customField->data_type === 'Boolean') {
-          $options = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
+          $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
         }
       }
       CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
