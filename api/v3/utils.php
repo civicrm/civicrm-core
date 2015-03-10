@@ -463,10 +463,13 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @param string $dao_name
  *   Name of DAO
  * @param array $params
- *  As passed into api get function.
+ *   As passed into api get function.
+ * @param bool $return_as_success
+ *   Return in api success format.
+ *
  * @return array
  */
-function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
+function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return_as_success = TRUE) {
   $dao = new $dao_name();
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $custom_fields = _civicrm_api3_custom_fields_for_entity($entity);
@@ -621,7 +624,12 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params) {
   }
   $result_dao->free();
 
-  return civicrm_api3_create_success($result_entities, $params, $entity, 'get', $dao);
+  if ($return_as_success) {
+    return civicrm_api3_create_success($result_entities, $params, $entity, 'get', $dao);
+  }
+  else {
+    return $result_entities;
+  }
 }
 
 /**
@@ -1483,6 +1491,15 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "") {
+  // if $params refers to a custom field, use a hack to
+  // avoid CRM-16036
+  foreach (array_keys($params) as $key) {
+    if (substr($key, 0, 7) == 'custom_') {
+      return _civicrm_api3_get_using_query_object_simple(
+        $bao_name, $params, $returnAsSuccess);
+    }
+  }
+
   $bao = new $bao_name();
   _civicrm_api3_dao_set_filter($bao, $params, TRUE);
   if ($returnAsSuccess) {
