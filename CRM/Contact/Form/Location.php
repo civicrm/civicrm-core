@@ -54,12 +54,8 @@ class CRM_Contact_Form_Location {
     }
 
     $className = CRM_Utils_System::getClassName($form);
-    if (in_array($className, array(
-      'CRM_Event_Form_ManageEvent_Location',
-      'CRM_Contact_Form_Domain',
-    ))
-    || is_subclass_of($className, 'CRM_Event_Form_ManageEvent_Location')
-    || is_subclass_of($className, 'CRM_Contact_Form_Domain')) {
+    if (is_a($className, 'CRM_Event_Form_ManageEvent_Location')
+    || is_a($className, 'CRM_Contact_Form_Domain')) {
       $form->_blocks = array(
         'Address' => ts('Address'),
         'Email' => ts('Email'),
