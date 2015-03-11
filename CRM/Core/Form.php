@@ -127,6 +127,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $controller;
 
   /**
+   * Api entity name
+   *
+   * @var string
+   */
+  public $entityName;
+
+  /**
    * Constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
@@ -1051,7 +1058,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addSelect($name, $props = array(), $required = FALSE) {
     if (!isset($props['entity'])) {
-      $props['entity'] = CRM_Utils_Api::getEntityName($this);
+      if (isset($this->entityName)) {
+        $props['entity'] = $this->entityName;
+      }
+      else {
+        $props['entity'] = CRM_Utils_Api::getEntityName($this);
+      }
     }
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
@@ -1847,7 +1859,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
             if (!$options) {
               $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
             }
-          } 
+          }
           else {
             $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
             $targetField->setAttribute('disabled', 'disabled');
