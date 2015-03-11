@@ -153,12 +153,14 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
 
-    $form->addElement('select',
+    $form->add('select',
       'uf_group_id',
       ts('Search Views'),
       array(
         '0' => ts('- default view -'),
-      ) + $searchProfiles
+      ) + $searchProfiles,
+      FALSE,
+      array('class' => 'crm-select2')
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
@@ -182,20 +184,23 @@ class CRM_Contact_Form_Search_Criteria {
     }
 
     if (count($componentModes) > 1) {
-      $form->addElement('select',
+      $form->add('select',
         'component_mode',
         ts('Display Results As'),
-        $componentModes
+        $componentModes,
+        FALSE,
+        array('class' => 'crm-select2')
       );
     }
 
-    $form->addElement('select',
+    $form->addRadio(
       'operator',
       ts('Search Operator'),
       array(
         'AND' => ts('AND'),
         'OR' => ts('OR'),
-      )
+      ),
+      array('allowClear' => FALSE)
     );
 
     // add the option to display relationships
@@ -214,7 +219,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('select',
       'display_relationship_type',
       ts('Display Results as Relationship'),
-      $rSelect
+      $rSelect,
+      array('class' => 'crm-select2')
     );
 
     // checkboxes for DO NOT phone, email, mail
@@ -255,7 +261,7 @@ class CRM_Contact_Form_Search_Criteria {
       $commPreff[] = $form->createElement('advcheckbox', $k, NULL, $v);
     }
 
-    $onHold[] = $form->createElement('advcheckbox', 'on_hold', NULL, ts(''));
+    $onHold[] = $form->createElement('advcheckbox', 'on_hold', NULL, '');
     $form->addGroup($onHold, 'email_on_hold', ts('Email On Hold'));
 
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
@@ -267,8 +273,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType);
-    $form->add('select', 'phone_phone_type_id', ts('Phone Type'), array('' => ts('- any -')) + $phoneType);
+    $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType, FALSE, array('class' => 'crm-select2'));
+    $form->add('select', 'phone_phone_type_id', ts('Phone Type'), array('' => ts('- any -')) + $phoneType, FALSE, array('class' => 'crm-select2'));
   }
 
 

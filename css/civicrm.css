@@ -282,11 +282,24 @@ input.crm-form-entityref {
 }
 
 .crm-container input.crm-form-text[disabled],
+.crm-container input.dateplugin[disabled],
+.crm-container select.crm-form-select[disabled],
 .crm-container input.crm-form-text[readonly] {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
   background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+}
+
+.crm-container input.crm-form-text[disabled],
+.crm-container input.dateplugin[disabled],
+.crm-container select.crm-form-select[disabled] {
+  color: #a9a9a9;
+}
+
+.crm-container .crm-form-time {
+  width: 5em;
+  margin-left: 1em;
 }
 
 .crm-container .crm-form-submit {
@@ -1210,20 +1223,6 @@ input.crm-form-entityref {
 
 .crm-container .underline-effect:before {
   content: "\00BB";
-}
-
-.crm-container div#searchForm {
-  height: auto;
-  width: 100%;
-}
-
-.crm-container div#searchForm table.form-layout {
-  border-spacing: 0;
-}
-
-.crm-container div#searchForm table.form-layout td {
-  padding: 4px;
-  border: 1px solid #DDDDDD;
 }
 
 /* editor specific classes */
@@ -2784,7 +2783,8 @@ div.crm-container form {
 }
 
 /* Date plugin */
-.crm-container input.dateplugin {
+.crm-container input.dateplugin,
+.crm-container input.crm-form-date {
   background: white url(../i/cal.gif) no-repeat scroll right center;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
@@ -3000,6 +3000,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .status-fatal,
 .crm-container .status-hold,
 .crm-container .status-past,
+.crm-contact-deceased,
 .crm-container .status-warning {
   color: #E43D2B !important;
 }
@@ -3301,6 +3302,13 @@ div.m ul#civicrm-menu,
 /*Needed for jstree contextmenu */
 #vakata-contextmenu.jstree-default-context li {
   background: none repeat scroll 0 0 transparent;
+}
+
+/* unset the styling for the li in jstree */
+#tagtree ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
 }
 
 /* Class for successful upgrade */
@@ -4009,29 +4017,6 @@ span.crm-status-icon {
   background: url("../i/loading-overlay.gif") center center no-repeat white !important;
 }
 
-/* Recurring Dialog */
-.crm-container .recurring-dialog-inner-wrapper {
-  display: inline-block;
-  width: 100%;
-}
-.crm-container .recurring-dialog-inner-left{
-  width: 30%;
-  float: left;
-}
-.crm-container .recurring-dialog-inner-right{
-  width: 70%;
-  float: left;
-}
-.crm-container .recurring-dialog-button{
-  background: #f5f5f5;
-  background-image: -webkit-linear-gradient(top,#f5f5f5,#f1f1f1);
-  border: 1px solid rgba(0,0,0,0.1);
-  padding: 5px 8px;
-  text-align: center;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 11px !important;
-}
 .crm-container table.mergecontact thead th {
   width:30%;
 }

@@ -154,6 +154,7 @@ class CRM_Core_IDS {
     exceptions[]        = report_header
     exceptions[]        = report_footer
     exceptions[]        = data
+    exceptions[]        = json
     exceptions[]        = instructions
     exceptions[]        = suggested_message
     exceptions[]        = page_text

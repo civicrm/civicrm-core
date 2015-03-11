@@ -461,15 +461,9 @@ ORDER BY start_date desc
     }
 
     $value = $this->get('event_type_id');
-    $val = array();
     if ($value) {
       if (is_array($value)) {
-        foreach ($value as $k => $v) {
-          if ($v) {
-            $val[$k] = $k;
-          }
-        }
-        $type = implode(',', $val);
+        $type = implode(',', $value);
       }
       $clauses[] = "event_type_id IN ({$type})";
     }

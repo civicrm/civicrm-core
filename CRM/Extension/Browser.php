@@ -326,6 +326,9 @@ class CRM_Extension_Browser {
 
   /**
    * A dummy function required for suppressing download errors.
+   *
+   * @param $errorNumber
+   * @param $errorString
    */
   public static function downloadError($errorNumber, $errorString) {
   }

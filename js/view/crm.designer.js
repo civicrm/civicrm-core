@@ -710,6 +710,9 @@
       if (this.options.fieldSchema.civiIsPhone) {
         result = result + '-' + CRM.PseudoConstant.phoneType[this.model.get('phone_type_id')];
       }
+      if (this.options.fieldSchema.civiIsWebsite) {
+        result = result + '-' + CRM.PseudoConstant.websiteType[this.model.get('website_type_id')];
+      }
       if (this.options.fieldSchema.civiIsLocation) {
         var locType = this.model.get('location_type_id') ? CRM.PseudoConstant.locationType[this.model.get('location_type_id')] : ts('Primary');
         result = result + ' (' + locType + ')';
@@ -744,9 +747,12 @@
   CRM.Designer.UFFieldDetailView = Backbone.View.extend({
     initialize: function() {
       // FIXME: hide/display 'in_selector' if 'visibility' is one of the public options
-      var fields = ['location_type_id', 'phone_type_id', 'label', 'is_multi_summary', 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_pre', 'help_post', 'is_active'];
+      var fields = ['location_type_id', 'website_type_id', 'phone_type_id', 'label', 'is_multi_summary', 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_pre', 'help_post', 'is_active'];
       if (! this.options.fieldSchema.civiIsLocation) {
         fields = _.without(fields, 'location_type_id');
+      }
+      if (! this.options.fieldSchema.civiIsWebsite) {
+        fields = _.without(fields, 'website_type_id');
       }
       if (! this.options.fieldSchema.civiIsPhone) {
         fields = _.without(fields, 'phone_type_id');

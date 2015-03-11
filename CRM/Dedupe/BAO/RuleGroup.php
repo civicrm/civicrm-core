@@ -390,7 +390,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   public static function dedupeRuleFieldsWeight($params) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->contact_type = $params['contact_type'];
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       // accept an ID if provided
       $rgBao->id = $params['id'];
     }

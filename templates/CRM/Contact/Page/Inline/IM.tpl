@@ -40,9 +40,9 @@
     {foreach from=$im item=item}
       {if $item.name or $item.provider}
         {if $item.name}
-        <div class="crm-summary-row">
+        <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
           <div class="crm-label">{$item.provider}&nbsp;({$item.location_type})</div>
-          <div class="crm-content crm-contact_im {if $item.is_primary eq 1} primary{/if}">{$item.name}</div>
+          <div class="crm-content crm-contact_im">{$item.name}</div>
         </div>
         {/if}
       {/if}

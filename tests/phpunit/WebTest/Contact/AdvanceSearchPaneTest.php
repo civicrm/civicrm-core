@@ -215,13 +215,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           'title' => 'Activities',
           'fields' => array(
             'Activity Type' => array(
-              'type' => 'checkbox',
-              'values' => array(
-                'activity_type_id[6]',
-                'activity_type_id[3]',
-                'activity_type_id[5]',
-                'activity_type_id[7]',
-              ),
+              'type' => 'multiselect2',
+              'locator' => 'activity_type_id',
+              'values' => array(array('Contribution', 'Email', 'Event Registration', 'Membership Signup')),
             ),
             'Activity Subject' => array(
               'type' => 'text',
@@ -229,8 +225,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
               'values' => array('Test Subject'),
             ),
             'Activity Status' => array(
-              'type' => 'checkbox',
-              'values' => array('activity_status[1]', 'activity_status[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'status_id',
+              'values' => array(array('Scheduled', 'Completed')),
             ),
           ),
         ),
@@ -253,7 +250,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
         ),
         'demographics' => array(
           'headerLocator' => 'div#demographics',
-          'bodyLocator' => 'input#birth_date_low_display',
+          'bodyLocator' => 'input#birth_date_low',
           'title' => 'Demographics',
           'fields' => array(
             'Birth Date Range' => array(
@@ -318,8 +315,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
               'values' => array('Donation'),
             ),
             'Contribution Status' => array(
-              'type' => 'checkbox',
-              'values' => array('contribution_status_id[1]', 'contribution_status_id[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'contribution_status_id',
+              'values' => array(array('Completed', 'Pending')),
             ),
           ),
         ),
@@ -344,12 +342,14 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           'title' => 'Events',
           'fields' => array(
             'Participant Status' => array(
-              'type' => 'checkbox',
-              'values' => array('participant_status_id[1]', 'participant_status_id[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'participant_status_id',
+              'values' => array(array('Registered', 'Attended')),
             ),
             'Participant Role' => array(
-              'type' => 'checkbox',
-              'values' => array('participant_role_id[1]', 'participant_role_id[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'participant_role_id',
+              'values' => array(array('Attendee', 'Volunteer')),
             ),
           ),
         ),

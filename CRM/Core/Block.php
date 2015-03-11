@@ -90,7 +90,7 @@ class CRM_Core_Block {
         self::CREATE_NEW => array(
           'template' => 'CreateNew.tpl',
           'info' => ts('CiviCRM Create New Record'),
-          'subject' => ts(''),
+          'subject' => '',
           'active' => TRUE,
           'cache' => BLOCK_CACHE_GLOBAL,
           'visibility' => 1,

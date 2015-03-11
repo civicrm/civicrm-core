@@ -191,9 +191,10 @@
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/recurringentity/generate-preview</path>
-     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::generatePreview</page_callback>
+     <path>civicrm/recurringentity/preview</path>
+     <page_callback>CRM_Core_Page_RecurringEntityPreview</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <title>Confirm dates</title>
   </item>
   <item>
     <path>civicrm/ajax/l10n-js</path>

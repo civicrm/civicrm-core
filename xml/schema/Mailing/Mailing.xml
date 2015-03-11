@@ -117,6 +117,20 @@
     </html>
   </field>
   <field>
+    <name>mailing_type</name>
+    <type>varchar</type>
+    <title>Mailing Type</title>
+    <length>32</length>
+    <comment>differentiate between standalone mailings, A/B tests, and A/B final-winner</comment>
+    <pseudoconstant>
+      <callback>CRM_Mailing_PseudoConstant::mailingTypes</callback>
+    </pseudoconstant>
+    <add>4.6</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
     <name>from_name</name>
     <title>Mailing From Name</title>
     <type>varchar</type>

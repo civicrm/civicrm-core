@@ -378,22 +378,22 @@ class CRM_Grant_BAO_Query {
     $form->addDate('grant_application_received_date_low', ts('App. Received Date - From'), FALSE, array('formatType' => 'searchDate'));
     $form->addDate('grant_application_received_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
 
-    $form->addElement('checkbox', 'grant_application_received_notset', ts(''), NULL);
+    $form->addElement('checkbox', 'grant_application_received_notset', '', NULL);
 
     $form->addDate('grant_money_transfer_date_low', ts('Money Sent Date - From'), FALSE, array('formatType' => 'searchDate'));
     $form->addDate('grant_money_transfer_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
 
-    $form->addElement('checkbox', 'grant_money_transfer_date_notset', ts(''), NULL);
+    $form->addElement('checkbox', 'grant_money_transfer_date_notset', '', NULL);
 
     $form->addDate('grant_due_date_low', ts('Report Due Date - From'), FALSE, array('formatType' => 'searchDate'));
     $form->addDate('grant_due_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
 
-    $form->addElement('checkbox', 'grant_due_date_notset', ts(''), NULL);
+    $form->addElement('checkbox', 'grant_due_date_notset', '', NULL);
 
     $form->addDate('grant_decision_date_low', ts('Grant Decision Date - From'), FALSE, array('formatType' => 'searchDate'));
     $form->addDate('grant_decision_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
 
-    $form->addElement('checkbox', 'grant_decision_date_notset', ts(''), NULL);
+    $form->addElement('checkbox', 'grant_decision_date_notset', '', NULL);
 
     $form->addYesNo('grant_report_received', ts('Grant report received?'), TRUE);
 

@@ -254,7 +254,7 @@ class CRM_Core_Payment_Form {
    *
    * @return bool
    */
-  public static function buildPaymentForm($form, $processor, $isBillingDataOptional) {
+  public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
@@ -353,7 +353,7 @@ class CRM_Core_Payment_Form {
    * Called within the scope of a QF formRule function
    */
   public static function validateCreditCard($values, &$errors) {
-    if (!empty($values['credit_card_type'])) {
+    if (!empty($values['credit_card_type']) || !empty($values['credit_card_number'])) {
       if (!empty($values['credit_card_number']) &&
         !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
       ) {
@@ -364,9 +364,6 @@ class CRM_Core_Payment_Form {
       ) {
         $errors['cvv2'] = ts('Please enter a valid Card Verification Number');
       }
-    }
-    elseif (!empty($values['credit_card_number'])) {
-      $errors['credit_card_number'] = ts('Please enter a valid Card Number');
     }
   }
 

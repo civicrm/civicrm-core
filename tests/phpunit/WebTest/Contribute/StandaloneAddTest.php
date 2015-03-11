@@ -198,7 +198,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Search_refresh");
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
 
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
     $this->clickAjaxLink('CiviContribute', "financial_type_id");
@@ -207,7 +207,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Advanced_refresh-top");
     $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
-    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type ID In {$financialType['name']}");
   }
 
   /**

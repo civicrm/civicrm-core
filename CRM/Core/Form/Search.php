@@ -72,6 +72,25 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_context = NULL;
 
   /**
+   * The list of tasks or actions that a searcher can perform on a result set.
+   *
+   * @var array
+   */
+  protected $_taskList = array();
+
+  /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * To modify the task list, child classes should alter $this->_taskList,
+   * preferably by extending this method.
+   *
+   * @return array
+   */
+  protected function buildTaskList() {
+    return $this->_taskList;
+  }
+
+  /**
    * Common buildform tasks required by all searches
    */
   public function buildQuickform() {
@@ -82,7 +101,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->assign('includeWysiwygEditor', TRUE);
     }
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
+    $resources
+      ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
+      ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
     $this->addButtons(array(
       array(
@@ -93,6 +114,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     ));
 
     $this->addClass('crm-search-form');
+
+    // for backwards compatibility we pass an argument to addTaskMenu even though
+    // it could just as well access $this->_taskList internally
+    $tasks = $this->buildTaskList();
+    $this->addTaskMenu($tasks);
   }
 
   /**

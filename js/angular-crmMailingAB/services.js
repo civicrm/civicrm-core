@@ -80,10 +80,12 @@
             // Most defaults provided by Mailing.create API, but we
             // want to force-enable tracking.
             open_tracking: "1",
-            url_tracking: "1"
+            url_tracking: "1",
+            mailing_type:"experiment"
           };
           crmMailingAB.mailings.a = crmMailingMgr.create(mailingDefaults);
           crmMailingAB.mailings.b = crmMailingMgr.create(mailingDefaults);
+          mailingDefaults.mailing_type = 'winner';
           crmMailingAB.mailings.c = crmMailingMgr.create(mailingDefaults);
           crmMailingAB.attachments.a = new CrmAttachments(function () {
             return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab.mailing_id_a};

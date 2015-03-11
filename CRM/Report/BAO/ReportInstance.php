@@ -209,7 +209,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
         $chart = "&charts=" . $params['charts'];
       }
       $limitResult = NULL;
-      if (CRM_Utils_Array::value('row_count', $params)) {
+      if (!empty($params['row_count'])) {
         $limitResult = '&rowCount=' . $params['row_count'];
       }
       $dashletParams['name'] = "report/{$instance->id}";
