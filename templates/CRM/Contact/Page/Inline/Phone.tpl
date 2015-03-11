@@ -42,12 +42,12 @@
     {/if}
     {foreach from=$phone item=item}
       {if $item.phone || $item.phone_ext}
-        <div class="crm-summary-row">
+        <div class="crm-summary-row {if $item.is_primary eq 1}primary{/if}">
           <div class="crm-label">
             {if $privacy.do_not_phone}<span class="icon privacy-flag do-not-phone" title="{ts}Privacy flag: Do Not Phone{/ts}"></span>{/if}
             {$item.location_type} {$item.phone_type}
           </div>
-          <div class="crm-content crm-contact_phone {if $item.is_primary eq 1}primary{/if}">
+          <div class="crm-content crm-contact_phone">
             {$item.phone}{if $item.phone_ext}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
           </div>
         </div>

@@ -26,11 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * Class CRM_Report_Form
  */
 class CRM_Report_Form extends CRM_Core_Form {
   const ROW_COUNT_LIMIT = 50;
@@ -148,12 +144,11 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * specify entity table for tags filter
-   *
    */
   protected $_tagFilterTable = 'civicrm_contact';
 
   /**
-   * build groups filter
+   * Build groups filter.
    *
    * @var bool
    */
@@ -167,6 +162,21 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_navigation = array();
 
   public $_drilldownReport = array();
+
+  /**
+   * Array of tabs to display on report.
+   *
+   * E.g we define the tab title, the tpl and the tab-specific part of the css or  html link.
+   *
+   *  $this->tabs['OrderBy'] = array(
+   *    'title' => ts('Sorting'),
+   *    'tpl' => 'OrderBy',
+   *    'div_label' => 'order-by',
+   *  );
+   *
+   * @var array
+   */
+  protected $tabs = array();
 
   /**
    * An attribute for checkbox/radio form field layout
@@ -373,13 +383,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_createNew;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
 
     $this->addClass('crm-report-form');
 
-    // build tag filter
     if ($this->_tagFilter) {
       $this->buildTagFilter();
     }
@@ -423,6 +433,13 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->assign('currencyColumn', $this->_currencyColumn);
   }
 
+  /**
+   * Shared pre-process function.
+   *
+   * If overriding preProcess function this should still be called.
+   *
+   * @throws \Exception
+   */
   public function preProcessCommon() {
     $this->_force
       = CRM_Utils_Request::retrieve(
@@ -548,6 +565,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
   }
 
+  /**
+   * Add bread crumb.
+   */
   public function addBreadCrumb() {
     $breadCrumbs
       = array(
@@ -560,6 +580,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     CRM_Utils_System::appendBreadCrumb($breadCrumbs);
   }
 
+  /**
+   * Pre process function.
+   *
+   * Called prior to build form.
+   */
   public function preProcess() {
     $this->preProcessCommon();
 
@@ -730,6 +755,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Set default values.
+   *
    * @param bool $freeze
    *
    * @return array
@@ -738,7 +765,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $freezeGroup = array();
 
     // FIXME: generalizing form field naming conventions would reduce
-    // lots of lines below.
+    // Lots of lines below.
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -878,6 +905,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get element from group.
+   *
    * @param string $group
    * @param string $grpFieldName
    *
@@ -894,7 +923,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_params
+   * Setter for $_params.
    *
    * @param array $params
    */
@@ -903,7 +932,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_id
+   * Setter for $_id.
    *
    * @param int $instanceID
    */
@@ -912,7 +941,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_force
+   * Setter for $_force.
    *
    * @param $isForce
    */
@@ -921,7 +950,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_limitValue
+   * Setter for $_limitValue.
    *
    * @param int $_limitValue
    */
@@ -930,7 +959,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Setter for $_offsetValue
+   * Setter for $_offsetValue.
    *
    * @param int $_offsetValue
    */
@@ -939,13 +968,17 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Getter for $_defaultValues
+   * Getter for $_defaultValues.
+   *
    * @return array
    */
   public function getDefaultValues() {
     return $this->_defaults;
   }
 
+  /**
+   * Add columns to report.
+   */
   public function addColumns() {
     $options = array();
     $colGroups = NULL;
@@ -986,9 +1019,24 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->addCheckBox("fields", ts('Select Columns'), $options, NULL,
       NULL, NULL, NULL, $this->_fourColumnAttribute, TRUE
     );
+    if (!empty($colGroups)) {
+      $this->tabs['FieldSelection'] = array(
+        'title' => ts('Columns'),
+        'tpl' => 'FieldSelection',
+        'div_label' => 'col-groups',
+      );
+
+      // Note this assignment is only really required in buildForm. It is being 'over-called'
+      // to reduce risk of being missed due to overridden functions.
+      $this->assign('tabs', $this->tabs);
+    }
+
     $this->assign('colGroups', $colGroups);
   }
 
+  /**
+   * Add filters to report.
+   */
   public function addFilters() {
     $filters = array();
     $count = 1;
@@ -1100,9 +1148,43 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
+    if (!empty($filters)) {
+      $this->tabs['Filters'] = array(
+        'title' => ts('Filters'),
+        'tpl' => 'Filters',
+        'div_label' => 'set-filters',
+      );
+    }
     $this->assign('filters', $filters);
   }
 
+  /**
+   * Function to assign the tabs to the template in the correct order.
+   *
+   * We want the tabs to wind up in this order (if not overridden).
+   *
+   *   - Field Selection
+   *   - Group Bys
+   *   - Order Bys
+   *   - Other Options
+   *   - Filters
+   */
+  protected function assignTabs() {
+    $order = array(
+      'FieldSelection',
+      'GroupBy',
+      'OrderBy',
+      'ReportOptions',
+      'Filters',
+    );
+    $order = array_intersect_key(array_fill_keys($order, 1), $this->tabs);
+    $order = array_merge($order, $this->tabs);
+    $this->assign('tabs', $order);
+  }
+
+  /**
+   * Add options defined in $this->_options to the report.
+   */
   public function addOptions() {
     if (!empty($this->_options)) {
       // FIXME: For now lets build all elements as checkboxes.
@@ -1122,9 +1204,19 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
+    if (!empty($this->_options)) {
+      $this->tabs['ReportOptions'] = array(
+        'title' => ts('Display Options'),
+        'tpl' => 'ReportOptions',
+        'div_label' => 'other-options',
+      );
+    }
     $this->assign('otherOptions', $this->_options);
   }
 
+  /**
+   * Add chart options to the report.
+   */
   public function addChartOptions() {
     if (!empty($this->_charts)) {
       $this->addElement('select', "charts", ts('Chart'), $this->_charts);
@@ -1133,6 +1225,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Add group by options to the report.
+   */
   public function addGroupBys() {
     $options = $freqElements = array();
 
@@ -1152,6 +1247,13 @@ class CRM_Report_Form extends CRM_Core_Form {
       NULL, NULL, NULL, $this->_fourColumnAttribute
     );
     $this->assign('groupByElements', $options);
+    if (!empty($options)) {
+      $this->tabs['GroupBy'] = array(
+        'title' => ts('Grouping'),
+        'tpl' => 'GroupBy',
+        'div_label' => 'group-by-elements',
+      );
+    }
 
     foreach ($freqElements as $name) {
       $this->addElement('select', "group_bys_freq[$name]",
@@ -1160,11 +1262,14 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Add data for order by tab.
+   */
   public function addOrderBys() {
     $options = array();
     foreach ($this->_columns as $tableName => $table) {
 
-      // Report developer may define any column to order by; include these as order-by options
+      // Report developer may define any column to order by; include these as order-by options.
       if (array_key_exists('order_bys', $table)) {
         foreach ($table['order_bys'] as $fieldName => $field) {
           if (!empty($field)) {
@@ -1190,6 +1295,13 @@ class CRM_Report_Form extends CRM_Core_Form {
     asort($options);
 
     $this->assign('orderByOptions', $options);
+    if (!empty($options)) {
+      $this->tabs['OrderBy'] = array(
+        'title' => ts('Sorting'),
+        'tpl' => 'OrderBy',
+        'div_label' => 'order-by-elements',
+      );
+    }
 
     if (!empty($options)) {
       $options = array(
@@ -1207,6 +1319,13 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * This adds the tab referred to as Title and Format, rendered through Instance.tpl.
+   *
+   * @todo call this tab into the report template in the same way as OrderBy etc, ie
+   * by adding a description of the tab to $this->tabs, causing the tab to be added in
+   * Criteria.tpl.
+   */
   public function buildInstanceAndButtons() {
     CRM_Report_Form_Instance::buildForm($this);
 
@@ -1258,6 +1377,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     );
   }
 
+  /**
+   * Main build form function.
+   */
   public function buildQuickForm() {
     $this->addColumns();
 
@@ -1271,19 +1393,21 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->buildInstanceAndButtons();
 
-    //add form rule for report
+    // Add form rule for report.
     if (is_callable(array(
       $this,
       'formRule',
     ))) {
       $this->addFormRule(array(get_class($this), 'formRule'), $this);
     }
+    $this->assignTabs();
   }
 
   /**
    * A form rule function to ensure that fields selected in group_by
    * (if any) should only be the ones present in display/select fields criteria;
    * note: works if and only if any custom field selected in group_by.
+   *
    * @param array $fields
    * @param array $ignoreFields
    *
@@ -1322,8 +1446,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Note: $fieldName param allows inheriting class to build operationPairs
-   * specific to a field.
+   * Get operators to display on form.
+   *
+   * Note: $fieldName param allows inheriting class to build operationPairs specific to a field.
+   *
    * @param string $type
    * @param string $fieldName
    *
@@ -1399,6 +1525,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Build the tag filter field to display on the filters tab.
+   */
   public function buildTagFilter() {
     $contactTags = CRM_Core_BAO_Tag::getTags($this->_tagFilterTable);
     if (!empty($contactTags)) {
@@ -1418,7 +1547,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * Adds group filters to _columns (called from _Construct
+   * Adds group filters to _columns (called from _Construct).
    */
   public function buildGroupFilter() {
     $this->_columns['civicrm_group']['filters'] = array(
@@ -1439,6 +1568,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get SQL operator from form text version.
+   *
    * @param string $operator
    *
    * @return string
@@ -1487,6 +1618,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Generate where clause.
+   *
    * This can be overridden in reports for special treatment of a field
    *
    * @param array $field Field specifications
@@ -1670,13 +1802,15 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get SQL where clause for a date field.
+   *
    * @param string $fieldName
    * @param $relative
    * @param string $from
    * @param string $to
-   * @param null $type
-   * @param null $fromTime
-   * @param null $toTime
+   * @param string $type
+   * @param string $fromTime
+   * @param string $toTime
    *
    * @return null|string
    */
@@ -1714,7 +1848,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @param bool $relative
    * @param string $from
-   * @param string_type $to
+   * @param string $to
    *
    * @return string|NULL
    */
@@ -2252,7 +2386,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
-              // just to make sure these values are transfered to rows.
+              // just to make sure these values are transferred to rows.
               // since we 'll need them for calculation purpose,
               // e.g making subtotals look nicer or graphs
               $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = array('no_display' => TRUE);
@@ -2894,7 +3028,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param null $rows
+   * End post processing.
+   *
+   * @param array|null $rows
    */
   public function endPostProcess(&$rows = NULL) {
     if ($this->_storeResultSet) {
@@ -3015,7 +3151,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Set store result set indicator to TRUE
+   * Set store result set indicator to TRUE.
+   *
    * @todo explain what this does
    */
   public function storeResultSet() {
@@ -3023,6 +3160,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Get result set.
+   *
    * @return bool
    */
   public function getResultSet() {

@@ -81,6 +81,12 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $defaultComponent;
 
   /**
+   * Mailing Types
+   * @var array
+   */
+  private static $mailingTypes;
+
+  /**
    * @return array
    */
   public static function abStatus() {
@@ -120,6 +126,20 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     return self::$abWinnerCriteria;
+  }
+
+  /**
+   * @return array
+   */
+  public static function mailingTypes() {
+    if (!is_array(self::$mailingTypes)) {
+      self::$mailingTypes  = array(
+        'standalone' => ts('Standalone'),
+        'experiment' => ts('Experimental'),
+        'winner' => ts('Winner'),
+      );
+    }
+    return self::$mailingTypes;
   }
 
   /**

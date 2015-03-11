@@ -1,6 +1,6 @@
 /* Styles specific to contact Summary/Edit/Inline-Edit pages */
 
-.crm-container .primary {
+.crm-container .primary .crm-label {
   font-weight: bold;
 }
 
@@ -186,7 +186,7 @@ div#crm-contact-thumbnail {
 
 #crm-container div.crm-summary-row div.crm-label {
   background-color: #FAFAFA;
-  color: #7A7A60;
+  color: #777760;
   text-align: left;
   width: 122px;
   float: left;

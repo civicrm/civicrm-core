@@ -164,4 +164,24 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
   }
 
+  /**
+   * get abtest based on Mailing ID
+   *
+   * @param int $mailingID
+   *   Mailing ID.
+   *
+   * @return object
+   */
+  public static function getABTest($mailingID) {
+    $query = "SELECT * FROM `civicrm_mailing_abtest` ab
+      where (ab.mailing_id_a = %1
+      OR ab.mailing_id_b = %1
+      OR ab.mailing_id_c = %1)
+      GROUP BY ab.id";
+    $params = array(1 => array($mailingID, 'Integer'));
+    $abTest = CRM_Core_DAO::executeQuery($query, $params);
+    $abTest->fetch();
+    return $abTest;
+  }
+
 }

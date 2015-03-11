@@ -2697,7 +2697,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    * @param array $params
    */
   public function setApiFilter(&$params) {
-    if (CRM_Utils_Array::value('target_contact_id', $params)) {
+    if (!empty($params['target_contact_id'])) {
       $this->selectAdd();
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

@@ -7,7 +7,7 @@
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="mailing.visibility"
-        ng-options="v.value as v.label for v in crmMailingConst.visibility"
+        ng-options="v.key as v.value for v in crmMailingConst.visibility"
         required
         >
       </select>

@@ -88,8 +88,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_html')
     );
 
-    $this->add('checkbox', 'is_default', ts('Default?'));
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addYesNo('is_default', ts('Default?'));
+    $this->addYesNo('is_active', ts('Enabled?'));
 
     $this->addFormRule(array('CRM_Mailing_Form_Component', 'dataRule'));
 
@@ -122,7 +122,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
     }
-    $defaults['is_active'] = 1;
+    else {
+      $defaults['is_active'] = 1;
+    }
 
     return $defaults;
   }

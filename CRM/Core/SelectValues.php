@@ -38,6 +38,18 @@
 class CRM_Core_SelectValues {
 
   /**
+   * Yes/No options
+   *
+   * @return array
+   */
+  public static function boolean() {
+    return array(
+      1 => ts('Yes'),
+      0 => ts('No'),
+    );
+  }
+
+  /**
    * Preferred mail format.
    *
    * @return array
@@ -231,7 +243,6 @@ class CRM_Core_SelectValues {
    * Styles for displaying the custom data group.
    *
    * @return array
-   *
    */
   public static function customGroupStyle() {
     return array(
@@ -265,7 +276,6 @@ class CRM_Core_SelectValues {
    * The status of a contact within a group.
    *
    * @return array
-   *
    */
   public static function groupContactStatus() {
     return array(
@@ -968,18 +978,21 @@ class CRM_Core_SelectValues {
   /**
    * Frequency unit for schedule reminders.
    *
+   * @param int $count
+   *   For pluralization
    * @return array
    */
-  public static function getScheduleReminderFrequencyUnits() {
-    //@todo update schema to refer to option group direct & remove this
-    static $scheduleReminderFrequencyUnits = NULL;
-    if (!$scheduleReminderFrequencyUnits) {
-      $scheduleReminderFrequencyUnits = array(
-        'hour' => ts('hour'),
-      ) + CRM_Core_OptionGroup::values('recur_frequency_units');
-    }
-
-    return $scheduleReminderFrequencyUnits;
+  public static function getRecurringFrequencyUnits($count = 1) {
+    // @todo this used to refer to the 'recur_frequency_unit' option_values which
+    // is for recurring payments and probably not good to re-use for recurring entities.
+    // If something other than a hard-coded list is desired, add a new option_group.
+    return array(
+      'hour' => ts('hour', array('plural' => 'hours', 'count' => $count)),
+      'day' => ts('day', array('plural' => 'days', 'count' => $count)),
+      'week' => ts('week', array('plural' => 'weeks', 'count' => $count)),
+      'month' => ts('month', array('plural' => 'months', 'count' => $count)),
+      'year' => ts('year', array('plural' => 'years', 'count' => $count)),
+    );
   }
 
 }

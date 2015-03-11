@@ -146,12 +146,11 @@ class CRM_Utils_REST {
 
     if (!empty($requestParams['json'])) {
       header('Content-Type: application/json');
-      $json = json_encode(array_merge($result));
       if (!empty($requestParams['prettyprint'])) {
         // Used by the api explorer
-        return self::jsonFormated($json);
+        return self::jsonFormated(array_merge($result));
       }
-      return $json;
+      return json_encode(array_merge($result));
     }
 
     if (isset($result['count'])) {
@@ -179,11 +178,20 @@ class CRM_Utils_REST {
   }
 
   /**
-   * @param $json
+   * @param $data
+   *
+   * @deprecated - switch to native JSON_PRETTY_PRINT when we drop support for php 5.3
    *
    * @return string
    */
-  public static function jsonFormated($json) {
+  public static function jsonFormated($data) {
+    // If php is 5.4+ we can use the native method
+    if (defined('JSON_PRETTY_PRINT')) {
+      return json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
+    }
+
+    // PHP 5.3 shim
+    $json = str_replace('\/', '/', json_encode($data));
     $tabcount = 0;
     $result = '';
     $inquote = FALSE;

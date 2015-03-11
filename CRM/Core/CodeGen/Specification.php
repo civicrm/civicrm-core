@@ -399,11 +399,16 @@ class CRM_Core_CodeGen_Specification {
         'condition',
         // callback funtion incase of static arrays
         'callback',
+        // Path to options edit form
+        'optionEditPath',
       );
       foreach ($validOptions as $pseudoOption) {
         if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
           $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
         }
+      }
+      if (!isset($field['pseudoconstant']['optionEditPath']) && !empty($field['pseudoconstant']['optionGroupName'])) {
+        $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
       }
       // For now, fields that have option lists that are not in the db can simply
       // declare an empty pseudoconstant tag and we'll add this placeholder.

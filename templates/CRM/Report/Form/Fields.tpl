@@ -29,31 +29,11 @@
       <div id="mainTabContainer">
         {*tab navigation bar*}
         <ul>
-          {if $colGroups}
+          {foreach from=$tabs item='tab'}
             <li class="ui-corner-all">
-              <a title="{ts}Columns{/ts}" href="#report-tab-col-groups">{ts}Columns{/ts}</a>
+              <a title="{$tab.title}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
             </li>
-          {/if}
-          {if $groupByElements}
-            <li class="ui-corner-all">
-              <a title="{ts}Grouping{/ts}" href="#report-tab-group-by-elements">{ts}Grouping{/ts}</a>
-            </li>
-          {/if}
-          {if $orderByOptions}
-            <li class="ui-corner-all">
-              <a title="{ts}Sorting{/ts}" href="#report-tab-order-by-elements">{ts}Sorting{/ts}</a>
-            </li>
-          {/if}
-          {if $otherOptions}
-            <li class="ui-corner-all">
-              <a title="{ts}Display Options{/ts}" href="#report-tab-other-options">{ts}Display{/ts}</a>
-            </li>
-          {/if}
-          {if $filters}
-            <li class="ui-corner-all">
-              <a title="{ts}Filters{/ts}" href="#report-tab-set-filters">{ts}Filters{/ts}</a>
-            </li>
-          {/if}
+          {/foreach}
           {if $instanceForm OR $instanceFormError}
             <li id="tab_settings" class="ui-corner-all">
               <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
@@ -72,7 +52,7 @@
 
         {*settings*}
         {if $instanceForm OR $instanceFormError}
-          {include file="CRM/Report/Form/Instance.tpl"}
+          {include file="CRM/Report/Form/Tabs/Instance.tpl"}
         {/if}
       </div> {* end mainTabContainer *}
 

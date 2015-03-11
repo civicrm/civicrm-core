@@ -27,7 +27,7 @@ li {
 
 label span {
   float: left;
-  width: 12em;
+  width: 14em;
 }
 
 .good td {
@@ -69,7 +69,8 @@ p.good {
 }
 
 p.error a {
-  color: #ccf;
+  color: #FFF;
+  font-weight: bold;
 }
 
 .testResults {

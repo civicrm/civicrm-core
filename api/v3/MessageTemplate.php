@@ -77,6 +77,8 @@ function civicrm_api3_message_template_delete($params) {
  * @param array $params
  */
 function _civicrm_api3_message_template_get_spec(&$params) {
+  // fetch active records by default
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
@@ -98,7 +100,27 @@ function civicrm_api3_message_template_get($params) {
  * @param array $params
  */
 function civicrm_api3_message_template_send($params) {
-  CRM_Core_BAO_MessageTemplates::sendTemplate($params);
+  // Change external param names to internal ones
+  $fieldSpec = array();
+  _civicrm_api3_message_template_send_spec($fieldSpec);
+
+  foreach ($fieldSpec as $field => $spec) {
+    if (isset($spec['api.aliases']) && array_key_exists($field, $params)) {
+      $params[CRM_Utils_Array::first($spec['api.aliases'])] = $params[$field];
+      unset($params[$field]);
+    }
+  }
+  if (empty($params['messageTemplateID'])) {
+    if (empty($params['groupName']) || empty($params['valueName'])) {
+      // Can't use civicrm_api3_verify_mandatory for this because it would give the wrong field names
+      throw new API_Exception(
+        "Mandatory key(s) missing from params array: requires id or option_group_name + option_value_name",
+        "mandatory_missing",
+        array("fields" => array('id', 'option_group_name', 'option_value_name'))
+      );
+    }
+  }
+  CRM_Core_BAO_MessageTemplate::sendTemplate($params);
 }
 
 /**
@@ -111,12 +133,55 @@ function civicrm_api3_message_template_send($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_send_spec(&$params) {
-  $params['messageTemplateID']['api.required'] = 1;
-  $params['messageTemplateID']['title'] = 'Message Template ID';
-  $params['contactId']['api.required'] = 1;
-  $params['contactId']['title'] = 'Contact ID';
-  $params['toEmail']['api.required'] = 1;
-  $params['toEmail']['title'] = 'To Email';
-  $params['toName']['api.required'] = 1;
-  $params['toName']['title'] = 'To Name';
+  $params['id']['description'] = 'ID of the template';
+  $params['id']['title'] = 'Message Template ID';
+  $params['id']['api.aliases'] = array('messageTemplateID', 'message_template_id');
+
+  $params['option_group_name']['description'] = 'option group name of the template (required if no id supplied)';
+  $params['option_group_name']['title'] = 'Option Group Name';
+  $params['option_group_name']['api.aliases'] = array('groupName');
+
+  $params['option_value_name']['description'] = 'option value name of the template (required if no id supplied)';
+  $params['option_value_name']['title'] = 'Option Value Name';
+  $params['option_value_name']['api.aliases'] = array('valueName');
+
+  $params['contact_id']['description'] = 'contact id if contact tokens are to be replaced';
+  $params['contact_id']['title'] = 'Contact ID';
+  $params['contact_id']['api.aliases'] = array('contactId');
+
+  $params['template_params']['description'] = 'additional template params (other than the ones already set in the template singleton)';
+  $params['template_params']['title'] = 'Template Params';
+  $params['template_params']['api.aliases'] = array('tplParams');
+
+  $params['from']['description'] = 'the From: header';
+  $params['from']['title'] = 'From';
+
+  $params['to_name']['description'] = 'the recipient’s name';
+  $params['to_name']['title'] = 'Recipient Name';
+  $params['to_name']['api.aliases'] = array('toName');
+
+  $params['to_email']['description'] = 'the recipient’s email - mail is sent only if set';
+  $params['to_email']['title'] = 'Recipient Email';
+  $params['to_email']['api.aliases'] = array('toEmail');
+
+  $params['cc']['description'] = 'the Cc: header';
+  $params['cc']['title'] = 'CC';
+
+  $params['bcc']['description'] = 'the Bcc: header';
+  $params['bcc']['title'] = 'BCC';
+
+  $params['reply_to']['description'] = 'the Reply-To: header';
+  $params['reply_to']['title'] = 'Reply To';
+  $params['reply_to']['api.aliases'] = array('replyTo');
+
+  $params['attachments']['description'] = 'email attachments';
+  $params['attachments']['title'] = 'Attachments';
+
+  $params['is_test']['description'] = 'whether this is a test email (and hence should include the test banner)';
+  $params['is_test']['title'] = 'Is Test';
+  $params['is_test']['api.aliases'] = array('isTest');
+
+  $params['pdf_filename']['description'] = 'filename of optional PDF version to add as attachment (do not include path)';
+  $params['pdf_filename']['title'] = 'PDF Filename';
+  $params['pdf_filename']['api.aliases'] = array('PDFFilename');
 }

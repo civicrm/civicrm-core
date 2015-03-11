@@ -80,6 +80,7 @@ class CRM_Activity_Page_AJAX {
       'class',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -115,6 +116,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $relGlobalTotalCount;
     $selectorElements = array('sort_name', 'phone', 'email');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($relGlobal, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -178,6 +180,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'] = count($allClientRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($clientRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -315,6 +318,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'] = count($allCaseRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email', 'actions');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($caseRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -486,7 +490,7 @@ class CRM_Activity_Page_AJAX {
 
     foreach ($activities as $key => $value) {
       //Check if recurring activity
-      if (CRM_Utils_Array::value('is_recurring_activity', $value)) {
+      if (!empty($value['is_recurring_activity'])) {
         if ($key == $value['is_recurring_activity']) {
           $activities[$key]['activity_type'] = $activities[$key]['activity_type'] . '<br/><span class="bold">Recurring Activity - (Parent)</span>';
         }
@@ -543,6 +547,7 @@ class CRM_Activity_Page_AJAX {
       'class',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

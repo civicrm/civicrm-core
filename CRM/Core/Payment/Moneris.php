@@ -53,7 +53,10 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @param $paymentProcessor
    *
-   * @return \CRM_Core_Payment_Moneris
+   * @param null $paymentForm
+   * @param bool $force
+   *
+   * @throws \Exception
    */
   public function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $this->_mode = $mode;

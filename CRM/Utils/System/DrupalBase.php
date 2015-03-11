@@ -269,7 +269,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function logger($message) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
-      watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
+      watchdog('civicrm', '%message', array('%message' => $message), NULL, WATCHDOG_DEBUG);
     }
   }
 

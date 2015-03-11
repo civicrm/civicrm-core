@@ -87,6 +87,17 @@
     background-image: url("{/literal}{$config->resourceBase}{literal}/i/icons/jquery-ui-52534D.png");
     opacity: .8;
   }
+  .api-field-desc {
+    font-size: .8em;
+    color: #828282;
+    line-height: 1.3em;
+  }
+  .select2-highlighted .api-field-desc {
+    color: #fcfcfc;
+  }
+  .api-param-op[readonly] {
+    width: 4em;
+  }
   pre ol.linenums li {
     list-style-type: decimal;
     color: #CFCFCF;
@@ -246,11 +257,19 @@
   <tr class="api-param-row">
     <td><input style="width: 100%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" /></td>
     <td>
-      <select class="crm-form-select api-param-op">
-        {foreach from=$operators item='op'}
-          <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
-        {/foreach}
-      </select>
+      {literal}
+      <% if (noOps) { %>
+        <input class="crm-form-text api-param-op" value="=" readonly="true" title="{/literal}{ts}Other operators not available for this action.{/ts}{literal}" />
+      <% } else { %>
+      {/literal}
+        <select class="crm-form-select api-param-op">
+          {foreach from=$operators item='op'}
+            <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
+          {/foreach}
+        </select>
+      {literal}
+      <% } %>
+      {/literal}
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>

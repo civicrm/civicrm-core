@@ -26,7 +26,7 @@
  */
 
 /**
- * This api exposes CiviCRM MailingComponent.
+ * This api exposes CiviCRM MailingComponent (header and footer).
  *
  * @package CiviCRM_APIv3
  */
@@ -44,6 +44,19 @@ function civicrm_api3_mailing_component_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $spec
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_mailing_component_create_spec(&$spec) {
+  $spec['is_active']['api.default'] = 1;
+}
+
 /**
  * Get a MailingComponent.
  *
@@ -54,6 +67,16 @@ function civicrm_api3_mailing_component_create($params) {
  */
 function civicrm_api3_mailing_component_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Adjust metadata for get.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_mailing_component_get_spec(&$params) {
+  // fetch active records by default
+  $params['is_active']['api.default'] = 1;
 }
 
 /**

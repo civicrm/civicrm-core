@@ -95,7 +95,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
+    $this->clickAjaxLink("xpath=//*[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(
@@ -284,7 +284,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
+    $this->clickAjaxLink("xpath=//*[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(

@@ -60,7 +60,8 @@ class CRM_Utils_Check_Security {
     $messages = array_merge(
       $this->checkLogFileIsNotAccessible(),
       $this->checkUploadsAreNotAccessible(),
-      $this->checkDirectoriesAreNotBrowseable()
+      $this->checkDirectoriesAreNotBrowseable(),
+      $this->checkFilesAreNotPresent()
     );
     return $messages;
   }
@@ -208,6 +209,36 @@ class CRM_Utils_Check_Security {
       }
     }
 
+    return $messages;
+  }
+
+
+  /**
+   * Check that some files are not present.
+   *
+   * These files have generally been deleted but Civi source tree but could be
+   * left online if one does a faulty upgrade.
+   *
+   * @return array of messages
+   */
+  public function checkFilesAreNotPresent() {
+    global $civicrm_root;
+
+    $messages = array();
+    $files = array(
+      "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005, upgraded from Civi <= 4.5.6
+      "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.5.7
+      "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.6.0
+    );
+    foreach ($files as $file) {
+      if (file_exists($file)) {
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkFilesAreNotPresent',
+          ts('File \'%1\' presents a security risk and should be deleted.', array(1 => $file)),
+          ts('Security Warning')
+        );
+      }
+    }
     return $messages;
   }
 
