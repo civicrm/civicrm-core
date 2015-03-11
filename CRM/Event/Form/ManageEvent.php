@@ -86,7 +86,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * Check if repeating event.
    */
   public $_isRepeatingEvent;
-  
+
   /**
    * Explicitly declare the entity api name.
    */
