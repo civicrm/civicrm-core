@@ -373,6 +373,9 @@
         if ($('#discount_id', $form).val()) {
           buildFeeBlock($('#discount_id', $form).val());
         }
+        $($form).on('change', '#discount_id', function() {
+          buildFeeBlock($(this).val());
+        });
 
         function buildRoleCustomData() {
           var roleId = $('select[name^=role_id]', $form).val().join();
