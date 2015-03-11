@@ -63,7 +63,7 @@ class CRM_Contact_Form_Location {
     }
 
     $form->assign('blocks', $form->_blocks);
-    $form->assign('className', $className);
+    $form->assign('className', CRM_Utils_System::getClassName($form));
 
     // get address sequence.
     if (!$addressSequence = $form->get('addressSequence')) {
