@@ -88,6 +88,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public $_isRepeatingEvent;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public $entityName = 'Event';
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
