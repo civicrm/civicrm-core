@@ -187,8 +187,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     // add event title, make required if this is not a template
     $this->add('text', 'title', ts('Event Title'), $attributes['event_title'], !$this->_isTemplate);
 
-    // We must specify the entity api name when using an addSelect
-    $this->entityName = 'Event';
     $this->addSelect('event_type_id',
       array('onChange' => "CRM.buildCustomData( 'Event', this.value );"),
       TRUE
