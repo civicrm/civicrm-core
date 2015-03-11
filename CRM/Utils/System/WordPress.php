@@ -351,6 +351,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
     $uid = CRM_Utils_Array::value('uid', $name);
+    if (!$uid) {
+      $name = $name  ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
+      $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      if ($name) {
+        $uid = wp_authenticate($name, $pass);
+        if (!$uid) {
+          if ($throwError) {
+            echo '<br />Sorry, unrecognized username or password.';
+            exit();
+          }
+          return FALSE;
+        }
+      }
+    }
     if ($uid) {
       $account = wp_set_current_user($uid);
       if ($account && $account->data->ID) {
