@@ -223,21 +223,21 @@ class CRM_Core_BAO_Block {
    *   CRM_Core_BAO_Block object on success, null otherwise
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
-  
+
     // @todo Consistant variable names, eg: locationTypeId / location_type_id
-    
+
     if (!self::blockExists($blockName, $params)) {
       return NULL;
     }
-    
+
     // Set up required information / defaults
     $entityElements = $blocks = array();
     $reset_primary = $primary_set = $billing_set = FALSE;
     $contact_id = NULL;
-    
+
     $bao_string = 'CRM_Core_BAO_' . ucfirst($blockName);
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    
+
     if ($entity) {
       $entityElements = array(
         'entity_table' => $params['entity_table'],
@@ -247,23 +247,23 @@ class CRM_Core_BAO_Block {
     else {
       $contact_id = $params['contact_id'];
     }
-    
+
     // Get current and submitted values
     $current_values = self::getBlockIds($blockName, $contact_id, $entityElements, $updateBlankLocInfo);
     $submitted_values = $params[$blockName];
-        
+
     // For each submitted value
     foreach ($submitted_values as $count => $submitted_value) {
-      
+
       // Set the contact ID
       $submitted_value['contact_id'] = $contact_id;
-      
+
       // If this is a primary value, and we haven't unset a primary value yet, and there are values on the contact
       // Then unset any primary value currently on the Contact
       if (!empty($submitted_value['is_primary']) && !$reset_primary && is_array($current_values)) {
         foreach ($current_values as $current_value_id => $current_value) {
           if (!empty($current_value['is_primary'])) {
-            
+
             // @todo Can we refactor this?
             $block = new $bao_string();
             $block->selectAdd();
@@ -274,14 +274,14 @@ class CRM_Core_BAO_Block {
               $block->save();
             }
             $block->free();
-            
+
             // Stop looping since we found a match
             $reset_primary = TRUE;
             break;
           }
         }
       }
-      
+
       // If there is already an ID passed in
       if (!empty($submitted_value['id'])) {
         // If the ID already exists on the contact
@@ -294,16 +294,16 @@ class CRM_Core_BAO_Block {
           unset($submitted_value['id']);
         }
       }
-      
+
       // Otherwise, if there was no ID passed in
       // Loop through the current values, and find the first match on location type
       else {
         foreach ($current_values as $current_value_id => $current_value) {
           if ($current_value['locationTypeId'] == $submitted_value['location_type_id']) {
-            
+
             // Also require a match on 'type id' for phone and IM blocks
             $match_found = FALSE;
-            
+
             if ($blockName == 'phone') {
               if (CRM_Utils_Array::value('phoneTypeId', $current_value) == CRM_Utils_Array::value('phone_type_id', $submitted_value)) {
                 $match_found = TRUE;
@@ -317,7 +317,7 @@ class CRM_Core_BAO_Block {
             else {
               $match_found = TRUE;
             }
-            
+
             // If we found a match
             if ($match_found) {
               // Match up the ID
@@ -334,13 +334,13 @@ class CRM_Core_BAO_Block {
           }
         }
       }
-      
+
       // Check if data exists in the input
       $data_exists = self::dataExists(self::$requiredBlockFields[$blockName], $submitted_value);
-      
+
       // If there is data
       if ($data_exists) {
-        
+
         // Ensure there is only one primary / billing block
         // "There can be only one"
         if (!$primary_set && !empty($submitted_value['is_primary'])) {
@@ -350,7 +350,7 @@ class CRM_Core_BAO_Block {
         else {
           $contactFields['is_primary'] = 0;
         }
-        
+
         if (!$billing_set && !empty($submitted_value['is_billing'])) {
           $submitted_value['is_billing'] = 1;
           $billing_set = TRUE;
@@ -358,23 +358,23 @@ class CRM_Core_BAO_Block {
         else {
           $contactFields['is_billing'] = 0;
         }
-        
+
         // Add the value to the list of blocks
         $blocks[] = $bao_string::add($submitted_value);
       }
-      
+
       // Otherwise, if there is no data, and there is an ID, and we are deleting 'blanked' values
       // Then delete it
       elseif (!empty($submitted_value['id']) && $updateBlankLocInfo) {
         self::blockDelete($blockName, array('id' => $submitted_value['id']));
       }
-      
+
       // Otherwise we ignore it
       else {
       }
-      
+
     }
-    
+
     return $blocks;
   }
 
