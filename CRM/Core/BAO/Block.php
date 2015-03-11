@@ -223,15 +223,21 @@ class CRM_Core_BAO_Block {
    *   CRM_Core_BAO_Block object on success, null otherwise
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
+  
+    // @todo Consistant variable names, eg: locationTypeId / location_type_id
+    
     if (!self::blockExists($blockName, $params)) {
       return NULL;
     }
-
-    $name = ucfirst($blockName);
-    $contactId = NULL;
-    $isPrimary = $isBilling = TRUE;
+    
+    // Set up required information / defaults
     $entityElements = $blocks = array();
-
+    $reset_primary = $primary_set = $billing_set = FALSE;
+    $contact_id = NULL;
+    
+    $bao_string = 'CRM_Core_BAO_' . ucfirst($blockName);
+    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    
     if ($entity) {
       $entityElements = array(
         'entity_table' => $params['entity_table'],
@@ -239,145 +245,136 @@ class CRM_Core_BAO_Block {
       );
     }
     else {
-      $contactId = $params['contact_id'];
+      $contact_id = $params['contact_id'];
     }
-
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-
-    //get existsing block ids.
-    $blockIds = self::getBlockIds($blockName, $contactId, $entityElements, $updateBlankLocInfo);
-
-    if (!$updateBlankLocInfo) {
-      $resetPrimaryId = NULL;
-      $primaryId = FALSE;
-      foreach ($params[$blockName] as $count => $value) {
-        $blockId = CRM_Utils_Array::value('id', $value);
-        if ($blockId) {
-          if (is_array($blockIds)
-            && array_key_exists($blockId, $blockIds)
-          ) {
-            unset($blockIds[$blockId]);
-          }
-          else {
-            unset($value['id']);
-          }
-        }
-        //lets allow to update primary w/ more cleanly.
-        if (!$resetPrimaryId && !empty($value['is_primary'])) {
-          $primaryId = TRUE;
-          if (is_array($blockIds)) {
-            foreach ($blockIds as $blockId => $blockValue) {
-              if (!empty($blockValue['is_primary'])) {
-                $resetPrimaryId = $blockId;
-                break;
-              }
-            }
-          }
-          if ($resetPrimaryId) {
-            $baoString = 'CRM_Core_BAO_' . $blockName;
-            $block = new $baoString();
+    
+    // Get current and submitted values
+    $current_values = self::getBlockIds($blockName, $contact_id, $entityElements, $updateBlankLocInfo);
+    $submitted_values = $params[$blockName];
+        
+    // For each submitted value
+    foreach ($submitted_values as $count => $submitted_value) {
+      
+      // Set the contact ID
+      $submitted_value['contact_id'] = $contact_id;
+      
+      // If this is a primary value, and we haven't unset a primary value yet, and there are values on the contact
+      // Then unset any primary value currently on the Contact
+      if (!empty($submitted_value['is_primary']) && !$reset_primary && is_array($current_values)) {
+        foreach ($current_values as $current_value_id => $current_value) {
+          if (!empty($current_value['is_primary'])) {
+            
+            // @todo Can we refactor this?
+            $block = new $bao_string();
             $block->selectAdd();
             $block->selectAdd("id, is_primary");
-            $block->id = $resetPrimaryId;
+            $block->id = $current_value['id'];
             if ($block->find(TRUE)) {
               $block->is_primary = FALSE;
               $block->save();
             }
             $block->free();
+            
+            // Stop looping since we found a match
+            $reset_primary = TRUE;
+            break;
           }
         }
       }
-    }
-
-    foreach ($params[$blockName] as $count => $value) {
-      if (!is_array($value)) {
-        continue;
+      
+      // If there is already an ID passed in
+      if (!empty($submitted_value['id'])) {
+        // If the ID already exists on the contact
+        // Then we don't want to match on it later, so unset it
+        if (array_key_exists($submitted_value['id'], $current_values)) {
+          unset($current_values[$current_value_id]);
+        }
+        // Otherwise it is a new value, ignore the passed in ID
+        else {
+          unset($submitted_value['id']);
+        }
       }
-      $contactFields = array(
-        'contact_id' => $contactId,
-        'location_type_id' => CRM_Utils_Array::value('location_type_id', $value),
-      );
-
-      //check for update
-      if (empty($value['id']) &&
-        is_array($blockIds) && !empty($blockIds)
-      ) {
-        foreach ($blockIds as $blockId => $blockValue) {
-          if ($updateBlankLocInfo) {
-            if (!empty($blockIds[$count])) {
-              $value['id'] = $blockIds[$count]['id'];
-              unset($blockIds[$count]);
+      
+      // Otherwise, if there was no ID passed in
+      // Loop through the current values, and find the first match on location type
+      else {
+        foreach ($current_values as $current_value_id => $current_value) {
+          if ($current_value['locationTypeId'] == $submitted_value['location_type_id']) {
+            
+            // Also require a match on 'type id' for phone and IM blocks
+            $match_found = FALSE;
+            
+            if ($blockName == 'phone') {
+              if (CRM_Utils_Array::value('phoneTypeId', $current_value) == CRM_Utils_Array::value('phone_type_id', $submitted_value)) {
+                $match_found = TRUE;
+              }
             }
-          }
-          else {
-            if ($blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value)) {
-              $valueId = FALSE;
-
-              if ($blockName == 'phone') {
-                $phoneTypeBlockValue = CRM_Utils_Array::value('phoneTypeId', $blockValue);
-                if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
-                  $valueId = TRUE;
-                }
+            elseif ($blockName == 'im') {
+              if (CRM_Utils_Array::value('providerId', $current_value) == CRM_Utils_Array::value('provider_id', $submitted_value)) {
+                $match_found = TRUE;
               }
-              elseif ($blockName == 'im') {
-                $providerBlockValue = CRM_Utils_Array::value('providerId', $blockValue);
-                if ($providerBlockValue == $value['provider_id']) {
-                  $valueId = TRUE;
-                }
+            }
+            else {
+              $match_found = TRUE;
+            }
+            
+            // If we found a match
+            if ($match_found) {
+              // Match up the ID
+              $submitted_value['id'] = $current_value['id'];
+              // If the submitted value is not primary, but the matched value is
+              // Then set the submitted value to be primary
+              if (empty($submitted_value['is_primary']) && !empty($current_value['is_primary'])) {
+                $submitted_value['is_primary'] = 1;
               }
-              else {
-                $valueId = TRUE;
-              }
-
-              if ($valueId) {
-                //assigned id as first come first serve basis
-                $value['id'] = $blockValue['id'];
-                if (!$primaryId && !empty($blockValue['is_primary'])) {
-                  $value['is_primary'] = $blockValue['is_primary'];
-                }
-                unset($blockIds[$blockId]);
-                break;
-              }
+              // Remove the original value from the array so we don't match on it again
+              unset($current_values[$current_value_id]);
+              break;
             }
           }
         }
       }
-
-      $dataExits = self::dataExists(self::$requiredBlockFields[$blockName], $value);
-
-      // Note there could be cases when block info already exist ($value[id] is set) for a contact/entity
-      // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
-      // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (!empty($value['id']) && !$dataExits && $updateBlankLocInfo) {
-        //delete the existing record
-        self::blockDelete($blockName, array('id' => $value['id']));
-        continue;
+      
+      // Check if data exists in the input
+      $data_exists = self::dataExists(self::$requiredBlockFields[$blockName], $submitted_value);
+      
+      // If there is data
+      if ($data_exists) {
+        
+        // Ensure there is only one primary / billing block
+        // "There can be only one"
+        if (!$primary_set && !empty($submitted_value['is_primary'])) {
+          $submitted_value['is_primary'] = 1;
+          $primary_set = TRUE;
+        }
+        else {
+          $contactFields['is_primary'] = 0;
+        }
+        
+        if (!$billing_set && !empty($submitted_value['is_billing'])) {
+          $submitted_value['is_billing'] = 1;
+          $billing_set = TRUE;
+        }
+        else {
+          $contactFields['is_billing'] = 0;
+        }
+        
+        // Add the value to the list of blocks
+        $blocks[] = $bao_string::add($submitted_value);
       }
-      elseif (!$dataExits) {
-        continue;
+      
+      // Otherwise, if there is no data, and there is an ID, and we are deleting 'blanked' values
+      // Then delete it
+      elseif (!empty($submitted_value['id']) && $updateBlankLocInfo) {
+        self::blockDelete($blockName, array('id' => $submitted_value['id']));
       }
-
-      if ($isPrimary && !empty($value['is_primary'])) {
-        $contactFields['is_primary'] = $value['is_primary'];
-        $isPrimary = FALSE;
-      }
+      
+      // Otherwise we ignore it
       else {
-        $contactFields['is_primary'] = 0;
       }
-
-      if ($isBilling && !empty($value['is_billing'])) {
-        $contactFields['is_billing'] = $value['is_billing'];
-        $isBilling = FALSE;
-      }
-      else {
-        $contactFields['is_billing'] = 0;
-      }
-
-      $blockFields = array_merge($value, $contactFields);
-      $baoString = 'CRM_Core_BAO_' . $name;
-      $blocks[] = $baoString::add($blockFields);
+      
     }
-
+    
     return $blocks;
   }
 
