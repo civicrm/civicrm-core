@@ -526,8 +526,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
     else {
       // We expect only one element in the array, of the form
       // "operator" => "rhs".
-      $dummy = array_keys($value);
-      $operator = $dummy[0];
+      $operator = CRM_Utils_Array::first(array_keys($value));
       if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
         // if operator not found, use = as default.
         $operator = "=";
