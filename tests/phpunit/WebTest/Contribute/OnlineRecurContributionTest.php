@@ -112,7 +112,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
 
     // Confirmation page
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
-    $text = 'I want to contribute this amount every 1 month(s) for 12 installments.';
+    $text = 'I want to contribute this amount every month for 12 installments.';
     $this->assertTrue($this->isTextPresent($text), 'Missing recurring contribution text (confirmation): ' . $text);
     $text = $rand;
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (confirmation): ' . $contributionAmount);
