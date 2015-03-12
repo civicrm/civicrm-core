@@ -49,6 +49,13 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   private $_blockCount = 6;
 
   /**
+   * Whether this contact has a first/last/organization/household name
+   *
+   * @var bool
+   */
+  public $contactHasName;
+
+  /**
    * Call preprocess.
    */
   public function preProcess() {
@@ -59,6 +66,15 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $email->contact_id = $this->_contactId;
 
     $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email, NULL);
+
+    // Check if this contact has a first/last/organization/household name
+    if ($this->_contactType == 'Individual') {
+      $this->contactHasName = (bool) (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'last_name')
+        || CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'first_name'));
+    }
+    else {
+      $this->contactHasName = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, strtolower($this->_contactType) . '_name');
+    }
   }
 
   /**
@@ -92,7 +108,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Email::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Email', 'formRule'));
+    $this->addFormRule(array('CRM_Contact_Form_Inline_Email', 'formRule'), $this);
   }
 
   /**
@@ -102,10 +118,11 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    *   Posted values of the form.
    * @param array $errors
    *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_Email $form
    *
    * @return array
    */
-  public static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors, $form) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
@@ -126,6 +143,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       if (count($hasPrimary) > 1) {
         $errors["email[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one email can be marked as primary.');
       }
+    }
+    if (!$hasData && !$form->contactHasName) {
+      $errors["email[1][email]"] = ts('Contact with no name must have an email.');
     }
     return $errors;
   }
@@ -163,6 +183,19 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
     CRM_Core_BAO_Block::create('email', $params);
+
+    // If contact has no name, set primary email as display name
+    // TODO: This should be handled in the BAO for the benefit of the api, etc.
+    if (!$this->contactHasName) {
+      foreach ($params['email'] as $email) {
+        if ($email['is_primary']) {
+          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name', $email['email']);
+          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'sort_name', $email['email']);
+          $this->ajaxResponse['reloadBlocks'] = array('#crm-contactname-content');
+          break;
+        }
+      }
+    }
 
     $this->log();
     $this->response();

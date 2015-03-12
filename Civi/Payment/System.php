@@ -63,7 +63,7 @@ class System {
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
-    $processor = civicrm_api3('payment_processor', 'get_single', array('id' => $id));
+    $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id));
     return self::getByProcessor($processor);
   }
 
@@ -73,7 +73,7 @@ class System {
    * @throws \CiviCRM_API3_Exception
    */
   public function getByName($name, $is_test) {
-    $processor = civicrm_api3('payment_processor', 'get_single', array('name' => $name, 'is_test' => $is_test));
+    $processor = civicrm_api3('payment_processor', 'getsingle', array('name' => $name, 'is_test' => $is_test));
     return self::getByProcessor($processor);
   }
 
