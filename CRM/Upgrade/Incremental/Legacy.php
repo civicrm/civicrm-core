@@ -219,7 +219,7 @@ SELECT  id
    */
   public static function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '3.2.alpha1') {
-      $postUpgradeMessage .= '<br />' . ts("We have reset the COUNTED flag to false for the event participant status 'Pending from incomplete transaction'. This change ensures that people who have a problem during registration can try again.");
+      $postUpgradeMessage .= '<br />' . ts("We have reset the COUNTED flag to false for the event participant status 'Pending (incomplete transaction)'. This change ensures that people who have a problem during registration can try again.");
     }
     if ($rev == '3.2.beta3') {
       $subTypes = CRM_Contact_BAO_ContactType::subTypes();

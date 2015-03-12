@@ -223,7 +223,7 @@ VALUES
 -- CRM-6024
    UPDATE civicrm_participant_status_type
        SET is_counted = 0
-       WHERE name = 'Pending from incomplete transaction';
+       WHERE name = 'Pending (incomplete transaction)';
 
 -- CRM-6004
 ALTER TABLE civicrm_uf_field
