@@ -109,9 +109,9 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
-    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
