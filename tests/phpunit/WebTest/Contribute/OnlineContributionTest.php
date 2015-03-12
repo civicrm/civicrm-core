@@ -259,7 +259,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
     $amountLabel = 'Total Amount';
-    $amountValue = '1.00';
+    $amountValue = '0.00';
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
