@@ -652,7 +652,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (!is_array($basicType)) {
           $basicType = array($basicType);
         }
-        if (!in_array($fieldType, $basicType)) {
+        if (!in_array($fieldType, $basicType) && $fieldType != 'Contact') {
           $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of subtype other than "%1".',
             array(1 => $fieldType)
           );
