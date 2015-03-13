@@ -1287,7 +1287,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'File':
         // In the context of displaying a profile, show file/image
-        if ($contactID) {
+        if ($contactID && $value) {
           $url = self::getFileURL($contactID, $fieldID, $value);
           if ($url) {
             $display = $url['file_url'];
