@@ -283,7 +283,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => '0.00',
+      'Non-deductible Amount' => 123,
       'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario4);
@@ -317,11 +317,11 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
-    $this->waitForElementPresent("link=Submit Credit Card Contribution");
+    $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
 
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[2]@href");
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[1]@href");
+    $url = $url.'&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -355,7 +355,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->select("product_name[0]", "label={$params['premium']}");
     }
     // Clicking save.
-    $this->click("_qf_Contribution_upload");
+    $this->click("_qf_Contribution_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
