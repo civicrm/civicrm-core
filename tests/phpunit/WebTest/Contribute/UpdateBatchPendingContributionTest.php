@@ -44,7 +44,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id');
+    $this->multiselect2('contribution_status_id', array("Pending"));
     $this->clickLink("_qf_Search_refresh");
 
     $this->click('radio_ts', 'ts_all');
@@ -59,7 +59,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id');
+    $this->multiselect2('contribution_status_id', array("Completed"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());

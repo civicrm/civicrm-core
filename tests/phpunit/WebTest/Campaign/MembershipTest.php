@@ -104,8 +104,8 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div/table/tbody/tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div/table/tbody/tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
     $this->memberAddTest($campaignTitle, $id);
   }
 
