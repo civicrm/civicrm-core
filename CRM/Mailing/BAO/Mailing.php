@@ -631,7 +631,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
 
     $protos = '(https?|ftp)';
     $letters = '\w';
-    $gunk = '\{\}/#~:.?+=&;%@!\,\-';
+    $gunk = '\{\}/#~:.?+=&;%@!\,\-\|\(\)\*';
     $punc = '.:?\-';
     $any = "{$letters}{$gunk}{$punc}";
     if ($onlyHrefs) {
