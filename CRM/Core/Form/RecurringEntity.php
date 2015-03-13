@@ -209,7 +209,11 @@ class CRM_Core_Form_RecurringEntity {
       '2' => ts('On'),
     );
     $form->addRadio('ends', ts("Ends"), $eoptionTypes, array('class' => 'required'), NULL);
-    $form->add('select', 'start_action_offset', NULL, CRM_Core_SelectValues::getNumericOptions(1, 30), FALSE);
+    // Offset options gets key=>val pairs like 1=>2 because the BAO wants to know the number of
+    // children while it makes more sense to the user to see the total number including the parent.
+    $offsetOptions = range(1, 30);
+    unset($offsetOptions[0]);
+    $form->add('select', 'start_action_offset', NULL, $offsetOptions, FALSE);
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
     $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array(
