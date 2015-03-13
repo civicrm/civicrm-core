@@ -603,7 +603,6 @@ class CRM_Core_Resources {
       // Add global settings
       $settings = array(
         'config' => array(
-          'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
           'isFrontend' => $config->userFrameworkFrontend,
         ),
       );
@@ -676,6 +675,7 @@ class CRM_Core_Resources {
         'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
         'filters' => self::getEntityRefFilters(),
       ),
+      'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
