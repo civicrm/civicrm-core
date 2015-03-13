@@ -412,17 +412,9 @@ class CRM_Core_Form_RecurringEntity {
           if (CRM_Utils_Array::value('pre_delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&
             CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])
           ) {
-            $preDeleteResult = call_user_func_array(
-              CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], 
-              array($params['entity_id'])
-            );
+            $preDeleteResult = call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id']));
             if (!empty($preDeleteResult)) {
-              call_user_func(
-                array(
-                  CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'],
-                  $preDeleteResult
-                )
-              );
+              call_user_func(array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], $preDeleteResult));
             }
           }
           //Ready to execute delete on entities if it has delete function set
