@@ -303,6 +303,81 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_5_6($rev) {
+    // Task to process sql.
+    $this->addTask(ts('Upgrade DB to 4.5.6: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
+
+    return TRUE;
+  }
+
+  /**
+   * Update saved search for multi-select custom fields on DB upgrade
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool TRUE for success
+   */
+  static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT id, form_values FROM civicrm_saved_search";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+        foreach ($formValues as $field => &$data_value) {
+        if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
+          // This indicates old-style data format. We need to fix it.
+          $op = 'and';
+          $fieldID = end(explode('_', $field));
+          $htmlType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldID, 'html_type');
+
+          switch ($htmlType) {
+            case 'CheckBox':
+              if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
+                $op = 'or';
+                unset($data_value['CiviCRM_OP_OR']);
+              }
+              $data_value = array_keys($data_value, 1);
+              break;
+
+            default:
+              $key = array_search('CiviCRM_OP_OR', $data_value);
+              if (!is_null($key)) {
+                $op = 'or';
+                unset($data_value[$key]);
+              }
+          }
+
+          //If only Or operator has been chosen means we need to select all values and
+          //so to execute OR operation between these values according to new data structure
+          if (count($data_value) == 0) {
+            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
+            foreach ($customOption as $option) {
+              $data_value[] = CRM_Utils_Array::value('value', $option);
+            }
+          }
+
+          // Add new key for the operator.
+          $formValues["${field}_operator"] = $op;
+
+          $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
+          CRM_Core_DAO::executeQuery($sql,
+            array(
+              array(serialize($formValues), 'String'),
+              array($dao->id, 'Integer'),
+            )
+          );
+        }
+      }
+    }
+
+    return TRUE;
+  }
+
+
+  /**
    * (Queue Task Callback)
    */
   static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
