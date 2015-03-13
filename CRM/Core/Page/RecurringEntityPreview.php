@@ -41,7 +41,7 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
    */
   public function run() {
     $parentEventId = $startDate = $endDate = NULL;
-    $dates = array();
+    $dates = $original = array();
     $formValues = $_REQUEST;
     if (!empty($formValues['entity_table'])) {
       $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
@@ -63,20 +63,23 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
         $parentEventId = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['entity_id'], $formValues['entity_table']);
       }
 
+      // Get original entity
+      $original[$startDateColumnName] = CRM_Utils_Date::processDate($formValues['repetition_start_date']);
+      $daoName = CRM_Core_BAO_RecurringEntity::$_tableDAOMapper[$formValues['entity_table']];
+      if ($parentEventId) {
+        $startDate = $original[$startDateColumnName] = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
+        $endDate = $original[$startDateColumnName] = $endDateColumnName ? CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName) : NULL;
+      }
+
       //Check if there is any enddate column defined to find out the interval between the two range
       if (CRM_Utils_Array::value('intervalDateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
-        $daoName = CRM_Core_BAO_RecurringEntity::$_tableDAOMapper[$formValues['entity_table']];
-        if ($parentEventId) {
-          $startDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
-          $endDate = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $endDateColumnName);
-        }
         if ($endDate) {
           $interval = $recursion->getInterval($startDate, $endDate);
           $recursion->intervalDateColumns = array($endDateColumnName => $interval);
         }
       }
 
-      $dates = $recursion->generateRecursiveDates();
+      $dates = array_merge(array($original), $recursion->generateRecursiveDates());
 
       foreach ($dates as $key => &$value) {
         if ($startDateColumnName) {
