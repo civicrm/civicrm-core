@@ -321,7 +321,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // since we don't have live credentials we will switch to test mode
     $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[1]@href");
-    $url = $url.'&mode=test';
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
