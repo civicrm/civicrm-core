@@ -126,7 +126,8 @@
         restrict: 'EA',
         scope: {
           crmUiField: '@',
-          crmTitle: '@'
+          crmTitle: '@',
+          crmHelp: '@'
         },
         templateUrl: function(tElement, tAttrs){
           var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
@@ -137,6 +138,7 @@
           $(element).addClass('crm-section');
           scope.crmUiField = attrs.crmUiField;
           scope.crmTitle = attrs.crmTitle;
+          scope.crmHelp = attrs.crmHelp;
         }
       };
     })
@@ -151,6 +153,27 @@
             var id = crmUiIdCtrl.get(attrs.crmUiId);
             element.attr('id', id);
           }
+        }
+      };
+    })
+
+    // standalone: <a crm-ui-help="field_name">
+    // within crmUiField: <div crm-ui-field crm-title="My Field" crm-help="field_name">
+    .directive('crmUiHelp', function() {
+      return {
+        restrict: 'EA',
+        scope: {
+          crmUiHelp: '='
+        },
+        link: function (scope, element, attrs) {
+          element
+            .addClass('helpicon')
+            .attr('title', ts('%1 Help', {1: scope.crmUiHelp.title}))
+            .attr('href', '#')
+            .on('click', function(e) {
+              e.preventDefault();
+              CRM.help(scope.crmUiHelp.title, {id: scope.crmUiHelp.id, file: scope.$parent.$parent.$parent.helpFile});
+            });
         }
       };
     })
