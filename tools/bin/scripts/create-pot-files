@@ -151,7 +151,7 @@ function build_raw_pot() {
         js/jquery/jquery.dashboard.js \
         js/model/crm.designer.js \
         js/model/crm.uf.js \
-        js/view/crm.designer.js
+        js/view/crm.designer.js \
         packages/HTML/QuickForm \
         partials/crmAttachment \
         partials/crmExample \
