@@ -78,7 +78,7 @@
   <field>
     <name>html_type</name>
     <type>varchar</type>
-    <title>Custom Field HTMl Type</title>
+    <title>Custom Field HTML Type</title>
     <length>32</length>
     <required>true</required>
     <comment>HTML types plus several built-in extended types.</comment>
