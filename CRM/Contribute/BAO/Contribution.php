@@ -3688,7 +3688,7 @@ WHERE con.id = {$contributionId}
    * @param Integer $financialTypeId
    *   Value of latest Financial Type.
    *
-   * @param Integer
+   * @param Integer $contributionId
    *   Contribution Id.
    *
    * @param array $errors
@@ -3705,7 +3705,7 @@ WHERE con.id = {$contributionId}
     }
     $sql = 'SELECT financial_type_id FROM civicrm_line_item WHERE contribution_id = %1 GROUP BY financial_type_id;';
     $params = array(
-      '1' => array($contributionId, 'Integer')
+      '1' => array($contributionId, 'Integer'),
     );
     $result = CRM_Core_DAO::executeQuery($sql, $params);
     if ($result->N > 1) {
