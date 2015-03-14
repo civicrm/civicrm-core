@@ -58,7 +58,7 @@ function civicrm_api3_contribution_create(&$params) {
   }
   if (!empty($params['id']) && !empty($params['financial_type_id'])) {
     $error = array();
-    CRM_Contribute_BAO_Contribution::checkFinancialTypeChange($params['financial_type_id'], $params['id'], $errors);
+    CRM_Contribute_BAO_Contribution::checkFinancialTypeChange($params['financial_type_id'], $params['id'], $error);
     if (array_key_exists('financial_type_id', $error)) {
       throw new API_Exception($error['financial_type_id']);
     }
