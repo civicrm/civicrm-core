@@ -3122,6 +3122,13 @@ WHERE  contribution_id = %1 ";
         }
       }
     }
+    if ($context == 'changeFinancialType') {
+      foreach ($params['line_item'] as &$lineItems) {
+        foreach ($lineItems as &$line) {
+          $line['financial_type_id'] = $params['financial_type_id'];
+        }
+      }
+    }
   }
 
   /**
