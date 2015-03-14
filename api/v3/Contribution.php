@@ -56,7 +56,13 @@ function civicrm_api3_contribution_create(&$params) {
       throw new API_Exception($error['contribution_status_id']);
     }
   }
-
+  if (!empty($params['id']) && !empty($params['financial_type_id'])) {
+    $error = array();
+    CRM_Contribute_BAO_Contribution::checkFinancialTypeChange($params['financial_type_id'], $params['id'], $errors);
+    if (array_key_exists('financial_type_id', $error)) {
+      throw new API_Exception($error['financial_type_id']);
+    }
+  }
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
   // Make sure tax calculation is handled via api.
