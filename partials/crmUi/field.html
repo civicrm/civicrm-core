@@ -1,3 +1,6 @@
-<div class="label"><label crm-ui-for="{{crmUiField}}" crm-depth="1">{{$parent.$parent.$eval(crmTitle)}}</label></div>
+<div class="label">
+  <label crm-ui-for="{{crmUiField}}" crm-depth="1">{{$parent.$parent.$eval(crmTitle)}}</label>
+  <a crm-ui-help="{title: $parent.$parent.$eval(crmTitle), id: crmHelp}" ng-if="crmHelp"></a>
+</div>
 <div class="content" ng-transclude></div>
 <div class="clear"></div>

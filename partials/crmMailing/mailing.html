@@ -21,7 +21,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         <a crm-icon="disk" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
       </div>
     </div>
-    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')">
+    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')" crm-help="id-from_email">
       <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
         <select
           crm-ui-id="subform.fromAddress"
