@@ -139,17 +139,17 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
       'CRM_Core_BAO_LabelFormat',
       $this->_id,
     ));
-    $this->addRule('NX', ts('Must be an integer'), 'integer');
-    $this->addRule('NY', ts('Must be an integer'), 'integer');
-    $this->addRule('tMargin', ts('Must be numeric'), 'numeric');
-    $this->addRule('lMargin', ts('Must be numeric'), 'numeric');
-    $this->addRule('SpaceX', ts('Must be numeric'), 'numeric');
-    $this->addRule('SpaceY', ts('Must be numeric'), 'numeric');
-    $this->addRule('lPadding', ts('Must be numeric'), 'numeric');
-    $this->addRule('tPadding', ts('Must be numeric'), 'numeric');
-    $this->addRule('width', ts('Must be numeric'), 'numeric');
-    $this->addRule('height', ts('Must be numeric'), 'numeric');
-    $this->addRule('weight', ts('Must be integer'), 'integer');
+    $this->addRule('NX', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('NY', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('tMargin', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('lMargin', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('SpaceX', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('SpaceY', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('lPadding', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('tPadding', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('width', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('height', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('weight', ts('Please enter a valid integer.'), 'integer');
   }
 
   /**
@@ -194,20 +194,24 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::COPY) {
       // make a copy of the Label Format
       $labelFormat = CRM_Core_BAO_LabelFormat::getById($this->_id, $this->_group);
+      $newlabel = ts('Copy of %1', array(1 => $labelFormat['label']));
+
       $list = CRM_Core_BAO_LabelFormat::getList(TRUE, $this->_group);
       $count = 1;
-      $prefix = ts('Copy of ');
-      while (in_array($prefix . $labelFormat['label'], $list)) {
-        $prefix = ts('Copy') . ' (' . ++$count . ') ' . ts('of ');
+
+      while (in_array($newlabel, $list)) {
+        $count++;
+        $newlabel = ts('Copy %1 of %2', array(1 => $count, 2 => $labelFormat['label']));
       }
-      $labelFormat['label'] = $prefix . $labelFormat['label'];
+
+      $labelFormat['label'] = $newlabel;
       $labelFormat['grouping'] = CRM_Core_BAO_LabelFormat::customGroupName();
       $labelFormat['is_default'] = 0;
       $labelFormat['is_reserved'] = 0;
 
       $bao = new CRM_Core_BAO_LabelFormat();
       $bao->saveLabelFormat($labelFormat, NULL, $this->_group);
-      CRM_Core_Session::setStatus($labelFormat['label'] . ts(' has been created.'), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('%1 has been created.', array(1 => $labelFormat['label'])), ts('Saved'), 'success');
       return;
     }
 

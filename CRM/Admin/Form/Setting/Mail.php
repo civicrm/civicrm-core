@@ -61,10 +61,10 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
 
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
-    $this->addRule('mailerBatchLimit', ts('Must be an integer'), 'integer');
-    $this->addRule('mailThrottleTime', ts('Must be an integer'), 'integer');
-    $this->addRule('mailerJobSize', ts('Must be an integer'), 'integer');
-    $this->addRule('mailerJobsMax', ts('Must be an integer'), 'integer');
+    $this->addRule('mailerBatchLimit', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('mailThrottleTime', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('mailerJobSize', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('mailerJobsMax', ts('Please enter a valid integer.'), 'integer');
 
     parent::buildQuickForm($check);
   }
