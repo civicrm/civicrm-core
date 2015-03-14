@@ -139,17 +139,17 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
       'CRM_Core_BAO_LabelFormat',
       $this->_id,
     ));
-    $this->addRule('NX', ts('Must be an integer'), 'integer');
-    $this->addRule('NY', ts('Must be an integer'), 'integer');
-    $this->addRule('tMargin', ts('Must be numeric'), 'numeric');
-    $this->addRule('lMargin', ts('Must be numeric'), 'numeric');
-    $this->addRule('SpaceX', ts('Must be numeric'), 'numeric');
-    $this->addRule('SpaceY', ts('Must be numeric'), 'numeric');
-    $this->addRule('lPadding', ts('Must be numeric'), 'numeric');
-    $this->addRule('tPadding', ts('Must be numeric'), 'numeric');
-    $this->addRule('width', ts('Must be numeric'), 'numeric');
-    $this->addRule('height', ts('Must be numeric'), 'numeric');
-    $this->addRule('weight', ts('Must be integer'), 'integer');
+    $this->addRule('NX', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('NY', ts('Please enter a valid integer.'), 'integer');
+    $this->addRule('tMargin', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('lMargin', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('SpaceX', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('SpaceY', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('lPadding', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('tPadding', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('width', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('height', ts('Please enter a valid number.'), 'numeric');
+    $this->addRule('weight', ts('Please enter a valid integer.'), 'integer');
   }
 
   /**
