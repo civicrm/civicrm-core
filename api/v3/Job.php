@@ -139,13 +139,26 @@ function civicrm_api3_job_geocode($params) {
  * @param array $params
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
-  $params['start'] = array('title' => 'Start Date');
-  $params['end'] = array('title' => 'End Date');
-  $params['geocoding'] = array('title' => 'Geocode address?');
-  $params['parse'] = array('title' => 'Parse street address?');
+  $params['start'] = array(
+    'title' => 'Start Date',
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+  );
+  $params['end'] = array(
+    'title' => 'End Date',
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+  );
+  $params['geocoding'] = array(
+    'title' => 'Geocode address?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['parse'] = array(
+    'title' => 'Parse street address?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['throttle'] = array(
     'title' => 'Throttle?',
-    'description' => 'if enabled, geo-codes at a slow rate',
+    'description' => 'If enabled, geo-codes at a slow rate',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
 }
 
