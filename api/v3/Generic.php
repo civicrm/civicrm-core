@@ -80,7 +80,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
   }
-  // determines whether to use unique field names - seem comment block above
+  // determines whether to use unique field names - see comment block above
   $unique = TRUE;
   if (empty($apiOptions) && isset($results[$entity . $subentity]) && isset($action, $results[$entity . $subentity])
     && isset($action, $results[$entity . $subentity][$sequential])) {
@@ -123,23 +123,30 @@ function civicrm_api3_generic_getfields($apiRequest) {
       $metadata = array(
         'id' => array(
           'title' => $entity . ' ID',
-          'name' => 'id',
           'api.required' => 1,
           'api.aliases' => array($lowercase_entity . '_id'),
           'type' => CRM_Utils_Type::T_INT,
         ));
       break;
 
-    case 'getoptions':
+    // Note: adding setvalue case here instead of in a generic spec function because
+    // some APIs override the generic setvalue fn which causes the generic spec to be overlooked.
+    case 'setvalue':
       $metadata = array(
         'field' => array(
-          'name' => 'field',
           'title' => 'Field name',
           'api.required' => 1,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
-        'context' => array(
-          'name' => 'context',
-          'title' => 'Context',
+        'id' => array(
+          'title' => $entity . ' ID',
+          'api.required' => 1,
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'value' => array(
+          'title' => 'Value',
+          'description' => "Field value to set",
+          'api.required' => 1,
         ),
       );
       break;
@@ -343,6 +350,28 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     $options = CRM_Utils_Array::makeNonAssociative($options);
   }
   return civicrm_api3_create_success($options, $apiRequest['params'], $apiRequest['entity'], 'getoptions');
+}
+
+/**
+ * Provide metadata for this generic action
+ *
+ * @param $params
+ * @param $apiRequest
+ */
+function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
+  $contexts = array_combine(array_keys(CRM_Core_DAO::buildOptionsContext()), array_keys(CRM_Core_DAO::buildOptionsContext()));
+  $params += array(
+    'field' => array(
+      'title' => 'Field name',
+      'api.required' => 1,
+      'type' => CRM_Utils_Type::T_STRING,
+    ),
+    'context' => array(
+      'title' => 'Context',
+      'options' => !empty($apiRequest['sequential']) ? CRM_Utils_Array::makeNonAssociative($contexts) : $contexts,
+      'type' => CRM_Utils_Type::T_STRING,
+    ),
+  );
 }
 
 /**
