@@ -201,8 +201,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Relationship that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
