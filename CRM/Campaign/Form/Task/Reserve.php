@@ -132,16 +132,22 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         $errorMsg = ts('The maximum number of contacts is already reserved for this interviewer.');
       }
       elseif (count($this->_contactIds) > ($maxVoters - $this->_numVoters)) {
-        $errorMsg = ts('You can reserve a maximum of %1 contact(s) at a time for this survey.',
-          array(1 => $maxVoters - $this->_numVoters)
+        $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
+          array(
+            'plural' => 'You can reserve a maximum of %count contacts at a time for this survey.',
+            'count' => $maxVoters - $this->_numVoters,
+          )
         );
       }
     }
 
     $defaultNum = CRM_Utils_Array::value('default_number_of_contacts', $this->_surveyDetails);
     if (!$errorMsg && $defaultNum && (count($this->_contactIds) > $defaultNum)) {
-      $errorMsg = ts('You can reserve a maximum of %1 contact(s) at a time for this survey.',
-        array(1 => $defaultNum)
+      $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
+        array(
+          'plural' => 'You can reserve a maximum of %count contacts at a time for this survey.',
+          'count' => $defaultNum,
+        )
       );
     }
 
@@ -276,18 +282,21 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
     // Success message
     if ($countVoters > 0) {
-      $status = '<p>' . ts("%1 Contact(s) have been reserved.", array(1 => $countVoters)) . '</p>';
+      $status = '<p>' . ts("%count contact has been reserved.", array('plural' => '%count contacts have been reserved.', 'count' => $countVoters)) . '</p>';
       if ($groupAdditions) {
-        $status .= '<p>' . ts('Respondent(s) has been added to %1 group(s).',
-            array(1 => implode(', ', $groupAdditions))
+        $status .= '<p>' . ts('They have been added to %1.',
+            array(1 => implode(' ' . ts('and') . ' ', $groupAdditions))
           ) . '</p>';
       }
       CRM_Core_Session::setStatus($status, ts('Reservation Added'), 'success');
     }
     // Error message
     if (count($this->_contactIds) > $countVoters) {
-      CRM_Core_Session::setStatus(ts('Reservation did not add for %1 contact(s).',
-        array(1 => (count($this->_contactIds) - $countVoters))
+      CRM_Core_Session::setStatus(ts('Reservation did not add for %count contact.',
+        array(
+          'plural' => 'Reservation did not add for %count contacts.',
+          'count' => (count($this->_contactIds) - $countVoters),
+        )
       ), ts('Notice'));
     }
 

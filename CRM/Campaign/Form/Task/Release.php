@@ -159,13 +159,23 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       $query = 'UPDATE civicrm_activity SET is_deleted = 1 WHERE id IN ( ' . implode(', ', $deleteActivityIds) . ' )';
       CRM_Core_DAO::executeQuery($query);
 
-      $status = array(ts("%1 respondent(s) have been released.", array(1 => count($deleteActivityIds))));
-      if (count($this->_contactIds) > count($deleteActivityIds)) {
-        $status[] = ts("%1 respondents did not release.",
-          array(1 => (count($this->_contactIds) - count($deleteActivityIds)))
-        );
+      if ($deleteActivityIds) {
+        $status = ts("Respondent has been released.", array(
+          'count' => count($deleteActivityIds),
+          'plural' => '%count respondents have been released.',
+        ));
+        CRM_Core_Session::setStatus($status, ts('Released'), 'success');
       }
-      CRM_Core_Session::setStatus(implode('&nbsp;', $status), '', 'info');
+
+      if (count($this->_contactIds) > count($deleteActivityIds)) {
+        $status = ts('1 respondent did not release.',
+          array(
+            'count' => (count($this->_contactIds) - count($deleteActivityIds)),
+            'plural' => '%count respondents did not release.',
+          )
+        );
+        CRM_Core_Session::setStatus($status, ts('Notice'), 'alert');
+      }
     }
   }
 
