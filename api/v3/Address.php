@@ -94,6 +94,7 @@ function _civicrm_api3_address_create_spec(&$params) {
   $params['street_parsing'] = array(
     'title' => 'Street Address Parsing',
     'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['world_region'] = array(
     'title' => ts('World Region'),

@@ -75,10 +75,19 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_unsubscribe_create_spec(&$params) {
-  $params['job_id']['api.required'] = 1;
-  $params['job_id']['title'] = 'Mailing Job ID';
-  $params['hash']['api.required'] = 1;
-  $params['hash']['title'] = 'Mailing Hash';
-  $params['event_queue_id']['api.required'] = 1;
-  $params['event_queue_id']['title'] = 'Mailing Queue ID';
+  $params['job_id'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Job ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['hash'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Hash',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['event_queue_id'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Queue ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }

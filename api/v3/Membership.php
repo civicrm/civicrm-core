@@ -152,6 +152,7 @@ function _civicrm_api3_membership_create_spec(&$params) {
   $params['skipStatusCal'] = array(
     'title' => 'Skip status calculation',
     'description' => 'By default this is 0 if id is not set and 1 if it is set.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['num_terms'] = array(
     'title' => 'Number of terms',
