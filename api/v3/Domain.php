@@ -117,7 +117,10 @@ function civicrm_api3_domain_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_get_spec(&$params) {
-  $params['current_domain'] = array('title' => "get loaded domain");
+  $params['current_domain'] = array(
+    'title' => "Current Domain",
+    'description' => "get loaded domain",
+  );
 }
 
 /**
