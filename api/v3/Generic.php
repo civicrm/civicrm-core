@@ -77,6 +77,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $action = CRM_Utils_Array::value('action', $apiRequest['params']);
   $sequential = empty($apiRequest['params']) ? 0 : 1;
   $apiOptions = CRM_Utils_Array::value('options', $apiRequest['params'], array());
+  $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
+
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
   }
@@ -149,6 +151,11 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'api.required' => 1,
         ),
       );
+      if (array_intersect(array('all', 'field'), $optionsToResolve)) {
+        $options = civicrm_api3_generic_getfields(array('entity' => $entity, array('params' => array('action' => 'create'))));
+        $options = CRM_Utils_Array::collect('title', $options['values']);
+        $metadata['field']['options'] = empty($apiRequest['sequential']) ? $options : CRM_Utils_Array::makeNonAssociative($options);
+      }
       break;
 
     default:
@@ -176,14 +183,12 @@ function civicrm_api3_generic_getfields($apiRequest) {
     $helper($metadata, $apiRequest);
   }
 
-  $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
-
   foreach ($metadata as $fieldname => $fieldSpec) {
     // Ensure 'name' is set
     if (!isset($fieldSpec['name'])) {
       $metadata[$fieldname]['name'] = $fieldname;
     }
-    _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve);
+    _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest, $fieldname, $fieldSpec, $optionsToResolve);
   }
 
   $results[$entity][$action][$sequential] = civicrm_api3_create_success($metadata, $apiRequest['params'], $entity, 'getfields');
@@ -359,7 +364,6 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param $apiRequest
  */
 function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
-  $contexts = array_combine(array_keys(CRM_Core_DAO::buildOptionsContext()), array_keys(CRM_Core_DAO::buildOptionsContext()));
   $params += array(
     'field' => array(
       'title' => 'Field name',
@@ -368,10 +372,28 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
     ),
     'context' => array(
       'title' => 'Context',
-      'options' => !empty($apiRequest['sequential']) ? CRM_Utils_Array::makeNonAssociative($contexts) : $contexts,
       'type' => CRM_Utils_Type::T_STRING,
     ),
   );
+
+  $apiOptions = CRM_Utils_Array::value('options', $apiRequest['params'], array());
+  $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
+
+  // Add available options to these params if requested
+  if (array_intersect(array('all', 'context'), $optionsToResolve)) {
+    $contexts = array_combine(array_keys(CRM_Core_DAO::buildOptionsContext()), array_keys(CRM_Core_DAO::buildOptionsContext()));
+    $params['context']['options'] = empty($apiRequest['sequential']) ? $contexts : CRM_Utils_Array::makeNonAssociative($contexts);
+  }
+  if (array_intersect(array('all', 'field'), $optionsToResolve)) {
+    $fields = civicrm_api3_generic_getfields(array('entity' => $apiRequest['entity'], array('params' => array('action' => 'create'))));
+    $options = array();
+    foreach ($fields['values'] as $name => $field) {
+      if (isset($field['pseudoconstant']) || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_BOOLEAN) {
+        $options[$name] = CRM_Utils_Array::value('title', $field, $name);
+      }
+    }
+    $params['field']['options'] = empty($apiRequest['sequential']) ? $options : CRM_Utils_Array::makeNonAssociative($options);
+  }
 }
 
 /**
@@ -395,7 +417,7 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
  * @param array $fieldSpec
  *   Metadata for that field.
  * @param array $fieldsToResolve
- *   Anny field resolutions specifically requested.
+ *   Any field resolutions specifically requested.
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve) {
   if (empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['option_group_id'])) {

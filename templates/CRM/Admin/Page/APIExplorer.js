@@ -24,7 +24,7 @@
     NO_OPERATORS = ['create', 'update', 'delete', 'setvalue', 'getoptions', 'getactions', 'getfields'],
 
     // Actions that don't support multiple values
-    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields'],
+    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields', 'setvalue'],
 
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
