@@ -177,13 +177,20 @@ function civicrm_api3_mailing_a_b_submit($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
-  $params['criteria']['title'] = 'Criteria';
-  $params['criteria']['default'] = 'Open';
+  $params['criteria'] = array(
+    'title' => 'Criteria',
+    'default' => 'Open',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+
   // mailing_ab_winner_criteria
   $params['target_date']['title'] = 'Target Date';
   $params['target_date']['type'] = CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME;
-  $params['split_count']['title'] = 'Split Count';
-  $params['split_count']['api.default'] = 6;
+  $params['split_count'] = array(
+    'title' => 'Split Count',
+    'api.default' => 6,
+    'type' => CRM_Utils_Type::T_INT,
+  );
   $params['split_count_select']['title'] = 'Split Count Select';
   $params['split_count_select']['api.required'] = 1;
   $params['target_url']['title'] = 'Target URL';

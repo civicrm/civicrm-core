@@ -60,8 +60,14 @@ function civicrm_api3_system_flush($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_system_flush_spec(&$params) {
-  $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
-  $params['session'] = array('title' => 'refresh sessions (boolean)');
+  $params['triggers'] = array(
+    'title' => 'rebuild triggers (boolean)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['session'] = array(
+    'title' => 'refresh sessions (boolean)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**

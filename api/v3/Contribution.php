@@ -85,6 +85,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     // field is called payment processor - not payment processor id but can only be one id so
     // it seems likely someone will fix it up one day to be more consistent - lets alias it from the start
     'api.aliases' => array('payment_processor_id'),
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id', 'contribution_type');
   $params['financial_type_id']['api.required'] = 1;
@@ -245,8 +246,11 @@ function _civicrm_api3_format_soft_credit(&$contribution) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_contribution_get_spec(&$params) {
-  $params['contribution_test']['api.default'] = 0;
-  $params['contribution_test']['title'] = 'Get Test Contributions?';
+  $params['contribution_test'] = array(
+    'api.default' => 0,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'title' => 'Get Test Contributions?'
+  );
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['contact_id'] = $params['contribution_contact_id'];
   $params['contact_id']['api.aliases'] = array('contribution_contact_id');
@@ -363,22 +367,28 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
   $params['id'] = array(
     'api.required' => 1,
     'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['receipt_from_email'] = array(
     'api.required' => 1,
     'title' => 'From Email address (string) required until someone provides a patch :-)',
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['receipt_from_name'] = array(
     'title' => 'From Name (string)',
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['cc_receipt'] = array(
     'title' => 'CC Email address (string)',
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['bcc_receipt'] = array(
     'title' => 'BCC Email address (string)',
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['receipt_text'] = array(
     'title' => 'Message (string)',
+    'type' => CRM_Utils_Type::T_STRING,
   );
 }
 

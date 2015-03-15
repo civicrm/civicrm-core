@@ -127,6 +127,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
   $params['dupe_check'] = array(
     'title' => 'Check for Duplicates',
     'description' => 'Throw error if contact create matches dedupe rule',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['prefix_id']['api.aliases'] = array('individual_prefix', 'individual_prefix_id');
   $params['suffix_id']['api.aliases'] = array('individual_suffix', 'individual_suffix_id');
@@ -172,37 +173,127 @@ function _civicrm_api3_contact_get_spec(&$params) {
 
   // We declare all these pseudoFields as there are other undocumented fields accessible
   // via the api - but if check permissions is set we only allow declared fields
-  $params['address_id']['title'] = 'Primary Address ID';
-  $params['street_address']['title'] = 'Primary Address Street Address';
-  $params['supplemental_address_1']['title'] = 'Primary Address Supplemental Address 1';
-  $params['supplemental_address_2']['title'] = 'Primary Address Supplemental Address 2';
-  $params['current_employer']['title'] = 'Current Employer';
-  $params['city']['title'] = 'Primary Address City';
-  $params['postal_code_suffix']['title'] = 'Primary Address Post Code Suffix';
-  $params['postal_code']['title'] = 'Primary Address Post Code';
-  $params['geo_code_1']['title'] = 'Primary Address Latitude';
-  $params['geo_code_2']['title'] = 'Primary Address Longitude';
-  $params['state_province_id']['title'] = 'Primary Address State Province ID';
-  $params['state_province_name']['title'] = 'Primary Address State Province Name';
-  $params['state_province']['title'] = 'Primary Address State Province';
-  $params['country_id']['title'] = 'Primary Address Country ID';
-  $params['country']['title'] = 'Primary Address country';
-  $params['worldregion_id']['title'] = 'Primary Address World Region ID';
-  $params['worldregion']['title'] = 'Primary Address World Region';
-  $params['phone_id']['title'] = 'Primary Phone ID';
-  $params['phone']['title'] = 'Primary Phone';
-  $params['phone_type_id']['title'] = 'Primary Phone Type ID';
-  $params['provider_id']['title'] = 'Primary Phone Provider ID';
-  $params['email_id']['title'] = 'Primary Email ID';
-  $params['email']['title'] = 'Primary Email';
-  $params['gender_id']['title'] = 'Gender ID';
-  $params['gender']['title'] = 'Gender';
-  $params['on_hold']['title'] = 'Primary Email On Hold';
-  $params['im']['title'] = 'Primary Instant Messenger';
-  $params['im_id']['title'] = 'Primary Instant Messenger ID';
-  $params['group_id']['title'] = 'Group Memberships (filter)';
-  $params['group']['title'] = 'Group Memberships (filter, array)';
-  $params['tag']['title'] = 'Assigned tags (filter, array)';
+  $params['address_id'] = array(
+    'title' => 'Primary Address ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['street_address'] = array(
+    'title' => 'Primary Address Street Address',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['supplemental_address_1'] = array(
+    'title' =>'Primary Address Supplemental Address 1',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['supplemental_address_2'] = array(
+    'title' =>'Primary Address Supplemental Address 2',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['current_employer'] = array(
+    'title' =>'Current Employer',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['city'] = array(
+    'title' =>'Primary Address City',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['postal_code_suffix'] = array(
+    'title' =>'Primary Address Post Code Suffix',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['postal_code'] = array(
+    'title' =>'Primary Address Post Code',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['geo_code_1'] = array(
+    'title' =>'Primary Address Latitude',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['geo_code_2'] = array(
+    'title' =>'Primary Address Longitude',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['state_province_id'] = array(
+    'title' =>'Primary Address State Province ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['state_province_name'] = array(
+    'title' =>'Primary Address State Province Name',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['state_province'] = array(
+    'title' =>'Primary Address State Province',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['country_id'] = array(
+    'title' =>'Primary Address Country ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['country'] = array(
+    'title' =>'Primary Address country',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['worldregion_id'] = array(
+    'title' =>'Primary Address World Region ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['worldregion'] = array(
+    'title' =>'Primary Address World Region',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['phone_id'] = array(
+    'title' =>'Primary Phone ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['phone'] = array(
+    'title' =>'Primary Phone',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['phone_type_id'] = array(
+    'title' =>'Primary Phone Type ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['provider_id'] = array(
+    'title' =>'Primary Phone Provider ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['email_id'] = array(
+    'title' =>'Primary Email ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['email'] = array(
+    'title' =>'Primary Email',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['gender_id'] = array(
+    'title' =>'Gender ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['gender'] = array(
+    'title' =>'Gender',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['on_hold'] = array(
+    'title' =>'Primary Email On Hold',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['im'] = array(
+    'title' =>'Primary Instant Messenger',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['im_id'] = array(
+    'title' =>'Primary Instant Messenger ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['group_id'] = array(
+    'title' =>'Group Memberships (filter)',
+  );
+  $params['group'] = array(
+    'title' =>'Group Memberships (filter, array)',
+  );
+  $params['tag'] = array(
+    'title' =>'Assigned tags (filter, array)',
+  );
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
   $params['deceased_date_low'] = array('name' => 'deceased_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
@@ -885,12 +976,22 @@ function civicrm_api3_contact_merge($params) {
  * @param array $params
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
-  $params['latitude']['api.required'] = 1;
-  $params['latitude']['title'] = 'Latitude';
-  $params['longitude']['api.required'] = 1;
-  $params['longitude']['title'] = 'Longitude';
-  $params['unit']['api.default'] = 'meter';
-  $params['unit']['title'] = 'Unit of Measurement';
+  $params['latitude'] = array(
+    'title' =>'Latitude',
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['longitude'] = array(
+    'title' =>'Longitude',
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+
+  $params['unit'] = array(
+    'title' =>'Unit of Measurement',
+    'api.default' => 'meter',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
 }
 
 /**

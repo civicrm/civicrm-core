@@ -136,10 +136,12 @@ function civicrm_api3_generic_getfields($apiRequest) {
           'name' => 'field',
           'title' => 'Field name',
           'api.required' => 1,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'context' => array(
           'name' => 'context',
           'title' => 'Context',
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
       break;
@@ -268,8 +270,11 @@ function civicrm_api3_generic_getvalue($apiRequest) {
  * @param array $params
  */
 function _civicrm_api3_generic_getrefcount_spec(&$params) {
-  $params['id']['api.required'] = 1;
-  $params['id']['title'] = 'Entity ID';
+  $params['id'] = array(
+    'api.required' => 1,
+    'title' => 'Entity ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }
 
 /**

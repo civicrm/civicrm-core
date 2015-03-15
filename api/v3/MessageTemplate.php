@@ -111,12 +111,26 @@ function civicrm_api3_message_template_send($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_message_template_send_spec(&$params) {
-  $params['messageTemplateID']['api.required'] = 1;
-  $params['messageTemplateID']['title'] = 'Message Template ID';
-  $params['contactId']['api.required'] = 1;
-  $params['contactId']['title'] = 'Contact ID';
-  $params['toEmail']['api.required'] = 1;
-  $params['toEmail']['title'] = 'To Email';
-  $params['toName']['api.required'] = 1;
-  $params['toName']['title'] = 'To Name';
+  $params['messageTemplateID'] = array(
+    'api.required' => 1,
+    'title' => 'Message Template ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+
+  $params['contactId'] = array(
+    'api.required' => 1,
+    'title' => 'Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['toEmail'] = array(
+    'api.required' => 1,
+    'title' => 'To Email',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+
+  $params['toName'] = array(
+    'api.required' => 1,
+    'title' => 'To Name',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
 }

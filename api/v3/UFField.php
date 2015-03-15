@@ -111,8 +111,12 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => TRUE,
   );
-  $params['created_id']['api.default'] = 'user_contact_id';
-  $params['created_id']['title']  = 'Created By';
+  $params['created_id'] = array(
+    'api.default' => 'user_contact_id',
+    'title'  => 'Created By',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+
   $params['is_active']['api.default'] = TRUE;
 }
 

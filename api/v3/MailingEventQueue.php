@@ -85,6 +85,10 @@ function civicrm_api3_mailing_event_queue_delete($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
-  $params['job_id']['api.required'] = 1;
+  $params['job_id'] = array(
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+    'title' => 'Job ID',
+  );
   $params['contact_id']['api.required'] = 1;
 }
