@@ -23,6 +23,9 @@
     // Actions that don't support fancy operators
     NO_OPERATORS = ['create', 'update', 'delete', 'setvalue', 'getoptions', 'getactions', 'getfields'],
 
+    // Actions that don't support multiple values
+    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields'],
+
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
@@ -266,7 +269,7 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
-    if (isYesNo(fieldName)) {
+    if (isYesNo(fieldName) || _.includes(NO_MULTI, action)) {
       return false;
     }
     if (_.includes(MULTI, operator)) {
