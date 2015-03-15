@@ -79,15 +79,24 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedGrants = 0;
+    $deleted = $failed = 0;
     foreach ($this->_grantIds as $grantId) {
       if (CRM_Grant_BAO_Grant::del($grantId)) {
-        $deletedGrants++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus(ts('Deleted Grant(s): %1', array(1 => $deletedGrants)), '', 'info');
-    CRM_Core_Session::setStatus(ts('Total Selected Grant(s): %1', array(1 => count($this->_grantIds))), '', 'info');
+    if ($deleted) {
+      $msg = ts('%count grant deleted.', array('plural' => '%count grants deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }
