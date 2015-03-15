@@ -283,7 +283,7 @@
     <td colspan="3">
       <label for="api-return-value"><%- title %>:</label> &nbsp;
       <input type="hidden" class="api-param-name" value="return" />
-      <input style="width: 50%;" id="api-return-value" class="crm-form-text api-param-value api-input" placeholder="{ts}Leave blank for default{/ts}"/>
+      <input style="width: 50%;" id="api-return-value" class="crm-form-text api-param-value api-input"/>
     </td>
   </tr>
 </script>
