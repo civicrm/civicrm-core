@@ -243,6 +243,10 @@
     }
   }
 
+  function isYesNo(fieldName) {
+    return getFieldData[fieldName] && getFieldData[fieldName].type === 16;
+  }
+
   /**
    * Should we render a select or textfield?
    *
@@ -251,7 +255,7 @@
    * @returns boolean
    */
   function isSelect(fieldName, operator) {
-    return (options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && !_.includes(TEXT, operator);
+    return (isYesNo(fieldName) || options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && !_.includes(TEXT, operator);
   }
 
   /**
@@ -262,6 +266,9 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
+    if (isYesNo(fieldName)) {
+      return false;
+    }
     if (_.includes(MULTI, operator)) {
       return true;
     }
@@ -309,8 +316,14 @@
       else if (!multiSelect && _.includes(currentVal, ',')) {
         $valField.val(currentVal.split(',')[0]);
       }
+      // Yes-No options
+      if (isYesNo(name)) {
+        $valField.select2({
+          data: [{id: 1, text: ts('Yes')}, {id: 0, text: ts('No')}]
+        });
+      }
       // Select options
-      if (options[name]) {
+      else if (options[name]) {
         $valField.select2({
           multiple: multiSelect,
           data: _.map(options[name], function (value, key) {
