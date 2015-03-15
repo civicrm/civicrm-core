@@ -158,18 +158,34 @@
         CRM.alert(data.deprecated, entity + ' Deprecated');
       }
       showFields(required);
-      if (action === 'get' || action === 'getsingle' || action === 'getstat') {
-        showReturn(action === 'getstat' ? ts('Group by') : ts('Fields to return'));
+      if (action === 'get' || action === 'getsingle' || action == 'getvalue' || action === 'getstat') {
+        showReturn();
       }
     });
   }
 
   /**
    * For "get" actions show the "return" options
+   *
+   * TODO: Too many hard-coded actions here. Need a way to fetch this from metadata
    */
-  function showReturn(title) {
+  function showReturn() {
+    var title = ts('Fields to return'),
+      params = {
+        data: fields,
+        multiple: true,
+        placeholder: ts('Leave blank for default')
+      };
+    if (action == 'getstat') {
+      title = ts('Group by');
+    }
+    if (action == 'getvalue') {
+      title = ts('Return Value');
+      params.placeholder = ts('Select field');
+      params.multiple = false;
+    }
     $('#api-params').prepend($(returnTpl({title: title})));
-    $('#api-return-value').crmSelect2({data: fields, multiple: true});
+    $('#api-return-value').crmSelect2(params);
   }
 
   /**
