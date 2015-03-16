@@ -188,4 +188,21 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $financialType;
   }
 
+  /**
+   * adding permissions for financial types
+   *
+   *
+   * @param array $permissions an array of permissions
+   */
+  public static function permissionedFinancialTypes(&$permissions) {
+    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    $prefix = ts('CiviCRM') . ': ';
+    foreach ($financialTypes as $id => $type) {
+      $permissions['add new contributions of type ' . $type] = $prefix . ts('add new contributions of type ' . $type);
+      $permissions['view contributions of type ' . $type] = $prefix . ts('view contributions of type ' . $type);
+      $permissions['edit contributions of type ' . $type] = $prefix . ts('edit contributions of type ' . $type);
+      $permissions['delete contributions of type ' . $type] = $prefix . ts('delete contributions of type ' . $type);
+    }
+    $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
+  }
 }
