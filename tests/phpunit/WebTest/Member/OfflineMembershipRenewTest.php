@@ -96,10 +96,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table[@class='display dataTable no-footer']/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']/div/table/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->click("xpath=//div[@id='memberships']/div/table[@class='display dataTable no-footer']/tbody/tr/td[9]/span[1]/a[1][text()='View']");
 
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
