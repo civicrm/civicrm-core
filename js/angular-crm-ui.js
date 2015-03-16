@@ -129,9 +129,9 @@
           // string, e.g. "myform.myfield"
           crmUiField: '@',
           // string, an expression producing a printable title
-          crmTitle: '@',
+          crmTitle: '=',
           // string, an expression producing a help id
-          crmHelp: '@'
+          crmHelp: '='
         },
         templateUrl: function(tElement, tAttrs){
           var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
@@ -141,9 +141,7 @@
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
           scope.crmUiField = attrs.crmUiField;
-          scope.crmTitle = attrs.crmTitle;
-          scope.crmHelp = attrs.crmHelp;
-          scope.crmUiHelpFile = scope.$parent.crmUiHelpFile;
+          scope.crmUiHelpFile = scope.$parent.crmUiHelpFile; // propagate default
         }
       };
     })
