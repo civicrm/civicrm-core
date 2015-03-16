@@ -1163,16 +1163,19 @@ SELECT is_primary,
       CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type '%1'", array(1 => $relationshipType)));
     }
 
-    // create relationship
-    $relationshipParams = array(
-      'is_active' => TRUE,
-      'relationship_type_id' => $relTypeId . '_a_b',
-      'contact_check' => array($sharedContactId => TRUE),
-    );
-
-    list($valid, $invalid, $duplicate,
-      $saved, $relationshipIds
-      ) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationshipParams, $cid);
+    try {
+      // create relationship
+      civicrm_api3('relationship', 'create', array(
+        'is_active' => TRUE,
+        'relationship_type_id' => $relTypeId,
+        'contact_id_a' => $cid,
+        'contact_id_b' => $sharedContactId,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // We catch and ignore here because this has historically been a best-effort relationship create call.
+      // presumably it could refuse due to duplication or similar and we would ignore that.
+    }
   }
 
   /**
