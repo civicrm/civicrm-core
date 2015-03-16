@@ -70,18 +70,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    */
   public static function create(&$params, $contactID) {
 
+    if (empty($params['website'])) {
+      return FALSE;
+    }
+
     // CRM-10551
     // Use updateBlankLocInfo to overwrite blanked values of matching type
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
 
-    // Get the websites submitted in the form
+    // Get websites submitted in the form, and already on the Contact
     $submitted_websites = $params['website'];
-
-    if (empty($submitted_websites)) {
-      return FALSE;
-    }
-
-    // Get the websites currently on the Contact
     $existing_websites = self::allWebsites($contactID);
 
     // For each website submitted on the form
