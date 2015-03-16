@@ -188,7 +188,7 @@ function loadSurveyList( )
              "bLengthChange": false,
              "aaSorting": [],
              "aoColumns":[{sClass:'crm-survey-id                          hiddenElement' },
-                          {sClass:'crmf-title crm-editable'                                     },
+                          {sClass:'crmf-title'                                     },
                           {sClass:'crm-survey-campaign_id                 hiddenElement' },
                           {sClass:'crm-survey-campaign'                                  },
                           {sClass:'crm-survey-activity_type_id            hiddenElement' },
@@ -216,6 +216,8 @@ function loadSurveyList( )
                CRM.$('.crm-editable').crmEditable();
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+               // Crm-editable
+               CRM.$(nRow).children().eq(1).addClass('crm-editable');
          //insert the id for each row for enable/disable.
          var rowId = 'survey-' + aData[0];
          CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');

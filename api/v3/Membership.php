@@ -150,10 +150,12 @@ function _civicrm_api3_membership_create_spec(&$params) {
   $params['membership_type_id']['api.aliases'] = array('membership_type');
   $params['status_id']['api.aliases'] = array('membership_status');
   $params['skipStatusCal'] = array(
-    'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.',
+    'title' => 'Skip status calculation',
+    'description' => 'By default this is 0 if id is not set and 1 if it is set.',
   );
   $params['num_terms'] = array(
-    'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.',
+    'title' => 'Number of terms',
+    'description' => 'Terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.',
     'type' => CRM_Utils_Type::T_INT,
   );
 }
@@ -169,7 +171,8 @@ function _civicrm_api3_membership_create_spec(&$params) {
 function _civicrm_api3_membership_get_spec(&$params) {
   $params['membership_type_id']['api.aliases'] = array('membership_type');
   $params['active_only'] = array(
-    'title' => 'Only retrieve active memberships',
+    'title' => 'Active Only',
+    'description' => 'Only retrieve active memberships',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   );
 }

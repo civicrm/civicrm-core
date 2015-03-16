@@ -43,8 +43,6 @@
 function civicrm_api3_generic_setValue($apiRequest) {
   $entity = $apiRequest['entity'];
   $params = $apiRequest['params'];
-  // we can't use _spec, doesn't work with generic
-  civicrm_api3_verify_mandatory($params, NULL, array('id', 'field', 'value'));
   $id = $params['id'];
   if (!is_numeric($id)) {
     return civicrm_api3_create_error(ts('Please enter a number'), array(

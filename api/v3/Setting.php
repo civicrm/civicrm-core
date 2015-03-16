@@ -80,9 +80,18 @@ function civicrm_api3_setting_getfields($params) {
  * @param array $params
  */
 function _civicrm_api3_setting_getfields_spec(&$params) {
-  $params['filters'] = array('title' => 'Fields you wish to filter by e.g. array("group_name" => "CiviCRM Preferences")');
-  $params['component_id'] = array('title' => 'id of relevant component');
-  $params['profile'] = array('title' => 'profile is passed through to hooks & added to cachestring');
+  $params['filters'] = array(
+    'title' => 'Filters',
+    'description' => 'Fields you wish to filter by e.g. array("group_name" => "CiviCRM Preferences")',
+  );
+  $params['component_id'] = array(
+    'title' => 'Component ID',
+    'description' => 'ID of relevant component',
+  );
+  $params['profile'] = array(
+    'title' => 'Profile',
+    'description' => 'Profile is passed through to hooks & added to cachestring',
+  );
 }
 
 /**
@@ -168,8 +177,14 @@ function civicrm_api3_setting_revert(&$params) {
  * @param array $params
  */
 function _civicrm_api3_setting_revert_spec(&$params) {
-  $params['name'] = array('title' => 'Setting Name belongs to');
-  $params['component_id'] = array('title' => 'id of relevant component');
+  $params['name'] = array(
+    'title' => 'Name',
+    'description' => 'Setting Name belongs to',
+  );
+  $params['component_id'] = array(
+    'title' => 'Component ID',
+    'description' => 'ID of relevant component',
+  );
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
     'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the current domain'
@@ -211,8 +226,14 @@ function civicrm_api3_setting_fill(&$params) {
  * @param array $params
  */
 function _civicrm_api3_setting_fill_spec(&$params) {
-  $params['name'] = array('title' => 'Setting Name belongs to');
-  $params['component_id'] = array('title' => 'id of relevant component');
+  $params['name'] = array(
+    'title' => 'Name',
+    'description' => 'Setting Name belongs to',
+  );
+  $params['component_id'] = array(
+    'title' => 'Component ID',
+    'description' => 'ID of relevant component',
+  );
   $params['domain_id'] = array(
     'api.default' => 'current_domain',
     'title' => 'Setting Domain',

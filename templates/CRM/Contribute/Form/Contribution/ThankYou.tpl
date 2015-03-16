@@ -56,8 +56,7 @@
       {if $is_email_receipt}
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
-            {ts 1=$email 2=$onBehalfEmail}An email confirmation with these payment instructions has been sent to %1 and
-              to %2.{/ts}
+            {ts 1=$email 2=$onBehalfEmail}An email confirmation with these payment instructions has been sent to %1 and to %2.{/ts}
           {else}
             {ts 1=$email}An email confirmation with these payment instructions has been sent to %1.{/ts}
           {/if}
@@ -68,8 +67,7 @@
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
-          {ts 1=$email 2=$onBehalfEmail}An email receipt will be sent to %1 and to %2 once the transaction is processed
-          successfully.{/ts}
+          {ts 1=$email 2=$onBehalfEmail}An email receipt will be sent to %1 and to %2 once the transaction is processed successfully.{/ts}
         {else}
           {ts 1=$email}An email receipt will be sent to %1 once the transaction is processed successfully.{/ts}
         {/if}

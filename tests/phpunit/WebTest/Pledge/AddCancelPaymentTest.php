@@ -119,7 +119,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[14]/td[7]", "Pending");
 
     // verify that Balance sum is correct
-    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]", "1,200.00");
+    $this->verifyText("xpath=//form[@class='CRM_Pledge_Form_Search crm-search-form']//div[@class='view-content']//table//tbody/tr[1]/td[4]", "1,200.00");
 
   }
 

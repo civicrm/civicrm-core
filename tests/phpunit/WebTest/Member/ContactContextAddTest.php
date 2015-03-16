@@ -140,7 +140,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->select("membership_type_id[1]", "label={$lifeTimeMemTypeParams['membership_type']}");
 
     $this->waitForElementPresent("xpath=//form[@id='Membership']/div[2]/div[2]//table/tbody//tr[@class='crm-membership-form-block-end_date']/td[2]");
-    $this->click("xpath=//form[@id='Membership']/div[2]/div[2]//table/tbody//tr[@class='crm-membership-form-block-end_date']/td[2]/a[@title='Clear']");
+    $this->click("xpath=//form[@id='Membership']/div[2]/div[2]/table/tbody//tr[@class='crm-membership-form-block-end_date']/td[2]/a");
 
     $this->click("_qf_Membership_upload-bottom");
 
