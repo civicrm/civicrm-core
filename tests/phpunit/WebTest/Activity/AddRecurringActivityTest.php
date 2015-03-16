@@ -86,14 +86,18 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Jane, $contact2", 'Contact not found in line ' . __LINE__);
 
-    $subject = "Test activity recursion";
+    if ($this->isTextPresent("A copy of this activity will be emailed to each Assignee.")) {
+      $isAssigneeNotificationEnabled = TRUE;
+    }
+
+    $subject = "Test activity recursion " . substr(sha1(rand()), 0, 7);
     $this->type("subject", $subject);
     $this->type("duration", "30");
 
     //Lets configure recursion for activity
     $this->click("css=.crm-activity-form-block-recurring_activity div.crm-accordion-header");
     $this->click('repetition_frequency_unit');
-    $this->select('repetition_frequency_unit', 'label=monthly');
+    $this->select('repetition_frequency_unit', 'label=month');
     $this->click('repetition_frequency_interval');
     $this->select('repetition_frequency_interval', 'label=1');
     $this->click('CIVICRM_QFID_1_repeats_by');
@@ -107,20 +111,25 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
     $this->type('start_action_offset', $occurrences);
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForTextPresent('Based on your repeat configuration, here is the list of dates. Do you wish to create a recurring set with these dates?');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Ok']");
+    $this->waitForTextPresent('A recurring set will be created with the following dates.');
+
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Continue']");
     $this->waitForPageToLoad();
 
     //Lets go to search screen and see if the records new activities are created()
     $this->openCiviPage("activity/search", "?reset=1", '_qf_Search_refresh');
-    $search_subject = 'Test activity recursion';
-    $this->type('activity_subject', $search_subject);
+    $this->type('activity_subject', $subject);
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad();
 
     //Minus tr having th and parent activity
     $countOfActivities = $this->getXpathCount("//div[@class='crm-search-results']/table/tbody/tr");
     $countOfActivities = $countOfActivities - 2;
+
+    if (!empty($isAssigneeNotificationEnabled)) {
+      $countOfActivities--;
+    }
+
     $this->assertEquals($occurrences, $countOfActivities);
     $this->assertTrue($this->isTextPresent("Recurring Activity - (Child)"));
     $this->assertTrue($this->isTextPresent("Recurring Activity - (Parent)"));
@@ -128,12 +137,12 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     //Cascade changes
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
-    $this->type('subject', 'Test activity recursion modified');
+    $this->type('subject', "{$subject} modified");
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
-    $this->click("xpath=//div[@id='recurring-dialog']/div[@class='show-block']/div[@class='recurring-dialog-inner-wrapper']/div[@class='recurring-dialog-inner-left']/button[text()='This and Following entities']");
+    $this->click("xpath=//input[@id='recur-this-and-all-following-entity']");
     $this->waitForAjaxContent();
-    $this->type('activity_subject', 'Test activity recursion modified');
+    $this->type('activity_subject', "{$subject} modified");
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad();
     $countOfActivities = $this->getXpathCount("xpath=//div[@class='crm-search-results']/table/tbody/tr");

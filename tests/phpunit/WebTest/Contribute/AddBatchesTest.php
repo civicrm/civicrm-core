@@ -134,7 +134,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Batch_next");
     $this->click("title");
     $this->type("title", $batchTitle);
-    $this->select("type_id", "Pledge");
+    $this->select("type_id", "Pledge Payment");
     $this->type("item_count", $itemCount);
     $this->type("total", 200);
     $this->click("_qf_Batch_next");

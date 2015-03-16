@@ -703,7 +703,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Financial Type' => $fields['values'][$fields['id']]['financial_type'],
       'Contribution Amount' => $fields['values'][$fields['id']]['total_amount'],
       'Contribution Status' => $fields['values'][$fields['id']]['contribution_status'],
-      'Paid By' => $fields['values'][$fields['id']]['contribution_payment_instrument'],
+      'Paid By' => $fields['values'][$fields['id']]['payment_instrument'],
       'Check Number' => $fields['values'][$fields['id']]['contribution_check_number'],
     );
 
