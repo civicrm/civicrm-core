@@ -443,7 +443,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       'Relationship'
     );
 
-    // Save relationships
+    // Save the relationships.
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
     $relationshipIds = $outcome['relationship_ids'];
     $this->setMessage($outcome);
@@ -476,31 +476,28 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    // Membership for related contacts CRM-1657
-    // @todo this belongs in the BAO.
-    // DOES THIS REALLY MEAN MEMBERSHIPS ARE NOT CREATED IF LOGGED IN USER DOESN'T HAVE PERMISSION!!
-    if (CRM_Core_Permission::access('CiviMember') && (!$duplicate)) {
-      $params['relationship_ids'] = $relationshipIds;
-      if ($this->_action & CRM_Core_Action::ADD && !empty($params['is_active'])) {
-        CRM_Contact_BAO_Relationship::relatedMemberships($this->_contactId,
-          $params, $ids,
-          $this->_action
-        );
-      }
-      elseif ($this->_action & CRM_Core_Action::UPDATE) {
-        //fixes for CRM-7985
-        //only if the relationship has been toggled to enable /disable
-        if (CRM_Utils_Array::value('is_active', $params) != $this->_enabled) {
-          $active = !empty($params['is_active']) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
-          CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
-        }
-      }
-      // Refresh contact tabs which might have been affected
-      $this->ajaxResponse['updateTabs'] = array(
-        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
+    $params['relationship_ids'] = $relationshipIds;
+
+    if ($this->_action & CRM_Core_Action::ADD && !empty($params['is_active'])) {
+      CRM_Contact_BAO_Relationship::relatedMemberships($this->_contactId,
+        $params, $ids,
+        $this->_action
       );
     }
+    elseif ($this->_action & CRM_Core_Action::UPDATE) {
+      //fixes for CRM-7985
+      //only if the relationship has been toggled to enable /disable
+      if (CRM_Utils_Array::value('is_active', $params) != $this->_enabled) {
+        $active = !empty($params['is_active']) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
+        CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
+      }
+    }
+    // Refresh contact tabs which might have been affected
+    $this->ajaxResponse['updateTabs'] = array(
+      '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
+      '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
+    );
+
     // Set current employee/employer relationship, CRM-3532
     if ($params['is_current_employer'] && $this->_allRelationshipNames[$params['relationship_type_id']]["name_a_b"] ==
     'Employee of') {
