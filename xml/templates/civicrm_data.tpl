@@ -376,6 +376,8 @@ VALUES
  -- for Print or Email Contribution Invoices
    (@option_group_id_act, '{ts escape="sql"}Downloaded Invoice{/ts}', 49, 'Downloaded Invoice',      NULL, 1, NULL, 49, '{ts escape="sql"}Downloaded Invoice.{/ts}',0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Emailed Invoice{/ts}', 50, 'Emailed Invoice',      NULL, 1, NULL, 50, '{ts escape="sql"}Emailed Invoice.{/ts}',0, 1, 1, NULL, NULL),
+ -- for manual contact merge
+   (@option_group_id_act, '{ts escape="sql"}Contact Merged{/ts}', 51, 'Contact Merged', NULL, 1, NULL, 51, '{ts escape="sql"}Contact Merged{/ts}',0, 1, 1, NULL, NULL), 
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}',      1, 'Female',      NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',        2, 'Male',        NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
