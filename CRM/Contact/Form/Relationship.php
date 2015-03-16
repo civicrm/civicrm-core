@@ -26,16 +26,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * This class generates form components for relationship
- *
+ * This class generates form components for relationship.
  */
 class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
@@ -210,11 +201,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Relationship that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -275,9 +262,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * add the rules for form.
-   *
-   * @return void
+   * Add the rules for form.
    */
   public function addRules() {
     if ($this->_cdType) {
@@ -291,8 +276,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -399,13 +382,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   *  This function is called when the form is submitted.
-   *
-   *
-   * @return void
+   * This function is called when the form is submitted.
    */
   public function postProcess() {
-    // store the submitted values in an array
+    // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
     // action is taken depending upon the mode
@@ -414,24 +394,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       return;
     }
 
-    $ids = array('contact' => $this->_contactId);
-
-    $relationshipTypeId = str_replace(array('_', 'a', 'b'), '', $params['relationship_type_id']);
-
-    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
-    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
-    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
+    $relationshipTypeParts = explode('_', $params['relationship_type_id']);
+    $params['relationship_type_id'] = $relationshipTypeParts[0];
+    if (!$this->_rtype) {
+      // Do we need to wrap this in an if - when is rtype used & is relationship_type_id always set then?
+      $this->_rtype = $params['relationship_type_id'];
+    }
+    $params['contact_id_' .  $relationshipTypeParts[1]] = $this->_contactId;
 
     // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $ids['relationship'] = $this->_relationshipId;
-      $relation = CRM_Contact_BAO_Relationship::getContactIds($this->_relationshipId);
+      $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
+      // @todo this belongs in the BAO.
       if ($this->_isCurrentEmployer) {
         // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
         // clear the current employer. CRM-3235.
-        $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
+        $relChanged = $params['relationship_type_id'] != $this->_values['relationship_type_id'];
         if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
           // Refresh contact summary if in ajax mode
@@ -441,17 +422,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     // Create mode (could be 1 or more relationships)
     else {
-      // Fill up this weird param with contact ids like the weird relationship bao expects
-      $params['contact_check'] = array_fill_keys(explode(',', $params['related_contact_id']), 1);
-      if (!$this->_rtype) {
-        list(, $this->_rtype) = explode('_', $params['relationship_type_id'], 2);
-      }
+      $params['contact_id_' .  $relationshipTypeParts[2]] = explode(',', $params['related_contact_id']);
     }
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], NULL, TRUE);
-    $params['end_date'] = CRM_Utils_Date::processDate($params['end_date'], NULL, TRUE);
 
-    // Process custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $relationshipTypeId);
+    // @todo create multiple probably does this - test!
+    $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $params['relationship_type_id']);
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
       $params,
       $customFields,
@@ -460,43 +435,19 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     // Save relationships
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::createMultiple($params, $ids);
+    $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = $outcome;
+    $this->setMessage($outcome);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
+    // @todo this belongs in the BAO.
     if ($this->_caseId) {
       CRM_Case_BAO_Case::createCaseRoleActivity($this->_caseId, $relationshipIds, $params['contact_check'], $this->_contactId);
     }
 
-    if ($valid) {
-      CRM_Core_Session::setStatus(ts('Relationship created.', array(
-            'count' => $valid,
-            'plural' => '%count relationships created.',
-          )), ts('Saved'), 'success');
-    }
-    if ($invalid) {
-      CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array(
-            'count' => $invalid,
-            'plural' => '%count relationship records were not created due to invalid contact types.',
-          )), ts('%count invalid relationship record', array(
-            'count' => $invalid,
-            'plural' => '%count invalid relationship records',
-          )));
-    }
-    if ($duplicate) {
-      CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array(
-            'count' => $duplicate,
-            'plural' => '%count relationships were not created because they already exist.',
-          )), ts('%count duplicate relationship', array(
-            'count' => $duplicate,
-            'plural' => '%count duplicate relationships',
-          )));
-    }
-    if ($saved) {
-      CRM_Core_Session::setStatus(ts('Relationship record has been updated.'), ts('Saved'), 'success');
-    }
-
     // Save notes
+    // @todo this belongs in the BAO.
     if ($this->_action & CRM_Core_Action::UPDATE || $params['note']) {
       foreach ($relationshipIds as $id) {
         $noteParams = array(
@@ -517,6 +468,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // Membership for related contacts CRM-1657
+    // @todo this belongs in the BAO.
+    // DOES THIS REALLY MEAN MEMBERSHIPS ARE NOT CREATED IF LOGGED IN USER DOESN'T HAVE PERMISSION!!
     if (CRM_Core_Permission::access('CiviMember') && (!$duplicate)) {
       $params['relationship_ids'] = $relationshipIds;
       if ($this->_action & CRM_Core_Action::ADD && !empty($params['is_active'])) {
@@ -540,13 +493,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       );
     }
     // Set current employee/employer relationship, CRM-3532
-    if ($params['is_current_employer'] && $this->_allRelationshipNames[$relationshipTypeId]["name_a_b"] == 'Employee of') {
+    if ($params['is_current_employer'] && $this->_allRelationshipNames[$params['relationship_type_id']]["name_a_b"] ==
+    'Employee of') {
       $employerParams = array();
       foreach ($relationshipIds as $id) {
         // Fixme this is dumb why do we have to look this up again?
-        $rel = CRM_Contact_BAO_Relationship::getContactIds($id);
+        $rel = CRM_Contact_BAO_Relationship::getRelationshipByID($id);
         $employerParams[$rel->contact_id_a] = $rel->contact_id_b;
       }
+      // @todo this belongs in the BAO.
       CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($employerParams);
       // Refresh contact summary if in ajax mode
       $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
@@ -575,6 +530,46 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Set Status message to reflect outcome of the update action.
+   *
+   * @param array $outcome
+   *   Outcome of save action - including
+   *   - 'valid' : Number of valid relationships attempted.
+   *   - 'invalid' : Number of invalid relationships attempted.
+   *   - 'duplicate' : Number of duplicate relationships attempted.
+   *   - 'saved' : boolean of whether save was successful
+   */
+  protected function setMessage($outcome) {
+    if (!empty($outcome['valid'])) {
+      CRM_Core_Session::setStatus(ts('Relationship created.', array(
+        'count' => $outcome['valid'],
+        'plural' => '%count relationships created.',
+      )), ts('Saved'), 'success');
+    }
+    if (!empty($outcome['invalid'])) {
+      CRM_Core_Session::setStatus(ts('%count relationship record was not created due to an invalid contact type.', array(
+        'count' => $outcome['invalid'],
+        'plural' => '%count relationship records were not created due to invalid contact types.',
+      )), ts('%count invalid relationship record', array(
+        'count' => $outcome['invalid'],
+        'plural' => '%count invalid relationship records',
+      )));
+    }
+    if (!empty($outcome['duplicate'])) {
+      CRM_Core_Session::setStatus(ts('One relationship was not created because it already exists.', array(
+        'count' => $outcome['duplicate'],
+        'plural' => '%count relationships were not created because they already exist.',
+      )), ts('%count duplicate relationship', array(
+        'count' => $outcome['duplicate'],
+        'plural' => '%count duplicate relationships',
+      )));
+    }
+    if (!empty($outcome['saved'])) {
+      CRM_Core_Session::setStatus(ts('Relationship record has been updated.'), ts('Saved'), 'success');
+    }
   }
 
 }
