@@ -1599,7 +1599,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
     }
 
-
     $customFields = CRM_Core_BAO_CustomField::getFields($customFieldExtend,
       FALSE,
       $inline,
