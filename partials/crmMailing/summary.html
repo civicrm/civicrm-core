@@ -5,7 +5,7 @@ FIXME: Don't hardcode table-based layout!
 -->
 <div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
-    <div crm-ui-field="subform.mailingName" crm-title="ts('Mailing Name')">
+    <div crm-ui-field="{name: 'subform.mailingName', title: ts('Mailing Name')}">
       <div>
         <input
           crm-ui-id="subform.mailingName"
@@ -17,7 +17,7 @@ FIXME: Don't hardcode table-based layout!
           name="mailingName" />
       </div>
     </div>
-    <div crm-ui-field="subform.campaign" crm-title="ts('Campaign')" ng-show="crmMailingConst.campNames.length > 0">
+    <div crm-ui-field="{name: 'subform.campaign', title: ts('Campaign')}" ng-show="crmMailingConst.campNames.length > 0">
       <select
         crm-ui-id="subform.campaign"
         name="campaign"

@@ -111,10 +111,10 @@
     })
 
     // Display a field/row in a field list
-    // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
-    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
-    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field crm-title="My Field" crm-ui-help="'help_field_name'"> {{mydata}} </div>
+    // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: 'help_field_name'}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -126,12 +126,8 @@
         require: '^crmUiIdScope',
         restrict: 'EA',
         scope: {
-          // string, e.g. "myform.myfield"
-          crmUiField: '@',
-          // string, an expression producing a printable title
-          crmTitle: '=',
-          // string, an expression producing a help id
-          crmHelp: '='
+          // {title, name, help}
+          crmUiField: '='
         },
         templateUrl: function(tElement, tAttrs){
           var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
@@ -140,7 +136,6 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
-          scope.crmUiField = attrs.crmUiField;
           scope.crmUiHelpFile = scope.$parent.crmUiHelpFile; // propagate default
         }
       };
