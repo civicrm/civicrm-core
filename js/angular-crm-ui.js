@@ -114,6 +114,7 @@
     // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
     // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
+    // example: <div crm-ui-field crm-title="My Field" crm-ui-help="'help_field_name'"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -125,8 +126,11 @@
         require: '^crmUiIdScope',
         restrict: 'EA',
         scope: {
+          // string, e.g. "myform.myfield"
           crmUiField: '@',
+          // string, an expression producing a printable title
           crmTitle: '@',
+          // string, an expression producing a help id
           crmHelp: '@'
         },
         templateUrl: function(tElement, tAttrs){
@@ -139,6 +143,7 @@
           scope.crmUiField = attrs.crmUiField;
           scope.crmTitle = attrs.crmTitle;
           scope.crmHelp = attrs.crmHelp;
+          scope.crmUiHelpFile = scope.$parent.crmUiHelpFile;
         }
       };
     })
@@ -157,8 +162,12 @@
       };
     })
 
-    // standalone: <a crm-ui-help="field_name">
-    // within crmUiField: <div crm-ui-field crm-title="My Field" crm-help="field_name">
+    // Display a help icon which loads help from a *.hlp file.
+    // Example: Use a default *.hlp file
+    //   JS: scope.crmUiHelpFile='CRM/Foo/Bar';
+    //   HTML: <a crm-ui-help="{title:ts('My Field'), id:'my_field'}">
+    // Example: Use an explicit *.hlp file
+    //   HTML: <a crm-ui-help="{title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'}">
     .directive('crmUiHelp', function() {
       return {
         restrict: 'EA',
@@ -172,7 +181,7 @@
             .attr('href', '#')
             .on('click', function(e) {
               e.preventDefault();
-              CRM.help(scope.crmUiHelp.title, {id: scope.crmUiHelp.id, file: scope.$parent.$parent.$parent.helpFile});
+              CRM.help(scope.crmUiHelp.title, {id: scope.crmUiHelp.id, file: scope.crmUiHelp.file || scope.$parent.crmUiHelpFile});
             });
         }
       };
