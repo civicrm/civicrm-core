@@ -677,8 +677,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function disableEnableRelationship($id, $action) {
     $relationship = self::clearCurrentEmployer($id, $action);
+
     if (CRM_Core_Permission::access('CiviMember')) {
-      // create $params array which isrequired to delete memberships
+      // create $params array which is required to delete memberships
       // of the related contacts.
       $params = array(
         'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
@@ -1463,7 +1464,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         continue;
       }
 
-      $relatedContacts = CRM_Utils_Array::value('relatedContacts', $details, array());
+      $relatedContacts = array_keys(CRM_Utils_Array::value('relatedContacts', $details, array()));
       $mainRelatedContactId = reset($relatedContacts);
 
       foreach ($details['memberships'] as $membershipId => $membershipValues) {
