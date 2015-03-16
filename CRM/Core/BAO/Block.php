@@ -249,7 +249,7 @@ class CRM_Core_BAO_Block {
     }
 
     // Get current and submitted values
-    $current_values = self::getBlockIds($blockName, $contact_id, $entityElements, $updateBlankLocInfo);
+    $existing_values = self::getBlockIds($blockName, $contact_id, $entityElements, $updateBlankLocInfo);
     $submitted_values = $params[$blockName];
 
     // For each submitted value
@@ -260,15 +260,15 @@ class CRM_Core_BAO_Block {
 
       // If this is a primary value, and we haven't unset a primary value yet, and there are values on the contact
       // Then unset any primary value currently on the Contact
-      if (!empty($submitted_value['is_primary']) && !$reset_primary && is_array($current_values)) {
-        foreach ($current_values as $current_value_id => $current_value) {
-          if (!empty($current_value['is_primary'])) {
+      if (!empty($submitted_value['is_primary']) && !$reset_primary && is_array($existing_values)) {
+        foreach ($existing_values as $existing_value_id => $existing_value) {
+          if (!empty($existing_value['is_primary'])) {
 
             // @todo Can we refactor this?
             $block = new $bao_string();
             $block->selectAdd();
             $block->selectAdd("id, is_primary");
-            $block->id = $current_value['id'];
+            $block->id = $existing_value['id'];
             if ($block->find(TRUE)) {
               $block->is_primary = FALSE;
               $block->save();
@@ -286,8 +286,8 @@ class CRM_Core_BAO_Block {
       if (!empty($submitted_value['id'])) {
         // If the ID already exists on the contact
         // Then we don't want to match on it later, so unset it
-        if (array_key_exists($submitted_value['id'], $current_values)) {
-          unset($current_values[$current_value_id]);
+        if (array_key_exists($submitted_value['id'], $existing_values)) {
+          unset($existing_values[$existing_value_id]);
         }
         // Otherwise it is a new value, ignore the passed in ID
         else {
@@ -298,19 +298,19 @@ class CRM_Core_BAO_Block {
       // Otherwise, if there was no ID passed in
       // Loop through the current values, and find the first match on location type
       else {
-        foreach ($current_values as $current_value_id => $current_value) {
-          if ($current_value['locationTypeId'] == $submitted_value['location_type_id']) {
+        foreach ($existing_values as $existing_value_id => $existing_value) {
+          if ($existing_value['locationTypeId'] == $submitted_value['location_type_id']) {
 
             // Also require a match on 'type id' for phone and IM blocks
             $match_found = FALSE;
 
             if ($blockName == 'phone') {
-              if (CRM_Utils_Array::value('phoneTypeId', $current_value) == CRM_Utils_Array::value('phone_type_id', $submitted_value)) {
+              if (CRM_Utils_Array::value('phoneTypeId', $existing_value) == CRM_Utils_Array::value('phone_type_id', $submitted_value)) {
                 $match_found = TRUE;
               }
             }
             elseif ($blockName == 'im') {
-              if (CRM_Utils_Array::value('providerId', $current_value) == CRM_Utils_Array::value('provider_id', $submitted_value)) {
+              if (CRM_Utils_Array::value('providerId', $existing_value) == CRM_Utils_Array::value('provider_id', $submitted_value)) {
                 $match_found = TRUE;
               }
             }
@@ -321,14 +321,14 @@ class CRM_Core_BAO_Block {
             // If we found a match
             if ($match_found) {
               // Match up the ID
-              $submitted_value['id'] = $current_value['id'];
+              $submitted_value['id'] = $existing_value['id'];
               // If the submitted value is not primary, but the matched value is
               // Then set the submitted value to be primary
-              if (empty($submitted_value['is_primary']) && !empty($current_value['is_primary'])) {
+              if (empty($submitted_value['is_primary']) && !empty($existing_value['is_primary'])) {
                 $submitted_value['is_primary'] = 1;
               }
               // Remove the original value from the array so we don't match on it again
-              unset($current_values[$current_value_id]);
+              unset($existing_values[$existing_value_id]);
               break;
             }
           }

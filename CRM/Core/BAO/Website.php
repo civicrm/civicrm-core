@@ -69,24 +69,24 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @return void
    */
   public static function create(&$params, $contactID) {
-    
+
     // CRM-10551
     // Use updateBlankLocInfo to overwrite blanked values of matching type
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    
+
     // Get the websites submitted in the form
     $submitted_websites = $params['website'];
-        
+
     if (empty($submitted_websites)) {
       return FALSE;
     }
-        
+
     // Get the websites currently on the Contact
     $existing_websites = self::allWebsites($contactID);
-    
+
     // For each website submitted on the form
     foreach ($submitted_websites as $key => $submitted_value) {
-      
+
       // Check for matching IDs on submitted / existing data
       $websiteId = CRM_Utils_Array::value('id', $submitted_value);
       if ($websiteId) {
@@ -108,16 +108,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
           }
         }
       }
-      
+
       $submitted_value['contact_id'] = $contactID;
-      
+
       // CRM-10551
       // If there is a matching ID, the URL is empty and we are deleting blanked values
       // Then remove it from the contact
       if (!empty($submitted_value['id']) && empty($submitted_value['url']) && $updateBlankLocInfo) {
         self::del(array($submitted_value['id']));
       }
-      
+
       // Otherwise, add the website if the URL isn't empty
       elseif (!empty($submitted_value['url'])) {
         self::add($submitted_value);
