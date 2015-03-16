@@ -192,14 +192,14 @@
       "aoColumns": [
         {sClass: 'crm-campaign-id                   hiddenElement' },
         {sClass: 'crm-campaign-name                 hiddenElement' },
-        {sClass: 'crmf-title crm-editable'                              },
-        {sClass: 'crmf-description crm-editable'                        },
+        {sClass: 'crmf-title'                              },
+        {sClass: 'crmf-description'                        },
         {sClass: 'crm-campaign-start_date'                         },
         {sClass: 'crm-campaign-end_date'                           },
         {sClass: 'crm-campaign-campaign-type_id     hiddenElement' },
-        {sClass: 'crmf-campaign_type_id crm-editable'                      },
+        {sClass: 'crmf-campaign_type_id'                      },
         {sClass: 'crm-campaign-campaign-status_id   hiddenElement' },
-        {sClass: 'crmf-status_id crm-editable'                    },
+        {sClass: 'crmf-status_id'                    },
         {sClass: 'crm-campaign-campaign-is_active   hiddenElement' },
         {sClass: 'crm-campaign-campaign-isAactive'                 },
         {sClass: 'crm-campaign-action', bSortable: false}
@@ -227,9 +227,10 @@
         }
 
         // Crm-editable
-        $(nRow).children().eq(3).data('type', 'textarea');
-        $(nRow).children().eq(7).data('type', 'select');
-        $(nRow).children().eq(9).data('type', 'select');
+        $(nRow).children().eq(2).addClass('crm-editable');
+        $(nRow).children().eq(3).data('type', 'textarea').addClass('crm-editable');
+        $(nRow).children().eq(7).data('type', 'select').addClass('crm-editable');
+        $(nRow).children().eq(9).data({type: 'select', emptyOption: ''}).addClass('crm-editable');
 
         return nRow;
       },
