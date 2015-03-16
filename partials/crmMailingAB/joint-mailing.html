@@ -15,7 +15,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
   <div class="crm-group">
 
 
-    <div crm-ui-field="subform.msg_template_id" crm-title="ts('Template')" ng-if="fields.msg_template_id">
+    <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}" ng-if="fields.msg_template_id">
       <div ng-controller="MsgTemplateCtrl">
         <select
           crm-ui-id="subform.msg_template_id"
@@ -30,7 +30,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         <a crm-icon="disk" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
       </div>
     </div>
-    <div crm-ui-field="subform.msg_template_idA" crm-title="ts('Template (A)')" ng-if="fields.msg_template_idA">
+    <div crm-ui-field="{name: 'subform.msg_template_idA', title: ts('Template (A)')}" ng-if="fields.msg_template_idA">
       <div ng-controller="MsgTemplateCtrl">
         <select
           crm-ui-id="subform.msg_template_idA"
@@ -45,7 +45,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         <a crm-icon="disk" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
       </div>
     </div>
-    <div crm-ui-field="subform.msg_template_idB" crm-title="ts('Template (B)')" ng-if="fields.msg_template_idB">
+    <div crm-ui-field="{name: 'subform.msg_template_idB', title: ts('Template (B)')}" ng-if="fields.msg_template_idB">
       <div ng-controller="MsgTemplateCtrl">
         <select
           crm-ui-id="subform.msg_template_idB"
@@ -62,7 +62,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
 
 
-    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')" ng-if="fields.fromAddress">
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From')}" ng-if="fields.fromAddress">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddress"
@@ -75,7 +75,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="subform.fromAddressA" crm-title="ts('From (A)')" ng-if="fields.fromAddressA">
+    <div crm-ui-field="{name: 'subform.fromAddressA', title: ts('From (A)')}" ng-if="fields.fromAddressA">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddressA"
@@ -88,7 +88,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="subform.fromAddressB" crm-title="ts('From (B)')" ng-if="fields.fromAddressB">
+    <div crm-ui-field="{name: 'subform.fromAddressB', title: ts('From (B)')}" ng-if="fields.fromAddressB">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.b">
         <select
           crm-ui-id="subform.fromAddressB"
@@ -103,7 +103,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
 
 
-    <div crm-ui-field="subform.replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyTo">
+    <div crm-ui-field="{name: 'subform.replyTo', title: ts('Reply-To')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyTo">
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyTo"
@@ -117,7 +117,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="subform.replyToA" crm-title="ts('Reply-To (A)')" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToA">
+    <div crm-ui-field="{name: 'subform.replyToA', title: ts('Reply-To (A)')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToA">
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyToA"
@@ -131,7 +131,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="subform.replyToB" crm-title="ts('Reply-To (B)')" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToB">
+    <div crm-ui-field="{name: 'subform.replyToB', title: ts('Reply-To (B)')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToB">
       <span ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyToB"
@@ -147,7 +147,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
 
 
-    <div crm-ui-field="subform.subject" crm-title="ts('Subject')" ng-if="fields.subject">
+    <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}" ng-if="fields.subject">
       <div style="float: right;">
         <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
       </div>
@@ -161,7 +161,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         placeholder="Subject"
         name="subject" />
     </div>
-    <div crm-ui-field="subform.subjectA" crm-title="ts('Subject (A)')" ng-if="fields.subjectA">
+    <div crm-ui-field="{name: 'subform.subjectA', title: ts('Subject (A)')}" ng-if="fields.subjectA">
       <div style="float: right;">
         <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" tabindex="-1"/>
       </div>
@@ -175,7 +175,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         placeholder="Subject"
         name="subjectA" />
     </div>
-    <div crm-ui-field="subform.subjectB" crm-title="ts('Subject (B)')" ng-if="fields.subjectB">
+    <div crm-ui-field="{name: 'subform.subjectB', title: ts('Subject (B)')}" ng-if="fields.subjectB">
       <div style="float: right;">
         <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" tabindex="-1"/>
       </div>
