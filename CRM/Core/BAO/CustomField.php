@@ -1586,15 +1586,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     //get the custom fields for the entity
     //subtype and basic type
     $customDataSubType = NULL;
-    if (is_array($customFieldExtend)) {
+    if ($customFieldExtend) {
       // This is the case when getFieldsForImport() requires fields
       // of subtype and its parent.CRM-5143
       // CRM-16065 - Custom field set data not being saved if contact has more than one contact sub type
       $customDataSubType = array_intersect(CRM_Contact_BAO_ContactType::subTypes(), (array) $customFieldExtend);
       if (!empty($customDataSubType) && is_array($customDataSubType)) {
-        $customFieldExtend = array_unique(array_values(CRM_Contact_BAO_ContactType::getBasicType($customDataSubType)));
+        $customFieldExtend = CRM_Contact_BAO_ContactType::getBasicType($customDataSubType);
+        if (is_array($customFieldExtend)) {
+          $customFieldExtend = array_unique(array_values($customFieldExtend));
+        }
       }
     }
+
 
     $customFields = CRM_Core_BAO_CustomField::getFields($customFieldExtend,
       FALSE,
