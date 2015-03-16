@@ -149,7 +149,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = array();
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
-    echo 'relationship id is ' . $relationshipId . "\n";
 
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
@@ -177,7 +176,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         // step 3: if valid relationship then add the relation and keep the count
 
         // step 1
-        $errors = self::checkValidRelationship($params, $ids, $key);
+        $contactFields = self::setContactABFromIDs($params, $ids, $key);
+        $errors = self::checkValidRelationship($contactFields, $ids, $key);
         if ($errors) {
           $invalid++;
           continue;
@@ -185,7 +185,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
         if (
         self::checkDuplicateRelationship(
-          $params,
+          $contactFields,
           CRM_Utils_Array::value('contact', $ids),
           // step 2
           $key
@@ -194,7 +194,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $duplicate++;
           continue;
         }
-        $contactFields = self::setContactABFromIDs($params, $ids, $key);
+
         $singleInstanceParams = array_merge($params, $contactFields);
         $relationship = self::add($singleInstanceParams);
         $relationshipIds[] = $relationship->id;
@@ -420,12 +420,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
       throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
     }
-    if (!is_numeric($params['relationship_type_id'])) {
+    if (isset($params['relationship_type_id']) && !is_numeric($params['relationship_type_id'])) {
       $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
       list($relationshipTypeID, $first) = explode('_', $relationshipTypes);
-      if (empty($params['relationship_type_id'])) {
-        $returnFields['relationship_type_id'] = $relationshipTypeID;
-      }
+      $returnFields['relationship_type_id'] = $relationshipTypeID;
+
       foreach (array('a', 'b') as $contactLetter) {
         if (empty($params['contact_' . $contactLetter])) {
           if ($first == $contactLetter) {
