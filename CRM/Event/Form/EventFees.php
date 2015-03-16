@@ -404,7 +404,7 @@ SELECT  id, html_type
             0 => ts('- select -'),
           ) + $discounts,
           FALSE,
-          array('onchange' => "buildFeeBlock( {$form->_eventId}, this.value );")
+          array('class' => "crm-select2")
         );
 
         if ($form->_online) {

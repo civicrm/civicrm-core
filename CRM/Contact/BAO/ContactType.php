@@ -386,6 +386,7 @@ WHERE  type.name IS NOT NULL
 
     $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
     $argString .= $isSeparator ? '_1' : '_0';
+    $argString .= $separator;
     if (!array_key_exists($argString, $_cache)) {
       $cache = CRM_Utils_Cache::singleton();
       $_cache[$argString] = $cache->get($argString);

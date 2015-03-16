@@ -143,7 +143,10 @@ function _civicrm_api3_job_geocode_spec(&$params) {
   $params['end'] = array('title' => 'End Date');
   $params['geocoding'] = array('title' => 'Geocode address?');
   $params['parse'] = array('title' => 'Parse street address?');
-  $params['throttle'] = array('title' => 'Throttle? if enabled, geo-codes at a slow rate');
+  $params['throttle'] = array(
+    'title' => 'Throttle?',
+    'description' => 'if enabled, geo-codes at a slow rate',
+  );
 }
 
 /**

@@ -264,7 +264,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Merge %1s', array(1 => $this->_contactType)));
+    CRM_Utils_System::setTitle(ts('Merge %1 contacts', array(1 => $this->_contactType)));
     $buttons = array();
 
     $buttons[] = array(

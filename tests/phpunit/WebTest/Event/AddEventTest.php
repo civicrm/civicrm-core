@@ -959,7 +959,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->waitForElementPresent("_qf_Confirm_next");
     $this->click('_qf_Confirm_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent("xpath=//div[@class='section']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-group participant_info-group']");
     $this->assertTextPresent("Thank You for Registering");
 
   }
