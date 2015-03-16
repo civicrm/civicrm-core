@@ -363,8 +363,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $contact->$name = $value;
     }
 
-    //add website
-    CRM_Core_BAO_Website::create($params, $contact->id);
+    // Process website(s) if present in params
+    if (!empty($params['website'])) {
+      CRM_Core_BAO_Website::create($params, $contact->id);
+    }
 
     //get userID from session
     $session = CRM_Core_Session::singleton();
