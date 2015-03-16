@@ -333,6 +333,22 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
+    //create activity.
+    $messageActivity = ts('Contact ID %1 has been merged and deleted.', array(1 => $this->_oid));
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+
+    $activityParams = array(
+      'activity_type_id' => array_search('Contact Merged', $activityTypes),
+      'subject' => $messageActivity,
+      'status_id' => 2,
+      'priority_id' => 2,
+      'activity_date_time' => date('YmdHis'),
+      'source_contact_id' => $session->get('userID'),
+      'target_contact_id' => $this->_cid,
+    );
+
+    CRM_Activity_BAO_Activity::create($activityParams);
+
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
     if (!empty($formValues['_qf_Merge_submit'])) {
       $listParamsURL = "reset=1&action=update&rgid={$this->_rgid}";
