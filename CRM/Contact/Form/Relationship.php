@@ -434,15 +434,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $params['contact_id_' .  $relationshipTypeParts[2]] = explode(',', $params['related_contact_id']);
     }
 
-    // @todo create multiple probably does this - test!
-    $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', FALSE, FALSE, $params['relationship_type_id']);
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
-      $params,
-      $customFields,
-      $this->_relationshipId,
-      'Relationship'
-    );
-
     // Save the relationships.
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
     $relationshipIds = $outcome['relationship_ids'];
