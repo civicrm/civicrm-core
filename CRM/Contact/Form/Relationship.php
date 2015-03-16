@@ -404,8 +404,17 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
+      $params['id'] = $this->_relationshipId;
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
+      if ($relation->contact_id_a == $this->_contactId) {
+        $params['contact_id_a'] = $this->_contactId;
+        $params['contact_id_b'] = array($params['related_contact_id']);
+      }
+      else {
+        $params['contact_id_b'] = $this->_contactId;
+        $params['contact_id_a'] = array($params['related_contact_id']);
+      }
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
       // @todo this belongs in the BAO.
@@ -436,7 +445,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // Save relationships
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
-    list($valid, $invalid, $duplicate, $saved, $relationshipIds) = $outcome;
+    $relationshipIds = $outcome['relationship_ids'];
     $this->setMessage($outcome);
 
     // if this is called from case view,
