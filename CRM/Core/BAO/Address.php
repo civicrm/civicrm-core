@@ -1172,7 +1172,7 @@ SELECT is_primary,
 
     list($valid, $invalid, $duplicate,
       $saved, $relationshipIds
-      ) = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
+      ) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationshipParams, $cid);
   }
 
   /**
