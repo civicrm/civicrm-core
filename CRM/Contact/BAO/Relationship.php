@@ -805,14 +805,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';
-    $contactParams = self::setContactABFromIDs($params, $ids, $contactId);
-    $params = array_merge($params, $contactParams);
-    // get the string of relationship type
-    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-    list($type) = explode('_', $relationshipTypes);
     // function to check if the relationship selected is correct
     // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $type)) {
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],
+      $params['relationship_type_id'])) {
       $errors = 'Please select valid relationship between these two contacts.';
     }
     return $errors;
