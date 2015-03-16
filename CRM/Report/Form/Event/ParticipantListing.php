@@ -40,6 +40,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_lineitemField = FALSE;
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
+  protected $_balance = FALSE;
   protected $activeCampaigns;
 
   protected $_customGroupExtends = array(
@@ -202,6 +203,16 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'participant_fee_level' => NULL,
           'participant_fee_amount' => NULL,
           'participant_register_date' => array('title' => ts('Registration Date')),
+          'total_paid' => array(
+            'title' => ts('Total Paid'),
+            'dbAlias' => 'SUM(ft.total_amount)',
+            'type' => 1024,
+          ),
+          'balance' => array(
+            'title' => ts('Balance'),
+            'dbAlias' => 'participant_civireport.fee_amount - SUM(ft.total_amount)',
+            'type' => 1024,
+          ),
         ),
         'grouping' => 'event-fields',
         'filters' => array(
@@ -453,7 +464,9 @@ ORDER BY  cv.label
             if ($tableName == 'civicrm_contribution') {
               $this->_contribField = TRUE;
             }
-
+            if ($fieldName == 'total_paid' || $fieldName == 'balance') {
+              $this->_balance = TRUE;
+            }
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -520,6 +533,16 @@ ORDER BY  cv.label
             LEFT JOIN civicrm_line_item line_item_civireport
                   ON line_item_civireport.entity_table = 'civicrm_participant' AND
                      line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
+      ";
+    }
+    if ($this->_balance) {
+      $this->_from .= "
+            LEFT JOIN civicrm_entity_financial_trxn eft
+                  ON (eft.entity_id = contribution_civireport.id)
+            LEFT JOIN civicrm_financial_account fa
+                  ON (fa.account_type_code = 'AR')
+            LEFT JOIN civicrm_financial_trxn ft
+                  ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND (ft.from_financial_account_id = fa.id)
       ";
     }
   }
