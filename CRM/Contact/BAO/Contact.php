@@ -276,9 +276,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $invokeHooks
    *   If we need to invoke hooks.
    *
-   * @param bool $skipDelete
-   *   Unclear parameter, passed to website create
-   *
    * @todo explain this parameter
    *
    * @throws Exception
@@ -286,7 +283,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *   Created or updated contribution object. We are deprecating returning an error in
    *   favour of exceptions
    */
-  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
+  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE) {
     $contact = NULL;
     if (empty($params['contact_type']) && empty($params['contact_id'])) {
       return $contact;
@@ -367,7 +364,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     //add website
-    CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
+    CRM_Core_BAO_Website::create($params, $contact->id);
 
     //get userID from session
     $session = CRM_Core_Session::singleton();
