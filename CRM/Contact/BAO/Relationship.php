@@ -60,8 +60,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
     $relationship = self::add($params);
     if (!empty($params['contact_id_a'])) {
-      $ids = array('contactTarget' => $relationship->contact_id_b, 'contact' => $params['contact_id_a']);
-      CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, (empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
+      $ids = array(
+        'contactTarget' => $relationship->contact_id_b,
+        'contact' => $params['contact_id_a'],
+      );
+      CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $params, $ids, (empty($params['id']) ?
+        CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
     }
 
     // Alter related membership if the is_active param is changed.
@@ -72,6 +76,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
       CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
     }
+
     self::addRecent($params, $relationship);
     return $relationship;
   }
@@ -1362,6 +1367,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // Check the end date and set the status of the relationship
     // accordingly.
     $status = self::CURRENT;
+    $targetContact = $targetContact = CRM_Utils_Array::value('contact_check', $params, array());
 
     if (!empty($params['end_date'])) {
       $endDate = CRM_Utils_Date::setDateDefaults(CRM_Utils_Date::format($params['end_date']), NULL, 'Ymd');
@@ -1391,13 +1397,13 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       // this call is coming from somewhere where the direction was resolved early on (e.g an api call)
       // so we can assume _a_b
       $relDirection = "_a_b";
+      $targetContact = array($params['contact_id_b'] => 1);
     }
-    $targetContact = array();
+
     if (($action & CRM_Core_Action::ADD) ||
       ($action & CRM_Core_Action::DELETE)
     ) {
       $contact = $contactId;
-      $targetContact = CRM_Utils_Array::value('contact_check', $params);
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
       $contact = $ids['contact'];

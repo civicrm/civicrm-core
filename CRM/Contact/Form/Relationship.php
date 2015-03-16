@@ -478,13 +478,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $params['relationship_ids'] = $relationshipIds;
 
-    if ($this->_action & CRM_Core_Action::ADD && !empty($params['is_active'])) {
-      CRM_Contact_BAO_Relationship::relatedMemberships($this->_contactId,
-        $params, $ids,
-        $this->_action
-      );
-    }
-
     // Refresh contact tabs which might have been affected
     $this->ajaxResponse['updateTabs'] = array(
       '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
