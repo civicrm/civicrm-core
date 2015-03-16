@@ -338,7 +338,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
     $activityParams = array(
-      'activity_type_id' =>array_search('Contact Merged', $activityTypes),
+      'activity_type_id' => array_search('Contact Merged', $activityTypes),
       'subject' => $messageActivity,
       'status_id' => 2,
       'priority_id' => 2,
