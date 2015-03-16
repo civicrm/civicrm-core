@@ -1324,7 +1324,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array
    *   array reference of all relationship types with context to current contact type .
    */
-  public function getRelationType($targetContactType) {
+  static public function getRelationType($targetContactType) {
     $relationshipType = array();
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
@@ -1457,12 +1457,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // done with 'values' array.
     // Finally add / edit / delete memberships for the related contacts
+
     foreach ($values as $cid => $details) {
       if (!array_key_exists('memberships', $details)) {
         continue;
       }
 
-      $mainRelatedContactId = key(CRM_Utils_Array::value('relatedContacts', $details, array()));
+      $relatedContacts = CRM_Utils_Array::value('relatedContacts', $details, array());
+      $mainRelatedContactId = reset($relatedContacts);
 
       foreach ($details['memberships'] as $membershipId => $membershipValues) {
         $relTypeIds = array();
