@@ -120,7 +120,8 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 1);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Main_upload-bottom");
+    $this->assertTrue($this->isTextPresent("You already have a lifetime membership and cannot select a membership with a shorter term."));
   }
 
   /**
