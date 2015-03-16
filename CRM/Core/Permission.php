@@ -584,6 +584,8 @@ class CRM_Core_Permission {
       $permissions = array_merge($permissions, $module_permissions);
     }
 
+    CRM_Financial_BAO_FinancialType::permissionedFinancialTypes($permissions);
+
     return $permissions;
   }
 

@@ -273,7 +273,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     );
 
     // financial type
-    $this->addSelect('financial_type_id');
+    if (CRM_Core_Permission::check('administer CiviCRM Financial Types')) {
+      $this->addSelect('financial_type_id');
+    }
+    else {
+      $financialType = $this->add('select', 'financial_type_id',
+        ts('Financial Type'),
+        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+      );
+    } 
     // add pay later options
     $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
       array('onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);")
