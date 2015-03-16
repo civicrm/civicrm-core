@@ -334,7 +334,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
     //create activity
-    //To do: this should be refactored into BAO layer, but that is absolutely beyond me. 
+    //To do: this should be refactored into BAO layer, but that is absolutely beyond me.
     $messageActivity = ts('Contact ID %1 has been merged and deleted.', array(1 => $this->_oid));
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
