@@ -63,10 +63,8 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $primaryFieldName = 'contact_id_' . $primaryRelationshipSide;
     $secondaryFieldName = 'contact_id_' . $secondaryRelationshipSide;
 
-
     $relationshipLabel = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
       $params['relationship_type_id'], "label_{$secondaryRelationshipSide}_{$primaryRelationshipSide}");
-
 
     $params[$secondaryFieldName] = $this->_contactIds;
     $params[$primaryFieldName] = $this->params['contact_check'];
@@ -102,7 +100,6 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
       'count' => $outcome['valid'],
       'plural' => 'Relationships created.',
     )), 'success', array('expires' => 0));
-
 
   }
 
