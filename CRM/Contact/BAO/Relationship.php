@@ -149,15 +149,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $valid = $invalid = $duplicate = $saved = 0;
     $relationships = $relationshipIds = array();
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    echo 'relationship id is ' . $relationshipId . "\n";
+
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket
     if (empty($relationshipId)) {
       $hook = 'create';
-      $action = CRM_Core_Action::ADD;
     }
     else {
       $hook = 'edit';
-      $action = CRM_Core_Action::UPDATE;
     }
 
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
@@ -269,9 +269,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
-    // Requirement to set fields in this function is historical & hopefully can go at some point.
-    $contactFields = self::setContactABFromIDs($params, $ids);
-    $params = array_merge($params, $contactFields);
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
     // explode the string with _ to get the relationship type id
