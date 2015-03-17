@@ -196,6 +196,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
+    $this->clickAt("xpath=//*[@class ='select2-chosen']");
     $this->assertStringsPresent($validateStrings);
   }
 
