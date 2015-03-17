@@ -116,9 +116,9 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('lineItemTotal', $lineItemTotal);
     }
 
-    $title = "Change selections for {$this->_contributorDisplayName}";
+    $title = ts("Change selections for %1", array(1 => $this->_contributorDisplayName));
     if ($title) {
-      CRM_Utils_System::setTitle(ts('%1', array(1 => $title)));
+      CRM_Utils_System::setTitle($title);
     }
   }
 

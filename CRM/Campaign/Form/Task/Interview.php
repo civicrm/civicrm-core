@@ -546,8 +546,7 @@ WHERE {$clause}
     $subject = '';
     $surveyTitle = CRM_Utils_Array::value('surveyTitle', $params);
     if ($surveyTitle) {
-      $subject = ts('%1', array(1 => $surveyTitle));
-      $subject .= ' - ';
+      $subject = $surveyTitle . ' - ';
     }
     $subject .= ts('Respondent Interview');
 
