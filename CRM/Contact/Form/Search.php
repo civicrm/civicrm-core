@@ -159,6 +159,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_customSearchClass = NULL;
 
   protected $_openedPanes = array();
+  
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contact';
+  }
 
   /**
    * Define the set of valid contexts that the search form operates on.

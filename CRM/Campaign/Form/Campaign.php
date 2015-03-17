@@ -66,6 +66,13 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * @var int
    */
   protected $_campaignId;
+  
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Campaign';
+  }
 
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
