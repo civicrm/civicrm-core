@@ -62,7 +62,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
     </div>
 
 
-    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From')}" ng-if="fields.fromAddress">
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: 'from_email'}" ng-if="fields.fromAddress">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddress"
@@ -75,7 +75,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="{name: 'subform.fromAddressA', title: ts('From (A)')}" ng-if="fields.fromAddressA">
+    <div crm-ui-field="{name: 'subform.fromAddressA', title: ts('From (A)'), help: 'from_email'}" ng-if="fields.fromAddressA">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
         <select
           crm-ui-id="subform.fromAddressA"
@@ -88,7 +88,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         </select>
       </span>
     </div>
-    <div crm-ui-field="{name: 'subform.fromAddressB', title: ts('From (B)')}" ng-if="fields.fromAddressB">
+    <div crm-ui-field="{name: 'subform.fromAddressB', title: ts('From (B)'), help: 'from_email'}" ng-if="fields.fromAddressB">
       <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.b">
         <select
           crm-ui-id="subform.fromAddressB"

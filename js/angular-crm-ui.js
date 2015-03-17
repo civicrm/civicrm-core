@@ -126,7 +126,7 @@
         require: '^crmUiIdScope',
         restrict: 'EA',
         scope: {
-          // {title, name, help}
+          // {title, name, help, helpFile}
           crmUiField: '='
         },
         templateUrl: function(tElement, tAttrs){
@@ -136,7 +136,8 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
-          scope.crmUiHelpFile = scope.$parent.crmUiHelpFile; // propagate default
+          // Inherit helpFile from parent scope if not specified
+          scope.crmUiHelpFile = scope.crmUiField.helpFile || scope.$parent.crmUiHelpFile;
         }
       };
     })

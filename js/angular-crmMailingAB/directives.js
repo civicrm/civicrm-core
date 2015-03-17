@@ -21,6 +21,7 @@
           scope.crmMailingConst = CRM.crmMailing;
           scope.crmMailingABCriteria = crmMailingABCriteria;
           scope.ts = CRM.ts(null);
+          scope.crmUiHelpFile = 'CRM/Mailing/MailingUI';
 
           var fieldsModel = $parse(attr[directiveName]);
           scope.fields = fieldsModel(scope.$parent);
