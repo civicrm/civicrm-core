@@ -96,7 +96,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
 
     //check link of the contact who created the group
-    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody//tr/td[1]/span[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name");
+    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody//tr/td[1]/span[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name", FALSE);
     $name = explode(',', $createdBy);
     $name1 = isset($name[1]) ? trim($name[1]) : NULL;
     $name0 = trim($name[0]);
