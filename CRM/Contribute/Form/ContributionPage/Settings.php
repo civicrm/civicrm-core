@@ -125,9 +125,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $this->addSelect('financial_type_id', array(), TRUE);
     }
     else {
+      CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
+
       $financialType = $this->add('select', 'financial_type_id',
         ts('Financial Type'),
-        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
+        array('' => ts('- select -')) + $financialTypes,
         TRUE
       );
     } 
