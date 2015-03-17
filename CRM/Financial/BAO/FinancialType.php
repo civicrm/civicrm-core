@@ -207,7 +207,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
   }
 
-  public static function getAvailableFinancialTypes(&$financialTypes, $action) {
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view') {
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     
     foreach ($financialTypes as $finTypeId => $type) {
@@ -215,5 +215,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         unset($financialTypes[$finTypeId]);
       }
     }
+    return $financialTypes;
   }
 }
