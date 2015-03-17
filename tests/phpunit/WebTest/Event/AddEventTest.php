@@ -806,7 +806,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[5]/td[1]/div//div/label[text()='Pending from pay later']");
+    $this->multiselect2('participant_status_id', array('Pending from pay later'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']");
 
@@ -834,7 +834,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
+    $this->multiselect2('participant_status_id', array('Pending from pay later'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
     $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']@href");
@@ -877,12 +877,11 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
 
     //Participant Status
     $this->openCiviPage("admin/participant_status", "reset=1&action=browse");
-    $this->_testEnableParticipantStatuses('Awaiting approval');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Awaiting approval')]/../td[9]/span/a[2][text()='Disable']");
-    $this->_testEnableParticipantStatuses('Pending from approval');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Pending from approval')]/../td[9]/span/a[2][text()='Disable']");
-    $this->_testEnableParticipantStatuses('Rejected');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Rejected')]/../td[9]/span/a[2][text()='Disable']");
+    foreach (array('Awaiting approval', 'Pending from approval', 'Rejected') as $label) {
+      $status = $this->webtest_civicrm_api("ParticipantStatusType", "getsingle", array('label' => $label));
+      $this->_testEnableParticipantStatuses($status['id']);
+      $this->isElementPresent("xpath=//tr[@id='participant_status_type-{$status['id']}']/td[9]/span/a[2][text()='Disable']");
+    }
 
     //Create New Event
 
@@ -967,11 +966,11 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
   /**
    * @param $status
    */
-  public function _testEnableParticipantStatuses($status) {
+  public function _testEnableParticipantStatuses($statusId) {
     // enable participant status
-    if ($this->isElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")) {
-      $this->click("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
-      $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
+    if ($this->isElementPresent("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Enable']")) {
+      $this->click("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Enable']");
+      $this->waitForElementPresent("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Disable']");
     }
   }
 

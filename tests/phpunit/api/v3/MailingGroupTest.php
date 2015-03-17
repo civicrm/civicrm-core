@@ -58,13 +58,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20111111010101',
       'hash' => 'sasa',
     );
-    $result = $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
-    if ($result['error_message'] != 'Subscription failed') {
-      $this->assertEquals($result['error_message'], 'Invalid Group id', 'In line ' . __LINE__);
-    }
-    else {
-      $this->assertEquals($result['error_message'], 'Subscription failed', 'In line ' . __LINE__);
-    }
+    $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
   }
 
   /**
@@ -105,8 +99,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     );
 
-    $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
+    $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
 
   //--------- civicrm_mailing_group_event_domain_unsubscribe methods -------
@@ -123,8 +116,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     );
 
-    $result = $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Domain Queue event could not be found', 'In line ' . __LINE__);
+    $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
 
   //----------- civicrm_mailing_group_event_resubscribe methods--------
@@ -144,8 +136,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'org_unsubscribe' => 'test',
       'time_stamp' => '20101212121212',
     );
-    $result = $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
+    $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
   }
 
   //------------------------ success case ---------------------

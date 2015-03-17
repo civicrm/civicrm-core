@@ -252,9 +252,6 @@
       var that = this;
       var url = this._formatUrl(this.options.url);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
-      if (this._originalContent === null) {
-        this._originalContent = this.element.contents().detach();
-      }
       if (this.options.block) this.element.block();
       $.getJSON(url, function(data) {
         if (that.options.block) that.element.unblock();
@@ -280,6 +277,11 @@
     // Perform any cleanup needed before removing/replacing content
     _beforeRemovingContent: function() {
       var that = this;
+      // Save original content to be restored if widget is destroyed
+      if (this._originalContent === null) {
+        $('.blockUI', this.element).remove();
+        this._originalContent = this.element.contents().detach();
+      }
       if (window.tinyMCE && tinyMCE.editors) {
         $.each(tinyMCE.editors, function(k) {
           if ($.contains(that.element[0], this.getElement())) {
