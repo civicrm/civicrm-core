@@ -213,13 +213,13 @@ ORDER BY target_entity_type, target_entity_id
       $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
         FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
       $component = $pcpBlockDao->target_entity_type;
-      $pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component);
-      $pcpBlock[] = array(
-        'pageId' => $pcpBlockDao->target_entity_id,
-        'pageTitle' => $pageTitle,
-        'component' => $pcpBlockDao->target_entity_type,
-        'action' => $action,
-      );
+      if ($pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component)) {
+        $pcpBlock[] = array(
+          'pageId' => $pcpBlockDao->target_entity_id,
+          'pageTitle' => $pageTitle,
+          'action' => $action,
+        );
+      }
     }
 
     return array($pcpBlock, $pcpInfo);
