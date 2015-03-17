@@ -175,7 +175,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
-  
+
   /**
    * Explicitly declare the entity api name.
    */

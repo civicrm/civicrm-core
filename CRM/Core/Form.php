@@ -1037,9 +1037,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addDate($name . $to, ts('To:'), $required, array('formatType' => $dateFormat));
     }
   }
-  
+
   /**
-   * Classes extending CRM_Core_Form should implement this method. 
+   * Classes extending CRM_Core_Form should implement this method.
    * @throws Exception
    */
   public function getDefaultEntity() {

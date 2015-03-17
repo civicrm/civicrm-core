@@ -126,7 +126,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * during the write phase
    */
   public $_preEditValues;
-  
+
   /**
    * Explicitly declare the entity api name.
    */

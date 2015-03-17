@@ -39,7 +39,7 @@
  */
 class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
-  
+
   /**
    * Explicitly declare the entity api name.
    */

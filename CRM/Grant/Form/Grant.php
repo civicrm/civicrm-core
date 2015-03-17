@@ -54,7 +54,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_contactID;
 
   protected $_context;
-  
+
   /**
    * Explicitly declare the entity api name.
    */
