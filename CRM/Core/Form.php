@@ -1037,6 +1037,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addDate($name . $to, ts('To:'), $required, array('formatType' => $dateFormat));
     }
   }
+  
+  /**
+   * Classes extending CRM_Core_Form should implement this method. 
+   * @throws Exception
+   */
+  public function getDefaultEntity() {
+    throw new Exception("Cannot determine default entity. The form class should implement getDefaultEntity().");
+  }
 
   /**
    * Adds a select based on field metadata.
@@ -1058,12 +1066,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addSelect($name, $props = array(), $required = FALSE) {
     if (!isset($props['entity'])) {
-      if (isset($this->entityName)) {
-        $props['entity'] = $this->entityName;
-      }
-      else {
-        $props['entity'] = CRM_Utils_Api::getEntityName($this);
-      }
+      $props['entity'] = $this->getDefaultEntity();
     }
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;

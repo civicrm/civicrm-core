@@ -52,6 +52,13 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * @var string
    */
   protected $_context;
+  
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
 
   public function preProcess() {
     parent::preProcess();

@@ -188,6 +188,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @var null
    */
   public $_onlinePendingContributionId = NULL;
+  
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Participant';
+  }
 
   /**
    * Set variables up before form is built.

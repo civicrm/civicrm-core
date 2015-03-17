@@ -33,6 +33,14 @@
  *
  */
 class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
+  
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'ParticipantStatusType';
+  }
+  
   public function buildQuickForm() {
     parent::buildQuickForm();
 
