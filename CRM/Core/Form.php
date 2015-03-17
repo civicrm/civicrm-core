@@ -127,13 +127,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $controller;
 
   /**
-   * Api entity name
-   *
-   * @var string
-   */
-  public $entityName;
-
-  /**
    * Constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
