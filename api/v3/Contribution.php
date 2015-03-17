@@ -527,7 +527,7 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     static $domainFromName;
     static $domainFromEmail;
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
-      list($domainFromName, $domainFromEmail) =  CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+      list($domainFromName, $domainFromEmail) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
