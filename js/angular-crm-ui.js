@@ -85,6 +85,31 @@
       };
     })
 
+    // Display debug information (if available)
+    // For richer DX, checkout Batarang/ng-inspector (Chrome/Safari), or AngScope/ng-inspect (Firefox).
+    // example: <div crm-ui-debug="myobject" />
+    .directive('crmUiDebug', function ($location) {
+      return {
+        restrict: 'AE',
+        scope: {
+          crmUiDebug: '@'
+        },
+        template: function() {
+          var args = $location.search();
+          return (args && args.angularDebug) ? '<div crm-ui-accordion crm-title=\'ts("Debug (%1)", {1: crmUiDebug})\' crm-collapsed="true"><pre>{{data|json}}</pre></div>' : '';
+        },
+        link: function(scope, element, attrs) {
+          var args = $location.search();
+          if (args && args.angularDebug) {
+            scope.ts = CRM.ts(null);
+            scope.$parent.$watch(attrs.crmUiDebug, function(data) {
+              scope.data = data;
+            });
+          }
+        }
+      };
+    })
+
     // Display a field/row in a field list
     // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
     // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
