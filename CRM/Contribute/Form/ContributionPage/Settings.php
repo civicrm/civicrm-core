@@ -122,16 +122,12 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     // financial Type
     if (CRM_Core_Permission::check('administer CiviCRM Financial Types')) {
-      $this->addSelect('financial_type_id', array(), TRUE);
+      $this->addSelect('financial_type_id', array('context' => 'search'), TRUE);
     }
     else {
-      CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
-      $financialType = $this->add('select', 'financial_type_id',
-        ts('Financial Type'),
-        array('' => ts('- select -')) + $financialTypes,
-        TRUE
-      );
+      $this->addSelect('financial_type_id', array('context' => 'search', 'options' => $financialTypes), TRUE);
     } 
 
     // name

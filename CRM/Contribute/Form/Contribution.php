@@ -651,7 +651,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     
     // Check permissions for financial type first
-    CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),

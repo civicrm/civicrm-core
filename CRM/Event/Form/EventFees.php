@@ -418,10 +418,13 @@ SELECT  id, html_type
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
         );
+        
+        // Check permissions for financial type first
+        CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
 
         $form->add('select', 'financial_type_id',
           ts('Financial Type'),
-          array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+          array('' => ts('- select -')) + $financialTypes
         );
 
         $form->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDate'));
