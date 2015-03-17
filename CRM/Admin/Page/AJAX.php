@@ -300,7 +300,7 @@ LIMIT $limit";
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
 
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($_GET['mappingID']);
+    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($_GET['mappingID'], $_GET['isLimit']);
 
     $output = array(
       'sel4' => array(),
