@@ -216,7 +216,8 @@ abstract class CRM_Core_Payment {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
 
-    $mode = (CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0;
+    $mode = CRM_Utils_Array::value('mode', $params);
+    $is_test = ($mode == 'test') ? 1 : 0;
 
     $sql = "SELECT ppt.class_name, ppt.name as processor_name, pp.id AS processor_id
               FROM civicrm_payment_processor_type ppt
@@ -227,21 +228,21 @@ abstract class CRM_Core_Payment {
     if (isset($params['processor_id'])) {
       $sql .= " WHERE pp.id = %2";
       $args[2] = array($params['processor_id'], 'Integer');
-      $notfound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
+      $notFound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
     }
     else {
       // This is called when processor_name is passed - passing processor_id instead is recommended.
       $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
-      $args[1] = array($mode, 'Integer');
+      $args[1] = array($is_test, 'Integer');
       $args[2] = array($params['processor_name'], 'String');
-      $notfound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
+      $notFound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $args);
 
     // Check whether we found anything at all ..
     if (!$dao->N) {
-      CRM_Core_Error::fatal($notfound);
+      CRM_Core_Error::fatal($notFound);
     }
 
     $method = 'handle' . $method;
