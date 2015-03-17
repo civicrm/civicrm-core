@@ -697,8 +697,8 @@ LIMIT 1;";
       $userID = $session->get('userID');
       if (!empty($userID)) {
         list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-        $values['receipt_from_email'] = $userEmail;
-        $values['receipt_from_name'] = $userName;
+        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
+        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
       }
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
