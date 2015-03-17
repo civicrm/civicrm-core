@@ -955,12 +955,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertCronRuns(array(
       array(
         // On some random day, no email.
-        'time' => '2014-03-07 01:00:00',
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' -60 days')),
         'recipients' => array(),
       ),
       array(
         // On the eve of 3 years after they were modified, send an email.
-        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' +3 years -1 day')),
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' +3 years -23 hours')),
         'recipients' => array(array('test-bday@example.com')),
       ),
     ));
