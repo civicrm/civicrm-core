@@ -153,7 +153,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'contribution_page_id' => array(
