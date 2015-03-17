@@ -236,8 +236,9 @@
 
         function buildSelects() {
           var mappingID = $('#entity_0', $form).val();
+          var isLimit = $('#limit_to', $form).val();
 
-          $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
+          $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID, isLimit: isLimit},
             function (result) {
               CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
               CRM.utils.setOptions($('#end_date', $form), result.sel4);

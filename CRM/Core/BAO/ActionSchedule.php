@@ -266,10 +266,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
    * @param int $id
+   * @param int $isLimit
    *
    * @return array
    */
-  public static function getSelection1($id = NULL) {
+  public static function getSelection1($id = NULL, $isLimit = NULL) {
     $mapping = self::getMapping($id);
     $sel4 = $sel5 = array();
     $options = array(
@@ -298,8 +299,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           break;
 
         case 'event_contacts':
-          $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
-          $sel5[$id] = $eventContacts + $options;
+          //CRM-15536, don't provide participant_role option on choosing 'Also Include' for Event entity
+          if ($isLimit == 1) {
+            $options += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+          }
+          $sel5[$id] = $options;
           $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
           break;
 
