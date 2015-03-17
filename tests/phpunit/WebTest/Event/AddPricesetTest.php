@@ -495,7 +495,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //click through to the participant view screen
     $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
   }
 
   /**
