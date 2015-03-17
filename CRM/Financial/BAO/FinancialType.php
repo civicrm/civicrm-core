@@ -192,7 +192,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * adding permissions for financial types
    *
    *
-   * @param array $permissions an array of permissions
+   * @param array $permissions        
+   *   an array of permissions
    */
   public static function permissionedFinancialTypes(&$permissions) {
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
