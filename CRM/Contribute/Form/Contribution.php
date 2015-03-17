@@ -491,7 +491,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public function buildQuickForm() {
     
     // FIXME: This probably needs to be done in preprocess
-    if ($this->_action & CRM_Core_Action::UPDATE) {
+    if ($this->_action & CRM_Core_Action::UPDATE && CRM_Utils_Array::value('financial_type_id', $this->_values)) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
@@ -651,13 +651,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     
     // Check permissions for financial type first
-    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    
-    foreach ($financialTypes as $finTypeId => $type) {
-      if (!CRM_Core_Permission::check('add new contributions of type ' . $type)) {
-        unset($financialTypes[$finTypeId]);
-      }
-    }
+    CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
 
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
