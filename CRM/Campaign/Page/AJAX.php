@@ -435,7 +435,7 @@ class CRM_Campaign_Page_AJAX {
             $surveytitle = $surveyValues['title'];
           }
 
-          $subject = ts('%1', array(1 => $surveytitle)) . ' - ' . ts('Respondent Reservation');
+          $subject = $surveytitle . ' - ' . ts('Respondent Reservation');
           $activityParams['subject'] = $subject;
           $activityParams['status_id'] = $scheduledStatusId;
           $activityParams['skipRecentView'] = 1;
