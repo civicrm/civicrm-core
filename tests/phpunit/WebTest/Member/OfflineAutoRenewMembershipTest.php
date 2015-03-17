@@ -58,11 +58,12 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->click('css=li#tab_member a');
 
-    $this->waitForElementPresent('link=Submit Credit Card Membership');
+    $this->waitForElementPresent('link=Add Membership');
 
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getAttribute("xpath=//div[@class='view-content']//div[@class='action-link']/a[2]@href");
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a[1]");
+    $url = $this->getAttribute("xpath=//a[contains(text(), 'Add Membership')]@href");
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -71,6 +72,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->select("payment_processor_id", "label={$processorName}");
 
     // fill in Membership Organization and Type
+    $this->waitForElementPresent('membership_type_id[0]');
     $this->select("membership_type_id[0]", "label={$memTypeParams['member_of_contact']}");
     // Wait for membership type select to reload
     $this->waitForTextPresent($memTypeParams['membership_type']);
@@ -81,7 +83,6 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->waitForElementPresent('auto_renew');
     $this->click("auto_renew");
-
     $this->webtestAddCreditCardDetails();
 
     $this->webtestAddBillingDetails($firstName, NULL, $lastName);
@@ -91,7 +92,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     // Use Find Members to make sure membership exists
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName, $firstName");
     $this->click("member_test");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickAjaxLink("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_MembershipView_cancel-bottom");
