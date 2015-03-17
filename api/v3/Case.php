@@ -134,8 +134,11 @@ function civicrm_api3_case_create($params) {
  *   Parameters determined by getfields.
  */
 function _civicrm_api3_case_get_spec(&$params) {
-  $params['contact_id']['api.aliases'] = array('client_id');
-  $params['contact_id']['title'] = 'Case Client';
+  $params['contact_id'] = array(
+    'api.aliases' => array('client_id'),
+    'title' => 'Case Client',
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }
 
 /**
@@ -145,9 +148,12 @@ function _civicrm_api3_case_get_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_create_spec(&$params) {
-  $params['contact_id']['api.aliases'] = array('client_id');
-  $params['contact_id']['title'] = 'Case Client';
-  $params['contact_id']['api.required'] = 1;
+  $params['contact_id'] = array(
+    'api.aliases' => array('client_id'),
+    'title' => 'Case Client',
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  );
   $params['status_id']['api.default'] = 1;
   $params['status_id']['api.aliases'] = array('case_status');
   $params['creator_id']['api.default'] = 'user_contact_id';
@@ -157,6 +163,7 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['medium_id'] = array(
     'name' => 'medium_id',
     'title' => 'Activity Medium',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 
