@@ -361,6 +361,18 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
     while ($result->fetch()) {
       $row = array();
+      $permissions[] = CRM_Core_Permission::VIEW;
+      if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
+        continue;
+      }
+      if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
+        unset($permissions[array_search(CRM_Core_Permission::EDIT, $permissions)]);
+        $mask = CRM_Core_Action::mask($permissions);
+      }
+      if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
+        unset($permissions[array_search(CRM_Core_Permission::DELETE, $permissions)]);
+        $mask = CRM_Core_Action::mask($permissions);
+      }
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (property_exists($result, $property)) {
