@@ -28,7 +28,7 @@
           });
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
-          scope.crmUiHelpFile = 'CRM/Mailing/Form/Upload';
+          scope.crmUiHelpFile = 'CRM/Mailing/MailingUI';
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
           $q.when(crmMetadata.getFields('Mailing'), function(fields) {
             scope.mailingFields = fields;
