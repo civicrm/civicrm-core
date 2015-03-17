@@ -121,8 +121,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $_values = array();
 
   protected $unsavedWarn = TRUE;
-  
-    /**
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {

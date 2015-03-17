@@ -81,7 +81,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_priceSetID = NULL;
 
   protected $_values;
-  
+
   /**
    * Explicitly declare the entity api name.
    */
