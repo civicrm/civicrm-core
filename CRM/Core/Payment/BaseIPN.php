@@ -438,6 +438,9 @@ class CRM_Core_Payment_BaseIPN {
     $recurContrib = &$objects['contributionRecur'];
 
     $values = array();
+    if (isset($input['is_email_receipt'])) {
+      $values['is_email_receipt'] = $input['is_email_receipt'];
+    }
     $source = NULL;
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
@@ -453,8 +456,10 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
       }
-      if ($recurContrib && $recurContrib->id) {
+
+      if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
+        // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
