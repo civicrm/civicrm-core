@@ -75,8 +75,12 @@ function _civicrm_api3_mailing_contact_getresults($params, $count) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_contact_get_spec(&$params) {
-  $params['contact_id']['api.required'] = 1;
-  $params['contact_id']['title'] = 'Contact ID';
+  $params['contact_id'] = array(
+    'api.required' => 1,
+    'title' => 'Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+
   $params['type'] = array(
     'api.default' => 'Delivered',
     'title' => 'Type', // doesn't really explain the field - but not sure I understand it to explain it better
