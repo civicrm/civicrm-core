@@ -20,18 +20,25 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    */
   public function appendQuickForm(&$form) {
     $textarea_size = array('size' => 30, 'maxlength' => 60);
-    $form->add('text', $this->email_field_name(), ts('Email Address'), $textarea_size, TRUE);
-
     list(
       $custom_fields_pre,
       $custom_fields_post
       ) = $this->get_participant_custom_data_fields($this->participant->event_id);
-
+    $email = FALSE;
     foreach ($custom_fields_pre as $key => $field) {
       CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, $this->participant->id);
+      if (strpos($key, 'email') !== FALSE) {
+        $email = TRUE;
+      }
     }
     foreach ($custom_fields_post as $key => $field) {
       CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, $this->participant->id);
+      if (strpos($key, 'email') !== FALSE) {
+        $email = TRUE;
+      }
+    }
+    if ($email === FALSE) {
+      $form->add('text', $this->email_field_name(), ts('Email Address'), $textarea_size, TRUE);
     }
     $custom = CRM_Utils_Array::value('custom', $form->getTemplate()->_tpl_vars, array());
     $form->assign('custom', array_merge($custom, array(
