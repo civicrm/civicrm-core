@@ -70,8 +70,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $type = self::ALL,
     $visibility = FALSE,
     $isRequired = NULL,
-    $groupName = 'Group(s)',
-    $tagName = 'Tag(s)',
+    $groupName = ts('Group(s)'),
+    $tagName = ts('Tag(s)'),
     $fieldName = NULL,
     $groupElementType = 'checkbox'
   ) {
@@ -130,7 +130,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         }
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
-          $form->add('select', $fName, ts('%1', array(1 => $groupName)), $groupsOptions, FALSE,
+          $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
             array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2')
           );
           $form->assign('groupCount', count($groupsOptions));
