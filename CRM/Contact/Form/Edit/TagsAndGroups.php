@@ -70,8 +70,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $type = self::ALL,
     $visibility = FALSE,
     $isRequired = NULL,
-    $groupName = ts('Group(s)'),
-    $tagName = ts('Tag(s)'),
+    $groupName = 'Group(s)',
+    $tagName = 'Tag(s)',
     $fieldName = NULL,
     $groupElementType = 'checkbox'
   ) {
