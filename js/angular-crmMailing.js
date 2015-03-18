@@ -338,7 +338,7 @@
   //   - "fields" (list of fields)
   angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope, crmUiHelp) {
     $scope.ts = CRM.ts(null);
-    $scope.help = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
+    $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
   });
 
   // Controller for the "Preview Mailing Component" segment
