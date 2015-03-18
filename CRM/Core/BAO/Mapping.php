@@ -322,7 +322,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if ($mappingType == 'Search Builder') {
         // get multiple custom group fields in this context
         $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required, FALSE, TRUE);
-      } else {
+      } 
+      else {
         $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
       }
       $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
