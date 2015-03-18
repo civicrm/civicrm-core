@@ -172,13 +172,9 @@
           return this.options[n];
         },
         open: function open() {
-          console.log('open', this.options.title, this.options.id, this.options.file);
           CRM.help(this.options.title, {id: this.options.id, file: this.options.file});
         },
         clone: function clone(options, defaults) {
-          options = options || {};
-          defaults = defaults || {};
-          console.log('clone', defaults, this.options, options);
           return new FieldHelp(angular.extend({}, defaults, this.options, options));
         }
       });
