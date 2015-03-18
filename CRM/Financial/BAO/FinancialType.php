@@ -217,4 +217,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return $financialTypes;
   }
+
+  public static function buildPermissionedClause(&$whereClauses) {
+    self::getAvailableFinancialTypes($financialType);
+    foreach ($financialType as $id => $type) {
+      $ids[] = $id;
+    }
+    $whereClauses[] = ' financial_type_id IN (' . implode(',' , $ids) .')';
+  }
 }

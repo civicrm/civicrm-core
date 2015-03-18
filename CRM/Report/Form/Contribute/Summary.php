@@ -508,7 +508,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           unset($this->_havingClauses[$key]);
         }
       }
-    }
+    }    
   }
 
   /**
@@ -595,6 +595,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
   public function postProcess() {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses);
     parent::postProcess();
   }
 
