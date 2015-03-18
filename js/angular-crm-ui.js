@@ -114,7 +114,7 @@
     // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: help('help_field_name')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -136,6 +136,7 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
+          scope.help = null;
           scope.$watch('crmUiField', function(crmUiField) {
             if (crmUiField && crmUiField.help) {
               scope.help = crmUiField.help.clone({}, {
@@ -179,10 +180,10 @@
         }
       });
 
-      // example: var help = crmUiHelp({file: 'CRM/Foo/Bar'});
+      // example: var hs = crmUiHelp({file: 'CRM/Foo/Bar'});
       return function(defaults){
-        // example: help('myfield')
-        // example: help({id: 'myfield', title: 'Foo Bar', file: 'Whiz/Bang'})
+        // example: hs('myfield')
+        // example: hs({id: 'myfield', title: 'Foo Bar', file: 'Whiz/Bang'})
         return function(options) {
           if (_.isString(options)) {
             options = {id: options};
@@ -194,28 +195,26 @@
 
     // Display a help icon
     // Example: Use a default *.hlp file
-    //   scope.help = crmUiHelp({file: 'Path/To/Help/File'});
-    //   HTML: <a crm-ui-help="help({title:ts('My Field'), id:'my_field'})">
+    //   scope.hs = crmUiHelp({file: 'Path/To/Help/File'});
+    //   HTML: <a crm-ui-help="hs({title:ts('My Field'), id:'my_field'})">
     // Example: Use an explicit *.hlp file
-    //   HTML: <a crm-ui-help="help({title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'})">
+    //   HTML: <a crm-ui-help="hs({title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'})">
     .directive('crmUiHelp', function() {
       return {
         restrict: 'EA',
-        link: function (scope, element, attrs) {
-          var crmUiHelp = null;
-
-          scope.$watch(attrs.crmUiHelp, function(newCrmUiHelp){
-            crmUiHelp = newCrmUiHelp;
+        link: function(scope, element, attrs) {
+          setTimeout(function() {
+            var crmUiHelp = scope.$eval(attrs.crmUiHelp);
             var title = crmUiHelp && crmUiHelp.get('title') ? ts('%1 Help', {1: crmUiHelp.get('title')}) : ts('Help');
             element.attr('title', title);
-          });
+          }, 50);
 
           element
             .addClass('helpicon')
             .attr('href', '#')
             .on('click', function(e) {
               e.preventDefault();
-              crmUiHelp.open();
+              scope.$eval(attrs.crmUiHelp).open();
             });
         }
       };
