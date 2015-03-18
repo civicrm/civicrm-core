@@ -16,7 +16,7 @@
     crmMailingBodyText: '~/crmMailing/body_text.html'
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
-    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata) {
+    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata, crmUiHelp) {
       return {
         scope: {
           crmMailing: '@'
@@ -28,7 +28,7 @@
           });
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
-          scope.crmUiHelpFile = 'CRM/Mailing/MailingUI';
+          scope.help = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
           $q.when(crmMetadata.getFields('Mailing'), function(fields) {
             scope.mailingFields = fields;
