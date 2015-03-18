@@ -60,3 +60,35 @@
 {htxt id="footer"}
   <p>{ts}You may choose to include a pre-configured Footer block below your message. This is a good place to include the required unsubscribe, opt-out and postal address tokens.{/ts}</p>
 {/htxt}
+
+{htxt id="dedupe_email"}
+  <p>{ts}Multiple people -- such as spouses, parents, or children -- may sometimes share the same email address.{/ts}</p>
+  <p>{ts}To send only one message to the shared address, enable this option. Mail-merge tokens will be filled for only one person.{/ts}</p>
+  <p>{ts}To send separate messages for each person, disable this option. Mail-merge tokens will be filled separately for each person.{/ts}</p>
+{/htxt}
+
+{htxt id="visibility"}
+  <p>
+    {ts}This option controls who can view the contents of this email on your website. The link can be included by inserting the "Mailing permalink" token (place it in a link when composing in HTML mode).{/ts}
+  </p><p>
+    {ts}The options for mailing visibility are:{/ts}
+  </p>
+  <ul>
+    <li>
+      {ts}"Public Pages" will make the content of this mailing viewable everyone who has the permission "view public CiviMail content". Note that even people who did not receive the mailing would be able to find it via search engines.{/ts}
+    </li>
+    <li>
+      {ts}"User and User Admin Only" means that only users that received the mailing or administrators can view this email on your website; users must be logged in to view the message.{/ts}
+    </li>
+  </ul>
+{/htxt}
+
+{htxt id="test"}
+  <p>{ts}It's a good idea to test your mailing by sending it to yourself and/or a selected group of people in your organization.{/ts}</p>
+  <p>{ts}Things to check in a test mailing:{/ts}</p>
+  <ul>
+    <li>{ts}Verify the content and formatting looks consistent across various email clients.{/ts}</li>
+    <li>{ts}If you are using mail-merge tokens, check that they have been replaced with expected values.{/ts}</li>
+    <li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
+  </ul>
+{/htxt}

@@ -336,8 +336,9 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - "mailing" (APIv3 mailing object)
   //   - "fields" (list of fields)
-  angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope) {
+  angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope, crmUiHelp) {
     $scope.ts = CRM.ts(null);
+    $scope.help = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
   });
 
   // Controller for the "Preview Mailing Component" segment
