@@ -114,7 +114,7 @@
     // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: 'help_field_name'}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: help('help_field_name')}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -136,8 +136,13 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
-          // Inherit helpFile from parent scope if not specified
-          scope.crmUiHelpFile = scope.crmUiField.helpFile || scope.$parent.crmUiHelpFile;
+          scope.$watch('crmUiField', function(crmUiField) {
+            if (crmUiField && crmUiField.help) {
+              scope.help = crmUiField.help.clone({}, {
+                title: crmUiField.title
+              });
+            }
+          });
         }
       };
     })
@@ -156,26 +161,65 @@
       };
     })
 
-    // Display a help icon which loads help from a *.hlp file.
+    // for example, see crmUiHelp
+    .service('crmUiHelp', function(){
+      // example: var h = new FieldHelp({id: 'foo'}); h.open();
+      function FieldHelp(options) {
+        this.options = options;
+      }
+      angular.extend(FieldHelp.prototype, {
+        get: function(n) {
+          return this.options[n];
+        },
+        open: function open() {
+          console.log('open', this.options.title, this.options.id, this.options.file);
+          CRM.help(this.options.title, {id: this.options.id, file: this.options.file});
+        },
+        clone: function clone(options, defaults) {
+          options = options || {};
+          defaults = defaults || {};
+          console.log('clone', defaults, this.options, options);
+          return new FieldHelp(angular.extend({}, defaults, this.options, options));
+        }
+      });
+
+      // example: var help = crmUiHelp({file: 'CRM/Foo/Bar'});
+      return function(defaults){
+        // example: help('myfield')
+        // example: help({id: 'myfield', title: 'Foo Bar', file: 'Whiz/Bang'})
+        return function(options) {
+          if (_.isString(options)) {
+            options = {id: options};
+          }
+          return new FieldHelp(angular.extend({}, defaults, options));
+        }
+      }
+    })
+
+    // Display a help icon
     // Example: Use a default *.hlp file
-    //   JS: scope.crmUiHelpFile='CRM/Foo/Bar';
-    //   HTML: <a crm-ui-help="{title:ts('My Field'), id:'my_field'}">
+    //   scope.help = crmUiHelp({file: 'Path/To/Help/File'});
+    //   HTML: <a crm-ui-help="help({title:ts('My Field'), id:'my_field'})">
     // Example: Use an explicit *.hlp file
-    //   HTML: <a crm-ui-help="{title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'}">
+    //   HTML: <a crm-ui-help="help({title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'})">
     .directive('crmUiHelp', function() {
       return {
         restrict: 'EA',
-        scope: {
-          crmUiHelp: '='
-        },
         link: function (scope, element, attrs) {
+          var crmUiHelp = null;
+
+          scope.$watch(attrs.crmUiHelp, function(newCrmUiHelp){
+            crmUiHelp = newCrmUiHelp;
+            var title = crmUiHelp && crmUiHelp.get('title') ? ts('%1 Help', {1: crmUiHelp.get('title')}) : ts('Help');
+            element.attr('title', title);
+          });
+
           element
             .addClass('helpicon')
-            .attr('title', ts('%1 Help', {1: scope.crmUiHelp.title}))
             .attr('href', '#')
             .on('click', function(e) {
               e.preventDefault();
-              CRM.help(scope.crmUiHelp.title, {id: scope.crmUiHelp.id, file: scope.crmUiHelp.file || scope.$parent.crmUiHelpFile});
+              crmUiHelp.open();
             });
         }
       };
