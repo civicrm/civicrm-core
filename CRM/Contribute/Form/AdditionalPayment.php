@@ -264,9 +264,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
     $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
-    $label = ($this->_refund) ? 'Refund Amount' : 'Payment Amount';
+    $label = ($this->_refund) ? ts('Refund Amount') : ts('Payment Amount');
     $this->addMoney('total_amount',
-      ts('%1', array(1 => $label)),
+      $label,
       FALSE,
       $attributes['total_amount'],
       TRUE, 'currency', NULL
@@ -289,8 +289,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     // add various dates
-    $dateLabel = ($this->_refund) ? 'Refund Date' : 'Received Date';
-    $this->addDateTime('trxn_date', ts('%1', array(1 => $dateLabel)), FALSE, array('formatType' => 'activityDateTime'));
+    $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Received Date');
+    $this->addDateTime('trxn_date', $dateLabel, FALSE, array('formatType' => 'activityDateTime'));
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {

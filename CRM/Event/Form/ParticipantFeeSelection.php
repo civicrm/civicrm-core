@@ -116,9 +116,9 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('lineItemTotal', $lineItemTotal);
     }
 
-    $title = "Change selections for {$this->_contributorDisplayName}";
+    $title = ts("Change selections for %1", array(1 => $this->_contributorDisplayName));
     if ($title) {
-      CRM_Utils_System::setTitle(ts('%1', array(1 => $title)));
+      CRM_Utils_System::setTitle($title);
     }
   }
 
@@ -136,7 +136,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     else {
       foreach ($priceFieldId as $key => $value) {
         if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
-          $defaults[$this->_participantId]['price_' . array_keys($this->_values['fee'])[$key]] = 0;
+          $fee_keys = array_keys($this->_values['fee']);
+          $defaults[$this->_participantId]['price_' . $fee_keys[$key]] = 0;
         }
       }
     }
