@@ -31,8 +31,8 @@
 {/htxt}
 
 {htxt id="id-account-type-code-title"}
-  {ts}Account Type Code}{/ts}
+  {ts}Account Type Code{/ts}
 {/htxt}
 {htxt id="id-account-type-code"}
-<p>{ts}For export to QuickBooks, export your Chart of Accounts and open in low level text editor. You will be able to see the Account Type Code for each account. Generally, they will be from the following list: BANK, AR, OCASSET, FIXASSET, OASSET, AP, OCLIAB, LTLIAB, EQUITY, INC, COGS, EXP, EXEXP (though there may be others in your version of QuickBooks). {/ts}</p>
+<p>{ts}For export to QuickBooks, export your Chart of Accounts and open in low level text editor. You will be able to see the Account Type Code for each account. Generally, they will be from the following list: BANK, AR, OCASSET, FIXASSET, OASSET, AP, OCLIAB, LTLIAB, EQUITY, INC, COGS, EXP, EXEXP (though there may be others in your version of QuickBooks).{/ts}</p>
 {/htxt}
