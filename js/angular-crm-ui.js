@@ -188,8 +188,8 @@
             options = {id: options};
           }
           return new FieldHelp(angular.extend({}, defaults, options));
-        }
-      }
+        };
+      };
     })
 
     // Display a help icon
