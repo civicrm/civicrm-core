@@ -533,6 +533,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses);
 
     $this->beginPostProcess();
 
