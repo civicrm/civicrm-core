@@ -74,15 +74,27 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $restoredCases = 0;
+    $restoredCases = $failed = 0;
     foreach ($this->_caseIds as $caseId) {
       if (CRM_Case_BAO_Case::restoreCase($caseId)) {
         $restoredCases++;
       }
+      else {
+        $failed++;
+      }
     }
 
-    CRM_Core_Session::setStatus($restoredCases, ts('Restored Cases'), 'success');
-    CRM_Core_Session::setStatus('', ts('Total Selected Case(s): %1', array(1 => count($this->_caseIds))), 'info');
+    if ($restoredCases) {
+      $msg = ts('%count case restored from trash.', array(
+        'plural' => '%count cases restored from trash.',
+        'count' => $restoredCases,
+      ));
+      CRM_Core_Session::setStatus($msg, ts('Restored'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be restored.', array('plural' => '%count could not be restored.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }

@@ -74,16 +74,25 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedActivities = 0;
+    $deleted = $failed = 0;
     foreach ($this->_activityHolderIds as $activityId['id']) {
       $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($activityId['id']);
       if (CRM_Activity_BAO_Activity::deleteActivity($activityId, $moveToTrash)) {
-        $deletedActivities++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus($deletedActivities, ts('Deleted Activities'), "success");
-    CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', array(1 => count($this->_activityHolderIds))), "info");
+    if ($deleted) {
+      $msg = ts('%count activity deleted.', array('plural' => '%count activities deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }

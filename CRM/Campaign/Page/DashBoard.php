@@ -314,7 +314,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $surveysData[$sid]['campaign'] = CRM_Utils_Array::value($campaignId, $campaigns);
         $surveysData[$sid]['activity_type'] = $surveyType[$survey['activity_type_id']];
         if (!empty($survey['release_frequency'])) {
-          $surveysData[$sid]['release_frequency'] = $survey['release_frequency'] . ' ' . ts('Day(s)');
+          $surveysData[$sid]['release_frequency'] = ts('1 Day', array('plural' => '%count Days', 'count' => $survey['release_frequency']));
         }
 
         $action = array_sum(array_keys(self::surveyActionLinks($surveysData[$sid]['activity_type'])));
