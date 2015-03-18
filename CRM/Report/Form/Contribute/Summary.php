@@ -534,7 +534,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           unset($this->_havingClauses[$key]);
         }
       }
-    }    
+    }   
   }
 
   /**
