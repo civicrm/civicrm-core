@@ -28,7 +28,7 @@
           });
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
-          scope.help = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
+          scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
           $q.when(crmMetadata.getFields('Mailing'), function(fields) {
             scope.mailingFields = fields;
@@ -49,7 +49,7 @@
         });
         scope.crmMailingConst = CRM.crmMailing;
         scope.ts = CRM.ts(null);
-        scope.help = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
+        scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
         scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
         scope.testGroup = {gid: null};
 

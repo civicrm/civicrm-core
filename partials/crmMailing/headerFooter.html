@@ -4,7 +4,7 @@ Required vars: mailing, crmMailingConst
 -->
 <div class="crm-block"  ng-form="subform" crm-ui-id-scope>
   <div class="crm-group" ng-controller="EmailBodyCtrl">
-    <div crm-ui-field="{name: 'subform.header_id', title: ts('Mailing Header'), help: help('header')}">
+    <div crm-ui-field="{name: 'subform.header_id', title: ts('Mailing Header'), help: hs('header')}">
       <select
         crm-ui-id="subform.header_id"
         name="header_id"
@@ -16,7 +16,7 @@ Required vars: mailing, crmMailingConst
         <option value=""></option>
       </select>
     </div>
-    <div crm-ui-field="{name: 'subform.footer_id', title: ts('Mailing Footer'), help: help('footer')}">
+    <div crm-ui-field="{name: 'subform.footer_id', title: ts('Mailing Footer'), help: hs('footer')}">
       <select
         crm-ui-id="subform.footer_id"
         name="footer_id"
