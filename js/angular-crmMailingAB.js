@@ -165,6 +165,8 @@
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
+        height: 'auto',
+        width: '40%',
         title: ts('Select Final Mailing (Test %1)', {
           1: mailingName.toUpperCase()
         })
@@ -240,28 +242,37 @@
       // When using dialogService with a button bar, the major button actions
       // need to be registered with the dialog widget (and not embedded in
       // the body of the dialog).
-      var buttons = {};
-      buttons[ts('Submit final mailing')] = function () {
-        crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
-          'name',
-          'recipients',
-          'scheduled_date'
-        ]);
-        crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
-          .then(function () {
-            return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
-              abtest.submitFinal().then(function(r){
-                delete abtest.$CrmMailingABReportCnt;
-                return r;
-              }));
-          })
-          .then(function(){
-            dialogService.close('selectWinnerDialog', abtest);
-          });
-      };
-      buttons[ts('Cancel')] = function () {
-        dialogService.cancel('selectWinnerDialog');
-      };
+      var buttons = [
+        {
+          text: ts('Submit final mailing'),
+          icons: {primary: 'ui-icon-check'},
+          click: function () {
+            crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
+              'name',
+              'recipients',
+              'scheduled_date'
+            ]);
+            crmStatus({start: ts('Saving...'), success: ''}, abtest.save())
+              .then(function () {
+                return crmStatus({start: ts('Submitting...'), success: ts('Submitted')},
+                  abtest.submitFinal().then(function(r){
+                    delete abtest.$CrmMailingABReportCnt;
+                    return r;
+                  }));
+              })
+              .then(function(){
+                dialogService.close('selectWinnerDialog', abtest);
+              });
+          }
+        },
+        {
+          text: ts('Cancel'),
+          icons: {primary: 'ui-icon-close'},
+          click: function () {
+            dialogService.cancel('selectWinnerDialog');
+          }
+        }
+      ];
       dialogService.setButtons('selectWinnerDialog', buttons);
     }
 
