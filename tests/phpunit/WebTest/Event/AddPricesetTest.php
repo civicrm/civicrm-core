@@ -196,7 +196,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
-    $this->clickAt("xpath=//*[@class ='select2-chosen']");
+    if ($this->isElementPresent("xpath=//*[@class ='select2-chosen']")) {
+      $this->clickAt("xpath=//*[@class ='select2-chosen']");
+    }
     $this->assertStringsPresent($validateStrings);
   }
 
@@ -709,7 +711,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Enter Event Title, Summary and Description
     $this->select("event_type_id", "value=4");
     $this->select("default_role_id", "value=1");
-    $this->type("title", "Test Event");
+    $this->type("template_title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
 
     $this->click("_qf_EventInfo_upload-bottom");
