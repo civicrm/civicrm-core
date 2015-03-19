@@ -328,6 +328,69 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test searching on custom fields returning a contact reference.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-16036
+   */
+  public function testEventGetCustomContactRefFieldCRM16036() {
+    // Create some contact.
+    $test_contact_name = 'Contact, Test';
+    $contact_save_result = $this->callAPISuccess('contact', 'create', array(
+      'sort_name' => $test_contact_name,
+      'contact_type' => 'Individual',
+      'display_name' => $test_contact_name,
+    ));
+    $contact_id = $contact_save_result['id'];
+
+    // I have no clue what this $subfile is about. I just copied it from another
+    // unit test.
+    $subfile = 'ContactRefCustomField';
+    $description = "Demonstrates get with Contact Reference Custom Field.";
+
+    // Create a custom group, and add a custom contact reference field.
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = array(
+      'custom_group_id' => $ids['custom_group_id'],
+      'name' => 'Worker_Lookup',
+      'label' => 'Worker Lookup',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'ContactReference',
+      'weight' => 4,
+      'is_searchable' => 1,
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+
+    // Create an event, and add the contact as custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $customField['id']] = "$contact_id";
+
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+
+    // Retrieve the activity, search for the contact.
+    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+      'return.custom_' . $customField['id'] => 1,
+      'custom_' . $customField['id'] => $contact_id,
+    ), __FUNCTION__, __FILE__, $description, $subfile);
+
+    $this->assertEquals($test_contact_name, $result['values'][$result['id']]['custom_' . $customField['id']]);
+    $this->assertEquals($contact_id, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
+    // Not sure whether I should test for custom_X_1 and custom_X_1_id as well.
+    // (1 being the id of the record in the custom value table)
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->callAPISuccess('contact', 'delete', array(
+      'id' => $contact_id,
+      'skip_undelete' => TRUE,
+    ));
+  }
+
+  /**
    * Test that an event with a price set can be created.
    */
   public function testCreatePaidEvent() {
