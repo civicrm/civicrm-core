@@ -61,6 +61,25 @@
             preview: {recipient: recipient}
           });
         };
+
+        scope.previewTestGroup = function(e) {
+          var $dialog = $(this);
+          $dialog.html('<div class="crm-loading-element"></div>');
+          CRM.api3('contact', 'get', {group: scope.testGroup.gid, options: {limit: 0}, return: 'display_name,email'}).done(function(data) {
+            var count = 0,
+              // Fixme: should this be in a template?
+              markup = '<ol>';
+            _.each(data.values, function(row) {
+              // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
+              if (row.email) {
+                count++;
+                markup += '<li>' + row.display_name + ' - ' + row.email + '</li>';
+              }
+            });
+            markup += '</ol>';
+            $dialog.html('<h4>' + ts('A test message will be sent to %1 people:', {1: count}) + '</h4>' + markup).trigger('crmLoad');
+          });
+        };
       }
     };
   });
