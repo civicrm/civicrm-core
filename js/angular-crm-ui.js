@@ -320,6 +320,10 @@
         link: function (scope, elm, attr, ngModel) {
           var ck = CKEDITOR.replace(elm[0]);
 
+          ck.on('contentDom', function(){
+            $(ck.container.$).addClass('crmCke');
+          });
+
           if (!ngModel) {
             return;
           }

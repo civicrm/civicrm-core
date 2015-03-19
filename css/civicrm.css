@@ -4023,3 +4023,8 @@ span.crm-status-icon {
 .crm-container .crm-ui-datetime.ng-dirty input.incomplete {
   border: 1px solid red;
 }
+
+/* In full-screen, avoid conflict with Civi nav bar */
+.crmCke .cke_maximized .cke_top {
+  margin-top: 30px;
+}
