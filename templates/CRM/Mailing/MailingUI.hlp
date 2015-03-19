@@ -92,3 +92,35 @@
     <li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
   </ul>
 {/htxt}
+
+{htxt id="url_tracking"}
+  <p>
+    {ts}Track the number of times recipients click each link in this mailing.{/ts}
+  </p><p>
+    {ts}NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="open_tracking"}
+  <p>
+    {ts}Track the number of times recipients open this mailing in their email software.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="override_verp"}
+  <p>
+    {ts}Recipients' replies are sent to a CiviMail specific address instead of the sender's address so they can be stored within CiviCRM.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="auto_responder"}
+  <p>
+    {ts}If a recipient replies to this mailing, send an automated reply using the selected message.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="forward_replies"}
+  <p>
+    {ts}If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.{/ts}
+  </p>
+{/htxt}
