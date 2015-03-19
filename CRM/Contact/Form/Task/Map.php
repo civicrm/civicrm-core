@@ -176,6 +176,9 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       CRM_Core_Error::statusBounce(ts('This address does not contain latitude/longitude information and cannot be mapped.'));
     }
 
+    if (empty($config->mapProvider)) {
+      CRM_Core_Error::statusBounce(ts('You need to configure a Mapping Provider before using this feature (Administer > System Settings > Mapping and Geocoding).'));
+    }
     if ($addBreadCrumb) {
       $session = CRM_Core_Session::singleton();
       $redirect = $session->readUserContext();
