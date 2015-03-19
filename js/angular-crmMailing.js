@@ -293,6 +293,7 @@
         recipients: $scope.recipients
       };
       var options = CRM.utils.adjustDialogDefaults({
+        width: '40%',
         autoOpen: false,
         title: ts('Preview (%1)', {
           1: $scope.getRecipientsEstimate()
@@ -305,6 +306,8 @@
     $scope.editOptions = function editOptions(mailing) {
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
+        width: '40%',
+        height: 'auto',
         title: ts('Edit Options')
       });
       $q.when(crmMetadata.getFields('Mailing')).then(function(fields) {
@@ -391,6 +394,8 @@
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
+        height: 'auto',
+        width: '40%',
         title: ts('Save Template')
       });
       return dialogService.open('saveTemplateDialog', '~/crmMailing/dialog/saveTemplate.html', model, options)
