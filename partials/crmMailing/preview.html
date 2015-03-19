@@ -52,7 +52,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
         <option value=""></option>
       </select>
     </div>
-    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !testGroup.gid" ng-click="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
+    <button crm-icon="mail-closed" title="{{ts('Send to group')}}" ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
   </div>
   <div class="clear"></div>
 </div>
