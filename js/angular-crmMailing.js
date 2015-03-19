@@ -109,6 +109,27 @@
         }));
     };
 
+    $scope.previewTestGroup = function(e) {
+      var $dialog = $(this),
+        // Fixme: how to get this from the scope?
+        gid = $('select[name=preview_test_group]').val();
+      $dialog.html('<div class="crm-loading-element"></div>');
+      CRM.api3('contact', 'get', {group: gid, options: {limit: 0}, return: 'display_name,email'}).done(function(data) {
+        // Fixme: should this be in a template?
+        var count = 0,
+          markup = '<ol>';
+        _.each(data.values, function(row) {
+          // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
+          if (row.email) {
+            count++;
+            markup += '<li>' + row.display_name + ' - ' + row.email + '</li>';
+          }
+        });
+        markup += '</ol>';
+        $dialog.html('<h4>' + ts('A test message will be sent to %1 people:', {1: count}) + '</h4>' + markup).trigger('crmLoad');
+      });
+    };
+
     // @return Promise
     $scope.submit = function submit(options) {
       options = options || {};
