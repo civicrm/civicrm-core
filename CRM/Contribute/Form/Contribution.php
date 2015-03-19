@@ -1044,7 +1044,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $isRelatedId = TRUE;
         }
         elseif (array_key_exists('participant', $contributionDetails)) {
-          $pId = current($contributionDetails['participant']);
+          $pId = $contributionDetails['participant'];
         }
       }
     }
