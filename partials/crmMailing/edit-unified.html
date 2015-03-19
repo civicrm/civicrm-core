@@ -35,11 +35,11 @@
       </div>
     </div>
 
-    <div crm-ui-accordion crm-title="ts('Preview')">
+    <div crm-ui-accordion="{title: ts('Preview')}" >
       <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)" />
     </div>
 
-    <div crm-ui-accordion crm-title="ts('Schedule')">
+    <div crm-ui-accordion="{title: ts('Schedule')}" >
       <div crm-mailing-block-schedule crm-mailing="mailing"/>
     </div>
 

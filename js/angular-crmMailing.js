@@ -72,13 +72,14 @@
     $location.replace();
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp) {
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;
 
     var ts = $scope.ts = CRM.ts(null);
+    $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
     var block = $scope.block = crmBlocker();
     var myAutosave = null;
 
