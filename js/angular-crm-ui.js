@@ -10,15 +10,23 @@
     .directive('crmUiAccordion', function() {
       return {
         scope: {
-          crmTitle: '@',
-          crmCollapsed: '@'
+          crmUiAccordion: '='
         },
-        template: '<div class="crm-accordion-wrapper" ng-class="cssClasses"><div class="crm-accordion-header">{{$parent.$eval(crmTitle)}}</div><div class="crm-accordion-body" ng-transclude></div></div>',
+        template: '<div ng-class="cssClasses"><div class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></div><div class="crm-accordion-body" ng-transclude></div></div>',
         transclude: true,
         link: function (scope, element, attrs) {
           scope.cssClasses = {
-            collapsed: scope.$parent.$eval(attrs.crmCollapsed)
+            'crm-accordion-wrapper': true,
+            collapsed: scope.crmUiAccordion.collapsed
           };
+          scope.help = null;
+          scope.$watch('crmUiAccordion', function(crmUiAccordion) {
+            if (crmUiAccordion && crmUiAccordion.help) {
+              scope.help = crmUiAccordion.help.clone({}, {
+                title: crmUiAccordion.title
+              });
+            }
+          });
         }
       };
     })
