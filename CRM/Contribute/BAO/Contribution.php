@@ -3123,6 +3123,7 @@ WHERE  contribution_id = %1 ";
       }
     }
     if ($context == 'changeFinancialType') {
+      $params['skipLineItem'] = FALSE;
       foreach ($params['line_item'] as &$lineItems) {
         foreach ($lineItems as &$line) {
           $line['financial_type_id'] = $params['financial_type_id'];
