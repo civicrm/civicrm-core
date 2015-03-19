@@ -486,7 +486,10 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
   $where_clauses = array();
 
   // Tables we need to join with to retrieve the custom values.
-  $tables_to_join = array();
+  $custom_value_tables = array();
+
+  // ID's of custom fields that refer to a contact.
+  $contact_reference_field_ids = array();
 
   // populate $select_fields
   $return_all_fields = (empty($options['return']) || !is_array($options['return']));
@@ -505,10 +508,22 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
     if ($return_all_fields || !empty($options['return'][$field_name])) {
       $table_name = $custom_field["table_name"];
       $column_name = $custom_field["column_name"];
-      $select_fields["$table_name.$column_name"] = "custom_$cf_id";
       // remember that we will need to join the correct table.
-      if (!in_array($table_name, $tables_to_join)) {
-        $tables_to_join[] = $table_name;
+      if (!in_array($table_name, $custom_value_tables)) {
+        $custom_value_tables[] = $table_name;
+      }
+      if ($custom_field["data_type"] != "ContactReference") {
+        // 'ordinary' custom field. We will select the value as custom_XX.
+        $select_fields["$table_name.$column_name"] = $field_name;
+      }
+      else {
+        // contact reference custom field. The ID will be stored in
+        // custom_XX_id. custom_XX will contain the sort name of the
+        // contact.
+        $contact_reference_field_ids[] = $cf_id;
+        $select_fields["$table_name.$column_name"] = $field_name . "_id";
+        // We will call the contact table for the join c_XX.
+        $select_fields["c_$cf_id.sort_name"] = $field_name;
       }
     }
   }
@@ -547,8 +562,8 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
           $operator,
           $rhs,
         );
-        if (!in_array($table_name, $tables_to_join)) {
-          $tables_to_join[] = $table_name;
+        if (!in_array($table_name, $custom_value_tables)) {
+          $custom_value_tables[] = $table_name;
         }
       }
     }
@@ -563,7 +578,8 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
     $query = $query->select("!column_$i as !alias_$i", array("!column_$i" => $column, "!alias_$i" => $alias));
   }
 
-  foreach ($tables_to_join as $table_name) {
+  // join with custom value tables
+  foreach ($custom_value_tables as $table_name) {
     ++$i;
     $query = $query->join(
       "!table_name_$i",
@@ -571,6 +587,19 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
       array("!table_name_$i" => $table_name)
     );
   }
+
+  // join with contact for contact reference fields
+  foreach ($contact_reference_field_ids as $field_id) {
+    ++$i;
+    $query = $query->join(
+      "!contact_table_name$i",
+      "LEFT OUTER JOIN civicrm_contact !contact_table_name_$i ON !contact_table_name_$i.id = !values_table_name_$i.!column_name_$i",
+      array(
+        "!contact_table_name_$i" => "c_$field_id",
+        "!values_table_name_$i" => $custom_fields[$field_id]["table_name"],
+        "!column_name_$i" => $custom_fields[$field_id]["column_name"],
+      ));
+  };
 
   foreach ($where_clauses as $clause) {
     ++$i;
@@ -664,7 +693,8 @@ function _civicrm_api3_field_names($fields) {
  *   {
  *     '1' => array {
  *       'table_name' => 'table_name_1',
- *       'column_name' => ''column_name_1',
+ *       'column_name' => 'column_name_1',
+ *       'data_type' => 'data_type_1',
  *     },
  *   }
  */
@@ -692,6 +722,7 @@ SELECT f.id, f.label, f.data_type,
     $result[$dao->id] = array(
       'table_name' => $dao->table_name,
       'column_name' => $dao->column_name,
+      'data_type' => $dao->data_type,
     );
   }
   $dao->free();
