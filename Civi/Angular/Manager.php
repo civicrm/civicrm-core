@@ -85,7 +85,7 @@ class Manager {
       );
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
+        'js' => array('js/angular-crm-ui.js'),
         'partials' => array('partials/crmUi'),
       );
       $angularModules['crmUtil'] = array(
@@ -255,36 +255,42 @@ class Manager {
   }
 
   /**
-   * @param string $name
-   *   Module name.
+   * Get resources for one or more modules.
+   *
+   * @param string|array $moduleNames
+   *   List of module names.
+   * @param string $resType
+   *   Type of resource ('js', 'css').
+   * @param string $refType
+   *   Type of reference to the resource ('cacheUrl', 'rawUrl', 'path').
    * @return array
-   *   List of URLs.
-   * @throws \Exception
+   *   List of URLs or paths.
+   * @throws \CRM_Core_Exception
    */
-  public function getScriptUrls($name) {
-    $module = $this->getModule($name);
+  public function getResources($moduleNames, $resType, $refType) {
     $result = array();
-    if (isset($module['js'])) {
-      foreach ($module['js'] as $file) {
-        $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
-      }
-    }
-    return $result;
-  }
+    $moduleNames = (array) $moduleNames;
+    foreach ($moduleNames as $moduleName) {
+      $module = $this->getModule($moduleName);
+      if (isset($module[$resType])) {
+        foreach ($module[$resType] as $file) {
+          switch ($refType) {
+            case 'path':
+              $result[] = $this->res->getPath($module['ext'], $file);
+              break;
 
-  /**
-   * @param string $name
-   *   Module name.
-   * @return array
-   *   List of URLs.
-   * @throws \Exception
-   */
-  public function getStyleUrls($name) {
-    $module = $this->getModule($name);
-    $result = array();
-    if (isset($module['css'])) {
-      foreach ($module['css'] as $file) {
-        $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+            case 'rawUrl':
+              $result[] = $this->res->getUrl($module['ext'], $file);
+              break;
+
+            case 'cacheUrl':
+              $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+              break;
+
+            default:
+              throw new \CRM_Core_Exception("Unrecognized resource format");
+          }
+        }
       }
     }
     return $result;
