@@ -409,7 +409,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    *
    * @return array
    */
-  public function getProfileContact($gid) {
+  public static function getProfileContact($gid) {
     $session = CRM_Core_Session::singleton();
     $params = $session->get('profileParams');
 
