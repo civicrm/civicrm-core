@@ -2730,7 +2730,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         'details' => $mergeActSubjectDetails,
         'status_id' => array_search('Completed', $activityStatuses),
         'activity_type_id' => $mergeActType,
-        'source_contact_id' => $mainContactId,
+        'source_contact_id' => $currentUserId,
         'activity_date_time' => date('YmdHis'),
       );
 
