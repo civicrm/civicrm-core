@@ -2209,6 +2209,7 @@ SELECT contact_id
       'search' => "Searchable options are returned. Labels are translated.",
       'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
       'abbreviate' => "Active options are returned, and labels are replaced with abbreviations.",
+      'match' => "Enabled options are returned using machine names as keys. Labels are translated.",
     );
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
