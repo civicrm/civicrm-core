@@ -65,6 +65,7 @@
         scope.previewTestGroup = function(e) {
           var $dialog = $(this);
           $dialog.html('<div class="crm-loading-element"></div>');
+          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.groupNames, {id: scope.testGroup.gid}), 'title')[0]}));
           CRM.api3('contact', 'get', {group: scope.testGroup.gid, options: {limit: 0}, return: 'display_name,email'}).done(function(data) {
             var count = 0,
               // Fixme: should this be in a template?
