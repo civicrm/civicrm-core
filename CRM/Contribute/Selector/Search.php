@@ -360,10 +360,13 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     while ($result->fetch()) {
+      $links = self::links($componentId,
+          $componentAction,
+          $qfKey,
+          $componentContext
+      );
       $checkLineItem = FALSE;
       $row = array();
-      $permissions[] = CRM_Core_Permission::VIEW; 
-      $permissions[] = CRM_Core_Permission::EDIT; 
       if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
         continue;
       }
@@ -375,20 +378,23 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           break;
         }
         if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+          unset($links[2]);
+          break;
         }
-        if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+          unset($links[8]);
+          break;
         }
       }
       if ($checkLineItem) {
         continue;
       }
       if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
-        unset($permissions[array_search(CRM_Core_Permission::EDIT, $permissions)]);
+        unset($links[2]);
       }
       if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
-        unset($permissions[array_search(CRM_Core_Permission::DELETE, $permissions)]);
+        unset($links[8]);
       }
-      $mask = CRM_Core_Action::mask($permissions);
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (property_exists($result, $property)) {
@@ -425,11 +431,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $row['action'] = CRM_Core_Action::formLink(
-        self::links($componentId,
-          $componentAction,
-          $qfKey,
-          $componentContext
-        ),
+        $links,
         $mask, $actions,
         ts('more'),
         FALSE,
