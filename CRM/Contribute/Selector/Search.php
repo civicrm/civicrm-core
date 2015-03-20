@@ -360,9 +360,21 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     while ($result->fetch()) {
+      $checkLineItem = FALSE;
       $row = array();
       $permissions[] = CRM_Core_Permission::VIEW;
       if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
+        continue;
+      }
+      // Now check for lineItems
+      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
+      foreach ($lineItems as $items) {
+        if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+          $checkLineItem = TRUE;
+          break;
+        }
+      }
+      if ($checkLineItem) {
         continue;
       }
       if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
