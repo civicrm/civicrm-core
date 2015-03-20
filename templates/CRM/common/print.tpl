@@ -45,7 +45,7 @@
 
 {crmRegion name='page-body' allowCmsOverride=0}
 <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-  {if $isForm}
+  {if $isForm and isset($formTpl)}
     {include file="CRM/Form/$formTpl.tpl"}
   {else}
     {include file=$tplFile}
