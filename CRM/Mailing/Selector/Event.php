@@ -168,8 +168,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'delivered':
-          $this->_columnHeaders = array('contact_id' =>
-            array(
+          $this->_columnHeaders = array(
+            'contact_id' => array(
               'name' => ts('Internal Contact ID'),
               'sort' => $contact . '.id',
               'direction' => CRM_Utils_Sort::ASCENDING,
@@ -243,15 +243,13 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           return 0;
       }
 
-      $this->_columnHeaders = array_merge($this->_columnHeaders,
-        array('date' =>
-          array(
-            'name' => ts('Date'),
-            'sort' => $dateSort,
-            'direction' => CRM_Utils_Sort::DESCENDING,
+      $this->_columnHeaders = array_merge($this->_columnHeaders, array(
+        'date' => array(
+          'name' => ts('Date'),
+          'sort' => $dateSort,
+          'direction' => CRM_Utils_Sort::DESCENDING,
           ),
-        )
-      );
+        ));
     }
     return $this->_columnHeaders;
   }

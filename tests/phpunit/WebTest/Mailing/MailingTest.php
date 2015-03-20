@@ -130,7 +130,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     $this->waitForTextPresent("Mailing $mailingName Webtest");
     $this->click("xpath=//div[@class='content']//a[text()='~1 recipient']");
-    $this->webtestVerifyTabularData(array("$firstName Mailson"=> "mailino$firstName@mailson.co.in"));
+    $this->webtestVerifyTabularData(array("$firstName Mailson" => "mailino$firstName@mailson.co.in"));
     $this->click("xpath=//button[@title='Close']");
     $this->waitForTextPresent("(Include: $groupName)");
 
@@ -380,7 +380,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     $this->waitForTextPresent("Mailing $mailingName Webtest");
     $this->click("xpath=//div[@class='content']//a[text()='~1 recipient']");
-    $this->webtestVerifyTabularData(array("$firstName Mailson"=> "mailino$firstName@mailson.co.in"));
+    $this->webtestVerifyTabularData(array("$firstName Mailson" => "mailino$firstName@mailson.co.in"));
     $this->click("xpath=//button[@title='Close']");
     $this->waitForTextPresent("(Include: $groupName)");
 
