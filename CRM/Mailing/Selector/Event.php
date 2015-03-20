@@ -150,12 +150,12 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     if (!isset($this->_columnHeaders)) {
 
       $this->_columnHeaders = array(
-        array(
+        'sort_name' => array(
           'name' => ts('Contact'),
           'sort' => $contact . '.sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
         ),
-        array(
+        'email' => array(
           'name' => ts('Email Address'),
           'sort' => $email . '.email',
           'direction' => CRM_Utils_Sort::DONTCARE,
@@ -168,6 +168,13 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'delivered':
+          $this->_columnHeaders = array('contact_id' =>
+            array(
+              'name' => ts('Internal Contact ID'),
+              'sort' => $contact . '.id',
+              'direction' => CRM_Utils_Sort::ASCENDING,
+            ),
+          ) + $this->_columnHeaders;
           $dateSort = CRM_Mailing_Event_BAO_Delivered::getTableName() . '.time_stamp';
           break;
 
@@ -237,7 +244,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
       }
 
       $this->_columnHeaders = array_merge($this->_columnHeaders,
-        array(
+        array('date' =>
           array(
             'name' => ts('Date'),
             'sort' => $dateSort,
