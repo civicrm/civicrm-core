@@ -387,6 +387,7 @@ class CRM_Core_Resources {
     foreach ((array) $text as $str) {
       $translated = ts($str, array(
         'domain' => ($domain == 'civicrm') ? NULL : array($domain, NULL),
+        'raw' => TRUE,
       ));
 
       // We only need to push this string to client if the translation
