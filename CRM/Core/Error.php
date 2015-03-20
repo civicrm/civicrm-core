@@ -192,7 +192,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error['type'] = $pearError->getType();
     $error['user_info'] = $pearError->getUserInfo();
     $error['to_string'] = $pearError->toString();
-    if (function_exists('mysql_error') &&
+
+    // We access connection info via _DB_DATAOBJECT instead
+    // of, e.g., calling getDatabaseConnection(), so that we
+    // can avoid infinite loops.
+    global $_DB_DATAOBJECT;
+
+    if (!isset($_DB_DATAOBJECT['CONFIG']['database'])) {
+      // we haven't setup sql, so it's not our sql error...
+    }
+    elseif (preg_match('/^mysql:/', $_DB_DATAOBJECT['CONFIG']['database']) &&
       mysql_error()
     ) {
       $mysql_error = mysql_error() . ', ' . mysql_errno();
@@ -201,13 +210,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       // execute a dummy query to clear error stack
       mysql_query('select 1');
     }
-    elseif (function_exists('mysqli_error')) {
+    elseif (preg_match('/^mysqli:/', $_DB_DATAOBJECT['CONFIG']['database'])) {
       $dao = new CRM_Core_DAO();
 
-      // we do it this way, since calling the function
-      // getDatabaseConnection could potentially result
-      // in an infinite loop
-      global $_DB_DATAOBJECT;
       if (isset($_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5])) {
         $conn = $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
         $link = $conn->connection;
