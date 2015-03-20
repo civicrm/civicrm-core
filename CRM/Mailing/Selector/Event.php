@@ -248,8 +248,8 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           'name' => ts('Date'),
           'sort' => $dateSort,
           'direction' => CRM_Utils_Sort::DESCENDING,
-          ),
-        ));
+        ),
+      ));
     }
     return $this->_columnHeaders;
   }
