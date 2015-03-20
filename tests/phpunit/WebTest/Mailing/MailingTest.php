@@ -99,7 +99,6 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     // HTML format message
     $HTMLMessage = "This is HTML formatted content for Mailing {$mailingName} Webtest.";
     $this->fillRichTextField("crmUiId_1", $HTMLMessage);
-
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
     $this->waitForTextPresent($HTMLMessage);
     $this->waitForAjaxContent();
@@ -210,7 +209,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("Successful Deliveries");
 
     // verify email
-    $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[2]", preg_quote("mailino$firstName@mailson.co.in"));
+    $this->verifyText("xpath=//table[@id='mailing_event']/tbody//tr/td[3]", preg_quote("mailino$firstName@mailson.co.in"));
 
     $eventQueue = new CRM_Mailing_Event_DAO_Queue();
     $eventQueue->contact_id = $contactId;
@@ -329,79 +328,74 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->select('protocol', 'value=1');
     $this->clickLink('_qf_MailSettings_next-bottom');
 
-    // Go to Schedule and Send Mailing form
-    $this->openCiviPage('mailing/send', 'reset=1', '_qf_Group_cancel');
+    $this->openCiviPage("a/#/mailing/new");
 
     //-------select recipients----------
 
     // fill mailing name
     $mailingName = substr(sha1(rand()), 0, 7);
-    $this->type("name", "Mailing $mailingName Webtest");
+    $this->waitForElementPresent("xpath=//input[@name='mailingName']");
+    $this->type("xpath=//input[@name='mailingName']", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups", "$groupName");
+    $this->select2("s2id_crmUiId_8", $groupName, TRUE);
 
-    // click next
-    $this->click("_qf_Group_next");
-    $this->waitForElementPresent("_qf_Settings_cancel");
+    // do check count for Recipient
+    $this->waitForTextPresent("~1 recipient");
+
+    // fill subject for mailing
+    $this->type("xpath=//input[@name='subject']", "Test subject {$mailingName} for Webtest");
+
+    // HTML format message
+    $HTMLMessage = "This is HTML formatted content for Mailing {$mailingName} Webtest.";
+    $this->fillRichTextField("crmUiId_1", $HTMLMessage);
+    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
+    $this->waitForElementPresent($HTMLMessage);
+    $this->waitForAjaxContent();
+    $this->click("xpath=//button[@title='Close']");
+
+    // Open Plain-text Format pane and type text format msg
+    $this->click("//div[text()='Plain Text']");
+    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$mailingName} Webtest.");
+
+    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
+    $this->waitForTextPresent("This is text formatted content for Mailing {$mailingName} Webtest.");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//button[@title='Close']");
+
+    // select default header and footer ( with label )
+    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
+    $this->select2("s2id_crmUiId_10", "Mailing Header");
+    $this->select2("s2id_crmUiId_11", "Mailing Footer");
 
     //--------track and respond----------
 
     // check for default settings options
+    $this->click("xpath=//ul/li/a[text()='Tracking']");
     $this->assertChecked("url_tracking");
     $this->assertChecked("open_tracking");
 
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-
     // click next with default settings
-    $this->clickLink("_qf_Settings_next");
+    $this->click("xpath=//div[@class='crm-wizard-buttons']/button[text()='Next']");
 
-    // fill subject for mailing
-    $this->type("subject", "Test subject {$mailingName} for Webtest");
-
-    // check for default option enabled
-    $this->assertChecked("CIVICRM_QFID_1_upload_type");
-
-    // HTML format message
-    $HTMLMessage = "This is HTML formatted content for Mailing {$mailingName} Webtest.";
-    $this->fillRichTextField("html_message", $HTMLMessage);
-
-    // Open Plain-text Format pane and type text format msg
-    $this->click("//fieldset[@id='compose_id']/div[2]/div[1]");
-    $this->type("text_message", "This is text formatted content for Mailing {$mailingName} Webtest.");
-
-    // select default header and footer ( with label )
-    $this->select("header_id", "label=Mailing Header");
-    $this->select("footer_id", "label=Mailing Footer");
-
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-
-    // click next with nominal content
-    $this->clickLink("_qf_Upload_upload", "_qf_Test_cancel");
-
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-
-    // click next
-    $this->clickLink("_qf_Test_next", "_qf_Schedule_cancel");
+    $this->waitForTextPresent("Mailing $mailingName Webtest");
+    $this->click("xpath=//div[@class='content']//a[text()='~1 recipient']");
+    $this->webtestVerifyTabularData(array("$firstName Mailson"=> "mailino$firstName@mailson.co.in"));
+    $this->click("xpath=//button[@title='Close']");
+    $this->waitForTextPresent("(Include: $groupName)");
 
     //----------Schedule or Send------------
 
     // do check for default option enabled
-    $this->assertChecked("now");
+    $this->assertChecked("xpath=//input[@id='schedule-send-now']");
 
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-
-    // finally schedule the mail by clicking submit
-    $this->clickLink("_qf_Schedule_next");
+    // click next with nominal content
+    $this->click("xpath=//center/a/div[text()='Submit Mailing']");
 
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->waitForTextPresent("Find Mailings");
     $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     // directly send schedule mailing -- not working right now
@@ -551,13 +545,13 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     foreach ($dataToCheck as $key => $value) {
       if ($entity == 'report') {
         if ($key == 'report_name') {
-          $this->assertElementContainsText('page-title', "{$value}");
+          $this->waitForTextPresent("{$value}");
           continue;
         }
         $this->assertTrue($this->isElementPresent("xpath=//form//div[3]/table/tbody//tr/th[contains(text(),'{$key}')]/../td[contains(text(),'{$value}')]"), "Criteria check for {$key} failed for Report for {$summaryInfo}");
       }
       else {
-        $this->assertElementContainsText('page-title', "Advanced Search");
+        $this->waitForTextPresent("Advanced Search");
         $assertedValue = $this->isElementPresent("xpath=//div[@class='crm-results-block']//div[@class='qill'][contains(text(),'{$key} {$value}')]");
         if (!$assertedValue) {
           $assertedValue = $this->isTextPresent("{$key} {$value}");
