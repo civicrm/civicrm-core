@@ -303,6 +303,9 @@ class CRM_Core_PseudoConstant {
         if ($context == 'validate') {
           $params['labelColumn'] = 'name';
         }
+        if ($context == 'match') {
+          $params['keyColumn'] = 'name';
+        }
         // Call our generic fn for retrieving from the option_value table
         return CRM_Core_OptionGroup::values(
           $pseudoconstant['optionGroupName'],
@@ -343,13 +346,14 @@ class CRM_Core_PseudoConstant {
           $wheres = array();
           $order = "ORDER BY %2";
 
-          // Use machine name instead of label in validate context
-          if ($context == 'validate') {
+          // Use machine name in certain contexts
+          if ($context == 'validate' || $context == 'match') {
+            $nameField = $context == 'validate' ? 'labelColumn' : 'keyColumn';
             if (!empty($pseudoconstant['nameColumn'])) {
-              $params['labelColumn'] = $pseudoconstant['nameColumn'];
+              $params[$nameField] = $pseudoconstant['nameColumn'];
             }
             elseif (in_array('name', $availableFields)) {
-              $params['labelColumn'] = 'name';
+              $params[$nameField] = 'name';
             }
           }
           // Condition param can be passed as an sql clause string or an array of clauses
