@@ -265,12 +265,6 @@ function _civicrm_api3_contact_get_spec(&$params) {
     'title' => 'Primary Email',
     'type' => CRM_Utils_Type::T_STRING,
   );
-  $params['gender_id']['title'] = 'Gender ID';
-  $params['gender_id']['type'] = CRM_Utils_Type::T_INT;
-  $params['gender'] = array(
-    'title' => 'Gender',
-    'type' => CRM_Utils_Type::T_STRING,
-  );
   $params['on_hold'] = array(
     'title' => 'Primary Email On Hold',
     'type' => CRM_Utils_Type::T_BOOLEAN,
