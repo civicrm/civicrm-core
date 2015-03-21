@@ -1109,6 +1109,142 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Adds a field based on metadata.
+   *
+   * @param $name
+   *   Field name to go on the form.
+   * @param array $props
+   *   Mix of html attributes and special properties, namely.
+   *   - entity (api entity name, can usually be inferred automatically from the form class)
+   *   - field (field name - only needed if different from name used on the form)
+   *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
+   *   - placeholder - set to NULL to disable
+   *   - multiple - bool
+   *   - context - @see CRM_Core_DAO::buildOptionsContext
+   * @param bool $required
+   * @throws CRM_Core_Exception
+   */
+  public function addField($name, $props = array(), $required = FALSE) {
+    // TODO: Handle custom field
+    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      throw new Exception("Custom fields are not supported by the addField method. ");
+    }
+
+    // Resolve entity.
+    if (!isset($props['entity'])) {
+      $props['entity'] = $this->getDefaultEntity();
+    }
+    // Resolve field.
+    if (!isset($props['field'])) {
+      $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    }
+    // Resolve fields properties from API.
+    $info = civicrm_api3($props['entity'], 'getfields');
+    foreach ($info['values'] as $uniqueName => $fieldSpec) {
+      if (
+          $uniqueName === $props['field'] ||
+          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
+          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
+      ) {
+        break;
+      }
+    }
+
+    $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
+
+    if (!array_key_exists('placeholder', $props)) {
+      $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
+    }
+
+    $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
+
+    if ($widget == 'TextArea' && CRM_Utils_Array::value('context', $props) == 'search') {
+      $widget = 'Text';
+    }
+
+    $isSelect = (in_array($widget, array(
+          'Select',
+          'Multi-Select',
+          'Select State/Province',
+          'Multi-Select State/Province',
+          'Select Country',
+          'Multi-Select Country',
+          'AdvMulti-Select',
+          'CheckBox',
+          'Radio',
+    )));
+
+    if ($isSelect) {
+      // Fetch options from the api unless passed explicitly
+      if (isset($props['options'])) {
+        $options = $props['options'];
+      }
+      else {
+        $info = civicrm_api3($props['entity'], 'getoptions', $props);
+        $options = $info['values'];
+      }
+      if (CRM_Utils_Array::value('context', $props) == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+        $widget = 'Select';
+      }
+      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      if (CRM_Utils_Array::value('context', $props) == 'search' || strpos($widget, 'Multi') !== FALSE) {
+        $props['class'] .= ' huge';
+        $props['multiple'] = 'multiple';
+      }
+
+      // Add data for popup link.
+      if (CRM_Utils_Array::value('context', $props) != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-api-entity'] = $props['entity'];
+        $props['data-api-field'] = $props['field'];
+      }
+    }
+
+    switch ($widget) {
+      case 'Text':
+      case 'Link':
+        //TODO: Autodetect ranges
+        $this->add('text', $name, $label, NULL, $required, $props);
+        break;
+
+      case 'TextArea':
+        //Set default rows and cols
+        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
+        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        $this->add('textarea', $name, $label, NULL, $required, $props);
+        break;
+
+      case 'Select Date':
+        //TODO: Add date formats
+        $this->addDate($name, $label, $required);
+        break;
+
+      // case 'Radio':
+      case 'Select':
+        if (empty($props['multiple'])) {
+          $options = array('' => $props['placeholder']) + $options;
+        }
+        $this->add('select', $name, $label, $options, $required, $props);
+        // TODO: Add and/or option for fields that store multiple values
+        break;
+
+      //case 'AdvMulti-Select':
+      //case 'CheckBox':
+      //case 'File':
+      //case 'RichTextEditor':
+      //case 'Autocomplete-Select':
+      // Check datatypes of fields
+      // case 'Int':
+      //case 'Float':
+      //case 'Money':
+      //case 'Link':
+      //case read only fields
+      default:
+        throw new Exception("Unsupported html-element " . $widget);
+    }
+  }
+
+  /**
    * Add a widget for selecting/editing/creating/copying a profile form
    *
    * @param string $name
