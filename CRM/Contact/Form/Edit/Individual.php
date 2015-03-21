@@ -64,28 +64,28 @@ class CRM_Contact_Form_Edit_Individual {
       //prefix
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addSelect('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
+        $form->addField('prefix_id', array('class' => 'eight', 'placeholder' => ' '));
       }
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
 
       if (isset($nameFields['Formal Title'])) {
-        $form->addElement('text', 'formal_title', ts('Title'), $attributes['formal_title']);
+        $form->addField('formal_title');
       }
 
       // first_name
       if (isset($nameFields['First Name'])) {
-        $form->addElement('text', 'first_name', ts('First Name'), $attributes['first_name']);
+        $form->addField('first_name');
       }
 
       //middle_name
       if (isset($nameFields['Middle Name'])) {
-        $form->addElement('text', 'middle_name', ts('Middle Name'), $attributes['middle_name']);
+        $form->addField('middle_name');
       }
 
       // last_name
       if (isset($nameFields['Last Name'])) {
-        $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
+        $form->addField('last_name');
       }
 
       // suffix
