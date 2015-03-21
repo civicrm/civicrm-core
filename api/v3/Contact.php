@@ -277,14 +277,17 @@ function _civicrm_api3_contact_get_spec(&$params) {
     'title' => 'Primary Instant Messenger ID',
     'type' => CRM_Utils_Type::T_INT,
   );
-  $params['group_id'] = array(
-    'title' => 'Group Memberships (filter)',
-  );
   $params['group'] = array(
-    'title' => 'Group Memberships (filter, array)',
+    'title' => 'Group',
+    'pseudoconstant' => array(
+      'table' => 'civicrm_group',
+    ),
   );
   $params['tag'] = array(
-    'title' => 'Assigned tags (filter, array)',
+    'title' => 'Tags',
+    'pseudoconstant' => array(
+      'table' => 'civicrm_tag',
+    ),
   );
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
