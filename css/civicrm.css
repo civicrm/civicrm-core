@@ -2385,7 +2385,7 @@ div.grippie {
 /* civicrm admin menu */
 #civicrm-menu .ui-autocomplete-input,
 .crm-container .ui-autocomplete-input {
-  background: white url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
+  background: white url("../bower_components/select2/select2.png") no-repeat scroll right -23px;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
 }
@@ -3106,7 +3106,7 @@ div.m ul#civicrm-menu,
 }
 /* Add arrow icon to multi-selects */
 .crm-container .select2-container-multi .select2-choices:before {
-  background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll 0 -4px;
+  background: url("../bower_components/select2/select2.png") no-repeat scroll 0 -4px;
   content: "";
   display: block;
   height: 15px;
