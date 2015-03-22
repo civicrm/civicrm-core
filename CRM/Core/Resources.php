@@ -710,7 +710,7 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.blockUI$min.js",
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
       "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
-      "packages/jquery/plugins/jquery.validate$min.js",
+      "bower_components/jquery-validation/dist/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
       "js/Common.js",
       "js/crm.ajax.js",
