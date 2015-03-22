@@ -3252,6 +3252,9 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu.action-icon-token .select2-default span.select2-chosen:before {
   background-position: -144px 0;
 }
+.crm-container .crm-action-menu.action-icon-mail-closed .select2-default span.select2-chosen:before {
+  background-position: -80px -96px;
+}
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
   box-sizing: border-box;
