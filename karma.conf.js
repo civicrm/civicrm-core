@@ -10,7 +10,7 @@ module.exports = function(config) {
       'bower_components/lodash-compat/lodash.min.js',
       'bower_components/select2/select2.min.js',
       'packages/jquery/plugins/jquery.blockUI.js',
-      'packages/jquery/plugins/jquery.validate.js',
+      'bower_components/jquery-validation/dist/jquery.validate.min.js',
       'packages/jquery/plugins/jquery.timeentry.js',
       'js/Common.js',
       'bower_components/angular/angular.js',
