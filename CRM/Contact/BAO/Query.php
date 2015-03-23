@@ -1375,7 +1375,7 @@ class CRM_Contact_BAO_Query {
       $where = "WHERE {$this->_whereClause}";
     }
 
-    if (!empty($this->_permissionWhereClause)) {
+    if (!empty($this->_permissionWhereClause) && empty($this->_displayRelationshipType)) {
       if (empty($where)) {
         $where = "WHERE $this->_permissionWhereClause";
       }
@@ -5329,6 +5329,10 @@ AND   displayRelType.is_active = 1
 ";
       }
       $this->_qill[0][] = $qillMessage . "'" . $relationshipTypeLabel . "'";
+    }
+
+    if (!empty($this->_permissionWhereClause)) {
+      $_rTypeWhere .= "AND $this->_permissionWhereClause";
     }
 
     if (strpos($from, $_rTypeFrom) === FALSE) {
