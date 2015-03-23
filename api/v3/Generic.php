@@ -75,7 +75,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $subentity    = CRM_Utils_Array::value('contact_type', $apiRequest['params']);
   $action = CRM_Utils_Array::value('action', $apiRequest['params']);
-  $sequential = empty($apiRequest['params']) ? 0 : 1;
+  $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
   $apiRequest['params']['options'] = CRM_Utils_Array::value('options', $apiRequest['params'], array());
   $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiRequest['params']['options'], array());
 
@@ -192,8 +192,9 @@ function civicrm_api3_generic_getfields($apiRequest) {
       $metadata[$fieldname]['name'] = $fieldname;
     }
     _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest, $fieldname, $fieldSpec, $optionsToResolve);
+
     // Convert options to "sequential" format
-    if (!empty($apiRequest['params']['sequential']) && !empty($metadata[$fieldname]['options'])) {
+    if ($sequential && !empty($metadata[$fieldname]['options'])) {
       $metadata[$fieldname]['options'] = CRM_Utils_Array::makeNonAssociative($metadata[$fieldname]['options']);
     }
   }

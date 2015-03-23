@@ -35,7 +35,7 @@
   </field>
   <field>
     <name>description</name>
-    <title>Processor Type De</title>
+    <title>Processor Type Description</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Payment Processor Description.</comment>

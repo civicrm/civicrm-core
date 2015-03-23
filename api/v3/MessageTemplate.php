@@ -136,52 +136,66 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['id']['description'] = 'ID of the template';
   $params['id']['title'] = 'Message Template ID';
   $params['id']['api.aliases'] = array('messageTemplateID', 'message_template_id');
+  $params['id']['type'] = CRM_Utils_Type::T_INT;
 
   $params['option_group_name']['description'] = 'option group name of the template (required if no id supplied)';
   $params['option_group_name']['title'] = 'Option Group Name';
   $params['option_group_name']['api.aliases'] = array('groupName');
+  $params['option_group_name']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['option_value_name']['description'] = 'option value name of the template (required if no id supplied)';
   $params['option_value_name']['title'] = 'Option Value Name';
   $params['option_value_name']['api.aliases'] = array('valueName');
+  $params['option_value_name']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['contact_id']['description'] = 'contact id if contact tokens are to be replaced';
   $params['contact_id']['title'] = 'Contact ID';
   $params['contact_id']['api.aliases'] = array('contactId');
+  $params['contact_id']['type'] = CRM_Utils_Type::T_INT;
 
   $params['template_params']['description'] = 'additional template params (other than the ones already set in the template singleton)';
   $params['template_params']['title'] = 'Template Params';
   $params['template_params']['api.aliases'] = array('tplParams');
+  // FIXME: Type??
 
   $params['from']['description'] = 'the From: header';
   $params['from']['title'] = 'From';
+  $params['from']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['to_name']['description'] = 'the recipient’s name';
   $params['to_name']['title'] = 'Recipient Name';
   $params['to_name']['api.aliases'] = array('toName');
+  $params['to_name']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['to_email']['description'] = 'the recipient’s email - mail is sent only if set';
   $params['to_email']['title'] = 'Recipient Email';
   $params['to_email']['api.aliases'] = array('toEmail');
+  $params['to_email']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['cc']['description'] = 'the Cc: header';
   $params['cc']['title'] = 'CC';
+  $params['cc']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['bcc']['description'] = 'the Bcc: header';
   $params['bcc']['title'] = 'BCC';
+  $params['bcc']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['reply_to']['description'] = 'the Reply-To: header';
   $params['reply_to']['title'] = 'Reply To';
   $params['reply_to']['api.aliases'] = array('replyTo');
+  $params['reply_to']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['attachments']['description'] = 'email attachments';
   $params['attachments']['title'] = 'Attachments';
+  // FIXME: Type??
 
   $params['is_test']['description'] = 'whether this is a test email (and hence should include the test banner)';
   $params['is_test']['title'] = 'Is Test';
   $params['is_test']['api.aliases'] = array('isTest');
+  $params['is_test']['type'] = CRM_Utils_Type::T_BOOLEAN;
 
   $params['pdf_filename']['description'] = 'filename of optional PDF version to add as attachment (do not include path)';
   $params['pdf_filename']['title'] = 'PDF Filename';
   $params['pdf_filename']['api.aliases'] = array('PDFFilename');
+  $params['pdf_filename']['type'] = CRM_Utils_Type::T_STRING;
 }

@@ -2724,13 +2724,13 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         }
       }
 
-      //create merge activity record.
+      //Create merge activity record. Source for merge activity is the logged in user's contact ID ($currentUserId).
       $activityParams = array(
         'subject' => $mergeActSubject,
         'details' => $mergeActSubjectDetails,
         'status_id' => array_search('Completed', $activityStatuses),
         'activity_type_id' => $mergeActType,
-        'source_contact_id' => $mainContactId,
+        'source_contact_id' => $currentUserId,
         'activity_date_time' => date('YmdHis'),
       );
 

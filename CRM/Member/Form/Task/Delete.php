@@ -78,15 +78,24 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedMembers = 0;
+    $deleted = $failed = 0;
     foreach ($this->_memberIds as $memberId) {
       if (CRM_Member_BAO_Membership::del($memberId)) {
-        $deletedMembers++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus($deletedMembers, ts('Deleted Membership(s)'), 'success');
-    CRM_Core_Session::setStatus(ts('Total Selected Membership(s): %1', array(1 => count($this->_memberIds))), '', 'info');
+    if ($deleted) {
+      $msg = ts('%count membership deleted.', array('plural' => '%count memberships deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }

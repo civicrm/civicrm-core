@@ -145,9 +145,9 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 
       list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_activityHolderIds, $key, 'civicrm_activity');
 
-      $status = array(ts('%count activities tagged', array('count' => $added, 'plural' => '%count activities tagged')));
+      $status = array(ts('Activity tagged', array('count' => $added, 'plural' => '%count activities tagged')));
       if ($notAdded) {
-        $status[] = ts('%count activities already had this tag', array(
+        $status[] = ts('1 activity already had this tag', array(
           'count' => $notAdded,
           'plural' => '%count activities already had this tag',
         ));

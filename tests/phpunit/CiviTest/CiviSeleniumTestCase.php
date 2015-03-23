@@ -853,8 +853,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     elseif ($processorType == 'PayPal') {
       $processorSettings = array(
         'test_user_name' => '559999327053114',
+        'user_name' => '559999327053114',
         'test_password' => 'R2zv2g60-A7GXKJYl0nR0g',
         'test_signature' => 'R2zv2g60-A7GXKJYl0nR0g',
+        'password' => 'R2zv2g60-A7GXKJYl0nR0g',
+        'signature' => 'R2zv2g60-A7GXKJYl0nR0g',
       );
     }
     elseif ($processorType == 'PayPal_Standard') {

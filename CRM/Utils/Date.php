@@ -1098,7 +1098,7 @@ class CRM_Utils_Date {
         switch ($relativeTerm) {
           case 'this':
             $from['Y'] = $fYear;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $form['d'], $from['Y'] + 1);
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
 
             $to['d'] = $fiscalEnd['2'];
@@ -1108,7 +1108,7 @@ class CRM_Utils_Date {
 
           case 'previous':
             $from['Y'] = $fYear - 1;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $form['d'], $from['Y'] + 1);
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
@@ -1117,7 +1117,7 @@ class CRM_Utils_Date {
 
           case 'next':
             $from['Y'] = $fYear + 1;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'], $from['Y'] + 1);
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
