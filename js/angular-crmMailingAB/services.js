@@ -42,7 +42,7 @@
   //   abtest.load().then(function(){
   //     alert("Mailing A is named "+abtest.mailings.a.name);
   //   });
-  angular.module('crmMailingAB').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments, crmNow) {
+  angular.module('crmMailingAB').factory('CrmMailingAB', function (crmApi, crmMailingMgr, $q, CrmAttachments) {
     function CrmMailingAB(id) {
       this.id = id;
       this.mailings = {};
@@ -136,8 +136,8 @@
         var params = {
           id: this.ab.id,
           status: 'Testing',
-          approval_date: crmNow(),
-          scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : crmNow()
+          approval_date: 'now',
+          scheduled_date: this.mailings.a.scheduled_date ? this.mailings.a.scheduled_date : 'now'
         };
         return crmApi('MailingAB', 'submit', params)
           .then(function () {
@@ -152,8 +152,8 @@
         var params = {
           id: this.ab.id,
           status: 'Final',
-          approval_date: crmNow(),
-          scheduled_date: this.mailings.c.scheduled_date ? this.mailings.c.scheduled_date : crmNow()
+          approval_date: 'now',
+          scheduled_date: this.mailings.c.scheduled_date ? this.mailings.c.scheduled_date : 'now'
         };
         return crmApi('MailingAB', 'submit', params)
           .then(function () {

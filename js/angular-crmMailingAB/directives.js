@@ -96,7 +96,7 @@
   //  - criteria: string
   //  - target_date: string, date
   //  - target_url: string
-  angular.module('crmMailingAB').directive('crmMailingAbStats', function (crmApi, $parse, crmNow) {
+  angular.module('crmMailingAB').directive('crmMailingAbStats', function (crmApi, $parse) {
     return {
       scope: {
         crmMailingAbStats: '@',
@@ -113,7 +113,6 @@
 
         scope.$watch(attrs.crmAbtest, refresh);
         function refresh() {
-          var now = crmNow();
           var abtest = abtestModel(scope.$parent);
           if (!abtest) {
             console.log('failed to draw stats - missing abtest');
@@ -132,7 +131,7 @@
           for (var i = 1; i <= options.split_count; i++) {
             var result = crmApi('MailingAB', 'graph_stats', {
               id: abtest.ab.id,
-              target_date: abtest.ab.declare_winning_time ? abtest.ab.declare_winning_time : now,
+              target_date: abtest.ab.declare_winning_time ? abtest.ab.declare_winning_time : 'now',
               target_url: null, // FIXME
               criteria: options.criteria,
               split_count: options.split_count,
