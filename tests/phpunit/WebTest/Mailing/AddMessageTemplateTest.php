@@ -106,64 +106,54 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     // configure default mail-box
     $this->setupDefaultMailbox();
 
-    $this->openCiviPage("mailing/send", "reset=1", "_qf_Group_cancel");
+    $this->openCiviPage("a/#/mailing/new");
+    $this->waitForElementPresent("xpath=//input[@name='mailingName']");
 
     // fill mailing name
     $mailingName = substr(sha1(rand()), 0, 7);
-    $this->type("name", "Mailing $mailingName Webtest");
+    $this->type("xpath=//input[@name='mailingName']", "Mailing $mailingName Webtest");
 
     // Add the test mailing group
-    $this->select("includeGroups", "$groupName");
-
-    // click next
-    $this->click("_qf_Group_next");
-    $this->waitForElementPresent("_qf_Settings_cancel");
-    // check for default settings options
-    $this->assertChecked("url_tracking");
-    $this->assertChecked("open_tracking");
+    $this->select2("s2id_crmUiId_8", $groupName, TRUE);
 
     // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-    $this->click("_qf_Settings_next");
-    $this->waitForElementPresent("_qf_Upload_cancel");
-
-    $this->click("template");
-    $this->select("template", "label=$msgTitle");
+    $this->waitForTextPresent("~1 recipient");
+    $this->click("msg_template_id");
+    $this->select("msg_template_id", "label=$msgTitle");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    $this->click("xpath=id('Upload')/div[2]/fieldset[@id='compose_id']/div[2]/div[1]");
+    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
     $this->click('subject');
 
+    // check for default settings options
+    $this->click("xpath=//ul/li/a[text()='Tracking']");
+    $this->assertChecked("url_tracking");
+    $this->assertChecked("open_tracking");
+
     // check for default header and footer ( with label )
+    $this->click("xpath=//ul/li/a[text()='Header and Footer']");
     $this->select('header_id', "label=Mailing Header");
     $this->select('footer_id', "label=Mailing Footer");
 
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
-
-    // click next with nominal content
-    $this->click("_qf_Upload_upload");
-    $this->waitForElementPresent("_qf_Test_cancel");
-
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
 
     // click next
-    $this->click("_qf_Test_next");
-    $this->waitForElementPresent("_qf_Schedule_cancel");
+    $this->click("xpath=//div[@class='crm-wizard-buttons']/button[text()='Next']");
 
-    $this->assertChecked("now");
-
-    // do check count for Recipient
-    $this->assertElementContainsText('css=.messages', "Total Recipients: 1");
+    $this->assertChecked("xpath=//input[@id='schedule-send-now']");
+    $this->waitForTextPresent("Mailing $mailingName Webtest");
+    $this->click("xpath=//div[@class='content']//a[text()='~1 recipient']");
+    $this->webtestVerifyTabularData(array("$firstName Mailson"=> "mailino$firstName@mailson.co.in"));
+    $this->click("xpath=//button[@title='Close']");
+    $this->waitForTextPresent("(Include: $groupName)");
 
     // finally schedule the mail by clicking submit
-    $this->click("_qf_Schedule_next");
+    $this->click("xpath=//center/a/div[text()='Submit Mailing']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->waitForTextPresent("Find Mailings");
     $this->isTextPresent("Mailing $mailingName Webtest");
     $this->openCiviPage('mailing/queue', 'reset=1');
 
@@ -173,7 +163,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     //View Activity
     $this->openCiviPage('activity/search', "reset=1", "_qf_Search_refresh");
     $this->type("sort_name", $firstName);
-    $this->click("activity_type_id[19]");
+    $this->select("activity_type_id","label=Bulk Email");
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
     $this->click("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
