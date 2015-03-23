@@ -1218,6 +1218,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'Select Date':
         //TODO: Add date formats
+        //TODO: Add javascript template for dates.
         $this->addDate($name, $label, $required);
         break;
 
@@ -1234,6 +1235,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case 'CheckBox':
       //case 'File':
       //case 'RichTextEditor':
+      //TODO: Add javascript template for wysiwyg.
       //case 'Autocomplete-Select':
       // Check datatypes of fields
       // case 'Int':
