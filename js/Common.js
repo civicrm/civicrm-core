@@ -503,7 +503,7 @@ CRM.strings = CRM.strings || {};
             .on('click.crmEntity', 'a.crm-add-entity', function(e) {
               $el.select2('close');
               CRM.loadForm($(this).attr('href'), {
-                dialog: {width: 500, height: 'auto'}
+                dialog: {width: 500, height: 220}
               }).on('crmFormSuccess', function(e, data) {
                 if (data.status === 'success' && data.id) {
                   CRM.status(ts('%1 Created', {1: data.label}));
