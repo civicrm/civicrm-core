@@ -177,6 +177,28 @@ class CRM_Utils_File {
   }
 
   /**
+   * Concatenate several files.
+   *
+   * @param array $files
+   *   List of file names.
+   * @param string $delim
+   *   An optional delimiter to put between files.
+   * @return string
+   */
+  public static function concat($files, $delim = '') {
+    $buf = '';
+    $first = TRUE;
+    foreach ($files as $file) {
+      if (!$first) {
+        $buf .= $delim;
+      }
+      $buf .= file_get_contents($file);
+      $first = FALSE;
+    }
+    return $buf;
+  }
+
+  /**
    * @param string $source
    * @param string $destination
    */
