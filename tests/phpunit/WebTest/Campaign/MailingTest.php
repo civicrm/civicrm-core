@@ -101,7 +101,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
   /**
    * @param string $groupName
    * @param $campaignTitle
-   * @param int $id
+   * @param $firstUserName
    */
   public function mailingAddTest($groupName, $campaignTitle, $title, $firstUserName) {
     //---- create mailing contact and add to mailing Group
@@ -123,7 +123,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@name='mailingName']", "Mailing $mailingName Webtest");
 
     // select campaign
-    $this->select2("s2id_crmUiId_4", "Campaign_".$title);
+    $this->select2("s2id_crmUiId_4", "Campaign_" . $title);
 
     // Add the test mailing group
     $this->select2("s2id_crmUiId_8", $groupName, TRUE);
@@ -162,7 +162,6 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->select("header_id", "label=Mailing Header");
     $this->select("footer_id", "label=Mailing Footer");
 
-
     //---------------Test------------------
 
     ////////--Commenting test mailing and mailing preview (test mailing and preview not presently working).
@@ -189,8 +188,8 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("Mailing $mailingName Webtest");
     $this->click("xpath=//div[@class='content']//a[text()='~2 recipients']");
     $verifyData = array(
-      "$firstUserName Smith"=> "$firstUserName.smith@example.org",
-      "$firstName Mailson"=> "mailino$firstName@mailson.co.in",
+      "$firstUserName Smith" => "$firstUserName.smith@example.org",
+      "$firstName Mailson" => "mailino$firstName@mailson.co.in",
     );
     $this->webtestVerifyTabularData($verifyData);
     $this->waitForTextPresent("(Include: $groupName)");

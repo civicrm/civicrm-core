@@ -137,14 +137,13 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->select('header_id', "label=Mailing Header");
     $this->select('footer_id', "label=Mailing Footer");
 
-
     // click next
     $this->click("xpath=//div[@class='crm-wizard-buttons']/button[text()='Next']");
 
     $this->assertChecked("xpath=//input[@id='schedule-send-now']");
     $this->waitForTextPresent("Mailing $mailingName Webtest");
     $this->click("xpath=//div[@class='content']//a[text()='~1 recipient']");
-    $this->webtestVerifyTabularData(array("$firstName Mailson"=> "mailino$firstName@mailson.co.in"));
+    $this->webtestVerifyTabularData(array("$firstName Mailson" => "mailino$firstName@mailson.co.in"));
     $this->click("xpath=//button[@title='Close']");
     $this->waitForTextPresent("(Include: $groupName)");
 
@@ -163,7 +162,7 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     //View Activity
     $this->openCiviPage('activity/search', "reset=1", "_qf_Search_refresh");
     $this->type("sort_name", $firstName);
-    $this->select("activity_type_id","label=Bulk Email");
+    $this->select("activity_type_id", "label=Bulk Email");
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
     $this->click("xpath=//form[@id='Search']/div[3]/div/div[2]/table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[1][text()='View']");
