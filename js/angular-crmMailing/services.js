@@ -97,7 +97,7 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmNow) {
+  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses) {
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -346,8 +346,8 @@
         var crmMailingMgr = this;
         var params = {
           id: mailing.id,
-          approval_date: crmNow(),
-          scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : crmNow()
+          approval_date: 'now',
+          scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : 'now'
         };
         return crmApi('Mailing', 'submit', params)
           .then(function (result) {
