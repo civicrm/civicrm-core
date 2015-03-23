@@ -92,7 +92,8 @@
     color: #828282;
     line-height: 1.3em;
   }
-  .select2-highlighted .api-field-desc {
+  .select2-highlighted .api-field-desc,
+  .select2-highlighted .crm-marker {
     color: #fcfcfc;
   }
   .api-param-op[readonly] {
@@ -281,7 +282,10 @@
 <script type="text/template" id="api-return-tpl">
   <tr class="api-return-row">
     <td colspan="3">
-      <label for="api-return-value"><%- title %>:</label> &nbsp;
+      <label for="api-return-value">
+        <%- title %>:
+        <% if(required) {ldelim} %> <span class="crm-marker">*</span> <% {rdelim} %>
+      </label> &nbsp;
       <input type="hidden" class="api-param-name" value="return" />
       <input style="width: 50%;" id="api-return-value" class="crm-form-text api-param-value api-input"/>
     </td>

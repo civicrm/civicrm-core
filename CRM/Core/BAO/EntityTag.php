@@ -403,13 +403,20 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
 
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    if ($fieldName == 'tag' || $fieldName == 'tag_id') {
+      if (!empty($props['entity_table'])) {
+        $entity = CRM_Utils_Type::escape($props['entity_table'], 'String');
+        $params[] = "used_for LIKE '%$entity%'";
+      }
 
-    // Output tag list as nested hierarchy
-    // TODO: This will only work when api.entity is "entity_tag". What about others?
-    if (($fieldName == 'tag' || $fieldName == 'tag_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Core_BAO_Tag::getTags('civicrm_contact', CRM_Core_DAO::$_nullArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+      // Output tag list as nested hierarchy
+      // TODO: This will only work when api.entity is "entity_tag". What about others?
+      if ($context == 'search' || $context == 'create') {
+        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), CRM_Core_DAO::$_nullArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+      }
     }
+
+    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
 
     return $options;
   }

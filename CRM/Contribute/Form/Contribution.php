@@ -948,7 +948,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($self->_id && $self->_values['contribution_status_id'] != $fields['contribution_status_id']) {
       CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);
     }
-
+    // CRM-16015, add form-rule to restrict change of financial type if using price field of different financial type
+    if ($self->_id && $self->_values['financial_type_id'] != $fields['financial_type_id']) {
+      CRM_Contribute_BAO_Contribution::checkFinancialTypeChange(NULL, $self->_id, $errors);
+    }
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
     if (!empty($fields['fee_amount']) && !empty($fields['financial_type_id']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
@@ -1041,7 +1044,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $isRelatedId = TRUE;
         }
         elseif (array_key_exists('participant', $contributionDetails)) {
-          $pId = current($contributionDetails['participant']);
+          $pId = $contributionDetails['participant'];
         }
       }
     }

@@ -80,15 +80,29 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedCases = 0;
+    $deleted = $failed = 0;
     foreach ($this->_caseIds as $caseId) {
       if (CRM_Case_BAO_Case::deleteCase($caseId, $this->_moveToTrash)) {
-        $deletedCases++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus($deletedCases, ts('Deleted Cases'), 'success');
-    CRM_Core_Session::setStatus('', ts('Total Selected Case(s): %1', array(1 => count($this->_caseIds))), 'info');
+    if ($deleted) {
+      if ($this->_moveToTrash) {
+        $msg = ts('%count case moved to trash.', array('plural' => '%count cases moved to trash.', 'count' => $deleted));
+      }
+      else {
+        $msg = ts('%count case permanently deleted.', array('plural' => '%count cases permanently deleted.', 'count' => $deleted));
+      }
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }

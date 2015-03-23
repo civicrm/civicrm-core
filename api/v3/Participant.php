@@ -180,8 +180,11 @@ function civicrm_api3_participant_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_get_spec(&$params) {
-  $params['participant_test']['api.default'] = 0;
-  $params['participant_test']['title'] = 'Get Test Participants';
+  $params['participant_test'] = array(
+    'api.default' => 0,
+    'title' => 'Get Test Participants',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**

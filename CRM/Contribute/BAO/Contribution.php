@@ -3122,6 +3122,14 @@ WHERE  contribution_id = %1 ";
         }
       }
     }
+    if ($context == 'changeFinancialType') {
+      $params['skipLineItem'] = FALSE;
+      foreach ($params['line_item'] as &$lineItems) {
+        foreach ($lineItems as &$line) {
+          $line['financial_type_id'] = $params['financial_type_id'];
+        }
+      }
+    }
   }
 
   /**
@@ -3673,6 +3681,37 @@ WHERE con.id = {$contributionId}
       }
     }
     return $params;
+  }
+
+  /**
+   * Check financial type validation on update of a contribution.
+   *
+   * @param Integer $financialTypeId
+   *   Value of latest Financial Type.
+   *
+   * @param Integer $contributionId
+   *   Contribution Id.
+   *
+   * @param array $errors
+   *   List of errors.
+   *
+   * @return bool
+   */
+  public static function checkFinancialTypeChange($financialTypeId, $contributionId, &$errors) {
+    if (!empty($financialTypeId)) {
+      $oldFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
+      if ($oldFinancialTypeId == $financialTypeId) {
+        return FALSE;
+      }
+    }
+    $sql = 'SELECT financial_type_id FROM civicrm_line_item WHERE contribution_id = %1 GROUP BY financial_type_id;';
+    $params = array(
+      '1' => array($contributionId, 'Integer'),
+    );
+    $result = CRM_Core_DAO::executeQuery($sql, $params);
+    if ($result->N > 1) {
+      $errors['financial_type_id'] = ts('One or more line items have a different financial type than the contribution. Editing the financial type is not yet supported in this situation.');
+    }
   }
 
 }

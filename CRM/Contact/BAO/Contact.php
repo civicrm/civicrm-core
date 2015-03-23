@@ -3329,6 +3329,17 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
           return CRM_Contact_BAO_ContactType::getSelectElements();
         }
         break;
+
+      // The contact api supports some related entities so we'll honor that by fetching their options
+      case 'group_id':
+      case 'group':
+        return CRM_Contact_BAO_GroupContact::buildOptions('group_id', $context, $props);
+
+      case 'tag_id':
+      case 'tag':
+        $props['entity_table'] = 'civicrm_contact';
+        return CRM_Core_BAO_EntityTag::buildOptions('tag_id', $context, $props);
+
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
