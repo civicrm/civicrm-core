@@ -8,7 +8,7 @@
     crmMailingAbBlockSetup: '~/crmMailingAB/setup.html'
   };
   _.each(simpleDirectives, function (templateUrl, directiveName) {
-    angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria) {
+    angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria, crmUiHelp) {
       var scopeDesc = {crmAbtest: '@'};
       scopeDesc[directiveName] = '@';
 
@@ -21,6 +21,7 @@
           scope.crmMailingConst = CRM.crmMailing;
           scope.crmMailingABCriteria = crmMailingABCriteria;
           scope.ts = CRM.ts(null);
+          scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
 
           var fieldsModel = $parse(attr[directiveName]);
           scope.fields = fieldsModel(scope.$parent);

@@ -72,13 +72,14 @@
     $location.replace();
   });
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp) {
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;
 
     var ts = $scope.ts = CRM.ts(null);
+    $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
     var block = $scope.block = crmBlocker();
     var myAutosave = null;
 
@@ -292,6 +293,7 @@
         recipients: $scope.recipients
       };
       var options = CRM.utils.adjustDialogDefaults({
+        width: '40%',
         autoOpen: false,
         title: ts('Preview (%1)', {
           1: $scope.getRecipientsEstimate()
@@ -304,6 +306,8 @@
     $scope.editOptions = function editOptions(mailing) {
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
+        width: '40%',
+        height: 'auto',
         title: ts('Edit Options')
       });
       $q.when(crmMetadata.getFields('Mailing')).then(function(fields) {
@@ -336,8 +340,9 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - "mailing" (APIv3 mailing object)
   //   - "fields" (list of fields)
-  angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope) {
+  angular.module('crmMailing').controller('EditRecipOptionsDialogCtrl', function EditRecipOptionsDialogCtrl($scope, crmUiHelp) {
     $scope.ts = CRM.ts(null);
+    $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
   });
 
   // Controller for the "Preview Mailing Component" segment
@@ -389,6 +394,8 @@
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
+        height: 'auto',
+        width: '40%',
         title: ts('Save Template')
       });
       return dialogService.open('saveTemplateDialog', '~/crmMailing/dialog/saveTemplate.html', model, options)

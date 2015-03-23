@@ -49,10 +49,10 @@
                 subjectB: 1
                 }"
               crm-abtest="abtest"></div>
-            <div crm-ui-accordion crm-title="ts('HTML')">
+            <div crm-ui-accordion="{title: ts('HTML')}" >
               <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.a.body_text'>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.a.body_text}">
               <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
             </div>
           </div>
@@ -73,10 +73,10 @@
             <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
           </div>
         </div>
-        <div crm-ui-accordion crm-title="ts('Preview (A)')">
+        <div crm-ui-accordion="{title: ts('Preview (A)')}" >
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
         </div>
-        <div crm-ui-accordion crm-title="ts('Preview (B)')">
+        <div crm-ui-accordion="{title: ts('Preview (B)')}" >
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
@@ -91,10 +91,10 @@
                 subjectA: 1
                 }"
               crm-abtest="abtest"></div>
-            <div crm-ui-accordion crm-title="ts('HTML')">
+            <div crm-ui-accordion="{title: ts('HTML')}" >
               <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.a.body_text'>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.a.body_text}">
               <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
             </div>
           </div>
@@ -111,7 +111,7 @@
             <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
           </div>
         </div>
-        <div crm-ui-accordion crm-title="ts('Preview')">
+        <div crm-ui-accordion="{title: ts('Preview')}" >
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
         </div>
       </div>
@@ -126,10 +126,10 @@
                 subjectB: 1
                 }"
               crm-abtest="abtest"></div>
-            <div crm-ui-accordion crm-title="ts('HTML')">
+            <div crm-ui-accordion="{title: ts('HTML')}" >
               <div crm-mailing-body-html crm-mailing="abtest.mailings.b"/>
             </div>
-            <div crm-ui-accordion crm-title="ts('Plain Text')" crm-collapsed='!abtest.mailings.b.body_text'>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.b.body_text}">
               <div crm-mailing-body-text crm-mailing="abtest.mailings.b"/>
             </div>
           </div>
@@ -146,7 +146,7 @@
             <div crm-mailing-block-responses crm-mailing="abtest.mailings.b"/>
           </div>
         </div>
-        <div crm-ui-accordion crm-title="ts('Preview')">
+        <div crm-ui-accordion="{title: ts('Preview')}" >
           <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
         </div>
       </div>
