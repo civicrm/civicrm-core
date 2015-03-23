@@ -127,6 +127,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->_checkPaymentInfoTable(800.00, 400.00);
     $balance = 800.00 - 400.00;
     //click through to the contribution view screen
+    $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
@@ -145,7 +146,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     // make additional payment
     // 1 - check for links presence on participant view and edit page
-    $this->waitForElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a[contains(text(), 'Record Payment')]");
+    $this->waitForElementPresent("xpath=//form[@id='ParticipantView']//div//table//tbody//td[@id='payment-info']//a[contains(text(), 'Record Payment')]");
     $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
     $this->waitForElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a[contains(text(), 'Record Payment')]");
     $this->clickLinkSuppressPopup("xpath=id('ParticipantView')//td[@id='payment-info']//a[contains(text(), 'Record Payment')]", 'AdditionalPayment');

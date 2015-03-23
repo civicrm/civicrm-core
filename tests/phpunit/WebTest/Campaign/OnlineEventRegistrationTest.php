@@ -360,7 +360,7 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span[1]/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
-    $this->assertElementContainsText("xpath=//form[@id='Participant']/div[2]/div/table[@class='form-layout-compressed']/tbody/tr[4]/td[2]/select", "$campaignTitle");
+    $this->assertElementContainsText("xpath=//form[@id='Participant']//div/div/table/tbody//tr/td[2]/select", "$campaignTitle");
   }
 
 }

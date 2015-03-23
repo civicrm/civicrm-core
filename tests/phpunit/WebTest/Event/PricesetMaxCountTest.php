@@ -1111,7 +1111,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Go to Fees tab
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
-    $this->click('xpath=//form[@id="Fee"]/div[2]/table/tbody/tr[2]/td[2]/label[contains(text(), "Yes")]');
+    $this->click('xpath=//form[@id="Fee"]//div/table/tbody//tr//td/label[contains(text(), "Yes")]');
     $processorName = $params['payment_processor'];
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
     $this->select('financial_type_id', 'value=4');
