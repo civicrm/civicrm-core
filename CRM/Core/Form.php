@@ -1152,10 +1152,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
 
-    if (!array_key_exists('placeholder', $props)) {
-      $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
-    }
-
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
 
     if ($widget == 'TextArea' && CRM_Utils_Array::value('context', $props) == 'search') {
@@ -1175,7 +1171,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     )));
 
     if ($isSelect) {
-      // Fetch options from the api unless passed explicitly
+      // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
       }
@@ -1183,6 +1179,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $info = civicrm_api3($props['entity'], 'getoptions', $props);
         $options = $info['values'];
       }
+
+      // The placeholder is only used for select-elements.
+      if (!array_key_exists('placeholder', $props)) {
+        $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
+      }
+
       if (CRM_Utils_Array::value('context', $props) == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
       }
