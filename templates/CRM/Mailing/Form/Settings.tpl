@@ -59,7 +59,10 @@ CRM.$(function($) {
     <table class="form-layout"><tr class="crm-mailing-settings-form-block-url_tracking">
     <td class="label">{$form.url_tracking.label}</td>
         <td>{$form.url_tracking.html}
-            <span class="description">{ts}Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automaticallly re-written to route through your CiviCRM server prior to redirecting to the target page.{/ts}</span>
+            <span class="description">
+              {ts}Track the number of times recipients click each link in this mailing.{/ts}
+              {ts}NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.{/ts}
+            </span>
         </td></tr><tr class="crm-mailing-settings-form-block-open_tracking">
     <td class="label">{$form.open_tracking.label}</td>
         <td>{$form.open_tracking.html}

@@ -5,7 +5,7 @@ Required vars: mailingABList
 
 <span crm-ui-order="{var: 'myOrder', defaults: ['-created_date']}"></span>
 
-<div crm-ui-accordion crm-title="ts('Filter')" crm-collapsed="true">
+<div crm-ui-accordion="{title: ts('Filter'), collapsed: true}">
   <form name="filterForm">
     <span>
       <input class="big crm-form-text" ng-model="filter.name" placeholder="{{ts('Name')}}"/>

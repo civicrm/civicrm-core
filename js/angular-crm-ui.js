@@ -10,15 +10,23 @@
     .directive('crmUiAccordion', function() {
       return {
         scope: {
-          crmTitle: '@',
-          crmCollapsed: '@'
+          crmUiAccordion: '='
         },
-        template: '<div class="crm-accordion-wrapper" ng-class="cssClasses"><div class="crm-accordion-header">{{$parent.$eval(crmTitle)}}</div><div class="crm-accordion-body" ng-transclude></div></div>',
+        template: '<div ng-class="cssClasses"><div class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></div><div class="crm-accordion-body" ng-transclude></div></div>',
         transclude: true,
         link: function (scope, element, attrs) {
           scope.cssClasses = {
-            collapsed: scope.$parent.$eval(attrs.crmCollapsed)
+            'crm-accordion-wrapper': true,
+            collapsed: scope.crmUiAccordion.collapsed
           };
+          scope.help = null;
+          scope.$watch('crmUiAccordion', function(crmUiAccordion) {
+            if (crmUiAccordion && crmUiAccordion.help) {
+              scope.help = crmUiAccordion.help.clone({}, {
+                title: crmUiAccordion.title
+              });
+            }
+          });
         }
       };
     })
@@ -111,9 +119,10 @@
     })
 
     // Display a field/row in a field list
-    // example: <div crm-ui-field crm-title="My Field"> {{mydata}} </div>
-    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
-    // example: <div crm-ui-field="subform.myfield" crm-title="'My Field'"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
+    // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -125,8 +134,8 @@
         require: '^crmUiIdScope',
         restrict: 'EA',
         scope: {
-          crmUiField: '@',
-          crmTitle: '@'
+          // {title, name, help, helpFile}
+          crmUiField: '='
         },
         templateUrl: function(tElement, tAttrs){
           var layout = tAttrs.crmLayout ? tAttrs.crmLayout : 'default';
@@ -135,8 +144,14 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
-          scope.crmUiField = attrs.crmUiField;
-          scope.crmTitle = attrs.crmTitle;
+          scope.help = null;
+          scope.$watch('crmUiField', function(crmUiField) {
+            if (crmUiField && crmUiField.help) {
+              scope.help = crmUiField.help.clone({}, {
+                title: crmUiField.title
+              });
+            }
+          });
         }
       };
     })
@@ -151,6 +166,64 @@
             var id = crmUiIdCtrl.get(attrs.crmUiId);
             element.attr('id', id);
           }
+        }
+      };
+    })
+
+    // for example, see crmUiHelp
+    .service('crmUiHelp', function(){
+      // example: var h = new FieldHelp({id: 'foo'}); h.open();
+      function FieldHelp(options) {
+        this.options = options;
+      }
+      angular.extend(FieldHelp.prototype, {
+        get: function(n) {
+          return this.options[n];
+        },
+        open: function open() {
+          CRM.help(this.options.title, {id: this.options.id, file: this.options.file});
+        },
+        clone: function clone(options, defaults) {
+          return new FieldHelp(angular.extend({}, defaults, this.options, options));
+        }
+      });
+
+      // example: var hs = crmUiHelp({file: 'CRM/Foo/Bar'});
+      return function(defaults){
+        // example: hs('myfield')
+        // example: hs({id: 'myfield', title: 'Foo Bar', file: 'Whiz/Bang'})
+        return function(options) {
+          if (_.isString(options)) {
+            options = {id: options};
+          }
+          return new FieldHelp(angular.extend({}, defaults, options));
+        };
+      };
+    })
+
+    // Display a help icon
+    // Example: Use a default *.hlp file
+    //   scope.hs = crmUiHelp({file: 'Path/To/Help/File'});
+    //   HTML: <a crm-ui-help="hs({title:ts('My Field'), id:'my_field'})">
+    // Example: Use an explicit *.hlp file
+    //   HTML: <a crm-ui-help="hs({title:ts('My Field'), id:'my_field', file:'CRM/Foo/Bar'})">
+    .directive('crmUiHelp', function() {
+      return {
+        restrict: 'EA',
+        link: function(scope, element, attrs) {
+          setTimeout(function() {
+            var crmUiHelp = scope.$eval(attrs.crmUiHelp);
+            var title = crmUiHelp && crmUiHelp.get('title') ? ts('%1 Help', {1: crmUiHelp.get('title')}) : ts('Help');
+            element.attr('title', title);
+          }, 50);
+
+          element
+            .addClass('helpicon')
+            .attr('href', '#')
+            .on('click', function(e) {
+              e.preventDefault();
+              scope.$eval(attrs.crmUiHelp).open();
+            });
         }
       };
     })
