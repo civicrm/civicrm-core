@@ -526,7 +526,7 @@ SELECT end_event_adjust_interval
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
-    $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Cancel')]");
 
     $this->type('name', "Membership Type $title");
     $this->select2('member_of_contact_id', $title);
