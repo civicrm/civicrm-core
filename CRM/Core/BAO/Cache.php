@@ -325,7 +325,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($table) {
-      CRM_Core_Config::clearTempTables($timeIntervalDays. ' day');
+      CRM_Core_Config::clearTempTables($timeIntervalDays . ' day');
     }
 
     if ($session) {
