@@ -97,9 +97,7 @@ class CRM_Contact_Form_Edit_Individual {
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
-      $form->addElement('text', 'nick_name', ts('Nickname'),
-        CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'nick_name')
-      );
+      $form->addField('nick_name', $attributes['nick_name']);
 
       // job title
       // override the size for UI to look better
