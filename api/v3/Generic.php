@@ -382,13 +382,11 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
     'context' => array(
       'title' => 'Context',
       'type' => CRM_Utils_Type::T_STRING,
+      'options' => CRM_Core_DAO::buildOptionsContext(),
     ),
   );
 
-  // Add available options to these params if requested
-  if (array_intersect(array('all', 'context'), $apiRequest['params']['options']['get_options'])) {
-    $params['context']['options'] = array_combine(array_keys(CRM_Core_DAO::buildOptionsContext()), array_keys(CRM_Core_DAO::buildOptionsContext()));
-  }
+  // Add available fields if requested
   if (array_intersect(array('all', 'field'), $apiRequest['params']['options']['get_options'])) {
     $fields = civicrm_api3_generic_getfields(array('entity' => $apiRequest['entity'], array('params' => array('action' => 'create'))));
     $params['field']['options'] = array();
