@@ -127,7 +127,8 @@
   function getFields(changedElement) {
     var required = [];
     fields = [];
-    options = getFieldData = {};
+    options = {};
+    getFieldData = {};
     // Special case for getfields
     if (action === 'getfields') {
       fields.push({
@@ -142,9 +143,9 @@
       return;
     }
     CRM.api3(entity, 'getFields', {'api_action': action, options: {get_options: 'all'}}).done(function(data) {
-      getFieldData = data.values;
       _.each(data.values, function(field) {
         if (field.name) {
+          getFieldData[field.name] = field;
           fields.push({
             id: field.name,
             text: field.title || field.name,
