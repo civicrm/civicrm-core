@@ -119,8 +119,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         array(
           'name' => 'entity[0]',
           'style' => 'vertical-align: top;',
-        ),
-        TRUE
+        )
       );
       $sel->setOptions(array($sel1, $sel2, $sel3));
 
