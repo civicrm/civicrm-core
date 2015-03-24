@@ -66,7 +66,10 @@
     <length>12</length>
     <comment>If defined, contact_a in a relationship of this type must be a specific contact_type.</comment>
     <pseudoconstant>
-      <callback>CRM_Contact_BAO_ContactType::getSelectElements</callback>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
     </pseudoconstant>
     <add>1.1</add>
     <html>
@@ -80,7 +83,10 @@
     <length>12</length>
     <comment>If defined, contact_b in a relationship of this type must be a specific contact_type.</comment>
     <pseudoconstant>
-      <callback>CRM_Contact_BAO_ContactType::getSelectElements</callback>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
     </pseudoconstant>
     <add>1.1</add>
     <html>
@@ -98,6 +104,12 @@
     <html>
       <type>Select</type>
     </html>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NOT NULL</condition>
+    </pseudoconstant>
   </field>
   <field>
     <name>contact_sub_type_b</name>
@@ -110,6 +122,12 @@
     <html>
       <type>Select</type>
     </html>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NOT NULL</condition>
+    </pseudoconstant>
   </field>
   <field>
     <name>is_reserved</name>
