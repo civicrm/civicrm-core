@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -23,32 +23,36 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="demographics" class="form-item">
-    <table class="form-layout">
-       <tr>
-           <tr><td><label>{ts}Birth Dates{/ts}</label></td></tr>
-    {include file="CRM/Core/DateRange.tpl" fieldName="birth_date" from='_low' to='_high'}
-       </tr>
-       <tr>
-           <tr><td><label>{ts}Age{/ts}</label></td></tr>
-    {include file="CRM/Core/AgeRange.tpl" fieldName="age" from='_low' to='_high' date='_asof_date'}
-       </tr>
-       <tr>
-         <td>
-           {$form.is_deceased.label}<br />
-           {$form.is_deceased.html}
-         </td>
-      </tr>
-      <tr>
-          <tr><td><label>{ts}Deceased Dates{/ts}</label></td></tr>
-    {include file="CRM/Core/DateRange.tpl" fieldName="deceased_date" from='_low' to='_high'}
-      </tr>
-      <tr>
-         <td>
-            {$form.gender_id.label}<br />
-            {$form.gender_id.html}
-         </td>
-      </tr>
-    </table>
-</div>
-
+{*this is included inside a table row*}
+<td>
+  <span class="crm-age-range">
+    <span class="crm-age-range-min">
+      {assign var=minName   value=$fieldName|cat:$from}
+      {$form.$minName.label}
+      {$form.$minName.html}
+    </span>
+    <span class="crm-age-range-max">
+      {assign var=maxName   value=$fieldName|cat:$to}
+      {$form.$maxName.label}
+      {$form.$maxName.html}
+    </span>
+  </span>
+</td>
+<td>
+  <span class="crm-age-range-asofdate">
+      {assign var=dateName   value=$fieldName|cat:$date}
+      {$form.$dateName.label}
+      {include file="CRM/common/jcalendar.tpl" elementName=$dateName}
+  </span>
+  {literal}
+    <script type="text/javascript">
+      cj(".crm-age-range").change(function() {
+        if (cj('.crm-age-range-min :text').val() || cj('.crm-age-range-max :text').val()) {
+          cj(".crm-age-range-asofdate").show();
+        } else {
+          cj(".crm-age-range-asofdate").hide();
+        }
+      }).change();
+    </script>
+  {/literal}
+</td>

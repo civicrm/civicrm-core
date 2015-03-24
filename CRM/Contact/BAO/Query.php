@@ -1767,11 +1767,17 @@ class CRM_Contact_BAO_Query {
         CRM_Activity_BAO_Query::whereClauseSingle($values, $this);
         return;
 
+      case 'age_low':
+      case 'age_high':
       case 'birth_date_low':
       case 'birth_date_high':
       case 'deceased_date_low':
       case 'deceased_date_high':
         $this->demographics($values);
+        return;
+
+      case 'age_asof_date':
+        // handled by demographics
         return;
 
       case 'log_date_low':
@@ -3869,7 +3875,12 @@ WHERE  id IN ( $groupIDs )
   public function demographics(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (($name == 'birth_date_low') || ($name == 'birth_date_high')) {
+    if (($name == 'age_low') || ($name == 'age_high')) {
+      $this->ageRangeQueryBuilder($values,
+        'contact_a', 'age', 'birth_date', ts('Age')
+      );
+    }
+    elseif (($name == 'birth_date_low') || ($name == 'birth_date_high')) {
 
       $this->dateQueryBuilder($values,
         'contact_a', 'birth_date', 'birth_date', ts('Birth Date')
@@ -5134,6 +5145,104 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       $displayValue = $options ? $options[$value] : $value;
       $this->_qill[$grouping][] = "$fieldTitle - $phrase \"$displayValue\"";
+    }
+  }
+
+
+  /**
+   * @param $values
+   * @param string $tableName
+   * @param string $fieldName
+   * @param string $dbFieldName
+   * @param $fieldTitle
+   * @param null $options
+   */
+  public function ageRangeQueryBuilder(
+    &$values,
+    $tableName, $fieldName,
+    $dbFieldName, $fieldTitle,
+    $options = NULL
+  ) {
+    list($name, $op, $value, $grouping, $wildcard) = $values;
+
+    $asofDateValues = $this->getWhereValues("{$fieldName}_asof_date", $grouping);
+    $asofDate = NULL;  // will be treated as current day
+    if ($asofDateValues) {
+      $asofDate = CRM_Utils_Date::processDate($asofDateValues[2]);
+      $asofDateFormat = CRM_Utils_Date::customFormat(substr($asofDate, 0, 8));
+      $fieldTitle .= ' ' . ts('as of') . ' ' . $asofDateFormat;
+    }
+
+    if ($name == "{$fieldName}_low" ||
+      $name == "{$fieldName}_high"
+    ) {
+      if (isset($this->_rangeCache[$fieldName])) {
+        return;
+      }
+      $this->_rangeCache[$fieldName] = 1;
+
+      $secondOP = $secondPhrase = $secondValue = NULL;
+
+      if ($name == "{$fieldName}_low") {
+        $firstPhrase = ts('greater than or equal to');
+        // NB: age > X means date of birth < Y
+        $firstOP = '<=';
+        $firstDate = self::calcDateFromAge($asofDate, $value, 'min');
+
+        $secondValues = $this->getWhereValues("{$fieldName}_high", $grouping);
+        if (!empty($secondValues)) {
+          $secondOP = '>=';
+          $secondPhrase = ts('less than or equal to');
+          $secondValue = $secondValues[2];
+          $secondDate = self::calcDateFromAge($asofDate, $secondValue, 'max');
+        }
+      }
+      else {
+        $firstOP = '>=';
+        $firstPhrase = ts('less than or equal to');
+        $firstDate = self::calcDateFromAge($asofDate, $value, 'max');
+
+        $secondValues = $this->getWhereValues("{$fieldName}_low", $grouping);
+        if (!empty($secondValues)) {
+          $secondOP = '<=';
+          $secondPhrase = ts('greater than or equal to');
+          $secondValue = $secondValues[2];
+          $secondDate = self::calcDateFromAge($asofDate, $secondValue, 'min');
+        }
+      }
+
+
+      if ($secondOP) {
+        $this->_where[$grouping][] = "
+( {$tableName}.{$dbFieldName} $firstOP '$firstDate' ) AND
+( {$tableName}.{$dbFieldName} $secondOP '$secondDate' )
+";
+        $displayValue = $options ? $options[$value] : $value;
+        $secondDisplayValue = $options ? $options[$secondValue] : $secondValue;
+
+        $this->_qill[$grouping][]
+          = "$fieldTitle - $firstPhrase \"$displayValue\" " . ts('AND') . " $secondPhrase \"$secondDisplayValue\"";
+      }
+      else {
+        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $firstOP '$firstDate'";
+        $displayValue = $options ? $options[$value] : $value;
+        $this->_qill[$grouping][] = "$fieldTitle - $firstPhrase \"$displayValue\"";
+      }
+      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+      return;
+    }
+  }
+
+  public static function calcDateFromAge($asofDate, $age, $type) {
+    $date = new DateTime($asofDate);
+    if ($type == "min") {
+      // minimum age is $age: dob <= date - age "235959"
+      $date->sub(new DateInterval("P" . $age . "Y"));
+      return $date->format('Ymd') . "235959";
+    } else {
+      // max age is $age: dob >= date - (age + 1y) + 1d "000000"
+      $date->sub(new DateInterval("P" . ($age + 1) . "Y"))->add(new DateInterval("P1D"));
+      return $date->format('Ymd') . "000000";
     }
   }
 
