@@ -1040,6 +1040,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Classes extending CRM_Core_Form should implement this method.
+   *
+   * TODO: Merge with CRM_Core_DAO::buildOptionsContext($context) and add validation.
+   * @throws Exception
+   */
+  public function getDefaultContext() {
+    throw new Exception("Cannot determine default context. The form class should implement getDefaultContext().");
+  }
+
+  /**
    * Adds a select based on field metadata.
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
@@ -1129,7 +1139,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       throw new Exception("Custom fields are not supported by the addField method. ");
     }
-
+    // Resolve context.
+    if (!isset($props['context'])) {
+      $props['context'] = $this->getDefaultContext();
+    }
     // Resolve entity.
     if (!isset($props['entity'])) {
       $props['entity'] = $this->getDefaultEntity();
@@ -1153,8 +1166,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
-
-    if ($widget == 'TextArea' && CRM_Utils_Array::value('context', $props) == 'search') {
+    if ($widget == 'TextArea' && $props['context'] == 'search') {
       $widget = 'Text';
     }
 
@@ -1182,20 +1194,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       // The placeholder is only used for select-elements.
       if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
+        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
       }
 
-      if (CRM_Utils_Array::value('context', $props) == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+      if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
       }
       $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if (CRM_Utils_Array::value('context', $props) == 'search' || strpos($widget, 'Multi') !== FALSE) {
+      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
         $props['class'] .= ' huge';
         $props['multiple'] = 'multiple';
       }
 
       // Add data for popup link.
-      if (CRM_Utils_Array::value('context', $props) != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+      if ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['field'];

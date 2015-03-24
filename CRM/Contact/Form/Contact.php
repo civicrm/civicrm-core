@@ -135,6 +135,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @return void

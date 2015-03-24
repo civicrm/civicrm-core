@@ -64,7 +64,7 @@ class CRM_Contact_Form_Edit_Individual {
       //prefix
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addField('prefix_id', array('class' => 'eight', 'placeholder' => ' '));
+        $form->addField('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
       }
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
@@ -91,7 +91,7 @@ class CRM_Contact_Form_Edit_Individual {
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       if (isset($nameFields['Suffix']) && $suffix) {
-        $form->addSelect('suffix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Suffix')));
+        $form->addField('suffix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Suffix')));
       }
     }
 
@@ -104,8 +104,8 @@ class CRM_Contact_Form_Edit_Individual {
       // job title
       // override the size for UI to look better
       $attributes['job_title']['size'] = 30;
-      $form->addElement('text', 'job_title', ts('Job Title'), $attributes['job_title'], 'size="30"');
-
+      //$form->addElement('text', 'job_title', ts('Job Title'), $attributes['job_title'], 'size="30"');
+      $form->addField('job_title', array('size' => 30));
       //Current Employer Element
       $props = array(
         'api' => array('params' => array('contact_type' => 'Organization')),
