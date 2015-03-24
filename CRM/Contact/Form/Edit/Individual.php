@@ -70,22 +70,22 @@ class CRM_Contact_Form_Edit_Individual {
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
 
       if (isset($nameFields['Formal Title'])) {
-        $form->addField('formal_title');
+        $form->addField('formal_title', $attributes['formal_title']);
       }
 
       // first_name
       if (isset($nameFields['First Name'])) {
-        $form->addField('first_name');
+        $form->addField('first_name', $attributes['first_name']);
       }
 
       //middle_name
       if (isset($nameFields['Middle Name'])) {
-        $form->addField('middle_name');
+        $form->addField('middle_name', $attributes['middle_name']);
       }
 
       // last_name
       if (isset($nameFields['Last Name'])) {
-        $form->addField('last_name');
+        $form->addField('last_name', $attributes['last_name']);
       }
 
       // suffix
@@ -104,8 +104,7 @@ class CRM_Contact_Form_Edit_Individual {
       // job title
       // override the size for UI to look better
       $attributes['job_title']['size'] = 30;
-      //$form->addElement('text', 'job_title', ts('Job Title'), $attributes['job_title'], 'size="30"');
-      $form->addField('job_title', array('size' => 30));
+      $form->addField('job_title', array('size' => '30') + $attributes['job_title']);
       //Current Employer Element
       $props = array(
         'api' => array('params' => array('contact_type' => 'Organization')),
