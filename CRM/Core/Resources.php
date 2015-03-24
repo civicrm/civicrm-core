@@ -702,7 +702,7 @@ class CRM_Core_Resources {
       "bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
       "bower_components/select2/select2$min.js",
-      "bower_components/select2/select2.css",
+      "bower_components/select2/select2$min.css",
       "packages/jquery/plugins/jquery.tableHeader.js",
       "packages/jquery/plugins/jquery.textarearesizer.js",
       "packages/jquery/plugins/jquery.form$min.js",
