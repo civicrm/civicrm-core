@@ -1214,25 +1214,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
 
+    CRM_Utils_Array::remove($props, 'entity', 'field', 'context', 'label');
     switch ($widget) {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
-        $this->add('text', $name, $label, NULL, $required, $props);
+        $this->addElement('text', $name, $label, $props, $required);
         break;
 
-      case 'TextArea':
-        //Set default rows and cols
-        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
-        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
-        $this->add('textarea', $name, $label, NULL, $required, $props);
-        break;
-
-      case 'Select Date':
-        //TODO: Add date formats
-        //TODO: Add javascript template for dates.
-        $this->addDate($name, $label, $required);
-        break;
+      //case 'TextArea':
+      //case 'Select Date':
+      //TODO: Add date formats
+      //TODO: Add javascript template for dates.
 
       // case 'Radio':
       case 'Select':
