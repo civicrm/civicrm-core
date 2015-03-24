@@ -5211,7 +5211,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         }
       }
 
-
       if ($secondOP) {
         $this->_where[$grouping][] = "
 ( {$tableName}.{$dbFieldName} $firstOP '$firstDate' ) AND
@@ -5239,7 +5238,8 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       // minimum age is $age: dob <= date - age "235959"
       $date->sub(new DateInterval("P" . $age . "Y"));
       return $date->format('Ymd') . "235959";
-    } else {
+    }
+    else {
       // max age is $age: dob >= date - (age + 1y) + 1d "000000"
       $date->sub(new DateInterval("P" . ($age + 1) . "Y"))->add(new DateInterval("P1D"));
       return $date->format('Ymd') . "000000";
