@@ -281,6 +281,66 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Chaining get event and loc block.
+   */
+  public function testChainingGetLocBlock() {
+    // create a loc block and an event for that loc block.
+    $eventParams = $this->_params[0];
+    $eventParams['loc_bloc_id'] = '$value.id';
+    $locBlockParams = array(
+      'address' => array(
+        'street_address' => 'Kipdorp 24',
+        'postal_code' => '2000',
+        'city' => 'Antwerpen',
+        'country_id' => '1020',
+        'location_type_id' => '1',
+      ),
+      'api.Event.create' => $eventParams,
+      'sequential' => 1,
+    );
+    $createResult = $this->callAPIAndDocument('LocBlock', 'create', $locBlockParams, __FUNCTION__, __FILE__);
+    $locBlockId = $createResult['id'];
+    $addressId = $createResult['values'][0]['address_id'];
+    $eventId = $createResult['values'][0]['api.Event.create']['id'];
+
+    // request the event with its loc block:
+    $check = $this->callAPISuccess($this->_entity, 'getsingle', array(
+      'id' => $eventId,
+      'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
+      'sequential' => 1,
+    ));
+
+    // assert
+    $this->assertEquals($eventId, $check['id'], ' in line ' . __LINE__);
+    $this->assertEquals(1, $check['api.LocBlock.get']['count'], ' in line ' . __LINE__);
+    $this->assertEquals($locBlockId, $check['api.LocBlock.get']['id'], ' in line ' . __LINE__);
+
+    // cleanup
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $eventId));
+  }
+
+  /**
+   * Chaining get event and non existing loc block.
+   *
+   * Even if there is no loc block, at least the event should be returned.
+   * http://forum.civicrm.org/index.php/topic,36113.0.html
+   */
+  public function testChainingGetNonExistingLocBlock() {
+    $params = $this->_params[0];
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'id' => $result['id'],
+      // this chaining request should not break things:
+      'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
+      ));
+    $this->assertEquals(0, $check['is_error'], ' in line ' . __LINE__);
+    $this->assertEquals($result['id'], $check['id'], ' in line ' . __LINE__);
+
+    $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
