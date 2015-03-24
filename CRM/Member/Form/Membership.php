@@ -1638,16 +1638,16 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $receiptSend = FALSE;
     $contributionId = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
-    if ($contributionId) {
+    $membershipIds = $this->_membershipIDs;
+    if ($contributionId && !empty($membershipIds)) {
       $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
-        CRM_Export_Form_Select::MEMBER_EXPORT, array($contributionId));
-      if ($contributionDetails[$contributionId]['status'] == 'Completed') {
-      $receiptSend = TRUE;
+        CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
+      if ($contributionDetails[$membership->id]['contribution_status'] == 'Completed') {
+        $receiptSend = TRUE;
       }
     }
 
     if (!empty($formValues['send_receipt']) && $receiptSend) {
-
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
 
