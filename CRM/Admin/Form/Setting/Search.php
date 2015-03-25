@@ -94,6 +94,9 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     $element = $this->getElement('autocompleteContactReference');
     $element->_elements[0]->_flagFrozen = TRUE;
 
+    // primary only or search all
+    $this->addYesNo('searchPrimaryEmailOnly', ts('Search primary email only'));
+
     parent::buildQuickForm();
   }
 
