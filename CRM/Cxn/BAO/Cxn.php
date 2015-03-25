@@ -56,4 +56,12 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
       2 => array($appMeta['appId'], 'String'),
     ));
   }
+
+  public static function getAppMeta($cxnId) {
+    $appMetaJson = CRM_Core_DAO::getFieldValue('CRM_Cxn_DAO_Cxn', $cxnId, 'app_meta', 'cxn_id', TRUE);
+    $appMeta = json_decode($appMetaJson, TRUE);
+    \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
+    return $appMeta;
+  }
+
 }
