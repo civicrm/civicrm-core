@@ -418,7 +418,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
   public $defaultSearchProfileID = NULL;
 
-  public $searchPrimaryEmailOnly = 1; 
+  public $searchPrimaryEmailOnly = 1;
 
   /**
    * Dashboard timeout
