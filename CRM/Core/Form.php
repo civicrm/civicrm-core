@@ -1226,7 +1226,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case 'Select Date':
       //TODO: Add date formats
       //TODO: Add javascript template for dates.
-
       // case 'Radio':
       case 'Select':
         if (empty($props['multiple'])) {
@@ -1241,7 +1240,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case 'File':
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
-      //case 'Autocomplete-Select':
+      case 'Autocomplete-Select':
+      case 'EntityRef':
+        $this->addEntityRef($name, $label, $props);
+        break;
+
       // Check datatypes of fields
       // case 'Int':
       //case 'Float':

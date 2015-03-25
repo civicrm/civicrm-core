@@ -108,9 +108,8 @@ class CRM_Contact_Form_Edit_Individual {
         'api' => array('params' => array('contact_type' => 'Organization')),
         'create' => TRUE,
       );
-      $form->addEntityRef('employer_id', ts('Current Employer'), $props);
-      $attributes['source']['class'] = 'big';
-      $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
+      $form->addField('employer_id', $props);
+      $form->addField('contact_source', array('class' => 'big'));
     }
 
     if (!$inlineEditMode) {
@@ -126,9 +125,7 @@ class CRM_Contact_Form_Edit_Individual {
       $form->assign('checkSimilar', $checkSimilar);
 
       //External Identifier Element
-      $form->add('text', 'external_identifier', ts('External ID'),
-        CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE
-      );
+      $form->addField('external_identifier', $attributes['external_identifier'] + array('label' => 'External ID'));
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
