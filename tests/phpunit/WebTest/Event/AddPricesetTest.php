@@ -711,7 +711,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Enter Event Title, Summary and Description
     $this->select("event_type_id", "value=4");
     $this->select("default_role_id", "value=1");
-    $this->type("template_title", "Test Event");
+    $this->type("title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
 
     $this->click("_qf_EventInfo_upload-bottom");
