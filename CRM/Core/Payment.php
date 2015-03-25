@@ -229,7 +229,9 @@ abstract class CRM_Core_Payment {
 
   /**
    * Getter for accessing member vars.
+   *
    * @todo believe this is unused
+   *
    * @param string $name
    *
    * @return null
@@ -453,8 +455,10 @@ abstract class CRM_Core_Payment {
   abstract protected function doDirectPayment(&$params);
 
   /**
-   * Process payment - this function wraps around both doTransferPayment and doDirectPayment
-   * it ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms more agnostic
+   * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
+   *
+   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
+   * more agnostic.
    *
    * @param array $params
    *
@@ -487,8 +491,12 @@ abstract class CRM_Core_Payment {
   abstract protected function checkConfig();
 
   /**
+   * Redirect for paypal.
+   *
+   * @todo move to paypal class or remove
+   *
    * @param $paymentProcessor
-   * @todo move to paypal class or remover
+   *
    * @return bool
    */
   public static function paypalRedirect(&$paymentProcessor) {
@@ -508,6 +516,10 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Handle incoming payment notification.
+   *
+   * IPNs, also called silent posts are notifications of payment outcomes or activity on an external site.
+   *
    * @todo move to0 \Civi\Payment\System factory method
    * Page callback for civicrm/payment/ipn
    */
@@ -557,7 +569,10 @@ abstract class CRM_Core_Payment {
     else {
       // This is called when processor_name is passed - passing processor_id instead is recommended.
       $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
-      $args[1] = array((CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0, 'Integer');
+      $args[1] = array(
+        (CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0,
+        'Integer',
+      );
       $args[2] = array($params['processor_name'], 'String');
       $notFound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
     }
