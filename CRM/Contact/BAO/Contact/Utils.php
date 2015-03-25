@@ -854,6 +854,12 @@ Group By  componentId";
           }
         }
       }
+
+      //5. modify the params to include county_id if it exist in master contact.
+      // CRM-16152: This is a hack since QF does not submit disabled field.
+      if (!empty($masterAddress->county_id) && empty($values['county_id'])) {
+        $values['county_id'] = $masterAddress->county_id;
+      }
     }
   }
 
