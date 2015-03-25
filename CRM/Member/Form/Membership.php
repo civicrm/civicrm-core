@@ -1430,7 +1430,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       else {
       $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
       }
-      if($params['contribution_status_id'] != array_search('Completed', $allContributionStatus)) {
+      if ($params['contribution_status_id'] != array_search('Completed', $allContributionStatus)) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);
         $params['skipStatusCal'] = TRUE;
         // unset send-receipt option, since receipt will be sent when ipn is received.
@@ -1441,7 +1441,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           'start_date' => 'startDate',
           'end_date' => 'endDate',
         );
-
+        foreach ($memberDates as $dp => $dv) {
+          $$dv = NULL;
+          foreach ($this->_memTypeSelected as $memType) {
+            $membershipTypeValues[$memType][$dv] = NULL;
+          }
+        }
       }
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
