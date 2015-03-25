@@ -108,9 +108,12 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
     $balanceAmtDAO = CRM_Core_DAO::executeQuery($q, $p);
     $ret = array();
+    if ($balanceAmtDAO->N) {
+      $ret['total_amount'] = 0;
+    }
     while ($balanceAmtDAO->fetch()) {
       $ret['trxn_id'] = $balanceAmtDAO->id;
-      $ret['total_amount'] = $balanceAmtDAO->total_amount;
+      $ret['total_amount'] += $balanceAmtDAO->total_amount;
     }
 
     return $ret;
