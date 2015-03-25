@@ -133,7 +133,24 @@ class ChainSubscriber implements EventSubscriberInterface {
             //set to the parent's id
             $subParams["entity_id"] = $parentAPIValues['id'];
             $subParams['entity_table'] = 'civicrm_' . $lowercase_entity;
-            $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
+
+            $crm16084 = FALSE;
+            if ($subEntity == 'relationship' && $lowercase_entity == 'contact') {
+              // if a relationship call is chained to a contact call, we need
+              // to check whether contact_id_a or contact_id_b for the
+              // relationship is given. If so, don't add an extra subParam
+              // "contact_id" => parent_id.
+              // See CRM-16084.
+              foreach (array_keys($newparams) as $key) {
+                if (substr($key, 0, 11) == 'contact_id_') {
+                  $crm16084 = TRUE;
+                  break;
+                }
+              }
+            }
+            if (!$crm16084) {
+              $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
+            }
           }
           if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
             //e.g. if event_id is in the values returned & subentity is event

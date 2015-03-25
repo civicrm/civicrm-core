@@ -1418,9 +1418,6 @@ class Installer extends InstallRequirements {
         echo '<div style="padding: 1em;"><p style="background-color: #0C0; border: 1px #070 solid; color: white;">' . ts("CiviCRM has been successfully installed") . '</p>';
         echo '<ul>';
 
-        $c = CRM_Core_Config::singleton(FALSE);
-        $c->free();
-
         $cmsURL = civicrm_cms_base();
         $cmsURL .= "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/configtask&reset=1";
         $wpPermissionsURL = "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/access/wp-permissions&reset=1";
@@ -1431,6 +1428,9 @@ class Installer extends InstallRequirements {
 
         echo '</ul>';
         echo '</div>';
+
+        $c = CRM_Core_Config::singleton(FALSE);
+        $c->free();
       }
     }
 

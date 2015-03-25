@@ -107,12 +107,11 @@ function civicrm_api3_uf_field_create($params) {
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
-    'title' => "Automatically adjust weights in UFGroup to align with UFField",
+    'title' => "Auto Weight",
+    'description' => "Automatically adjust weights in UFGroup to align with UFField",
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => TRUE,
   );
-  $params['created_id']['api.default'] = 'user_contact_id';
-  $params['created_id']['title']  = 'Created By';
   $params['is_active']['api.default'] = TRUE;
 }
 

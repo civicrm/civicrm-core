@@ -268,6 +268,9 @@ class CRM_Core_I18n {
       $domain = NULL;
     }
 
+    $raw = !empty($params['raw']);
+    unset($params['raw']);
+
     if (!empty($domain)) {
       // It might be prettier to cast to an array, but this is high-traffic stuff.
       if (is_array($domain)) {
@@ -288,7 +291,7 @@ class CRM_Core_I18n {
     }
 
     // replace the numbered %1, %2, etc. params if present
-    if (count($params)) {
+    if (count($params) && !$raw) {
       $text = $this->strarg($text, $params);
     }
 

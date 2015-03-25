@@ -176,6 +176,11 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$honorDisplayName"), "Honoree contact not found.");
 
+    // CRM-16064 - Contributions pricesets charge $1 more than selected
+    $contributionAmt = number_format($rand, 2);
+    $label = "Label $hash";
+    $this->_verifyContributionAmt($pageId, $contributionAmt, $label);
+
   }
 
   public function testOnlineContributionWithZeroAmount() {
@@ -259,7 +264,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
     $amountLabel = 'Total Amount';
-    $amountValue = '1.00';
+    $amountValue = '0.00';
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -310,6 +315,64 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       $amountLabel => $amountValue,
+      'Contribution Status' => 'Completed',
+    );
+    $this->webtestVerifyTabularData($expected);
+  }
+
+  public function _verifyContributionAmt($pageId, $contributionAmt, $label) {
+    // logout
+    $this->webtestLogout();
+
+    //Open Live Contribution Page
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $this->type("email-5", $firstName . "@example.com");
+
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+    $this->check("xpath=//div[@id='priceset']/div[contains(@class, 'contribution_amount-section')]//div[contains(@class, 'contribution_amount-row1')]/span/input");
+    $streetAddress = "100 Main Street";
+    $this->type("street_address-1", $streetAddress);
+    $this->type("city-1", "San Francisco");
+    $this->type("postal_code-1", "94117");
+    $this->select("country-1", "value=1228");
+    $this->select("state_province-1", "value=1001");
+
+    //Credit Card Info
+    $this->select("credit_card_type", "value=Visa");
+    $this->type("credit_card_number", "4111111111111111");
+    $this->type("cvv2", "000");
+    $this->select("credit_card_exp_date[M]", "value=1");
+    $this->select("credit_card_exp_date[Y]", "value=2020");
+
+    //Billing Info
+    $this->type("billing_first_name", $firstName . "billing");
+    $this->type("billing_last_name", $lastName . "billing");
+    $this->type("billing_street_address-5", "15 Main St.");
+    $this->type(" billing_city-5", "San Jose");
+    $this->select("billing_country_id-5", "value=1228");
+    $this->select("billing_state_province_id-5", "value=1004");
+    $this->type("billing_postal_code-5", "94129");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->assertElementContainsText("xpath=//div[contains(@class, 'amount_display-group')]//div[@class='display-block']/strong", "$ $contributionAmt - $label", "Contribution amount does not match");
+    $this->clickLink("_qf_Confirm_next-bottom");
+    $this->assertElementContainsText("xpath=//div[contains(@class, 'amount_display-group')]//div[@class='display-block']/strong", "$ $contributionAmt - $label", "Contribution amount does not match");
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+
+    $this->type("sort_name", "$lastName $firstName");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+
+    //View Contribution Record and verify data
+    $expected = array(
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Donation',
+      'Total Amount' => $contributionAmt,
       'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);

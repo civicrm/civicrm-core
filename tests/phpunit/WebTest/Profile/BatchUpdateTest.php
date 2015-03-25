@@ -235,7 +235,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(5);
 
-    if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
+    if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}") == $this->getValue("{$dateElementIdSecondRow}")) {
       $assertCheck = TRUE;
     }
     else {
@@ -476,7 +476,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(5);
 
-    if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}_display") == $this->getValue("{$dateElementIdSecondRow}_display")) {
+    if ($this->getValue("{$dateElementIdFirstRow}_time") == $this->getValue("{$dateElementIdSecondRow}_time") && $this->getValue("{$dateElementIdFirstRow}") == $this->getValue("{$dateElementIdSecondRow}")) {
       $assertCheck = TRUE;
     }
     else {

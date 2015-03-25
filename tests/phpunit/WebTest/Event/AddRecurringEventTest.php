@@ -48,7 +48,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/manage/repeat", "reset=1&action=update&id=1", '_qf_Repeat_cancel-bottom');
 
     $this->click('repetition_frequency_unit');
-    $this->select('repetition_frequency_unit', 'label=weekly');
+    $this->select('repetition_frequency_unit', 'label=week');
     $this->click('repetition_frequency_interval');
     $this->select('repetition_frequency_interval', 'label=1');
     $this->click('start_action_condition_monday');

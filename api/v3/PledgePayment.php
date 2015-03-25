@@ -126,5 +126,9 @@ function civicrm_api3_pledge_payment_get($params) {
  *   Modifiable list of fields allowed for the PledgePayment.get action.
  */
 function civicrm_api3_pledge_payment_get_spec(&$params) {
-  $params['option.create_new'] = array('title' => "Create new field rather than update an unpaid payment");
+  $params['option.create_new'] = array(
+    'title' => "Create New",
+    'description' => "Create new field rather than update an unpaid payment",
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }

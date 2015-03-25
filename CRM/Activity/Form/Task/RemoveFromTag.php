@@ -135,7 +135,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
       list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds, $key, 'civicrm_activity');
 
       $status = array(
-        ts('%count activities un-tagged', array(
+        ts('%count activity un-tagged', array(
             'count' => $removed,
             'plural' => '%count activities un-tagged',
           )),

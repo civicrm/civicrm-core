@@ -129,7 +129,7 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     // confirm contribution
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertFalse($this->isTextPresent("Payment Processor Error message"), "Payment processor returned error message");
+    $this->assertStringsPresent("Payment Processor Error message");
   }
 
 }

@@ -93,10 +93,16 @@ function civicrm_api3_activity_type_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
-  $params['label']['api.required'] = 1;
-  $params['label']['title'] = 'Label';
-  $params['weight']['api.required'] = 1;
-  $params['weight']['title'] = 'Weight';
+  $params['label'] = array(
+    'api.required' => 1,
+    'title' => 'Label',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['weight'] = array(
+    'api.required' => 1,
+    'title' => 'Weight',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
 }
 
 /**

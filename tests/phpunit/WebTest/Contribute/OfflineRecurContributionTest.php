@@ -51,10 +51,10 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
 
     $this->click('css=li#tab_contribute a');
 
-    $this->waitForElementPresent('link=Submit Credit Card Contribution');
+    $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getAttribute("xpath=//*[@id='Search']//a[text()='Submit Credit Card Contribution']@href");
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[1]@href");
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

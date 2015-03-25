@@ -61,6 +61,35 @@
             preview: {recipient: recipient}
           });
         };
+
+        scope.previewTestGroup = function(e) {
+          var $dialog = $(this);
+          $dialog.html('<div class="crm-loading-element"></div>').parent().find('button[data-op=yes]').prop('disabled', true);
+          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.groupNames, {id: scope.testGroup.gid}), 'title')[0]}));
+          CRM.api3('contact', 'get', {group: scope.testGroup.gid, options: {limit: 0}, return: 'display_name,email'}).done(function(data) {
+            var count = 0,
+              // Fixme: should this be in a template?
+              markup = '<ol>';
+            _.each(data.values, function(row) {
+              // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
+              if (row.email) {
+                count++;
+                markup += '<li>' + row.display_name + ' - ' + row.email + '</li>';
+              }
+            });
+            markup += '</ol>';
+            markup = '<h4>' + ts('A test message will be sent to %1 people:', {1: count}) + '</h4>' + markup;
+            if (!count) {
+              markup = '<div class="messages status"><div class="icon ui-icon-alert"></div> ' +
+              (data.count ? ts('None of the contacts in this group have an email address.') : ts('Group is empty.')) +
+              '</div>';
+            }
+            $dialog
+              .html(markup)
+              .trigger('crmLoad')
+              .parent().find('button[data-op=yes]').prop('disabled', !count);
+          });
+        };
       }
     };
   });
@@ -148,9 +177,18 @@
           }
         });
 
-        element.on('click', ':radio[value=at]', function() {
-          $('.crm-form-date', element).focus();
-        });
+        element
+          // Open datepicker when clicking "At" radio
+          .on('click', ':radio[value=at]', function() {
+            $('.crm-form-date', element).focus();
+          })
+          // Reset mode if user entered an invalid date
+          .on('change', '.crm-hidden-date', function(e, context) {
+            if (context === 'userInput' && $(this).val() === '' && $(this).siblings('.crm-form-date').val().length) {
+              schedule.mode = 'at';
+              schedule.datetime = '?';
+            }
+          });
 
         $scope.$watch(attrs.crmMailingRadioDate + '.mode', updateParent);
         $scope.$watch(attrs.crmMailingRadioDate + '.datetime', function (newValue, oldValue) {

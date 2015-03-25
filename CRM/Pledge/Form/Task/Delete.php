@@ -76,18 +76,24 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedPledges = 0;
+    $deleted = $failed = 0;
     foreach ($this->_pledgeIds as $pledgeId) {
       if (CRM_Pledge_BAO_Pledge::deletePledge($pledgeId)) {
-        $deletedPledges++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    $status = ts('Deleted Pledge(s): %1 (Total Selected: %2) ', array(
-        1 => $deletedPledges,
-        2 => count($this->_pledgeIds),
-      ));
-    CRM_Core_Session::setStatus($status, '', 'info');
+    if ($deleted) {
+      $msg = ts('%count pledge deleted.', array('plural' => '%count pledges deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }

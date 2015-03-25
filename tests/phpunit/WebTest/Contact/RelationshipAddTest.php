@@ -337,8 +337,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
 
-    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_2']/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//table[@id='DataTables_Table_2']/tbody/tr[1]/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->click("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody/tr/td[9]/span/a[1][text()='View']");
 
     $this->webtestVerifyTabularData(
       array(

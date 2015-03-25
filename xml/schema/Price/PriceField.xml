@@ -101,7 +101,7 @@
   </field>
   <field>
     <name>help_post</name>
-    <title>Price Field Post Test</title>
+    <title>Price Field Post Text</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display after this field.</comment>

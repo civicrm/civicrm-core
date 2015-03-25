@@ -90,7 +90,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Explicitly declare the entity api name.
    */
-  public $entityName = 'Event';
+  public function getDefaultEntity() {
+    return 'Event';
+  }
 
   /**
    * Set variables up before form is built.

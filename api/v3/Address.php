@@ -91,8 +91,11 @@ function civicrm_api3_address_create(&$params) {
 function _civicrm_api3_address_create_spec(&$params) {
   $params['location_type_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
-  $params['country'] = array('title' => 'Name or 2-letter abbreviation of country. Looked up in civicrm_country table');
-  $params['street_parsing'] = array('title' => 'optional param to indicate you want the street_address field parsed into individual params');
+  $params['street_parsing'] = array(
+    'title' => 'Street Address Parsing',
+    'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['world_region'] = array(
     'title' => ts('World Region'),
     'name' => 'world_region',

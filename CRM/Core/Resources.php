@@ -387,6 +387,7 @@ class CRM_Core_Resources {
     foreach ((array) $text as $str) {
       $translated = ts($str, array(
         'domain' => ($domain == 'civicrm') ? NULL : array($domain, NULL),
+        'raw' => TRUE,
       ));
 
       // We only need to push this string to client if the translation
@@ -603,7 +604,6 @@ class CRM_Core_Resources {
       // Add global settings
       $settings = array(
         'config' => array(
-          'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
           'isFrontend' => $config->userFrameworkFrontend,
         ),
       );
@@ -676,6 +676,7 @@ class CRM_Core_Resources {
         'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
         'filters' => self::getEntityRefFilters(),
       ),
+      'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
@@ -700,8 +701,8 @@ class CRM_Core_Resources {
       "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
       "bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
-      "packages/jquery/plugins/select2/select2$min.js",
-      "packages/jquery/plugins/select2/select2.css",
+      "bower_components/select2/select2$min.js",
+      "bower_components/select2/select2.css",
       "packages/jquery/plugins/jquery.tableHeader.js",
       "packages/jquery/plugins/jquery.textarearesizer.js",
       "packages/jquery/plugins/jquery.form$min.js",
@@ -709,7 +710,7 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.blockUI$min.js",
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
       "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
-      "packages/jquery/plugins/jquery.validate$min.js",
+      "bower_components/jquery-validation/dist/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
       "js/Common.js",
       "js/crm.ajax.js",

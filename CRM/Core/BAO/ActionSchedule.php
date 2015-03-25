@@ -73,7 +73,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    */
   public static function getDateFields() {
     $allFields = CRM_Core_BAO_CustomField::getFields('');
-    $dateFields = array('birth_date' => ts('Birth Date'));
+    $dateFields = array(
+      'birth_date' => ts('Birth Date'),
+      'created_date' => ts('Created Date'),
+      'modified_date' => ts('Modified Date'),
+    );
     foreach ($allFields as $fieldID => $field) {
       if ($field['data_type'] == 'Date') {
         $dateFields["custom_$fieldID"] = $field['label'];
@@ -262,10 +266,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
    * @param int $id
+   * @param int $isLimit
    *
    * @return array
    */
-  public static function getSelection1($id = NULL) {
+  public static function getSelection1($id = NULL, $isLimit = NULL) {
     $mapping = self::getMapping($id);
     $sel4 = $sel5 = array();
     $options = array(
@@ -294,8 +299,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           break;
 
         case 'event_contacts':
-          $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
-          $sel5[$id] = $eventContacts + $options;
+          //CRM-15536, don't provide participant_role option on choosing 'Also Include' for Event entity
+          if ($isLimit == 1) {
+            $options += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+          }
+          $sel5[$id] = $options;
           $recipientMapping += CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
           break;
 
@@ -1108,8 +1116,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       }
 
       if ($mapping->entity == 'civicrm_contact') {
-        if ($value == 'birth_date') {
-          $dateDBField = 'birth_date';
+        $contactFields = array(
+          'birth_date',
+          'created_date',
+          'modified_date',
+        );
+        if (in_array($value, $contactFields)) {
+          $dateDBField = $value;
           $table = 'civicrm_contact e';
           $contactField = 'e.id';
           $where[] = 'e.is_deleted = 0';
@@ -1138,9 +1151,6 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           // regular mode:
           $dateField = 'e.' . $dateDBField;
         }
-        // TODO get this working
-
-        // TODO: Make sure everything's provided for repetition, etc.
       }
 
       // CRM-13577 Introduce Smart Groups Handling

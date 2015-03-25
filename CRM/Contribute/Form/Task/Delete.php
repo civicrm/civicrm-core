@@ -78,17 +78,24 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    * @return void
    */
   public function postProcess() {
-    $deletedContributions = 0;
+    $deleted = $failed = 0;
     foreach ($this->_contributionIds as $contributionId) {
       if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionId)) {
-        $deletedContributions++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
-    $status = ts('Deleted Contribution(s): %1 (Total Selected: %2) ', array(
-        1 => $deletedContributions,
-        2 => count($this->_contributionIds),
-      ));
-    CRM_Core_Session::setStatus($status, '', 'info');
+
+    if ($deleted) {
+      $msg = ts('%count contribution deleted.', array('plural' => '%count contributions deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
+
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
   }
 
 }
