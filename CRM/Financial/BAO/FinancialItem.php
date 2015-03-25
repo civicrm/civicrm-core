@@ -72,7 +72,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *
    * @return void
    */
-  public static function add($lineItem, $contribution, $taxTrxnID = FALSE) {
+  public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
@@ -121,8 +121,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
       $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
-    $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-    $trxnId['id'] = $trxn['financialTrxnId'];
+    if (empty($trxnId)) {
+      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
+      $trxnId['id'] = $trxn['financialTrxnId'];
+    }
 
     return self::create($params, NULL, $trxnId);
   }
