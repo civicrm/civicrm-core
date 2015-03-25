@@ -97,6 +97,12 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
+    $container->setDefinition('cxn_reg_client', new Definition(
+      '\Civi\Cxn\Rpc\RegistrationClient',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createRegistrationClient');
+
     // Expose legacy singletons as services in the container.
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
@@ -212,4 +218,10 @@ class Container {
     return $kernel;
   }
 
+  public function createRegistrationClient() {
+    $cxnStore = new \CRM_Cxn_CiviCxnStore();
+    $client = new \Civi\Cxn\Rpc\RegistrationClient(NULL, $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
+    $client->setLog(new \CRM_Utils_SystemLogger());
+    return $client;
+  }
 }
