@@ -2084,7 +2084,6 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $updatedContributionDAO->total_amount = $updatedAmount;
       $updatedContributionDAO->tax_amount = $taxAmount;
       $updatedContributionDAO->save();
-      
       // adjusted amount financial_trxn creation
       $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
         array('id' => $contributionId),
