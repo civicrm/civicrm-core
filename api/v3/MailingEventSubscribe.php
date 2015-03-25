@@ -80,8 +80,14 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
-  $params['email']['api.required'] = 1;
-  $params['email']['title'] = 'Unsubscribe Email';
-  $params['group_id']['api.required'] = 1;
-  $params['group_id']['title'] = 'Unsubscribe From Group';
+  $params['email'] = array(
+    'api.required' => 1,
+    'title' => 'Unsubscribe Email',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['group_id'] = array(
+    'api.required' => 1,
+    'title' => 'Unsubscribe From Group',
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }

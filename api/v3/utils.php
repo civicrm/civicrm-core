@@ -2185,16 +2185,16 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  * @return bool|string
  *   fieldName or FALSE if the field does not exist
  */
-function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
+function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
-  if ($fieldName == "{$entity}_id") {
+  if ($fieldName == _civicrm_api_get_entity_name_from_camel($entity) . '_id') {
     return 'id';
   }
   $result = civicrm_api($entity, 'getfields', array(
     'version' => 3,
-    'action' => 'create',
+    'action' => $action,
   ));
   $meta = $result['values'];
   if (!isset($meta[$fieldName]['name']) && isset($meta[$fieldName . '_id'])) {
@@ -2210,6 +2210,10 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName) {
     if (array_search($fieldName, CRM_Utils_Array::value('api.aliases', $info, array())) !== FALSE) {
       return $info['name'];
     }
+  }
+  // Create didn't work, try with get
+  if ($action == 'create') {
+    return _civicrm_api3_api_resolve_alias($entity, $fieldName, 'get');
   }
   return FALSE;
 }

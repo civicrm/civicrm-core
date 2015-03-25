@@ -196,6 +196,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
+    if ($this->isElementPresent("xpath=//*[@class ='select2-chosen']")) {
+      $this->clickAt("xpath=//*[@class ='select2-chosen']");
+    }
     $this->assertStringsPresent($validateStrings);
   }
 
@@ -490,11 +493,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the participant view screen
-    $this->click("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
   }
 
   /**
@@ -618,9 +621,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -708,7 +711,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Enter Event Title, Summary and Description
     $this->select("event_type_id", "value=4");
     $this->select("default_role_id", "value=1");
-    $this->type("title", "Test Event");
+    $this->type("template_title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
 
     $this->click("_qf_EventInfo_upload-bottom");
@@ -732,7 +735,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/span[2]");
+    $this->waitForElementPresent("xpath=//table[@class='display crm-price-set-listing dataTable no-footer']/tbody/tr/td[4]/span[2]");
     $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[4]/span[2]/ul/li[3]/a");
     // Check confirmation alert.
     $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this price set?/",

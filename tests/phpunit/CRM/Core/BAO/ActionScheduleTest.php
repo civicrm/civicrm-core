@@ -382,6 +382,67 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_contact_grad_anniv',
     );
+
+    $this->fixtures['sched_contact_created_yesterday'] = array(
+      'name' => 'sched_contact_created_yesterday',
+      'title' => 'sched_contact_created_yesterday',
+      'absolute_date' => '',
+      'body_html' => '<p>Your contact was created yesterday</p>',
+      'body_text' => 'Your contact was created yesterday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'entity_value' => 'created_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_created_yesterday',
+    );
+
+    $this->fixtures['sched_contact_mod_anniv'] = array(
+      'name' => 'sched_contact_mod_anniv',
+      'title' => 'sched_contact_mod_anniv',
+      'absolute_date' => '',
+      'body_html' => '<p>You last updated your data last year</p>',
+      'body_text' => 'Go update your stuff!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 2,
+      'entity_value' => 'modified_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_mod_anniv',
+    );
+
     $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'] = array(
       'name' => 'sched_membership_end_2month',
       'title' => 'sched_membership_end_2month',
@@ -863,6 +924,46 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
     ));
     $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
+  }
+
+  public function testContactCreatedNoAnniv() {
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_created_yesterday'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On the date created, no email.
+        'time' => $contact['values'][$contact['id']]['created_date'],
+        'recipients' => array(),
+      ),
+      array(
+        // The next day, send an email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['created_date'] . ' +1 day')),
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
+  }
+
+  public function testContactModifiedAnniversary() {
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_mod_anniv'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On some random day, no email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' -60 days')),
+        'recipients' => array(),
+      ),
+      array(
+        // On the eve of 3 years after they were modified, send an email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' +3 years -23 hours')),
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
   }
 
   /**

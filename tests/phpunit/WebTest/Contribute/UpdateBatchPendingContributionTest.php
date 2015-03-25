@@ -44,7 +44,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id_2');
+    $this->multiselect2('contribution_status_id', array("Pending"));
     $this->clickLink("_qf_Search_refresh");
 
     $this->click('radio_ts', 'ts_all');
@@ -59,7 +59,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id_1');
+    $this->multiselect2('contribution_status_id', array("Completed"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -99,13 +99,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Anderson");
-    $this->click('contribution_status_id_2');
+    $this->multiselect2('contribution_status_id', array("Pending"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('radio_ts', 'ts_all');
 
     $this->select('task', "label=Update Pending Contribution Status");
+    $this->waitForElementPresent("_qf_Search_next_action");
     $this->click("_qf_Search_next_action");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->select('contribution_status_id', 'label=Completed');
@@ -116,7 +117,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Anderson");
-    $this->click('contribution_status_id_1');
+    $this->click('contribution_status_id');
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -172,9 +173,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $firstName Anderson has been added");
 
-    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(

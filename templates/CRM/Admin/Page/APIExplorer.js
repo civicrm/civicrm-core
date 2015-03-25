@@ -23,6 +23,9 @@
     // Actions that don't support fancy operators
     NO_OPERATORS = ['create', 'update', 'delete', 'setvalue', 'getoptions', 'getactions', 'getfields'],
 
+    // Actions that don't support multiple values
+    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields', 'setvalue'],
+
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
@@ -53,8 +56,14 @@
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')}),
+      formatSelection: function(field) {
+        return field.text +
+          (field.required ? ' <span class="crm-marker">*</span>' : '');
+      },
       formatResult: function(field) {
-        return field.text + '<div class="api-field-desc">' + field.description + '</div>';
+        return field.text +
+          (field.required ? ' <span class="crm-marker">*</span>' : '') +
+          '<div class="api-field-desc">' + field.description + '</div>';
       }
     }).change();
   }
@@ -155,18 +164,34 @@
         CRM.alert(data.deprecated, entity + ' Deprecated');
       }
       showFields(required);
-      if (action === 'get' || action === 'getsingle' || action === 'getstat') {
-        showReturn(action === 'getstat' ? ts('Group by') : ts('Fields to return'));
+      if (action === 'get' || action === 'getsingle' || action == 'getvalue' || action === 'getstat') {
+        showReturn();
       }
     });
   }
 
   /**
    * For "get" actions show the "return" options
+   *
+   * TODO: Too many hard-coded actions here. Need a way to fetch this from metadata
    */
-  function showReturn(title) {
-    $('#api-params').prepend($(returnTpl({title: title})));
-    $('#api-return-value').crmSelect2({data: fields, multiple: true});
+  function showReturn() {
+    var title = ts('Fields to return'),
+      params = {
+        data: fields,
+        multiple: true,
+        placeholder: ts('Leave blank for default')
+      };
+    if (action == 'getstat') {
+      title = ts('Group by');
+    }
+    if (action == 'getvalue') {
+      title = ts('Return Value');
+      params.placeholder = ts('Select field');
+      params.multiple = false;
+    }
+    $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
+    $('#api-return-value').crmSelect2(params);
   }
 
   /**
@@ -243,6 +268,10 @@
     }
   }
 
+  function isYesNo(fieldName) {
+    return getFieldData[fieldName] && getFieldData[fieldName].type === 16;
+  }
+
   /**
    * Should we render a select or textfield?
    *
@@ -251,7 +280,7 @@
    * @returns boolean
    */
   function isSelect(fieldName, operator) {
-    return (options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && !_.includes(TEXT, operator);
+    return (isYesNo(fieldName) || options[fieldName] || (getFieldData[fieldName] && getFieldData[fieldName].FKApiName)) && !_.includes(TEXT, operator);
   }
 
   /**
@@ -262,6 +291,9 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
+    if (isYesNo(fieldName) || _.includes(NO_MULTI, action)) {
+      return false;
+    }
     if (_.includes(MULTI, operator)) {
       return true;
     }
@@ -309,8 +341,14 @@
       else if (!multiSelect && _.includes(currentVal, ',')) {
         $valField.val(currentVal.split(',')[0]);
       }
+      // Yes-No options
+      if (isYesNo(name)) {
+        $valField.select2({
+          data: [{id: 1, text: ts('Yes')}, {id: 0, text: ts('No')}]
+        });
+      }
       // Select options
-      if (options[name]) {
+      else if (options[name]) {
         $valField.select2({
           multiple: multiSelect,
           data: _.map(options[name], function (value, key) {

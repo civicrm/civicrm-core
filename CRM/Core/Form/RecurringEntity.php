@@ -209,7 +209,11 @@ class CRM_Core_Form_RecurringEntity {
       '2' => ts('On'),
     );
     $form->addRadio('ends', ts("Ends"), $eoptionTypes, array('class' => 'required'), NULL);
-    $form->add('select', 'start_action_offset', NULL, CRM_Core_SelectValues::getNumericOptions(1, 30), FALSE);
+    // Offset options gets key=>val pairs like 1=>2 because the BAO wants to know the number of
+    // children while it makes more sense to the user to see the total number including the parent.
+    $offsetOptions = range(1, 30);
+    unset($offsetOptions[0]);
+    $form->add('select', 'start_action_offset', NULL, $offsetOptions, FALSE);
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
     $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
     $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array(
@@ -408,11 +412,10 @@ class CRM_Core_Form_RecurringEntity {
           if (CRM_Utils_Array::value('pre_delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&
             CRM_Utils_Array::value('helper_class', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']])
           ) {
-            call_user_func(array(
-                CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'],
-                call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id'])),
-              )
-            );
+            $preDeleteResult = call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], array($params['entity_id']));
+            if (!empty($preDeleteResult)) {
+              call_user_func(array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], $preDeleteResult));
+            }
           }
           //Ready to execute delete on entities if it has delete function set
           if (CRM_Utils_Array::value('delete_func', CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]) &&

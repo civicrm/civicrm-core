@@ -111,7 +111,6 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->_fillData($data[$i], $i, "Membership");
     }
     $this->click("_qf_Entry_cancel");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->_verifyData($data, "Membership");
   }
@@ -134,7 +133,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Batch_next");
     $this->click("title");
     $this->type("title", $batchTitle);
-    $this->select("type_id", "Pledge");
+    $this->select("type_id", "Pledge Payment");
     $this->type("item_count", $itemCount);
     $this->type("total", 200);
     $this->click("_qf_Batch_next");
@@ -331,8 +330,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $type
    */
   public function _verifyData($data, $type) {
-    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
-    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr//td/span/a[1][contains(text(),'Enter records')]");
+    $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr//td/span/a[1]");
     $this->waitForElementPresent('_qf_Entry_upload');
     $this->click("_qf_Entry_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());

@@ -179,7 +179,7 @@ function loadPetitionList( )
              "aaSorting": [],
              "aoColumns":[
                  {sClass:'crm-petition-id                          hiddenElement' },
-                 {sClass:'crmf-title crm-editable'                                     },
+                 {sClass:'crmf-title'                                     },
                  {sClass:'crm-petition-campaign_id                 hiddenElement' },
                  {sClass:'crmf-campaign_id'                                  },
                  {sClass:'crm-petition-activity_type_id            hiddenElement' },
@@ -202,6 +202,10 @@ function loadPetitionList( )
                CRM.$('.crm-editable').crmEditable();
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+
+               // Crm-editable
+               CRM.$(nRow).children().eq(1).addClass('crm-editable');
+
          //insert the id for each row for enable/disable.
          var rowId = 'survey-' + aData[0];
          CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');

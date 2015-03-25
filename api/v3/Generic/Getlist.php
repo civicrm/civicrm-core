@@ -184,3 +184,57 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
   }
   return $output;
 }
+
+/**
+ * Provide metadata for this api
+ *
+ * @param array $params
+ * @param array $apiRequest
+ */
+function _civicrm_api3_generic_getlist_spec(&$params, $apiRequest) {
+  $params += array(
+    'page_num' => array(
+      'title' => 'Page Number',
+      'description' => "Current page of a multi-page lookup",
+      'type' => CRM_Utils_Type::T_INT,
+    ),
+    'input' => array(
+      'title' => 'Search Input',
+      'description' => "String to search on",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+    'params' => array(
+      'title' => 'API Params',
+      'description' => "Additional filters to send to the {$apiRequest['entity']} API.",
+    ),
+    'extra' => array(
+      'title' => 'Extra',
+      'description' => 'Array of additional fields to return.',
+    ),
+    'image_field' => array(
+      'title' => 'Image Field',
+      'description' => "Field that this entity uses to store icons (usually automatic)",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+    'id_field' => array(
+      'title' => 'ID Field',
+      'description' => "Field that uniquely identifies this entity (usually automatic)",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+    'description_field' => array(
+      'title' => 'Description Field',
+      'description' => "Field that this entity uses to store summary text (usually automatic)",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+    'label_field' => array(
+      'title' => 'Search Field',
+      'description' => "Field to display as title of results (usually automatic)",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+    'search_field' => array(
+      'title' => 'Search Field',
+      'description' => "Field to search on (assumed to be the same as label field unless otherwise specified)",
+      'type' => CRM_Utils_Type::T_TEXT,
+    ),
+  );
+}

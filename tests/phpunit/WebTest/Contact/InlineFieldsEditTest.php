@@ -47,7 +47,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
     // Set Communication Prefs
     $this->inlineEdit('crm-communication-pref-content', array(
-      'css=#email_greeting_display a' => TRUE,
+      'email_greeting_id' => TRUE,
       'privacy_do_not_email' => 1,
       'preferred_communication_method_1' => 1,
       'preferred_communication_method_2' => 1,
@@ -312,7 +312,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
             case 'string':
               if ($val && substr($val, 0, 5) == 'date:') {
                 $val = date('m/d/Y', strtotime(trim(substr($val, 5))));
-                $item .= '_display';
+                $item = "xpath=//input[starts-with(@id, '{$item}_display_')]";
               }
               if ($val) {
                 $this->assertElementValueEquals($item, $val);
