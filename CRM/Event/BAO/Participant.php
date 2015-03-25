@@ -1906,12 +1906,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 GROUP BY li.entity_table, li.entity_id, price_field_value_id
 ";
       $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
-      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'ASC', TRUE);
+      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId, 'DESC', TRUE);
       $trxnId['id'] = $trxn['financialTrxnId'];
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
-
+      $financialItemsArray = array();
       while ($updateFinancialItemInfoDAO->fetch()) {
         $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
         $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
@@ -1936,18 +1936,17 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
         // if submitted and difference is 0 add a positive entry again
         elseif (in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedFieldValueIds) && $updateFinancialItemInfoValues['differenceAmt'] == 0) {
           $updateFinancialItemInfoValues['amount'] = $updateFinancialItemInfoValues['amount'];
-          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
           // INSERT financial_items for tax amount
           if ($updateFinancialItemInfoValues['entity_id'] == $updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['id'] &&
             isset($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'])
           ) {
-            $updateFinancialItemInfoValues['amount'] = $updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
-            $updateFinancialItemInfoValues['description'] = $taxTerm;
+            $updateFinancialItemInfoValues['tax']['amount'] = $updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
+            $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
             if ($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']) {
-              $updateFinancialItemInfoValues['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
+              $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
             }
-            CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
           }
+          $financialItemsArray[] = $updateFinancialItemInfoValues;          
         }
       }
     }
@@ -2012,8 +2011,22 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     else {
       $taxAmount = "NULL";
     }
-    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount);
-
+    $trxn = self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount);
+    $trxnId = array();
+    if ($trxn) {
+      $trxnId['id'] = $trxn->id;
+      foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
+        CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+        if (!empty($updateFinancialItemInfoValues['tax'])) {
+          $updateFinancialItemInfoValues['tax']['amount'] = $updateFinancialItemInfoValues['amount'];
+          $updateFinancialItemInfoValues['tax']['description'] = $updateFinancialItemInfoValues['description'];
+          if (!empty($updateFinancialItemInfoValues['financial_account_id'])) {
+            $updateFinancialItemInfoValues['financial_account_id'] = $updateFinancialItemInfoValues['tax']['financial_account_id'];
+          }
+          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);          
+        }
+      }
+    }
     $fetchCon = array('id' => $contributionId);
     $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     // insert financial items
@@ -2024,9 +2037,9 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
         $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
         // insert financial items
         // ensure entity_financial_trxn table has a linking of it.
-        $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
+        $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnId);
         if (isset($lineObj->tax_amount)) {
-          CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE);
+          CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnId);
         }
       }
     }
@@ -2061,7 +2074,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $skip = FALSE;
+    $adjustedTrxn = $skip = FALSE;    
     if ($balanceAmt) {
       if ($balanceAmt > 0 && $paidAmount != 0) {
         $contributionStatusVal = $partiallyPaidStatusId;
@@ -2104,6 +2117,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       );
       $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
     }
+    return $adjustedTrxn;
   }
 
   /**
