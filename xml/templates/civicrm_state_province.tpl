@@ -3978,4 +3978,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1193, "209", "Sveta Trojica v Slovenskih goricah"),
 (NULL, 1193, "210", "Sveti Jurij v Slovenskih goricah"),
 (NULL, 1193, "211", "Sveti Tomaž"),
-(NULL, 1193, "212", "Vodice");
+(NULL, 1193, "212", "Vodice"),
+
+--  Add New name/ISO Code for Renamed India State (1225, 1101, "UL", "Uttaranchal")
+(NULL, 1101, "UT", "Uttarakhand");
