@@ -219,7 +219,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "2 Contact\(s\) have been reserved");
+    $this->waitForText('crm-notification-container', "2 contacts have been reserved.");
 
     // Interview Respondents
     $this->openCiviPage("survey/search", "reset=1&op=interview", "_qf_Search_refresh");
@@ -273,7 +273,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('task', "Reserve Respondents");
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
     $this->click("_qf_Reserve_done_reserve-bottom");
-    $this->waitForText('crm-notification-container', "1 Contact\(s\) have been reserved");
+    $this->waitForText('crm-notification-container', "1 contact has been reserved.");
 
     // Release Respondents
     $this->openCiviPage("survey/search", "reset=1&op=release", "_qf_Search_refresh");
@@ -499,7 +499,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Reserve_done_reserve-bottom');
 
     $this->clickLink('_qf_Reserve_done_reserve-bottom', 'access');
-    $this->waitForText('crm-notification-container', "2 Contact\(s\) have been reserved");
+    $this->waitForText('crm-notification-container', "2 contacts have been reserved.");
 
     $this->openCiviPage("report/survey/detail", "reset=1", '_qf_SurveyDetails_submit');
 
