@@ -103,6 +103,12 @@
                 <p class="description">{ts}If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts.{/ts}</p>
             </td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-allow_profile_html_snippet">
+            <td class="label">{$form.allow_profile_html_snippet.label}</td>
+            <td>{$form.allow_profile_html_snippet.html}<br />
+                <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles using HTML snippets.{/ts}</p>
+            </td>
+        </tr>
 
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
