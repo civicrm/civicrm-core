@@ -3504,7 +3504,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
       $isBalance = FALSE;
     }
-    if (empty($total) || $usingLineTotal) {
+    if (!CRM_Utils_Array::value('total_amount', $total) || $usingLineTotal) {
       // for additional participants
       if ($entityTable == 'civicrm_participant') {
         $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
