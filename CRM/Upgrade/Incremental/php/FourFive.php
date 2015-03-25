@@ -79,7 +79,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
       $postUpgradeMessage .= '<br /><br />' . ts('WARNING: If you use CiviCase with v4.5.alpha*, v4.5.beta*, or v4.5.0, it is possible that previous upgrades corrupted some CiviCase metadata. If you have not already done so, please identify any custom field sets, smart groups, or reports which refer to CiviCase and ensure that they are properly configured.');
     }
     if ($rev == '4.5.9') {
-      $postUpgradeMessage .= '<br /><br />' . ts('WARNING: <a href="%1">learn more...</a>', array(1 => ''));
+      $postUpgradeMessage .= '<br /><br />' . ts("WARNING: To improve security, HTML snippets for profiles are no longer allowed to create or edit data by default. If you need to allow users to submit profiles using HTML snippets, you can enable by going to Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) and clicking to enable 'Override security by accepting unauthenticated posts from other sites?");
     }
   }
 
