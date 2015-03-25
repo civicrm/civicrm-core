@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
 /**
  * @param array $params
  *   Array with keys:
@@ -54,11 +53,9 @@ function civicrm_api3_cxn_register($params) {
   }
   \Civi\Cxn\Rpc\AppMeta::validate($params['appMeta']);
 
-  // FIXME Move cxnStore and client into Container.
-  $cxnStore = new CRM_Cxn_CiviCxnStore();
   try {
-    $client = new \Civi\Cxn\Rpc\RegistrationClient(NULL, $cxnStore, CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
-    $client->setLog(new CRM_Utils_SystemLogger());
+    /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
+    $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
     list($cxnId, $isOk) = $client->register($params['appMeta']);
     CRM_Cxn_BAO_Cxn::updateAppMeta($params['appMeta']);
   }
@@ -71,7 +68,7 @@ function civicrm_api3_cxn_register($params) {
     $result = array(
       'cxnId' => $cxnId,
     );
-    return civicrm_api3_create_success();
+    return civicrm_api3_create_success($result);
   }
   else {
     return civicrm_api3_create_error('Connection failed');
