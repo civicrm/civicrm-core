@@ -253,7 +253,7 @@ class CRM_Contact_Page_AJAX {
       }
 
       // create new or update existing relationship
-      $return = CRM_Contact_BAO_Relationship::createMultiple($relationParams, $relationIds);
+      $return = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
 
       if (!empty($return[4][0])) {
         $relationshipID = $return[4][0];
@@ -804,7 +804,8 @@ LIMIT {$offset}, {$rowCount}
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape($_GET['context'], 'String');
-    $relationship_type_id = CRM_Utils_Type::escape($_GET['relationship_type_id'], 'Integer', FALSE);
+    $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer',
+      FALSE);
 
     if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
       return CRM_Utils_System::permissionDenied();
