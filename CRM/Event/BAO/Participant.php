@@ -1946,7 +1946,7 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
               $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateLines[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
             }
           }
-          $financialItemsArray[] = $updateFinancialItemInfoValues;          
+          $financialItemsArray[] = $updateFinancialItemInfoValues;
         }
       }
     }
@@ -2023,7 +2023,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
           if (!empty($updateFinancialItemInfoValues['financial_account_id'])) {
             $updateFinancialItemInfoValues['financial_account_id'] = $updateFinancialItemInfoValues['tax']['financial_account_id'];
           }
-          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);          
+          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
         }
       }
     }
@@ -2074,7 +2074,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $adjustedTrxn = $skip = FALSE;    
+    $adjustedTrxn = $skip = FALSE;
     if ($balanceAmt) {
       if ($balanceAmt > 0 && $paidAmount != 0) {
         $contributionStatusVal = $partiallyPaidStatusId;
