@@ -56,7 +56,7 @@ function civicrm_api3_cxn_register($params) {
   try {
     /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
     $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
-    list($cxnId, $isOk) = $client->register($params['appMeta']);
+    list($cxnId, $result) = $client->register($params['appMeta']);
     CRM_Cxn_BAO_Cxn::updateAppMeta($params['appMeta']);
   }
   catch (Exception $e) {
@@ -64,13 +64,25 @@ function civicrm_api3_cxn_register($params) {
     throw $e;
   }
 
-  if ($isOk) {
-    $result = array(
-      'cxnId' => $cxnId,
-    );
-    return civicrm_api3_create_success($result);
+  return $result;
+}
+
+/**
+ * @param array $params
+ *   Array with keys:
+ *   - cxnId: string
+ * @return array
+ */
+function civicrm_api3_cxn_unregister($params) {
+  if (empty($params['cxnId'])) {
+    throw new API_Exception('Missing required parameter: cxnId');
   }
-  else {
-    return civicrm_api3_create_error('Connection failed');
-  }
+
+  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($params['cxnId']);
+
+  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
+  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
+
+  return $result;
 }
