@@ -1844,6 +1844,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Possibly unused function.
+   *
    * @todo - could not find any instances where this is called
    *
    * @param bool $relative
@@ -1877,6 +1879,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Get values for from and to for date ranges.
+   *
    * @param bool $relative
    * @param string $from
    * @param string $to
@@ -1915,7 +1919,9 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $rows
+   * Alter the way in which custom data fields are displayed.
+   *
+   * @param array $rows
    */
   public function alterCustomDataDisplay(&$rows) {
     // custom code to alter rows having custom values
