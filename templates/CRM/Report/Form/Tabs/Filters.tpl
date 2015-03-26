@@ -30,7 +30,7 @@
       {foreach from=$filters item=table key=tableName}
         {assign  var="filterCount" value=$table|@count}
         {* Wrap custom field sets in collapsed accordion pane. *}
-        {if $colGroups.$tableName.group_title and $filterCount gte 1}
+        {if $filterGroups.$tableName.group_title and $filterCount gte 1}
           {* we should close table that contains other filter elements before we start building custom group accordian
            *}
           {if $counter eq 1}
@@ -39,7 +39,7 @@
           {/if}
           <div class="crm-accordion-wrapper crm-accordion collapsed">
             <div class="crm-accordion-header">
-              {$colGroups.$tableName.group_title}
+              {$filterGroups.$tableName.group_title}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
               <table class="report-layout">
@@ -65,7 +65,7 @@
                   </tr>
                 {/if}
         {/foreach}
-        {if $colGroups.$tableName.group_title}
+        {if $filterGroups.$tableName.group_title}
               </table>
             </div><!-- /.crm-accordion-body -->
           </div><!-- /.crm-accordion-wrapper -->
