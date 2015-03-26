@@ -101,7 +101,7 @@ class Container {
       '\Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createRegistrationClient');
+      ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
     // Expose legacy singletons as services in the container.
     $singletons = array(
@@ -140,9 +140,9 @@ class Container {
     $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
     $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
-        'CRM_Core_LegacyErrorHandler',
-        'handleException',
-      ));
+      'CRM_Core_LegacyErrorHandler',
+      'handleException',
+    ));
     return $dispatcher;
   }
 
@@ -218,10 +218,4 @@ class Container {
     return $kernel;
   }
 
-  public function createRegistrationClient() {
-    $cxnStore = new \CRM_Cxn_CiviCxnStore();
-    $client = new \Civi\Cxn\Rpc\RegistrationClient(NULL, $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
-    $client->setLog(new \CRM_Utils_SystemLogger());
-    return $client;
-  }
 }
