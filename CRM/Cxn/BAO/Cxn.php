@@ -26,6 +26,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Cxn\Rpc\Constants;
+
 /**
  *
  * @package CRM
@@ -62,6 +64,73 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     $appMeta = json_decode($appMetaJson, TRUE);
     \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
     return $appMeta;
+  }
+
+  /**
+   * Parse the CIVICRM_CXN_CA constant. It may have the following
+   * values:
+   *   - 'CiviRootCA'|undefined -- Use the production civicrm.org root CA
+   *   - 'CiviTestRootCA' -- Use the test civicrm.org root CA
+   *   - 'none' -- Do not perform any certificate verification.
+   *
+   * This constant is emphatically *not* exposed through Civi's "Settings"
+   * system (or any other runtime-editable datastore). Manipulating
+   * this setting can expose the system to man-in-the-middle attacks,
+   * and allowing runtime manipulation would create a new vector
+   * for escalating privileges. This setting must only be manipulated
+   * by developers and sysadmins who already have full privileges
+   * to edit the source.
+   *
+   * @return string|NULL
+   *   The PEM-encoded root certificate. NULL if verification is disabled.
+   * @throws CRM_Core_Exception
+   */
+  public static function createCACert() {
+    if (!defined('CIVICRM_CXN_CA') || CIVICRM_CXN_CA === 'CiviRootCA') {
+      $file = Constants::getCert();
+    }
+    elseif (CIVICRM_CXN_CA === 'CiviTestRootCA') {
+      $file = Constants::getTestCert();
+    }
+    elseif (CIVICRM_CXN_CA === 'none') {
+      return NULL;
+    }
+    else {
+      throw new \CRM_Core_Exception("CIVICRM_CXN_CA is invalid.");
+    }
+
+    $content = file_get_contents($file);
+    if (empty($content)) {
+      // Fail hard. Returning an empty value is not acceptable.
+      throw new \CRM_Core_Exception("Error loading CA certificate: $file");
+    }
+    return $content;
+  }
+
+  /**
+   * Determine if this site's security policy allows connecting
+   * to apps based on untrusted metadata.
+   *
+   * @return bool
+   *   TRUE if application metadata must be verified.
+   */
+  public static function isAppMetaVerified() {
+    if (defined('CIVICRM_CXN_VERIFY_APPMETA')) {
+      return CIVICRM_CXN_VERIFY_APPMETA;
+    }
+    elseif (!defined('CIVICRM_CXN_CA')) {
+      return TRUE;
+    }
+    else {
+      return !in_array(CIVICRM_CXN_CA, array('CiviTestRootCA', 'none'));
+    }
+  }
+
+  public static function createRegistrationClient() {
+    $cxnStore = new \CRM_Cxn_CiviCxnStore();
+    $client = new \Civi\Cxn\Rpc\RegistrationClient(self::createCACert(), $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
+    $client->setLog(new \CRM_Utils_SystemLogger());
+    return $client;
   }
 
 }

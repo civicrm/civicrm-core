@@ -33,7 +33,7 @@
  */
 function civicrm_api3_cxn_register($params) {
   if (empty($params['appMeta']) && !empty($params['appMetaUrl'])) {
-    if (defined('CIVICRM_CXN_VERIFY') && !CIVICRM_CXN_VERIFY) {
+    if (!CRM_Cxn_BAO_Cxn::isAppMetaVerified()) {
       list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['appMetaUrl']);
       if (CRM_Utils_HttpClient::STATUS_OK != $status) {
         throw new API_Exception("Failed to download appMeta.");
@@ -43,8 +43,8 @@ function civicrm_api3_cxn_register($params) {
     else {
       // Note: The metadata includes a cert, but the details aren't signed.
       // This is very useful in testing/development. In ordinary usage, we
-      // rely on a general signature for the full batch of all metadata.
-      throw new API_Exception('This site is configured to only use verified metadata.');
+      // rely on civicrm.org to sign the metadata for all apps en masse.
+      throw new API_Exception('This site is configured to only connect to applications with verified metadata.');
     }
   }
 
