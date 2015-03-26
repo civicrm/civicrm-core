@@ -28,7 +28,7 @@
     {foreach from=$colGroups item=grpFields key=dnc}
       {assign  var="count" value="0"}
       {* Wrap custom field sets in collapsed accordion pane. *}
-      {if $grpFields.group_title}
+      {if $grpFields.use_accordian_for_field_selection}
         <div class="crm-accordion-wrapper crm-accordion collapsed">
         <div class="crm-accordion-header">
           {$grpFields.group_title}
@@ -49,7 +49,7 @@
           {/if}
         </tr>
       </table>
-      {if $grpFields.group_title}
+      {if $grpFields.use_accordian_for_field_selection}
         </div><!-- /.crm-accordion-body -->
         </div><!-- /.crm-accordion-wrapper -->
       {/if}

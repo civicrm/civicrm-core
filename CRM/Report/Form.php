@@ -1003,13 +1003,16 @@ class CRM_Report_Form extends CRM_Core_Form {
 
             if (!$groupTitle && isset($table['group_title'])) {
               $groupTitle = $table['group_title'];
+              // Having a group_title is secret code for being a custom group
+              // which cryptically translates to needing an accordian.
+              // here we make that explicit.
+              $colGroups[$tableName]['use_accordian_for_field_selection'] = TRUE;
             }
 
             $colGroups[$tableName]['fields'][$fieldName] = CRM_Utils_Array::value('title', $field);
             if ($groupTitle && empty($colGroups[$tableName]['group_title'])) {
               $colGroups[$tableName]['group_title'] = $groupTitle;
             }
-
             $options[$fieldName] = CRM_Utils_Array::value('title', $field);
           }
         }
