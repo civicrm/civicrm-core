@@ -140,6 +140,7 @@ class CRM_Core_Form_Date {
       'previous_2.month' => ts('Previous 2 Months'),
       'previous_2.week' => ts('Previous 2 Weeks'),
       'previous_2.day' => ts('Previous 2 Days'),
+      'before_previous.month' => ts('All Prior to Previous Month'),
       'previous_before.year' => ts('Prior to Previous Year'),
       'previous_before.quarter' => ts('Prior to Previous Quarter'),
       'previous_before.month' => ts('Prior to Previous Month'),

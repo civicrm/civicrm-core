@@ -1316,7 +1316,22 @@ class CRM_Utils_Date {
             $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
             break;
 
+          case 'before_previous':
+          // all before previous month
+            if ($now['mon'] < 3) {
+              $to['M'] = 10 + $now['mon'];
+              $to['Y'] = $now['year'] - 1;
+            }
+            else {
+              $to['M'] = $now['mon'] - 2;
+              $to['Y'] = $now['year'];
+            }
+            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+            unset($from);
+            break;
+
           case 'previous_before':
+          // month before previous month
             $from['d'] = 1;
             if ($now['mon'] < 3) {
               $from['M'] = $to['M'] = 10 + $now['mon'];
