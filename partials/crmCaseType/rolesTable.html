@@ -5,9 +5,9 @@ Required vars: caseType
 <table>
   <thead>
 	  <tr>
-	    <th>Name</th>
-	    <th>Assign to Creator</th>
-	    <th>Is Manager</th>
+	    <th>{{ts('Name')}}</th>
+	    <th>{{ts('Assign to Creator')}}</th>
+	    <th>{{ts('Is Manager')}}</th>
 	    <th></th>
 	  </tr>
   </thead>
@@ -17,7 +17,7 @@ Required vars: caseType
 	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="1" ng-false-value="0"/></td>
 	    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"/></td>
 	    <td>
-	      <a crm-icon="trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)" title="Remove"></a>
+	      <a crm-icon="trash" class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)" title="{{ts('Remove')}}"></a>
 	    </td>
 	  </tr>
   </tbody>
@@ -25,7 +25,7 @@ Required vars: caseType
   <tfoot>
 	  <tr class="addRow">
 	    <td colspan="4">
-	      Add role:
+	      {{ts('Add role:')}}
 	      <span crm-add-name
 	           crm-options="relationshipTypeNames"
 	           crm-var="newRole"
