@@ -12,18 +12,14 @@
         placeholder="A/B Test Name"
         required/>
     </div>
-    <div crm-ui-field="{name: 'setupForm.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campNames.length > 0"
+    <div crm-ui-field="{name: 'setupForm.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled"
          ng-if="fields.campaign">
-      <select
+      <input
+        crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"
         crm-ui-id="setupForm.campaign"
         name="campaign"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Campaign')}"
         ng-model="mailing.campaign_id"
-        ng-options="campaign.id as campaign.title for campaign in crmMailingConst.campNames|orderBy:'title'"
-        >
-        <option value=""></option>
-      </select>
+      />
     </div>
     <div crm-ui-field="{title: ts('Test Type')}" ng-if="fields.testing_criteria">
       <div ng-repeat="criteria in crmMailingABCriteria.getAll()">

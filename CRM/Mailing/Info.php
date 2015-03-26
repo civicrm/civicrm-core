@@ -92,6 +92,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ),
     );
 
+    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
@@ -105,18 +106,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'options' => array(
         'limit' => 500,
         'sort' => 'is_archived asc, scheduled_date desc',
-      )
+      ),
     ));
     // Generic params
     $params = array(
       'options' => array('limit' => 0),
       'sequential' => 1,
     );
-    
-    $campNames = civicrm_api3('Campaign', 'get', $params + array(
-      'is_active' => 1,
-      'return' => 'title',
-    ));
+
     $groupNames = civicrm_api3('Group', 'get', $params + array(
       'is_active' => 1,
       'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
@@ -142,7 +139,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $mailGrp = civicrm_api3('MailingGroup', 'get', $params);
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array(
       'entity' => array('contact', 'mailing'),
-      'sequential' => 1
+      'sequential' => 1,
     ));
     $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
       'option_group_id' => "from_email_address",
@@ -151,7 +148,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ->addSetting(array(
         'crmMailing' => array(
           'civiMails' => $civiMails['values'],
-          'campNames' => $campNames['values'],
+          'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
