@@ -1317,7 +1317,7 @@ class CRM_Utils_Date {
             break;
 
           case 'before_previous':
-          // all before previous month
+        // all before previous month
             if ($now['mon'] < 3) {
               $to['M'] = 10 + $now['mon'];
               $to['Y'] = $now['year'] - 1;
