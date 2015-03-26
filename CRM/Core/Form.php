@@ -1222,6 +1222,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->addElement('text', $name, $label, $props, $required);
         break;
 
+      case 'hidden':
+        $this->addElement('hidden', $name, $label, $props);
+        break;
+
       //case 'TextArea':
       //case 'Select Date':
       //TODO: Add date formats
