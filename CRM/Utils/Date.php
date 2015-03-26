@@ -989,8 +989,17 @@ class CRM_Utils_Date {
             $to['M'] = 12;
             $to['Y'] = $from['Y'] = $now['year'] - 1;
             break;
+   
+          case 'before_previous':
+          // all before previous year
+            $to['d'] = 31;
+            $to['M'] = 12;
+            $to['Y'] = $now['year'] - 2;
+            unset($from);
+            break;
 
           case 'previous_before':
+          // year before previous year
             $from['M'] = $from['d'] = 1;
             $to['d'] = 31;
             $to['M'] = 12;
@@ -1154,7 +1163,22 @@ class CRM_Utils_Date {
             $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
             break;
 
+          case 'before_previous':
+          // all before previous quarter
+            $quarter = ceil($now['mon'] / 3) - 2;
+            $subtractYear = 0;
+            if ($quarter <= 0) {
+              $subtractYear = 1;
+              $quarter += 4;
+            }
+            $to['M'] = 3 * $quarter;
+            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
+            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+            unset($from);
+            break;
+
           case 'previous_before':
+          // quarter before previous quarter
             $difference = 2;
             $quarter = ceil($now['mon'] / 3);
             $quarter = $quarter - $difference;
@@ -1316,7 +1340,23 @@ class CRM_Utils_Date {
             $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
             break;
 
+          case 'before_previous':
+          // all before previous month
+            if ($now['mon'] < 3) {
+              $to['M'] = 10 + $now['mon'];
+              $to['Y'] = $now['year'] - 1;
+            }
+            else {
+              $to['M'] = $now['mon'] - 2;
+              $to['Y'] = $now['year'];
+            }
+
+            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+            unset($from);
+            break;
+
           case 'previous_before':
+          // month before previous month
             $from['d'] = 1;
             if ($now['mon'] < 3) {
               $from['M'] = $to['M'] = 10 + $now['mon'];
@@ -1461,7 +1501,17 @@ class CRM_Utils_Date {
             $to = self::intervalAdd('day', 6, $from);
             break;
 
+          case 'before_previous':
+          //all before previous week
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to = self::intervalAdd('day', -1 * ($now['wday']) - 8, $to);
+            unset($from);
+            break;
+
           case 'previous_before':
+          // week before previous week
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
@@ -1570,7 +1620,17 @@ class CRM_Utils_Date {
             $to['Y'] = $from['Y'];
             break;
 
+          case 'before_previous':
+          // all before previous day
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to = self::intervalAdd('day', -2, $to);
+            unset($from);
+            break;
+
           case 'previous_before':
+          // day before previous day
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
