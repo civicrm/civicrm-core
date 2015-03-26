@@ -303,6 +303,8 @@
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
+    var ts = $scope.ts = CRM.ts(null);
+
     $scope.caseTypes = caseTypes.values;
     $scope.toggleCaseType = function (caseType) {
       caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
@@ -315,7 +317,7 @@
     $scope.deleteCaseType = function (caseType) {
       crmApi('CaseType', 'delete', {id: caseType.id}, {
         error: function (data) {
-          CRM.alert(data.error_message, ts('Error'));
+          CRM.alert(data.error_message, ts('Error'), 'error');
         }
       })
         .then(function (data) {
