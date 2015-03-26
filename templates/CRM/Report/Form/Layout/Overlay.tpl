@@ -110,7 +110,7 @@
                             {elseif $header.group_by eq 'YEAR'}
                                 {$row.$field|crmDate:$config->dateformatYear}
                             {else}
-                                {if $header.type & 4}
+                                {if $header.type == 4}
                                    {$row.$field|truncate:10:''|crmDate}
                                 {else}
                                    {$row.$field|crmDate}
