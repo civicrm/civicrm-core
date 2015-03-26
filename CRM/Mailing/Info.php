@@ -95,14 +95,24 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
+    // Get past mailings
+    // CRM-16155 - Limit to a reasonable number
+    $civiMails = civicrm_api3('Mailing', 'get', array(
+      'is_completed' => 1,
+      'mailing_type' => array('IN' => array('standalone', 'winner')),
+      'return' => array('id', 'name', 'scheduled_date'),
+      'sequential' => 1,
+      'options' => array(
+        'limit' => 500,
+        'sort' => 'is_archived asc, scheduled_date desc',
+      )
+    ));
+    // Generic params
     $params = array(
       'options' => array('limit' => 0),
       'sequential' => 1,
     );
-    $civiMails = civicrm_api3('Mailing', 'get', $params + array(
-      'is_completed' => 1,
-      'return' => array('id', 'name', 'scheduled_date'),
-    ));
+    
     $campNames = civicrm_api3('Campaign', 'get', $params + array(
       'is_active' => 1,
       'return' => 'title',
