@@ -1439,8 +1439,18 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         //assign amount to template if payment was successful
         $this->assign('amount', $params['total_amount']);
       }
+      
+      // if the payment processor returns a contribution_status_id -> use it!
+      if (isset($paymentParams['contribution_status_id'])) {
+        $params['contribution_status_id'] = $paymentParams['contribution_status_id'];
+      }
+      // do what used to happen previously
+      else {
+        $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
+      }
+      // if the contribution_status_id was 'completed' -> then also set the membership_status_id to completed
+      if ($params['contribution_status_id'] == 1) {$params['status_id'] = $params['contribution_status_id'];}
 
-      $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
