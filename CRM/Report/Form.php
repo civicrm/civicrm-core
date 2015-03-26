@@ -1041,7 +1041,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Add filters to report.
    */
   public function addFilters() {
-    $filters = $filterGroups =array();
+    $filters = $filterGroups = array();
     $count = 1;
 
     foreach ($this->_filters as $table => $attributes) {
