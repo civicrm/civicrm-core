@@ -2,8 +2,7 @@
   <div class="crm-block" ng-form="editRecipOptionsForm" crm-ui-id-scope>
     <div class="crm-group">
 
-      <!-- FIXME: ts is not working here. -->
-      <div crm-ui-field crm-title="'Dedupe by email'" crm-layout="checkbox">
+      <div crm-ui-field="{title: ts('Dedupe by email'), help: hs('dedupe_email')}" crm-layout="checkbox">
         <input
           type='checkbox'
           ng-model='model.mailing.dedupe_email'
@@ -11,13 +10,8 @@
           ng-false-value="'0'"
           />
       </div>
-      <div class="crm-section" id="help">
-        <p>{{ts('Multiple people -- such as spouses, parents, or children -- may sometimes share the same email address.')}}</p>
-        <p>{{ts('To send only one message to the shared address, enable this option. Mail-merge tokens will be filled for only one person.')}}</p>
-        <p>{{ts('To send separate messages for each person, disable this option. Mail-merge tokens will be filled separately for each person.')}}</p>
-      </div>
 
-      <div crm-ui-field="editRecipOptionsForm.location_type_id" crm-title="ts('Location Type')">
+      <div crm-ui-field="{name: 'editRecipOptionsForm.location_type_id', title: ts('Location Type')}">
         <select
           crm-ui-id="editRecipOptionsForm.location_type_id"
           crm-ui-select="{dropdownAutoWidth : true}"
@@ -32,7 +26,7 @@
         </select>
       </div>
 
-      <div crm-ui-field="editRecipOptionsForm.email_selection_method" crm-title="ts('Selection Method')">
+      <div crm-ui-field="{name: 'editRecipOptionsForm.email_selection_method', title: ts('Selection Method')}">
         <select
           crm-ui-id="editRecipOptionsForm.email_selection_method"
           crm-ui-select=""

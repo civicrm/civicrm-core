@@ -330,7 +330,7 @@ UNION
         'contact_check' => array($organization => TRUE),
       );
       list($valid, $invalid, $duplicate, $saved, $relationshipIds)
-        = CRM_Contact_BAO_Relationship::createMultiple($relationshipParams, $cid);
+        = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationshipParams, $cid);
 
       // In case we change employer, clean previous employer related records.
       if (!$previousEmployerID && !$newContact) {
@@ -346,7 +346,7 @@ UNION
       self::setCurrentEmployer(array($contactID => $organization));
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
-      // handle related meberships. CRM-3792
+      // Handle related memberships. CRM-3792
       self::currentEmployerRelatedMembership($contactID, $organization, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
@@ -853,6 +853,12 @@ Group By  componentId";
             $values[$field] = '';
           }
         }
+      }
+
+      //5. modify the params to include county_id if it exist in master contact.
+      // CRM-16152: This is a hack since QF does not submit disabled field.
+      if (!empty($masterAddress->county_id) && empty($values['county_id'])) {
+        $values['county_id'] = $masterAddress->county_id;
       }
     }
   }

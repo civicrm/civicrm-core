@@ -37,6 +37,7 @@
  * Open a new case, add client and manager roles, and standard timeline.
  *
  * @param array $params
+ *
  * @code
  * //REQUIRED:
  * 'case_type_id' => int OR
@@ -373,6 +374,7 @@ function civicrm_api3_case_update($params) {
  * Delete a specified case.
  *
  * @param array $params
+ *
  * @code
  *   //REQUIRED:
  *   'id' => int

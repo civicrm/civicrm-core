@@ -16,7 +16,7 @@
     crmMailingBodyText: '~/crmMailing/body_text.html'
   };
   _.each(simpleBlocks, function(templateUrl, directiveName){
-    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata) {
+    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata, crmUiHelp) {
       return {
         scope: {
           crmMailing: '@'
@@ -28,6 +28,7 @@
           });
           scope.crmMailingConst = CRM.crmMailing;
           scope.ts = CRM.ts(null);
+          scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
           $q.when(crmMetadata.getFields('Mailing'), function(fields) {
             scope.mailingFields = fields;
@@ -39,7 +40,7 @@
 
   // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
-  angular.module('crmMailing').directive('crmMailingBlockPreview', function () {
+  angular.module('crmMailing').directive('crmMailingBlockPreview', function (crmUiHelp) {
     return {
       templateUrl: '~/crmMailing/preview.html',
       link: function (scope, elm, attr) {
@@ -48,6 +49,7 @@
         });
         scope.crmMailingConst = CRM.crmMailing;
         scope.ts = CRM.ts(null);
+        scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
         scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
         scope.testGroup = {gid: null};
 
