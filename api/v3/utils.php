@@ -2268,9 +2268,9 @@ function _civicrm_api3_field_value_check(&$params, $fieldName) {
 }
 
 /**
- * Like _civicrm_api3_basic_get, but data is backed by a simple array
- * instead of a DAO/BAO. This is useful for small/mid-size data loaded
- * from JSON or XML documents.
+ * A generic "get" API based on simple array data. This is comparable to
+ * _civicrm_api3_basic_get but does not use DAO/BAO. This is useful for
+ * small/mid-size data loaded from external JSON or XML documents.
  *
  * @param array $params
  *   API parameters.
@@ -2297,6 +2297,9 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
     }
     $match = TRUE;
     foreach ($params as $k => $v) {
+      if ($k == 'id') {
+        $k = $idCol;
+      }
       if (in_array($k, $fields) && $record[$k] !== $v) {
         $match = FALSE;
         break;
