@@ -1770,6 +1770,14 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   }
   $d = new $dao();
   $fields = $d->fields();
+
+  // Set html attributes for text fields
+  foreach ($fields as $name => &$field) {
+    if (isset($field['html'])) {
+      $field['html'] += (array) $d::makeAttribute($field);
+    }
+  }
+
   // replace uniqueNames by the normal names as the key
   if (empty($unique)) {
     foreach ($fields as $name => &$field) {

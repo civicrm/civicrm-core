@@ -67,25 +67,23 @@ class CRM_Contact_Form_Edit_Individual {
         $form->addField('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
       }
 
-      $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-
       if (isset($nameFields['Formal Title'])) {
-        $form->addField('formal_title', $attributes['formal_title']);
+        $form->addField('formal_title');
       }
 
       // first_name
       if (isset($nameFields['First Name'])) {
-        $form->addField('first_name', $attributes['first_name']);
+        $form->addField('first_name');
       }
 
       //middle_name
       if (isset($nameFields['Middle Name'])) {
-        $form->addField('middle_name', $attributes['middle_name']);
+        $form->addField('middle_name');
       }
 
       // last_name
       if (isset($nameFields['Last Name'])) {
-        $form->addField('last_name', $attributes['last_name']);
+        $form->addField('last_name');
       }
 
       // suffix
@@ -97,12 +95,11 @@ class CRM_Contact_Form_Edit_Individual {
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
-      $form->addField('nick_name', $attributes['nick_name']);
+      $form->addField('nick_name');
 
       // job title
       // override the size for UI to look better
-      $attributes['job_title']['size'] = 30;
-      $form->addField('job_title', array('size' => '30') + $attributes['job_title']);
+      $form->addField('job_title', array('size' => '30'));
       //Current Employer Element
       $props = array(
         'api' => array('params' => array('contact_type' => 'Organization')),
@@ -125,14 +122,13 @@ class CRM_Contact_Form_Edit_Individual {
       $form->assign('checkSimilar', $checkSimilar);
 
       //External Identifier Element
-      $form->addField('external_identifier', $attributes['external_identifier'] + array('label' => 'External ID'));
+      $form->addField('external_identifier', array('label' => 'External ID'));
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
         array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
       );
-      $config = CRM_Core_Config::singleton();
       CRM_Core_ShowHideBlocks::links($form, 'demographics', '', '');
     }
   }

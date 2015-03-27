@@ -1227,8 +1227,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-
-    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action');
+    $props += CRM_Utils_Array::value('html', $fieldSpec, array());
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
     switch ($widget) {
       case 'Text':
       case 'Link':
