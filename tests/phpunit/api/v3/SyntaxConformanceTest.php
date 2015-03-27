@@ -83,6 +83,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = array(
+      'CxnApp', // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
       'Profile',
       'CustomValue',
       'Constant',
@@ -93,6 +94,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Setting',
     );
     $this->toBeImplemented['create'] = array(
+      'Cxn',
+      'CxnApp',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -105,6 +108,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'User',
     );
     $this->toBeImplemented['delete'] = array(
+      'Cxn',
+      'CxnApp',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
