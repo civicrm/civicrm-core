@@ -85,7 +85,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    *   The PEM-encoded root certificate. NULL if verification is disabled.
    * @throws CRM_Core_Exception
    */
-  public static function createCACert() {
+  public static function getCACert() {
     if (!defined('CIVICRM_CXN_CA') || CIVICRM_CXN_CA === 'CiviRootCA') {
       $file = Constants::getCert();
     }
@@ -128,7 +128,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
 
   public static function createRegistrationClient() {
     $cxnStore = new \CRM_Cxn_CiviCxnStore();
-    $client = new \Civi\Cxn\Rpc\RegistrationClient(self::createCACert(), $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
+    $client = new \Civi\Cxn\Rpc\RegistrationClient(self::getCACert(), $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
     $client->setLog(new \CRM_Utils_SystemLogger());
     return $client;
   }
