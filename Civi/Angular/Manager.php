@@ -81,6 +81,12 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('ang/crmAutosave.js'),
       );
+      $angularModules['crmCxn'] = array(
+        'ext' => 'civicrm',
+        'js' => array('ang/crmCxn.js', 'ang/crmCxn/*.js'),
+        'css' => array('ang/crmCxn.css'),
+        'partials' => array('ang/crmCxn'),
+      );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
       //  'js' => array('ang/crmExample.js'),

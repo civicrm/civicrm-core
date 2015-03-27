@@ -173,5 +173,16 @@ function civicrm_api3_cxn_unregister($params) {
  *   API result array.
  */
 function civicrm_api3_cxn_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (is_array($result['values'])) {
+    foreach (array_keys($result['values']) as $i) {
+      if (!empty($result['values'][$i]['app_meta'])) {
+        $result['values'][$i]['app_meta'] = json_decode($result['values'][$i]['app_meta'], TRUE);
+      }
+      if (!empty($result['values'][$i]['perm'])) {
+        $result['values'][$i]['perm'] = json_decode($result['values'][$i]['perm'], TRUE);
+      }
+    }
+  }
+  return $result;
 }
