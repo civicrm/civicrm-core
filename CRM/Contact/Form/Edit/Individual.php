@@ -60,36 +60,26 @@ class CRM_Contact_Form_Edit_Individual {
         'contact_edit_options', TRUE, NULL,
         FALSE, 'name', TRUE, 'AND v.filter = 2'
       );
-
-      //prefix
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addField('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
+      // Fixme: dear god why? these come out in a format that is NOT the name of the fields.
+      foreach ($nameFields as &$fix) {
+        $fix = str_replace(' ', '_', strtolower($fix));
+        if ($fix == 'prefix' || $fix == 'suffix') {
+          // God, why god?
+          $fix .= '_id';
+        }
       }
 
-      if (isset($nameFields['Formal Title'])) {
-        $form->addField('formal_title');
-      }
-
-      // first_name
-      if (isset($nameFields['First Name'])) {
-        $form->addField('first_name');
-      }
-
-      //middle_name
-      if (isset($nameFields['Middle Name'])) {
-        $form->addField('middle_name');
-      }
-
-      // last_name
-      if (isset($nameFields['Last Name'])) {
-        $form->addField('last_name');
-      }
-
-      // suffix
-      $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-      if (isset($nameFields['Suffix']) && $suffix) {
-        $form->addField('suffix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Suffix')));
+      foreach ($nameFields as $name) {
+        $props = array();
+        if ($name == 'prefix_id' || $name == 'suffix_id') {
+          $options = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name);
+          // Skip if we have no options available
+          if (!CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name)) {
+            //continue;
+          }
+          $props = array('class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix'));
+        }
+        $form->addField($name, $props);
       }
     }
 
@@ -100,6 +90,7 @@ class CRM_Contact_Form_Edit_Individual {
       // job title
       // override the size for UI to look better
       $form->addField('job_title', array('size' => '30'));
+
       //Current Employer Element
       $props = array(
         'api' => array('params' => array('contact_type' => 'Organization')),
