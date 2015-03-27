@@ -5,11 +5,11 @@ Required vars: activitySet
 <table>
   <thead>
   <tr>
-    <th>Activity</th>
-    <th>Status</th>
-    <th>Reference</th>
-    <th>Offset</th>
-    <th>Select</th>
+    <th>{{ts('Activity')}}</th>
+    <th>{{ts('Status')}}</th>
+    <th>{{ts('Reference')}}</th>
+    <th>{{ts('Offset')}}</th>
+    <th>{{ts('Select')}}</th>
     <th></th>
   </tr>
   </thead>
@@ -67,7 +67,7 @@ Required vars: activitySet
          crm-icon="trash"
          ng-show="isActivityRemovable(activitySet, activity)"
          ng-click="removeItem(activitySet.activityTypes, activity)"
-         title="Remove">
+         title="{{ts('Remove')}}">
       </a>
     </td>
   </tr>
@@ -76,7 +76,7 @@ Required vars: activitySet
   <tfoot>
   <tr class="addRow">
     <td colspan="6">
-      Add activity:
+      {{ts('Add activity:')}}
       <span crm-add-name
            crm-options="activityTypeNames"
            crm-var="newActivity"

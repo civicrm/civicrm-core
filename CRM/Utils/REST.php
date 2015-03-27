@@ -187,7 +187,7 @@ class CRM_Utils_REST {
   public static function jsonFormated($data) {
     // If php is 5.4+ we can use the native method
     if (defined('JSON_PRETTY_PRINT')) {
-      return json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
+      return json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
     }
 
     // PHP 5.3 shim

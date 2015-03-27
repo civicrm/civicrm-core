@@ -45,32 +45,6 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   public $_action;
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
-   */
-  public function setDefaultValues() {
-    $parentDefaults = parent::setDefaultValues();
-
-    $eventId = $this->_id;
-    $params = array();
-    $defaults = array();
-    if (isset($eventId)) {
-      $params = array('id' => $eventId);
-    }
-
-    CRM_Event_BAO_Event::retrieve($params, $defaults);
-
-    $defaults = array_merge($defaults, $parentDefaults);
-    $defaults['id'] = $eventId;
-
-    return $defaults;
-  }
-
-  /**
-   * Build the form object.
    *
    * @return void
    */
@@ -97,14 +71,8 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
   }
 
   public function postProcess() {
-    $params = array();
     $params = $this->exportValues();
 
-    if (trim($params['parent_event_name']) === '') {
-      # believe me...
-      $params['parent_event_id'] = '';
-    }
-    //update events table
     $params['id'] = $this->_id;
     CRM_Event_BAO_Event::add($params);
 

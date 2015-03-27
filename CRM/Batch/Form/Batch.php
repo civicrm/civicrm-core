@@ -26,30 +26,22 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * This class generates form components for batch entry
- *
+ * This class generates form components for batch entry.
  */
 class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
+  /**
+   * PreProcess function.
+   */
   public function preProcess() {
     parent::preProcess();
-    // set the usercontext
+    // Set the user context.
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/batch', "reset=1"));
   }
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -77,15 +69,12 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      // set batch name default
+      // Set batch name default.
       $defaults['title'] = CRM_Batch_BAO_Batch::generateBatchName();
     }
     else {
@@ -96,9 +85,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

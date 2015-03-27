@@ -1,7 +1,8 @@
 <label crm-depth="1">
   <span ng-transclude></span>
   <span ng-class="cssClasses">
-    {{$parent.$parent.$eval(crmTitle)}}
+    {{crmUiField.title}}
   </span>
 </label>
+<a crm-ui-help="help" ng-if="crmUiField.help"></a>
 <div class="clear"></div>

@@ -6,7 +6,7 @@ It could perhaps be thinned by 30-60% by making more directives.
 -->
 <div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
-    <div crm-ui-field="subform.msg_template_id" crm-title="ts('Template')">
+    <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}">
       <div ng-controller="MsgTemplateCtrl">
         <select
           crm-ui-id="subform.msg_template_id"
@@ -21,7 +21,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         <a crm-icon="disk" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
       </div>
     </div>
-    <div crm-ui-field="subform.fromAddress" crm-title="ts('From')">
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}">
       <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
         <select
           crm-ui-id="subform.fromAddress"
@@ -34,7 +34,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         </select>
       </div>
     </div>
-    <div crm-ui-field="subform.replyTo" crm-title="ts('Reply-To')" ng-show="crmMailingConst.enableReplyTo">
+    <div crm-ui-field="{name: 'subform.replyTo', title: ts('Reply-To')}" ng-show="crmMailingConst.enableReplyTo">
       <div ng-controller="EmailAddrCtrl">
         <select
           crm-ui-id="subform.replyTo"
@@ -48,11 +48,11 @@ It could perhaps be thinned by 30-60% by making more directives.
         </select>
       </div>
     </div>
-    <div crm-ui-field="subform.recipients" crm-title="ts('Recipients')">
+    <div crm-ui-field="{name: 'subform.recipients', title: ts('Recipients')}">
       <div crm-mailing-block-recipients="{name: 'recipients', id: 'subform.recipients'}" crm-mailing="mailing"></div>
     </div>
     <span ng-controller="EditUnsubGroupCtrl">
-      <div crm-ui-field="subform.baseGroup" crm-title="ts('Unsubscribe Group')" ng-if="isUnsubGroupRequired(mailing)">
+      <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
         <select
           crm-ui-id="subform.baseGroup"
           crm-ui-select
@@ -64,7 +64,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         </select>
       </div>
     </span>
-    <div crm-ui-field="subform.subject" crm-title="ts('Subject')">
+    <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}">
       <div style="float: right;">
         <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
       </div>
