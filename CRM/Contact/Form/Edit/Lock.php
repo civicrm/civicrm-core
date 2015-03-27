@@ -48,7 +48,7 @@ class CRM_Contact_Form_Edit_Lock {
    * @return void
    */
   public static function buildQuickForm(&$form) {
-    $form->addElement('hidden', 'modified_date', '', array('id' => 'modified_date'));
+    $form->addField('modified_date', array('type' => 'hidden', 'id' => 'modified_date', 'label' => ''));
   }
 
   /**
