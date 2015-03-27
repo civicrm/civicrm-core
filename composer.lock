@@ -1,18 +1,24 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "be40d4f92aa2bb9fdfe034e64f5ed4b5",
+    "hash": "836deff5048be510d1c6ff0fdf654f2f",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "dev-master",
+            "version": "v0.15.07.07",
             "source": {
                 "type": "git",
-                "url": "https://github.com/totten/civicrm-cxn-rpc",
-                "reference": "d3a201efdb09b8781e6205a9582e0ea2dd2a7dd4"
+                "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
+                "reference": "e56f4a3e19cbb78b3df83425600f485361d12ca3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e56f4a3e19cbb78b3df83425600f485361d12ca3",
+                "reference": "e56f4a3e19cbb78b3df83425600f485361d12ca3",
+                "shasum": ""
             },
             "require": {
                 "phpseclib/phpseclib": "0.3.*",
@@ -27,6 +33,7 @@
                     "Civi\\Cxn\\Rpc\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -36,8 +43,8 @@
                     "email": "totten@civicrm.org"
                 }
             ],
-            "description": "RPC library for CiviCRM QuickConnect",
-            "time": "2015-03-25 11:25:27"
+            "description": "RPC library for CiviConnect",
+            "time": "2015-07-08 00:58:37"
         },
         {
             "name": "dompdf/dompdf",
@@ -498,9 +505,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "civicrm/civicrm-cxn-rpc": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
