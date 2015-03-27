@@ -2186,6 +2186,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  *   fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
+  if (!$fieldName) {
+    return FALSE;
+  }
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
