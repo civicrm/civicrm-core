@@ -532,17 +532,19 @@ ORDER BY  cv.label
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
                   ON line_item_civireport.entity_table = 'civicrm_participant' AND
-                     line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
+                     line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id AND
+                     line_item_civireport.qty > 0
       ";
     }
     if ($this->_balance) {
       $this->_from .= "
             LEFT JOIN civicrm_entity_financial_trxn eft
-                  ON (eft.entity_id = contribution_civireport.id)
+                  ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
             LEFT JOIN civicrm_financial_account fa
                   ON (fa.account_type_code = 'AR')
             LEFT JOIN civicrm_financial_trxn ft
-                  ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND (ft.from_financial_account_id = fa.id)
+                  ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
+                     (ft.to_financial_account_id != fa.id)
       ";
     }
   }
