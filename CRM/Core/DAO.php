@@ -2204,11 +2204,12 @@ SELECT contact_id
    */
   public static function buildOptionsContext($context = NULL) {
     $contexts = array(
-      'get' => "All options are returned, even if they are disabled. Labels are translated.",
-      'create' => "Options are filtered appropriately for the object being created/updated. Labels are translated.",
-      'search' => "Searchable options are returned. Labels are translated.",
-      'validate' => "All options are returned, even if they are disabled. Machine names are used in place of labels.",
-      'abbreviate' => "Active options are returned, and labels are replaced with abbreviations.",
+      'get' => "get: all options are returned, even if they are disabled; labels are translated.",
+      'create' => "create: options are filtered appropriately for the object being created/updated; labels are translated.",
+      'search' => "search: searchable options are returned; labels are translated.",
+      'validate' => "validate: all options are returned, even if they are disabled; machine names are used in place of labels.",
+      'abbreviate' => "abbreviate: enabled options are returned; labels are replaced with abbreviations.",
+      'match' => "match: enabled options are returned using machine names as keys; labels are translated.",
     );
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
