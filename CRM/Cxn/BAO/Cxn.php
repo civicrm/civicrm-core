@@ -40,6 +40,12 @@ use Civi\Cxn\Rpc\Constants;
  * This class helps to manage connections to third-party apps.
  */
 class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
+
+  /**
+   * Determine the current site's callback URL.
+   *
+   * @return string
+   */
   public static function getSiteCallbackUrl() {
     $config = CRM_Core_Config::singleton();
     if (preg_match('/^(http|https):/', $config->resourceBase)) {
@@ -51,6 +57,12 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     return rtrim($civiUrl, '/') . '/extern/cxn.php';
   }
 
+  /**
+   * Update the AppMeta for any existing connections.
+   *
+   * @param array $appMeta
+   * @throws \Civi\Cxn\Rpc\Exception\CxnException
+   */
   public static function updateAppMeta($appMeta) {
     \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
     CRM_Core_DAO::executeQuery('UPDATE civicrm_cxn SET app_meta = %1 WHERE app_id = %2', array(
@@ -59,6 +71,13 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     ));
   }
 
+  /**
+   * Get the AppMeta for an existing connection.
+   *
+   * @param string $cxnId
+   * @return array
+   * @throws \Civi\Cxn\Rpc\Exception\CxnException
+   */
   public static function getAppMeta($cxnId) {
     $appMetaJson = CRM_Core_DAO::getFieldValue('CRM_Cxn_DAO_Cxn', $cxnId, 'app_meta', 'cxn_id', TRUE);
     $appMeta = json_decode($appMetaJson, TRUE);
@@ -126,6 +145,12 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     }
   }
 
+  /**
+   * Construct a client for performing registration actions.
+   *
+   * @return \Civi\Cxn\Rpc\RegistrationClient
+   * @throws CRM_Core_Exception
+   */
   public static function createRegistrationClient() {
     $cxnStore = new \CRM_Cxn_CiviCxnStore();
     $client = new \Civi\Cxn\Rpc\RegistrationClient(self::getCACert(), $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
