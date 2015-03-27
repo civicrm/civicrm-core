@@ -341,6 +341,12 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       array('b', 'c'),
     );
 
+    $cases[] = array(
+      $records,
+      array('version' => 3, 'id' => 'd'),
+      array('d'),
+    );
+
     return $cases;
   }
 
