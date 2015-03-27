@@ -13,14 +13,8 @@
     "psr/log": "1.0.0",
     "symfony/finder": "2.3.*",
     "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "dev-master#d3a201efdb09b8781e6205a9582e0ea2dd2a7dd4"
+    "civicrm/civicrm-cxn-rpc": "~0.15.07.07"
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/totten/civicrm-cxn-rpc"
-    }
-  ],
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh"

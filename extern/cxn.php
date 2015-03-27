@@ -50,4 +50,4 @@ $apiServer->setRouter(function ($cxn, $entity, $action, $params) {
   return civicrm_api($entity, $action, $params);
 
 });
-$apiServer->handleAndRespond(file_get_contents('php://input'));
+$apiServer->handle(file_get_contents('php://input'))->send();
