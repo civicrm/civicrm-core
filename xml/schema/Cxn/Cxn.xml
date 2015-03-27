@@ -5,6 +5,7 @@
   <add>4.6</add>
   <field>
     <name>id</name>
+    <title>Connection ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Connection ID</comment>
