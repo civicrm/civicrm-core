@@ -18,7 +18,7 @@
   <!-- Application identification -->
 
   <field>
-    <name>app_id</name>
+    <name>app_guid</name>
     <title>Application GUID</title>
     <type>varchar</type>
     <length>128</length>
@@ -27,7 +27,7 @@
   </field>
   <index>
     <name>UI_appid</name>
-    <fieldName>app_id</fieldName>
+    <fieldName>app_guid</fieldName>
     <unique>true</unique>
     <add>4.6</add>
   </index>
@@ -42,7 +42,7 @@
   <!-- Connection details -->
   
   <field>
-    <name>cxn_id</name>
+    <name>cxn_guid</name>
     <title>Connection GUID</title>
     <type>varchar</type>
     <length>128</length>
@@ -51,7 +51,7 @@
   </field>
   <index>
     <name>UI_keypair_cxnid</name>
-    <fieldName>cxn_id</fieldName>
+    <fieldName>cxn_guid</fieldName>
     <unique>true</unique>
     <add>4.6</add>
   </index>

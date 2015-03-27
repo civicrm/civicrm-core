@@ -65,7 +65,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    */
   public static function updateAppMeta($appMeta) {
     \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_cxn SET app_meta = %1 WHERE app_id = %2', array(
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_cxn SET app_meta = %1 WHERE app_guid = %2', array(
       1 => array(json_encode($appMeta), 'String'),
       2 => array($appMeta['appId'], 'String'),
     ));
@@ -79,7 +79,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    * @throws \Civi\Cxn\Rpc\Exception\CxnException
    */
   public static function getAppMeta($cxnId) {
-    $appMetaJson = CRM_Core_DAO::getFieldValue('CRM_Cxn_DAO_Cxn', $cxnId, 'app_meta', 'cxn_id', TRUE);
+    $appMetaJson = CRM_Core_DAO::getFieldValue('CRM_Cxn_DAO_Cxn', $cxnId, 'app_meta', 'cxn_guid', TRUE);
     $appMeta = json_decode($appMetaJson, TRUE);
     \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
     return $appMeta;
