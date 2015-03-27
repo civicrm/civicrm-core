@@ -866,4 +866,25 @@ class CRM_Utils_Array {
     return $arrayDiff;
   }
 
+  /**
+   * Given a 2-dimensional matrix, create a new matrix with a restricted list of columns.
+   *
+   * @param array $matrix
+   *   All matrix data, as a list of rows.
+   * @param array $columns
+   *   List of column names.
+   * @return array
+   */
+  public static function filterColumns($matrix, $columns) {
+    $newRows = array();
+    foreach ($matrix as $pos => $oldRow) {
+      $newRow = array();
+      foreach ($columns as $column) {
+        $newRow[$column] = CRM_Utils_Array::value($column, $oldRow);
+      }
+      $newRows[$pos] = $newRow;
+    }
+    return $newRows;
+  }
+
 }
