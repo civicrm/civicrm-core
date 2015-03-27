@@ -22,7 +22,7 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
       return $this->cxns[$cxnId];
     }
     $dao = new CRM_Cxn_DAO_Cxn();
-    $dao->cxn_id = $cxnId;
+    $dao->cxn_guid = $cxnId;
     if ($dao->find(TRUE)) {
       $this->cxns[$cxnId] = $this->convertDaoToCxn($dao);
       return $this->cxns[$cxnId];
@@ -34,10 +34,10 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
 
   public function getByAppId($appId) {
     $dao = new CRM_Cxn_DAO_Cxn();
-    $dao->app_id = $appId;
+    $dao->app_guid = $appId;
     if ($dao->find(TRUE)) {
-      $this->cxns[$dao->cxn_id] = $this->convertDaoToCxn($dao);
-      return $this->cxns[$dao->cxn_id];
+      $this->cxns[$dao->cxn_guid] = $this->convertDaoToCxn($dao);
+      return $this->cxns[$dao->cxn_guid];
     }
     else {
       return NULL;
@@ -46,7 +46,7 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
 
   public function add($cxn) {
     $dao = new CRM_Cxn_DAO_Cxn();
-    $dao->cxn_id = $cxn['cxnId'];
+    $dao->cxn_guid = $cxn['cxnId'];
     $dao->find(TRUE);
     $this->convertCxnToDao($cxn, $dao);
     $dao->save();
@@ -54,7 +54,7 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
   }
 
   public function remove($cxnId) {
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_cxn WHERE cxn_id = %1', array(
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_cxn WHERE cxn_guid = %1', array(
       1 => array($cxnId, 'String'),
     ));
     unset($this->cxns[$cxnId]);
@@ -67,9 +67,9 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
   protected function convertDaoToCxn($dao) {
     $appMeta = json_decode($dao->app_meta, TRUE);
     return array(
-      'cxnId' => $dao->cxn_id,
+      'cxnId' => $dao->cxn_guid,
       'secret' => $dao->secret,
-      'appId' => $dao->app_id,
+      'appId' => $dao->app_guid,
       'appUrl' => $appMeta['appUrl'],
       'siteUrl' => CRM_Cxn_BAO_Cxn::getSiteCallbackUrl(),
       'perm' => json_decode($dao->perm, TRUE),
@@ -80,12 +80,13 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
    * @param CRM_Cxn_DAO_Cxn $dao
    */
   protected function convertCxnToDao($cxn, $dao) {
-    $dao->cxn_id = $cxn['cxnId'];
+    $dao->cxn_guid = $cxn['cxnId'];
     $dao->secret = $cxn['secret'];
-    $dao->app_id = $cxn['appId'];
+    $dao->app_guid = $cxn['appId'];
     $dao->perm = json_encode($cxn['perm']);
 
     // Note: we don't save siteUrl because it's more correct to regenerate on-demand.
     // Note: we don't save appUrl, but other processes will update appMeta.
   }
+
 }
