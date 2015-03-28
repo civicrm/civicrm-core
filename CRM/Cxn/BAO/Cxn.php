@@ -134,8 +134,8 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    *   TRUE if application metadata must be verified.
    */
   public static function isAppMetaVerified() {
-    if (defined('CIVICRM_CXN_VERIFY_APPMETA')) {
-      return CIVICRM_CXN_VERIFY_APPMETA;
+    if (defined('CIVICRM_CXN_APPS_VERIFY')) {
+      return CIVICRM_CXN_APPS_VERIFY;
     }
     elseif (!defined('CIVICRM_CXN_CA')) {
       return TRUE;
