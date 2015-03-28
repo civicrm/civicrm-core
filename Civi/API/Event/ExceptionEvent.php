@@ -45,10 +45,12 @@ class ExceptionEvent extends Event {
    *   The API provider responsible for executing the request.
    * @param array $apiRequest
    *   The full description of the API request.
+   * @param \Civi\API\Kernel $apiKernel
+   *   The kernel which fired the event.
    */
-  public function __construct($exception, $apiProvider, $apiRequest) {
+  public function __construct($exception, $apiProvider, $apiRequest, $apiKernel) {
     $this->exception = $exception;
-    parent::__construct($apiProvider, $apiRequest);
+    parent::__construct($apiProvider, $apiRequest, $apiKernel);
   }
 
   /**
