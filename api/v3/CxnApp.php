@@ -95,12 +95,18 @@ function _civicrm_api3_cxn_app_get_spec(&$spec) {
  */
 function civicrm_api3_cxn_app_get($params) {
   // FIXME: We should cache, but CRM_Utils_Cache and CRM_Core_BAO_Cache don't seem to support TTL...
-  list ($status, $blob) = CRM_Utils_HttpClient::singleton()->get(\Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL);
+
+  // You should not change CIVICRM_CXN_APPS_URL in production; this is for local development.
+  $url = defined('CIVICRM_CXN_APPS_URL') ? CIVICRM_CXN_APPS_URL : \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL;
+
+  list ($status, $blob) = CRM_Utils_HttpClient::singleton()->get($url);
   if (CRM_Utils_HttpClient::STATUS_OK != $status) {
     throw new API_Exception("Failed to download application list.");
   }
+
   $agent = new \Civi\Cxn\Rpc\Agent(CRM_Cxn_BAO_Cxn::getCACert(), NULL, NULL);
   $message = $agent->decode(array(AppMetasMessage::NAME, GarbledMessage::NAME), $blob);
+
   if ($message instanceof AppMetasMessage) {
     return _civicrm_api3_basic_array_get('CxnApp', $params, $message->getData(), 'appId',
       array('appId', 'appUrl', 'desc', 'appCert', 'perm'));
