@@ -108,6 +108,20 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public $_cdType;
 
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Relationship';
+  }
+
   public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
