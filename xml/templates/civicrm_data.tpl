@@ -552,8 +552,8 @@ VALUES
   (@option_group_id_adOpt, '{ts escape="sql"}Address Name{/ts}'      , 12, 'address_name', NULL, 0, NULL, 12, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}Street Address Parsing{/ts}', 13, 'street_address_parsing', NULL, 0, NULL, 13, NULL, 0, 0, 1, NULL, NULL),
 
-  (@option_group_id_gType, 'Access Control', 1, 'Access Control', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
-  (@option_group_id_gType, 'Mailing List',   2, 'Mailing List',   NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_gType, '{ts escape="sql"}Access Control{/ts}', 1, 'Access Control', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_gType, '{ts escape="sql"}Mailing List{/ts}',   2, 'Mailing List',   NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
 
   (@option_group_id_grantSt, '{ts escape="sql"}Submitted{/ts}', 1, 'Submitted',  NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_grantSt, '{ts escape="sql"}Eligible{/ts}', 2, 'Eligible',  NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
