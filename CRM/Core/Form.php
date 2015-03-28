@@ -1032,6 +1032,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Based on form action, return a string representing the api action.
+   * Used by addField method.
+   *
+   * Return string
+   */
+  private function getApiAction() {
+    $action = $this->getAction();
+    if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
+      return 'create';
+    }
+    if ($action & (CRM_Core_Action::BROWSE)) {
+      return 'get';
+    }
+    // If you get this exception try adding more cases above.
+    throw new Exception("Cannot determine api action for " . __CLASS__);
+  }
+
+  /**
    * Classes extending CRM_Core_Form should implement this method.
    * @throws Exception
    */
@@ -1126,13 +1144,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props
    *   Mix of html attributes and special properties, namely.
    *   - entity (api entity name, can usually be inferred automatically from the form class)
-   *   - field (field name - only needed if different from name used on the form)
+   *   - name (field name - only needed if different from name used on the form)
    *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
    *   - placeholder - set to NULL to disable
    *   - multiple - bool
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
-   * @throws CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public function addField($name, $props = array(), $required = FALSE) {
     // TODO: Handle custom field
@@ -1148,22 +1167,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['entity'] = $this->getDefaultEntity();
     }
     // Resolve field.
-    if (!isset($props['field'])) {
-      $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    if (!isset($props['name'])) {
+      $props['name'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    // Resolve fields properties from API.
-    $info = civicrm_api3($props['entity'], 'getfields');
-    foreach ($info['values'] as $uniqueName => $fieldSpec) {
-      if (
-          $uniqueName === $props['field'] ||
-          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
-          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
-      ) {
-        break;
-      }
+    // Resolve action.
+    if (!isset($props['action'])) {
+      $props['action'] = $this->getApiAction();
     }
+    // Get field metadata.
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', array('options' => array('get_options' => 1)) + $props);
+    $fieldSpec = $fieldSpec['values'];
 
-    $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
+    $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $props['context'] == 'search') {
@@ -1188,8 +1203,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = $props['options'];
       }
       else {
-        $info = civicrm_api3($props['entity'], 'getoptions', $props);
-        $options = $info['values'];
+        $options = $fieldSpec['options'];
       }
 
       // The placeholder is only used for select-elements.
@@ -1210,11 +1224,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
-        $props['data-api-field'] = $props['field'];
+        $props['data-api-field'] = $props['name'];
       }
     }
-
-    CRM_Utils_Array::remove($props, 'entity', 'field', 'context', 'label');
+    $props += CRM_Utils_Array::value('html', $fieldSpec, array());
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
     switch ($widget) {
       case 'Text':
       case 'Link':
