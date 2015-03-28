@@ -42,8 +42,7 @@ class CRM_Contact_Form_Edit_Notes {
    */
   public static function buildQuickForm(&$form) {
     $form->applyFilter('__ALL__', 'trim');
-    $form->add('text', 'subject', ts('Subject'), array('size' => 60, 'maxlength' => 254));
-    $form->add('textarea', 'note', ts('Notes'), array('cols' => '60', 'rows' => '3'));
+    $form->addField('note', array('entity' => 'note', 'cols' => '60', 'rows' => '3'));
   }
 
 }
