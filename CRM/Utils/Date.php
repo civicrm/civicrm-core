@@ -989,7 +989,7 @@ class CRM_Utils_Date {
             $to['M'] = 12;
             $to['Y'] = $from['Y'] = $now['year'] - 1;
             break;
-   
+
           case 'before_previous':
             // all before previous year
             $to['d'] = 31;
