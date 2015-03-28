@@ -104,7 +104,7 @@
         },
         template: function() {
           var args = $location.search();
-          return (args && args.angularDebug) ? '<div crm-ui-accordion crm-title=\'ts("Debug (%1)", {1: crmUiDebug})\' crm-collapsed="true"><pre>{{data|json}}</pre></div>' : '';
+          return (args && args.angularDebug) ? '<div crm-ui-accordion=\'{title: ts("Debug (%1)", {1: crmUiDebug}), collapsed: true}\'><pre>{{data|json}}</pre></div>' : '';
         },
         link: function(scope, element, attrs) {
           var args = $location.search();
