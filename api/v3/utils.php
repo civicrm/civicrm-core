@@ -2300,7 +2300,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
       if ($k == 'id') {
         $k = $idCol;
       }
-      if (in_array($k, $fields) && $record[$k] !== $v) {
+      if (in_array($k, $fields) && $record[$k] != $v) {
         $match = FALSE;
         break;
       }
