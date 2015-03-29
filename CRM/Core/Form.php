@@ -1201,6 +1201,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
+        // Else this get passed to the form->add method.
+        unset($props['options']);
       }
       else {
         $options = $fieldSpec['options'];
@@ -1221,10 +1223,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // Add data for popup link.
-      if ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+      if ((isset($props['options-url']) && $props['options-url']) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
+        if (isset($props['options-url'])) {
+          unset($props['options-url']);
+        }
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
@@ -1249,13 +1254,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
-        $this->add('select', $name, $label, $options, $required, $props);
+        $props += array('required' => $required);
+        $this->addElement('select', $name, $label, $options, $props);
         // TODO: Add and/or option for fields that store multiple values
         break;
 
       //case 'AdvMulti-Select':
       //case 'CheckBox':
-      //case 'File':
+      case 'File':
+        // We should not build upload file in search mode.
+        if (isset($props['context']) && $props['context'] == 'search') {
+          return;
+        }
+        $this->addElement('file', $name, $label, $props, $required);
+        $this->addUploadElement($name);
+        break;
+
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
