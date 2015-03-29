@@ -221,11 +221,9 @@ function civicrm_api3_generic_getfield($apiRequest) {
   }
   // Turn off sequential to make the field easier to find
   $apiRequest['params']['sequential'] = 0;
-  if (!empty($params['options']['get_options'])) {
+  if (isset($params['get_options'])) {
+    $apiRequest['params']['options']['get_options_context'] = $params['get_options'];
     $apiRequest['params']['options']['get_options'] = $fieldName;
-  }
-  if (isset($params['context'])) {
-    $apiRequest['params']['options']['get_options_context'] = $params['context'];
   }
   $result = civicrm_api3_generic_getfields($apiRequest, FALSE);
   $result = $result['values'][$fieldName];
@@ -251,11 +249,12 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
       'type' => CRM_Utils_Type::T_STRING,
       'api.aliases' => array('api_action'),
     ),
-    'context' => array(
-      'title' => 'Context',
-      'description' => 'Context passed to getoptions. Only relevant if options.get_options is set.',
+    'get_options' => array(
+      'title' => 'Get Options',
+      'description' => 'Context for which to get field options, or null to skip fetching options.',
       'type' => CRM_Utils_Type::T_STRING,
       'options' => CRM_Core_DAO::buildOptionsContext(),
+      'api.aliases' => array('context'),
     ),
   );
   // Add available options to these params if requested
