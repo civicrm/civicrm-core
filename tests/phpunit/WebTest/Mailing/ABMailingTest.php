@@ -35,7 +35,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-	public function testWithDifferentSubject() {
+  public function testWithDifferentSubject() {
     $this->webtestLogin();
 
     //----do create test mailing group
@@ -66,7 +66,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i<=$totalUser; $i++) {
+    for ($i=1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
@@ -212,7 +212,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i<=$totalUser; $i++) {
+    for ($i=1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
@@ -237,34 +237,34 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     // make Form Email address
     $formEmailAddressA = 'ABMailing_' . substr(sha1(rand()), 0, 7);
     $aEmailID = '"'.$formEmailAddressA.'" <'.$formEmailAddressA.'@abtest.org>';
-		$this->type("xpath=//input[@name='label']", "$aEmailID");
-		$this->click("xpath=//button/span[text()='Save']");
+    $this->type("xpath=//input[@name='label']", "$aEmailID");
+    $this->click("xpath=//button/span[text()='Save']");
 
 		// make Form Email address
     $this->click("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
 		$this->waitForAjaxContent();
     $formEmailAddressB = 'ABMailing_' . substr(sha1(rand()), 0, 7);
     $bEmailID = '"'.$formEmailAddressB.'" <'.$formEmailAddressB.'@abtest.org>';
-		$this->type("xpath=//input[@name='label']", "$bEmailID");
-		$this->click("xpath=//button/span[text()='Save']");
+    $this->type("xpath=//input[@name='label']", "$bEmailID");
+    $this->click("xpath=//button/span[text()='Save']");
 
-		$this->openCiviPage("a/#/abtest/new", NULL, "xpath=//div[@class='crm-wizard-buttons']");
-		$this->waitForElementPresent("xpath=//input[@name='abName']");
+    $this->openCiviPage("a/#/abtest/new", NULL, "xpath=//div[@class='crm-wizard-buttons']");
+    $this->waitForElementPresent("xpath=//input[@name='abName']");
 
 		$ABTestName = substr(sha1(rand()), 0, 7) . "ABTestName";
-		$this->type("xpath=//input[@name='abName']", "$ABTestName");
+    $this->type("xpath=//input[@name='abName']", "$ABTestName");
 
-		$this->click("xpath=//input[@value='from']");
+    $this->click("xpath=//input[@value='from']");
 
-		//click on next
-		$this->click("//button[@ng-click='crmUiWizardCtrl.next()']");
+    //click on next
+    $this->click("//button[@ng-click='crmUiWizardCtrl.next()']");
 
-		// Add the test mailing group
+    // Add the test mailing group
     $this->select2("s2id_crmUiId_13", $groupName, TRUE);
 
 		//click on next
-		$this->click("//button[@ng-click='crmUiWizardCtrl.next()']");
-		$this->waitForElementPresent("xpath=//input[@name='subject']");
+    $this->click("//button[@ng-click='crmUiWizardCtrl.next()']");
+    $this->waitForElementPresent("xpath=//input[@name='subject']");
 
 		//-------Compose Mail----------
 
@@ -384,7 +384,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i<=$totalUser; $i++) {
+    for ($i=1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
