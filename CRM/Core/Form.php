@@ -1175,7 +1175,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['action'] = $this->getApiAction();
     }
     // Get field metadata.
-    $fieldSpec = civicrm_api3($props['entity'], 'getfield', array('options' => array('get_options' => 1)) + $props);
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
 
     $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
