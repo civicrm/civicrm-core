@@ -158,7 +158,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser * ($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser / 100));
 
     //---- check for delivery detail--
 
@@ -244,7 +244,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
     $this->waitForAjaxContent();
     $formEmailAddressB = 'ABMailing_' . substr(sha1(rand()), 0, 7);
-    $bEmailID = '"' . $formEmailAddressB.'" <' . $formEmailAddressB . '@abtest.org>';
+    $bEmailID = '"' . $formEmailAddressB . '" <' . $formEmailAddressB . '@abtest.org>';
     $this->type("xpath=//input[@name='label']", "$bEmailID");
     $this->click("xpath=//button/span[text()='Save']");
 
@@ -328,7 +328,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser * ($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser / 100));
 
     //---- check for delivery detail--
     $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
@@ -502,7 +502,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser * ($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser / 100));
 
     //---- check for delivery detail--
     $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
