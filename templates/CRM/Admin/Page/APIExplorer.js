@@ -141,7 +141,7 @@
       showFields(['api_action']);
       return;
     }
-    CRM.api3(entity, 'getFields', {'api_action': action, options: {get_options: 'all'}}).done(function(data) {
+    CRM.api3(entity, 'getfields', {'api_action': action, options: {get_options: 'all', get_options_context: 'match'}}).done(function(data) {
       _.each(data.values, function(field) {
         if (field.name) {
           getFieldData[field.name] = field;
