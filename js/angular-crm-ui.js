@@ -631,6 +631,47 @@
       };
     })
 
+    // Render a crmEntityRef widget
+    // usage: <input crm-entityref="{entity: 'Contact', select: {allowClear:true}}" ng-model="myobj.field" />
+    .directive('crmEntityref', function ($parse, $timeout) {
+      return {
+        require: '?ngModel',
+        scope: {
+          crmEntityref: '='
+        },
+        link: function (scope, element, attrs, ngModel) {
+          // In cases where UI initiates update, there may be an extra
+          // call to refreshUI, but it doesn't create a cycle.
+
+          ngModel.$render = function () {
+            $timeout(function () {
+              // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
+              // new item is added before selection is made
+              element.select2('val', ngModel.$viewValue);
+            });
+          };
+          function refreshModel() {
+            var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            if (oldValue != newValue) {
+              scope.$parent.$apply(function () {
+                ngModel.$setViewValue(newValue);
+              });
+            }
+          }
+
+          function init() {
+            // TODO watch options
+            // TODO can we infer "entity" from model?
+            element.crmEntityRef(scope.crmEntityref || {});
+            element.on('change', refreshModel);
+            $timeout(ngModel.$render);
+          }
+
+          init();
+        }
+      };
+    })
+
     // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
