@@ -2588,7 +2588,8 @@ div a.helpicon:focus {
   border: 0 none;
 }
 
-/* Override Drupal .2em margin-bottom on forms (we don't want to give up that space) */
+/* ID selector is needed to override Drupal 2em margin-bottom on forms (we don't want to give up that space) */
+div#crm-container form,
 div.crm-container form {
   margin-bottom: 0;
 }
