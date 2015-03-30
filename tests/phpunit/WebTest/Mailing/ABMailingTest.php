@@ -66,7 +66,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i <= $totalUser; $i++) {
+    for ($i = 1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
@@ -107,7 +107,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     // fill subject for mailing
     $MailingSubject = substr(sha1(rand()), 0, 7);
     $this->type("xpath=//input[@name='subjectA']", "Test subject {$MailingSubject} for A");
-		$this->type("xpath=//input[@name='subjectB']", "Test subject {$MailingSubject} for B");
+    $this->type("xpath=//input[@name='subjectB']", "Test subject {$MailingSubject} for B");
 
     // HTML format message
     $HTMLMessage = "This is HTML formatted content for Mailing {$MailingSubject} Webtest.";
@@ -162,23 +162,23 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
 
     //---- check for delivery detail--
 
-    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=".$mailedUser."]");
+    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[2]", "$mailedUser");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr//td/span", 'Complete');
 
     //check value for Mailing A
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject '.$MailingSubject.' for A');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A (' . $ABTestName . ')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject ' . $MailingSubject . ' for A');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
 
     ////check value for Mailing B
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B ('.$ABTestName.')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject '.$MailingSubject.' for B');
 
     //check value for Mailing Final
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject '.$MailingSubject.' for A');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final (' . $ABTestName.')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject ' . $MailingSubject . ' for A');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ". $groupName);
   }
 
   public function testWithDifferentFrom() {
@@ -212,7 +212,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i <= $totalUser; $i++) {
+    for ($i = 1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
@@ -232,26 +232,26 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/options/from_email_address", "reset=1");
     $this->waitForElementPresent("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
     $this->click("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
-		$this->waitForAjaxContent();
+    $this->waitForAjaxContent();
 
     // make Form Email address
     $formEmailAddressA = 'ABMailing_' . substr(sha1(rand()), 0, 7);
-    $aEmailID = '"'.$formEmailAddressA.'" <'.$formEmailAddressA.'@abtest.org>';
+    $aEmailID = '"' . $formEmailAddressA . '" <' . $formEmailAddressA . '@abtest.org>';
     $this->type("xpath=//input[@name='label']", "$aEmailID");
     $this->click("xpath=//button/span[text()='Save']");
 
-		// make Form Email address
+    // make Form Email address
     $this->click("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
-		$this->waitForAjaxContent();
+    $this->waitForAjaxContent();
     $formEmailAddressB = 'ABMailing_' . substr(sha1(rand()), 0, 7);
-    $bEmailID = '"'.$formEmailAddressB.'" <'.$formEmailAddressB.'@abtest.org>';
+    $bEmailID = '"' . $formEmailAddressB.'" <' . $formEmailAddressB.'@abtest.org>';
     $this->type("xpath=//input[@name='label']", "$bEmailID");
     $this->click("xpath=//button/span[text()='Save']");
 
     $this->openCiviPage("a/#/abtest/new", NULL, "xpath=//div[@class='crm-wizard-buttons']");
     $this->waitForElementPresent("xpath=//input[@name='abName']");
 
-		$ABTestName = substr(sha1(rand()), 0, 7) . "ABTestName";
+    $ABTestName = substr(sha1(rand()), 0, 7) . "ABTestName";
     $this->type("xpath=//input[@name='abName']", "$ABTestName");
 
     $this->click("xpath=//input[@value='from']");
@@ -262,11 +262,11 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     // Add the test mailing group
     $this->select2("s2id_crmUiId_13", $groupName, TRUE);
 
-		//click on next
+    //click on next
     $this->click("//button[@ng-click='crmUiWizardCtrl.next()']");
     $this->waitForElementPresent("xpath=//input[@name='subject']");
 
-		//-------Compose Mail----------
+    //-------Compose Mail----------
 
     // fill subject for mailing
     $MailingSubject = substr(sha1(rand()), 0, 7);
@@ -331,26 +331,26 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $mailedUser = round($totalUser*($totalUser/100));
 
     //---- check for delivery detail--
-    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=".$mailedUser."]");
+    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[2]", "$mailedUser");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr//td/span", 'Complete');
 
     //check value for Mailing A
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A ('.$ABTestName.')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A (' . $ABTestName . ')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[2]/td[2]", "$aEmailID");
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject '.$MailingSubject.' for webtest');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject ' . $MailingSubject . ' for webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
 
     //check value for Mailing B
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B ('.$ABTestName.')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B (' . $ABTestName . ')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[2]/td[3]", "$bEmailID");
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject '.$MailingSubject.' for webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject ' . $MailingSubject . ' for webtest');
 
     //check value for Mailing Final
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final ('.$ABTestName.')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final (' . $ABTestName . ')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[2]/td[4]", "$aEmailID");
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject '.$MailingSubject.' for webtest');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject ' . $MailingSubject . ' for webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
   }
 
   public function testWithDifferentABMailing() {
@@ -384,7 +384,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $totalUser = 10;
 
     //---- create mailing contact and add to mailing Group
-    for ($i=1; $i <= $totalUser; $i++) {
+    for ($i = 1; $i <= $totalUser; $i++) {
       $firstName = substr(sha1(rand()), 0, 7);
       $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
 
@@ -505,22 +505,23 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $mailedUser = round($totalUser*($totalUser/100));
 
     //---- check for delivery detail--
-    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=".$mailedUser."]");
+    $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[2]", "$mailedUser");
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr//td/span", 'Complete');
 
     //check value for Mailing A
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject '.$AMailingSubject.' for Webtest');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr/td[2]", 'Test A (' . $ABTestName . ')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[2]", 'Test subject ' . $AMailingSubject . ' for Webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
 
     //check value for Mailing B
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject '.$BMailingSubject.' for Webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B (' . $ABTestName . ')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject ' . $BMailingSubject . ' for Webtest');
 
     //check value for Mailing Final
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final ('.$ABTestName.')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject '.$AMailingSubject.' for Webtest');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
   }
+
 }
