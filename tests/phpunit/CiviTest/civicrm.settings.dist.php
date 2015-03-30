@@ -9,7 +9,7 @@ define('CIVICRM_TEST', 1);
 //--- you shouldn't have to modify anything under this line, but might want to put the compiled templates CIVICRM_TEMPLATE_COMPILEDIR in a different folder than our default location ----------
 
 if (!defined('CIVICRM_DSN') && !empty($GLOBALS['mysql_user'])) {
-  $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+  $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'trunk_crm_test';
   if (empty($GLOBALS['mysql_pass']) && $GLOBALS['mysql_pass_need_password']) {
     $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword('Password');
   }

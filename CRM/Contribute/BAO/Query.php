@@ -317,7 +317,6 @@ class CRM_Contribute_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.receipt_date", $op);
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
-      
       case 'financial_type':
       case 'contribution_page':
       case 'payment_instrument':
