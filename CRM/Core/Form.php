@@ -1234,11 +1234,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
+    // TODO: refactor switch statement, to seperate methods.
     switch ($widget) {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
-        $this->addElement('text', $name, $label, $props, $required);
+        $element = $this->addElement('text', $name, $label, $props);
+        if ($required) {
+          $this->addRequiredRule($element);
+        }
         break;
 
       case 'hidden':
@@ -1254,8 +1258,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
-        $props += array('required' => $required);
         $this->addElement('select', $name, $label, $options, $props);
+        if ($required) {
+          $this->addRequiredRule($element);
+        }
         // TODO: Add and/or option for fields that store multiple values
         break;
 
@@ -1266,15 +1272,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (isset($props['context']) && $props['context'] == 'search') {
           return;
         }
-        $this->addElement('file', $name, $label, $props, $required);
+        $this->addElement('file', $name, $label, $props);
         $this->addUploadElement($name);
+        if ($required) {
+          $this->addRequiredRule($element, 'uploadedfile');
+        }
         break;
 
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
       case 'EntityRef':
-        $this->addEntityRef($name, $label, $props);
+        //TODO: Refactor to avoid add-method.
+        $this->addEntityRef($name, $label, $props, $required);
         break;
 
       // Check datatypes of fields
@@ -1285,6 +1295,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case read only fields
       default:
         throw new Exception("Unsupported html-element " . $widget);
+    }
+  }
+
+  /**
+   * Add a required rule to a form element.
+   */
+  public function addRequiredRule($element, $rule = 'required') {
+    $error = $this->addRule($element->getName(), ts('%1 is a required field.', array(1 => $element->getLabel())), $rule);
+    if (HTML_QuickForm::isError($error)) {
+      CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
     }
   }
 
