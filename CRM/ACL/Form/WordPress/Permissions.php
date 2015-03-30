@@ -49,7 +49,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     // Get the core permissions array
     $permissionsArray = self::getPermissionArray();
-    $permissionsDesc = self::getPermissionArray(true);
+    $permissionsDesc = self::getPermissionArray(TRUE);
 
     // Get the wordpress roles, default capabilities and assign to the form
     // TODO: Create a new wordpress role (Anonymous user) and define capabilities in Wordpress Access Control
@@ -187,10 +187,10 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * @return array
    *   civicrm permissions
    */
-  public static function getPermissionArray($descriptions = false) {
+  public static function getPermissionArray($descriptions = FALSE) {
     global $civicrm_root;
 
-    $permissions = CRM_Core_Permission::basicPermissions(false, $descriptions);
+    $permissions = CRM_Core_Permission::basicPermissions(FALSE, $descriptions);
 
     $perms_array = array();
     foreach ($permissions as $perm => $title) {

@@ -96,7 +96,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
         ts('Delete memberships'),
       ),
     );
-    
+
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
         $permissions[$name] = array_shift($attr);

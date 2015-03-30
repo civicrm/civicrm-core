@@ -575,7 +575,7 @@ class CRM_Core_Permission {
       }
 
       foreach ($components as $comp) {
-        $perm = $comp->getPermissions(false, $descriptions);
+        $perm = $comp->getPermissions(FALSE, $descriptions);
         if ($perm) {
           $info = $comp->getInfo();
           foreach ($perm as $p) {
@@ -638,7 +638,7 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  public static function getCorePermissions($descriptions = false) {
+  public static function getCorePermissions($descriptions = FALSE) {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = array(
       'add contacts' => array(
