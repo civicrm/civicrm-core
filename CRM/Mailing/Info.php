@@ -184,21 +184,51 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = array(
-      'access CiviMail',
-      'access CiviMail subscribe/unsubscribe pages',
-      'delete in CiviMail',
-      'view public CiviMail content',
+      'access CiviMail' => array(
+        ts('access CiviMail'),
+      ),
+      'access CiviMail subscribe/unsubscribe pages' => array(
+        ts('access CiviMail subscribe/unsubscribe pages'),
+        ts('Subscribe/unsubscribe from mailing list group'),
+      ),
+      'delete in CiviMail' => array(
+        ts('delete in CiviMail'),
+        ts('Delete Mailing'),
+      ),
+      'view public CiviMail content' => array(
+        ts('view public CiviMail content'),
+      ),
     );
 
     if (self::workflowEnabled() || $getAllUnconditionally) {
-      $permissions[] = 'create mailings';
-      $permissions[] = 'schedule mailings';
-      $permissions[] = 'approve mailings';
+      $permissions[] = array(
+        'create mailings' => array(
+          ts('create mailings'),
+        ),
+      );
+      $permissions[] = array(
+        'schedule mailings' => array(
+          ts('schedule mailings'),
+        ),
+      );
+      $permissions[] = array(
+        'approve mailings' => array(
+          ts('approve mailings'),
+        ),
+      );
+    }
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
     }
 
     return $permissions;

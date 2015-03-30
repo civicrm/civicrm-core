@@ -75,21 +75,35 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * implementation of $getAllUnconditionally is required.
    *
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array|null
    *   collection of permissions, null if none
    */
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'access CiviMember',
-      'edit memberships',
-      'delete in CiviMember',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviMember' => array(
+        ts('access CiviMember'),
+        ts('View memberships'),
+      ),
+      'edit memberships' => array(
+        ts('edit memberships'),
+        ts('Create and update memberships'),
+      ),
+      'delete in CiviMember' => array(
+        ts('delete in CiviMember'),
+        ts('Delete memberships'),
+      ),
     );
+    
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
   /**
