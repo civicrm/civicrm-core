@@ -17,17 +17,13 @@ FIXME: Don't hardcode table-based layout!
           name="mailingName" />
       </div>
     </div>
-    <div crm-ui-field="{name: 'subform.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campNames.length > 0">
-      <select
+    <div crm-ui-field="{name: 'subform.campaign', title: ts('Campaign'), help: hs({id: 'id-campaign_id', file: 'CRM/Campaign/Form/addCampaignToComponent'})}" ng-show="crmMailingConst.campaignEnabled">
+      <input
+        crm-entityref="{entity: 'Campaign', select: {allowClear: true, placeholder: ts('Select Campaign')}}"
         crm-ui-id="subform.campaign"
         name="campaign"
-        ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Campaign')}"
         ng-model="mailing.campaign_id"
-        ng-options="campaign.id as campaign.name for campaign in crmMailingConst.campNames|orderBy:'name'"
-        >
-        <option value=""></option>
-      </select>
+      />
     </div>
   </div>
 </div>
