@@ -158,7 +158,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser*($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser/100));
 
     //---- check for delivery detail--
 
@@ -172,13 +172,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
 
     ////check value for Mailing B
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject '.$MailingSubject.' for B');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[3]", 'Test B (' . $ABTestName . ')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject ' . $MailingSubject . ' for B');
 
     //check value for Mailing Final
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final (' . $ABTestName.')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final (' . $ABTestName . ')');
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject ' . $MailingSubject . ' for A');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ". $groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
   }
 
   public function testWithDifferentFrom() {
@@ -244,7 +244,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='action-link']/a/span[contains(text(), 'Add From Email Address')]");
     $this->waitForAjaxContent();
     $formEmailAddressB = 'ABMailing_' . substr(sha1(rand()), 0, 7);
-    $bEmailID = '"' . $formEmailAddressB.'" <' . $formEmailAddressB.'@abtest.org>';
+    $bEmailID = '"' . $formEmailAddressB.'" <' . $formEmailAddressB . '@abtest.org>';
     $this->type("xpath=//input[@name='label']", "$bEmailID");
     $this->click("xpath=//button/span[text()='Save']");
 
@@ -328,7 +328,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser*($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser/100));
 
     //---- check for delivery detail--
     $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
@@ -502,7 +502,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
 
     //get actual number of user for mailing
-    $mailedUser = round($totalUser*($totalUser/100));
+    $mailedUser = round($totalUser * ($totalUser/100));
 
     //---- check for delivery detail--
     $this->waitForElementPresent("xpath=//table[@class='crm-mailing-ab-table']/tbody/tr//td//a[text()=" . $mailedUser . "]");
@@ -519,9 +519,9 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[3]", 'Test subject ' . $BMailingSubject . ' for Webtest');
 
     //check value for Mailing Final
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final ('.$ABTestName.')');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject '.$AMailingSubject.' for Webtest');
-    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: ".$groupName);
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]//tr//td[4]", 'Final (' . $ABTestName . ')');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']/tbody[3]/tr[3]//td[4]", 'Test subject ' . $AMailingSubject . ' for Webtest');
+    $this->assertElementContainsText("xpath=//table[@class='crm-mailing-ab-table']//tbody//tr[@ng-controller='ViewRecipCtrl']//td/div", "Include: " . $groupName);
   }
 
 }
