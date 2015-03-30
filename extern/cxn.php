@@ -33,9 +33,11 @@ CRM_Utils_System::loadBootStrap(array(), FALSE);
 $apiServer = new \Civi\Cxn\Rpc\ApiServer(new CRM_Cxn_CiviCxnStore());
 $apiServer->setLog(new CRM_Utils_SystemLogger());
 $apiServer->setRouter(function ($cxn, $entity, $action, $params) {
+  $SUPER_PERM = array('administer CiviCRM');
+
   require_once 'api/v3/utils.php';
 
-  // Note: cxnId is authenticated before router is called.
+  // Note: $cxn and cxnId are authenticated before router is called.
   $dao = new CRM_Cxn_DAO_Cxn();
   $dao->cxn_id = $cxn['cxnId'];
   if (empty($cxn['cxnId']) || !$dao->find(TRUE) || !$dao->cxn_id) {
@@ -44,9 +46,31 @@ $apiServer->setRouter(function ($cxn, $entity, $action, $params) {
   if (!$dao->is_active) {
     return civicrm_api3_create_error('Connection is inactive');
   }
+  if (!is_string($entity) || !is_string($action) || !is_array($params)) {
+    return civicrm_api3_create_error('API parameters are malformed.');
+  }
+  if (
+    empty($cxn['perm']['api'])
+    || !is_array($cxn['perm']['api'])
+    || empty($cxn['perm']['grant'])
+    || !(is_array($cxn['perm']['grant']) || is_string($cxn['perm']['grant']))
+  ) {
+    return civicrm_api3_create_error('Connection has no permissions.');
+  }
 
-  // FIXME: apply $dao->perm
+  $whitelist = \Civi\API\WhitelistRule::createAll($cxn['perm']['api']);
+  Civi\Core\Container::singleton()
+    ->get('dispatcher')
+    ->addSubscriber(new \Civi\API\Subscriber\WhitelistSubscriber($whitelist));
+  CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+  if ($cxn['perm']['grant'] === '*') {
+    CRM_Core_Config::singleton()->userPermissionTemp->grant($SUPER_PERM);
+  }
+  else {
+    CRM_Core_Config::singleton()->userPermissionTemp->grant($cxn['perm']['grant']);
+  }
 
+  $params['check_permissions'] = 'whitelist';
   return civicrm_api($entity, $action, $params);
 
 });
