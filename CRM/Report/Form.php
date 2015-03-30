@@ -1003,13 +1003,16 @@ class CRM_Report_Form extends CRM_Core_Form {
 
             if (!$groupTitle && isset($table['group_title'])) {
               $groupTitle = $table['group_title'];
+              // Having a group_title is secret code for being a custom group
+              // which cryptically translates to needing an accordian.
+              // here we make that explicit.
+              $colGroups[$tableName]['use_accordian_for_field_selection'] = TRUE;
             }
 
             $colGroups[$tableName]['fields'][$fieldName] = CRM_Utils_Array::value('title', $field);
             if ($groupTitle && empty($colGroups[$tableName]['group_title'])) {
               $colGroups[$tableName]['group_title'] = $groupTitle;
             }
-
             $options[$fieldName] = CRM_Utils_Array::value('title', $field);
           }
         }
@@ -1038,9 +1041,20 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Add filters to report.
    */
   public function addFilters() {
-    $filters = array();
+    $filters = $filterGroups = array();
     $count = 1;
+
     foreach ($this->_filters as $table => $attributes) {
+      if (isset($this->_columns[$table]['group_title'])) {
+        // The presence of 'group_title' is secret code for 'is_a_custom_table'
+        // which magically means to 'display in an accordian'
+        // here we make this explicit.
+        $filterGroups[$table] = array(
+          'group_title' => $this->_columns[$table]['group_title'],
+          'use_accordian_for_field_selection' => TRUE,
+
+        );
+      }
       foreach ($attributes as $fieldName => $field) {
         // get ready with option value pair
         // @ todo being able to specific options for a field (e.g a date field) in the field spec as an array rather than an override
@@ -1156,6 +1170,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       );
     }
     $this->assign('filters', $filters);
+    $this->assign('filterGroups', $filterGroups);
   }
 
   /**
