@@ -71,21 +71,35 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * implementation of $getAllUnconditionally is required.
    *
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array|null
    *   collection of permissions, null if none
    */
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'access CiviPledge',
-      'edit pledges',
-      'delete in CiviPledge',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviPledge' => array(
+        ts('access CiviPledge'),
+        ts('View pledges'),
+      ),
+      'edit pledges' => array(
+        ts('edit pledges'),
+        ts('Create and update pledges'),
+      ),
+      'delete in CiviPledge' => array(
+        ts('delete in CiviPledge'),
+        ts('Delete pledges'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
   /**
