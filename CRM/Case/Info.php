@@ -94,17 +94,38 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'delete in CiviCase',
-      'administer CiviCase',
-      'access my cases and activities',
-      'access all cases and activities',
-      'add cases',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'delete in CiviCase' => array(
+        ts('delete in CiviCase'),
+        ts('Delete Cases'),
+      ),
+      'administer CiviCase' => array(
+        ts('administer CiviCase'),
+      ),
+      'access my cases and activities' => array(
+        ts('access my cases and activities'),
+      ),
+      'access all cases and activities' => array(
+        ts('access all cases and activities'),
+      ),
+      'add cases' => array(
+        ts('add cases'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
   /**

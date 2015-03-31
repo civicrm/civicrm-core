@@ -48,9 +48,12 @@
             {else}
                 <tr style="background-color: #FFFFFF;">
             {/if}
-                <td style="height:30px;">
+                <td style="height:3em;">
                 {if $i eq 1}
                   {$form.$role_name.$name.label}
+                  {if $permDesc.$name}
+                    <br/><span class="description">{$permDesc.$name}</span>
+                  {/if}
                 {/if}
                 </td>
                 <td align="center">{$form.$role_name.$name.html}<br /></td>
