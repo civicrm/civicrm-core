@@ -651,19 +651,6 @@
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
       }
-
-      //play w/ receipt option.
-      if ( cj("#auto_renew").prop('checked' ) ) {
-        cj("#notice").hide( );
-        cj("#send_receipt").prop('checked', false );
-        cj("#send-receipt").hide( );
-      }
-      else {
-        cj("#send-receipt").show( );
-        if ( cj("#send_receipt").prop('checked' ) ) {
-          cj("#notice").show( );
-        }
-      }
     }
     {/literal}
     {/if}

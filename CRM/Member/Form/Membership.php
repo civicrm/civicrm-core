@@ -1004,6 +1004,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       return;
     }
 
+    $allMemberStatus = CRM_Member_PseudoConstant::membershipStatus();
+    $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+
     $isTest = ($this->_mode == 'test') ? 1 : 0;
 
     $lineItems = NULL;
@@ -1049,8 +1052,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $count++;
       }
 
-      // unset send-receipt option, since receipt will be sent when ipn is received.
-      unset($this->_params['send_receipt'], $formValues['send_receipt']);
     }
 
     // process price set and get total amount and line items.
@@ -1232,8 +1233,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
       ) {
-        $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-        $params['status_id'] = array_search('Pending', $allStatus);
+        $params['status_id'] = array_search('Pending', $allMemberStatus);
         $params['skipStatusCal'] = TRUE;
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
@@ -1362,8 +1362,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // we do need contribution and recuring records.
       $result = NULL;
       if (!empty($paymentParams['is_recur'])) {
-        $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
         if (!$contributionType->find(TRUE)) {
@@ -1396,22 +1394,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         $ids['contribution'] = $contribution->id;
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
-        $params['status_id'] = array_search('Pending', $allStatus);
-        $params['skipStatusCal'] = TRUE;
-
-        //as membership is pending set dates to null.
-        $memberDates = array(
-          'join_date' => 'joinDate',
-          'start_date' => 'startDate',
-          'end_date' => 'endDate',
-        );
-
-        foreach ($memberDates as $dp => $dv) {
-          $$dv = NULL;
-          foreach ($this->_memTypeSelected as $memType) {
-            $membershipTypeValues[$memType][$dv] = NULL;
-          }
-        }
       }
 
       if ($params['total_amount'] > 0.0) {
@@ -1440,7 +1422,32 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->assign('amount', $params['total_amount']);
       }
 
+      // if the payment processor returns a contribution_status_id -> use it!
+      if (isset($result['contribution_status_id'])) {
+        $params['contribution_status_id'] = $result['contribution_status_id'];
+      }
+      // do what used to happen previously
+      else {
       $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
+      }
+      if ($params['contribution_status_id'] != array_search('Completed', $allContributionStatus)) {
+        $params['status_id'] = array_search('Pending', $allMemberStatus);
+        $params['skipStatusCal'] = TRUE;
+        // unset send-receipt option, since receipt will be sent when ipn is received.
+        unset($this->_params['send_receipt'], $formValues['send_receipt']);
+        //as membership is pending set dates to null.
+        $memberDates = array(
+          'join_date' => 'joinDate',
+          'start_date' => 'startDate',
+          'end_date' => 'endDate',
+        );
+        foreach ($memberDates as $dp => $dv) {
+          $$dv = NULL;
+          foreach ($this->_memTypeSelected as $memType) {
+            $membershipTypeValues[$memType][$dv] = NULL;
+          }
+        }
+      }
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
@@ -1635,12 +1642,20 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
     $receiptSend = FALSE;
-    if (!empty($formValues['send_receipt'])) {
-      $receiptSend = TRUE;
+    $contributionId = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
+    $membershipIds = $this->_membershipIDs;
+    if ($contributionId && !empty($membershipIds)) {
+      $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
+        CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
+      if ($contributionDetails[$membership->id]['contribution_status'] == 'Completed') {
+        $receiptSend = TRUE;
+      }
+    }
 
+    if (!empty($formValues['send_receipt']) && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
+      $formValues['contribution_id'] = $contributionId;
 
-      $formValues['contribution_id'] = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
