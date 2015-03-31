@@ -815,15 +815,21 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     }
 
     $contactType = $contact->contact_type;
+    // currently we only clear employer cache.
+    // we are now deleting inherited membership if any.
+    if ($contact->contact_type == 'Organization') {
+      $action = $restore ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
+      $relationshipDtls = CRM_Contact_BAO_Relationship::getRelationship($id);
+      if (!empty($relationshipDtls)) {
+        foreach ($relationshipDtls as $rId => $details) {
+          CRM_Contact_BAO_Relationship::disableEnableRelationship($rId, $action);
+        }
+      }
+      CRM_Contact_BAO_Contact_Utils::clearAllEmployee($id);
+    }
 
     if ($restore) {
       return self::contactTrashRestore($contact, TRUE);
-    }
-
-    // currently we only clear employer cache.
-    // we are not deleting inherited membership if any.
-    if ($contact->contact_type == 'Organization') {
-      CRM_Contact_BAO_Contact_Utils::clearAllEmployee($id);
     }
 
     // start a new transaction
