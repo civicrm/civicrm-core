@@ -258,6 +258,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
     'title' => 'Get Test Contributions?',
   );
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['payment_instrument_id']['api.aliases'] = array('contribution_payment_instrument', 'payment_instrument');
   $params['contact_id'] = $params['contribution_contact_id'];
   $params['contact_id']['api.aliases'] = array('contribution_contact_id');
   unset($params['contribution_contact_id']);
