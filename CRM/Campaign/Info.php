@@ -60,19 +60,49 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'administer CiviCampaign',
-      'manage campaign',
-      'reserve campaign contacts',
-      'release campaign contacts',
-      'interview campaign contacts',
-      'gotv campaign contacts',
-      'sign CiviCRM Petition',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'administer CiviCampaign' => array(
+        ts('administer CiviCampaign'),
+        ts('Create new campaign, survey and petition types and their status'),
+      ),
+      'manage campaign' => array(
+        ts('manage campaign'),
+        ts('Create new campaigns, surveys and petitions, reserve respondents'),
+      ),
+      'reserve campaign contacts' => array(
+        ts('reserve campaign contacts'),
+        ts('Reserve campaign contacts for surveys and petitions'),
+      ),
+      'release campaign contacts' => array(
+        ts('release campaign contacts'),
+        ts('Release reserved campaign contacts for surveys and petitions'),
+      ),
+      'interview campaign contacts' => array(
+        ts('interview campaign contacts'),
+        ts('Record survey and petition responses from their reserved contacts'),
+      ),
+      'gotv campaign contacts' => array(
+        ts('GOTV campaign contacts'),
+        ts('Record that contacts voted'),
+      ),
+      'sign CiviCRM Petition' => array(
+        ts('sign CiviCRM Petition'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
 
