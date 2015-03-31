@@ -1048,8 +1048,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
     }
-
-
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
       // CRM-10117 update the line items for participants.
       if ($pId) {
