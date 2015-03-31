@@ -1221,6 +1221,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['class'] .= ' huge';
         $props['multiple'] = 'multiple';
       }
+      // Set default options-url value. 
+      if ((!isset($props['options-url']))) {
+        $props['options-url'] = TRUE;
+      }
 
       // Add data for popup link.
       if ((isset($props['options-url']) && $props['options-url']) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
