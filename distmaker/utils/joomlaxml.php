@@ -100,7 +100,7 @@ function generateJoomlaConfig($version) {
   foreach ($permissions as $perm => $attr) {
     // give an empty string as default description
     $attr[] = '';
-    
+
     //order matters here, but we deal with that later
     $perms_array[CRM_Utils_String::munge(strtolower($perm))] = array(
       'title' => array_shift($attr),
