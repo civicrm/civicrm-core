@@ -52,16 +52,15 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on sucess, NULL otherwise
-   *
+   * @return CRM_Core_DAO_Navigation|NULL
+   *   DAO object on success, NULL otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Navigation', $id, 'is_active', $is_active);
   }
 
   /**
-   * Get existing / build navigation for CiviCRM Admin Menu
+   * Get existing / build navigation for CiviCRM Admin Menu.
    *
    * @return array
    *   associated array
@@ -82,11 +81,11 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Add/update navigation record
+   * Add/update navigation record.
    *
-   * @param $params associated array of submitted values
+   * @param array $params Submitted values
    *
-   * @return object
+   * @return CRM_Core_DAO_Navigation
    *   navigation object
    */
   public static function add(&$params) {
@@ -216,7 +215,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * Helper function for getNavigationList( )
+   * Helper function for getNavigationList().
    *
    * @param array $list
    *   Menu info.
@@ -240,12 +239,13 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
   }
 
   /**
-   * Helper function for getNavigationList( )
+   * Helper function for getNavigationList().
    *
    * @param string $val
    *   Menu name.
    * @param array $pidGroups
    *   Parent menus.
+   *
    * @return array
    */
   public static function _getNavigationValue($val, &$pidGroups) {
@@ -393,6 +393,7 @@ ORDER BY parent_id, weight";
    * @param string $navigationString
    * @param bool $json
    * @param bool $skipMenuItems
+   *
    * @return string
    */
   public static function recurseNavigation(&$value, &$navigationString, $json, $skipMenuItems) {
@@ -468,6 +469,7 @@ ORDER BY parent_id, weight";
    *
    * @param $value
    * @param array $skipMenuItems
+   *
    * @return bool|string
    */
   public static function getMenuName(&$value, &$skipMenuItems) {
@@ -647,6 +649,7 @@ ORDER BY parent_id, weight";
    *
    * @param int $contactID
    *   Reset only entries belonging to that contact ID.
+   *
    * @return string
    */
   public static function resetNavigation($contactID = NULL) {
@@ -684,8 +687,6 @@ ORDER BY parent_id, weight";
    *
    * @param array $params
    *   Associated array, $_GET.
-   *
-   * @return void
    */
   public static function processNavigation(&$params) {
     $nodeID = (int) str_replace("node_", "", $params['id']);
@@ -722,8 +723,6 @@ ORDER BY parent_id, weight";
    *   Parent id where node is moved. 0 mean no parent.
    * @param $position
    *   New position of the nod, it starts with 0 - n.
-   *
-   * @return void
    */
   public static function processMove($nodeID, $referenceID, $position) {
     // based on the new position we need to get the weight of the node after moved node
@@ -779,7 +778,7 @@ ORDER BY parent_id, weight";
   }
 
   /**
-   *  Function to process rename action for tree.
+   * Function to process rename action for tree.
    *
    * @param int $nodeID
    * @param $label
@@ -835,6 +834,8 @@ ORDER BY parent_id, weight";
   }
 
   /**
+   * Get cache key.
+   *
    * @param int $cid
    *
    * @return object|string
