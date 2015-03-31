@@ -1221,7 +1221,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['class'] .= ' huge';
         $props['multiple'] = 'multiple';
       }
-      // Set default options-url value. 
+      // Set default options-url value.
       if ((!isset($props['options-url']))) {
         $props['options-url'] = TRUE;
       }
