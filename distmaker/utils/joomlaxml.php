@@ -90,8 +90,10 @@ function generateJoomlaConfig($version) {
     $perm = $comp->getPermissions(FALSE, TRUE);
     if ($perm) {
       $info = $comp->getInfo();
-      foreach ($perm as $p) {
-        $permissions[$p] = $info['translatedName'] . ': ' . $p;
+      foreach ($perm as $p => $attr) {
+        $title = $info['translatedName'] . ': ' . array_shift($attr);
+        array_unshift($attr, $title);
+        $permissions[$p] = $attr;
       }
     }
   }
