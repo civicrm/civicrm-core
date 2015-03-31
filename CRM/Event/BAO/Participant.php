@@ -1922,16 +1922,15 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
         if (!in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedFieldValueIds) && $updateFinancialItemInfoValues['differenceAmt'] != 0) {
           // INSERT negative financial_items
           $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
-          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
-          // INSERT negative financial_items for tax amount
           if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-            $updateFinancialItemInfoValues['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
-            $updateFinancialItemInfoValues['description'] = $taxTerm;
+            $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
+            $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
             if ($updateFinancialItemInfoValues['financial_type_id']) {
-              $updateFinancialItemInfoValues['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
+              $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
             }
-            CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
           }
+          // INSERT negative financial_items for tax amount
+          $financialItemsArray[] = $updateFinancialItemInfoValues;
         }
         // if submitted and difference is 0 add a positive entry again
         elseif (in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedFieldValueIds) && $updateFinancialItemInfoValues['differenceAmt'] == 0) {
