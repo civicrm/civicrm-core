@@ -67,7 +67,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
       //CRM-16087 removed additional call to function relatedMemberships which is already called by disableEnableRelationship
       //resulting in memership being created twice
-      self::disableEnableRelationship($params['id'], $action, $params, $ids);
+      if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
+        $action = CRM_Core_Action::DISABLE;
+        $active = FALSE;
+      }
+      else {
+        $action = CRM_Core_Action::ENABLE;
+        $active = TRUE;
+      }
+      self::disableEnableRelationship($params['id'], $action, $params, $ids, $active);
     }
 
     self::addRecent($params, $relationship);
@@ -684,15 +692,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
           'contact_check' => array($relationship->contact_id_b => 1),
         );
-      }
-      else {
-        if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
-          $action = CRM_Core_Action::DISABLE;
-        }
-        else {
-          $action = CRM_Core_Action::ENABLE;
-          $active = TRUE;
-        }
       }
       $contact_id_a = empty($params['contact_id_a']) ? $relationship->contact_id_a : $params['contact_id_a'];
       // calling relatedMemberships to delete/add the memberships of
