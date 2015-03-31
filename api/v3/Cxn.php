@@ -88,7 +88,7 @@ function civicrm_api3_cxn_register($params) {
   }
   elseif (!empty($params['app_guid'])) {
     $appMeta = civicrm_api3('CxnApp', 'getsingle', array(
-      'app_guid' => $params['app_guid'],
+      'appId' => $params['app_guid'],
     ));
   }
 
