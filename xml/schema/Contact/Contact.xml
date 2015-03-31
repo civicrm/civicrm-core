@@ -272,7 +272,8 @@
     <comment>optional URL for preferred image (photo, logo, etc.) to display for this contact.</comment>
     <add>1.1</add>
     <html>
-      <type>Text</type>
+      <type>File</type>
+      <size>BIG</size>
     </html>
   </field>
   <field>
