@@ -831,4 +831,35 @@ class CRM_Utils_Array {
     return $output;
   }
 
+  /**
+   * Diff multidimensional arrays
+   * ( array_diff does not support multidimensional array)
+   *
+   * @param array $array1
+   * @param array $array2
+   * @return array
+   */
+  public static function multiArrayDiff($array1, $array2) {
+    $arrayDiff = array();
+    foreach ($array1 as $mKey => $mValue) {
+      if (array_key_exists($mKey, $array2)) {
+        if (is_array($mValue)) {
+          $recursiveDiff = self::multiArrayDiff($mValue, $array2[$mKey]);
+          if (count($recursiveDiff)) {
+            $arrayDiff[$mKey] = $recursiveDiff;
+          }
+        }
+        else {
+          if ($mValue != $array2[$mKey]) {
+            $arrayDiff[$mKey] = $mValue;
+          }
+        }
+      }
+      else {
+        $arrayDiff[$mKey] = $mValue;
+      }
+    }
+    return $arrayDiff;
+  }
+
 }
