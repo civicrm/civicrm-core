@@ -59,19 +59,49 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   /**
    * @inheritDoc
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'access CiviEvent',
-      'edit event participants',
-      'edit all events',
-      'register for events',
-      'view event info',
-      'view event participants',
-      'delete in CiviEvent',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviEvent' => array(
+        ts('access CiviEvent'),
+        ts('Create events, view all events, and view participant records (for visible contacts)'),
+      ),
+      'edit event participants' => array(
+        ts('edit event participants'),
+        ts('Record and update backend event registrations'),
+      ),
+      'edit all events' => array(
+        ts('edit all events'),
+        ts('Edit events even without specific ACL granted'),
+      ),
+      'register for events' => array(
+        ts('register for events'),
+        ts('Register for events online'),
+      ),
+      'view event info' => array(
+        ts('view event info'),
+        ts('View online event information pages'),
+      ),
+      'view event participants' => array(
+        ts('view event participants'),
+      ),
+      'delete in CiviEvent' => array(
+        ts('delete in CiviEvent'),
+        ts('Delete participants and events that you can edit'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
   /**

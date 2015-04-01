@@ -80,26 +80,34 @@ function generateJoomlaConfig($version) {
 
   require_once 'CRM/Core/Permission.php';
   require_once 'CRM/Utils/String.php';
-  $permissions = CRM_Core_Permission::getCorePermissions();
+  $permissions = CRM_Core_Permission::getCorePermissions(TRUE);
 
   $crmFolderDir = $sourceCheckoutDir . DIRECTORY_SEPARATOR . 'CRM';
 
   require_once 'CRM/Core/Component.php';
   $components = CRM_Core_Component::getComponentsFromFile($crmFolderDir);
   foreach ($components as $comp) {
-    $perm = $comp->getPermissions();
+    $perm = $comp->getPermissions(FALSE, TRUE);
     if ($perm) {
       $info = $comp->getInfo();
-      foreach ($perm as $p) {
-        $permissions[$p] = $info['translatedName'] . ': ' . $p;
+      foreach ($perm as $p => $attr) {
+        $title = $info['translatedName'] . ': ' . array_shift($attr);
+        array_unshift($attr, $title);
+        $permissions[$p] = $attr;
       }
     }
   }
 
   $perms_array = array();
-  foreach ($permissions as $perm => $title) {
+  foreach ($permissions as $perm => $attr) {
+    // give an empty string as default description
+    $attr[] = '';
+
     //order matters here, but we deal with that later
-    $perms_array[CRM_Utils_String::munge(strtolower($perm))] = $title;
+    $perms_array[CRM_Utils_String::munge(strtolower($perm))] = array(
+      'title' => array_shift($attr),
+      'description' => array_shift($attr),
+    );
   }
   $smarty->assign('permissions', $perms_array);
 
