@@ -441,21 +441,21 @@ WHERE     ct.id = cp.financial_type_id AND
    *   associative array of id => name
    */
   public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE) {
-    $query = '
-    SELECT
-       DISTINCT ( price_set_id ) as id, title
+    $query = 'SELECT
+       s.id, title
     FROM
-       civicrm_price_field,
-       civicrm_price_set
+       civicrm_price_set s
+       INNER JOIN civicrm_price_field f ON f.price_set_id = s.id
+       INNER JOIN civicrm_price_field_value v ON v.price_field_id = f.id
     WHERE
-       civicrm_price_set.id = civicrm_price_field.price_set_id  AND is_quick_config = 0 ';
+       is_quick_config = 0';
 
     if (!$withInactive) {
-      $query .= ' AND civicrm_price_set.is_active = 1 ';
+      $query .= ' AND s.is_active = 1 ';
     }
 
     if (self::eventPriceSetDomainID()) {
-      $query .= ' AND civicrm_price_set.domain_id = ' . CRM_Core_Config::domainID();
+      $query .= ' AND s.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     $priceSets = array();
@@ -465,9 +465,18 @@ WHERE     ct.id = cp.financial_type_id AND
       if (!$componentId) {
         return $priceSets;
       }
-      $query .= " AND civicrm_price_set.extends LIKE '%$componentId%' ";
+      $query .= " AND s.extends LIKE '%$componentId%' ";
     }
-
+    // Check permissioned financial types
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, 'add');
+    if ($financialType) {
+      $types = implode(',' , array_keys($financialType));
+      $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
+    }
+    else {
+      $query .= " AND 0 "; // Do not display any price sets
+    }
+    $query .= " GROUP BY s.id";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $priceSets[$dao->id] = $dao->title;
