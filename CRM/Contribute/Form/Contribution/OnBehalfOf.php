@@ -171,7 +171,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           $field['is_required'] = 1;
         }
 
-        CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, TRUE);
+        CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, 'onbehalf');
       }
     }
 

@@ -817,6 +817,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   $legacyreturnProperties = array();
   $otherVars = array(
     'sort', 'offset', 'rowCount', 'options', 'return',
+    'version', 'prettyprint', 'check_permissions', 'sequential',
   );
   foreach ($params as $n => $v) {
     if (substr($n, 0, 7) == 'return.') {
