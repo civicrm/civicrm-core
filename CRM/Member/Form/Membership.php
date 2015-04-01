@@ -1427,7 +1427,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       // do what used to happen previously
       else {
-      $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
+        $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
       }
       if ($params['contribution_status_id'] != array_search('Completed', $allContributionStatus)) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);
@@ -1647,7 +1647,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
         CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
       if ($contributionDetails[$membership->id]['contribution_status'] == 'Completed') {
-      $receiptSend = TRUE;
+        $receiptSend = TRUE;
       }
     }
 
