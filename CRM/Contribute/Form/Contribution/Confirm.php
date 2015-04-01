@@ -1554,6 +1554,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['frequency_interval'] = CRM_Utils_Array::value('frequency_interval', $params);
     $recurParams['installments'] = CRM_Utils_Array::value('installments', $params);
     $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+    $recurParams['currency'] = CRM_Utils_Array::value('currency', $params);
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
     // if separate payments is not enabled, make sure only the membership fee recurs
