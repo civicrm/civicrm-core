@@ -64,17 +64,19 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         'contactTarget' => $relationship->contact_id_b,
         'contact' => $params['contact_id_a'],
       );
-      CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $params, $ids, (empty($params['id']) ?
-        CRM_Core_Action::ADD : CRM_Core_Action::UPDATE));
-    }
 
-    // Alter related membership if the is_active param is changed.
-    if (!empty($params['id']) && array_key_exists('is_active', $params)) {
-      $action = CRM_Core_Action::DISABLE;
-      if (!empty($params['is_active'])) {
-        $action = CRM_Core_Action::ENABLE;
+      //CRM-16087 removed additional call to function relatedMemberships which is already called by disableEnableRelationship
+      //resulting in memership being created twice
+      if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
+        $action = CRM_Core_Action::DISABLE;
+        $active = FALSE;
       }
-      CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
+      else {
+        $action = CRM_Core_Action::ENABLE;
+        $active = TRUE;
+      }
+      $id = empty($params['id']) ? $relationship->id : $params['id'];
+      self::disableEnableRelationship($id, $action, $params, $ids, $active);
     }
 
     self::addRecent($params, $relationship);
@@ -680,35 +682,36 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param $action
    */
-  public static function disableEnableRelationship($id, $action) {
+  public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
 
     if (CRM_Core_Permission::access('CiviMember')) {
       // create $params array which is required to delete memberships
       // of the related contacts.
-      $params = array(
-        'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
-        'contact_check' => array($relationship->contact_id_b => 1),
-      );
-
-      $ids = array();
+      if (empty($params)) {
+        $params = array(
+          'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
+          'contact_check' => array($relationship->contact_id_b => 1),
+        );
+      }
+      $contact_id_a = empty($params['contact_id_a']) ? $relationship->contact_id_a : $params['contact_id_a'];
       // calling relatedMemberships to delete/add the memberships of
       // related contacts.
       if ($action & CRM_Core_Action::DISABLE) {
-        CRM_Contact_BAO_Relationship::relatedMemberships($relationship->contact_id_a,
+        CRM_Contact_BAO_Relationship::relatedMemberships($contact_id_a,
           $params,
           $ids,
           CRM_Core_Action::DELETE,
-          FALSE
+          $active
         );
       }
       elseif ($action & CRM_Core_Action::ENABLE) {
-        $ids['contact'] = $relationship->contact_id_a;
-        CRM_Contact_BAO_Relationship::relatedMemberships($relationship->contact_id_a,
+        $ids['contact'] = empty($ids['contact']) ? $contact_id_a : $ids['contact'];
+        CRM_Contact_BAO_Relationship::relatedMemberships($contact_id_a,
           $params,
           $ids,
-          CRM_Core_Action::ADD,
-          FALSE
+          empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE,
+          $active
         );
       }
     }
@@ -1488,8 +1491,8 @@ SELECT relationship_type_id, relationship_direction
             $relDirection = $dao->relationship_direction;
           }
           $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
-          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds)) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $mainRelatedContactId);
+          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds) && !empty($membershipValues['owner_membership_id'])) {
+            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
           continue;
         }
@@ -1575,9 +1578,17 @@ SELECT count(*)
           // membership=>relationship then we need to
           // delete the membership record created for
           // previous relationship.
-
-          if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, CRM_Utils_Array::value('relationship_ids', $params))) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $mainRelatedContactId);
+          // CRM-16087 we need to pass ownerMembershipId to deleteRelatedMemberships function
+          if (empty($params['relationship_ids']) && !empty($params['id'])) {
+            $relIds = array($params['id']);
+          }
+          else {
+            $relIds = CRM_Utils_Array::value('relationship_ids', $params);
+          }
+          if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
+          $relIds
+          ) && !empty($membershipValues['owner_membership_id'])) {
+            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
         }
       }
