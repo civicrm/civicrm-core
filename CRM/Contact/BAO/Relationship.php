@@ -75,7 +75,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $action = CRM_Core_Action::ENABLE;
         $active = TRUE;
       }
-      self::disableEnableRelationship($params['id'], $action, $params, $ids, $active);
+      $id = empty($params['id']) ? $relationship->id : $params['id'];
+      self::disableEnableRelationship($id, $action, $params, $ids, $active);
     }
 
     self::addRecent($params, $relationship);
@@ -705,7 +706,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         );
       }
       elseif ($action & CRM_Core_Action::ENABLE) {
-        $ids['contact'] = $relationship->contact_id_a;
+        $ids['contact'] = empty($ids['contact']) ? $contact_id_a : $ids['contact'];
         CRM_Contact_BAO_Relationship::relatedMemberships($contact_id_a,
           $params,
           $ids,
