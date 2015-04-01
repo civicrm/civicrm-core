@@ -191,6 +191,14 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 function civicrm_api3_contribution_delete($params) {
 
   $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
+  // First check contribution financial type
+  $financialType = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id');
+  
+  // Now check permissioned lineitems & permissioned contribution
+  if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialType)) || 
+    !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE)) {
+    return civicrm_api3_create_error('You do not have permission to delete this contribution');
+  }
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }
