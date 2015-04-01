@@ -717,10 +717,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $isPaidEvent = CRM_Utils_Array::value('is_monetary', $form->_values['event']);
     }
     if (!empty($form->_values['fee'])) {
-      foreach ($form->_values['fee'] as $fees) {
+      foreach ($form->_values['fee'] as $k => $fees) {
         foreach ($fees['options'] as $options) {
           if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+            unset($form->_values['fee'][$k]);
           }
         }
       }
