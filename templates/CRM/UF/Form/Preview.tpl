@@ -118,10 +118,7 @@
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if $n|substr:0:4 eq 'url-'}
-                  {assign var="websiteType" value=$n|cat:"-website_type_id"}
-                  {$form.$websiteType.html}&nbsp;
-                  {elseif $n|substr:0:3 eq 'im-'}
+                {if $n|substr:0:3 eq 'im-'}
                   {assign var="provider" value=$n|cat:"-provider_id"}
                   {$form.$provider.html}&nbsp;
                 {/if}
