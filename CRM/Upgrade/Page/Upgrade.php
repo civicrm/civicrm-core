@@ -142,7 +142,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
-    $postUpgradeMessage = '<span class="bold">' . ts('Congratulations! Your upgrade was successful! (... wasn\'t that easy!)') . '</span>';
+    $postUpgradeMessage = '<span class="bold">' . ts('Congratulations! Your upgrade was successful!') . '</span>';
 
     // lets drop all the triggers here
     CRM_Core_DAO::dropTriggers();
