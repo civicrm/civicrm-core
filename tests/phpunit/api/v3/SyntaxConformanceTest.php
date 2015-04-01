@@ -1074,9 +1074,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
-    $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
+    $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get', 'options' => array('get_options' => 'all')));
     if ($entityName != 'Pledge') {
-      $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
+      $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create', 'options' => array('get_options' => 'all')));
     }
     $fields = $fields['values'];
     $return = array_keys($fieldsGet['values']);
@@ -1179,23 +1179,27 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      if (!empty($specs['pseudoconstant'])) {
-        $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
-        if (empty($options['values'])) {
+      if (empty($specs['FKClassName']) && (!empty($specs['pseudoconstant']) || !empty($specs['options']))) {
+        $options = CRM_Utils_Array::value('options', $specs, array());
+        if (!$options) {
           //eg. pdf_format id doesn't ship with any
           if (isset($specs['pseudoconstant']['optionGroupName'])) {
-            $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array(
-                'name' => 'pdf_format',
-                'return' => 'id',
-              ));
             $optionValue = $this->callAPISuccess('option_value', 'create', array(
-                'option_group_id' => $optionGroupID,
+                'option_group_id' => $specs['pseudoconstant']['optionGroupName'],
                 'label' => 'new option value',
+                'sequential' => 1,
               ));
-            $options['values'][] = $optionValue['id'];
+            $optionValue = $optionValue['values'];
+            $options[$optionValue[0]['value']] = 'new option value';
           }
         }
-        $entity[$field] = array_rand($options['values']);
+        $entity[$field] = array_rand($options);
+      }
+      if (!empty($specs['FKClassName']) && !empty($specs['pseudoconstant'])) {
+        // in the weird situation where a field has both an fk and pseudoconstant defined,
+        // e.g. campaign_id field, need to flush caches.
+        // FIXME: Why doesn't creating a campaign clear caches?
+        civicrm_api3($entityName, 'getfields', array('cache_clear' => 1));
       }
       $updateParams = array(
         'id' => $entity['id'],
