@@ -259,9 +259,6 @@ function _civicrm_api3_event_getlist_output($result, $request) {
       if (!empty($row['summary'])) {
         $data['description'][] = $row['summary'];
       }
-      foreach ($request['extra'] as $field) {
-        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
-      }
       $output[] = $data;
     }
   }
