@@ -1,6 +1,78 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
+Key Contributors and Sponsors for 4.6
+************************************************
+
+CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
+               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi, 
+               Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
+               Yashodha Chaku
+ADG Communications - Steve Binkowski  
+AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
+Alex C
+Allan Chappell
+Amnesty International Spain - Carlos Capote
+Andy Clark
+Arete Imagine - Marisa Porter, Nate Porter
+Blackfly Solutions - Alan Dixon
+Botanical Society of America - Toby Lounsbury
+Christian Wach
+Chris Ward
+Circle Interactive - Dave Moreton, Andrew Walker, Dave Jenkins, Maya Gibbs
+CiviCoop - Erik Hommel, Jaap Jansma
+CiviDesk - Nicolas Ganivet, Sunil Pawar
+Community Human Services Corporation - Paul Mosey
+Compucorp - Jamie Novick, Greg Meszeros, Robin Mitra, Guanhuan Chen, Chanun Chirattikanon
+David Hepper
+Detlev Sieber
+Drishtant - Ruchi Kumar
+Drupal Association - Neil Drumm
+Freeform Solutions - Lola Slade
+Future First - David Knoll, John Prescott, Vitor Nobrega
+Fuzion, NZ - Chris Burgess, Eileen McNaughton, Peter Davis
+Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
+GMVCO Databases - Jon-man Cheung, Alex Lee, Craig Almond
+Google Summer of Code - Aditya Nambiar, Siddhant Rajagopalan, Torrance Hodgeson
+Gnu.org - David Thompson
+Jaka Kranjc
+JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
+Joanne Chester
+Johan Vervloet
+John Kingsnorth
+Kathryn Benedicto
+Han Velthuis
+Ken West
+Kirk Jackson
+Korlon - Stuart Gaston
+Lighthouse Consulting and Design - Brian Shaughnessy
+MC3 - Graham Mitchell
+Mission Matters - Joshua Aranda
+Mobius - Jeremy Proffitt
+Northbridge Digital - Oliver Gibson
+Symbiotic - Mathieu Lutfy, Samuel Vanhove
+National Democratic Institute - Chris Doten
+New York State Senate - Ken Zalewski
+Niro Solutions
+Palente Technology Cooperative - Jon Goldberg, Joseph Lacey
+Paul Campbell
+Pogstone - Sarah Gladstone
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Registered Nurses Association of Ontario - Stan Dragnev
+Richard Van Oosterhout
+Semper IT - Karin Gerritsen
+Skvare - Mark Hanna, Peter Petrik
+Squiffle Consulting - Aidan Saunders
+Stephen Palmstrom
+Systopia - Björn Endres, Fabian Schuttenberg, Martin Peth
+Tadpole - Dana Skallman, Kevin Cristiano
+Tech to the People - Xavier Dutoit
+Veda Consulting - Priyanka Karan, Parvez Saleh, Deepak Srivastava
+Web Access - Tony Mazzerella
+Wikimedia Foundation - Adam Wight
+Zing - Simon West, Andrew Tombs, Vivek Arora
+
+************************************************
 Key Contributors and Sponsors for 4.5
 ************************************************
 
