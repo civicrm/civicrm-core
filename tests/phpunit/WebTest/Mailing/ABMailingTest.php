@@ -103,6 +103,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//input[@name='subjectA']");
 
     //-------Compose Mail----------
+    $tokens = ' {domain.address}{action.optOutUrl}';
 
     // fill subject for mailing
     $MailingSubject = substr(sha1(rand()), 0, 7);
@@ -111,19 +112,20 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
 
     // HTML format message
     $HTMLMessage = "This is HTML formatted content for Mailing {$MailingSubject} Webtest.";
-    $this->fillRichTextField("crmUiId_1", $HTMLMessage);
+    $this->fillRichTextField("crmUiId_1", $HTMLMessage . $tokens);
 
-    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
-    $this->waitForTextPresent($HTMLMessage);
-    $this->waitForAjaxContent();
-    $this->click("xpath=//button[@title='Close']");
+    // FIXME: Selenium can't access content in an iframe
+    //$this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
+    //$this->waitForTextPresent($HTMLMessage);
+    //$this->waitForAjaxContent();
+    //$this->click("xpath=//button[@title='Close']");
 
     // Open Plain-text Format pane and type text format msg
-    $this->click("//div[text()='Plain Text']");
-    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.");
+    $this->click("//div[starts-with(text(),'Plain Text')]");
+    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
-    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.");
+    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
     $this->waitForAjaxContent();
     $this->click("xpath=//button[@title='Close']");
 
@@ -267,6 +269,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//input[@name='subject']");
 
     //-------Compose Mail----------
+    $tokens = ' {domain.address}{action.optOutUrl}';
 
     // fill subject for mailing
     $MailingSubject = substr(sha1(rand()), 0, 7);
@@ -281,19 +284,20 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
 
     // HTML format message
     $HTMLMessage = "This is HTML formatted content for Mailing {$MailingSubject} Webtest.";
-    $this->fillRichTextField("crmUiId_1", $HTMLMessage);
+    $this->fillRichTextField("crmUiId_1", $HTMLMessage . $tokens);
 
-    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
-    $this->waitForTextPresent($HTMLMessage);
-    $this->waitForAjaxContent();
-    $this->click("xpath=//button[@title='Close']");
+    // FIXME: Selenium can't access content in an iframe
+    //$this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
+    //$this->waitForTextPresent($HTMLMessage);
+    //$this->waitForAjaxContent();
+    //$this->click("xpath=//button[@title='Close']");
 
     // Open Plain-text Format pane and type text format msg
-    $this->click("//div[text()='Plain Text']");
-    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.");
+    $this->click("//div[starts-with(text(),'Plain Text')]");
+    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
-    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.");
+    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
     $this->waitForAjaxContent();
     $this->click("xpath=//button[@title='Close']");
 
@@ -419,6 +423,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//input[@name='subjectA']");
 
     //-------Compose A----------
+    $tokens = ' {domain.address}{action.optOutUrl}';
 
     // fill subject for mailing
     $AMailingSubject = substr(sha1(rand()), 0, 7);
@@ -426,16 +431,17 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
 
     // HTML format message
     $AHTMLMessage = "This is HTML formatted content for Mailing {$AMailingSubject} Webtest.";
-    $this->fillRichTextField("crmUiId_19", $AHTMLMessage);
+    $this->fillRichTextField("crmUiId_19", $AHTMLMessage . $tokens);
 
-    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
-    $this->waitForTextPresent($AHTMLMessage);
-    $this->waitForAjaxContent();
-    $this->click("xpath=//button[@title='Close']");
+    // FIXME: Selenium can't access content in an iframe
+    //$this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
+    //$this->waitForTextPresent($AHTMLMessage);
+    //$this->waitForAjaxContent();
+    //$this->click("xpath=//button[@title='Close']");
 
     // Open Plain-text Format pane and type text format msg
-    $this->click("//div[text()='Plain Text']");
-    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$AMailingSubject} Webtest.");
+    $this->click("//div[starts-with(text(),'Plain Text')]");
+    $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$AMailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
     $this->waitForTextPresent("This is text formatted content for Mailing {$AMailingSubject} Webtest.");
@@ -455,16 +461,17 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
 
     // HTML format message
     $BHTMLMessage = "This is HTML formatted content for Mailing {$BMailingSubject} Webtest.";
-    $this->fillRichTextField("crmUiId_28", $BHTMLMessage);
+    $this->fillRichTextField("crmUiId_28", $BHTMLMessage . $tokens);
 
-    $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
-    $this->waitForTextPresent($BHTMLMessage);
-    $this->waitForAjaxContent();
-    $this->click("xpath=//button[@title='Close']");
+    // FIXME: Selenium can't access content in an iframe
+    //$this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as HTML']");
+    //$this->waitForTextPresent($BHTMLMessage);
+    //$this->waitForAjaxContent();
+    //$this->click("xpath=//button[@title='Close']");
 
     // Open Plain-text Format pane and type text format msg
     $this->click("xpath=//div[@id='tab-mailingB']//div[text()='Plain Text']");
-    $this->type("xpath=//div[@id='tab-mailingB']//*[@name='body_text']", "This is text formatted content for Mailing {$BMailingSubject} Webtest.");
+    $this->type("xpath=//div[@id='tab-mailingB']//*[@name='body_text']", "This is text formatted content for Mailing {$BMailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@crm-mailing='abtest.mailings.b']//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
     $this->waitForTextPresent("This is text formatted content for Mailing {$BMailingSubject} Webtest.");
