@@ -262,9 +262,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->waitForAjaxContent();
     //Assertions
     $subtractedTotal = $this->_getPremiumActualCost($contId, NULL, 'Payment Processor Account');
-    $this->assertEquals($subtractedTotal, -$amount, "Verify amount deleted from old account");
+    $this->assertEquals($subtractedTotal, NULL, "Verify amount deleted from old account");
     $totalAmount = $this->_getPremiumActualCost($contId, NULL, 'Accounts Receivable');
-    $this->assertEquals($totalAmount, $amount, "Verify amount for newly inserted values");
+    $this->assertEquals($totalAmount, NULL, "Verify amount for newly inserted values");
   }
 
   public function testRefundContribution() {
