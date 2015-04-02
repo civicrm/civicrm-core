@@ -1155,8 +1155,6 @@ SELECT is_primary,
       $relationshipType = 'Household Member of';
     }
 
-    $cid = array('contact' => $currentContactId);
-
     $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $relationshipType, 'id', 'name_a_b');
 
     if (!$relTypeId) {
@@ -1168,7 +1166,7 @@ SELECT is_primary,
       civicrm_api3('relationship', 'create', array(
         'is_active' => TRUE,
         'relationship_type_id' => $relTypeId,
-        'contact_id_a' => $cid,
+        'contact_id_a' => $currentContactId,
         'contact_id_b' => $sharedContactId,
       ));
     }
