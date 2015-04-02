@@ -34,6 +34,7 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   protected $api_key;
   protected $session_id;
   protected $nocms_contact_id;
+  protected $old_api_keys;
 
   /**
    * @param $apiResult
@@ -59,9 +60,19 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     if (!property_exists($this->settings, 'adminApiKey') || empty($this->settings->adminApiKey)) {
       $this->markTestSkipped('CiviSeleniumSettings is missing adminApiKey');
     }
+
+    $this->old_api_keys = array();
   }
 
   protected function tearDown() {
+    if (!empty($this->old_api_keys)) {
+      foreach ($this->old_api_keys as $cid => $apiKey) {
+        $this->webtest_civicrm_api('Contact', 'create', array(
+          'id' => $cid,
+          'api_key' => $apiKey,
+        ));
+      }
+    }
     parent::tearDown();
     if (isset($this->nocms_contact_id)) {
       $deleteParams = array(
@@ -193,6 +204,8 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
    * @param $is_error
    */
   public function testAPICalls($query, $is_error) {
+    $this->updateAdminApiKey();
+
     $client = CRM_Utils_HttpClient::singleton();
     list($status, $data) = $client->post($this->url, $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
@@ -265,6 +278,26 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
     $result = json_decode($data, TRUE);
     $this->assertNotNull($result);
     $this->assertAPIErrorCode($result, 1);
+  }
+
+  protected function updateAdminApiKey() {
+    $this->webtestLogin($this->settings->adminUsername, $this->settings->adminPassword);
+    $adminContact = $this->webtestGetLoggedInContact();
+    $this->webtestLogout();
+
+    $this->old_api_keys[$adminContact['id']] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1', array(
+      1 => array($adminContact['id'], 'Positive'),
+    ));
+
+    //$this->old_admin_api_key = $this->webtest_civicrm_api('Contact', 'get', array(
+    //  'id' => $adminContact['id'],
+    //  'return' => 'api_key',
+    //));
+
+    $this->webtest_civicrm_api('Contact', 'create', array(
+      'id' => $adminContact['id'],
+      'api_key' => $this->settings->adminApiKey,
+    ));
   }
 
 }
