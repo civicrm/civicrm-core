@@ -201,7 +201,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
         //go to next page
         $this->click("xpath=//div[@class='crm-search-results']/div[@class='crm-pager']/span[@class='crm-pager-nav']/a[@title='next page']");
-        $this->waitForElementPresent("task");
+        $this->waitForElementPresent("xpath=//a[@title='first page']");
         $j = $j + $subTotal;
       }
 
