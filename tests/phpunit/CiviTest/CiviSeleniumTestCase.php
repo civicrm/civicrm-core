@@ -2295,15 +2295,31 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Select multiple options.
    * @param $fieldid
    * @param $params
+   * @param $isDate if multiple date is to be selected from datepicker
    */
-  public function multiselect2($fieldid, $params) {
+  public function multiselect2($fieldid, $params, $isDate = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
     foreach ($params as $value) {
-      $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
-      $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
-      $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
-      $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
+      if ($isDate) {
+        $timeStamp = strtotime($value ? $value : '+1 month');
+        $year = date('Y', $timeStamp);
+        // -1 ensures month number is inline with calender widget's month
+        $mon = date('n', $timeStamp) - 1;
+        $day = date('j', $timeStamp);
+
+        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+        $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
+        $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
+        $this->select("css=div#ui-datepicker-div div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-year", "value=$year");
+        $this->click("link=$day");
+      }
+      else {
+        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+        $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
+        $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
+        $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
+      }
     }
     // Wait a sec for select2 to update the original element
     sleep(1);
