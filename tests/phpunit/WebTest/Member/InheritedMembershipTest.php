@@ -386,7 +386,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // click through to the membership view screen after edit
     $this->click('css=li#tab_member a');
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
-    $this->assertEquals(2, $this->getText("xpath=//li[@id='tab_member']/a/em"));
+    $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_member']/a/em"));
 
     $url = $this->parseURL($this->getAttribute("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']@href"));
     $actualMembershipId1 = $url['queryString']['id'];
@@ -394,13 +394,14 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // click through to the activity view screen after edit
     $this->click('css=li#tab_activity a');
     $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']");
-    $this->assertEquals(2, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
+    $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_activity']/a/em"));
     $url = $this->parseURL($this->getAttribute("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr/td[8]/span/a[text()='View']@href"));
     $actualMembershipActivityId1 = $url['queryString']['id'];
 
     // verify membership id and membership activity id with previous one
+    // FIXME: These 2 lines are currently failing because the inherited membership and signup activity or being recreated when contact is edited/saved. dgg
     $this->assertEquals($expectedMembershipId, $actualMembershipId1);
-    $this->assertNotEquals($expectedMembershipId, $actualMembershipActivityId1);
+    $this->assertNotEquals($expectedMembershipActivityId, $actualMembershipActivityId1);
 
     // click through to the relationship view screen after edit
     $this->click('css=li#tab_rel a');
