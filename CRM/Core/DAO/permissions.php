@@ -107,6 +107,14 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
+  // Allow non-admins to get and create tags to support tagset widget
+  // Delete is still reserved for admins
+  $permissions['tag'] = array(
+    'get' => array('access CiviCRM'),
+    'create' => array('access CiviCRM'),
+    'update' => array('access CiviCRM'),
+  );
+
   //relationship permissions
   $permissions['relationship'] = array(
     'get' => array(
