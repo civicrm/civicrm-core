@@ -357,7 +357,7 @@
           }
         };
 
-        /// @return string HTML representingn an option
+        // @return string HTML representing an option
         function formatItem(item) {
           if (!item.id) {
             // return `text` for optgroup
@@ -369,7 +369,7 @@
           if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
-          return "<img src='../../sites/all/modules/civicrm/i/" + icon + "' height=12 width=12 /> <span class='" + spanClass + "'>" + item.text + "</span>";
+          return '<img src="' + CRM.config.resourceBase + 'i/' + icon + '" height="12" width="12" /> <span class="' + spanClass + '">' + item.text + '</span>';
         }
 
         function validate() {
