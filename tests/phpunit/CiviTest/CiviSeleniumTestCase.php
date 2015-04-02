@@ -315,13 +315,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     $result = civicrm_api($entity, $action, $params);
-    $this->assertTrue(!civicrm_error($result), 'Civicrm api error.');
+    $this->assertAPISuccess($result);
     return $result;
   }
 
   /**
-   * Call the API on the remote server.
-   * Experimental - currently only works if permissions on remote site allow anon user to access ajax api
+   * Call the API on the remote server using the AJAX endpoint.
+   *
    * @see CRM-11889
    * @param $entity
    * @param $action
@@ -332,17 +332,28 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $params += array(
       'version' => 3,
     );
-    $url = "{$this->settings->sandboxURL}/{$this->sboxPath}civicrm/ajax/rest?entity=$entity&action=$action&json=" . json_encode($params);
-    $request = array(
-      'http' => array(
-        'method' => 'POST',
-        // Naughty sidestep of civi's security checks
-        'header' => "X-Requested-With: XMLHttpRequest",
-      ),
+    static $reqId = 0;
+    $reqId++;
+
+    $jsCmd = '
+      setTimeout(function(){
+        CRM.api3("@entity", "@action", @params).then(function(a){
+          cj("<textarea>").css("display", "none").prop("id","crmajax@reqId").val(JSON.stringify(a)).appendTo("body");
+        });
+      }, 500);
+    ';
+    $jsArgs = array(
+      '@entity' => $entity,
+      '@action' => $action,
+      '@params' => json_encode($params),
+      '@reqId' => $reqId,
     );
-    $ctx = stream_context_create($request);
-    $result = file_get_contents($url, FALSE, $ctx);
-    return json_decode($result, TRUE);
+    $js = strtr($jsCmd, $jsArgs);
+    $this->runScript($js);
+    $this->waitForElementPresent("crmajax{$reqId}");
+    $result = json_decode($this->getValue("crmajax{$reqId}"), TRUE);
+    $this->runScript("cj('#crmajax{$reqId}').remove();");
+    return $result;
   }
 
   /**
@@ -2356,6 +2367,34 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
       $this->fail($msg);
     }
+  }
+
+  /**
+   * @return array
+   *   Contact record (per APIv3).
+   */
+  public function webtestGetLoggedInContact() {
+    $result = $this->rest_civicrm_api('Contact', 'get', array(
+      'id' => 'user_contact_id',
+    ));
+    $this->assertAPISuccess($result, 'Load logged-in contact');
+    return CRM_Utils_Array::first($result['values']);
+  }
+
+  public function assertAPISuccess($apiResult, $prefix = '') {
+    if (!empty($prefix)) {
+      $prefix .= ': ';
+    }
+    $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
+
+    if (!empty($apiResult['debug_information'])) {
+      $errorMessage .= "\n " . print_r($apiResult['debug_information'], TRUE);
+    }
+    if (!empty($apiResult['trace'])) {
+      $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
+    }
+    $this->assertFalse(civicrm_error($apiResult), $prefix . $errorMessage);
+    //$this->assertEquals(0, $apiResult['is_error']);
   }
 
 }
