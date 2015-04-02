@@ -404,6 +404,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
+      $update = TRUE;
       $params['id'] = $this->_relationshipId;
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
@@ -437,6 +438,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Save the relationships.
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
     $relationshipIds = $outcome['relationship_ids'];
+    if (empty($outcome['saved']) && !empty($update)) {
+      $outcome['saved'] = $update;
+    }
     $this->setMessage($outcome);
 
     // if this is called from case view,
@@ -526,7 +530,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *   - 'saved' : boolean of whether save was successful
    */
   protected function setMessage($outcome) {
-    if (!empty($outcome['valid'])) {
+    if (!empty($outcome['valid']) && empty($outcome['saved'])) {
       CRM_Core_Session::setStatus(ts('Relationship created.', array(
         'count' => $outcome['valid'],
         'plural' => '%count relationships created.',
