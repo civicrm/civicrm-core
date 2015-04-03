@@ -66,14 +66,22 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->_exportColumnCount = $this->get('exportColumnCount');
+    $this->_mappingId = $this->get('mappingId');
+
     if (!$this->_exportColumnCount) {
-      $this->_exportColumnCount = 10;
+      // Set default from saved mapping
+      if ($this->_mappingId) {
+        $mapping = new CRM_Core_DAO_MappingField();
+        $mapping->mapping_id = $this->_mappingId;
+        $this->_exportColumnCount = $mapping->count();
+      }
+      else {
+        $this->_exportColumnCount = 10;
+      }
     }
     else {
-      $this->_exportColumnCount = $this->_exportColumnCount + 10;
+      $this->_exportColumnCount += 10;
     }
-
-    $this->_mappingId = $this->get('mappingId');
   }
 
   public function buildQuickForm() {
