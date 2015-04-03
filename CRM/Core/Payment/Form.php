@@ -392,6 +392,7 @@ class CRM_Core_Payment_Form {
         'state_province' => "billing_state_province-$id",
         'postal_code' => "billing_postal_code-$id",
         'country' => "billing_country-$id",
+        'contactID' => 'contact_id',
       );
     }
 
