@@ -587,7 +587,9 @@ abstract class CRM_Utils_Hook {
    *   - name: string, eg "sql:civicrm_email:contact_id"
    *   - type: string, eg "sql"
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
-   * @return void
+   *
+   * @return mixed
+   *   Return is not really intended to be used.
    */
   public static function referenceCounts($dao, &$refCounts) {
     return self::singleton()->invoke(2, $dao, $refCounts,
@@ -925,13 +927,15 @@ abstract class CRM_Utils_Hook {
    *
    * Definition will look like this:
    *
-   *   function hook_civicrm_alterPaymentProcessorParams($paymentObj,
-   *                                                     &$rawParams, &$cookedParams);
+   *   function hook_civicrm_alterPaymentProcessorParams(
+   *     $paymentObj,
+   *     &$rawParams,
+   *     &$cookedParams
+   *   );
    *
-   * See discussion in CRM-16224 as to whether $paymentObj should be passed by reference.
-   *
-   * @param string $paymentObj
-   *    instance of payment class of the payment processor invoked (e.g., 'CRM_Core_Payment_Dummy')
+   * @param CRM_Core_Payment $paymentObj
+   *   Instance of payment class of the payment processor invoked (e.g., 'CRM_Core_Payment_Dummy')
+   *   See discussion in CRM-16224 as to whether $paymentObj should be passed by reference.
    * @param array &$rawParams
    *    array of params as passed to to the processor
    * @param array &$cookedParams
