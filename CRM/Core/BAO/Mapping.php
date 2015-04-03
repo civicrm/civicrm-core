@@ -408,7 +408,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
         //get the component payment fields
         if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
-          require_once 'CRM/Export/BAO/Export.php';
           $componentPaymentFields = array();
           foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
             $componentPaymentFields[$payField] = array('title' => $payTitle);
