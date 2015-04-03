@@ -29,7 +29,7 @@ WHERE option_group_id = @option_group_id_notePrivacy AND value = 1;
 
 --These labels were never translated so just copy them over as names
 UPDATE civicrm_option_value v, civicrm_option_group g
-SET v.name = v.label
+SET v.name = {localize field='label'}v.label{/localize} 
 WHERE g.id = v.option_group_id AND g.name IN
 ('group_type', 'safe_file_extension', 'wysiwyg_editor');
 
