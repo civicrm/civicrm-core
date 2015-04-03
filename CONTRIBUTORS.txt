@@ -13,6 +13,7 @@ AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
 Alex C
 Allan Chappell
 Amnesty International Spain - Carlos Capote
+Andreas Hennings
 Andy Clark
 Arete Imagine - Marisa Porter, Nate Porter
 Blackfly Solutions - Alan Dixon
@@ -28,9 +29,11 @@ David Hepper
 Detlev Sieber
 Drishtant - Ruchi Kumar
 Drupal Association - Neil Drumm
+Elliott Eggleston
 Freeform Solutions - Lola Slade
 Future First - David Knoll, John Prescott, Vitor Nobrega
 Fuzion, NZ - Chris Burgess, Eileen McNaughton, Peter Davis
+Giantrabbit - Anthony Nemirovsky, Peter Haight
 Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
 GMVCO Databases - Jon-man Cheung, Alex Lee, Craig Almond
 Google Summer of Code - Aditya Nambiar, Siddhant Rajagopalan, Torrance Hodgeson
@@ -40,12 +43,15 @@ JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
 Joanne Chester
 Johan Vervloet
 John Kingsnorth
+jsnyder83
 Kathryn Benedicto
 Han Velthuis
 Ken West
 Kirk Jackson
 Korlon - Stuart Gaston
 Lighthouse Consulting and Design - Brian Shaughnessy
+Mattias Michaux
+Max
 MC3 - Graham Mitchell
 Mission Matters - Joshua Aranda
 Mobius - Jeremy Proffitt
@@ -60,15 +66,20 @@ Pogstone - Sarah Gladstone
 Progressive Tech Project - Alice Aguilar, Jamie McClelland
 Registered Nurses Association of Ontario - Stan Dragnev
 Richard Van Oosterhout
+Seamus Lee
 Semper IT - Karin Gerritsen
 Skvare - Mark Hanna, Peter Petrik
 Squiffle Consulting - Aidan Saunders
 Stephen Palmstrom
-Systopia - Björn Endres, Fabian Schuttenberg, Martin Peth
+Systopia - Björn Endres, Fabian Schuttenberg, Martin Peth, Niko Bochan
 Tadpole - Dana Skallman, Kevin Cristiano
 Tech to the People - Xavier Dutoit
+TeNNoX
+Tim Mallezie
+Toke Høiland-Jørgensen
 Veda Consulting - Priyanka Karan, Parvez Saleh, Deepak Srivastava
-Web Access - Tony Mazzerella
+William Theaker
+Web Access - Tony Mazzerella, Nileema Jadhav, Parag Bhilkar, Pratiksha Dubey, Manish More
 Wikimedia Foundation - Adam Wight
 Zing - Simon West, Andrew Tombs, Vivek Arora
 
