@@ -105,6 +105,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
         ),
         array(
           'type' => 'done',
+          'icon' => 'close',
           'name' => ts('Done'),
         ),
       )
