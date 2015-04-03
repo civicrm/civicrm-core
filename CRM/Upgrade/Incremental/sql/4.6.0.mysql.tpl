@@ -29,15 +29,13 @@ WHERE option_group_id = @option_group_id_notePrivacy AND value = 1;
 
 --These labels were never translated so just copy them over as names
 {if $multilingual}
-  {foreach from=$locales item=locale}
-    UPDATE civicrm_option_value v, civicrm_option_group g
-      SET v.name = v.label_{$locale}
-    WHERE g.id = v.option_group_id AND g.name IN
-    ('group_type', 'safe_file_extension', 'wysiwyg_editor');
-  {/foreach}
+  UPDATE civicrm_option_value v, civicrm_option_group g
+  SET v.name = v.label_{$locales.0}
+  WHERE g.id = v.option_group_id AND g.name IN
+  ('group_type', 'safe_file_extension', 'wysiwyg_editor');
 {else}
   UPDATE civicrm_option_value v, civicrm_option_group g
-    SET v.name = v.label
+  SET v.name = v.label
   WHERE g.id = v.option_group_id AND g.name IN
   ('group_type', 'safe_file_extension', 'wysiwyg_editor');
 {/if}
