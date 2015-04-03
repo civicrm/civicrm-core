@@ -928,6 +928,8 @@ abstract class CRM_Utils_Hook {
    *   function hook_civicrm_alterPaymentProcessorParams($paymentObj,
    *                                                     &$rawParams, &$cookedParams);
    *
+   * See discussion in CRM-16224 as to whether $paymentObj should be passed by reference.
+   *
    * @param string $paymentObj
    *    instance of payment class of the payment processor invoked (e.g., 'CRM_Core_Payment_Dummy')
    * @param array &$rawParams
@@ -936,6 +938,7 @@ abstract class CRM_Utils_Hook {
    *     params after the processor code has translated them into its own key/value pairs
    *
    * @return mixed
+   *   This return is not really intended to be used.
    */
   public static function alterPaymentProcessorParams(
     $paymentObj,
