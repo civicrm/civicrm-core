@@ -208,7 +208,8 @@ VALUES
    ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1, 0),
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
-   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1);
+   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1),
+   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , 1, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -286,6 +287,7 @@ SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where na
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
+SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -947,7 +949,13 @@ VALUES
 
 -- Reminder Options for Contact Date Fields
 (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
+(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+
+-- Relative Date Filters
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Month{/ts}', 'previous.month', 'previous.month', NULL, NULL, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Week{/ts}', 'previous.week', 'previous.week', NULL, NULL, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Month{/ts}', 'this.month', 'this.month', NULL, NULL, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Week{/ts}', 'this.week', 'this.week', NULL, NULL, NULL, 4, NULL, 0, 0, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
