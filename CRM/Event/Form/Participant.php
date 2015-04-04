@@ -1189,7 +1189,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (!empty($this->_params['send_receipt'])) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+
+      // The only reason for merging in the 'contact_id' rather than ensuring it is set
+      // is that this patch is being done around the time of the stable release
+      // so more conservative approach is called for.
+      // In fact the use of $params and $this->_params & $this->_contactId vs $contactID
+      // needs rationalising.
+      $mapParams = array_merge(array('contact_id' => $contactID), $this->_params);
+      CRM_Core_Payment_Form::mapParams($this->_bltID, $mapParams, $paymentParams, TRUE);
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
@@ -1228,7 +1235,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'financial_type_id');
       $this->_params['mode'] = $this->_mode;
 
-      //add contribution reocord
+      //add contribution record
       $contributions[] = $contribution = CRM_Event_Form_Registration_Confirm::processContribution($this, $this->_params, $result, $contactID, FALSE);
 
       // add participant record
