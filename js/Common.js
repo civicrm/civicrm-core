@@ -281,8 +281,8 @@ CRM.strings = CRM.strings || {};
     _.each(options, function(option) {
       if (option.children) {
         rendered += '<optgroup label="' + esc(option.value) + '">' +
-          CRM.utils.renderOptions(option.children, val) +
-          '</optgroup>';
+        CRM.utils.renderOptions(option.children, val) +
+        '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
         rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
@@ -311,11 +311,11 @@ CRM.strings = CRM.strings || {};
     }
   }
 
-/**
- * Compare Form Input values against cached initial value.
- *
- * @return {Boolean} true if changes have been made.
- */
+  /**
+   * Compare Form Input values against cached initial value.
+   *
+   * @return {Boolean} true if changes have been made.
+   */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
     $(':input:visible, .select2-container:visible+:input:hidden', el).not('[type=submit], [type=button], .crm-action-menu, :disabled').each(function () {
@@ -329,7 +329,7 @@ CRM.strings = CRM.strings || {};
     });
     return isDirty;
   };
-  
+
   /**
    * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
    *
@@ -356,7 +356,7 @@ CRM.strings = CRM.strings || {};
     }
     return settings;
   };
-  
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -732,11 +732,11 @@ CRM.strings = CRM.strings || {};
     }
     var markup = '<div class="crm-entityref-filters">' +
       '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
-        '<option value="">' + ts('Refine search...') + '</option>' +
-        CRM.utils.renderOptions(filters, filter.key) +
+      '<option value="">' + ts('Refine search...') + '</option>' +
+      CRM.utils.renderOptions(filters, filter.key) +
       '</select> &nbsp; ' +
       '<select class="crm-entityref-filter-value' + (filter.key ? ' active"' : '"') + (filter.key ? '' : ' style="display:none;"') + '>' +
-        '<option value="">' + ts('- select -') + '</option>';
+      '<option value="">' + ts('- select -') + '</option>';
     if (filterSpec && filterSpec.options) {
       markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
     }
@@ -870,14 +870,13 @@ CRM.strings = CRM.strings || {};
     .on('submit', function(e) {
       // CRM-14353 - disable changes warn when submitting a form
       $('[data-warn-changes]').attr('data-warn-changes', 'false');
-    })
-   ;
+    });
 
   // CRM-14353 - Warn of unsaved changes for forms which have opted in
   window.onbeforeunload = function() {
     if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]:visible'))) {
       return ts('You have unsaved changes.');
-     }
+    }
   };
 
   /**
