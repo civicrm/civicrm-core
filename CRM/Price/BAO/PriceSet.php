@@ -1005,7 +1005,7 @@ WHERE  id = %1";
    */
   public static function checkCurrentMembership(&$options, $userid) {
     if (!$userid || empty($options)) {
-      return;
+      return FALSE;
     }
     static $_contact_memberships = array();
     $checkLifetime = FALSE;
