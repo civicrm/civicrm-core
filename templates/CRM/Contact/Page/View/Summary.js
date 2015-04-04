@@ -11,7 +11,7 @@
       // Copied from crm.ajax.js
       if (window.CKEDITOR && window.CKEDITOR.instances) {
         $.each(CKEDITOR.instances, function() {
-          this.updateElement && this.updateElement();
+          if (this.updateElement) this.updateElement();
         });
       }
       if (window.tinyMCE && tinyMCE.editors) {
