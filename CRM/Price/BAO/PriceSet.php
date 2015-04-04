@@ -713,7 +713,7 @@ WHERE  id = %1";
    * @param $lineItem
    * @param string $component
    */
-  public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();

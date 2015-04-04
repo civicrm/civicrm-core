@@ -61,8 +61,7 @@ class CRM_Event_Form_EventFees {
     if ($form->_eventId &&
       ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
     ) {
-      $config = CRM_Core_Config::singleton();
-      $config->defaultCurrency = $currency;
+      CRM_Core_Config::singleton()->defaultCurrency = $currency;
     }
   }
 
