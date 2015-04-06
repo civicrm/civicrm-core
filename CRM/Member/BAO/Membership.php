@@ -1354,6 +1354,9 @@ AND civicrm_membership.is_test = %2";
     if ($isProcessSeparateMembershipTransaction) {
       try {
         $lineItems = $form->_lineItem = $membershipLineItems;
+        if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
+          unset($membershipParams['is_recur']);
+        }
         $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipParams, $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
       }
       catch (CRM_Core_Exception $e) {
