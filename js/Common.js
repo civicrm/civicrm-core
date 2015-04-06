@@ -1337,13 +1337,14 @@ CRM.strings = CRM.strings || {};
    * @return string
    */
   var currencyTemplate;
-  CRM.formatMoney = function(value, format) {
+  CRM.formatMoney = function(value, format, onlyNumber) {
     var decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
       return;
     }
     format = format || currencyTemplate;
+    onlyNumber = onlyNumber || false;
     result = /1(.?)234(.?)56/.exec(format);
     if (result === null) {
       return 'Invalid format passed to CRM.formatMoney';
@@ -1355,6 +1356,9 @@ CRM.strings = CRM.strings || {};
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
+    if ( onlyNumber ) {
+      return result;
+    }
     return format.replace(/1.*234.*56/, result);
   };
 
