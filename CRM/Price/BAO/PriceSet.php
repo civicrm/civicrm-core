@@ -917,6 +917,13 @@ WHERE  id = %1";
 
     $priceSet = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet = CRM_Utils_Array::value($priceSetId, $priceSet);
+    foreach ($form->_priceSet['fields'] as $key => $value) {
+      foreach ($value['options'] as $options) {
+        if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+          unset($form->_priceSet['fields'][$key]);
+        }
+      }
+    }
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
     $form->_quickConfig = $quickConfig = 0;
     if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
