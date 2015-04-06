@@ -110,7 +110,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
         $op = key($params['role_id']);
         $params['role_id'] = $params['role_id'][$op];
       }
-      $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
+      else {
+        $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
+      }
     }
 
     $participantBAO = new CRM_Event_BAO_Participant();
