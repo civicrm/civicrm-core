@@ -555,7 +555,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $dateElement
    * @param null $strToTimeArgs
    */
-  public function webtestFillDate($dateElement, $strToTimeArgs = NULL) {
+  public function webtestFillDate($dateElement, $strToTimeArgs = NULL, $multiselect = FALSE) {
     $timeStamp = strtotime($strToTimeArgs ? $strToTimeArgs : '+1 month');
 
     $year = date('Y', $timeStamp);
@@ -563,7 +563,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $mon = date('n', $timeStamp) - 1;
     $day = date('j', $timeStamp);
 
-    $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
+    if (!$multiselect) {
+      $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
+    }
     $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
     $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
     $this->select("css=div#ui-datepicker-div div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-year", "value=$year");
@@ -2302,17 +2304,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForElementNotPresent('css=select.loading');
     foreach ($params as $value) {
       if ($isDate) {
-        $timeStamp = strtotime($value ? $value : '+1 month');
-        $year = date('Y', $timeStamp);
-        // -1 ensures month number is inline with calender widget's month
-        $mon = date('n', $timeStamp) - 1;
-        $day = date('j', $timeStamp);
-
         $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
-        $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
-        $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
-        $this->select("css=div#ui-datepicker-div div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-year", "value=$year");
-        $this->click("link=$day");
+        $this->webtestFillDate($fieldid, $value, TRUE);
       }
       else {
         $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
