@@ -106,7 +106,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     // ensure that role ids are encoded as a string
     if (isset($params['role_id']) && is_array($params['role_id'])) {
-      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators())) {
+      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
         $op = key($params['role_id']);
         $params['role_id'] = $params['role_id'][$op];
       }
