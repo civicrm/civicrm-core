@@ -225,10 +225,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // (i.e., the amount NOT associated with the membership). Temporarily
         // cache the is_recur values so we can process the additional gift as a
         // one-off payment.
-        if ($form->_membershipBlock['is_separate_payment']) {
+        if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
           $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
-          unset($form->_values['is_recur']);
           $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
+          unset($form->_values['is_recur']);
           unset($paymentParams['is_recur']);
         }
 
@@ -244,7 +244,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         );
 
         // restore cached values (part of fix for CRM-14354)
-        if ($form->_membershipBlock['is_separate_payment']) {
+        if (!empty($cachedFormValue)) {
           $form->_values['is_recur'] = $cachedFormValue;
           $paymentParams['is_recur'] = $cachedParamValue;
         }
