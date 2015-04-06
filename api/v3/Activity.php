@@ -483,9 +483,6 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
           1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['source_contact_id'], 'display_name'),
         ));
       }
-      foreach ($request['extra'] as $field) {
-        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
-      }
       $output[] = $data;
     }
   }

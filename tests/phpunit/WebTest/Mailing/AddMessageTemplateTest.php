@@ -120,10 +120,14 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("~1 recipient");
     $this->click("msg_template_id");
     $this->select("msg_template_id", "label=$msgTitle");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(5);
+    
+    $this->waitForAjaxContent();
+    $this->select2('s2id_autogen1', "Unsubscribe via web page");
+    $this->select2('s2id_autogen1', "Domain (organization) address");
+    $this->waitForAjaxContent();
+    $this->select2('s2id_autogen3', "Unsubscribe via web page");
+    $this->select2('s2id_autogen3', "Domain (organization) address");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
     $this->click('subject');
 

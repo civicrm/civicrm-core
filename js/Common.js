@@ -281,8 +281,8 @@ CRM.strings = CRM.strings || {};
     _.each(options, function(option) {
       if (option.children) {
         rendered += '<optgroup label="' + esc(option.value) + '">' +
-          CRM.utils.renderOptions(option.children, val) +
-          '</optgroup>';
+        CRM.utils.renderOptions(option.children, val) +
+        '</optgroup>';
       } else {
         var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
         rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
@@ -311,11 +311,11 @@ CRM.strings = CRM.strings || {};
     }
   }
 
-/**
- * Compare Form Input values against cached initial value.
- *
- * @return {Boolean} true if changes have been made.
- */
+  /**
+   * Compare Form Input values against cached initial value.
+   *
+   * @return {Boolean} true if changes have been made.
+   */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
     $(':input:visible, .select2-container:visible+:input:hidden', el).not('[type=submit], [type=button], .crm-action-menu, :disabled').each(function () {
@@ -329,7 +329,7 @@ CRM.strings = CRM.strings || {};
     });
     return isDirty;
   };
-  
+
   /**
    * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
    *
@@ -356,7 +356,7 @@ CRM.strings = CRM.strings || {};
     }
     return settings;
   };
-  
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -732,11 +732,11 @@ CRM.strings = CRM.strings || {};
     }
     var markup = '<div class="crm-entityref-filters">' +
       '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
-        '<option value="">' + ts('Refine search...') + '</option>' +
-        CRM.utils.renderOptions(filters, filter.key) +
+      '<option value="">' + ts('Refine search...') + '</option>' +
+      CRM.utils.renderOptions(filters, filter.key) +
       '</select> &nbsp; ' +
       '<select class="crm-entityref-filter-value' + (filter.key ? ' active"' : '"') + (filter.key ? '' : ' style="display:none;"') + '>' +
-        '<option value="">' + ts('- select -') + '</option>';
+      '<option value="">' + ts('- select -') + '</option>';
     if (filterSpec && filterSpec.options) {
       markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
     }
@@ -870,72 +870,14 @@ CRM.strings = CRM.strings || {};
     .on('submit', function(e) {
       // CRM-14353 - disable changes warn when submitting a form
       $('[data-warn-changes]').attr('data-warn-changes', 'false');
-    })
-   ;
+    });
 
   // CRM-14353 - Warn of unsaved changes for forms which have opted in
   window.onbeforeunload = function() {
     if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]:visible'))) {
       return ts('You have unsaved changes.');
-     }
+    }
   };
-
-  /**
-   * Function to make multiselect boxes behave as fields in small screens
-   */
-  function advmultiselectResize() {
-    var amswidth = $("#crm-container form:has(table.advmultiselect)").width();
-    if (amswidth < 700) {
-      $("form table.advmultiselect td").css('display', 'block');
-    }
-    else {
-      $("form table.advmultiselect td").css('display', 'table-cell');
-    }
-    var contactwidth = $('#crm-container #mainTabContainer').width();
-    if (contactwidth < 600) {
-      $('#crm-container #mainTabContainer').addClass('narrowpage');
-      $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
-        if (index > 1) {
-          if (index % 2 === 0) {
-            $(this).parent().after('<tr class="narrowadded"></tr>');
-          }
-          var item = $(this);
-          $(this).parent().next().append(item);
-        }
-      });
-    }
-    else {
-      $('#crm-container #mainTabContainer.narrowpage').removeClass('narrowpage');
-      $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each(function () {
-        var nitem = $(this);
-        var parent = $(this).parent();
-        $(this).parent().prev().append(nitem);
-        if (parent.children().size() === 0) {
-          parent.remove();
-        }
-      });
-      $('#crm-container #mainTabContainer.narrowpage #contactTopBar tr.added').detach();
-    }
-    var cformwidth = $('#crm-container #Contact .contact_basic_information-section').width();
-
-    if (cformwidth < 720) {
-      $('#crm-container .contact_basic_information-section').addClass('narrowform');
-      $('#crm-container .contact_basic_information-section table.form-layout-compressed td .helpicon').parent().addClass('hashelpicon');
-      if (cformwidth < 480) {
-        $('#crm-container .contact_basic_information-section').addClass('xnarrowform');
-      }
-      else {
-        $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
-      }
-    }
-    else {
-      $('#crm-container .contact_basic_information-section.narrowform').removeClass('narrowform');
-      $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
-    }
-  }
-
-  advmultiselectResize();
-  $(window).resize(advmultiselectResize);
 
   $.fn.crmtooltip = function () {
     $(document)

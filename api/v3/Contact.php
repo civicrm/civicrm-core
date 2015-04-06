@@ -1133,9 +1133,6 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
       else {
         $data['icon_class'] = $row['contact_type'];
       }
-      foreach ($request['extra'] as $field) {
-        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
-      }
       $output[] = $data;
     }
   }

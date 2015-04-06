@@ -11,7 +11,7 @@
       // Copied from crm.ajax.js
       if (window.CKEDITOR && window.CKEDITOR.instances) {
         $.each(CKEDITOR.instances, function() {
-          this.updateElement && this.updateElement();
+          if (this.updateElement) this.updateElement();
         });
       }
       if (window.tinyMCE && tinyMCE.editors) {
@@ -346,5 +346,55 @@
           reloadBlock(data.reloadBlocks.join(','));
         }
       });
+
+    /**
+     * Make contact summary fit in small screens
+     */
+    function onResize() {
+      var contactwidth = $('#crm-container #mainTabContainer').width();
+      if (contactwidth < 600) {
+        $('#crm-container #mainTabContainer').addClass('narrowpage');
+        $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
+          if (index > 1) {
+            if (index % 2 === 0) {
+              $(this).parent().after('<tr class="narrowadded"></tr>');
+            }
+            var item = $(this);
+            $(this).parent().next().append(item);
+          }
+        });
+      }
+      else {
+        $('#crm-container #mainTabContainer.narrowpage').removeClass('narrowpage');
+        $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each(function () {
+          var nitem = $(this);
+          var parent = $(this).parent();
+          $(this).parent().prev().append(nitem);
+          if (parent.children().size() === 0) {
+            parent.remove();
+          }
+        });
+        $('#crm-container #mainTabContainer.narrowpage #contactTopBar tr.added').detach();
+      }
+      var cformwidth = $('#crm-container #Contact .contact_basic_information-section').width();
+
+      if (cformwidth < 720) {
+        $('#crm-container .contact_basic_information-section').addClass('narrowform');
+        $('#crm-container .contact_basic_information-section table.form-layout-compressed td .helpicon').parent().addClass('hashelpicon');
+        if (cformwidth < 480) {
+          $('#crm-container .contact_basic_information-section').addClass('xnarrowform');
+        }
+        else {
+          $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
+        }
+      }
+      else {
+        $('#crm-container .contact_basic_information-section.narrowform').removeClass('narrowform');
+        $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
+      }
+    }
+
+    onResize();
+    $(window).resize(onResize);
   });
 })(CRM.$, CRM._);

@@ -351,6 +351,9 @@ class CRM_Core_Payment_Form {
   /**
    * Make sure that credit card number and cvv are valid.
    * Called within the scope of a QF formRule function
+   *
+   * @param array $values
+   * @param array $errors
    */
   public static function validateCreditCard($values, &$errors) {
     if (!empty($values['credit_card_type']) || !empty($values['credit_card_number'])) {
@@ -371,13 +374,11 @@ class CRM_Core_Payment_Form {
    * Map address fields.
    *
    * @param int $id
-   * @param $src
-   * @param $dst
+   * @param array $src
+   * @param array $dst
    * @param bool $reverse
-   *
-   * @return void
    */
-  public static function mapParams($id, &$src, &$dst, $reverse = FALSE) {
+  public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
     static $map = NULL;
     if (!$map) {
       $map = array(
@@ -391,6 +392,7 @@ class CRM_Core_Payment_Form {
         'state_province' => "billing_state_province-$id",
         'postal_code' => "billing_postal_code-$id",
         'country' => "billing_country-$id",
+        'contactID' => 'contact_id',
       );
     }
 
