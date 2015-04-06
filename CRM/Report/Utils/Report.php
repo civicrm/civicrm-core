@@ -281,7 +281,7 @@ WHERE  inst.report_id = %1";
             }
           }
           elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024) {
-            $value = CRM_Utils_Money::format($value);
+            $value = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
           }
           $displayRows[$v] = '"' . $value . '"';
         }

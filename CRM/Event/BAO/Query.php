@@ -542,13 +542,18 @@ class CRM_Event_BAO_Query {
 
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
-    $eventId = $form->addEntityRef('event_id', ts('Event Name'), array(
+    $form->addEntityRef('event_id', ts('Event Name'), array(
         'entity' => 'event',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),
+        'api' => array(
+          'params' => array(
+            'api.RecurringEntity.getcount' => array('entity_id' => "\$value.id", 'entity_table' => "civicrm_event"),
+          ),
+        ),
       )
     );
-    $eventType = $form->addEntityRef('event_type_id', ts('Event Type'), array(
+    $form->addEntityRef('event_type_id', ts('Event Type'), array(
         'entity' => 'option_value',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),
@@ -560,7 +565,8 @@ class CRM_Event_BAO_Query {
     $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
-    $eventIncludeRepeatingEvents = &$form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include Repeating Events?'));
+
+    $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', array(1 => '<em>%1</em>')));
 
     $form->addSelect('participant_status_id',
       array('entity' => 'participant', 'label' => ts('Participant Status'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))

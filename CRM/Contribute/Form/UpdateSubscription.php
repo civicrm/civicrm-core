@@ -151,7 +151,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       array(
         'size' => 20,
       ), TRUE,
-      'currency', NULL, TRUE
+      'currency', $this->_subscriptionDetails->currency, TRUE
     );
 
     $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), TRUE);

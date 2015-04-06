@@ -58,6 +58,8 @@ function civicrm_api3_generic_getList($apiRequest) {
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
   $values = $fnName($result, $request);
 
+  _civicrm_api3_generic_getlist_postprocess($result, $request, $values);
+
   $output = array('page_num' => $request['page_num']);
 
   // Limit is set for searching but not fetching by id
@@ -176,13 +178,36 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
       }
-      foreach ($request['extra'] as $field) {
-        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
-      }
       $output[] = $data;
     }
   }
   return $output;
+}
+
+/**
+ * Common postprocess for getlist output
+ *
+ * @param $result
+ * @param $request
+ * @param $values
+ */
+function _civicrm_api3_generic_getlist_postprocess($result, $request, &$values) {
+  $chains = array();
+  foreach ($request['params'] as $field => $param) {
+    if (substr($field, 0, 4) === 'api.') {
+      $chains[] = $field;
+    }
+  }
+  if (!empty($result['values'])) {
+    foreach (array_values($result['values']) as $num => $row) {
+      foreach ($request['extra'] as $field) {
+        $values[$num]['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+      }
+      foreach ($chains as $chain) {
+        $values[$num][$chain] = isset($row[$chain]) ? $row[$chain] : NULL;
+      }
+    }
+  }
 }
 
 /**

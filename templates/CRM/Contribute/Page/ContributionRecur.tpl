@@ -69,7 +69,7 @@
         {foreach from=$recurRows item=row}
             {assign var=id value=$row.id}
             <tr id="contribution_recur-{$row.id}" data-action="cancel" class="crm-entity {cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
-                <td>{$row.amount|crmMoney}{if $row.is_test} ({ts}test{/ts}){/if}</td>
+                <td>{$row.amount|crmMoney:$row.currency}{if $row.is_test} ({ts}test{/ts}){/if}</td>
                 <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
                 <td>{$row.start_date|crmDate}</td>
                 <td>{$row.installments}</td>

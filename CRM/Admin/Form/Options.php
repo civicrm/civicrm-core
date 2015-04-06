@@ -115,17 +115,18 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
    *
    * @return void
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    if (!isset($defaults['weight']) || !$defaults['weight']) {
-      $fieldValues = array('option_group_id' => $this->_gid);
-      $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
+    // Default weight & value
+    $fieldValues = array('option_group_id' => $this->_gid);
+    foreach (array('weight', 'value') as $field) {
+      if (empty($defaults[$field])) {
+        $defaults[$field] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues, $field);
+      }
     }
 
     //setDefault of contact types for email greeting, postal greeting, addressee, CRM-4575

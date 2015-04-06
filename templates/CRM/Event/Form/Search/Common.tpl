@@ -25,8 +25,10 @@
 *}
 <tr>
   <td class="crm-event-form-block-event_id">
-      {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} <br/>
-      {$form.event_include_repeating_events.label}&nbsp;&nbsp;{$form.event_include_repeating_events.html}
+      {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge}
+      <div class="crm-event-form-block-event_include_repeating_events">
+        {$form.event_include_repeating_events.label}&nbsp;&nbsp;{$form.event_include_repeating_events.html}
+      </div>
   </td>
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
@@ -81,6 +83,18 @@ campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
+  var recurringLabel = $('label[for=event_include_repeating_events]').html();
+  // Conditional rule for recurring checkbox
+  function toggleRecurrigCheckbox() {
+    if ($(this).val() && $(this).select2('data')['api.RecurringEntity.getcount']) {
+      $('.crm-event-form-block-event_include_repeating_events').show();
+      $('label[for=event_include_repeating_events]').html(recurringLabel.replace('%1', $(this).select2('data').label));
+    } else {
+      $('.crm-event-form-block-event_include_repeating_events').hide().find('input').prop('checked', false);
+    }
+  }
+  $('#event_id').each(toggleRecurrigCheckbox).change(toggleRecurrigCheckbox);
+
   // FIXME: This could be much simpler as an entityRef field but the priceFieldValue api doesn't currently support the filters we need
   $('#participant_fee_id').crmSelect2({
     placeholder: {/literal}'{ts escape="js"}- any -{/ts}'{literal},

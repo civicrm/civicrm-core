@@ -207,6 +207,27 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Getter for the payment processor.
+   *
+   * The payment processor array is based on the civicrm_payment_processor table entry.
+   *
+   * @return array
+   *   Payment processor array.
+   */
+  public function getPaymentProcessor() {
+    return $this->_paymentProcessor;
+  }
+
+  /**
+   * Setter for the payment processor.
+   *
+   * @param array $processor
+   */
+  public function setPaymentProcessor($processor) {
+    $this->_paymentProcessor = $processor;
+  }
+
+  /**
    * Setter for the payment form that wants to use the processor.
    *
    * @deprecated

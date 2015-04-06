@@ -1132,7 +1132,7 @@ UPDATE  civicrm_activity
       case 'activity_type_id':
         $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
         if ($campaignCompId) {
-          $params['condition'] = array("component_id={$campaignCompId}", "v.name != 'Petition'");
+          $params['condition'] = array("component_id={$campaignCompId}");
         }
         break;
     }

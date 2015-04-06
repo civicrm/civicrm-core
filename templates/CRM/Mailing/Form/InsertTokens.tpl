@@ -167,9 +167,6 @@ function selectValue( val, prefix) {
       if (prefix == "SMS") {
           text_message = "sms_text_message";
       }
-      else {
-        cj("#subject").val( data.subject );
-      }
       if ( data.msg_text ) {
         cj("#"+text_message).val( data.msg_text );
         cj("div.text").show();
@@ -183,6 +180,9 @@ function selectValue( val, prefix) {
 
     if (prefix == "SMS") {
       return;
+    }
+    else {
+      cj("#subject").val( data.subject );
     }
     var html_body  = "";
     if (  data.msg_html ) {

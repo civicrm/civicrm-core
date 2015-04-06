@@ -111,6 +111,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public $_isUpdateDupe = 0;
 
+  /**
+   * Dedupe using a specific rule (CRM-6131).
+   * Not currently exposed in profile settings, but can be set in a buildForm hook.
+   */
+  public $_ruleGroupID = NULL;
+
   public $_isAddCaptcha = FALSE;
 
   protected $_isPermissionedChecksum = FALSE;
@@ -953,7 +959,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams,
         $ctype,
         $ruleType,
-        $exceptions
+        $exceptions,
+        $form->_ruleGroupID
       );
       if ($ids) {
         if ($form->_isUpdateDupe == 2) {
