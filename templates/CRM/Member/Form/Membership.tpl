@@ -397,12 +397,12 @@
           else {
       var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
           }
-          cj("#total_amount").val( feeTotal.toFixed(2) );
+          cj("#total_amount").val(CRM.formatMoney(feeTotal, '', true));
         }
         else {
     if (taxRate) {
             var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
-      cj("#total_amount").val( feeTotal );
+      cj("#total_amount").val(CRM.formatMoney(feeTotal, '', true));
           }
           else {
       var feeTotal = allMemberships[memType]['total_amount'];
