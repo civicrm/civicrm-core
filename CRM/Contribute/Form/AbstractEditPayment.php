@@ -421,6 +421,9 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
+        if (!empty($processor['description'])) {
+          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        }
       }
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
