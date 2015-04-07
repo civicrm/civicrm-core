@@ -120,7 +120,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
       'is_active' => 1,
-      'return' => array('name', 'component_type', 'is_default'),
+      'return' => array('name', 'component_type', 'is_default', 'body_html', 'body_text'),
     ));
 
     $emailAdd = civicrm_api3('Email', 'get', array(
