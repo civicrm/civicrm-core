@@ -195,6 +195,8 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
         unset($financialType[$key]);
       }
     }
+    // Check permissioned financial types
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, 'add');
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
