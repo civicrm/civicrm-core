@@ -208,8 +208,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view') {
-    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    
+    if (empty($financialTypes)) {
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    }
     foreach ($financialTypes as $finTypeId => $type) {
       if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
