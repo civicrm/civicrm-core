@@ -64,11 +64,11 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
         else {
           $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid);
         }
+        CRM_Utils_System::redirect($redirect);
       }
-      CRM_Utils_System::redirect($redirect);
       if ($mid && !$continue) {
-        CRM_Core_Error::fatal('Not implemented: Re-use mailing');
-        // CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid));
+        $clone = civicrm_api3('Mailing', 'clone', array('id' => $mid));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $clone['id']));
       }
     }
 
