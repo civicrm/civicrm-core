@@ -84,7 +84,7 @@ class Main extends \CRM_Core_Page {
     $this->res->addScriptFile('civicrm', 'bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
 
     // FIXME: crmUi depends on loading ckeditor, but ckeditor doesn't work with this aggregation.
-    $this->res->addScriptFile('civicrm', 'packages/ckeditor/ckeditor.js', 100, 'html-header', FALSE);
+    $this->res->addScriptFile('civicrm', 'packages/ckeditor/ckeditor.js', 100, 'page-header', FALSE);
 
     $config = \CRM_Core_Config::singleton();
     if ($config->debug) {
