@@ -185,7 +185,7 @@
       // ex: var msgs = findMissingTokens(mailing, 'body_html');
       findMissingTokens: function(mailing, field) {
         var missing = {};
-        if (!_.isEmpty(mailing[field])) {
+        if (!_.isEmpty(mailing[field]) && !CRM.crmMailing.disableMandatoryTokensCheck) {
           var body = '';
           if (mailing.footer_id) {
             var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
