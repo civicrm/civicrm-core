@@ -1333,18 +1333,18 @@ CRM.strings = CRM.strings || {};
   /**
    * Clientside currency formatting
    * @param number value
+   * @param [optional] boolean onlyNumber - if true, we return formated amount without currency sign
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */
   var currencyTemplate;
-  CRM.formatMoney = function(value, format, onlyNumber) {
+  CRM.formatMoney = function(value, onlyNumber, format) {
     var decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
       return;
     }
     format = format || currencyTemplate;
-    onlyNumber = onlyNumber || false;
     result = /1(.?)234(.?)56/.exec(format);
     if (result === null) {
       return 'Invalid format passed to CRM.formatMoney';
