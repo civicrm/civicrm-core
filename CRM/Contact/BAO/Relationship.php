@@ -1554,6 +1554,10 @@ SELECT relationship_type_id, relationship_direction
             }
 
             if ($action & CRM_Core_Action::UPDATE) {
+              //if updated relationship is already related to contact don't delete existing inherited membership
+              if (in_array($relTypeId, $relTypeIds) && !empty($values[$relatedContactId]['memberships'])) {
+                continue;
+              }
               //delete the membership record for related
               //contact before creating new membership record.
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
@@ -1600,7 +1604,7 @@ SELECT count(*)
    */
   public static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (in_array($relTypeId, $relTypeIds)) {
-      return TRUE;
+      return FALSE;
     }
 
     if (empty($relIds)) {
