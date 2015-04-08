@@ -4,8 +4,8 @@
   //   scope.myAbtest = new CrmMailingAB();
   //   <crm-mailing-ab-block-mailing="{fromAddressA: 1, fromAddressB: 1}" crm-abtest="myAbtest" />
   var simpleDirectives = {
-    crmMailingAbBlockMailing: '~/crmMailingAB/joint-mailing.html',
-    crmMailingAbBlockSetup: '~/crmMailingAB/setup.html'
+    crmMailingAbBlockMailing: '~/crmMailingAB/BlockMailing.html',
+    crmMailingAbBlockSetup: '~/crmMailingAB/BlockSetup.html'
   };
   _.each(simpleDirectives, function (templateUrl, directiveName) {
     angular.module('crmMailingAB').directive(directiveName, function ($parse, crmMailingABCriteria, crmUiHelp) {
@@ -35,7 +35,7 @@
     return {
       require: '?ngModel',
       scope: {},
-      templateUrl: '~/crmMailingAB/slider.html',
+      templateUrl: '~/crmMailingAB/Slider.html',
       link: function (scope, element, attrs, ngModel) {
         var TEST_MIN = 1, TEST_MAX = 50;
         var sliders = $('.slider-test,.slider-win', element);
