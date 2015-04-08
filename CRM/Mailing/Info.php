@@ -83,12 +83,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'ang/crmMailingAB/*/*.js',
       ),
       'css' => array('ang/crmMailingAB.css'),
-      'partials' => array('partials/crmMailingAB', 'ang/crmMailingAB'),
+      'partials' => array('ang/crmMailingAB'),
     );
     $result['crmD3'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmD3.js',
+        'ang/crmD3.js',
         'bower_components/d3/d3.min.js',
       ),
     );
