@@ -82,16 +82,32 @@ class Main extends \CRM_Core_Page {
 
     $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
     $this->res->addScriptFile('civicrm', 'bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
-    $headOffset = 0;
-    foreach ($modules as $moduleName => $module) {
-      foreach ($this->angular->getStyleUrls($moduleName) as $url) {
-        $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+
+    // FIXME: crmUi depends on loading ckeditor, but ckeditor doesn't work with this aggregation.
+    $this->res->addScriptFile('civicrm', 'packages/ckeditor/ckeditor.js', 100, 'page-header', FALSE);
+
+    $config = \CRM_Core_Config::singleton();
+    if ($config->debug) {
+      $headOffset = 0;
+      foreach ($modules as $moduleName => $module) {
+        foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
+          $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+        }
+        foreach ($this->angular->getResources($moduleName, 'js', 'cacheUrl') as $url) {
+          $this->res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+          // addScriptUrl() bypasses the normal string-localization of addScriptFile(),
+          // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
+        }
       }
-      foreach ($this->angular->getScriptUrls($moduleName) as $url) {
-        $this->res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
-        // addScriptUrl() bypasses the normal string-localization of addScriptFile(),
-        // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
-      }
+    }
+    else {
+      // Note: addScriptUrl() bypasses the normal string-localization of addScriptFile(),
+      // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
+      $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      $this->res->addScriptUrl($aggScriptUrl, 120, 'html-header');
+
+      $aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      $this->res->addStyleUrl($aggStyleUrl, 120, 'html-header');
     }
   }
 
