@@ -5,7 +5,7 @@
     '$routeProvider',
     function ($routeProvider) {
       $routeProvider.when('/abtest', {
-        templateUrl: '~/crmMailingAB/list.html',
+        templateUrl: '~/crmMailingAB/ListCtrl.html',
         controller: 'CrmMailingABListCtrl',
         resolve: {
           mailingABList: function ($route, crmApi) {
@@ -29,7 +29,7 @@
         }
       });
       $routeProvider.when('/abtest/:id', {
-        templateUrl: '~/crmMailingAB/main.html',
+        templateUrl: '~/crmMailingAB/EditCtrl/main.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
           abtest: function ($route, CrmMailingAB) {
@@ -171,7 +171,7 @@
           1: mailingName.toUpperCase()
         })
       });
-      return myAutosave.suspend(dialogService.open('selectWinnerDialog', '~/crmMailingAB/selectWinner.html', model, options));
+      return myAutosave.suspend(dialogService.open('selectWinnerDialog', '~/crmMailingAB/WinnerDialogCtrl.html', model, options));
     };
 
     // initialize
