@@ -483,10 +483,7 @@ $(function($) {
             $('#additional_profile_pre,#additional_profile_post').show();
         }
 
-        showRuleFields({/literal}{$ruleFields}{literal});
     });
-
-    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
 
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
