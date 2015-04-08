@@ -2779,7 +2779,7 @@ WHERE  contribution_id = %1 ";
         'trxn_date' => date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
-        'net_amount' => CRM_Utils_Array::value('net_amount', $params, $params['total_amount']),
+        'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $statusId,
@@ -3276,6 +3276,7 @@ WHERE  contribution_id = %1 ";
       $params['partial_payment_total'] = $contributionDAO->total_amount;
       $params['partial_amount_pay'] = $trxnsData['total_amount'];
       $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
+      $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
