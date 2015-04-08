@@ -61,7 +61,7 @@ class Manager {
       );
       $angularModules['crmApp'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmApp.js'),
+        'js' => array('ang/crmApp.js'),
       );
       $angularModules['crmAttachment'] = array(
         'ext' => 'civicrm',
