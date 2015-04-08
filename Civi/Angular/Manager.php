@@ -90,7 +90,7 @@ class Manager {
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-util.js'),
+        'js' => array('ang/crmUtil.js'),
       );
       // https://github.com/jwstadler/angular-jquery-dialog-service
       $angularModules['dialogService'] = array(
