@@ -690,9 +690,15 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //add field for amount to allow an amount to be entered that differs from minimum
       $this->add('text', 'total_amount', ts('Amount'));
     }
+    if (CRM_Core_Action::ADD & $this->_action) {
+      $op = 'add';
+    }
+    else if (CRM_Core_Action::UPDATE & $this->_action) {
+      $op = 'edit';
+    }
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+      array('' => ts('- select -')) + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $op)
     );
 
     //CRM-10223 - allow contribution to be recorded against different contact
