@@ -13,14 +13,14 @@
       });
 
       var editorPaths = {
-        '': '~/crmMailing/edit.html',
-        '/unified': '~/crmMailing/edit-unified.html',
-        '/unified2': '~/crmMailing/edit-unified2.html',
-        '/wizard': '~/crmMailing/edit-wizard.html'
+        '': '~/crmMailing/EditMailingCtrl/2step.html',
+        '/unified': '~/crmMailing/EditMailingCtrl/unified.html',
+        '/unified2': '~/crmMailing/EditMailingCtrl/unified2.html',
+        '/wizard': '~/crmMailing/EditMailingCtrl/wizard.html'
       };
       angular.forEach(editorPaths, function(editTemplate, pathSuffix) {
         if (CRM && CRM.crmMailing && CRM.crmMailing.workflowEnabled) {
-          editTemplate = '~/crmMailing/edit-workflow.html'; // override
+            editTemplate = '~/crmMailing/EditMailingCtrl/workflow.html'; // override
         }
         $routeProvider.when('/mailing/new' + pathSuffix, {
           template: '<p>' + ts('Initializing...') + '</p>',
