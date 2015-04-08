@@ -399,9 +399,9 @@
       // @return Promise
       preview: function preview(mailing, mode) {
         var templates = {
-          html: '~/crmMailing/dialog/previewHtml.html',
-          text: '~/crmMailing/dialog/previewText.html',
-          full: '~/crmMailing/dialog/previewFull.html'
+          html: '~/crmMailing/PreviewMgr/html.html',
+          text: '~/crmMailing/PreviewMgr/text.html',
+          full: '~/crmMailing/PreviewMgr/full.html'
         };
         var result = null;
         var p = crmMailingMgr

@@ -64,7 +64,7 @@
           1: $scope.getRecipientsEstimate()
         })
       });
-      dialogService.open('recipDialog', '~/crmMailing/dialog/recipients.html', model, options);
+      dialogService.open('recipDialog', '~/crmMailing/PreviewRecipCtrl.html', model, options);
     };
 
     // Open a dialog for editing the advanced recipient options.
@@ -80,7 +80,7 @@
           fields: fields,
           mailing: mailing
         };
-        dialogService.open('previewComponentDialog', '~/crmMailing/dialog/recipientOptions.html', model, options);
+        dialogService.open('previewComponentDialog', '~/crmMailing/EditRecipOptionsDialogCtrl.html', model, options);
       });
     };
   });

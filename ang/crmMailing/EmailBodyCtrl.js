@@ -31,7 +31,7 @@
         lastEmailTokenAlert = crmUiAlert({
           type: 'error',
           title: ts('Required tokens'),
-          templateUrl: '~/crmMailing/dialog/tokenAlert.html',
+          templateUrl: '~/crmMailing/EmailBodyCtrl/tokenAlert.html',
           scope: angular.extend($scope.$new(), {
             insertable: insertable,
             insertToken: function(token) {
