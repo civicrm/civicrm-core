@@ -1056,6 +1056,17 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
         $membership['status_id'],
         'is_current_member', 'id'
       );
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $membership['id'],
+        'owner_membership_id', 'id'
+      );
+      if ($ownerMemberId) {
+        $membership['id'] = $membership['membership_id'] = $ownerMemberId;
+        $membership['membership_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $membership['id'],
+          'contact_id', 'id'
+        );
+      }
       return $membership;
     }
 
