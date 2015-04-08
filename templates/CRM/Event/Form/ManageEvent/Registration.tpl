@@ -424,6 +424,7 @@ invert              = 0
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
     function addBottomProfile( e ) {
+        var urlPath;
         e.preventDefault();
 
         var addtlPartc = $(this).data('addtlPartc');
@@ -490,9 +491,9 @@ $(function($) {
 
     $('#crm-container').on('crmLoad', function(e) {
         $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
-            $input = $(e.target);
+            var $input = $(e.target);
             if ( $input.val() == '') {
-                $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
+                var $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
                 if ($selected.text() == strSelect) { $input.val('none'); }
             }
         });
