@@ -71,7 +71,7 @@ class Manager {
       );
       $angularModules['crmAutosave'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAutosave.js'),
+        'js' => array('ang/crmAutosave.js'),
       );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
