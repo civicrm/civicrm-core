@@ -51,4 +51,14 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
     $this->_cache = array();
   }
 
+  /**
+   * Get a list of all cache items.
+   *
+   * Note: This is NOT part of the general caching interface and
+   * should not generally be used. It is intended for unit-testing.
+   */
+  public function getAll() {
+    return $this->_cache;
+  }
+
 }
