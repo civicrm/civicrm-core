@@ -81,9 +81,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'ang/crmMailingAB.js',
         'ang/crmMailingAB/*.js',
         'ang/crmMailingAB/*/*.js',
-        'js/angular-crmMailingAB/*.js',
       ),
-      'css' => array('css/angular-crmMailingAB.css'),
+      'css' => array('ang/crmMailingAB.css'),
       'partials' => array('partials/crmMailingAB', 'ang/crmMailingAB'),
     );
     $result['crmD3'] = array(
