@@ -6,7 +6,9 @@ CRM.$(function($) {
       'url': CRM.url('civicrm/ajax/batch')
     };
 
-    $("#Entry").ajaxSubmit(options);
+    $("#Entry").ajaxSubmit(options).on('click', function() {
+      $(this).block();
+    });
 
     // validate rows
     checkColumns($(this));
