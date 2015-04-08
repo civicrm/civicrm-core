@@ -75,8 +75,8 @@ class Manager {
       );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
-      //  'js' => array('js/angular-crmExample.js'),
-      //  'partials' => array('partials/crmExample'),
+      //  'js' => array('ang/crmExample.js'),
+      //  'partials' => array('ang/crmExample'),
       //);
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
