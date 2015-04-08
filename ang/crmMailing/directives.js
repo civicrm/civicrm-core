@@ -1,43 +1,5 @@
 (function (angular, $, _) {
 
-  // The following directives have the same simple implementation -- load
-  // a template and export a "mailing" object into scope.
-  var simpleBlocks = {
-    crmMailingBlockApprove: '~/crmMailing/approve.html',
-    crmMailingBlockHeaderFooter: '~/crmMailing/headerFooter.html',
-    crmMailingBlockMailing: '~/crmMailing/mailing.html',
-    crmMailingBlockPublication: '~/crmMailing/publication.html',
-    crmMailingBlockResponses: '~/crmMailing/responses.html',
-    crmMailingBlockRecipients: '~/crmMailing/recipients.html',
-    crmMailingBlockSchedule: '~/crmMailing/schedule.html',
-    crmMailingBlockSummary: '~/crmMailing/summary.html',
-    crmMailingBlockTracking: '~/crmMailing/tracking.html',
-    crmMailingBodyHtml: '~/crmMailing/body_html.html',
-    crmMailingBodyText: '~/crmMailing/body_text.html'
-  };
-  _.each(simpleBlocks, function(templateUrl, directiveName){
-    angular.module('crmMailing').directive(directiveName, function ($q, crmMetadata, crmUiHelp) {
-      return {
-        scope: {
-          crmMailing: '@'
-        },
-        templateUrl: templateUrl,
-        link: function (scope, elm, attr) {
-          scope.$parent.$watch(attr.crmMailing, function(newValue){
-            scope.mailing = newValue;
-          });
-          scope.crmMailingConst = CRM.crmMailing;
-          scope.ts = CRM.ts(null);
-          scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
-          scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
-          $q.when(crmMetadata.getFields('Mailing'), function(fields) {
-            scope.mailingFields = fields;
-          });
-        }
-      };
-    });
-  });
-
   // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
   angular.module('crmMailing').directive('crmMailingBlockPreview', function (crmUiHelp) {
