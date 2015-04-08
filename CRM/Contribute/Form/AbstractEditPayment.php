@@ -282,7 +282,7 @@ WHERE  contribution_id = {$id}
    *
    * @return null|string
    */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
+  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
     $statusMsg = NULL;
     if (!$contributionId || !$statusId) {
       return $statusMsg;
@@ -292,6 +292,7 @@ WHERE  contribution_id = {$id}
       'contribution_id' => $contributionId,
       'contribution_status_id' => $statusId,
       'previous_contribution_status_id' => $previousStatusId,
+      'receive_date' => $receiveDate,
     );
 
     $updateResult = CRM_Contribute_BAO_Contribution::transitionComponents($params);
