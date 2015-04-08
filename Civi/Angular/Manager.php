@@ -85,8 +85,8 @@ class Manager {
       );
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-ui.js'),
-        'partials' => array('partials/crmUi'),
+        'js' => array('ang/crmUi.js'),
+        'partials' => array('ang/crmUi'),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
