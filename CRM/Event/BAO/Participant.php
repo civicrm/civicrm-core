@@ -2093,7 +2093,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       if (!$skip) {
         $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
       }
-      $updatedContributionDAO->total_amount = $updatedAmount;
+      $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
+      $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;
       $updatedContributionDAO->save();
       // adjusted amount financial_trxn creation
