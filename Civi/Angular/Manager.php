@@ -65,9 +65,9 @@ class Manager {
       );
       $angularModules['crmAttachment'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAttachment.js'),
-        'css' => array('css/angular-crmAttachment.css'),
-        'partials' => array('partials/crmAttachment'),
+        'js' => array('ang/crmAttachment.js'),
+        'css' => array('ang/crmAttachment.css'),
+        'partials' => array('ang/crmAttachment'),
       );
       $angularModules['crmAutosave'] = array(
         'ext' => 'civicrm',
