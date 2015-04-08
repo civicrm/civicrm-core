@@ -22,7 +22,7 @@
         width: '40%',
         title: ts('Save Template')
       });
-      return dialogService.open('saveTemplateDialog', '~/crmMailing/dialog/saveTemplate.html', model, options)
+      return dialogService.open('saveTemplateDialog', '~/crmMailing/SaveMsgTemplateDialogCtrl.html', model, options)
         .then(function(item) {
           mailing.msg_template_id = item.id;
           return item;

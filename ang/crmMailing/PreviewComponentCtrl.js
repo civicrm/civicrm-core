@@ -17,7 +17,7 @@
         autoOpen: false,
         title: title // component[0].name
       });
-      dialogService.open('previewComponentDialog', '~/crmMailing/dialog/previewComponent.html', component[0], options);
+      dialogService.open('previewComponentDialog', '~/crmMailing/PreviewComponentDialogCtrl.html', component[0], options);
     };
   });
 
