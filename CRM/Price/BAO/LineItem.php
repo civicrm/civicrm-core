@@ -542,10 +542,10 @@ AND li.entity_id = {$entityId}
       return FALSE;
     }
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;
+      $tax = round($lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100, 2);
     }
     else {
-      $tax = ($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100;
+      $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
     }
     return $tax;
   }
