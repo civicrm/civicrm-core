@@ -384,7 +384,7 @@
       var term = cj("#num_terms").val();
       if (term) {
         var renewTotal = allMemberships[memType]['total_amount_numeric'] * term;
-        cj("#total_amount").val(renewTotal.toFixed(2));
+        cj("#total_amount").val(CRM.formatMoney(renewTotal, true));
       }
       else {
         cj("#total_amount").val(allMemberships[memType]['total_amount']);

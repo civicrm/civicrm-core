@@ -39,7 +39,7 @@
 
   // Initialize CRM.url and CRM.formatMoney
   CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
-  CRM.formatMoney('init', {$moneyFormat});
+  CRM.formatMoney('init', false, {$moneyFormat});
 
   // Localize select2
   $.fn.select2.defaults.formatNoMatches = "{ts escape='js'}None found.{/ts}";
