@@ -451,8 +451,9 @@ invert              = 0
         $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
-    var strSameAs = ' - '+ts('same as for main contact')+' - ';
-    var strSelect = ' - '+ts('select')+' - ';
+    var
+      strSameAs = '{/literal}{ts escape='js'}- same as for main contact -{/ts}{literal}',
+      strSelect = '{/literal}{ts escape='js'}- select -{/ts}{literal}';
 
     $('#crm-container').on('crmLoad', function() {
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
