@@ -224,18 +224,16 @@ class CRM_Core_BAO_Block {
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
 
-    // @todo Consistant variable names, eg: locationTypeId / location_type_id
-
     if (!self::blockExists($blockName, $params)) {
       return NULL;
     }
 
     // Set up required information / defaults
     $entityElements = $blocks = array();
-    $reset_primary = $primary_set = $billing_set = FALSE;
-    $contact_id = NULL;
+    $resetPrimary = $primarySet = $billingSet = FALSE;
+    $contactId = NULL;
 
-    $bao_string = 'CRM_Core_BAO_' . ucfirst($blockName);
+    $baoString = 'CRM_Core_BAO_' . ucfirst($blockName);
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
 
     if ($entity) {
@@ -245,30 +243,30 @@ class CRM_Core_BAO_Block {
       );
     }
     else {
-      $contact_id = $params['contact_id'];
+      $contactId = $params['contact_id'];
     }
 
     // Get current and submitted values
-    $existing_values = self::getBlockIds($blockName, $contact_id, $entityElements, $updateBlankLocInfo);
-    $submitted_values = $params[$blockName];
+    $existingValues = self::getBlockIds($blockName, $contactId, $entityElements, $updateBlankLocInfo);
+    $submittedValues = $params[$blockName];
 
     // For each submitted value
-    foreach ($submitted_values as $count => $submitted_value) {
+    foreach ($submittedValues as $count => $submittedValue) {
 
       // Set the contact ID
-      $submitted_value['contact_id'] = $contact_id;
+      $submittedValue['contact_id'] = $contactId;
 
       // If this is a primary value, and we haven't unset a primary value yet, and there are values on the contact
       // Then unset any primary value currently on the Contact
-      if (!empty($submitted_value['is_primary']) && !$reset_primary && is_array($existing_values)) {
-        foreach ($existing_values as $existing_value_id => $existing_value) {
-          if (!empty($existing_value['is_primary'])) {
+      if (!empty($submittedValue['is_primary']) && !$resetPrimary && is_array($existingValues)) {
+        foreach ($existingValues as $existingValueId => $existingValue) {
+          if (!empty($existingValue['is_primary'])) {
 
             // @todo Can we refactor this?
-            $block = new $bao_string();
+            $block = new $baoString();
             $block->selectAdd();
             $block->selectAdd("id, is_primary");
-            $block->id = $existing_value['id'];
+            $block->id = $existingValue['id'];
             if ($block->find(TRUE)) {
               $block->is_primary = FALSE;
               $block->save();
@@ -276,97 +274,96 @@ class CRM_Core_BAO_Block {
             $block->free();
 
             // Stop looping since we found a match
-            $reset_primary = TRUE;
+            $resetPrimary = TRUE;
             break;
           }
         }
       }
 
       // If there is already an ID passed in
-      if (!empty($submitted_value['id'])) {
+      if (!empty($submittedValue['id'])) {
         // If the ID already exists on the contact
         // Then we don't want to match on it later, so unset it
-        if (array_key_exists($submitted_value['id'], $existing_values)) {
-          unset($existing_values[$existing_value_id]);
+        if (array_key_exists($submittedValue['id'], $existingValues)) {
+          unset($existingValues[$existingValueId]);
         }
-        // Otherwise it is a new value, ignore the passed in ID
+        // Otherwise it is a new value, so ignore the passed in ID
         else {
-          unset($submitted_value['id']);
+          unset($submittedValue['id']);
         }
       }
 
       // Otherwise, if there was no ID passed in
       // Loop through the current values, and find the first match on location type
       else {
-        foreach ($existing_values as $existing_value_id => $existing_value) {
-          if ($existing_value['locationTypeId'] == $submitted_value['location_type_id']) {
+        foreach ($existingValues as $existingValueId => $existingValue) {
+          if ($existingValue['locationTypeId'] == $submittedValue['location_type_id']) {
 
             // Also require a match on 'type id' for phone and IM blocks
-            $match_found = FALSE;
+            $matchFound = FALSE;
 
             if ($blockName == 'phone') {
-              if (CRM_Utils_Array::value('phoneTypeId', $existing_value) == CRM_Utils_Array::value('phone_type_id', $submitted_value)) {
-                $match_found = TRUE;
+              if (CRM_Utils_Array::value('phoneTypeId', $existingValue) == CRM_Utils_Array::value('phone_type_id', $submittedValue)) {
+                $matchFound = TRUE;
               }
             }
             elseif ($blockName == 'im') {
-              if (CRM_Utils_Array::value('providerId', $existing_value) == CRM_Utils_Array::value('provider_id', $submitted_value)) {
-                $match_found = TRUE;
+              if (CRM_Utils_Array::value('providerId', $existingValue) == CRM_Utils_Array::value('provider_id', $submittedValue)) {
+                $matchFound = TRUE;
               }
             }
             else {
-              $match_found = TRUE;
+              $matchFound = TRUE;
             }
 
             // If we found a match
-            if ($match_found) {
+            if ($matchFound) {
               // Match up the ID
-              $submitted_value['id'] = $existing_value['id'];
+              $submittedValue['id'] = $existingValue['id'];
               // If the submitted value is not primary, but the matched value is
               // Then set the submitted value to be primary
-              if (empty($submitted_value['is_primary']) && !empty($existing_value['is_primary'])) {
-                $submitted_value['is_primary'] = 1;
+              if (empty($submittedValue['is_primary']) && !empty($existingValue['is_primary'])) {
+                $submittedValue['is_primary'] = 1;
               }
               // Remove the original value from the array so we don't match on it again
-              unset($existing_values[$existing_value_id]);
+              unset($existingValues[$existingValueId]);
               break;
             }
           }
         }
       }
 
-      // Check if data exists in the input
-      $data_exists = self::dataExists(self::$requiredBlockFields[$blockName], $submitted_value);
+      // Check if data exists in the submitted value
+      $dataExists = self::dataExists(self::$requiredBlockFields[$blockName], $submittedValue);
 
       // If there is data
-      if ($data_exists) {
+      if ($dataExists) {
 
-        // Ensure there is only one primary / billing block
-        // "There can be only one"
-        if (!$primary_set && !empty($submitted_value['is_primary'])) {
-          $submitted_value['is_primary'] = 1;
-          $primary_set = TRUE;
+        // "There can be only one" primary / billing block
+        if (!$primarySet && !empty($submittedValue['is_primary'])) {
+          $submittedValue['is_primary'] = 1;
+          $primarySet = TRUE;
         }
         else {
           $contactFields['is_primary'] = 0;
         }
 
-        if (!$billing_set && !empty($submitted_value['is_billing'])) {
-          $submitted_value['is_billing'] = 1;
-          $billing_set = TRUE;
+        if (!$billingSet && !empty($submittedValue['is_billing'])) {
+          $submittedValue['is_billing'] = 1;
+          $billingSet = TRUE;
         }
         else {
           $contactFields['is_billing'] = 0;
         }
 
         // Add the value to the list of blocks
-        $blocks[] = $bao_string::add($submitted_value);
+        $blocks[] = $baoString::add($submittedValue);
       }
 
       // Otherwise, if there is no data, and there is an ID, and we are deleting 'blanked' values
       // Then delete it
-      elseif (!empty($submitted_value['id']) && $updateBlankLocInfo) {
-        self::blockDelete($blockName, array('id' => $submitted_value['id']));
+      elseif (!empty($submittedValue['id']) && $updateBlankLocInfo) {
+        self::blockDelete($blockName, array('id' => $submittedValue['id']));
       }
 
       // Otherwise we ignore it
