@@ -37,7 +37,7 @@
  * This class generates form components for processing a contribution
  *
  */
-class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
+class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_mode;
 
   public $_action;

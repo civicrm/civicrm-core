@@ -322,7 +322,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $this->_action = CRM_Core_Action::COPY;
           break;
       }
-      CRM_Contact_Form_Task::preProcessCommon($this);
+      parent::preProcess();
 
       $this->_single = FALSE;
       $this->_contactId = NULL;
