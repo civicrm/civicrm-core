@@ -36,6 +36,13 @@ function civicrm_setup($filesDirectory) {
   global $crmPath, $sqlPath, $pkgPath, $tplPath;
   global $compileDir;
 
+  // This is needed to allow CiviCRM to be installed by drush.
+  $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
+  set_include_path($crmPath . PATH_SEPARATOR .
+      $pkgPath . PATH_SEPARATOR .
+      get_include_path()
+  );
+
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
 
