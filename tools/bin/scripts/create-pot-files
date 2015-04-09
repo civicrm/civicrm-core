@@ -139,9 +139,7 @@ function build_raw_pot() {
         xml/templates/civicrm_msg_template.tpl \
         xml/templates/message_templates/friend_* \
         xml/templates/message_templates/uf_notify_* \
-        js/angular-crmApp.js \
-        js/angular-crmAttachment.js \
-        js/angular-crm-ui.js \
+        ang/crm{App,Attachment,Example,Ui,Util}{,.js}  \
         js/Common.js \
         js/crm.ajax.js \
         js/crm.backbone.js \
@@ -152,11 +150,7 @@ function build_raw_pot() {
         js/model/crm.designer.js \
         js/model/crm.uf.js \
         js/view/crm.designer.js \
-        packages/HTML/QuickForm \
-        partials/crmAttachment \
-        partials/crmExample \
-        partials/crmUi
-
+        packages/HTML/QuickForm
 
       ## The CRM/Upgrade folder includes *.tpl files which, for some reason,
       ## have been omitted from past pot's. Omitting these requires more
@@ -225,7 +219,7 @@ function build_raw_pot() {
     Case)
       _civistrings -o "$filepath" \
         {CRM,templates/CRM}/$name \
-        partials/crmCaseType \
+        ang/crmCaseType{,.js} \
         xml/templates/message_templates/case_*
       ;;
 
@@ -246,14 +240,7 @@ function build_raw_pot() {
     Mailing)
       _civistrings -o "$filepath" \
         {CRM,templates/CRM}/$name \
-        js/angular-crmCaseType.js \
-        js/angular-crmMailingAB.js \
-        js/angular-crmMailingAB/services.js \
-        js/angular-crmMailing/directives.js \
-        js/angular-crmMailing.js \
-        js/angular-crmMailing/services.js \
-        partials/crmMailing \
-        partials/crmMailingAB
+        ang/crm{Mailing,MailingAB}{,.js}
       ;;
 
     Member)

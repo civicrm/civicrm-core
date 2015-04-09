@@ -61,22 +61,22 @@ class Manager {
       );
       $angularModules['crmApp'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmApp.js'),
+        'js' => array('ang/crmApp.js'),
       );
       $angularModules['crmAttachment'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAttachment.js'),
-        'css' => array('css/angular-crmAttachment.css'),
-        'partials' => array('partials/crmAttachment'),
+        'js' => array('ang/crmAttachment.js'),
+        'css' => array('ang/crmAttachment.css'),
+        'partials' => array('ang/crmAttachment'),
       );
       $angularModules['crmAutosave'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAutosave.js'),
+        'js' => array('ang/crmAutosave.js'),
       );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
-      //  'js' => array('js/angular-crmExample.js'),
-      //  'partials' => array('partials/crmExample'),
+      //  'js' => array('ang/crmExample.js'),
+      //  'partials' => array('ang/crmExample'),
       //);
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
@@ -85,12 +85,12 @@ class Manager {
       );
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-ui.js'),
-        'partials' => array('partials/crmUi'),
+        'js' => array('ang/crmUi.js'),
+        'partials' => array('ang/crmUi'),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-util.js'),
+        'js' => array('ang/crmUtil.js'),
       );
       // https://github.com/jwstadler/angular-jquery-dialog-service
       $angularModules['dialogService'] = array(
