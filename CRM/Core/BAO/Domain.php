@@ -271,15 +271,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       $groupID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $title, 'id', 'title', TRUE
       );
-      if (empty($groupID) && !empty($title)) {
-        $groupParams = array(
-          'title' => $title,
-          'is_active' => 1,
-          'no_parent' => 1,
-        );
-        $group = CRM_Contact_BAO_Group::create($groupParams);
-        $groupID = $group->id;
-      }
     }
     return $groupID ? $groupID : FALSE;
   }

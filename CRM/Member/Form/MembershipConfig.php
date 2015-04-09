@@ -53,6 +53,13 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    */
   protected $_BAOName;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'MembershipType';
+  }
+
   public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');

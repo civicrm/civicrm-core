@@ -1771,6 +1771,14 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   }
   $d = new $dao();
   $fields = $d->fields();
+
+  // Set html attributes for text fields
+  foreach ($fields as $name => &$field) {
+    if (isset($field['html'])) {
+      $field['html'] += (array) $d::makeAttribute($field);
+    }
+  }
+
   // replace uniqueNames by the normal names as the key
   if (empty($unique)) {
     foreach ($fields as $name => &$field) {
@@ -2187,6 +2195,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  *   fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
+  if (!$fieldName) {
+    return FALSE;
+  }
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }

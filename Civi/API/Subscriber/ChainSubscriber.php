@@ -90,7 +90,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
     // We don't need to worry about nested api in the getfields/getoptions
     // actions, so just return immediately.
-    if (in_array($action, array('getfields', 'getoptions'))) {
+    if (in_array($action, array('getfields', 'getfield', 'getoptions'))) {
       return;
     }
 

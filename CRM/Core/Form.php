@@ -1032,6 +1032,42 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Based on form action, return a string representing the api action.
+   * Used by addField method.
+   *
+   * Return string
+   */
+  private function getApiAction() {
+    $action = $this->getAction();
+    if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
+      return 'create';
+    }
+    if ($action & (CRM_Core_Action::BROWSE)) {
+      return 'get';
+    }
+    // If you get this exception try adding more cases above.
+    throw new Exception("Cannot determine api action for " . __CLASS__);
+  }
+
+  /**
+   * Classes extending CRM_Core_Form should implement this method.
+   * @throws Exception
+   */
+  public function getDefaultEntity() {
+    throw new Exception("Cannot determine default entity. The form class should implement getDefaultEntity().");
+  }
+
+  /**
+   * Classes extending CRM_Core_Form should implement this method.
+   *
+   * TODO: Merge with CRM_Core_DAO::buildOptionsContext($context) and add validation.
+   * @throws Exception
+   */
+  public function getDefaultContext() {
+    throw new Exception("Cannot determine default context. The form class should implement getDefaultContext().");
+  }
+
+  /**
    * Adds a select based on field metadata.
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
@@ -1051,7 +1087,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addSelect($name, $props = array(), $required = FALSE) {
     if (!isset($props['entity'])) {
-      $props['entity'] = CRM_Utils_Api::getEntityName($this);
+      $props['entity'] = $this->getDefaultEntity();
     }
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
@@ -1098,6 +1134,144 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-api-field'] = $props['field'];
     CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options', 'context');
     return $this->add('select', $name, $label, $options, $required, $props);
+  }
+
+  /**
+   * Adds a field based on metadata.
+   *
+   * @param $name
+   *   Field name to go on the form.
+   * @param array $props
+   *   Mix of html attributes and special properties, namely.
+   *   - entity (api entity name, can usually be inferred automatically from the form class)
+   *   - name (field name - only needed if different from name used on the form)
+   *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
+   *   - placeholder - set to NULL to disable
+   *   - multiple - bool
+   *   - context - @see CRM_Core_DAO::buildOptionsContext
+   * @param bool $required
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function addField($name, $props = array(), $required = FALSE) {
+    // TODO: Handle custom field
+    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      throw new Exception("Custom fields are not supported by the addField method. ");
+    }
+    // Resolve context.
+    if (!isset($props['context'])) {
+      $props['context'] = $this->getDefaultContext();
+    }
+    // Resolve entity.
+    if (!isset($props['entity'])) {
+      $props['entity'] = $this->getDefaultEntity();
+    }
+    // Resolve field.
+    if (!isset($props['name'])) {
+      $props['name'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    }
+    // Resolve action.
+    if (!isset($props['action'])) {
+      $props['action'] = $this->getApiAction();
+    }
+    // Get field metadata.
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
+    $fieldSpec = $fieldSpec['values'];
+
+    $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
+
+    $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
+    if ($widget == 'TextArea' && $props['context'] == 'search') {
+      $widget = 'Text';
+    }
+
+    $isSelect = (in_array($widget, array(
+          'Select',
+          'Multi-Select',
+          'Select State/Province',
+          'Multi-Select State/Province',
+          'Select Country',
+          'Multi-Select Country',
+          'AdvMulti-Select',
+          'CheckBox',
+          'Radio',
+    )));
+
+    if ($isSelect) {
+      // Fetch options from the api unless passed explicitly.
+      if (isset($props['options'])) {
+        $options = $props['options'];
+      }
+      else {
+        $options = $fieldSpec['options'];
+      }
+
+      // The placeholder is only used for select-elements.
+      if (!array_key_exists('placeholder', $props)) {
+        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
+      }
+
+      if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+        $widget = 'Select';
+      }
+      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
+        $props['class'] .= ' huge';
+        $props['multiple'] = 'multiple';
+      }
+
+      // Add data for popup link.
+      if ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+        $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-api-entity'] = $props['entity'];
+        $props['data-api-field'] = $props['name'];
+      }
+    }
+    $props += CRM_Utils_Array::value('html', $fieldSpec, array());
+    CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
+    switch ($widget) {
+      case 'Text':
+      case 'Link':
+        //TODO: Autodetect ranges
+        $this->addElement('text', $name, $label, $props, $required);
+        break;
+
+      case 'hidden':
+        $this->addElement('hidden', $name, $label, $props);
+        break;
+
+      //case 'TextArea':
+      //case 'Select Date':
+      //TODO: Add date formats
+      //TODO: Add javascript template for dates.
+      // case 'Radio':
+      case 'Select':
+        if (empty($props['multiple'])) {
+          $options = array('' => $props['placeholder']) + $options;
+        }
+        $this->add('select', $name, $label, $options, $required, $props);
+        // TODO: Add and/or option for fields that store multiple values
+        break;
+
+      //case 'AdvMulti-Select':
+      //case 'CheckBox':
+      //case 'File':
+      //case 'RichTextEditor':
+      //TODO: Add javascript template for wysiwyg.
+      case 'Autocomplete-Select':
+      case 'EntityRef':
+        $this->addEntityRef($name, $label, $props);
+        break;
+
+      // Check datatypes of fields
+      // case 'Int':
+      //case 'Float':
+      //case 'Money':
+      //case 'Link':
+      //case read only fields
+      default:
+        throw new Exception("Unsupported html-element " . $widget);
+    }
   }
 
   /**
@@ -1847,7 +2021,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
             if (!$options) {
               $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
             }
-          } 
+          }
           else {
             $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
             $targetField->setAttribute('disabled', 'disabled');

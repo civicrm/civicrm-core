@@ -53,6 +53,13 @@ class CRM_Extension_System {
   private $_repoUrl = NULL;
 
   /**
+   * @var array
+   *   Construction parameters. These are primarily retained so
+   *   that they can influence the cache name.
+   */
+  protected $parameters;
+
+  /**
    * @param bool $fresh
    *   TRUE to force creation of a new system.
    *
@@ -101,6 +108,9 @@ class CRM_Extension_System {
     }
     if (!array_key_exists('cmsRootPath', $parameters)) {
       $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
+    }
+    if (!array_key_exists('domain_id', $parameters)) {
+      $parameters['domain_id'] = CRM_Core_Config::domainID();
     }
     ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
 

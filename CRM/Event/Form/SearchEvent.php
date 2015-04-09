@@ -35,6 +35,13 @@
 class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Event';
+  }
+
+  /**
    * @return array
    */
   public function setDefaultValues() {
@@ -62,7 +69,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     );
 
     $this->addSelect('event_type_id', array('multiple' => TRUE, 'context' => 'search'));
-    
+
     $eventsByDates = array();
     $searchOption = array(ts('Show Current and Upcoming Events'), ts('Search All or by Date Range'));
     $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, array('onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"), "<br />");
