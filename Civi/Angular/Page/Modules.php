@@ -74,7 +74,8 @@ class Modules extends \CRM_Core_Page {
       array('angular', '$', '_'),
       array('angular', 'CRM.$', 'CRM._')
     );
-    return implode("\n", $scripts);
+    // This impl of stripComments currently adds 10-20ms and cuts ~7%
+    return \CRM_Utils_JS::stripComments(implode("\n", $scripts));
   }
 
   /**

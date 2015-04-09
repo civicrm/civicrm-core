@@ -108,4 +108,23 @@ class CRM_Utils_JS {
     return $scripts;
   }
 
+  /**
+   * This is a primitive comment stripper. It doesn't catch all comments
+   * and falls short of minification, but it doesn't munge Angular injections
+   * and is fast enough to run synchronously (without caching).
+   *
+   * At time of writing, running this against the Angular modules, this impl
+   * of stripComments currently adds 10-20ms and cuts ~7%.
+   *
+   * Please be extremely cautious about extending this. If you want better
+   * minification, you should probably remove this implementation,
+   * import a proper JSMin implementation, and cache its output.
+   *
+   * @param string $script
+   * @return string
+   */
+  public static function stripComments($script) {
+    return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
+  }
+
 }

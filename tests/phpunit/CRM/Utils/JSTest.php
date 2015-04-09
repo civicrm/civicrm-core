@@ -153,4 +153,39 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     );
     $this->assertEquals($expectedOutput, implode("", $actualOutput));
   }
+
+  public function stripCommentsExamples() {
+    $cases = array();
+    $cases[] = array(
+      "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
+      "a();\n\nb();",
+    );
+    $cases[] = array(
+      "// foo\na();",
+      "\na();",
+    );
+    $cases[] = array(
+      "b();\n  // foo",
+      "b();\n",
+    );
+    $cases[] = array(
+      "/// foo\na();\n\t \t//bar\nb();\n// whiz",
+      "\na();\n\nb();\n",
+    );
+    $cases[] = array(
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
+    );
+    return $cases;
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider stripCommentsExamples
+   */
+  public function testStripComments($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::stripComments($input));
+  }
+
 }
