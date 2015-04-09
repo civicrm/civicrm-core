@@ -65,4 +65,47 @@ class CRM_Utils_JS {
     return array_values($strings);
   }
 
+  /**
+   * Identify duplicate, adjacent, identical closures and consolidate them.
+   *
+   * Note that you can only dedupe closures if they are directly adjacent and
+   * have exactly the same parameters.
+   *
+   * @param array $scripts
+   *   Javascript source.
+   * @param array $localVars
+   *   Ordered list of JS vars to identify the start of a closure.
+   * @param array $inputVals
+   *   Ordered list of input values passed into the closure.
+   * @return string
+   *   Javascript source.
+   */
+  public static function dedupeClosures($scripts, $localVars, $inputVals) {
+    // Example opening: (function (angular, $, _) {
+    $opening = '\s*\(\s*function\s*\(\s*';
+    $opening .= implode(',\s*', array_map(function ($v) {
+      return preg_quote($v, '/');
+    }, $localVars));
+    $opening .= '\)\s*\{';
+    $opening = '/^' . $opening . '/';
+
+    // Example closing: })(angular, CRM.$, CRM._);
+    $closing = '\}\s*\)\s*\(\s*';
+    $closing .= implode(',\s*', array_map(function ($v) {
+      return preg_quote($v, '/');
+    }, $inputVals));
+    $closing .= '\);\s*';
+    $closing = "/$closing\$/";
+
+    $scripts = array_values($scripts);
+    for ($i = count($scripts) - 1; $i > 0; $i--) {
+      if (preg_match($closing, $scripts[$i - 1]) && preg_match($opening, $scripts[$i])) {
+        $scripts[$i - 1] = preg_replace($closing, '', $scripts[$i - 1]);
+        $scripts[$i] = preg_replace($opening, '', $scripts[$i]);
+      }
+    }
+
+    return $scripts;
+  }
+
 }
