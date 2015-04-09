@@ -156,6 +156,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'member-fields',
+        'group_bys' => array(
+          'id' => array(
+            'title' => ts('Membership'),
+            'default' => TRUE,
+          ),
+        ),
       ),
       'civicrm_membership_status' => array(
         'dao' => 'CRM_Member_DAO_MembershipStatus',
