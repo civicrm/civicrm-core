@@ -1243,6 +1243,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
+        $props['size'] = isset($props['size']) ? $props['size'] : 60;
         $this->add('text', $name, $label, $props, $required);
         break;
 
