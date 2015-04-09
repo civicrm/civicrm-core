@@ -86,9 +86,9 @@ class Main extends \CRM_Core_Page {
     // FIXME: crmUi depends on loading ckeditor, but ckeditor doesn't work with this aggregation.
     $this->res->addScriptFile('civicrm', 'packages/ckeditor/ckeditor.js', 100, 'page-header', FALSE);
 
+    $headOffset = 0;
     $config = \CRM_Core_Config::singleton();
     if ($config->debug) {
-      $headOffset = 0;
       foreach ($modules as $moduleName => $module) {
         foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
           $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
@@ -106,8 +106,13 @@ class Main extends \CRM_Core_Page {
       $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
       $this->res->addScriptUrl($aggScriptUrl, 120, 'html-header');
 
-      $aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
-      $this->res->addStyleUrl($aggStyleUrl, 120, 'html-header');
+      // FIXME: The following CSS aggregator doesn't currently handle path-adjustments - which can break icons.
+      //$aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      //$this->res->addStyleUrl($aggStyleUrl, 120, 'html-header');
+
+      foreach ($this->angular->getResources(array_keys($modules), 'css', 'cacheUrl') as $url) {
+        $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), 'html-header');
+      }
     }
   }
 
