@@ -35,7 +35,7 @@ ALTER TABLE `civicrm_pcp_block`
 -- PCP userDashboard Option
 
  SELECT @option_group_id_udOpt  := max(id) from civicrm_option_group where name = 'user_dashboard_options';
- SELECT @maxValue  := max(value) from civicrm_option_value where option_group_id=@option_group_id_udOpt ;
+ SELECT @maxValue  := max(ROUND(value)) from civicrm_option_value where option_group_id=@option_group_id_udOpt ;
 
 {if $multilingual}
   INSERT INTO civicrm_option_value
