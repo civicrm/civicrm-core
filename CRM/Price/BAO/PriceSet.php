@@ -735,7 +735,7 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
-  public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
+  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
