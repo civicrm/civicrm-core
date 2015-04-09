@@ -164,7 +164,7 @@ ALTER TABLE civicrm_pledge DROP honor_type_id;
 -- CRM-13964 and CRM-13965
 SELECT @option_group_id_cs   := max(id) from civicrm_option_group where name = 'contribution_status';
 SELECT @option_val_id_cs_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
-SELECT @option_val_id_cs_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
+SELECT @option_val_id_cs_val := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
 
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
