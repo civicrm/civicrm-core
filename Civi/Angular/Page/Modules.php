@@ -41,7 +41,7 @@ class Modules extends \CRM_Core_Page {
       case 'js':
         $this->send(
           'application/javascript',
-          \CRM_Utils_File::concat($angular->getResources($moduleNames, 'js', 'path'), "\n")
+          $this->digestJs($angular->getResources($moduleNames, 'js', 'path'))
         );
         break;
 
@@ -57,6 +57,24 @@ class Modules extends \CRM_Core_Page {
     }
 
     \CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @param array $files
+   *   File paths.
+   * @return string
+   */
+  public function digestJs($files) {
+    $scripts = array();
+    foreach ($files as $file) {
+      $scripts[] = file_get_contents($file);
+    }
+    $scripts = \CRM_Utils_JS::dedupeClosures(
+      $scripts,
+      array('angular', '$', '_'),
+      array('angular', 'CRM.$', 'CRM._')
+    );
+    return implode("\n", $scripts);
   }
 
   /**
