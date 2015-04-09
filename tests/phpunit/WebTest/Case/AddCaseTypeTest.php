@@ -76,7 +76,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
       $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", $tActivityType, FALSE, TRUE);
     }
 
-    $this->clickAjaxLink("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
+    $this->click('css=.crm-submit-buttons button:first-child');
 
     $this->openCiviPage('case/add', 'reset=1&action=add&atype=13&context=standalone', '_qf_Case_upload-bottom');
     $client = $this->createDialogContact("client_id");
@@ -126,7 +126,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//*[@id='crm-main-content-wrapper']/div/div/div[2]/a/span[contains(text(),'New Case Type')]");
 
     $this->click("xpath=//table/tbody//tr/td[1][text()='{$caseTypeLabel}']/../td[5]/span/a[text()='Edit']");
-    $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
+    $this->waitForElementPresent("css=.crm-submit-buttons button:first-child");
 
     $editCaseTypeLabel = "Case Type Edit" . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('title');
@@ -138,7 +138,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=//a[text()='Standard Timeline']");
     $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", 'SMS', FALSE, TRUE);
 
-    $this->click("xpath=//div[@class='crm-submit-buttons']/span/input[@value='Save']");
+    $this->click('css=.crm-submit-buttons button:first-child');
     $this->waitForElementPresent("xpath=//*[@id='crm-main-content-wrapper']/div/div/div[2]/a/span[contains(text(),'New Case Type')]");
 
     $this->verifyText("xpath=//table/tbody//tr/td[contains(text(),'$editCaseTypeLabel')]", $editCaseTypeLabel);
