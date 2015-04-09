@@ -97,6 +97,10 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
       );
+      $angularModules['ngRoute'] = array(
+        'ext' => 'civicrm',
+        'js' => array('bower_components/angular-route/angular-route.min.js'),
+      );
       $angularModules['ui.utils'] = array(
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
