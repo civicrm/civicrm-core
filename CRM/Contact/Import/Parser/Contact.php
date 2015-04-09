@@ -568,7 +568,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   $this->_retCode = CRM_Import_Parser::NO_MATCH;
                 }
                 else {
-                  $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId, FALSE, $this->_dedupeRuleGroupID);
                   $updateflag = FALSE;
                   $this->_retCode = CRM_Import_Parser::VALID;
                 }
