@@ -35,6 +35,16 @@
 
 /**
  * This class generates form components for processing a contribution
+ * CRM-16229 - During the event registration bulk action via search we
+ * need to inherit CRM_Contact_Form_Task so that we can inherit functions
+ * like getContactIds and make use of controller state. But this is not possible
+ * because CRM_Event_Form_Participant inherits this class.
+ * Ideal situation would be something like
+ * CRM_Event_Form_Participant extends CRM_Contact_Form_Task,
+ * CRM_Contribute_Form_AbstractEditPayment
+ * However this is not possible. Currently PHP does not support multiple
+ * inheritance. So work around solution is to extend this class with
+ * CRM_Contact_Form_Task which further extends CRM_Core_Form.
  *
  */
 class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
