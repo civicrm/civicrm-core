@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
 -- add batch type for pledge payments
 SELECT @option_group_id := id FROM civicrm_option_group WHERE name = 'batch_type';
 
-SELECT @max_option_value:= max(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id;
+SELECT @max_option_value:= max(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id;
 
 INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}`label`{/localize}, value, name,weight)
 VALUES (@option_group_id, {localize}'{ts escape="sql"}Pledge Payment{/ts}'{/localize}, @max_option_value+1, 'Pledge Payment','3');
