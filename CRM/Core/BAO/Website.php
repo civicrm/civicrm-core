@@ -79,46 +79,46 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
 
     // Get websites submitted in the form, and already on the Contact
-    $submitted_websites = $params['website'];
-    $existing_websites = self::allWebsites($contactID);
+    $submittedWebsites = $params['website'];
+    $existingWebsites = self::allWebsites($contactID);
 
     // For each website submitted on the form
-    foreach ($submitted_websites as $key => $submitted_value) {
+    foreach ($submittedWebsites as $key => $submittedValue) {
 
       // Check for matching IDs on submitted / existing data
-      $websiteId = CRM_Utils_Array::value('id', $submitted_value);
+      $websiteId = CRM_Utils_Array::value('id', $submittedValue);
       if ($websiteId) {
-        if (array_key_exists($websiteId, $existing_websites)) {
-          unset($existing_websites[$websiteId]);
+        if (array_key_exists($websiteId, $existingWebsites)) {
+          unset($existingWebsites[$websiteId]);
         }
         else {
-          unset($submitted_value['id']);
+          unset($submittedValue['id']);
         }
       }
 
       // Match up submitted values to existing ones, based on type
-      if (empty($submitted_value['id']) && !empty($existing_websites)) {
-        foreach ($existing_websites as $id => $existing_value) {
-          if ($existing_value['website_type_id'] == $submitted_value['website_type_id']) {
-            $submitted_value['id'] = $id;
-            unset($existing_websites[$id]);
+      if (empty($submittedValue['id']) && !empty($existingWebsites)) {
+        foreach ($existingWebsites as $id => $existingValue) {
+          if ($existingValue['website_type_id'] == $submittedValue['website_type_id']) {
+            $submittedValue['id'] = $id;
+            unset($existingWebsites[$id]);
             break;
           }
         }
       }
 
-      $submitted_value['contact_id'] = $contactID;
+      $submittedValue['contact_id'] = $contactID;
 
       // CRM-10551
       // If there is a matching ID, the URL is empty and we are deleting blanked values
       // Then remove it from the contact
-      if (!empty($submitted_value['id']) && empty($submitted_value['url']) && $updateBlankLocInfo) {
-        self::del(array($submitted_value['id']));
+      if (!empty($submittedValue['id']) && empty($submittedValue['url']) && $updateBlankLocInfo) {
+        self::del(array($submittedValue['id']));
       }
 
       // Otherwise, add the website if the URL isn't empty
-      elseif (!empty($submitted_value['url'])) {
-        self::add($submitted_value);
+      elseif (!empty($submittedValue['url'])) {
+        self::add($submittedValue);
       }
     }
   }
