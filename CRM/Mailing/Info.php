@@ -69,25 +69,26 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmMailing.js',
-        'js/angular-crmMailing/*.js',
+        'ang/crmMailing.js',
+        'ang/crmMailing/*.js',
       ),
-      'css' => array('css/angular-crmMailing.css'),
-      'partials' => array('partials/crmMailing'),
+      'css' => array('ang/crmMailing.css'),
+      'partials' => array('ang/crmMailing'),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmMailingAB.js',
-        'js/angular-crmMailingAB/*.js',
+        'ang/crmMailingAB.js',
+        'ang/crmMailingAB/*.js',
+        'ang/crmMailingAB/*/*.js',
       ),
-      'css' => array('css/angular-crmMailingAB.css'),
-      'partials' => array('partials/crmMailingAB'),
+      'css' => array('ang/crmMailingAB.css'),
+      'partials' => array('ang/crmMailingAB'),
     );
     $result['crmD3'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmD3.js',
+        'ang/crmD3.js',
         'bower_components/d3/d3.min.js',
       ),
     );
