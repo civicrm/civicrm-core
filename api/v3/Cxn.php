@@ -163,6 +163,11 @@ function civicrm_api3_cxn_unregister($params) {
   return $result;
 }
 
+function _civicrm_api3_cxn_get_spec(&$spec) {
+  // Don't trust AJAX callers or other external code to modify, filter, or return the secret.
+  unset($spec['secret']);
+}
+
 /**
  * Returns an array of Cxn records.
  *
@@ -173,6 +178,9 @@ function civicrm_api3_cxn_unregister($params) {
  *   API result array.
  */
 function civicrm_api3_cxn_get($params) {
+  // Don't trust AJAX callers or other external code to modify, filter, or return the secret.
+  unset($params['secret']);
+
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   if (is_array($result['values'])) {
     foreach (array_keys($result['values']) as $i) {
@@ -182,7 +190,10 @@ function civicrm_api3_cxn_get($params) {
       if (!empty($result['values'][$i]['perm'])) {
         $result['values'][$i]['perm'] = json_decode($result['values'][$i]['perm'], TRUE);
       }
+      // Don't trust AJAX callers or other external code to modify, filter, or return the secret.
+      unset($result['values'][$i]['secret']);
     }
   }
+
   return $result;
 }
