@@ -113,6 +113,10 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-route/angular-route.min.js'),
       );
+      $angularModules['ngSanitize'] = array(
+        'ext' => 'civicrm',
+        'js' => array('bower_components/angular-sanitize/angular-sanitize.min.js'),
+      );
       $angularModules['ui.utils'] = array(
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
