@@ -254,17 +254,19 @@ function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
   $mapper = CRM_Extension_System::singleton()->getMapper();
   $result = array();
+  $id = 0;
   foreach ($statuses as $key => $status) {
     //try {
     //  $info = (array) $mapper->keyToInfo($key);
     //} catch (CRM_Extension_Exception $e) {
     $info = array();
+    $info['id'] = $id++; // backward compatibility with indexing scheme
     $info['key'] = $key;
     //}
     $info['status'] = $status;
     $result[] = $info;
   }
-  return civicrm_api3_create_success($result);
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', array('id', 'key', 'status'));
 }
 
 /**
