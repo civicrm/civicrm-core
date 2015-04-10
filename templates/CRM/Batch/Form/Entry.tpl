@@ -513,8 +513,7 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
   if (date_format != 'mm/dd/yy') {
     displayDateValue = cj.datepicker.formatDate(date_format, actualDateValue);
   }
-
-  cj('#field_' + blockNo + '_' + fname + '_display').val(displayDateValue);
+  cj('[id^=field_' + blockNo + '_' + fname + '_display]').val(displayDateValue);
 
   // need to fix time formatting
   if (dateValues[1]) {
