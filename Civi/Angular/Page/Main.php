@@ -68,16 +68,13 @@ class Main extends \CRM_Core_Page {
 
     $this->res->addSettingsFactory(function () use (&$modules, $page) {
       // TODO optimization; client-side caching
-      return array(
+      return array_merge($page->angular->getResources(array_keys($modules), 'settings', 'settings'), array(
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
           'cacheCode' => $page->res->getCacheCode(),
         ),
-        'crmAttachment' => array(
-          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
-        ),
-      );
+      ));
     });
 
     $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
