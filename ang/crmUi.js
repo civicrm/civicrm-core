@@ -393,6 +393,19 @@
         link: function (scope, elm, attr, ngModel) {
           var ck = CKEDITOR.replace(elm[0]);
 
+          if (ck) {
+            _.extend(ck.config, {
+              width: '94%',
+              height: '400',
+              filebrowserBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=files',
+              filebrowserImageBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=images',
+              filebrowserFlashBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=flash',
+              filebrowserUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=files',
+              filebrowserImageUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=images',
+              filebrowserFlashUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=flash',
+            });
+          }
+
           if (!ngModel) {
             return;
           }
