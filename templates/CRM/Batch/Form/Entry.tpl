@@ -129,18 +129,18 @@ CRM.$(function($) {
     $($form).ajaxSubmit(options);
   });
  
- cj('input[id*="primary_contact_"]').change(function() {
+ $('input[id*="primary_contact_"]').change(function() {
  var temp = this.id.split('_');
    var ROWID = temp[3];
-   if (cj(this).val()) {
+   if ($(this).val()) {
      updateContactInfo(ROWID,'primary_');
    }
  });
 
- cj('select[id^="option_type_"]').each(function () {
-    if (cj(this).val() == 1) {
-      cj(this).attr('disabled', true);
-      cj(this).hide();
+ $('select[id^="option_type_"]').each(function () {
+    if ($(this).val() == 1) {
+      $(this).attr('disabled', true);
+      $(this).hide();
     }
   });
 
