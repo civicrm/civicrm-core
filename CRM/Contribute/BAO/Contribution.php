@@ -367,22 +367,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    // check if activity record exist for this contribution, if
-    // not add activity
-    $activity = new CRM_Activity_DAO_Activity();
-    $activity->source_record_id = $contribution->id;
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      'Contribution',
-      'name'
-    );
-    if (!$activity->find(TRUE)) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
-    }
-    else {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
-    }
-
     // Handle soft credit and / or link to personal campaign page
     $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
 
@@ -435,6 +419,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $transaction->commit();
+
+    // check if activity record exist for this contribution, if
+    // not add activity
+    $activity = new CRM_Activity_DAO_Activity();
+    $activity->source_record_id = $contribution->id;
+    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
+      'Contribution',
+      'name'
+    );
+    if (!$activity->find(TRUE)) {
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
+    }
+    else {
+      // CRM-13237 : if activity record found, update it with campaign id of contribution
+      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+    }
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
