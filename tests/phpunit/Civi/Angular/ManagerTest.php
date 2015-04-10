@@ -103,7 +103,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/edit.html']);
+    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 
