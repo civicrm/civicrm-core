@@ -190,7 +190,7 @@ AND li.entity_id = {$entityId}
     if ($entity == 'participant') {
       $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
       if (!empty($additionalParticipantIDs)) {
-        $whereClause = "WHERE %2.id IN (%1, ". implode(', ', $additionalParticipantIDs). ")";
+        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
       }
     }
 
