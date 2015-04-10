@@ -219,6 +219,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return $financialTypes;
   }
+ 
+  public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
+    if (empty($membershipTypes)) {
+      $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+    }
+    foreach ($membershipTypes as $memTypeId => $type) {
+      $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
+      $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+      if (!CRM_Core_Permission::check($action . ' contributions of type ' . $finType)) {
+        unset($membershipTypes[$memTypeId]);
+      }
+    }
+    return $membershipTypes;
+  }
 
   public static function buildPermissionedClause(&$whereClauses) {
     self::getAvailableFinancialTypes($financialType);
