@@ -322,7 +322,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $extra = array();
         if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
           foreach ($fieldOptions as &$fieldOption) {
-            if ($fieldOption['name'] == 'other_amount') {
+            if (strtolower($fieldOption['name']) == 'other_amount') {
               $fieldOption['label'] = $fieldOption['label'] . '  ' . $currencySymbol;
             }
           }
