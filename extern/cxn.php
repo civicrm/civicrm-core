@@ -37,6 +37,14 @@ $apiServer->setRouter(function ($cxn, $entity, $action, $params) {
 
   require_once 'api/v3/utils.php';
 
+  // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
+  if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL') &&
+    !CRM_Utils_System::isSSL() &&
+    strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
+  ) {
+    return civicrm_api3_create_error('System policy requires HTTPS.');
+  }
+
   // Note: $cxn and cxnId are authenticated before router is called.
   $dao = new CRM_Cxn_DAO_Cxn();
   $dao->cxn_id = $cxn['cxnId'];
@@ -44,7 +52,7 @@ $apiServer->setRouter(function ($cxn, $entity, $action, $params) {
     return civicrm_api3_create_error('Failed to lookup connection authorizations.');
   }
   if (!$dao->is_active) {
-    return civicrm_api3_create_error('Connection is inactive');
+    return civicrm_api3_create_error('Connection is inactive.');
   }
   if (!is_string($entity) || !is_string($action) || !is_array($params)) {
     return civicrm_api3_create_error('API parameters are malformed.');
