@@ -96,6 +96,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['create'] = array(
       'Cxn',
       'CxnApp',
+      'JobLog',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -109,6 +110,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = array(
       'Cxn',
       'CxnApp',
+      'JobLog',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
