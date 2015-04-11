@@ -1201,6 +1201,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Fetch options from the api unless passed explicitly.
       if (isset($props['options'])) {
         $options = $props['options'];
+        // Else this get passed to the form->add method.
+        unset($props['options']);
       }
       else {
         $options = $fieldSpec['options'];
@@ -1219,25 +1221,33 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['class'] .= ' huge';
         $props['multiple'] = 'multiple';
       }
+      // Set default options-url value.
+      if ((!isset($props['options-url']))) {
+        $props['options-url'] = TRUE;
+      }
 
       // Add data for popup link.
-      if ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+      if ((isset($props['options-url']) && $props['options-url']) && ($props['context'] != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
+        if (isset($props['options-url'])) {
+          unset($props['options-url']);
+        }
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
+    // TODO: refactor switch statement, to seperate methods.
     switch ($widget) {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
-        $this->addElement('text', $name, $label, $props, $required);
+        $this->add('text', $name, $label, $props, $required);
         break;
 
       case 'hidden':
-        $this->addElement('hidden', $name, $label, $props);
+        $this->add('hidden', $name, $label, $props, $required);
         break;
 
       //case 'TextArea':
@@ -1255,12 +1265,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       //case 'AdvMulti-Select':
       //case 'CheckBox':
-      //case 'File':
+      case 'File':
+        // We should not build upload file in search mode.
+        if (isset($props['context']) && $props['context'] == 'search') {
+          return;
+        }
+        $this->add('file', $name, $label, $props, $required);
+        $this->addUploadElement($name);
+        break;
+
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
       case 'EntityRef':
-        $this->addEntityRef($name, $label, $props);
+        $this->addEntityRef($name, $label, $props, $required);
         break;
 
       // Check datatypes of fields
