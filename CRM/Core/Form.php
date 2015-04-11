@@ -1243,14 +1243,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
-        $element = $this->addElement('text', $name, $label, $props);
-        if ($required) {
-          $this->addRequiredRule($element);
-        }
+        $this->add('text', $name, $label, $props, $required);
         break;
 
       case 'hidden':
-        $this->addElement('hidden', $name, $label, $props);
+        $this->add('hidden', $name, $label, $props, $required);
         break;
 
       //case 'TextArea':
@@ -1262,10 +1259,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
-        $this->addElement('select', $name, $label, $options, $props);
-        if ($required) {
-          $this->addRequiredRule($element);
-        }
+        $this->add('select', $name, $label, $options, $required, $props);
         // TODO: Add and/or option for fields that store multiple values
         break;
 
@@ -1276,18 +1270,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (isset($props['context']) && $props['context'] == 'search') {
           return;
         }
-        $this->addElement('file', $name, $label, $props);
+        $this->add('file', $name, $label, $props, $required);
         $this->addUploadElement($name);
-        if ($required) {
-          $this->addRequiredRule($element, 'uploadedfile');
-        }
         break;
 
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
       case 'EntityRef':
-        //TODO: Refactor to avoid add-method.
         $this->addEntityRef($name, $label, $props, $required);
         break;
 
@@ -1299,16 +1289,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case read only fields
       default:
         throw new Exception("Unsupported html-element " . $widget);
-    }
-  }
-
-  /**
-   * Add a required rule to a form element.
-   */
-  public function addRequiredRule($element, $rule = 'required') {
-    $error = $this->addRule($element->getName(), ts('%1 is a required field.', array(1 => $element->getLabel())), $rule);
-    if (HTML_QuickForm::isError($error)) {
-      CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
     }
   }
 
