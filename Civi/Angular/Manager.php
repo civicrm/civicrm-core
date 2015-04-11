@@ -25,6 +25,8 @@ class Manager {
    *   - partials: array(string $relativeFilePath)
    *     A list of partial-HTML folders (relative to the extension).
    *     This will be mapped to "~/moduleName" by crmResource.
+   *   - settings: array(string $key => mixed $value)
+   *     List of settings to preload.
    */
   protected $modules = NULL;
 
@@ -50,9 +52,12 @@ class Manager {
    *   - partials: array(string $relativeFilePath)
    *     A list of partial-HTML folders (relative to the extension).
    *     This will be mapped to "~/moduleName" by crmResource.
+   *   - settings: array(string $key => mixed $value)
+   *     List of settings to preload.
    */
   public function getModules() {
     if ($this->modules === NULL) {
+      $config = \CRM_Core_Config::singleton();
 
       $angularModules = array();
       $angularModules['angularFileUpload'] = array(
@@ -68,6 +73,9 @@ class Manager {
         'js' => array('ang/crmAttachment.js'),
         'css' => array('ang/crmAttachment.css'),
         'partials' => array('ang/crmAttachment'),
+        'settings' => array(
+          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
+        ),
       );
       $angularModules['crmAutosave'] = array(
         'ext' => 'civicrm',
@@ -87,6 +95,10 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('ang/crmUi.js'),
         'partials' => array('ang/crmUi'),
+        'settings' => array(
+          'browseUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/browse.php',
+          'uploadUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/upload.php',
+        ),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
@@ -264,9 +276,9 @@ class Manager {
    * @param string|array $moduleNames
    *   List of module names.
    * @param string $resType
-   *   Type of resource ('js', 'css').
+   *   Type of resource ('js', 'css', 'settings').
    * @param string $refType
-   *   Type of reference to the resource ('cacheUrl', 'rawUrl', 'path').
+   *   Type of reference to the resource ('cacheUrl', 'rawUrl', 'path', 'settings').
    * @return array
    *   List of URLs or paths.
    * @throws \CRM_Core_Exception
@@ -289,6 +301,12 @@ class Manager {
 
             case 'cacheUrl':
               $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+              break;
+
+            case 'settings':
+              if (!empty($module[$resType])) {
+                $result[$moduleName] = $module[$resType];
+              }
               break;
 
             default:
