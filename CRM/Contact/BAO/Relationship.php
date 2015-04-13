@@ -1603,7 +1603,7 @@ SELECT count(*)
       return TRUE;
     }
 
-    if (empty($relIds)) {
+    if (empty($relIds) || empty($relTypeIds)) {
       return FALSE;
     }
 
