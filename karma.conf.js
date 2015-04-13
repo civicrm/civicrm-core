@@ -23,18 +23,18 @@ module.exports = function(config) {
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
       'tests/karma/modules.js',
       'js/crm.ajax.js',
-      'js/angular-*.js',
-      'js/angular-crmMailing/*.js',
+      'ang/*.js',
+      'ang/**/*.js',
       'tests/karma/lib/*.js',
       'tests/karma/**/*.js',
-      'partials/**/*.html'
+      'ang/**/*.html'
     ],
     preprocessors : {
-      'partials/**/*.html' : ['ng-html2js']
+      'ang/**/*.html' : ['ng-html2js']
     },
 
     ngHtml2JsPreprocessor: {
-      stripPrefix: 'partials/',
+      stripPrefix: 'ang/',
       prependPrefix: '~/',
       moduleName: 'crmResource'
     },

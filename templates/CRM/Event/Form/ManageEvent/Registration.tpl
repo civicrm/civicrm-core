@@ -424,6 +424,7 @@ invert              = 0
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
     function addBottomProfile( e ) {
+        var urlPath;
         e.preventDefault();
 
         var addtlPartc = $(this).data('addtlPartc');
@@ -450,8 +451,9 @@ invert              = 0
         $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
-    var strSameAs = ' - '+ts('same as for main contact')+' - ';
-    var strSelect = ' - '+ts('select')+' - ';
+    var
+      strSameAs = '{/literal}{ts escape='js'}- same as for main contact -{/ts}{literal}',
+      strSelect = '{/literal}{ts escape='js'}- select -{/ts}{literal}';
 
     $('#crm-container').on('crmLoad', function() {
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
@@ -483,19 +485,16 @@ $(function($) {
             $('#additional_profile_pre,#additional_profile_post').show();
         }
 
-        showRuleFields({/literal}{$ruleFields}{literal});
     });
-
-    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
 
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
 
     $('#crm-container').on('crmLoad', function(e) {
         $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
-            $input = $(e.target);
+            var $input = $(e.target);
             if ( $input.val() == '') {
-                $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
+                var $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
                 if ($selected.text() == strSelect) { $input.val('none'); }
             }
         });

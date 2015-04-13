@@ -187,6 +187,13 @@ AND li.entity_id = {$entityId}
     $whereClause = "
       WHERE     %2.id = %1";
 
+    if ($entity == 'participant') {
+      $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
+      if (!empty($additionalParticipantIDs)) {
+        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
+      }
+    }
+
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
     if ($isQuick) {
@@ -542,10 +549,10 @@ AND li.entity_id = {$entityId}
       return FALSE;
     }
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;
+      $tax = round($lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100, 2);
     }
     else {
-      $tax = ($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100;
+      $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
     }
     return $tax;
   }

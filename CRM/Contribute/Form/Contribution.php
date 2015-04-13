@@ -1303,7 +1303,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $contribution->contribution_status_id,
           CRM_Utils_Array::value('contribution_status_id',
             $this->_values
-          )
+          ),
+          $contribution->receive_date
         );
       }
 

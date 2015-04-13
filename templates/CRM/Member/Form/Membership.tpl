@@ -397,12 +397,12 @@
           else {
       var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
           }
-          cj("#total_amount").val( feeTotal.toFixed(2) );
+          cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
         else {
     if (taxRate) {
             var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
-      cj("#total_amount").val( feeTotal );
+      cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
           }
           else {
       var feeTotal = allMemberships[memType]['total_amount'];
@@ -568,18 +568,19 @@
             endDate = memberorgs[selectedorg].membership_end_date,
             org = $('option:selected', "select[name='membership_type_id[0]']").text();
           if (endDate) {
-            andEndDate = ' ' + ts("and end date of %1", {1:endDate});
+            andEndDate = '{/literal}{ts escape='js' 1='%1'}and end date of %1{/ts}{literal}';
+            andEndDate = ' ' + ts(andEndDate, {1:endDate});
           }
 
           alert = CRM.alert(
             // Mixing client-side variables with a translated string in smarty is awkward!
             ts({/literal}'{ts escape='js' 1='%1' 2='%2' 3='%3' 4='%4'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
               + '<ul><li><a href="' + memberorgs[selectedorg].renewUrl + '">'
-              + {/literal}'{ts escape='js''}Renew the existing membership instead{/ts}'
+              + {/literal}'{ts escape='js'}Renew the existing membership instead{/ts}'
               + '</a></li><li><a href="' + memberorgs[selectedorg].membershipTab + '">'
               + '{ts escape='js'}View all existing and / or expired memberships for this contact{/ts}'{literal}
               + '</a></li></ul>',
-            ts('Duplicate Membership?'), 'alert');
+            '{/literal}{ts escape='js'}Duplicate Membership?{/ts}{literal}', 'alert');
         }
       }
       checkExistingMemOrg();
@@ -756,16 +757,18 @@
         if (cid) {
           CRM.api('relationship', 'getcount', {contact_id: cid, membership_type_id: memType}, {
             success: function(result) {
-              var relatable = ' ' + result.result + ts(' contacts are ');
-              if(result.result === 0) {
-                relatable = ts(' No contacts are ');
+              var relatable;
+              if (result.result === 0) {
+                relatable = '{/literal}{ts escape='js'}No contacts are currently eligible to inherit this relationship.{/ts}{literal}';
               }
-              if(result.result === 1) {
-                relatable = ts(' One contact is ');
+              else if (result.result === 1) {
+                relatable = '{/literal}{ts escape='js'}One contact is currently eligible to inherit this relationship.{/ts}{literal}';
               }
-
-              var others = relatable + ts('currently eligible to inherit this relationship.');
-              cj('#max_related').siblings('.description').append(others);
+              else {
+                relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
+                relatable = ts(relatable, {1: result});
+              }
+              cj('#max_related').siblings('.description').append(' ' + relatable);
             }
           });
         }

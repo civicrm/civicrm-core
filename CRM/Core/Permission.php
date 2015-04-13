@@ -616,7 +616,7 @@ class CRM_Core_Permission {
     }
 
     // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = $config->userPermissionClass->getAllModulePermissions();
+    $module_permissions = $config->userPermissionClass->getAllModulePermissions($descriptions);
     $permissions = array_merge($permissions, $module_permissions);
     return $permissions;
   }

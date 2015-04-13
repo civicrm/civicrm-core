@@ -65,4 +65,66 @@ class CRM_Utils_JS {
     return array_values($strings);
   }
 
+  /**
+   * Identify duplicate, adjacent, identical closures and consolidate them.
+   *
+   * Note that you can only dedupe closures if they are directly adjacent and
+   * have exactly the same parameters.
+   *
+   * @param array $scripts
+   *   Javascript source.
+   * @param array $localVars
+   *   Ordered list of JS vars to identify the start of a closure.
+   * @param array $inputVals
+   *   Ordered list of input values passed into the closure.
+   * @return string
+   *   Javascript source.
+   */
+  public static function dedupeClosures($scripts, $localVars, $inputVals) {
+    // Example opening: (function (angular, $, _) {
+    $opening = '\s*\(\s*function\s*\(\s*';
+    $opening .= implode(',\s*', array_map(function ($v) {
+      return preg_quote($v, '/');
+    }, $localVars));
+    $opening .= '\)\s*\{';
+    $opening = '/^' . $opening . '/';
+
+    // Example closing: })(angular, CRM.$, CRM._);
+    $closing = '\}\s*\)\s*\(\s*';
+    $closing .= implode(',\s*', array_map(function ($v) {
+      return preg_quote($v, '/');
+    }, $inputVals));
+    $closing .= '\);\s*';
+    $closing = "/$closing\$/";
+
+    $scripts = array_values($scripts);
+    for ($i = count($scripts) - 1; $i > 0; $i--) {
+      if (preg_match($closing, $scripts[$i - 1]) && preg_match($opening, $scripts[$i])) {
+        $scripts[$i - 1] = preg_replace($closing, '', $scripts[$i - 1]);
+        $scripts[$i] = preg_replace($opening, '', $scripts[$i]);
+      }
+    }
+
+    return $scripts;
+  }
+
+  /**
+   * This is a primitive comment stripper. It doesn't catch all comments
+   * and falls short of minification, but it doesn't munge Angular injections
+   * and is fast enough to run synchronously (without caching).
+   *
+   * At time of writing, running this against the Angular modules, this impl
+   * of stripComments currently adds 10-20ms and cuts ~7%.
+   *
+   * Please be extremely cautious about extending this. If you want better
+   * minification, you should probably remove this implementation,
+   * import a proper JSMin implementation, and cache its output.
+   *
+   * @param string $script
+   * @return string
+   */
+  public static function stripComments($script) {
+    return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
+  }
+
 }

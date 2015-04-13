@@ -56,6 +56,9 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount", FALSE);
     $this->type("total_amount", "90");
     $this->clickLink('_qf_Contribution_upload', '', FALSE);
+    $this->waitForText('crm-notification-container', "The sum of fee amount and net amount must be equal to total amount");
+    $this->type("net_amount", "90");
+    $this->clickLink('_qf_Contribution_upload', '', FALSE);
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
