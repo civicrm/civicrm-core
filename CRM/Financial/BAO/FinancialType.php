@@ -234,12 +234,22 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $membershipTypes;
   }
 
-  public static function buildPermissionedClause(&$whereClauses) {
-    self::getAvailableFinancialTypes($financialType);
-    foreach ($financialType as $id => $type) {
-      $ids[] = $id;
+  public static function buildPermissionedClause(&$whereClauses, $component = NULL) {
+    self::getAvailableFinancialTypes($types);
+    if (is_array($whereClauses)) {
+      $whereClauses[] = ' financial_type_id IN (' . implode(',' , array_keys($types)) .')';
     }
-    $whereClauses[] = ' financial_type_id IN (' . implode(',' , $ids) .')';
+    else {
+      if ($component == 'contribution') {
+        $column = "financial_type_id";
+      }
+      if ($component == 'membership') {
+        $types = array();
+        self::getAvailableMembershipTypes($types, 'view');
+        $column = "membership_type_id";
+      }
+      $whereClauses .= " AND civicrm_{$component}.{$column} IN (". implode(',' , array_keys($types)) .")";
+    }
   }
 
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
