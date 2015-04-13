@@ -949,6 +949,9 @@ WHERE  id = %1";
           unset($feeBlock[$key]['options'][$k]);
         }
       }
+      if (empty($feeBlock[$key]['options'])) {
+        unset($feeBlock[$key]);
+      }
     }
     // call the hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
