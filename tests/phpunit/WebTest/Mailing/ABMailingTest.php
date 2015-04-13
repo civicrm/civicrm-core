@@ -151,13 +151,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));
@@ -323,13 +323,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));
@@ -500,13 +500,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[1][text()='Final ($ABTestName)']/../descendant::a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));
