@@ -8,6 +8,11 @@ CRM.$(function($) {
 
     $("#Entry").ajaxSubmit(options);
 
+    //avoid multiple click on submit button
+    $("#_qf_Entry_upload").on('click', function() {
+      $('#Entry').block();
+    });
+
     // validate rows
     checkColumns($(this));
   });
@@ -152,7 +157,7 @@ function checkColumns(parentRow) {
     parentRow.find("div:first span").prop('class', 'batch-invalid');
   }
   else {
-    if (inValidRow == 0 && validRow > 0) {
+    if (inValidRow === 0 && validRow > 0) {
       parentRow.find("div:first span").prop('class', 'batch-valid');
     }
     else {
@@ -178,11 +183,13 @@ function formatMoney(amount) {
   var t = CRM.setting.monetaryThousandSeparator;
   var d = CRM.setting.monetaryDecimalPoint;
 
+  c = isNaN(c = Math.abs(c)) ? 2 : c;
+  t = t === undefined ? "." : t;
+  d = d === undefined ? "," : d;
+
   var n = amount,
-    c = isNaN(c = Math.abs(c)) ? 2 : c,
-    d = d == undefined ? "," : d,
-    t = t == undefined ? "." : t, s = n < 0 ? "-" : "",
     i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+    s = n < 0 ? "-" : "",
     j = (j = i.length) > 3 ? j % 3 : 0;
 
   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
@@ -197,12 +204,12 @@ function formatMoney(amount) {
 function setFieldValue(fname, fieldValue, blockNo) {
   var elementId = cj('[name="field[' + blockNo + '][' + fname + ']"]');
 
-  if (elementId.length == 0) {
+  if (elementId.length === 0) {
     elementId = cj('input[type=checkbox][name^="field[' + blockNo + '][' + fname + ']"][type!=hidden]');
   }
 
   // if element not found than return
-  if (elementId.length == 0) {
+  if (elementId.length === 0) {
     return;
   }
 
@@ -240,7 +247,7 @@ function setFieldValue(fname, fieldValue, blockNo) {
       if (editor) {
         switch (editor) {
           case 'ckeditor':
-            var elemtId = elementId.attr('id');
+            elemtId = elementId.attr('id');
             oEditor = CKEDITOR.instances[elemtId];
             oEditor.setData(htmlContent);
             break;
@@ -249,9 +256,10 @@ function setFieldValue(fname, fieldValue, blockNo) {
             tinyMCE.get(elemtId).setContent(htmlContent);
             break;
           case 'joomlaeditor':
-          // TO DO
+            // TO DO
           case 'drupalwysiwyg':
-          // TO DO
+            // TO DO
+            break;
           default:
             elementId.val(fieldValue);
         }
@@ -265,7 +273,7 @@ function setFieldValue(fname, fieldValue, blockNo) {
   // since we use different display field for date we also need to set it.
   // also check for date time field and set the value correctly
   if (isDateElement && fieldValue) {
-    setDateFieldValue(fname, fieldValue, blockNo)
+    setDateFieldValue(fname, fieldValue, blockNo);
   }
 }
 

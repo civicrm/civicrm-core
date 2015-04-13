@@ -367,22 +367,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    // check if activity record exist for this contribution, if
-    // not add activity
-    $activity = new CRM_Activity_DAO_Activity();
-    $activity->source_record_id = $contribution->id;
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      'Contribution',
-      'name'
-    );
-    if (!$activity->find(TRUE)) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
-    }
-    else {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
-    }
-
     // Handle soft credit and / or link to personal campaign page
     $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
 
@@ -435,6 +419,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $transaction->commit();
+
+    // check if activity record exist for this contribution, if
+    // not add activity
+    $activity = new CRM_Activity_DAO_Activity();
+    $activity->source_record_id = $contribution->id;
+    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
+      'Contribution',
+      'name'
+    );
+    if (!$activity->find(TRUE)) {
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
+    }
+    else {
+      // CRM-13237 : if activity record found, update it with campaign id of contribution
+      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+    }
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
@@ -1632,7 +1632,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             }
 
             // CRM-15735-to update the membership status as per the contribution receive date
+            $joinDate = NULL;
             if (!empty($params['receive_date'])) {
+              $joinDate = $params['receive_date'];
               $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($membership->start_date,
                 $membership->end_date,
                 $membership->join_date,
@@ -1651,7 +1653,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
-              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, NULL, NULL, NULL, $numterms);
+              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, $joinDate, NULL, NULL, $numterms);
             }
 
             //get the status for membership.
@@ -2779,7 +2781,7 @@ WHERE  contribution_id = %1 ";
         'trxn_date' => date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
-        'net_amount' => CRM_Utils_Array::value('net_amount', $params),
+        'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
         'status_id' => $statusId,
@@ -3276,6 +3278,7 @@ WHERE  contribution_id = %1 ";
       $params['partial_payment_total'] = $contributionDAO->total_amount;
       $params['partial_amount_pay'] = $trxnsData['total_amount'];
       $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
+      $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
@@ -3297,7 +3300,7 @@ WHERE  contribution_id = %1 ";
 
       // update statuses
       // criteria for updates contribution total_amount == financial_trxns of partial_payments
-      $sql = "SELECT SUM(ft.total_amount) as sum_of_payments
+      $sql = "SELECT SUM(ft.total_amount) as sum_of_payments, SUM(ft.net_amount) as net_amount_total
 FROM civicrm_financial_trxn ft
 LEFT JOIN civicrm_entity_financial_trxn eft
   ON (ft.id = eft.financial_trxn_id)
@@ -3306,7 +3309,9 @@ WHERE eft.entity_table = 'civicrm_contribution'
   AND ft.to_financial_account_id != {$toFinancialAccount}
   AND ft.status_id = {$statusId}
 ";
-      $sumOfPayments = CRM_Core_DAO::singleValueQuery($sql);
+      $query = CRM_Core_DAO::executeQuery($sql);
+      $query->fetch();
+      $sumOfPayments = $query->sum_of_payments;
 
       // update statuses
       if ($contributionDAO->total_amount == $sumOfPayments) {
@@ -3315,8 +3320,9 @@ WHERE eft.entity_table = 'civicrm_contribution'
         $contributionDAO->contribution_status_id = $statusId;
         $contributionDAO->cancel_date = 'null';
         $contributionDAO->cancel_reason = NULL;
-        $netAmount = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
-        $contributionDAO->net_amount = $contributionDAO->net_amount + $netAmount;
+        $netAmount = !empty($trxnsData['net_amount']) ? NULL : $trxnsData['total_amount'];
+        $contributionDAO->net_amount = $query->net_amount_total + $netAmount;
+        $contributionDAO->fee_amount = $contributionDAO->total_amount - $contributionDAO->net_amount;
         $contributionDAO->save();
 
         //Change status of financial record too

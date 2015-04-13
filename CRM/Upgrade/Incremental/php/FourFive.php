@@ -353,7 +353,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
             if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
               // This indicates data structure identified by jamie in the form:
               // value1 => 1, value2 => , value3 => 1.
-              $data_value = array_keys($data_value, 1); 
+              $data_value = array_keys($data_value, 1);
 
               // If CiviCRM_OP_OR - change OP from default to OR
               if($data_value['CiviCRM_OP_OR'] == 1) {
@@ -370,14 +370,23 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
               $op = 'or';
               unset($data_value[$key]);
             }
-     
+
+            //If only Or operator has been chosen, means we need to select all values and
+            //so to execute OR operation between these values according to new data structure
+            if (count($data_value) == 0 && $op == 'or') {
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
+              foreach ($customOption as $option) {
+                $data_value[] = CRM_Utils_Array::value('value', $option);
+              }
+            }
+
             $formValues[$field] = $data_value;
             $formValues["${field}_operator"] = $op;
           }
         }
       }
 
-      if($update) { 
+      if ($update) {
         $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
         CRM_Core_DAO::executeQuery($sql,
           array(

@@ -156,11 +156,8 @@
      * @return void
      */
     function copyValuesDate(fname) {
-      var fnameDisplay = fname + '_display';
-      var fnameTime    = fname + '_time';
-
-      var displayElement = $('.crm-copy-fields [name^="field_"][name$="_' + fnameDisplay +'"][type!=hidden]');
-      var timeElement    = $('.crm-copy-fields [name^="field["][name*="[' + fnameTime +']"][type!=hidden]');
+      var displayElement = $('.crm-copy-fields [name^="field_"][name*="_' + fname +'_display"]:visible');
+      var timeElement    = $('.crm-copy-fields [name^="field["][name*="[' + fname +'_time]"][type!=hidden]');
 
       displayElement.val( displayElement.eq(0).val() );
       timeElement.val( timeElement.eq(0).val() );

@@ -104,7 +104,7 @@
         },
         template: function() {
           var args = $location.search();
-          return (args && args.angularDebug) ? '<div crm-ui-accordion crm-title=\'ts("Debug (%1)", {1: crmUiDebug})\' crm-collapsed="true"><pre>{{data|json}}</pre></div>' : '';
+          return (args && args.angularDebug) ? '<div crm-ui-accordion=\'{title: ts("Debug (%1)", {1: crmUiDebug}), collapsed: true}\'><pre>{{data|json}}</pre></div>' : '';
         },
         link: function(scope, element, attrs) {
           var args = $location.search();
@@ -392,6 +392,19 @@
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
           var ck = CKEDITOR.replace(elm[0]);
+
+          if (ck) {
+            _.extend(ck.config, {
+              width: '94%',
+              height: '400',
+              filebrowserBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=files',
+              filebrowserImageBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=images',
+              filebrowserFlashBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=flash',
+              filebrowserUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=files',
+              filebrowserImageUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=images',
+              filebrowserFlashUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=flash',
+            });
+          }
 
           if (!ngModel) {
             return;
@@ -906,7 +919,8 @@
 
     // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
-    .directive('crmConfirm', function () {
+    // Example: <button crm-confirm="{templateUrl: '~/path/to/view.html', export: {foo: bar}}" on-yes="frobnicate(123)">Frobincate</button>
+    .directive('crmConfirm', function ($compile, $rootScope, $templateRequest, $q) {
       // Helpers to calculate default options for CRM.confirm()
       var defaultFuncs = {
         'disable': function (options) {
@@ -940,6 +954,7 @@
           };
         }
       };
+      var confirmCount = 0;
       return {
         link: function (scope, element, attrs) {
           $(element).click(function () {
@@ -948,9 +963,35 @@
               options.title = attrs.title;
             }
             var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
+
+            var tpl = null, stubId = null;
+            if (!options.message) {
+              if (options.templateUrl) {
+                tpl = $templateRequest(options.templateUrl);
+              }
+              else if (options.template) {
+                tpl = options.template;
+              }
+              if (tpl) {
+                stubId = 'crmUiConfirm_' + (++confirmCount);
+                options.message = '<div id="' + stubId + '"></div>';
+              }
+            }
+
             CRM.confirm(_.extend(defaults, options))
-              .on('crmConfirm:yes', function () { scope.$apply(attrs.onYes); })
-              .on('crmConfirm:no', function () { scope.$apply(attrs.onNo); });
+              .on('crmConfirm:yes', function() { scope.$apply(attrs.onYes); })
+              .on('crmConfirm:no', function() { scope.$apply(attrs.onNo); });
+
+            if (tpl && stubId) {
+              $q.when(tpl, function(html) {
+                var scope = options.scope || $rootScope.$new();
+                if (options.export) {
+                  angular.extend(scope, options.export);
+                }
+                var linker = $compile(html);
+                $('#' + stubId).append($(linker(scope)));
+              });
+            }
           });
         }
       };

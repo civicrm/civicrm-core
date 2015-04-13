@@ -129,26 +129,18 @@ CRM.$(function($) {
     $($form).ajaxSubmit(options);
   });
  
- cj('input[id*="primary_contact_"]').change(function() {
+ $('input[id*="primary_contact_"]').change(function() {
  var temp = this.id.split('_');
    var ROWID = temp[3];
-   if (cj(this).val()) {
+   if ($(this).val()) {
      updateContactInfo(ROWID,'primary_');
    }
  });
 
- cj('select[id^="option_type_"]').each(function () {
-    if (cj(this).val() == 1) {
-      cj(this).attr('disabled', true);
-      cj(this).hide();
-    }
-  });
-
-  cj('input[id*="primary_contact_id_"]').change(function() {
-    var temp = this.id.split('_');
-    var ROWID = temp[3];
-    if (cj(this).val()) {
-      updateContactInfo(ROWID,'primary_');
+ $('select[id^="option_type_"]').each(function () {
+    if ($(this).val() == 1) {
+      $(this).attr('disabled', true);
+      $(this).hide();
     }
   });
 
@@ -513,8 +505,7 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
   if (date_format != 'mm/dd/yy') {
     displayDateValue = cj.datepicker.formatDate(date_format, actualDateValue);
   }
-
-  cj('#field_' + blockNo + '_' + fname + '_display').val(displayDateValue);
+  cj('[id^=field_' + blockNo + '_' + fname + '_display]').val(displayDateValue);
 
   // need to fix time formatting
   if (dateValues[1]) {

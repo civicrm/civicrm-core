@@ -69,25 +69,26 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmMailing.js',
-        'js/angular-crmMailing/*.js',
+        'ang/crmMailing.js',
+        'ang/crmMailing/*.js',
       ),
-      'css' => array('css/angular-crmMailing.css'),
-      'partials' => array('partials/crmMailing'),
+      'css' => array('ang/crmMailing.css'),
+      'partials' => array('ang/crmMailing'),
     );
     $result['crmMailingAB'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmMailingAB.js',
-        'js/angular-crmMailingAB/*.js',
+        'ang/crmMailingAB.js',
+        'ang/crmMailingAB/*.js',
+        'ang/crmMailingAB/*/*.js',
       ),
-      'css' => array('css/angular-crmMailingAB.css'),
-      'partials' => array('partials/crmMailingAB'),
+      'css' => array('ang/crmMailingAB.css'),
+      'partials' => array('ang/crmMailingAB'),
     );
     $result['crmD3'] = array(
       'ext' => 'civicrm',
       'js' => array(
-        'js/angular-crmD3.js',
+        'ang/crmD3.js',
         'bower_components/d3/d3.min.js',
       ),
     );
@@ -120,7 +121,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
       'is_active' => 1,
-      'return' => array('name', 'component_type', 'is_default'),
+      'return' => array('name', 'component_type', 'is_default', 'body_html', 'body_text'),
     ));
 
     $emailAdd = civicrm_api3('Email', 'get', array(
@@ -158,6 +159,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'contactid' => $contactID,
           'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
           'enableReplyTo' => (int) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'replyTo'),
+          'disableMandatoryTokensCheck' => (int) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],
           'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
               'id' => 'user_contact_id',

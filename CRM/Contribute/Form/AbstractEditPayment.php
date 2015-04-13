@@ -35,9 +35,19 @@
 
 /**
  * This class generates form components for processing a contribution
+ * CRM-16229 - During the event registration bulk action via search we
+ * need to inherit CRM_Contact_Form_Task so that we can inherit functions
+ * like getContactIds and make use of controller state. But this is not possible
+ * because CRM_Event_Form_Participant inherits this class.
+ * Ideal situation would be something like
+ * CRM_Event_Form_Participant extends CRM_Contact_Form_Task,
+ * CRM_Contribute_Form_AbstractEditPayment
+ * However this is not possible. Currently PHP does not support multiple
+ * inheritance. So work around solution is to extend this class with
+ * CRM_Contact_Form_Task which further extends CRM_Core_Form.
  *
  */
-class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
+class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_mode;
 
   public $_action;
@@ -282,7 +292,7 @@ WHERE  contribution_id = {$id}
    *
    * @return null|string
    */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
+  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
     $statusMsg = NULL;
     if (!$contributionId || !$statusId) {
       return $statusMsg;
@@ -292,6 +302,7 @@ WHERE  contribution_id = {$id}
       'contribution_id' => $contributionId,
       'contribution_status_id' => $statusId,
       'previous_contribution_status_id' => $previousStatusId,
+      'receive_date' => $receiveDate,
     );
 
     $updateResult = CRM_Contribute_BAO_Contribution::transitionComponents($params);
@@ -421,6 +432,9 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
+        if (!empty($processor['description'])) {
+          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        }
       }
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;

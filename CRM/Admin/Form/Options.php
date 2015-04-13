@@ -177,6 +177,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
       TRUE
     );
+
     if (!in_array($this->_gName, array(
         'email_greeting',
         'postal_greeting',
@@ -221,12 +222,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $required = TRUE;
     }
     elseif ($this->_gName == 'redaction_rule' || $this->_gName == 'engagement_index') {
-      $this->add('text',
-        'value',
-        ts('Value'),
-        CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
-        TRUE
-      );
       if ($this->_gName == 'redaction_rule') {
         $this->add('checkbox',
           'filter',

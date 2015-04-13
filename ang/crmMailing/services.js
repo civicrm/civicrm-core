@@ -185,7 +185,7 @@
       // ex: var msgs = findMissingTokens(mailing, 'body_html');
       findMissingTokens: function(mailing, field) {
         var missing = {};
-        if (!_.isEmpty(mailing[field])) {
+        if (!_.isEmpty(mailing[field]) && !CRM.crmMailing.disableMandatoryTokensCheck) {
           var body = '';
           if (mailing.footer_id) {
             var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
@@ -399,9 +399,9 @@
       // @return Promise
       preview: function preview(mailing, mode) {
         var templates = {
-          html: '~/crmMailing/dialog/previewHtml.html',
-          text: '~/crmMailing/dialog/previewText.html',
-          full: '~/crmMailing/dialog/previewFull.html'
+          html: '~/crmMailing/PreviewMgr/html.html',
+          text: '~/crmMailing/PreviewMgr/text.html',
+          full: '~/crmMailing/PreviewMgr/full.html'
         };
         var result = null;
         var p = crmMailingMgr
@@ -499,6 +499,34 @@
             return null;
         }
       }
+    };
+  });
+
+  // crmMailingSimpleDirective is a template/factory-function for constructing very basic
+  // directives that accept a "mailing" argument. Please don't overload it. If one continues building
+  // this, it risks becoming a second system that violates Angular architecture (and prevents one
+  // from using standard Angular docs+plugins). So this really shouldn't do much -- it is really
+  // only for simple directives. For something complex, suck it up and write 10 lines of boilerplate.
+  angular.module('crmMailing').factory('crmMailingSimpleDirective', function ($q, crmMetadata, crmUiHelp) {
+    return function crmMailingSimpleDirective(directiveName, templateUrl) {
+      return {
+        scope: {
+          crmMailing: '@'
+        },
+        templateUrl: templateUrl,
+        link: function (scope, elm, attr) {
+          scope.$parent.$watch(attr.crmMailing, function(newValue){
+            scope.mailing = newValue;
+          });
+          scope.crmMailingConst = CRM.crmMailing;
+          scope.ts = CRM.ts(null);
+          scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
+          scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};
+          $q.when(crmMetadata.getFields('Mailing'), function(fields) {
+            scope.mailingFields = fields;
+          });
+        }
+      };
     };
   });
 

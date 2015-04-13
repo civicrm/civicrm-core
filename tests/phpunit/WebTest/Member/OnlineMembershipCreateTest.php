@@ -162,6 +162,23 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     }
     $this->webtestVerifyTabularData($verifyData);
 
+    //CRM-15735 - verify membership dates gets changed w.r.t receive_date of contribution.
+    if ($payLater) {
+      $receiveDate = date('F jS, Y', strtotime("-1 month"));
+      $endDate = date('F jS, Y', strtotime("+1 year -1 month -1 day"));
+      $this->clickAjaxLink("xpath=//button//span[contains(text(),'Edit')]", 'receive_date');
+      $this->select('contribution_status_id', 'Completed');
+      $this->webtestFillDate('receive_date', '-1 month');
+      $this->clickAjaxLink("xpath=//button//span[contains(text(),'Save')]", "xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+      $updatedData = array(
+        'Status' => 'New',
+        'Member Since' => $receiveDate,
+        'Start date' => $receiveDate,
+        'End date' => $endDate,
+      );
+      $this->webtestVerifyTabularData($updatedData);
+    }
+
     // CRM-8141 signup for membership 2 with same anonymous user info (should create 2 separate membership records because membership orgs are different)
     //logout
     $this->webtestLogout();
