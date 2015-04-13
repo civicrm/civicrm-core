@@ -235,16 +235,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   public static function buildPermissionedClause(&$whereClauses, $component = NULL) {
-    self::getAvailableFinancialTypes($types);
     if (is_array($whereClauses)) {
+      self::getAvailableFinancialTypes($types);
       $whereClauses[] = ' financial_type_id IN (' . implode(',' , array_keys($types)) .')';
     }
     else {
       if ($component == 'contribution') {
+        self::getAvailableFinancialTypes($types);
         $column = "financial_type_id";
       }
       if ($component == 'membership') {
-        $types = array();
         self::getAvailableMembershipTypes($types, 'view');
         $column = "membership_type_id";
       }
