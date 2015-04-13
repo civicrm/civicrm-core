@@ -367,9 +367,6 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
       $checkLineItem = FALSE;
       $row = array();
-      if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
-        continue;
-      }
       // Now check for lineItems
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
       foreach ($lineItems as $items) { 
