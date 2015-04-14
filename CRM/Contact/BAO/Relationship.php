@@ -52,13 +52,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function create(&$params) {
 
-    $extended_params = self::loadExistingRelationshipDetails($params);
+    $extendedParams = self::loadExistingRelationshipDetails($params);
     // When id is specified we always wan't to update, so we don't need to
     // check for duplicate relations.
-    if (!isset($params['id']) && self::checkDuplicateRelationship($extended_params, $extended_params['contact_id_a'], $extended_params['contact_id_b'], CRM_Utils_Array::value('id', $extended_params, 0))) {
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
-    $params = $extended_params;
+    $params = $extendedParams;
     if (self::checkValidRelationship($params, $params, 0)) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
