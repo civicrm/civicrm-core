@@ -621,20 +621,7 @@ ORDER BY parent_id, weight";
         $homeLabel = ts('CiviCRM Home');
       }
       // Link to hide the menubar
-      if (
-        ($config->userSystem->is_drupal) &&
-        ((module_exists('toolbar') && user_access('access toolbar')) ||
-          module_exists('admin_menu') && user_access('access administration menu')
-        )
-      ) {
-        $hideLabel = ts('Drupal Menu');
-      }
-      elseif ($config->userSystem->is_wordpress) {
-        $hideLabel = ts('WordPress Menu');
-      }
-      else {
-        $hideLabel = ts('Hide Menu');
-      }
+      $hideLabel = ts('Hide Menu');
 
       $prepandString = "
         <li class='menumain crm-link-home'>$homeIcon
