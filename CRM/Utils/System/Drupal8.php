@@ -317,22 +317,33 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
+    $htmlize = FALSE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $query = html_entity_decode($query);
+
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
+    // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal::url($url['route_name'], array(), array(
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
         'query' => $url['query'],
-        'absolute' => $absolute,
         'fragment' => $fragment,
-      ));
+        'absolute' => $absolute,
+      ])->toString();
     }
     catch (Exception $e) {
+      // @Todo: log to watchdog
       $url = '';
+    }
+
+    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
+    // are invalid and Drupal will attempt to escape them. We unescape them here:
+    if ($path == '*path*') {
+      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
+      $url = rtrim($url, '=');
+      $url = urldecode($url);
     }
 
     if ($htmlize) {
