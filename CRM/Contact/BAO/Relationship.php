@@ -1607,7 +1607,7 @@ SELECT count(*)
       return FALSE;
     }
 
-    if (empty($relIds)) {
+    if (empty($relIds) || empty($relTypeIds)) {
       return FALSE;
     }
 
