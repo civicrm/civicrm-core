@@ -68,7 +68,41 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    $count = 0;
+    foreach ($this->_contributionIds as $key => $id) {
+      $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
+      if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
+        unset($this->_contributionIds[$key]);
+        $count++;
+      }
+      // Now check for lineItems
+      if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
+        foreach ($lineItems as $items) { 
+          if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+            unset($this->_contributionIds[$key]);
+            $count++;
+            break;
+          }
+        }
+      }
+    }
+    if ($count && empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution could not be deleted.', array('plural' => '%count contributions could not be deleted.', 'count' => $count)), ts('Error'), 'error');
+      $this->addButtons(array(
+        array(
+          'type' => 'back',
+          'name' => ts('Cancel'),
+        ),
+       )
+      );
+    }
+    elseif ($count && !empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', array('plural' => '%count contributions will not be deleted.', 'count' => $count)), ts('Warning'), 'warning');
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
+    else {
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
   }
 
   /**

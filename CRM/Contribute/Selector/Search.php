@@ -376,11 +376,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         }
         if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
           unset($links[CRM_Core_Action::UPDATE]);
-          break;
         }
         if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
           unset($links[CRM_Core_Action::DELETE]);
-          break;
         }
       }
       if ($checkLineItem) {
