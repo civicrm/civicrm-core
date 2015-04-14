@@ -36,6 +36,13 @@ function civicrm_setup($filesDirectory) {
   global $crmPath, $sqlPath, $pkgPath, $tplPath;
   global $compileDir;
 
+  // Setup classloader
+  // This is needed to allow CiviCRM to be installed by drush.
+  // TODO: move to civicrm.drush.inc drush_civicrm_install()
+  global $crmPath;
+  require_once $crmPath . '/CRM/Core/ClassLoader.php';
+  CRM_Core_ClassLoader::singleton()->register();
+
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
 
