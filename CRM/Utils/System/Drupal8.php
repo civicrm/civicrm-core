@@ -109,7 +109,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    $user = user_load($ufID);
+    $user = entity_load('user', $ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -185,7 +185,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-
     \Drupal::service('civicrm.page_state')->setTitle($pageTitle);
   }
 
@@ -217,19 +216,25 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $options = array('group' => JS_LIBRARY, 'weight' => 10);
+    static $weight = 0;
+
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
-
       default:
         return FALSE;
     }
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addJS($url, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#attributes' => array(
+        'src' => $url,
+      ),
+      '#weight' => $weight,
+    );
+    $weight++;
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -237,17 +242,19 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScript($code, $region) {
-    $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
-
       default:
         return FALSE;
     }
-    \Drupal::service('civicrm.page_state')->addJS($code, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -258,10 +265,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array();
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addCSS($url, $options);
+    $css = array(
+      '#tag' => 'link',
+      '#attributes' => array(
+        'href' => $url,
+        'rel' => 'stylesheet',
+      ),
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
@@ -272,8 +283,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array('type' => 'inline');
-    \Drupal::service('civicrm.page_state')->addCSS($code, $options);
+    $css = array(
+      '#tag' => 'style',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
