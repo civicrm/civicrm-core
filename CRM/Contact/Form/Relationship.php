@@ -451,7 +451,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $this->setMessage($outcome);
     }
 
-
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
     // @todo this belongs in the BAO.
