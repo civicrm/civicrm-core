@@ -94,6 +94,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('_qf_MembershipRenewal_upload-bottom');
 
     // page was loaded
+    $this->waitForAjaxContent();
     $this->waitForTextPresent($sourceText);
     $this->waitForElementPresent("xpath=//div[@id='memberships']/div/table[@class='display dataTable no-footer']/tbody/tr/td[9]/span[1]/a[1][contains(text(),'View')]");
 
