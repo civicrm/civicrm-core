@@ -985,11 +985,15 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $dao->whereAdd('is_test IS NULL OR is_test = 0');
     }
 
+    $statusIds = array();
     //avoid pending membership as current membership: CRM-3027
-    $statusIds[] = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+    $pending = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+    if(!empty($pending)) {
+      $statusIds[] = $pending;
+    }
     if (!$membershipId) {
       // CRM-15475
-      $statusIds[] = array_search(
+      $cancelled = array_search(
         'Cancelled', 
         CRM_Member_PseudoConstant::membershipStatus(
           NULL, 
@@ -999,8 +1003,13 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
           TRUE
         )
       );
+      if(!empty($cancelled)) {
+        $statusIds[] = $cancelled;
+      } 
     }
-    $dao->whereAdd('status_id NOT IN ( ' . implode(',',  $statusIds) . ')');
+    if(count($statusIds) > 0) {
+      $dao->whereAdd('status_id NOT IN ( ' . implode(',',  $statusIds) . ')');
+    }
 
     // order by start date to find most recent membership first, CRM-4545
     $dao->orderBy('start_date DESC');
