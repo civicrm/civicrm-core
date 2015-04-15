@@ -409,12 +409,21 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
       if ($relation->contact_id_a == $this->_contactId) {
+        // I couldn't replicate this path in testing. See below.
         $params['contact_id_a'] = $this->_contactId;
         $params['contact_id_b'] = array($params['related_contact_id']);
+        $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+        $relationshipIds = $outcome['relationship_ids'];
       }
       else {
+        // The only reason we have changed this to use the api & not the above is that this was broken.
+        // Recommend extracting all of update into a function that uses the api
+        // and ensuring api / bao take care of 'other stuff' in this form
+        // the contact_id_a & b can't be changed on this form so don't really need setting.
         $params['contact_id_b'] = $this->_contactId;
-        $params['contact_id_a'] = array($params['related_contact_id']);
+        $params['contact_id_a'] = $params['related_contact_id'];
+        $result = civicrm_api3('relationship', 'create', $params);
+        $relationshipIds = array($result['id']);
       }
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
@@ -429,19 +438,18 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
         }
       }
+      $this->setMessage(ts('The relationship has been updated'));
     }
     // Create mode (could be 1 or more relationships)
     else {
       $params['contact_id_' .  $relationshipTypeParts[2]] = explode(',', $params['related_contact_id']);
+      $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+      $relationshipIds = $outcome['relationship_ids'];
+      if (empty($outcome['saved']) && !empty($update)) {
+        $outcome['saved'] = $update;
+      }
+      $this->setMessage($outcome);
     }
-
-    // Save the relationships.
-    $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
-    $relationshipIds = $outcome['relationship_ids'];
-    if (empty($outcome['saved']) && !empty($update)) {
-      $outcome['saved'] = $update;
-    }
-    $this->setMessage($outcome);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
