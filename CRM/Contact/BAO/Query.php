@@ -1165,6 +1165,9 @@ class CRM_Contact_BAO_Query {
                     //gross hack to pickup corrupted data also, CRM-7603
                     if (strpos($cond, 'phone_type_id') !== FALSE) {
                       $phoneTypeCondition = " AND ( `$tName`.$cond OR `$tName`.phone_type_id IS NULL ) ";
+                      if (!empty($lCond)) {
+                        $phoneTypeCondition .= " AND ( `$tName`.$lCond ) ";
+                      }
                     }
                     $this->_tables[$tName] .= $phoneTypeCondition;
                   }
