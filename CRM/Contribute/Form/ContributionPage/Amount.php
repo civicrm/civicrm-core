@@ -316,8 +316,13 @@ SELECT id
 
       //CRM-16165, Don't allow reccuring contribution if membership block contain any renewable membership option
       $membershipTypes = unserialize($membershipBlock->membership_types);
-      if (!empty($fields['is_recur']) && !empty($membershipTypes) && count(array_filter($membershipTypes)) != 0) {
-        $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
+      if (!empty($fields['is_recur']) && !empty($membershipTypes)) {
+        if (!$membershipBlock->is_separate_payment) {
+          $errors['is_recur'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution.');
+        }
+        elseif (count(array_filter($membershipTypes)) != 0) {
+          $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
+        }
       }
     }
 
