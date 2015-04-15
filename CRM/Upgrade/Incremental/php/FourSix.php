@@ -191,8 +191,8 @@ class CRM_Upgrade_Incremental_php_FourSix {
     // CRM-16289 - Fix invalid data in log_civicrm_case.case_type_id.
     $this->addTask(ts('Cleanup case type id data in log table.'), 'fixCaseLog');
   }
-  
-   /**
+
+  /**
     * Remove special characters from case_type_id column in log_civicrm_case.
     *
     * CRM-16289 - If logging enabled and upgrading from 4.4 or earlier, log_civicrm_case.case_type_id will contain special characters.
@@ -207,7 +207,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $res = CRM_Core_DAO::singleValueQuery($sql);
 
     if ($res) {
-      // executeQuery doesn't like running multiple engine changes in one pass, so have to break it up. dgg 
+      // executeQuery doesn't like running multiple engine changes in one pass, so have to break it up. dgg
       $query = "ALTER TABLE `log_civicrm_case` ENGINE = InnoDB;";
       CRM_Core_DAO::executeQuery($query);
       $query = "UPDATE log_civicrm_case SET case_type_id = replace(case_type_id, 0x01, '');";
@@ -215,8 +215,9 @@ class CRM_Upgrade_Incremental_php_FourSix {
       $query = "ALTER TABLE `log_civicrm_case` ENGINE = ARCHIVE;";
       CRM_Core_DAO::executeQuery($query);
       $query = "ALTER TABLE log_civicrm_case MODIFY `case_type_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_case_type.id';";
-      CRM_Core_DAO::executeQuery($query);      
+      CRM_Core_DAO::executeQuery($query);
     }
     return TRUE;
   }
+
 }
