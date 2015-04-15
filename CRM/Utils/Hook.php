@@ -424,7 +424,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called before a db write on a custom table.
+   * This hook is called after a db write on a custom table.
    *
    * @param string $op
    *   The type of operation being performed.
