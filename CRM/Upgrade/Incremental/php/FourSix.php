@@ -193,15 +193,15 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
   /**
-    * Remove special characters from case_type_id column in log_civicrm_case.
-    *
-    * CRM-16289 - If logging enabled and upgrading from 4.4 or earlier, log_civicrm_case.case_type_id will contain special characters.
-    * This will cause ALTER TABLE to fail when changing this column to an INT
-    *
-    * @param \CRM_Queue_TaskContext $ctx
-    *
-    * @return bool
-    */
+   * Remove special characters from case_type_id column in log_civicrm_case.
+   *
+   * CRM-16289 - If logging enabled and upgrading from 4.4 or earlier, log_civicrm_case.case_type_id will contain special characters.
+   * This will cause ALTER TABLE to fail when changing this column to an INT
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
   public static function fixCaseLog(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'log_civicrm_case'";
     $res = CRM_Core_DAO::singleValueQuery($sql);
