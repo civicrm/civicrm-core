@@ -97,7 +97,8 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses) {
+  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
+    var qApi = crmQueue(crmApi);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -116,7 +117,7 @@
       get: function get(id) {
         var crmMailingMgr = this;
         var mailing;
-        return crmApi('Mailing', 'getsingle', {id: id})
+        return qApi('Mailing', 'getsingle', {id: id})
           .then(function (getResult) {
             mailing = getResult;
             return $q.all([
@@ -172,7 +173,7 @@
       // @return Promise
       'delete': function (mailing) {
         if (mailing.id) {
-          return crmApi('Mailing', 'delete', {id: mailing.id});
+          return qApi('Mailing', 'delete', {id: mailing.id});
         }
         else {
           var d = $q.defer();
@@ -263,7 +264,7 @@
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
         if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
-          return crmApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
+          return qApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
             return result.values;
           });
         }
@@ -276,7 +277,7 @@
             }
           });
           delete params.recipients; // the content was merged in
-          return crmApi('Mailing', 'create', params).then(function(result) {
+          return qApi('Mailing', 'create', params).then(function(result) {
             // changes rolled back, so we don't care about updating mailing
             return result.values[result.id]['api.Mailing.preview'].values;
           });
@@ -302,7 +303,7 @@
           }
         });
         delete params.recipients; // the content was merged in
-        return crmApi('Mailing', 'create', params).then(function (recipResult) {
+        return qApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
           return recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
         });
@@ -330,7 +331,7 @@
 
         delete params.recipients; // the content was merged in
 
-        return crmApi('Mailing', 'create', params).then(function(result) {
+        return qApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
@@ -349,7 +350,7 @@
           approval_date: 'now',
           scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : 'now'
         };
-        return crmApi('Mailing', 'submit', params)
+        return qApi('Mailing', 'submit', params)
           .then(function (result) {
             angular.extend(mailing, result.values[result.id]); // Perhaps we should reload mailing based on result?
             return crmMailingMgr._loadJobs(mailing);
@@ -382,7 +383,7 @@
 
         delete params.recipients; // the content was merged in
 
-        return crmApi('Mailing', 'create', params).then(function (result) {
+        return qApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
