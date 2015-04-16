@@ -435,7 +435,7 @@
             });
             result = dialogService.open('previewDialog', templates[mode], content, options);
           });
-        crmStatus({start: ts('Previewing'), success: ''}, p);
+        crmStatus({start: ts('Previewing...'), success: ''}, p);
         return result;
       },
 
