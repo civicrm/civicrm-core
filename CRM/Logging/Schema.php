@@ -81,6 +81,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
 
+    // do not log civicrm_mailing_recipients table, CRM-16193
+    $this->tables = array_diff($this->tables, array('civicrm_mailing_recipients'));
+
     if (defined('CIVICRM_LOGGING_DSN')) {
       $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
       $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
