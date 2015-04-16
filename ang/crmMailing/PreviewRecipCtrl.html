@@ -1,13 +1,21 @@
 <div ng-controller="PreviewRecipCtrl">
   <!--
   Controller: PreviewRecipCtrl
-  Required vars: model.recipients
+  Required vars: model.sample
   -->
-  <p><em>{{ts('Based on current data, the following contacts will receive a copy of the mailing. If contacts are added or removed from the target groups, then the final list may change.')}}</em></p>
-  <div ng-show="model.recipients == 0">
+
+  <div class="help">
+    <p>{{ts('Based on current data, approximately %1 contacts will receive a copy of the mailing.', {1: model.count})}}</p>
+
+    <p ng-show="model.sample.length == model.sampleLimit">{{ts('Below is a sample of the first %1 recipients.', {1: model.sampleLimit})}}</p>
+
+    <p>{{ts('If individual contacts are separately modified, added, or removed, then the final list may change.')}}</p>
+  </div>
+
+  <div ng-show="model.sample == 0">
     {{ts('No recipients')}}
   </div>
-  <table ng-show="model.recipients.length > 0">
+  <table ng-show="model.sample.length > 0">
     <thead>
       <tr>
         <th>{{ts('Name')}}</th>
@@ -15,7 +23,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="recipient in model.recipients">
+      <tr ng-repeat="recipient in model.sample">
         <td>{{recipient['api.contact.getvalue']}}</td>
         <td>{{recipient['api.email.getvalue']}}</td>
       </tr>
