@@ -309,6 +309,25 @@
         });
       },
 
+      previewRecipientCount: function previewRecipientCount(mailing) {
+        // To get list of recipients, we tentatively save the mailing and
+        // get the resulting recipients -- then rollback any changes.
+        var params = angular.extend({}, mailing, mailing.recipients, {
+          name: 'placeholder', // for previewing recipients on new, incomplete mailing
+          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
+          options: {force_rollback: 1},
+          'api.mailing_job.create': 1, // note: exact match to API default
+          'api.MailingRecipients.getcount': {
+            mailing_id: '$value.id'
+          }
+        });
+        delete params.recipients; // the content was merged in
+        return qApi('Mailing', 'create', params).then(function (recipResult) {
+          // changes rolled back, so we don't care about updating mailing
+          return recipResult.values[recipResult.id]['api.MailingRecipients.getcount'];
+        });
+      },
+
       // Save a (draft) mailing
       // @param mailing Object (per APIv3)
       // @return Promise
