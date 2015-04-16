@@ -91,6 +91,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'grouping' => 'contact-field',
@@ -147,7 +150,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -241,7 +244,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-             {$this->_aclFrom}";
+             {$this->_aclFrom}
+              LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
+                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
+                         {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'";
 
     if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
@@ -311,6 +317,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function groupBy() {
