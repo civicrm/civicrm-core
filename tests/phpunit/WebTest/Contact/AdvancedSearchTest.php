@@ -73,7 +73,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("receipt_text");
     $this->multiselect2("role_id", array('Volunteer'));
     // Select $100 fee
-    $this->click("css=input[data-amount=100]");
+    $this->click("xpath=//input[@data-amount='100']");
     $this->check("record_contribution");
     $this->waitForElementPresent("contribution_status_id");
     $this->select("payment_instrument_id", "Check");
