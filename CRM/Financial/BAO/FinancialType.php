@@ -234,10 +234,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $membershipTypes;
   }
 
-  public static function buildPermissionedClause(&$whereClauses, $component = NULL) {
+  public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
     if (is_array($whereClauses)) {
       self::getAvailableFinancialTypes($types);
-      $whereClauses[] = ' financial_type_id IN (' . implode(',' , array_keys($types)) .')';
+      $whereClauses[] = ' '.$alias.'.financial_type_id IN (' . implode(',' , array_keys($types)) .')';
     }
     else {
       if ($component == 'contribution') {
