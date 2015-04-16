@@ -1378,4 +1378,11 @@ CRM.strings = CRM.strings || {};
   CRM.checkPerm = function(perm) {
     return CRM.permissions[perm];
   };
+
+  // Round while preserving sigfigs
+  CRM.sigfig = function(n, digits) {
+    var len = ("" + n).length;
+    var scale = Math.pow(10.0, len-digits);
+    return Math.round(n / scale) * scale;
+  };
 })(jQuery, _);
