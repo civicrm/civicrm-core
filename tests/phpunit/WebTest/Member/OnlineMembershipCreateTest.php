@@ -357,7 +357,6 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    * CRM-16302 - To check whether membership, contribution are
    * created for free membership signup.
    */
-
   public function testOnlineMembershipCreateWithZeroContribution() {
     //login with admin credentials & make sure we do have required permissions.
     $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
