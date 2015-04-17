@@ -193,6 +193,40 @@
     };
   }]);
 
+  // Wrap an async function in a queue, ensuring that independent async calls are issued in strict sequence.
+  // usage: qApi = crmQueue(crmApi); qApi(entity,action,...).then(...); qApi(entity2,action2,...).then(...);
+  // This is similar to promise-chaining, but allows chaining independent procs (without explicitly sharing promises).
+  angular.module('crmUtil').factory('crmQueue', function($q) {
+    // @param worker A function which generates promises
+    return function crmQueue(worker) {
+      var queue = [];
+      function next() {
+        var task = queue[0];
+        worker.apply(null, task.a).then(
+          function onOk(data) {
+            queue.shift();
+            task.dfr.resolve(data);
+            if (queue.length > 0) next();
+          },
+          function onErr(err) {
+            queue.shift();
+            task.dfr.reject(err);
+            if (queue.length > 0) next();
+          }
+        );
+      }
+      function enqueue() {
+        var dfr = $q.defer();
+        queue.push({a: arguments, dfr: dfr});
+        if (queue.length === 1) {
+          next();
+        }
+        return dfr.promise;
+      }
+      return enqueue;
+    };
+  });
+
   // Adapter for CRM.status which supports Angular promises (instead of jQuery promises)
   // example: crmStatus('Saving', crmApi(...)).then(function(result){...})
   angular.module('crmUtil').factory('crmStatus', function($q){

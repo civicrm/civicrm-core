@@ -137,7 +137,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
       'workflow_id' => array('IS NULL' => ""),
     ));
-    $mailGrp = civicrm_api3('MailingGroup', 'get', $params);
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array(
       'entity' => array('contact', 'mailing'),
       'sequential' => 1,
@@ -154,7 +153,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
           'emailAdd' => $emailAdd['values'],
-          'mailGrp' => $mailGrp['values'],
           'mailTokens' => $mailTokens['values'],
           'contactid' => $contactID,
           'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
