@@ -356,7 +356,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
   /**
    * CRM-16302 - To check whether membership, contribution are
    * created for free membership signup.
-   **/
+   */
 
   public function testOnlineMembershipCreateWithZeroContribution() {
     //login with admin credentials & make sure we do have required permissions.
@@ -365,23 +365,12 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
-    $amountSection = FALSE;
-    $payLater = FALSE;
-    $allowOtherAmount = FALSE;
-    $onBehalf = FALSE;
-    $pledges = FALSE;
-    $recurring = FALSE;
+    $amountSection = $payLater = $allowOtherAmount = $onBehalf = $pledges = $recurring = FALSE;
+    $premiums = $widget = $pcp = $isSeparatePayment = $membershipsRequired = $fixedAmount = $friend = FALSE;
     $memberships = TRUE;
     $memPriceSetId = NULL;
-    $friend = FALSE;
     $profilePreId = 1;
     $profilePostId = NULL;
-    $premiums = FALSE;
-    $widget = FALSE;
-    $pcp = FALSE;
-    $isSeparatePayment = FALSE;
-    $membershipsRequired = FALSE;
-    $fixedAmount = FALSE;
     $contributionTitle = "Title $hash";
     $pageId = $this->webtestAddContributionPage($hash,
       $rand,
