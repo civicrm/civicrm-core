@@ -29,7 +29,7 @@
       if ($scope.recipients === 1) {
         return ts('~1 recipient');
       }
-      return ts('~%1 recipients', {1: CRM.sigfig($scope.recipients, 2)});
+      return ts('~%1 recipients', {1: $scope.recipients});
     };
 
     // We monitor four fields -- use debounce so that changes across the
