@@ -1177,8 +1177,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Get field metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
+    $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
+    $name = isset($props['name_id']) ? $props['name_id'] : $name;
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $props['context'] == 'search') {
@@ -1205,7 +1205,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($props['options']);
       }
       else {
-        $options = $fieldSpec['options'];
+        $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
 
       // The placeholder is only used for select-elements.
@@ -1254,7 +1254,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case 'Select Date':
       //TODO: Add date formats
       //TODO: Add javascript template for dates.
-      // case 'Radio':
+      case 'Radio':
+        $separator = isset($props['separator']) ? $props['separator'] : NULL;
+        unset($props['seperator']);
+        $this->addRadio($name, $label, $options, NULL, $separator, $required);
+        break;
+
       case 'Select':
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
@@ -1264,7 +1269,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         break;
 
       //case 'AdvMulti-Select':
-      //case 'CheckBox':
+      case 'CheckBox':
+        $this->add('checkbox', $name, $label, NULL, $required);
+        break;
+
       case 'File':
         // We should not build upload file in search mode.
         if (isset($props['context']) && $props['context'] == 'search') {
