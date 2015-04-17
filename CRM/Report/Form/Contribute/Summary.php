@@ -96,6 +96,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
@@ -153,7 +156,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'contribution_page_id' => array(
@@ -435,6 +438,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
              LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']}
                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                         {$this->_aliases['civicrm_email']}.is_primary = 1)
+             LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
+                     ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
+                        {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
 
              LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
@@ -508,7 +514,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           unset($this->_havingClauses[$key]);
         }
       }
-    }
+    }   
   }
 
   /**
@@ -595,6 +601,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
   public function postProcess() {
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_contribution']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_line_item']);
     parent::postProcess();
   }
 

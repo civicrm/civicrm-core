@@ -114,6 +114,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
@@ -206,7 +209,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'contribution_page_id' => array(
@@ -365,7 +368,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+              LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
+                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
+                         {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'";
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
@@ -389,7 +395,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
                INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
                        ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
-               {$this->_aclFrom}";
+               {$this->_aclFrom}
+               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
+                       ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id";
     }
 
     if (!empty($this->_params['ordinality_value'])) {
@@ -533,6 +541,8 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_contribution']);
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_line_item']);
 
     $this->beginPostProcess();
 

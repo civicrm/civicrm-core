@@ -240,6 +240,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       //retrieve event information
       $params = array('id' => $this->_eventId);
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
+      // check for is_monetary status
+      $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values['event']);
+      // check for ability to add contributions of type
+      if ($isMonetary && !CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($this->_values['event']['financial_type_id']))) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
 
       $this->checkValidEvent($infoUrl);
       // get the participant values, CRM-4320
@@ -285,8 +291,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $participant_role = CRM_Core_OptionGroup::values('participant_role');
         $this->_values['event']['participant_role'] = $participant_role["{$this->_values['event']['default_role_id']}"];
       }
-      // check for is_monetary status
-      $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values['event']);
       $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
       //check for variour combination for paylater, payment
       //process with paid event.
@@ -711,6 +715,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     else {
       $isPaidEvent = CRM_Utils_Array::value('is_monetary', $form->_values['event']);
+    }
+    if (!empty($form->_values['fee'])) {
+      foreach ($form->_values['fee'] as $k => $fees) {
+        foreach ($fees['options'] as $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($form->_values['fee'][$k]);
+          }
+        }
+      }
     }
     if ($isPaidEvent && empty($form->_values['fee'])) {
       if (CRM_Utils_System::getClassName($form) != 'CRM_Event_Form_Participant') {

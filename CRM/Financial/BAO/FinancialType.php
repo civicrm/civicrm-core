@@ -181,11 +181,94 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     );
 
     foreach ($financialType as $key => $financialTypeName) {
-      if (!in_array($key, $revenueFinancialType)) {
+      if (!in_array($key, $revenueFinancialType) || !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName)) {
         unset($financialType[$key]);
       }
+      
     }
     return $financialType;
   }
 
+  /**
+   * adding permissions for financial types
+   *
+   *
+   * @param array $permissions        
+   *   an array of permissions
+   */
+  public static function permissionedFinancialTypes(&$permissions) {
+    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    $prefix = ts('CiviCRM') . ': ';
+    foreach ($financialTypes as $id => $type) {
+      $permissions['add contributions of type ' . $type] = $prefix . ts('add contributions of type ' . $type);
+      $permissions['view contributions of type ' . $type] = $prefix . ts('view contributions of type ' . $type);
+      $permissions['edit contributions of type ' . $type] = $prefix . ts('edit contributions of type ' . $type);
+      $permissions['delete contributions of type ' . $type] = $prefix . ts('delete contributions of type ' . $type);
+    }
+    $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
+  }
+
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view') {
+    if (empty($financialTypes)) {
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    }
+    foreach ($financialTypes as $finTypeId => $type) {
+      if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
+        unset($financialTypes[$finTypeId]);
+      }
+    }
+    return $financialTypes;
+  }
+ 
+  public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
+    if (empty($membershipTypes)) {
+      $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+    }
+    foreach ($membershipTypes as $memTypeId => $type) {
+      $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
+      $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+      if (!CRM_Core_Permission::check($action . ' contributions of type ' . $finType)) {
+        unset($membershipTypes[$memTypeId]);
+      }
+    }
+    return $membershipTypes;
+  }
+
+  public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
+    if (is_array($whereClauses)) {
+      self::getAvailableFinancialTypes($types);
+      $whereClauses[] = ' '.$alias.'.financial_type_id IN (' . implode(',' , array_keys($types)) .')';
+    }
+    else {
+      if ($component == 'contribution') {
+        self::getAvailableFinancialTypes($types);
+        $column = "financial_type_id";
+      }
+      if ($component == 'membership') {
+        self::getAvailableMembershipTypes($types, 'view');
+        $column = "membership_type_id";
+        if (empty($types)) {
+          $whereClauses .= " AND civicrm_{$component}.{$column} IN (0)";
+          return;
+        }
+      }
+      $whereClauses .= " AND civicrm_{$component}.{$column} IN (". implode(',' , array_keys($types)) .")";
+    }
+  }
+
+  public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
+    foreach ($lineItems as $items) { 
+      if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+        if ($force) {
+          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+          break;
+        }
+        return FALSE;
+      }
+      else {
+        return TRUE;
+      }
+    }
+  }
 }
