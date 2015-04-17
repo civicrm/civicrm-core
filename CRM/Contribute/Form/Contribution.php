@@ -489,6 +489,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+    
+    // FIXME: This probably needs to be done in preprocess
+    if ($this->_action & CRM_Core_Action::UPDATE && CRM_Utils_Array::value('financial_type_id', $this->_values)) {
+      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
+      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
+      if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+    }
     //@todo document the purpose of cdType (if still in use)
     if ($this->_cdType) {
       CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -641,13 +650,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
+    
+    // Check permissions for financial type first
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
+      array('' => ts('- select -')) + $financialTypes,
       TRUE,
       array('onChange' => "CRM.buildCustomData( 'Contribution', this.value );")
     );
+
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $paymentInstrument = $this->add('select', 'payment_instrument_id',

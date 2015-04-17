@@ -121,7 +121,14 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage');
 
     // financial Type
-    $this->addSelect('financial_type_id', array(), TRUE);
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+    $financialOptions = array(
+      'options' => $financialTypes,
+    );
+    if (!CRM_Core_Permission::check('administer CiviCRM Financial Types')) {
+      $financialOptions['context'] = 'search';
+    }
+    $this->addSelect('financial_type_id', $financialOptions, TRUE);
 
     // name
     $this->add('text', 'title', ts('Title'), $attributes['title'], TRUE);

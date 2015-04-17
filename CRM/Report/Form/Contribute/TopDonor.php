@@ -74,6 +74,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
     );
     $this->_columns += $this->getAddressColumns();
     $this->_columns += array(
@@ -115,7 +118,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'name' => 'financial_type_id',
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -252,6 +255,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1
+             LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
+                         ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
+                            {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
   ";
     $this->addAddressFromClause();
   }
@@ -307,6 +313,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function groupBy() {

@@ -150,7 +150,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'name' => 'id',
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
         ),
         'grouping' => 'softcredit-fields',
