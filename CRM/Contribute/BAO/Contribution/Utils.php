@@ -225,7 +225,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // (i.e., the amount NOT associated with the membership). Temporarily
         // cache the is_recur values so we can process the additional gift as a
         // one-off payment.
-        $pending = TRUE;
+        $pending = FALSE;
         if ($form->_membershipBlock['is_separate_payment']) {
           if (!empty($form->_params['auto_renew'])) {
             $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
@@ -234,7 +234,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
             unset($paymentParams['is_recur']);
           }
           else {
-            $pending = FALSE;
+            $pending = TRUE;
           }
         }
 
