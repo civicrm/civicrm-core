@@ -1491,7 +1491,9 @@ SELECT relationship_type_id, relationship_direction
             $relDirection = $dao->relationship_direction;
           }
           $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
-          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds) && !empty($membershipValues['owner_membership_id'])) {
+          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds
+          //CRM-16300 check if owner membership exist for related membership
+          ) && !empty($membershipValues['owner_membership_id']) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
           continue;
@@ -1555,7 +1557,8 @@ SELECT relationship_type_id, relationship_direction
 
             if ($action & CRM_Core_Action::UPDATE) {
               //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds) && !empty($values[$relatedContactId]['memberships'])) {
+              if (in_array($relTypeId, $relTypeIds
+              ) && !empty($values[$relatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
                 continue;
               }
               //delete the membership record for related
@@ -1590,8 +1593,8 @@ SELECT count(*)
             $relIds = CRM_Utils_Array::value('relationship_ids', $params);
           }
           if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
-          $relIds
-          ) && !empty($membershipValues['owner_membership_id'])) {
+          $relIds) && !empty($membershipValues['owner_membership_id']
+          ) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
         }
