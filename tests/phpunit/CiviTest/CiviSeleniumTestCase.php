@@ -1474,7 +1474,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return array
    */
-  public function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no') {
+  public function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no', $minimumFee = 100) {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);
@@ -1512,7 +1512,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     $this->select2('member_of_contact_id', $membershipTitle);
 
-    $this->type('minimum_fee', '100');
+    $this->type('minimum_fee', $minimumFee);
     $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
 
     $this->type('duration_interval', $duration_interval);
