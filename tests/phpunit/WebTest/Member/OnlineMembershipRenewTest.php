@@ -658,6 +658,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * CRM-16165
+   */
   public function testOnRecurringContributionAndMembershipRenewal() {
     // Log in as admin
     $this->webtestLogin('admin');
