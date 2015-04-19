@@ -262,7 +262,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     //add currency element.
     $this->addCurrency('currency', ts('Currency'), FALSE);
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
+    $paymentProcessor = $this->getProcessorsWithDescriptions();
 
     $this->assign('paymentProcessor', $paymentProcessor);
 
@@ -391,6 +391,33 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     parent::buildQuickForm();
   }
 
+  /**
+   * Get payment processors with the description for back office selection.
+   *
+   * This is a temporary approach as should also apply to contribution pages per CRM-16204.
+   *
+   * In these back office config scenarios we are only loading one entity so performance is not main concern.
+   *
+   * However, the question is whether we should be using the api getlist functionality, and if so how we cater
+   * to front office vs back office. The description fields should really only be displayed backoffice where
+   * there is a need to know whether 'Credit Card' is processor x or processor y.
+   *
+   * @return array
+   *   Payment processors keyed by id and showing name and description.
+   */
+  protected function getProcessorsWithDescriptions() {
+    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
+    $processorDetails = civicrm_api3('payment_processor', 'get', array(
+      'id' => array(
+        'IN' => array_keys($paymentProcessor))
+    ));
+    foreach ($paymentProcessor as $id => $value) {
+      if ((!empty($processorDetails['values'][$id]['description']))) {
+        $paymentProcessor[$id] = $value . ' (' . $processorDetails['values'][$id]['description'] . ')';
+      }
+    }
+    return $paymentProcessor;
+  }
   /**
    * Add local and global form rules.
    *
