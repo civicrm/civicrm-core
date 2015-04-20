@@ -24,18 +24,18 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is for configuring label formats *}
+{* this template is for configuring relative date filters*}
 <div class="help">
-  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}
+  {ts}You can configure relative date filters for your searches and reports.{/ts}
 </div>
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
-  {include file="CRM/Admin/Form/LabelFormats.tpl"}
+  {include file="CRM/Admin/Form/DateFilter.tpl"}
 {else}
 
   {if $rows}
-    <div id="ltype">
+    <div id="date-filters">
       {strip}
-        <table id="labelFormats" class="row-highlight">
+        <table id="dateFilter" class="row-highlight">
           <thead>
           <tr class="columnheader">
             <th>{ts}Name{/ts}</th>
@@ -48,14 +48,14 @@
           </tr>
           </thead>
           {foreach from=$rows item=row}
-            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
-              <td class="crm-labelFormat-name">{$row.label}</td>
-              <td class="crm-labelFormat-name">{$row.groupName}</td>
-              <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
-              <td class="crm-labelFormat-description">{$row.grouping}</td>
-              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}<img
+            <tr id="row_{$row.id}" class="crm-dateFilter {cycle values="odd-row,even-row"} {$row.class}">
+              <td class="crm-dateFilter-name">{$row.label}</td>
+              <td class="crm-dateFilter-name">{$row.groupName}</td>
+              <td class="crm-dateFilter-order nowrap">{$row.weight}</td>
+              <td class="crm-dateFilter-description">{$row.grouping}</td>
+              <td class="crm-dateFilter-is_default">{if $row.is_default eq 1}<img
                 src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
-              <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
+              <td class="crm-dateFilter-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>
@@ -71,8 +71,8 @@
   {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {capture assign=crmURL}{crmURL p='civicrm/admin/labelFormats' q="action=add&reset=1"}{/capture}
-      {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
+      {capture assign=crmURL}{crmURL p='civicrm/admin/dateFilter' q="action=add&reset=1"}{/capture}
+      {ts 1=$crmURL}There are no Relative Date Filters configured. You can<a href='%1'>add one</a>.{/ts}
     </div>
   {/if}
 {/if}
