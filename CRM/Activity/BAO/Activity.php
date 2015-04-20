@@ -867,7 +867,7 @@ ORDER BY    fixed_sort_order
 
       // if deleted, wrap in <del>
       if ($dao->is_deleted) {
-        $dao->contact_name = "<del>{$dao->contact_name}</dao>";
+        $dao->contact_name = "<del>{$dao->contact_name}</del>";
       }
 
       if ($dao->record_type_id == $sourceID && $dao->contact_id) {
