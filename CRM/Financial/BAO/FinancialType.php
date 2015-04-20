@@ -247,10 +247,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       if ($component == 'membership') {
         self::getAvailableMembershipTypes($types, 'view');
         $column = "membership_type_id";
-        if (empty($types)) {
-          $whereClauses .= " AND civicrm_{$component}.{$column} IN (0)";
-          return;
-        }
+      }
+      if (empty($types)) {
+        $whereClauses .= " AND civicrm_{$component}.{$column} IN (0)";
+        return;
       }
       $whereClauses .= " AND civicrm_{$component}.{$column} IN (". implode(',' , array_keys($types)) .")";
     }
