@@ -131,8 +131,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
 
     $this->assertEquals($occurrences, $countOfActivities);
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Child)"));
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Parent)"));
+    $this->assertTrue($this->isTextPresent("Repeating"));
 
     //Cascade changes
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td/span/a[text()='Edit']");
