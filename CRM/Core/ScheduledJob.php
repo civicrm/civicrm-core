@@ -67,7 +67,7 @@ class CRM_Core_ScheduledJob {
 
       foreach ($lines as $line) {
         $pair = explode("=", $line);
-        if ($pair === false || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
+        if ($pair === FALSE || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
           $this->remarks[] .= 'Malformed parameters!';
           break;
         }
