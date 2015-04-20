@@ -37,7 +37,7 @@
 /**
  * This class contains functions for managing Label Formats
  */
-class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
+class CRM_Core_BAO_DateFilter extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the Label Formats Option Group ID.
@@ -240,18 +240,18 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Option Group ID for Label Formats.
+   * Get Option Group ID for Relative Date Filters.
    *
    * @param string $name
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
    */
-  private static function _getGid($name = 'label_format') {
+  private static function _getGid($name = 'relative_date_filters') {
     if (!isset(self::$_gid[$name]) || !self::$_gid[$name]) {
       self::$_gid[$name] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $name, 'id', 'name');
       if (!self::$_gid[$name]) {
-        CRM_Core_Error::fatal(ts('Label Format Option Group not found in database.'));
+        CRM_Core_Error::fatal(ts('Relative Date Filter Option Group not found in database.'));
       }
     }
     return self::$_gid[$name];
