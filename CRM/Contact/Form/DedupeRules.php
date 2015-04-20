@@ -111,7 +111,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       'objectExists', array('CRM_Dedupe_DAO_RuleGroup', $this->_rgid, 'title')
     );
 
-    $this->addField('used', array('label' => ts('Usage'), 'type' => 'Radio'), TRUE);
+    $this->addField('used', array('label' => ts('Usage')), TRUE);
     $disabled = array();
     $reserved = $this->addField('is_reserved', array('label' => ts('Reserved?')));
     if (!empty($this->_defaults['is_reserved'])) {
