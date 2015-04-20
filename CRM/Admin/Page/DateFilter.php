@@ -37,16 +37,8 @@
 /**
  * Page for displaying list of Relative Date Filters.
  */
-class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
+class CRM_Admin_Page_DateFilter extends CRM_Admin_Page_Options {
 
-  public $useLivePageJS = TRUE;
-
-  /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -57,6 +49,16 @@ class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
   public function getBAOName() {
     return 'CRM_Core_BAO_DateFilter';
   }
+  /**
+   * Get action Links.
+   *
+   * @return array
+   *   (reference) of action links
+   */
+  public function preProcess() {
+    $this->set('gName', 'relative_date_filters');
+    parent::preprocess();
+  }
 
   /**
    * Get action Links.
@@ -66,7 +68,7 @@ class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      // helper variable for nicer formatting
+      // override CRM_Admin_Page_Options::links so we can define our edit page.
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
@@ -74,17 +76,21 @@ class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
           'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Edit Date Filter'),
         ),
-        CRM_Core_Action::COPY => array(
-          'name' => ts('Copy'),
-          'url' => 'civicrm/admin/relative_date_filters',
-          'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
-          'title' => ts('Copy Date Filter'),
+        CRM_Core_Action::DISABLE => array(
+          'name' => ts('Disable'),
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Disable %1', array(1 => self::$_gName)),
+        ),
+        CRM_Core_Action::ENABLE => array(
+          'name' => ts('Enable'),
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Enable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/relative_date_filters',
-          'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
-          'title' => ts('Delete Date Filter'),
+          'url' => 'civicrm/admin/options/' . self::$_gName,
+          'qs' => 'action=delete&id=%%id%%',
+          'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
         ),
       );
     }
@@ -99,17 +105,7 @@ class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
    *   Classname of edit form.
    */
   public function editForm() {
-    return 'CRM_Admin_Form_LabelFormats';
-  }
-
-  /**
-   * Get edit form name.
-   *
-   * @return string
-   *   name of this page.
-   */
-  public function editName() {
-    return 'Relative Date Filters';
+    return 'CRM_Admin_Form_DateFilter';
   }
 
   /**
@@ -123,49 +119,4 @@ class CRM_Admin_Page_DateFilter extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/admin/relative_date_filters';
   }
-
-  /**
-   * Browse all Label Format settings.
-   *
-   * @param null $action
-   *
-   * @return void
-   */
-  public function browse($action = NULL) {
-    // Get list of configured Label Formats
-    $labelFormatList = CRM_Core_BAO_LabelFormat::getList();
-    $nameFormatList = CRM_Core_BAO_LabelFormat::getList(FALSE, 'name_badge');
-
-    // Add action links to each of the Label Formats
-    foreach ($labelFormatList as & $format) {
-      $action = array_sum(array_keys($this->links()));
-      if (!empty($format['is_reserved'])) {
-        $action -= CRM_Core_Action::DELETE;
-      }
-
-      $format['groupName'] = ts('Mailing Label');
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'label_format'),
-        ts('more'),
-        FALSE,
-        'labelFormat.manage.action',
-        'LabelFormat',
-        $format['id']
-      );
-    }
-
-    // Add action links to each of the Label Formats
-    foreach ($nameFormatList as & $format) {
-      $format['groupName'] = ts('Name Badge');
-    }
-
-    $labelFormatList = array_merge($labelFormatList, $nameFormatList);
-
-    // Order Label Formats by weight
-    $returnURL = CRM_Utils_System::url(self::userContext());
-    CRM_Core_BAO_LabelFormat::addOrder($labelFormatList, $returnURL);
-
-    $this->assign('rows', $labelFormatList);
-  }
-
 }
