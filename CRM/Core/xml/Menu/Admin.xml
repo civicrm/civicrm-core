@@ -174,6 +174,14 @@
      <weight>65</weight>
   </item>
   <item>
+     <path>civicrm/admin/relative_date_filters</path>
+     <title>Relative Date Filters</title>
+     <desc>Edit the relative date filters for searches and reports.</desc>
+     <page_callback>CRM_Admin_Page_DateFilter</page_callback>
+     <adminGroup>Customize Data and Screens</adminGroup>
+     <weight>83</weight>
+  </item>
+  <item>
      <path>civicrm/admin/options/instant_messenger_service</path>
      <title>Instant Messenger Services</title>
      <desc>List of IM services which can be used when recording screen-names for contacts.</desc>
