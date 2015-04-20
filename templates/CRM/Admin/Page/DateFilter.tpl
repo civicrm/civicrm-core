@@ -35,26 +35,23 @@
   {if $rows}
     <div id="date-filters">
       {strip}
+      {* handle enable/disable actions*}
+      {include file="CRM/common/enableDisableApi.tpl"}
         <table id="dateFilter" class="row-highlight">
           <thead>
           <tr class="columnheader">
             <th>{ts}Name{/ts}</th>
-            <th>{ts}Used for{/ts}</th>
+            <th>{ts}Description{/ts}</th>
             <th>{ts}Order{/ts}</th>
-            <th>{ts}Grouping{/ts}</th>
-            <th>{ts}Default?{/ts}</th>
             <th>{ts}Reserved?{/ts}</th>
             <th></th>
           </tr>
           </thead>
           {foreach from=$rows item=row}
-            <tr id="row_{$row.id}" class="crm-dateFilter {cycle values="odd-row,even-row"} {$row.class}">
+            <tr id="option_value-{$row.id}" class="crm-dateFilter crm-entity {cycle values="odd-row,even-row"} {$row.class} {if NOT $row.is_active} disabled{/if}">
               <td class="crm-dateFilter-name">{$row.label}</td>
-              <td class="crm-dateFilter-name">{$row.groupName}</td>
+              <td class="crm-dateFilter-name">{$row.description}</td>
               <td class="crm-dateFilter-order nowrap">{$row.weight}</td>
-              <td class="crm-dateFilter-description">{$row.grouping}</td>
-              <td class="crm-dateFilter-is_default">{if $row.is_default eq 1}<img
-                src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
               <td class="crm-dateFilter-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
@@ -64,8 +61,8 @@
       {/strip}
 
       <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div
-              class="icon ui-icon-circle-plus"></div>{ts}Add Label Format{/ts}</span></a>
+        <a href="{crmURL q="action=add&reset=1"}" id="newDateFilter" class="button"><span><div
+              class="icon ui-icon-circle-plus"></div>{ts}Add Relative Date Filter{/ts}</span></a>
       </div>
     </div>
   {else}
