@@ -1257,7 +1257,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
         unset($props['seperator']);
-        $this->addRadio($name, $label, $options, NULL, $separator, $required);
+        if (!isset($props['allowClear'])) {
+          $attributes['allowClear'] = !$required;
+        }
+        $this->addRadio($name, $label, $options, $attributes, $separator, $required);
         break;
 
       case 'Select':
