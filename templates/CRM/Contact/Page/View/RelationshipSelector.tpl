@@ -106,6 +106,9 @@
           {/literal}{if $context eq 'current'}{literal}
           if ($('#tab_rel').length) {
             CRM.tabHeader.updateCount($('#tab_rel'), currentoTable.fnSettings().fnRecordsTotal());
+            // Refresh contact tabs which might have been affected
+            CRM.tabHeader.updateCount($('#tab_member'), currentoTable.fnSettings().fnRecordsTotal());
+            CRM.tabHeader.updateCount($('#tab_contribute'), currentoTable.fnSettings().fnRecordsTotal());
           }
           {/literal}{/if}{literal}
         },
