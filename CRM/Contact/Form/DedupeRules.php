@@ -106,7 +106,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $foo = CRM_Core_DAO::getAttribute('CRM_Dedupe_DAO_Rule', 'title');
     $this->addField('title', array('label' => ts('Rule Name')), TRUE);
     $this->addRule('title', ts('A duplicate matching rule with this name already exists. Please select another name.'),
       'objectExists', array('CRM_Dedupe_DAO_RuleGroup', $this->_rgid, 'title')
