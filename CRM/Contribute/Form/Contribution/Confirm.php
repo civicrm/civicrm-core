@@ -1619,6 +1619,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Add on behalf of organization and it's location.
    *
+   * This situation occurs when on behalf of is enabled for the contribution page and the person
+   * signing up does so on behalf of an organization.
+   *
    * @param array $behalfOrganization
    *   array of organization info.
    * @param int $contactID
@@ -1628,7 +1631,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $values
    *   form values array.
    * @param array $params
-   * @param null $fields
+   * @param array $fields
+   *   Array of fields from the onbehalf profile relevant to the organization.
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;

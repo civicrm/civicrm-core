@@ -1151,6 +1151,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ));
     $contactAMembership = $this->callAPISuccessGetSingle('membership', array('contact_id' => $this->_cId_a));
     $this->assertEquals($originalMembership['id'], $contactAMembership['owner_membership_id']);
+    // Deleting the organization should cause the related membership to be deleted.
+    $this->callAPISuccess('contact', 'delete', array('id' => $this->_cId_b));
+    $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_cId_a), 0);
   }
 
 }
