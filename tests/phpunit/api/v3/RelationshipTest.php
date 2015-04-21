@@ -29,7 +29,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class contains api test cases for "civicrm_relationship"
- *
  */
 class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
@@ -40,7 +39,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    */
   protected $_cId_a_2;
   protected $_cId_b;
-  protected $_cId_b2;// second org
+  /**
+   * Second organization contact.
+   *
+   * @var  int
+   */
+  protected $_cId_b2;
   protected $_relTypeID;
   protected $_ids = array();
   protected $_customGroupId = NULL;
@@ -49,6 +53,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   protected $_entity;
 
+  /**
+   * Set up function.
+   */
   public function setUp() {
     parent::setUp();
     $this->_cId_a = $this->individualCreate();
@@ -60,7 +67,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->_cId_b = $this->organizationCreate();
     $this->_cId_b2 = $this->organizationCreate(array('organization_name' => ' Org 2'));
     $this->_entity = 'relationship';
-    //Create a relationship type
+    //Create a relationship type.
     $relTypeParams = array(
       'name_a_b' => 'Relation 1 for delete',
       'name_b_a' => 'Relation 2 for delete',
@@ -82,6 +89,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Tear down function.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     $this->contactDelete($this->_cId_a);
     $this->contactDelete($this->_cId_a_2);
@@ -90,8 +102,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_relationship'), TRUE);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
-
-  ///////////////// civicrm_relationship_create methods
 
   /**
    * Check with empty array.
@@ -136,7 +146,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
     $this->callAPIFailure('relationship', 'create', $params);
 
-    //contact id does not exists
+    // Contact id does not exist.
     $params['contact_id_a'] = 999;
     $this->callAPIFailure('relationship', 'create', $params);
 
@@ -149,8 +159,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Check relationship creation with invalid Relationship.
    */
-  public function testRelationshipCreatInvalidRelationship() {
-    // both the contact of type Individual
+  public function testRelationshipCreateInvalidRelationship() {
+    // Both have the contact type Individual.
     $params = array(
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_a,
@@ -194,10 +204,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'start_date' => '2008-12-20',
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
+    $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
 
     $params['id'] = $relationship['id'];
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
+    $this->callAPISuccess('relationship', 'delete', $params);
   }
 
   /**
@@ -219,16 +229,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 0,
       'debug' => 1,
     );
-    $result = $this->callAPISuccess('relationship', 'create', $params);
-    $result = $this->callAPISuccess('relationship', 'get', $params);
+    $this->callAPISuccess('relationship', 'create', $params);
+    $this->callAPISuccess('relationship', 'get', $params);
     $params['id'] = $relationship['id'];
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
+    $this->callAPISuccess('relationship', 'delete', $params);
   }
 
   /**
-   * Checkupdate doesn't reset stuff badly - CRM-11789
+   * Check update doesn't reset stuff badly - CRM-11789.
    */
-  public function testRelationshipCreateUpdateDoesntMangle() {
+  public function testRelationshipCreateUpdateDoesNotMangle() {
     $params = array(
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -240,11 +250,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
     $relationship = $this->callAPISuccess('relationship', 'create', $params);
 
-    $updateparams = array(
+    $updateParams = array(
       'id' => $relationship['id'],
       'relationship_type_id' => $this->_relTypeID,
     );
-    $result = $this->callAPISuccess('relationship', 'create', $updateparams);
+    $this->callAPISuccess('relationship', 'create', $updateParams);
 
     //make sure the orig params didn't get changed
     $this->getAndCheck($params, $relationship['id'], 'relationship');
@@ -348,7 +358,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * Check relationship creation with custom data.
    */
   public function testRelationshipCreateWithCustomData() {
-    $customGroup = $this->createCustomGroup();
+    $this->createCustomGroup();
     $this->_ids = $this->createCustomField();
     //few custom Values for comparing
     $custom_params = array(
@@ -371,11 +381,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relationParams = array(
       'id' => $result['id'],
     );
-    // assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_Relationship', $result['id'], $relationParams);
 
     $params['id'] = $result['id'];
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
+    $this->callAPISuccess('relationship', 'delete', $params);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -436,7 +445,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $result = $this->callAPISuccess('CustomField', 'create', $params);
+    $this->callAPISuccess('CustomField', 'create', $params);
 
     $customField = NULL;
     $ids[] = $customField['result']['customFieldId'];
@@ -509,14 +518,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     return $ids;
   }
 
-  ///////////////// civicrm_relationship_delete methods
-
   /**
    * Check with empty array.
    */
   public function testRelationshipDeleteEmpty() {
-    $params = array();
-    $result = $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('relationship', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
   /**
@@ -529,7 +535,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $result = $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
   }
 
   /**
@@ -542,10 +548,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => 'Breaking Relationship',
     );
 
-    $result = $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('relationship', 'delete', $params, 'Mandatory key(s) missing from params array: id');
 
     $params['id'] = "Invalid";
-    $result = $this->callAPIFailure('relationship', 'delete', $params, 'Invalid value for relationship ID');
+    $this->callAPIFailure('relationship', 'delete', $params, 'Invalid value for relationship ID');
   }
 
   /**
@@ -561,12 +567,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPISuccess('relationship', 'create', $params);
-
-    //Delete relationship
-    $params = array();
-    $params['id'] = $result['id'];
-
-    $result = $this->callAPIAndDocument('relationship', 'delete', $params, __FUNCTION__, __FILE__);
+    $params = array('id' => $params = array('id' => $result['id']));
+    $this->callAPIAndDocument('relationship', 'delete', $params, __FUNCTION__, __FILE__);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -576,7 +578,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * Check with empty array.
    */
   public function testRelationshipUpdateEmpty() {
-    $result = $this->callAPIFailure('relationship', 'create', array(),
+    $this->callAPIFailure('relationship', 'create', array(),
       'Mandatory key(s) missing from params array: contact_id_a, contact_id_b, relationship_type_id');
   }
 
@@ -600,7 +602,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('relationship', 'create', $relParams);
 
     $this->assertNotNull($result['id']);
-    $this->_relationID = $result['id'];
 
     $params = array(
       'contact_id_a' => $this->_cId_a,
@@ -611,16 +612,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 0,
     );
 
-    $result = $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
+    $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
 
-    //delete created relationship
-    $params = array(
-      'id' => $this->_relationID,
-    );
-
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
-
-    //delete created relationship type
+    $this->callAPISuccess('relationship', 'delete', array('id' => $result['id'],));
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -637,7 +631,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $result = $this->callAPISuccess('relationship', 'create', $relParams);
+    $this->callAPISuccess('relationship', 'create', $relParams);
 
     //get relationship
     $params = array(
@@ -672,15 +666,18 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $result = $this->callAPISuccess('relationship', 'create', $relParams);
+    $this->callAPISuccess('relationship', 'create', $relParams);
 
     //get relationship
     $params = array(
       'contact_id_b' => $this->_cId_b,
     );
-    $result = $this->callAPISuccess('relationship', 'get', $params);
+    $this->callAPISuccess('relationship', 'get', $params);
   }
 
+  /**
+   * Test retrieving only current relationships.
+   */
   public function testGetIsCurrent() {
     $rel2Params = array(
       'contact_id_a' => $this->_cId_a,
@@ -689,7 +686,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'start_date' => '2008-12-20',
       'is_active' => 0,
     );
-    $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
+    $this->callAPISuccess('relationship', 'create', $rel2Params);
     $rel1 = $this->callAPISuccess('relationship', 'create', $this->_params);
 
     $getParams = array(
@@ -705,7 +702,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     // now try not started
     $rel2Params['is_active'] = 1;
     $rel2Params['start_date'] = 'tomorrow';
-    $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
+    $this->callAPISuccess('relationship', 'create', $rel2Params);
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 1);
     $this->AssertEquals($rel1['id'], $result['id']);
@@ -714,7 +711,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel2Params['is_active'] = 1;
     $rel2Params['start_date'] = 'last week';
     $rel2Params['end_date'] = 'yesterday';
-    $rel2 = $this->callAPISuccess('relationship', 'create', $rel2Params);
+    $this->callAPISuccess('relationship', 'create', $rel2Params);
   }
 
   /**
@@ -812,7 +809,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
     );
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
+    $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
       'id is not a valid integer');
   }
 
@@ -840,7 +837,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params = array(
       'id' => $relationship['id'],
     );
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
+     $this->callAPISuccess('relationship', 'delete', $params);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -862,12 +859,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $contact_a = array(
       'contact_id' => $this->_cId_a,
     );
-    $result = $this->callAPISuccess('relationship', 'get', $contact_a);
+    $this->callAPISuccess('relationship', 'get', $contact_a);
 
     $params = array(
       'id' => $relationship['id'],
     );
-    $result = $this->callAPISuccess('relationship', 'delete', $params);
+    $this->callAPISuccess('relationship', 'delete', $params);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -902,8 +899,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByTypeDAO() {
-    $this->ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE) + $this->_params);
-    $result = $this->callAPISuccess($this->_entity, 'getcount', array(
+    $this->_ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE) +
+      $this->_params);
+    $this->callAPISuccess($this->_entity, 'getcount', array(
         'contact_id_a' => $this->_cId_a,
       ),
       1);
@@ -927,12 +925,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByTypeArrayDAO() {
-    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
     $relType2 = 5; // lets just assume built in ones aren't being messed with!
     $relType3 = 6; // lets just assume built in ones aren't being messed with!
 
-    //relationshp 2
+    // Relationship 2.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
@@ -940,7 +938,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 3
+    // Relationship 3.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
@@ -967,12 +965,13 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByTypeArrayReciprocal() {
-    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
-    $relType2 = 5; // lets just assume built in ones aren't being messed with!
-    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    // lets just assume built in ones aren't being messed with!
+    $relType2 = 5;
+    $relType3 = 6;
 
-    //relationshp 2
+    // Relationship 2.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
@@ -980,7 +979,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 3
+    // Relationship 3.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
@@ -1009,7 +1008,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByMembershipTypeDAO() {
-    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
 
     $relType2 = 5; // lets just assume built in ones aren't being messed with!
@@ -1020,7 +1019,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
     ));
 
-    //relationshp 2
+    // Relationship 2.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
@@ -1028,7 +1027,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 3
+    // Relationship 3.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
@@ -1036,7 +1035,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 4 with reveral
+    // Relationship 4 with reversal.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
@@ -1064,18 +1063,19 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * an incorrect one
    */
   public function testGetRelationshipByMembershipTypeReciprocal() {
-    $created = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
 
-    $relType2 = 5; // lets just assume built in ones aren't being messed with!
-    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    // Let's just assume built in ones aren't being messed with!
+    $relType2 = 5;
+    $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate(array(
       'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
       'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
     ));
 
-    //relationshp 2
+    // Relationship 2.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType2,
@@ -1083,7 +1083,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 3
+    // Relationship 4.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType3,
@@ -1091,7 +1091,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ))
     );
 
-    //relationshp 4 with reveral
+    // Relationship 4 with reversal.
     $this->callAPISuccess($this->_entity, 'create',
       array_merge($this->_params, array(
         'relationship_type_id' => $relType1,
@@ -1104,7 +1104,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id' => $this->_cId_a,
       'membership_type_id' => $memberType,
     ));
-    // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
+    // Although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
     $this->assertEquals(2, $result['count']);
 
     foreach ($result['values'] as $key => $value) {
@@ -1113,7 +1113,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check for enotices on enable & disable as reported in CRM-14350
+   * Check for e-notices on enable & disable as reported in CRM-14350
    */
   public function testSetActive() {
     $relationship = $this->callAPISuccess($this->_entity, 'create', $this->_params);
