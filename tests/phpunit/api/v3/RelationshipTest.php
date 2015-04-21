@@ -567,7 +567,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPISuccess('relationship', 'create', $params);
-    $params = array('id' => $params = array('id' => $result['id']));
+    $params = array('id' => $result['id']);
     $this->callAPIAndDocument('relationship', 'delete', $params, __FUNCTION__, __FILE__);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
@@ -1119,6 +1119,38 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relationship = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 0));
     $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 1));
+  }
+
+  /**
+   * Test creating related memberships.
+   */
+  public function testCreateRelatedMembership() {
+    $relatedMembershipType = $this->callAPISuccess('MembershipType', 'create', array(
+      'name' => 'Membership with Related',
+      'member_of_contact_id' => 1,
+      'financial_type_id' => 1,
+      'minimum_fee' => 0.00,
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'relationship_type_id' => $this->_relTypeID,
+      'relationship_direction' => 'b_a',
+      'visibility' => 'Public',
+      'auto_renew' => 0,
+      'is_active' => 1,
+      'domain_id' => CRM_Core_Config::domainID(),
+    ));
+    $originalMembership = $this->callAPISuccess('Membership', 'create', array(
+      'membership_type_id' => $relatedMembershipType['id'],
+      'contact_id' => $this->_cId_b,
+    ));
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => $this->_relTypeID,
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_b,
+    ));
+    $contactAMembership = $this->callAPISuccessGetSingle('membership', array('contact_id' => $this->_cId_a));
+    $this->assertEquals($originalMembership['id'], $contactAMembership['owner_membership_id']);
   }
 
 }
