@@ -84,7 +84,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $this->click('event-configure-1');
     $this->waitForElementPresent("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
     $this->click("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
-    $this->waitForElementPresent('_qf_EventInfo_cancel-bottom');
+    $this->waitForTextPresent("Event Title");
     $this->type('title', 'CiviCon');
     $this->click('_qf_EventInfo_upload_done-top');
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
