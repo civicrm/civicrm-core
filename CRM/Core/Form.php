@@ -1207,19 +1207,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-
-      // The placeholder is only used for select-elements.
-      if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
-      }
-
+      //@TODO AdvMulti-Select is deprecated, drop support.
       if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
-      }
-      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
-        $props['class'] .= ' huge';
-        $props['multiple'] = 'multiple';
       }
       // Set default options-url value.
       if ((!isset($props['options-url']))) {
@@ -1234,6 +1224,26 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (isset($props['options-url'])) {
           unset($props['options-url']);
         }
+      }
+    }
+    //Use select2 library for following widgets.
+    $isSelect2 = (in_array($widget, array(
+          'Select',
+          'Multi-Select',
+          'Select State/Province',
+          'Multi-Select State/Province',
+          'Select Country',
+          'Multi-Select Country',
+    )));
+    if ($isSelect2) {
+      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
+        $props['class'] .= ' huge';
+        $props['multiple'] = 'multiple';
+      }
+      // The placeholder is only used for select-elements.
+      if (!array_key_exists('placeholder', $props)) {
+        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
@@ -1256,11 +1266,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //TODO: Add javascript template for dates.
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
-        unset($props['seperator']);
+        unset($props['separator']);
         if (!isset($props['allowClear'])) {
-          $attributes['allowClear'] = !$required;
+          $props['allowClear'] = !$required;
         }
-        $this->addRadio($name, $label, $options, $attributes, $separator, $required);
+        $this->addRadio($name, $label, $options, $props, $separator, $required);
         break;
 
       case 'Select':
