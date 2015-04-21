@@ -103,4 +103,46 @@ describe('crmUtil', function() {
     });
 
   });
+
+  describe('crmQueue', function() {
+    var crmQueue, $q, $rootScope, $timeout;
+
+    beforeEach(inject(function(_crmQueue_, _$rootScope_, _$q_, _$timeout_) {
+      crmQueue = _crmQueue_;
+      $rootScope = _$rootScope_;
+      $q = _$q_;
+      $timeout = _$timeout_;
+    }));
+
+    function addAfterTimeout(a, b, ms) {
+      var dfr = $q.defer();
+      $timeout(function(){
+        dfr.resolve(a+b);
+      }, ms);
+      return dfr.promise;
+    }
+
+    it('returns in order', function(done) {
+      var last = null;
+      var queuedFunc = crmQueue(addAfterTimeout);
+      // note: the queueing order is more important the timeout-durations (15ms vs 5ms)
+      queuedFunc(1, 2, 25).then(function(sum) {
+        expect(last).toBe(null);
+        expect(sum).toBe(3);
+        last = sum;
+      });
+      queuedFunc(3, 4, 5).then(function(sum){
+        expect(last).toBe(3);
+        expect(sum).toBe(7);
+        last = sum;
+        done();
+      });
+
+      for (var i = 0; i < 5; i++) {
+        $rootScope.$apply();
+        $timeout.flush(20);
+      }
+    });
+  });
+
 });

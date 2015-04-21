@@ -679,7 +679,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public function postProcess() {
     $contactID = $this->getContactID();
     $isPayLater = $this->_params['is_pay_later'];
-    if ($this->_params['payment_processor'] == 0) {
+    if (isset($this->_params['payment_processor']) && $this->_params['payment_processor'] == 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
     // add a description field at the very beginning
