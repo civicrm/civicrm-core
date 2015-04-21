@@ -110,7 +110,8 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("event_id");
     $this->select2("event_id", $eventName);
 
-    $this->clickLink("_qf_Search_refresh", "search-status");
+    $this->click("_qf_Search_refresh");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $stringsToCheck = array(
       "Event = $eventName",
@@ -161,6 +162,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
     $this->click("_qf_Search_refresh");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//form[@id='Search']/div[3]/div/div[1]/div");
 
     $stringsToCheck = array(
