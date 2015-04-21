@@ -1554,6 +1554,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (is_a($result, 'CRM_Core_Error')) {
+      CRM_Core_Error::debug_log_message('rolling back error !!! ' . ' ' . print_r($result, TRUE));
       //make sure to cleanup db for recurring case.
       if (CRM_Utils_Array::value('contributionID', $paymentParams)) {
         CRM_Core_Error::debug_log_message(CRM_Core_Error::getMessages($result) . "contact id={$this->_contactID} (deleting contribution {$paymentParams['contributionID']}");

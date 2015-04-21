@@ -699,6 +699,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @static
    */
   static function deleteContribution($id) {
+    CRM_Core_Error::debug_log_message('deleting contribution!!! ' . $id. ' ' . print_r(debug_backtrace(), TRUE));
     CRM_Utils_Hook::pre('delete', 'Contribution', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
