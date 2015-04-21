@@ -73,7 +73,7 @@ class CRM_Admin_Page_DateFilter extends CRM_Admin_Page_Options {
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/relative_date_filters',
-          'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
+          'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Date Filter'),
         ),
         CRM_Core_Action::DISABLE => array(
