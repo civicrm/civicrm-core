@@ -42,11 +42,11 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
    *
    * @param int $contributionPageID
    * @param int $widgetID
-   * @param boolean $includePending
+   * @param bool $includePending
    *
    * @return object
    */
-  public static function getContributionPageData($contributionPageID, $widgetID, $includePending = false) {
+  public static function getContributionPageData($contributionPageID, $widgetID, $includePending = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     $data = array();
