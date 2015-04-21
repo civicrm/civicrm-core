@@ -429,7 +429,7 @@ CRM.strings = CRM.strings || {};
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: function(row) {
-          return row.label;
+          return (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '');
         },
         escapeMarkup: function (m) {return m;},
         initSelection: function($el, callback) {
@@ -670,8 +670,10 @@ CRM.strings = CRM.strings || {};
     else if (row.icon_class) {
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">';
+    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '') +
+      '</div>' +
+      '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
       markup += '<p>' + text + '</p>';
     });
