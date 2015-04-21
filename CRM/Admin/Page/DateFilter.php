@@ -88,7 +88,7 @@ class CRM_Admin_Page_DateFilter extends CRM_Admin_Page_Options {
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/options/' . self::$_gName,
+          'url' => 'civicrm/admin/relative_date_filters/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
         ),
