@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,26 +38,24 @@
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @access public
    * @return \CRM_Contact_DAO_SubscriptionHistory
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Create a new subscription history record
+   * Create a new subscription history record.
    *
-   * @param array $params     Values for the new history record
+   * @param array $params
+   *   Values for the new history record.
    *
-   * @return object $history  The new history object
-   * @access public
-   * @static
+   * @return object
+   *   $history  The new history object
    */
   public static function &create(&$params) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();
@@ -70,16 +68,15 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   /**
    * Erase a contact's subscription history records
    *
-   * @param int $id       The contact id
+   * @param int $id
+   *   The contact id.
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function deleteContact($id) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();
     $history->contact_id = $id;
     $history->delete();
   }
-}
 
+}

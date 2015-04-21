@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,12 +23,12 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,13 +43,14 @@ class CRM_Custom_Form_CustomData {
    * @param null|string $subName
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param null|String $type
+   * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
    *
    * @return void
    */
-  static function preProcess(&$form, $subName = NULL, $subType = NULL,
+  public static function preProcess(
+    &$form, $subName = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {
@@ -102,11 +103,12 @@ class CRM_Custom_Form_CustomData {
       $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
     }
 
-    $typeCheck = CRM_Utils_Request::retrieve( 'type', 'String', CRM_Core_DAO::$_nullObject );
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
-    if ( isset($typeCheck) && $urlGroupId) {
+    if (isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
-    } else {
+    }
+    else {
       $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
     }
 
@@ -146,11 +148,11 @@ class CRM_Custom_Form_CustomData {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return array
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
     CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
     return $defaults;
@@ -160,10 +162,10 @@ class CRM_Custom_Form_CustomData {
    * @param CRM_Core_Form $form
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->addElement('hidden', 'hidden_custom', 1);
     $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
     CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
   }
-}
 
+}

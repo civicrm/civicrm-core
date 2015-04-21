@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,13 +22,13 @@
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +------- -------------------------------------------------------------+
-*/
+ +--------------------------------------------------------------------+
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,75 +40,65 @@
 class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * financial types
+   * Financial types
    * @var array
-   * @static
    */
   private static $financialType;
 
   /**
-   * financial types
+   * Financial types
    * @var array
-   * @static
    */
   private static $financialTypeAccount;
 
 
   /**
-   * financial types
+   * Financial types
    * @var array
-   * @static
    */
   private static $financialAccount;
 
-    /**
-   * contribution pages
+  /**
+   * Contribution pages
    * @var array
-   * @static
    */
   private static $contributionPageActive = NULL;
 
   /**
-   * contribution pages
+   * Contribution pages
    * @var array
-   * @static
    */
   private static $contributionPageAll = NULL;
 
   /**
-   * payment instruments
+   * Payment instruments
    *
    * @var array
-   * @static
    */
   private static $paymentInstrument;
 
   /**
-   * contribution status
+   * Contribution status
    *
    * @var array
-   * @static
    */
   private static $contributionStatus;
 
   /**
    * Personal campaign pages
    * @var array
-   * @static
    */
   private static $pcPage;
 
   /**
-   * status of personal campaign page
+   * Status of personal campaign page
    * @var array
-   * @static
    */
   private static $pcpStatus;
 
   /**
-   * contribution / financial batches
+   * Contribution / financial batches
    * @var array
-   * @static
    */
   private static $batch;
 
@@ -117,12 +107,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the financial types
    *
-   * @access public
    *
-   * @param null $id
+   * @param int $id
    *
-   * @return array - array reference of all financial types if any
-   * @static
+   * @return array
+   *   array reference of all financial types if any
    */
   public static function &financialType($id = NULL) {
     if (!self::$financialType) {
@@ -149,20 +138,19 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the financial Accounts
    *
-   * @access public
    *
-   * @param null $id
-   * @param null $financialAccountTypeId
+   * @param int $id
+   * @param int $financialAccountTypeId
    * @param string $retrieveColumn
    * @param string $key
    *
-   * @return array - array reference of all financial accounts if any
-   * @static
+   * @return array
+   *   array reference of all financial accounts if any
    */
   public static function &financialAccount($id = NULL, $financialAccountTypeId = NULL, $retrieveColumn = 'name', $key = 'id') {
-    $condition = NUll;
+    $condition = NULL;
     if ($financialAccountTypeId) {
-      $condition = " financial_account_type_id = ". $financialAccountTypeId;
+      $condition = " financial_account_type_id = " . $financialAccountTypeId;
     }
     $cacheKey = "{$id}_{$financialAccountTypeId}_{$retrieveColumn}_{$key}";
     if (!isset(self::$financialAccount[$cacheKey])) {
@@ -189,13 +177,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * nex time it's requested.
    *
-   * @access public
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }
@@ -205,13 +191,14 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the contribution pages
    *
-   * @param integer $id  id of the contribution page
-   * @param boolean $all do we want all pages or only active pages
+   * @param int $id
+   *   Id of the contribution page.
+   * @param bool $all
+   *   Do we want all pages or only active pages.
    *
-   * @access public
    *
-   * @return array - array reference of all contribution pages if any
-   * @static
+   * @return array
+   *   array reference of all contribution pages if any
    */
   public static function &contributionPage($id = NULL, $all = FALSE) {
     if ($all) {
@@ -239,12 +226,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * Get all the payment instruments
    *
-   * @access public
    *
    * @param string $columnName
    *
-   * @return array - array reference of all payment instruments if any
-   * @static
+   * @return array
+   *   array reference of all payment instruments if any
    */
   public static function &paymentInstrument($columnName = 'label') {
     if (!isset(self::$paymentInstrument[$columnName])) {
@@ -257,29 +243,27 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the valid accepted credit cards
+   * Get all the valid accepted credit cards.
    *
-   * @access public
    *
-   * @return array - array reference of all payment instruments if any
-   * @static
+   * @return array
+   *   array reference of all payment instruments if any
    */
   public static function &creditCard() {
     return CRM_Core_OptionGroup::values('accept_creditcard', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
   }
 
   /**
-   * Get all premiums
+   * Get all premiums.
    *
-   * @access public
    *
-   * @param null $pageID
-   * @return array - array of all Premiums if any
-   * @static
+   * @param int $pageID
+   * @return array
+   *   array of all Premiums if any
    */
   public static function products($pageID = NULL) {
-    $products       = array();
-    $dao            = new CRM_Contribute_DAO_Product();
+    $products = array();
+    $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->orderBy('id');
     $dao->find();
@@ -288,9 +272,9 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       $products[$dao->id] = $dao->name;
     }
     if ($pageID) {
-      $dao               = new CRM_Contribute_DAO_Premium();
+      $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id    = $pageID;
+      $dao->entity_id = $pageID;
       $dao->find(TRUE);
       $premiumID = $dao->id;
 
@@ -317,14 +301,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the contribution statuses
+   * Get all the contribution statuses.
    *
-   * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param string $columnName
-   * @return array - array reference of all contribution statuses
-   * @static
+   * @return array
+   *   array reference of all contribution statuses
    */
   public static function &contributionStatus($id = NULL, $columnName = 'label') {
     $cacheKey = $columnName;
@@ -342,15 +325,14 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Personal campaign pages
+   * Get all the Personal campaign pages.
    *
-   * @access public
    *
    * @param null $pageType
-   * @param null $id
+   * @param int $id
    *
-   * @return array - array reference of all pcp if any
-   * @static
+   * @return array
+   *   array reference of all pcp if any
    */
   public static function &pcPage($pageType = NULL, $id = NULL) {
     if (!isset(self::$pcPage[$pageType])) {
@@ -378,11 +360,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array pcpStatus is returned
    *
-   * @access public
-   * @static
    *
    * @param string $column
-   * @return array - array reference of all PCP activity statuses
+   * @return array
+   *   array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
     if (NULL === self::$pcpStatus) {
@@ -403,12 +384,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array  $financialTypeAccount is returned
    *
-   * @access public
-   * @static
    *
-   * @param $financialTypeId
-   * @param null $relationTypeId
-   * @return array - array reference of all financial accounts for a Financial type
+   * @param int $financialTypeId
+   * @param int $relationTypeId
+   * @return array
+   *   array reference of all financial accounts for a Financial type
    */
   public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
     if (!CRM_Utils_Array::value($financialTypeId, self::$financialTypeAccount)) {
@@ -416,7 +396,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       CRM_Core_PseudoConstant::populate(
         self::$financialTypeAccount[$financialTypeId],
         'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = true,
+        $all = TRUE,
         $retrieve = 'financial_account_id',
         $filter = NULL,
         $condition,
@@ -433,13 +413,12 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all batches
+   * Get all batches.
    *
-   * @access public
    *
-   * @param null $id
-   * @return array - array reference of all batches if any
-   * @static
+   * @param int $id
+   * @return array
+   *   array reference of all batches if any
    */
   public static function &batch($id = NULL) {
     if (!self::$batch) {
@@ -461,5 +440,5 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     return self::$batch;
   }
-}
 
+}

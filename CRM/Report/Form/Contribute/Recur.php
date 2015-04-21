@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
-  function __construct() {
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -85,7 +88,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'total_amount' => array(
             'title' => ts('Amount Contributed to Date'),
             'statistics' => array(
-              'sum' => ts("Total Amount Contributed")
+              'sum' => ts("Total Amount Contributed"),
             ),
           ),
         ),
@@ -164,13 +167,13 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options'  => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'frequency_unit' => array(
             'title' => ts('Frequency Unit'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' =>  CRM_Core_OptionGroup::values('recur_frequency_units'),
+            'options' => CRM_Core_OptionGroup::values('recur_frequency_units'),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'frequency_interval' => array(
@@ -200,19 +203,28 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Calculated end date (either end date or date all installments will be made)'),
             'description' => "does this work?",
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'pseudofield' => TRUE
+            'pseudofield' => TRUE,
           ),
         ),
-      )
+      ),
     );
     $this->_currencyColumn = 'civicrm_contribution_recur_currency';
     parent::__construct();
   }
-  function getTemplateName() {
-    return 'CRM/Report/Form.tpl' ;
+
+  /**
+   * Get template file name.
+   *
+   * @return string
+   */
+  public function getTemplateName() {
+    return 'CRM/Report/Form.tpl';
   }
 
-  function from() {
+  /**
+   * Generate FROM SQL clause.
+   */
+  public function from() {
     $this->_from = "
       FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
         INNER JOIN civicrm_contribution_recur   {$this->_aliases['civicrm_contribution_recur']}
@@ -229,11 +241,11 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY " . $this->_aliases['civicrm_contribution_recur'] . ".id";
   }
 
-  function where() {
+  public function where() {
     parent::where();
     // Handle calculated end date. This can come from one of two sources:
     // Either there is a specified end date for the end_date field
@@ -241,9 +253,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     // installments * intervals using the mysql date_add function, along
     // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
     $date_suffixes = array('relative', 'from', 'to');
-    while(list(,$suffix) = each($date_suffixes)) {
+    while (list(, $suffix) = each($date_suffixes)) {
       // Check to see if the user wants to search by calculated date.
-      if(!empty($this->_params['calculated_end_date_' . $suffix])) {
+      if (!empty($this->_params['calculated_end_date_' . $suffix])) {
         // The calculated date field is in use - spring into action
         // Gather values
         $relative = CRM_Utils_Array::value("calculated_end_date_relative", $this->_params);
@@ -258,7 +270,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $start_date_db_alias = $this->_columns['civicrm_contribution_recur']['filters']['start_date']['dbAlias'];
 
         // The end date clause is simple to construct
-        $end_date_clause   = $this->dateClause($end_date_db_alias, $relative, $from, $to, $end_date_type, NULL, NULL);
+        $end_date_clause = $this->dateClause($end_date_db_alias, $relative, $from, $to, $end_date_type, NULL, NULL);
 
         // NOTE: For the calculation based on installment, there doesn't
         // seem to be a way to include the interval unit (e.g. month,
@@ -267,22 +279,22 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
         $installment_clause = '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) month)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'month' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) day)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'day' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) week)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
 
         $installment_clause .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) year)",
-          $relative, $from, $to, $start_date_type, NULL, NULL);
+            $relative, $from, $to, $start_date_type, NULL, NULL);
         $installment_clause .= " AND $frequency_unit_db_alias = 'year' )\n";
 
         $this->_where .= " AND ";
@@ -297,7 +309,16 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
   }
 
 
-  function alterDisplay(&$rows) {
+  /**
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
+   */
+  public function alterDisplay(&$rows) {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     foreach ($rows as $rowNum => $row) {
       // convert display name to links
@@ -317,11 +338,12 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
       }
-      
+
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'],$rows[$rowNum]['civicrm_contribution_recur_currency']);
+        $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
-      
+
     }
   }
+
 }

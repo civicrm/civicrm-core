@@ -21,7 +21,12 @@
   var PHONE_TYPES = _.map(CRM.PseudoConstant.phoneType, function(value, key) {
     return {val: key, label: value};
   });
+
+  var WEBSITE_TYPES = _.map(CRM.PseudoConstant.websiteType, function(value, key) {
+    return {val: key, label: value};
+  });
   var DEFAULT_PHONE_TYPE_ID = PHONE_TYPES[0].val;
+  var DEFAULT_WEBSITE_TYPE_ID = WEBSITE_TYPES[0].val;
 
   /**
    * Add a help link to a form label
@@ -48,14 +53,14 @@
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
-    if (coreTypesExpr && coreTypesExpr != '') {
+    if (!_.isEmpty(coreTypesExpr)) {
       _.each(coreTypesExpr.split(','), function(coreType){
         typeList.coreTypes[coreType] = true;
       });
     }
 
     //CRM-15427 Allow Multiple subtype filtering
-    if (subTypesExpr && subTypesExpr != '') {
+    if (!_.isEmpty(subTypesExpr)) {
       if (subTypesExpr.indexOf(';;') !== -1) {
         var subTypeparts = subTypesExpr.replace(/;;/g,'\0').split('\0');
         _.each(subTypeparts, function(subTypepart) {
@@ -111,7 +116,7 @@
           throw "Cannot guess entity name for field_type=" + field_type;
         }
     }
-  }
+  };
 
   /**
    * Represents a field in a customizable form.
@@ -198,6 +203,11 @@
         type: 'Select',
         options: LOCATION_TYPES
       },
+      'website_type_id': {
+        title: ts('Website Type'),
+        type: 'Select',
+        options: WEBSITE_TYPES
+      },
       'phone_type_id': {
         title: ts('Phone Type'),
         type: 'Select',
@@ -222,6 +232,9 @@
       if (fieldSchema && fieldSchema.civiIsLocation && !this.get('location_type_id')) {
         this.set('location_type_id', DEFAULT_LOCATION_TYPE_ID);
       }
+      if (fieldSchema && fieldSchema.civiIsWebsite && !this.get('website_type_id')) {
+        this.set('website_type_id', DEFAULT_WEBSITE_TYPE_ID);
+      }
       if (fieldSchema && fieldSchema.civiIsPhone && !this.get('phone_type_id')) {
         this.set('phone_type_id', DEFAULT_PHONE_TYPE_ID);
       }
@@ -245,10 +258,10 @@
      * @return {String}
      */
     getSignature: function() {
-      return this.get("entity_name")
-        + '::' + this.get("field_name")
-        + '::' + (this.get("location_type_id") ? this.get("location_type_id") : '')
-        + '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
+      return this.get("entity_name") +
+        '::' + this.get("field_name") +
+        '::' + (this.get("location_type_id") ? this.get("location_type_id") : this.get("website_type_id") ? this.get("website_type_id") : '') +
+        '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
     },
 
     /**
@@ -308,6 +321,9 @@
       if (fieldSchema.civiIsLocation) {
         limit *= LOCATION_TYPES.length;
       }
+      if (fieldSchema.civiIsWebsite) {
+        limit *= WEBSITE_TYPES.length;
+      }
       if (fieldSchema.civiIsPhone) {
         limit *= PHONE_TYPES.length;
       }
@@ -315,11 +331,13 @@
     },
     watchDuplicates: function(model, collection, options) {
       model.on('change:location_type_id', this.markDuplicates, this);
+      model.on('change:website_type_id', this.markDuplicates, this);
       model.on('change:phone_type_id', this.markDuplicates, this);
       this.markDuplicates();
     },
     unwatchDuplicates: function(model, collection, options) {
       model.off('change:location_type_id', this.markDuplicates, this);
+      model.off('change:website_type_id', this.markDuplicates, this);
       model.off('change:phone_type_id', this.markDuplicates, this);
       this.markDuplicates();
     },
@@ -496,14 +514,14 @@
       },
       'help_post': {
         title: ts('Post-form Help'),
-        help: ts('Explanatory text displayed at the end of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the end of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'help_pre': {
-        title: ts('Pre-form Help '),
-        help: ts('Explanatory text displayed at the beginning of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        title: ts('Pre-form Help'),
+        help: ts('Explanatory text displayed at the beginning of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'is_active': {
@@ -530,7 +548,7 @@
         options: YESNO
       },
       'is_proximity_search': {
-        title: ts('Proximity search'),
+        title: ts('Proximity Search'),
         help: ts('FIXME'),
         type: 'Select',
         options: YESNO // FIXME
@@ -598,7 +616,7 @@
           ufGroupModel: this
         });
         paletteFieldCollection.sync = function(method, model, options) {
-          options || (options = {});
+          if (!options) options = {};
           // console.log(method, model, options);
           switch (method) {
             case 'read':
@@ -613,6 +631,8 @@
             case 'create':
             case 'update':
             case 'delete':
+              throw 'Unsupported method: ' + method;
+
             default:
               throw 'Unsupported method: ' + method;
           }
@@ -674,7 +694,7 @@
     checkGroupType: function(validTypesExpr, allowAllSubtypes) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
-      if (! this.get('group_type') || this.get('group_type') == '') {
+      if (_.isEmpty(this.get('group_type'))) {
         return true;
       }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,10 +44,8 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     $this->_print = CRM_Core_Smarty::PRINT_PAGE;
 
     $this->preProcess();
@@ -58,15 +56,14 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
   }
 
   /**
-   * View summary details of a contact
+   * View summary details of a contact.
    *
    * @return void
-   * @access public
    */
-  function view() {
-    $params   = array();
+  public function view() {
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
@@ -75,5 +72,5 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
 
     return parent::view();
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,17 +40,16 @@
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
-  static function preProcess(&$form) {
-    $messageText    = array();
+  public static function preProcess(&$form) {
+    $messageText = array();
     $messageSubject = array();
-    $dao            = new CRM_Core_BAO_MessageTemplate();
+    $dao = new CRM_Core_BAO_MessageTemplate();
     $dao->is_active = 1;
     $dao->find();
     while ($dao->fetch()) {
@@ -64,23 +63,23 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * @param $form
-   * @param $cid
+   * @param CRM_Core_Form $form
+   * @param int $cid
    */
-  static function preProcessSingle(&$form, $cid) {
+  public static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
     CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
    * @var CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     // This form outputs a file so should never be submitted via ajax
     $form->preventAjaxSubmit();
 
@@ -157,15 +156,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     );
 
     $config = CRM_Core_Config::singleton();
-    if ($config->wkhtmltopdfPath == false) {
-      $form->add(
-        'text',
-        'stationery',
-        ts('Stationery (relative path to PDF you wish to use as the background)'),
-        array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
-        FALSE
-      );
+    /** CRM-15883 Suppressing Stationery path field until we switch from DOMPDF to a library that supports it.
+    if ($config->wkhtmltopdfPath == FALSE) {
+    $form->add(
+    'text',
+    'stationery',
+    ts('Stationery (relative path to PDF you wish to use as the background)'),
+    array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
+    FALSE
+    );
     }
+     */
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
@@ -193,26 +194,27 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * Set default values
+   * Set default values.
    */
-  static function setDefaultValues() {
+  public static function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
     return $defaultFormat;
   }
 
   /**
-   * form rule
+   * Form rule.
    *
-   * @param array $fields    the input form values
+   * @param array $fields
+   *   The input form values.
    * @param array $dontCare
-   * @param array $self      additional values form 'this'
+   * @param array $self
+   *   Additional values form 'this'.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   *
+   * @return bool
+   *   TRUE if no errors, else array of errors.
    */
-  static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $dontCare, $self) {
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
 
@@ -236,13 +238,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * part of the post process which prepare and extract information from the template
+   * Part of the post process which prepare and extract information from the template.
    *
-   * @access protected
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return array( $categories, $html_message, $messageToken, $returnProperties )
+   * @return array
+   *   [$categories, $html_message, $messageToken, $returnProperties]
    */
   static protected function processMessageTemplate(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
@@ -311,15 +313,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
 
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
@@ -364,18 +365,18 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $html_message
    * @param $contactIds
    *
    * @throws CRM_Core_Exception
    */
-  static function createActivities($form, $html_message, $contactIds) {
+  public static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
-    $formValues     = $form->controller->exportValues($form->getName());
+    $formValues = $form->controller->exportValues($form->getName());
 
-    $session        = CRM_Core_Session::singleton();
-    $userID         = $session->get('userID');
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
     $activityTypeID = CRM_Core_OptionGroup::getValue(
       'activity_type',
       'Print PDF Letter',
@@ -412,7 +413,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
         'contact_id' => $contactId,
-        'record_type_id' => $targetID
+        'record_type_id' => $targetID,
       );
       CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     }
@@ -421,7 +422,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * @param $message
    */
-  static function formatMessage(&$message) {
+  public static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(
         'oper' => '<p>',
@@ -441,8 +442,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $matches = array();
         if (preg_match('/^(&nbsp;)+/', $msg, $matches)) {
           $spaceLen = strlen($matches[0]) / 6;
-          $trimMsg  = ltrim($msg, '&nbsp; ');
-          $charLen  = strlen($trimMsg);
+          $trimMsg = ltrim($msg, '&nbsp; ');
+          $charLen = strlen($trimMsg);
           $totalLen = $charLen + $spaceLen;
           if ($totalLen > 100) {
             $spacesCount = 10;
@@ -460,5 +461,5 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
   }
-}
 
+}

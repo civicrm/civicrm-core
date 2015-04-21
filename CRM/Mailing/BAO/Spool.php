@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,54 +23,52 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
    * Store Mails into Spool table.
    *
-   * @param $recipient
-   * @param array $headers The string of headers to send with the mail.
+   * @param string|array $recipient
+   *   Either a comma-seperated list of recipients
+   *   (RFC822 compliant), or an array of recipients,
+   *   each RFC822 valid. This may contain recipients not
+   *   specified in the headers, for Bcc:, resending
+   *   messages, etc.
+   * @param array $headers
+   *   The array of headers to send with the mail.
    *
-   * @param string $body The full text of the message body, including any
-   *               Mime parts, etc.
+   * @param string $body
+   *   The full text of the message body, including any mime parts, etc.
    *
-   * @param null $job_id
+   * @param int $job_id
    *
-   * @internal param mixed $recipients Either a comma-seperated list of recipients
-   *              (RFC822 compliant), or an array of recipients,
-   *              each RFC822 valid. This may contain recipients not
-   *              specified in the headers, for Bcc:, resending
-   *              messages, etc.
-   *
-   * @return mixed Returns true on success, or a CRM_Eore_Error
-   *               containing a descriptive error message on
-   *               failure.
-   * @access public
+   * @return bool|CRM_Core_Error
+   *   true if successful
    */
-  function send($recipient, $headers, $body, $job_id = null) {
+  public function send($recipient, $headers, $body, $job_id = NULL) {
     $headerStr = array();
     foreach ($headers as $name => $value) {
       $headerStr[] = "$name: $value";
     }
     $headerStr = implode("\n", $headerStr);
 
-    if ( is_null( $job_id ) ) {
+    if (is_null($job_id)) {
       // This is not a bulk mailing. Create a dummy job for it.
 
       $session = CRM_Core_Session::singleton();
@@ -81,14 +79,14 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['scheduled_date'] = $params['created_date'];
       $params['is_completed'] = 1;
       $params['is_archived'] = 1;
-      $params['body_html'] = htmlspecialchars( $headerStr ) . "\n\n" . $body;
+      $params['body_html'] = htmlspecialchars($headerStr) . "\n\n" . $body;
       $params['subject'] = $headers['Subject'];
       $params['name'] = $headers['Subject'];
       $ids = array();
       $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
 
-      if ( empty( $mailing ) || is_a( $mailing, 'CRM_Core_Error' ) ) {
-        return PEAR::raiseError( 'Unable to create spooled mailing.' );
+      if (empty($mailing) || is_a($mailing, 'CRM_Core_Error')) {
+        return PEAR::raiseError('Unable to create spooled mailing.');
       }
 
       $job = new CRM_Mailing_BAO_MailingJob();
@@ -113,8 +111,8 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $job->save();
       $job_id = $job->id; // this is the one we want for the spool
 
-      if ( is_array( $recipient ) ) {
-        $recipient = implode( ';', $recipient );
+      if (is_array($recipient)) {
+        $recipient = implode(';', $recipient);
       }
     }
 
@@ -135,5 +133,5 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
     return TRUE;
   }
-}
 
+}

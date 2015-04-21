@@ -6,10 +6,10 @@
 {/if}
 
 {if $editActURL}
-{ts}Edit this Activity{/ts} : {$editActURL}
+{ts}Edit activity{/ts} : {$editActURL}
 {/if}
 {if $viewActURL}
-{ts}View this Activity{/ts} : {$viewActURL}
+{ts}View activity{/ts} : {$viewActURL}
 {/if}
 
 {foreach from=$activity.fields item=field}

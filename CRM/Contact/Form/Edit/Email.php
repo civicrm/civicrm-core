@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,17 +39,18 @@
 class CRM_Contact_Form_Edit_Email {
 
   /**
-   * build the form elements for an email object
+   * Build the form object elements for an email object.
    *
-   * @param CRM_Core_Form $form              reference to the form object
-   * @param int           $blockCount block number to build
-   * @param boolean       $blockEdit         is it block edit
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
+   * @param int $blockCount
+   *   Block number to build.
+   * @param bool $blockEdit
+   *   Is it block edit.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$blockCount) {
       $blockId = ($form->get('Email_Block_Count')) ? $form->get('Email_Block_Count') : 1;
@@ -65,13 +66,18 @@ class CRM_Contact_Form_Edit_Email {
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
-      $form->addSelect("email[$blockId][location_type_id]", array('entity' => 'email', 'class' => 'eight', 'placeholder' => NULL));
+      $form->addSelect("email[$blockId][location_type_id]", array(
+          'entity' => 'email',
+          'class' => 'eight',
+          'placeholder' => NULL,
+        ));
 
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();
 
       //On-hold select
       if ($multipleBulk) {
-        $holdOptions = array(0 => ts('- select -'),
+        $holdOptions = array(
+          0 => ts('- select -'),
           1 => ts('On Hold Bounce'),
           2 => ts('On Hold Opt Out'),
         );
@@ -115,5 +121,5 @@ class CRM_Contact_Form_Edit_Email {
       }
     }
   }
-}
 
+}

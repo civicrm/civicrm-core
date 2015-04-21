@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,6 +36,6 @@
       <a href="{crmURL p='civicrm/contact/view' q="reset=1&action=browse&selectedChild=log&cid=`$contactId`"}" class="crm-log-view">&raquo; {ts}View Change Log{/ts}</a>
     {/if}
   {/if}
-	{if !empty($created_date)}<div class="contact-created-date">{ts}Created{/ts}: {$created_date|crmDate}</div>{/if}
+  {if !empty($created_date)}<div class="contact-created-date">{ts}Created{/ts}: {$created_date|crmDate}</div>{/if}
 </div>
 {/strip}

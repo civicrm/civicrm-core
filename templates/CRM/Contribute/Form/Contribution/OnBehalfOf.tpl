@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {**
- * This file provides the HTML for the on-behalf-of form. 
+ * This file provides the HTML for the on-behalf-of form.
  * Also used for related contact edit form.
  * FIXME: This is way more complex than it needs to be
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
@@ -116,10 +116,10 @@
               {if $form.onbehalf.$phone_ext_field.html}
                 &nbsp;{$form.onbehalf.$phone_ext_field.html}
               {/if}
-            {/if} 
-	    {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
+            {/if}
+      {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
             {assign var=elementName value=onbehalf[$fieldName]}
-	       {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
+         {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
             {/if}
             {if $onBehalfOfFields.$fieldName.help_post}
               <br /><span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>

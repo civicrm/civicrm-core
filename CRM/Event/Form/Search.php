@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,52 +43,46 @@
 class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query.
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * prefix for the controller
-   *
+   * Prefix for the controller.
    */
   protected $_prefix = "event_";
 
   protected $_defaults;
 
   /**
-   * the saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars.
    *
    * @var int
-   * @access protected
    */
   protected $_ssID;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -104,11 +98,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->_ssID    = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
+    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->assign("context", $this->_context);
 
     // get user submitted values
@@ -169,13 +163,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
@@ -200,18 +193,16 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = array();
-        // Filter on is_test if specified in search form
-        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0' ) {
+        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
-          $statuses = array_keys($this->_formValues['participant_status_id']);
-          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $statuses) . ' ) )';
+          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_status_id']) . ' ) )';
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $roles = array_keys($this->_formValues['participant_role_id']);
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
+          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_role_id']) . ' ) )';
         }
+
         // CRM-15379
         if (!empty($this->_formValues['participant_fee_id'])) {
           $participant_fee_id = $this->_formValues['participant_fee_id'];
@@ -219,12 +210,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
           $seatClause[] = "( participant.fee_level LIKE '%$feeLabel%' )";
         }
-        $clause = NULL;
-        if (!empty($seatClause)) {
-          $clause = implode(' AND ', $seatClause);
-        }
 
-        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $clause);
+        $seatClause = implode(' AND ', $seatClause);
+        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $seatClause);
       }
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
@@ -265,9 +253,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -357,29 +344,29 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {}
+  public function addRules() {
+  }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
@@ -403,14 +390,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
       }
       elseif (is_numeric($status)) {
-        $status = (int) $status;
-        $statusTypes = array($status => CRM_Event_PseudoConstant::participantStatus($status));
+        $statusTypes = (int) $status;
       }
-      $status = array();
-      foreach ($statusTypes as $key => $value) {
-        $status[$key] = 1;
-      }
-      $this->_formValues['participant_status_id'] = $status;
+      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String',
@@ -425,14 +407,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
       }
       elseif (is_numeric($role)) {
-        $role = (int) $role;
-        $roleTypes = array($role => CRM_Event_PseudoConstant::participantRole($role));
+        $roleTypes = (int) $role;
       }
-      $role = array();
-      foreach ($roleTypes as $key => $value) {
-        $role[$key] = 1;
-      }
-      $this->_formValues['participant_role_id'] = $role;
+      $this->_formValues['participant_role_id'] = is_array($roleTypes) ? array_keys($roleTypes) : $roleTypes;
     }
 
     $type = CRM_Utils_Request::retrieve('type', 'Positive',
@@ -458,7 +435,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 
@@ -466,10 +443,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Participants');
   }
-}
 
+}

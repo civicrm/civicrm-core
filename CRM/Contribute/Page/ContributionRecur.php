@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,11 +44,11 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
-   * View details of a recurring contribution
+   * View details of a recurring contribution.
    *
    * @return void
-   * @access public
-   */ function view() {
+   */
+  public function view() {
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $this->_id;
     if ($recur->find(TRUE)) {
@@ -71,10 +71,10 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
   }
 
-  function preProcess() {
-    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+  public function preProcess() {
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -91,13 +91,12 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -106,5 +105,5 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

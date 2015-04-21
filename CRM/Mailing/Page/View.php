@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,12 +42,12 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
   protected $_contactID;
 
   /**
-   * Lets do permission checking here
+   * Lets do permission checking here.
    * First check for valid mailing, if false return fatal
    * Second check for visibility
    * Call a hook to see if hook wants to override visibility setting
    */
-  function checkPermission() {
+  public function checkPermission() {
     if (!$this->_mailing) {
       return FALSE;
     }
@@ -62,6 +62,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
     // if user is an admin, return true
     if (CRM_Core_Permission::check('administer CiviCRM') ||
+      CRM_Core_Permission::check('approve mailings') ||
       CRM_Core_Permission::check('access CiviMail')
     ) {
       return TRUE;
@@ -71,16 +72,16 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
-   * @param null $id
-   * @param null $contactID
+   * @param int $id
+   * @param int $contactID
    * @param bool $print
    * @param bool $allowID
    *
    * @return void
    */
-  function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
+  public function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
     if (is_numeric($id)) {
       $this->_mailingID = $id;
     }
@@ -156,7 +157,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       //get tokens that are not contact specific resolved
-      $params  = array('contact_id' => 0);
+      $params = array('contact_id' => 0);
       $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
         $returnProperties,
         TRUE, TRUE, NULL,
@@ -200,5 +201,5 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       return $content;
     }
   }
-}
 
+}

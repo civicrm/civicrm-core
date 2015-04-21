@@ -1,0 +1,38 @@
+.crmCaseType .ui-icon-grip-dotted-vertical {
+    vertical-align: middle;
+    cursor: move;
+}
+.crmCaseType .ui-icon {
+    margin: 0.4em 0.2em 0 0;
+    cursor: pointer;
+}
+
+.crmCaseType .ui-tabs-nav li .ui-icon {
+    float: left;
+}
+
+.crmCaseType .ui-tabs-nav select {
+    float: right;
+}
+
+.crmCaseType tr.addRow td {
+    background: #ddddff;
+    padding: 0.5em 1em;
+    text-align: center;
+}
+
+.crmCaseType input.number {
+    width: 3.5em;
+}
+
+.crmCaseType .add-activity {
+    width: 50%;
+}
+
+.crmCaseType table td select {
+    width: 10em;
+}
+
+tr.forked {
+    font-weight: bold;
+}

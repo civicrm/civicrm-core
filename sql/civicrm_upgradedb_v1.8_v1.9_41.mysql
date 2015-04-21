@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -41,12 +41,12 @@ CREATE TABLE civicrm_mailing_spool (
      job_id int(10) unsigned NOT NULL COMMENT 'The ID of the Job .',
      recipient_email text NULL DEFAULT NULL COMMENT 'The email of the receipients this mail is to be sent.',
      headers text NULL DEFAULT NULL COMMENT 'The header information of this mailing .',
-     body text NULL DEFAULT NULL COMMENT 'The body of this mailing.', 
-     added_at datetime NULL DEFAULT NULL COMMENT 'date on which this job was added.', 
+     body text NULL DEFAULT NULL COMMENT 'The body of this mailing.',
+     added_at datetime NULL DEFAULT NULL COMMENT 'date on which this job was added.',
      removed_at datetime NULL DEFAULT NULL COMMENT 'date on which this job was removed.'
 ,
     PRIMARY KEY ( id )
-,      
+,
      CONSTRAINT FK_civicrm_mailing_spool_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
 
 ,    CONSTRAINT FK_civicrm_mailing_spool_job_id FOREIGN KEY (job_id) REFERENCES civicrm_mailing_job(id)
@@ -77,44 +77,44 @@ CREATE TABLE civicrm_mailing_spool (
   ALTER TABLE civicrm_payment_processor_type
        DROP INDEX UI_name,
        ADD UNIQUE INDEX UI_name_domain_id( name, domain_id );
-  
+
 
 -- /*******************************************************
 -- *
 -- * civicrm_domain
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_domain 
+  ALTER TABLE civicrm_domain
       ADD email_name varchar(255) NULL DEFAULT NULL COMMENT 'The default email name that is used in the from address for all outgoing emails',
             ADD email_address varchar(255) NULL DEFAULT NULL COMMENT 'The default email address that is used as the from address for all outgoing emails',
       DROP contact_name;
 
-    UPDATE `civicrm_domain` SET `email_name`='FIXME';  
-    UPDATE `civicrm_domain` SET `email_address`='info@EXAMPLE.ORG';  
+    UPDATE `civicrm_domain` SET `email_name`='FIXME';
+    UPDATE `civicrm_domain` SET `email_address`='info@EXAMPLE.ORG';
     UPDATE `civicrm_domain` SET `email_domain`='EXAMPLE.ORG';
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_mailing_job
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_mailing_job 
+  ALTER TABLE civicrm_mailing_job
       ADD is_test tinyint(4) DEFAULT 0 COMMENT 'Is this job for a test mail?',
       DROP is_retry;
-        
+
     UPDATE civicrm_mailing_job
     SET    is_test = 0;
-    
+
 
 -- /*******************************************************
 -- *
 -- * civicrm_currency
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_currency 
+  ALTER TABLE civicrm_currency
       ADD numeric_code varchar(3) NULL DEFAULT NULL COMMENT 'Numeric currency code',
             ADD full_name varchar(64) NULL DEFAULT NULL COMMENT 'Full currency name';
-           
+
 -- /*******************************************************
 -- *
 -- * civicrm_mailing
@@ -139,7 +139,7 @@ CREATE TABLE civicrm_mailing_spool (
 -- * civicrm_group
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_group 
+  ALTER TABLE civicrm_group
       ADD group_type varchar(128) NULL DEFAULT NULL COMMENT 'FK to group type',
             ADD INDEX index_group_type (group_type);
 
@@ -148,7 +148,7 @@ CREATE TABLE civicrm_mailing_spool (
 -- * civicrm_contribution_page
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_contribution_page 
+  ALTER TABLE civicrm_contribution_page
       MODIFY default_amount_id int(10) unsigned NULL DEFAULT NULL COMMENT 'FK to civicrm_custom_option.';
 
 -- /*******************************************************
@@ -157,8 +157,8 @@ CREATE TABLE civicrm_mailing_spool (
 -- *
 -- *******************************************************/
 
-  REPLACE 
-      civicrm_currency (id, name, symbol, numeric_code, full_name) 
+  REPLACE
+      civicrm_currency (id, name, symbol, numeric_code, full_name)
   VALUES
     (  1, "AUD",  "$", "036", "Australian Dollar"),
     (  2, "CAD",  "$", "124", "Canadian Dollar"),
@@ -354,15 +354,15 @@ CREATE TABLE civicrm_mailing_spool (
 -- *
 -- *******************************************************/
 
-  INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-  VALUES  
+  INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`)
+  VALUES
         (@domain_id, 'group_type', 'Group Type', 0, 1);
-  
+
 
   SELECT @option_group_id_gType := max(id) from civicrm_option_group where name = 'group_type';
 
-  INSERT INTO 
-     civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active) 
+  INSERT INTO
+     civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active)
   VALUES
     (@option_group_id_gType, 'Access Control'  , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 1, 1 ),
     (@option_group_id_gType, 'Mailing List'    , 2, NULL, NULL, 0, NULL, 2, NULL, 0, 1, 1 );
@@ -373,9 +373,9 @@ CREATE TABLE civicrm_mailing_spool (
 -- * civicrm_payment_processor_type (new processor plugins)
 -- *
 -- *******************************************************/
-    INSERT INTO 
+    INSERT INTO
         civicrm_payment_processor_type (domain_id, name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_recur_default, url_button_default, url_site_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
-    VALUES 
+    VALUES
         (@domain_id,'PayJunction','PayJunction',NULL,1,0,'User Name','Password',NULL,NULL,'Payment_PayJunction','https://payjunction.com/quick_link',NULL,NULL,'https://payjunction.com/quick_link',NULL,NULL,1,0);
 
 

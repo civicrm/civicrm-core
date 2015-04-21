@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,13 @@
 
     {/if}
 
-    <td>{$row.activity_type}</td>
+    <td>
+      {$row.activity_type}
+      {if $row.repeat}
+        <br/>
+        <span><b>{$row.repeat}</b></span>
+      {/if}
+    </td>
 
   <td>{$row.activity_subject}</td>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -73,14 +73,14 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
 class CRM_Utils_Tree {
 
   /**
-   * Store the tree information as a string or array
+   * Store the tree information as a string or array.
    * @var string|array
    */
   private $tree;
@@ -88,12 +88,11 @@ class CRM_Utils_Tree {
   /**
    * Constructor for the tree.
    *
-   * @param $nodeName
+   * @param string $nodeName
    *
-   * @internal param string $root
+   * @internal param string $rootNode
    *
    * @return CRM_Utils_Tree
-   * @access public
    */
   public function __construct($nodeName) {
     // create the root node
@@ -104,17 +103,14 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Find a node that matches the given string
+   * Find a node that matches the given string.
    *
-   * @param string      $name       name of the node we are searching for.
+   * @param string $name
+   *   Name of the node we are searching for.
    * @param array (ref) $parentNode which parent node should we search in ?
    *
-   * @return array(
-     ref) | false node if found else false
-   *
-   * @access public
+   * @return array(ref) | false node if found else false
    */
-  //public function &findNode(&$parentNode, $name)
   public function &findNode($name, &$parentNode) {
     // if no parent node specified, please start from root node
     if (!$parentNode) {
@@ -145,46 +141,41 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Function to check if node is a leaf node.
+   * Check if node is a leaf node.
    * Currently leaf nodes are strings and non-leaf nodes are arrays
    *
-   * @param array(
-     ref) $node node which needs to checked
+   * @param array $node node which needs to checked
    *
-   * @return boolean
-   *
-   * @access public
+   * @return bool
    */
   public function isLeafNode(&$node) {
     return (count($node['children']) ? TRUE : FALSE);
   }
 
   /**
-   * Create a node
+   * Create a node.
    *
    * @param string $name
    *
-   * @return array (ref)
-   *
-   * @access public
+   * @return array
+   *   (ref)
    */
   public function &createNode($name) {
-    $node['name']     = $name;
+    $node['name'] = $name;
     $node['children'] = array();
-    $node['data']     = array();
+    $node['data'] = array();
 
     return $node;
   }
 
   /**
-   * Add node
+   * Add node.
    *
-   * @param string $parentName - name of the parent ?
-   * @param array  (ref)       - node to be added
+   * @param string $parentName
+   *   Name of the parent ?.
+   * @param array (ref) $node - node to be added
    *
    * @return void
-   *
-   * @access public
    */
   public function addNode($parentName, &$node) {
     $temp = '';
@@ -194,15 +185,13 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Add Data
+   * Add Data.
    *
-   * @param string $parentName - name of the parent ?
-   * @param mixed              - data to be added
-   * @param string             - key to be used (optional)
+   * @param string $parentName Name of the parent ?.
+   * @param string $childName - key to be used (optional)
+   * @param mixed $data - data to be added
    *
    * @return void
-   *
-   * @access public
    */
   public function addData($parentName, $childName, $data) {
     $temp = '';
@@ -217,29 +206,21 @@ class CRM_Utils_Tree {
   }
 
   /**
-   * Get Tree
-   *
-   * @param none
+   * Get Tree.
    *
    * @return tree
-   *
-   * @access public
    */
   public function getTree() {
     return $this->tree;
   }
 
   /**
-   * print the tree
-   *
-   * @param none
+   * Print the tree.
    *
    * @return void
-   *
-   * @access public
    */
   public function display() {
     print_r($this->tree);
   }
-}
 
+}

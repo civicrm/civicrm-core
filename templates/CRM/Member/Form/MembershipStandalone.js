@@ -32,7 +32,7 @@ CRM.$(function($) {
               if (this.end_date) {
                 andEndDate = ' ' + ts("and end date of %1", {1:this.end_date});
               }
-              
+
               var renewUrl = CRM.url('civicrm/contact/view/membership',
                 "reset=1&action=renew&cid="+this.contact_id+"&id="+this['id']+"&context=membership&selectedChild=member"
               );
@@ -42,7 +42,7 @@ CRM.$(function($) {
               );
 
               var org = $('option:selected', "select[name='membership_type_id[0]']").text();
-              
+
               alert = CRM.alert(
                 ts('This contact has an existing %1 membership at %2 with %3 status%4.', {1: CRM.existingMems.memtypes[this.membership_type_id], 2: org, 3: membership_status, 4: andEndDate})
                   + '<ul><li><a href="' + renewUrl + '">'

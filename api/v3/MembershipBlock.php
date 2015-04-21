@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,37 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 membership type functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Membership
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: MembershipBlock.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * API to Create or update a Membership Type
+ * This api exposes CiviCRM MembershipBlock records.
  *
- * @param array$params  an associative array of name/value property values of civicrm_membership_block
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * API to Create or update a MembershipBlock.
  *
- * @return array $result newly created or updated membership type property values.
- * @access public
- * {getfields MembershipBlock_get}
+ * @param array $params
+ *   An associative array of name/value property values of MembershipBlock.
+ *
+ * @return array
+ *   newly created or updated membership block property values.
  */
 function civicrm_api3_membership_block_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_block_create_spec(&$params) {
   $params['is_active']['api.default'] = TRUE;
@@ -63,33 +59,32 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
 }
 
 /**
- * Get a Membership Type.
+ * Get a Membership Block.
  *
- * This api is used for finding an existing membership type.
+ * This api is used for finding an existing membership block.
  *
- * @param array $params  an associative array of name/value property values of civicrm_membership_block
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_membership_block.
  * {getfields MembershipBlock_get}
  *
- * @return array api result array of all found membership block property values.
- * @access public
+ * @return array
+ *   api result array of all found membership block property values.
  */
 function civicrm_api3_membership_block_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Deletes an existing membership type
+ * Deletes an existing membership block.
  *
- * This API is used for deleting a membership type
- * Required parameters : id of a membership type
+ * This API is used for deleting a membership block
+ * Required parameters : id of a membership block
  *
- * @param  array $params
+ * @param array $params
  *
- * @return array api result array
- * @access public
- * {getfields MembershipBlock_delete}
+ * @return array
+ *   api result array
  */
 function civicrm_api3_membership_block_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

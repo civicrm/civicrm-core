@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class glues together the various parts of the extension
  * system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -46,7 +46,7 @@ class CRM_Extension_System {
   private $downloader = NULL;
 
   /**
-   * The URL of the remote extensions repository
+   * The URL of the remote extensions repository.
    *
    * @var string|FALSE
    */
@@ -54,14 +54,16 @@ class CRM_Extension_System {
 
   /**
    * @param bool $fresh
+   *   TRUE to force creation of a new system.
    *
    * @return CRM_Extension_System
    */
   public static function singleton($fresh = FALSE) {
-    if (! self::$singleton || $fresh) {
+    if (!self::$singleton || $fresh) {
       if (self::$singleton) {
         self::$singleton = new CRM_Extension_System(self::$singleton->parameters);
-      } else {
+      }
+      else {
         self::$singleton = new CRM_Extension_System();
       }
     }
@@ -70,6 +72,7 @@ class CRM_Extension_System {
 
   /**
    * @param CRM_Extension_System $singleton
+   *   The new, singleton extension system.
    */
   public static function setSingleton(CRM_Extension_System $singleton) {
     self::$singleton = $singleton;
@@ -77,20 +80,35 @@ class CRM_Extension_System {
 
   /**
    * @param array $parameters
+   *   List of configuration values required by the extension system.
+   *   Missing values will be guessed based on $config.
    */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
-    if (!array_key_exists('extensionsDir', $parameters)) {
-      $parameters['extensionsDir'] = $config->extensionsDir;
+    $configKeys = array(
+      'extensionsDir',
+      'extensionsURL',
+      'resourceBase',
+      'userFrameworkBaseURL',
+    );
+    foreach ($configKeys as $key) {
+      if (!array_key_exists($key, $parameters)) {
+        $parameters[$key] = $config->{$key};
+      }
     }
-    if (!array_key_exists('extensionsURL', $parameters)) {
-      $parameters['extensionsURL'] = $config->extensionsURL;
+    if (!array_key_exists('civicrm_root', $parameters)) {
+      $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
     }
+    if (!array_key_exists('cmsRootPath', $parameters)) {
+      $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
+    }
+    ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
+
     $this->parameters = $parameters;
   }
 
   /**
-   * Get a container which represents all available extensions
+   * Get a container which represents all available extensions.
    *
    * @return CRM_Extension_Container_Interface
    */
@@ -102,9 +120,12 @@ class CRM_Extension_System {
         $containers['default'] = $this->getDefaultContainer();
       }
 
-      $config = CRM_Core_Config::singleton();
-      global $civicrm_root;
-      $containers['civiroot']  = new CRM_Extension_Container_Basic($civicrm_root, $config->resourceBase, $this->getCache(), 'civiroot');
+      $containers['civiroot'] = new CRM_Extension_Container_Basic(
+        $this->parameters['civicrm_root'],
+        $this->parameters['resourceBase'],
+        $this->getCache(),
+        'civiroot'
+      );
 
       // TODO: CRM_Extension_Container_Basic( /sites/all/modules )
       // TODO: CRM_Extension_Container_Basic( /sites/$domain/modules
@@ -112,11 +133,15 @@ class CRM_Extension_System {
       // TODO: CRM_Extension_Container_Basic( /vendors )
 
       // At time of writing, D6, D7, and WP support cmsRootPath() but J does not
-      $cmsRootPath = $config->userSystem->cmsRootPath();
-      if (NULL !== $cmsRootPath) {
-        $vendorPath = $cmsRootPath . DIRECTORY_SEPARATOR . 'vendor';
+      if (NULL !== $this->parameters['cmsRootPath']) {
+        $vendorPath = $this->parameters['cmsRootPath'] . DIRECTORY_SEPARATOR . 'vendor';
         if (is_dir($vendorPath)) {
-          $containers['cmsvendor'] = new CRM_Extension_Container_Basic($vendorPath, $config->userFrameworkBaseURL  . DIRECTORY_SEPARATOR . 'vendor', $this->getCache(), 'cmsvendor');
+          $containers['cmsvendor'] = new CRM_Extension_Container_Basic(
+            $vendorPath,
+            $this->parameters['userFrameworkBaseURL'] . DIRECTORY_SEPARATOR . 'vendor',
+            $this->getCache(),
+            'cmsvendor'
+          );
         }
       }
 
@@ -126,7 +151,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the container to which new extensions are installed
+   * Get the container to which new extensions are installed.
    *
    * This container should be a particular, writeable directory.
    *
@@ -136,7 +161,8 @@ class CRM_Extension_System {
     if ($this->defaultContainer === NULL) {
       if ($this->parameters['extensionsDir']) {
         $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
-      } else {
+      }
+      else {
         $this->defaultContainer = FALSE;
       }
     }
@@ -144,7 +170,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the service which provides runtime information about extensions
+   * Get the service which provides runtime information about extensions.
    *
    * @return CRM_Extension_Mapper
    */
@@ -156,7 +182,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Get the service for enabling and disabling extensions
+   * Get the service for enabling and disabling extensions.
    *
    * @return CRM_Extension_Manager
    */
@@ -212,11 +238,13 @@ class CRM_Extension_System {
   public function getCache() {
     if ($this->cache === NULL) {
       if (defined('CIVICRM_DSN')) {
+        $cacheGroup = md5(serialize(array('ext', $this->parameters)));
         $this->cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => 'ext',
+          'group' => $cacheGroup,
           'prefetch' => TRUE,
         ));
-      } else {
+      }
+      else {
         $this->cache = new CRM_Utils_Cache_ArrayCache(array());
       }
     }
@@ -224,7 +252,7 @@ class CRM_Extension_System {
   }
 
   /**
-   * Determine the URL which provides a feed of available extensions
+   * Determine the URL which provides a feed of available extensions.
    *
    * @return string|FALSE
    */
@@ -235,8 +263,8 @@ class CRM_Extension_System {
 
       // boolean false means don't try to check extensions
       // http://issues.civicrm.org/jira/browse/CRM-10575
-      if($url === false) {
-        $this->_repoUrl = false;
+      if ($url === FALSE) {
+        $this->_repoUrl = FALSE;
       }
       else {
         $this->_repoUrl = CRM_Utils_System::evalUrl($url);
@@ -244,4 +272,5 @@ class CRM_Extension_System {
     }
     return $this->_repoUrl;
   }
+
 }

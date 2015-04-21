@@ -1,0 +1,10 @@
+<!--
+  Implicit Controller: CrmMailingABEditCtrl
+-->
+<div crm-ui-debug="abtest.ab"></div>
+<div crm-ui-debug="abtest.mailings"></div>
+
+<form name="crmMailingAB" novalidate>
+  <div ng-include="'~/crmMailingAB/EditCtrl/edit.html'" ng-if="!isSubmitted()"></div>
+  <div ng-include="'~/crmMailingAB/EditCtrl/report.html'" ng-if="isSubmitted()"></div>
+</form>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,26 +33,26 @@
     </div>
     {if ! $ownerOrgOK}
         <div class="finalconf-button">
-            <a href="{$fixOrgUrl}" id="fixOrgUrl" class="button"><span><div class="icon settings-icon"></div>{ts}Go{/ts}</span></a>
+            <a href="{$fixOrgUrl}" id="fixOrgUrl" class="button"><span><div class="icon ui-icon-wrench"></div>{ts}Go{/ts}</span></a>
         </div>
       <div class="finalconf-itemdesc">{ts}Please enter your organization's name and primary address.{/ts}</div>
-      <h4 class="finalconf-item"><div class="icon alert-icon"></div> &nbsp;{ts}Organization Name{/ts}</h4>
+      <h4 class="finalconf-item"><div class="icon ui-icon-alert"></div> &nbsp;{ts}Organization Name{/ts}</h4>
       <div style="clear:both"></div>
   {/if}
     {if ! $fromEmailOK}
         <div class="finalconf-button">
-            <a href="{$fixEmailUrl}" id="fixOrgUrl" class="button"><span><div class="icon settings-icon"></div>{ts}Go{/ts}</span></a>
+            <a href="{$fixEmailUrl}" id="fixOrgUrl" class="button"><span><div class="icon ui-icon-wrench"></div>{ts}Go{/ts}</span></a>
         </div>
       <div class="finalconf-itemdesc">{ts}Please enter a default FROM Email Address (for system-generated emails).{/ts}</div>
-      <h4 class="finalconf-item"><div class="icon alert-icon"></div> &nbsp;{ts}From Email Address{/ts}</h4>
+      <h4 class="finalconf-item"><div class="icon ui-icon-alert"></div> &nbsp;{ts}From Email Address{/ts}</h4>
       <div style="clear:both"></div>
     {/if}
     {if ! $defaultMailboxOK}
         <div class="finalconf-button">
-            <a href="{$fixDefaultMailbox}" id="fixDefaultMailbox" class="button"><span><div class="icon settings-icon"></div>{ts}Go{/ts}</span></a>
+            <a href="{$fixDefaultMailbox}" id="fixDefaultMailbox" class="button"><span><div class="icon ui-icon-wrench"></div>{ts}Go{/ts}</span></a>
         </div>
         <div class="finalconf-itemdesc">{ts}Please configure a default mailbox for CiviMail.{/ts} (<a href="http://book.civicrm.org/user/advanced-configuration/email-system-configuration/" title="{ts}opens online user guide in a new window{/ts}" target="_blank">{ts}learn more{/ts}</a>)</div>
-        <h4 class="finalconf-item"><div class="icon alert-icon"></div> &nbsp;{ts}Default CiviMail Mailbox{/ts}</h4>
+        <h4 class="finalconf-item"><div class="icon ui-icon-alert"></div> &nbsp;{ts}Default CiviMail Mailbox{/ts}</h4>
         <div style="clear:both"></div>
     {/if}
     </div>
@@ -60,15 +60,15 @@
 {$communityMessages}
 <div class="crm-submit-buttons">
 <a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
-  <span class="icon settings-icon"></span> {ts}Configure Your Dashboard{/ts}
+  <span class="icon ui-icon-wrench"></span> {ts}Configure Your Dashboard{/ts}
 </a>
 
 <a style="display:none;" href="{crmURL p="civicrm/dashboard" q="reset=1"}" class="button show-done" style="margin-left: 6px;">
-  <span><div class="icon check-icon"></div> {ts}Done{/ts}</span>
+  <span><div class="icon ui-icon-check"></div> {ts}Done{/ts}</span>
 </a>
 
 <a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="crm-hover-button show-refresh" style="margin-left: 6px;">
-  <span class="icon refresh-icon"></span> {ts}Refresh Dashboard Data{/ts}
+  <span class="icon ui-icon-refresh"></span> {ts}Refresh Dashboard Data{/ts}
 </a>
 
 </div>

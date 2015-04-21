@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,27 +41,26 @@
 class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
 
   /**
-   * name of the tag
+   * Name of the tag.
    *
    * @var string
    */
   protected $_name;
 
   /**
-   * all the tags in the system
+   * All the tags in the system.
    *
    * @var array
    */
   protected $_tags;
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags();
 
@@ -75,17 +74,17 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
     $this->addDefaultButtons(ts('Tag Contacts'));
   }
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Task_AddToTag', 'formRule'));
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rule
    *
    * @return array
    */
-  static function formRule($form, $rule) {
+  public static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['contact_taglist'])) {
       $errors['_qf_default'] = ts("Please select at least one tag.");
@@ -94,9 +93,8 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -148,13 +146,15 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
 
       $status = array(ts('%count contact tagged', array('count' => $added, 'plural' => '%count contacts tagged')));
       if ($notAdded) {
-        $status[] = ts('%count contact already had this tag', array('count' => $notAdded, 'plural' => '%count contacts already had this tag'));
+        $status[] = ts('%count contact already had this tag', array(
+            'count' => $notAdded,
+            'plural' => '%count contacts already had this tag',
+          ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
     }
 
   }
-  //end of function
-}
 
+}

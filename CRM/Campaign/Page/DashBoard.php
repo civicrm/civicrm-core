@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  --------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,7 +39,7 @@
 class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -50,10 +50,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_campaignActionLinks
-   *
+   * @return array
    */
-  function &campaignActionLinks() {
+  public function &campaignActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_campaignActionLinks)) {
       $deleteExtra = ts('Are you sure you want to delete this Campaign?');
@@ -89,7 +88,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &surveyActionLinks() {
+  public function &surveyActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_surveyActionLinks)) {
       self::$_surveyActionLinks = array(
@@ -124,7 +123,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &petitionActionLinks() {
+  public function &petitionActionLinks() {
     if (!isset(self::$_petitionActionLinks)) {
       self::$_petitionActionLinks = self::surveyActionLinks();
       self::$_petitionActionLinks[CRM_Core_Action::UPDATE] = array(
@@ -155,14 +154,14 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         'qs' => 'sid=%%id%%&reset=1',
         'title' => ts('Sign Petition'),
         'fe' => TRUE,
-      //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
+        //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
       );
       self::$_petitionActionLinks[CRM_Core_Action::BROWSE] = array(
         'name' => ts('Signatures'),
         'url' => 'civicrm/activity/search',
         'qs' => 'survey=%%id%%&force=1',
         'title' => ts('List the signatures'),
-      //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
+        //CRM_Core_Action::PROFILE is used because there isn't a specific action for sign
       );
     }
 
@@ -172,7 +171,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function browseCampaign() {
+  public function browseCampaign() {
     // ensure valid javascript (these must have a value set)
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('campaignTypes', json_encode(NULL));
@@ -200,19 +199,25 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  public static function getCampaignSummary($params = array(
-    )) {
+  public static function getCampaignSummary($params = array()) {
     $campaignsData = array();
 
     //get the campaigns.
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaignSummary($params);
     if (!empty($campaigns)) {
-      $config         = CRM_Core_Config::singleton();
-      $campaignType   = CRM_Campaign_PseudoConstant::campaignType();
+      $config = CRM_Core_Config::singleton();
+      $campaignType = CRM_Campaign_PseudoConstant::campaignType();
       $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
-      $properties     = array(
-        'id', 'name', 'title', 'status_id', 'description',
-        'campaign_type_id', 'is_active', 'start_date', 'end_date',
+      $properties = array(
+        'id',
+        'name',
+        'title',
+        'status_id',
+        'description',
+        'campaign_type_id',
+        'is_active',
+        'start_date',
+        'end_date',
       );
       foreach ($campaigns as $cmpid => $campaign) {
         foreach ($properties as $prop) {
@@ -265,7 +270,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   /**
    * @return mixed
    */
-  function browseSurvey() {
+  public function browseSurvey() {
     // ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('surveyTypes', json_encode(NULL));
@@ -294,8 +299,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getSurveySummary($params = array(
-    )) {
+  public function getSurveySummary($params = array()) {
     $surveysData = array();
 
     //get the survey.
@@ -310,7 +314,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $surveysData[$sid]['campaign'] = CRM_Utils_Array::value($campaignId, $campaigns);
         $surveysData[$sid]['activity_type'] = $surveyType[$survey['activity_type_id']];
         if (!empty($survey['release_frequency'])) {
-          $surveysData[$sid]['release_frequency'] = $survey['release_frequency'] . ' Day(s)';
+          $surveysData[$sid]['release_frequency'] = ts('1 Day', array('plural' => '%count Days', 'count' => $survey['release_frequency']));
         }
 
         $action = array_sum(array_keys(self::surveyActionLinks($surveysData[$sid]['activity_type'])));
@@ -334,9 +338,10 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $surveysData[$sid]['is_default'] = $isDefault;
 
         if ($surveysData[$sid]['result_id']) {
-          $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ',' . "'" . $surveysData[$sid]['title'] . "'" . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set').'">' . ts('Result Set') . '</a>';
+          $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ',' . "'" . $surveysData[$sid]['title'] . "'" . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set') . '">' . ts('Result Set') . '</a>';
           $surveysData[$sid]['result_id'] = $resultSet;
-        } else {
+        }
+        else {
           $resultUrl = CRM_Utils_System::url("civicrm/survey/configure/results", "action=update&id={$sid}&reset=1");
           $surveysData[$sid]['result_id'] = "<a href='{$resultUrl}' class='status-warning'>(" . ts('Incomplete. Click to configure result set.') . ')</a>';
         }
@@ -358,7 +363,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
 
         if ($reportID = CRM_Campaign_BAO_Survey::getReportID($sid)) {
-          $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}",'reset=1');
+          $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}", 'reset=1');
           $surveysData[$sid]['title'] = "<a href='{$url}' title='View Survey Report'>{$surveysData[$sid]['title']}</a>";
         }
       }
@@ -367,8 +372,13 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $surveysData;
   }
 
-  function browsePetition() {
-    // ensure valid javascript - this must have a value set
+  /**
+   * Browse petitions.
+   *
+   * @return mixed|null
+   */
+  public function browsePetition() {
+    // Ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
     $this->assign('petitionCampaigns', json_encode(NULL));
 
@@ -378,11 +388,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     //don't load find interface when no petition in db.
     if (!$petitionCount) {
       $this->assign('hasPetitions', FALSE);
-      return;
+      return NULL;
     }
     $this->assign('hasPetitions', TRUE);
 
-    //build the ajaxify petition search and selector.
+    // Build the ajax petition search and selector.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Search_Petition', ts('Search Petition'));
     $controller->set('searchTab', 'petition');
     $controller->setEmbedded(TRUE);
@@ -395,8 +405,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
    *
    * @return array
    */
-  function getPetitionSummary($params = array(
-    )) {
+  public function getPetitionSummary($params = array()) {
     $config = CRM_Core_Config::singleton();
     $petitionsData = array();
 
@@ -446,7 +455,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $petitionsData;
   }
 
-  function browse() {
+  public function browse() {
     $this->_tabs = array(
       'campaign' => ts('Campaigns'),
       'survey' => ts('Surveys'),
@@ -468,15 +477,17 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array('tabSettings' => array(
-        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-      )));
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+        ),
+      ));
   }
 
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
@@ -486,7 +497,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return parent::run();
   }
 
-  function buildTabs() {
+  public function buildTabs() {
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
       $allTabs[$name] = array(
@@ -499,5 +510,5 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     $allTabs['campaign']['class'] = 'livePage';
     $this->assign('tabHeader', $allTabs);
   }
-}
 
+}

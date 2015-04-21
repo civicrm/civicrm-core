@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,39 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 activity contact functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_ActivityContact
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: ActivityContact.php 2014-04-01 elcapo $
  */
 
 /**
- *  Add a record relating a contact with an activity
+ * This api exposes the CiviCRM ActivityContact join table.
  *
- * Allowed @params array keys are:
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Add a record relating a contact with an activity.
  *
- * @example ActivityContact.php
+ * @param array $params
  *
- * @param $params
- *
- * @return array of newly created activity contact records.
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_activity_contact_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_contact_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -64,14 +57,12 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ActivityContact record
+ * Delete an existing ActivityContact record.
  *
- * @param  array  $params
+ * @param array $params
  *
- * @return array Api Result
- *
- * @example ActivityContact.php
- * @access public
+ * @return array
+ *   Api Result
  */
 function civicrm_api3_activity_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -80,13 +71,11 @@ function civicrm_api3_activity_contact_delete($params) {
 /**
  * Get a ActivityContact.
  *
- * @example ActivityContact.php
+ * @param array $params
+ *   An associative array of name/value pairs.
  *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array details of found tags else error
- *
- * @access public
+ * @return array
+ *   details of found tags else error
  */
 function civicrm_api3_activity_contact_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

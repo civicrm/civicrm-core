@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A PHP cron script to mail the result set of specified report to the
@@ -31,9 +31,8 @@
  */
 class CiviReportMail {
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->initialize();
 
     CRM_Utils_System::authenticateScript(TRUE);
@@ -42,14 +41,14 @@ class CiviReportMail {
     CRM_Core_Error::debug_log_message('CiviReportMail.php');
   }
 
-  function initialize() {
+  public function initialize() {
     require_once '../civicrm.config.php';
     require_once 'CRM/Core/Config.php';
 
     $config = CRM_Core_Config::singleton();
   }
 
-  function run() {
+  public function run() {
     require_once 'CRM/Core/Lock.php';
     $lock = new CRM_Core_Lock('CiviReportMail');
 
@@ -70,9 +69,9 @@ class CiviReportMail {
 
     $lock->release();
   }
+
 }
 
 session_start();
-$obj = new CiviReportMail;
+$obj = new CiviReportMail();
 $obj->run();
-

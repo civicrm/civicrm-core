@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,26 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 interface CRM_Report_Interface {
 
   /**
-   * The constructor gets the submitted form values
+   * The constructor gets the submitted form values.
+   *
+   * @param $formValues
    */
-  function __construct(&$formValues);
+  public function __construct(&$formValues);
 
   /**
-   * Builds the quickform for this search
+   * Builds the quickform for this search.
+   * @param $form
    */
-  function buildForm(&$form);
+  public function buildForm(&$form);
 
   /**
    * Builds the search query for various cases. We break it down into finer cases
@@ -56,26 +58,27 @@ interface CRM_Report_Interface {
    * Count of records that match the current input parameters
    * Used by pager
    */
-  function count();
+  public function count();
 
   /**
    * Summary information for the query that can be displayed in the template
    * This is useful to pass total / sub total information if needed
    */
-  function summary();
+  public function summary();
 
   /**
    * List of contact ids that match the current input parameters
    * Used by different tasks. Will be also used to optimize the
    * 'all' query below to avoid excessive LEFT JOIN blowup
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
   /**
    * Retrieve all the values that match the current input parameters
    * Used by the selector
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE
   );
 
@@ -86,27 +89,26 @@ interface CRM_Report_Interface {
    * The from clause should be a valid sql from clause including the word FROM
    * CiviMail will pick up the contacts where the email is primary and
    * is not on hold / opt out / do not email
-   *
    */
 
   /**
-   * The from clause for the query
+   * The from clause for the query.
    */
-  function from();
+  public function from();
 
   /**
-   * The where clause for the query
+   * The where clause for the query.
    */
-  function where($includeContactIDs = FALSE);
+  public function where($includeContactIDs = FALSE);
 
   /**
-   * The template FileName to use to display the results
+   * The template FileName to use to display the results.
    */
-  function templateFile();
+  public function templateFile();
 
   /**
-   * Returns an array of column headers and field names and sort options
+   * Returns an array of column headers and field names and sort options.
    */
-  function &columns();
+  public function &columns();
+
 }
-

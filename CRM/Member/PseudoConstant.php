@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,29 +40,26 @@
 class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * membership types
+   * Membership types.
    * @var array
-   * @static
    */
   private static $membershipType;
 
   /**
-   * membership types
+   * Membership types.
    * @var array
-   * @static
    */
   private static $membershipStatus;
 
   /**
-   * Get all the membership types
+   * Get all the membership types.
    *
-   * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param bool $force
    *
-   * @return array - array reference of all membership types if any
-   * @static
+   * @return array
+   *   array reference of all membership types if any
    */
   public static function &membershipType($id = NULL, $force = FALSE) {
     if (!self::$membershipType || $force) {
@@ -84,17 +81,16 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the membership statuss
+   * Get all the membership statuss.
    *
-   * @access public
    *
-   * @param null $id
+   * @param int $id
    * @param null $cond
    * @param string $column
    * @param bool $force
    *
-   * @return array - array reference of all membership statuss if any
-   * @static
+   * @return array
+   *   array reference of all membership statuss if any
    */
   public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
     if (self::$membershipStatus === NULL) {
@@ -127,15 +123,13 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }
-}
 
+}

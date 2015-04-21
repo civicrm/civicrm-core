@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,6 +45,8 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
   protected $label;
 
   /**
+   * Class constructor.
+   *
    * @param string $name
    * @param string $label
    */
@@ -53,10 +55,20 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
     $this->label = $label;
   }
 
+  /**
+   * Get label.
+   *
+   * @return string
+   */
   public function getLabel() {
     return $this->label;
   }
 
+  /**
+   * Get name.
+   *
+   * @return string
+   */
   public function getName() {
     return $this->name;
   }
@@ -69,14 +81,18 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *
    * TODO: Understand why $queryLimit and $detailLimit are different
    *
-   * @param string $queryText a string of text to search for
-   * @param string $entityIDTableName a temporary table into which we can write a list of all matching IDs
-   * @param string $detailTable a table into which we can write details about a page worth of matches
+   * @param string $queryText
+   *   A string of text to search for.
+   * @param string $entityIDTableName
+   *   A temporary table into which we can write a list of all matching IDs.
+   * @param string $detailTable
+   *   A table into which we can write details about a page worth of matches.
    * @param array|NULL $queryLimit overall limit (applied when building $entityIDTableName)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @param array|NULL $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @return array keys: match-descriptor
+   * @return array
+   *   keys: match-descriptor
    *   - count: int
    */
   public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
@@ -92,7 +108,7 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    * @param $tables
    * @param $extends
    */
-  function fillCustomInfo(&$tables, $extends) {
+  public function fillCustomInfo(&$tables, $extends) {
     $sql = "
 SELECT     cg.table_name, cf.column_name
 FROM       civicrm_custom_group cg
@@ -119,15 +135,17 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
 
   /**
    * @param string $queryText
-   * @param array $tables a list of places to query. Keys may be:
+   * @param array $tables
+   *   A list of places to query. Keys may be:.
    *   - sql: an array of SQL queries to execute
    *   - final: an array of SQL queries to execute at the end
    *   - *: All other keys are treated as table names
-   * @return array keys: match-descriptor
+   * @return array
+   *   keys: match-descriptor
    *   - count: int
    *   - files: NULL | array
    */
-  function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
+  public function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
 
@@ -148,7 +166,7 @@ $sqlStatement
             CRM_Core_DAO::executeQuery($sql);
           }
         }
-        else if ($tableName == 'file') {
+        elseif ($tableName == 'file') {
           $searcher = CRM_Core_BAO_File::getSearchService();
           if (!($searcher && CRM_Core_Permission::check('access uploaded files'))) {
             continue;
@@ -156,7 +174,7 @@ $sqlStatement
 
           $query = $tableValues + array(
             'text' => CRM_Utils_QueryFormatter::singleton()
-              ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
+            ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
           );
           list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
@@ -228,13 +246,15 @@ GROUP BY {$tableValues['id']}
   }
 
   /**
-   * Create a SQL expression for matching against a list of
+   * Create a SQL expression for matching against a list of.
    * text columns.
    *
-   * @param string $table eg "civicrm_note" or "civicrm_note mynote"
+   * @param string $table
+   *   Eg "civicrm_note" or "civicrm_note mynote".
    * @param array|string $fullTextFields list of field names
    * @param string $queryText
-   * @return string SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
+   * @return string
+   *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -286,7 +306,8 @@ GROUP BY {$tableValues['id']}
    *
    * @param string $toTable
    * @param string $parentIdColumn
-   * @param array $files see return format of CRM_Core_FileSearchInterface::search
+   * @param array $files
+   *   See return format of CRM_Core_FileSearchInterface::search.
    */
   public function moveFileIDs($toTable, $parentIdColumn, $files) {
     if (empty($files)) {
@@ -321,7 +342,8 @@ GROUP BY {$tableValues['id']}
 
   /**
    * @param int|array $limit
-   * @return string SQL
+   * @return string
+   *   SQL
    * @see CRM_Contact_Form_Search_Custom_FullText::toLimit
    */
   public function toLimit($limit) {
@@ -340,7 +362,8 @@ GROUP BY {$tableValues['id']}
 
   /**
    * @param array|int $limit
-   * @return array (0 => $limit, 1 => $offset)
+   * @return array
+   *   (0 => $limit, 1 => $offset)
    */
   public function parseLimitOffset($limit) {
     if (is_scalar($limit)) {

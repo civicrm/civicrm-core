@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -48,13 +48,12 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return object CRM_Price_DAO_LineItem object
-   * @access public
-   * @static
+   * @return CRM_Price_DAO_LineItem
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $id = CRM_Utils_Array::value('id', $params);
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
@@ -85,19 +84,18 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.  Typically, the valid params are only
-   * price_field_id.  This is the inverse function of create.  It also
-   * stores all of the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * It also stores all the retrieved values in the default array.
    *
-   * @return object CRM_Price_BAO_LineItem object
-   * @access public
-   * @static
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Price_BAO_LineItem
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $lineItem = new CRM_Price_BAO_LineItem();
     $lineItem->copyValues($params);
     if ($lineItem->find(TRUE)) {
@@ -108,13 +106,13 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param $entityTable
    *
    * @return null|string
    */
-  static function getLineTotal($entityId, $entityTable) {
-    $sqlLineItemTotal = "SELECT SUM(li.line_total)
+  public static function getLineTotal($entityId, $entityTable) {
+    $sqlLineItemTotal = "SELECT SUM(li.line_total + COALESCE(li.tax_amount,0))
 FROM civicrm_line_item li
 WHERE li.entity_table = '{$entityTable}'
 AND li.entity_id = {$entityId}
@@ -124,20 +122,38 @@ AND li.entity_id = {$entityId}
   }
 
   /**
+   * Wrapper for line item retrieval when contribution ID is known.
+   * @param int $contributionID
+   *
+   * @return array
+   */
+  public static function getLineItemsByContributionID($contributionID) {
+    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+  }
+
+  /**
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
-   * @param $entityId  int    participant/contribution id
-   * @param $entity    string participant/contribution.
+   * @param int $entityId
+   *   participant/contribution id.
+   * @param string $entity
+   *   participant/contribution.
    *
    * @param null $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
-   * @return array of line items
+   * @param string $overrideWhereClause
+   *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
+   *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
+   *   when we don't want it's entity-id magix
+   *
+   * @return array
+   *   Array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE, $relatedEntity = FALSE) {
-    $selectClause = $whereClause = $fromClause = NULL;
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+    $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
       li.label,
@@ -145,6 +161,8 @@ AND li.entity_id = {$entityId}
       li.qty,
       li.unit_price,
       li.line_total,
+      li.entity_table,
+      li.entity_id,
       pf.label as field_title,
       pf.html_type,
       pfv.membership_type_id,
@@ -153,6 +171,7 @@ AND li.entity_id = {$entityId}
       li.participant_count,
       li.price_field_value_id,
       li.financial_type_id,
+      li.tax_amount,
       pfv.description";
 
     $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
@@ -167,6 +186,13 @@ AND li.entity_id = {$entityId}
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
     $whereClause = "
       WHERE     %2.id = %1";
+
+    if ($entity == 'participant') {
+      $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
+      if (!empty($additionalParticipantIDs)) {
+        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
+      }
+    }
 
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
@@ -190,13 +216,20 @@ AND li.entity_id = {$entityId}
       2 => array($entity, 'Text'),
     );
 
+    $getTaxDetails = FALSE;
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($overrideWhereClause) {
+      $whereClause = $overrideWhereClause;
+    }
+
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
         continue;
       }
       $lineItems[$dao->id] = array(
-        'qty' => $dao->qty,
+        'qty' => (float) $dao->qty,
         'label' => $dao->label,
         'unit_price' => $dao->unit_price,
         'line_total' => $dao->line_total,
@@ -206,12 +239,27 @@ AND li.entity_id = {$entityId}
         'field_title' => $dao->field_title,
         'html_type' => $dao->html_type,
         'description' => $dao->description,
-        'entity_id' => $entityId,
+        // the entity id seems prone to randomness but not sure if it has a reason - so if we are overriding the Where clause we assume
+        // we also JUST WANT TO KNOW the the entity_id in the DB
+        'entity_id' => empty($overrideWhereClause) ? $entityId : $dao->entity_id,
+        'entity_table' => $dao->entity_table,
         'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
+        'tax_amount' => $dao->tax_amount,
       );
+      $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
+      $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
+      if ($lineItems[$dao->id]['tax_amount'] != '') {
+        $getTaxDetails = TRUE;
+      }
+    }
+    if ($invoicing) {
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('taxTerm', $taxTerm);
+      $smarty->assign('getTaxDetails', $getTaxDetails);
     }
     return $lineItems;
   }
@@ -220,18 +268,21 @@ AND li.entity_id = {$entityId}
    * This method will create the lineItem array required for
    * processAmount method
    *
-   * @param  int   $fid       price set field id
-   * @param  array $params    reference to form values
-   * @param  array $fields    reference to array of fields belonging
+   * @param int $fid
+   *   Price set field id.
+   * @param array $params
+   *   Reference to form values.
+   * @param array $fields
+   *   Reference to array of fields belonging.
    *                          to the price set used for particular event
-   * @param  array $values    reference to the values array(
-     this is
+   * @param array $values
+   *   Reference to the values array(.
+   *   this is
    *                          lineItem array)
    *
    * @return void
-   * @access static
    */
-  static function format($fid, &$params, &$fields, &$values) {
+  public static function format($fid, &$params, &$fields, &$values) {
     if (empty($params["price_{$fid}"])) {
       return;
     }
@@ -277,6 +328,7 @@ AND li.entity_id = {$entityId}
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
+        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
       );
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
@@ -292,8 +344,6 @@ AND li.entity_id = {$entityId}
    * @param int $entityTable
    *
    * @return bool
-   * @access public
-   * @static
    */
   public static function deleteLineItems($entityId, $entityTable) {
     if (!$entityId || !$entityTable) {
@@ -310,22 +360,20 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Function to process price set and line items.
+   * Process price set and line items.
    *
-   * @param $entityId
-   * @param array $lineItem line item array
+   * @param int $entityId
+   * @param array $lineItem
+   *   Line item array.
    * @param object $contributionDetails
-   * @param string $entityTable entity table
+   * @param string $entityTable
+   *   Entity table.
    *
    * @param bool $update
    *
-   * @internal param int $contributionId contribution id
-   * @internal param \decimal $initAmount amount
-   * @access public
    * @return void
-   * @static
    */
-  static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+  public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItem)
       || CRM_Utils_system::isNull($lineItem)
     ) {
@@ -339,8 +387,10 @@ AND li.entity_id = {$entityId}
 
       foreach ($values as $line) {
         $line['entity_table'] = $entityTable;
-        $line['entity_id'] = $entityId;
-        if(!empty($line['membership_type_id'])) {
+        if (empty($line['entity_id'])) {
+          $line['entity_id'] = $entityId;
+        }
+        if (!empty($line['membership_type_id'])) {
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {
@@ -358,20 +408,24 @@ AND li.entity_id = {$entityId}
         $lineItems = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+          if (isset($line['tax_amount'])) {
+            CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
+          }
         }
       }
     }
   }
 
   /**
-   * @param $entityId
+   * @param int $entityId
    * @param string $entityTable
    * @param $amount
-   * @param null $otherParams
+   * @param array $otherParams
    */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
-    if (!$entityId || CRM_Utils_System::isNull($amount))
+    if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
+    }
 
     $from = " civicrm_line_item li
       LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
@@ -401,7 +455,7 @@ AND li.entity_id = {$entityId}
       $set .= " ,li.label = %4,
         li.price_field_value_id = cpfv.id ";
       $where .= " AND cpse.entity_table = 'civicrm_event' AND cpse.entity_id = %5 ";
-      $amount = empty($amount) ? 0: $amount;
+      $amount = empty($amount) ? 0 : $amount;
       $params += array(
         4 => array($otherParams['fee_label'], 'String'),
         5 => array($otherParams['event_id'], 'String'),
@@ -417,19 +471,20 @@ AND li.entity_id = {$entityId}
     CRM_Core_DAO::executeQuery($query, $params);
   }
 
-   /**
-   * Function to build line items array.
-   * @param array $params form values
+  /**
+   * Build line items array.
+   * @param array $params
+   *   Form values.
    *
-   * @param string $entityId entity id
+   * @param string $entityId
+   *   Entity id.
    *
-   * @param string $entityTable entity Table
+   * @param string $entityTable
+   *   Entity Table.
    *
-   * @access public
    * @return void
-   * @static
    */
-  static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
+  public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
@@ -453,7 +508,7 @@ AND li.entity_id = {$entityId}
           'unit_price' => $totalAmount,
           'line_total' => $totalAmount,
           'financial_type_id' => $financialType,
-          'membership_type_id' => $values['membership_type_id']
+          'membership_type_id' => $values['membership_type_id'],
         );
         break;
       }
@@ -469,7 +524,8 @@ AND li.entity_id = {$entityId}
             $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }
           if (!empty($params['is_quick_config']) && array_key_exists('total_amount', $params)
-            && $totalEntityId == 1) {
+            && $totalEntityId == 1
+          ) {
             $values['line_total'] = $values['unit_price'] = $params['total_amount'];
           }
           $values['id'] = $key;
@@ -478,4 +534,27 @@ AND li.entity_id = {$entityId}
       }
     }
   }
+
+  /**
+   * Calculate tax rate in percentage.
+   *
+   * @param array $lineItemId
+   *   An assoc array of lineItem.
+   *
+   * @return int|void
+   *   tax rate
+   */
+  public static function calculateTaxRate($lineItemId) {
+    if ($lineItemId['unit_price'] == 0) {
+      return FALSE;
+    }
+    if ($lineItemId['html_type'] == 'Text') {
+      $tax = round($lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100, 2);
+    }
+    else {
+      $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
+    }
+    return $tax;
+  }
+
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,8 +32,7 @@
   <div id="contact-summary-relationship-tab" class="view-content">
     {if $permission EQ 'edit'}
       <div class="action-link">
-        <a accesskey="N" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"
-           class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship{/ts}</span></a>
+        {crmButton accesskey="N"  p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1" icon="circle-plus"}{ts}Add Relationship{/ts}{/crmButton}
       </div>
     {/if}
 

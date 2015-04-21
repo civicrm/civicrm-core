@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,17 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
-
   /**
    * @var int Time to live (seconds).
    *
@@ -41,7 +40,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
    */
   private $ttl = 43200;
 
-  function run() {
+  public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
       CRM_Core_Error::fatal('Malformed photo name');
     }
@@ -49,7 +48,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     // FIXME Optimize performance of image_url query
     $sql = "SELECT id FROM civicrm_contact WHERE image_url like %1;";
     $params = array(
-      1 => array("%" . $_GET['photo'], 'String')
+      1 => array("%" . $_GET['photo'], 'String'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {

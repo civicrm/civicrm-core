@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,28 +40,25 @@
 class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
   /**
-   * the id of the case that we are proceessing
+   * The id of the case that we are proceessing.
    *
    * @var int
-   * @protected
    */
   protected $_id;
 
   /**
-   * the id of the contact associated with this contribution
+   * The id of the contact associated with this contribution.
    *
    * @var int
-   * @protected
    */
   protected $_contactID;
 
   protected $_context;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     //custom data related code
@@ -74,11 +71,10 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_grantType = NULL;
     if ($this->_id) {
-      $this->_grantType =
-        CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
+      $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
     }
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -87,7 +83,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviGrant', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     $this->setPageTitle(ts('Grant'));
@@ -120,7 +116,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
@@ -170,10 +166,9 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
@@ -235,22 +230,22 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
     $this->addButtons(array(
-      array(
-        'type' => 'upload',
-        'name' => ts('Save'),
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'upload',
-        'name' => ts('Save and New'),
-        'js' => array('onclick' => "return verify( );"),
-        'subName' => 'new',
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-     )
+        array(
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'upload',
+          'name' => ts('Save and New'),
+          'js' => array('onclick' => "return verify( );"),
+          'subName' => 'new',
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
     );
 
     if ($this->_context == 'standalone') {
@@ -259,9 +254,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -320,20 +314,20 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     if ($this->_context == 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/add',
-            'reset=1&action=add&context=standalone'
-          ));
+          'reset=1&action=add&context=standalone'
+        ));
       }
       else {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&cid={$this->_contactID}&selectedChild=grant"
-          ));
+          "reset=1&cid={$this->_contactID}&selectedChild=grant"
+        ));
       }
     }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/grant',
-          "reset=1&action=add&context=grant&cid={$this->_contactID}"
-        ));
+        "reset=1&action=add&context=grant&cid={$this->_contactID}"
+      ));
     }
   }
-}
 
+}

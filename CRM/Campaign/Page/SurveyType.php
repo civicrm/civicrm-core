@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,18 +41,16 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * The option group name
+   * The option group name.
    *
    * @var array
-   * @static
    */
   protected $_gName;
 
@@ -60,15 +58,13 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
-   * @static
    */
   protected $_GName;
 
   /**
-   * The option group id
+   * The option group id.
    *
    * @var array
-   * @static
    */
   protected $_gid = NULL;
 
@@ -76,10 +72,8 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * Obtains the group name from url and sets the title.
    *
    * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_gName = 'activity_type';
 
     $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gName, 'id', 'name');
@@ -95,20 +89,22 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_OptionValue';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -143,23 +139,21 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 
   /**
-   * Browse all options
+   * Browse all options.
    *
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse() {
+  public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-    $groupParams    = array('name' => $this->_gName);
-    $optionValues   = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
+    $groupParams = array('name' => $this->_gName);
+    $optionValues = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
 
     foreach ($optionValues as $key => $optionValue) {
       if (CRM_Utils_Array::value('component_id', $optionValue) != $campaingCompId) {
@@ -178,20 +172,22 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Campaign_Form_SurveyType';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return $this->_GName;
   }
 
@@ -200,22 +196,23 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @param null $mode
    *
-   * @return string user context.
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/campaign/surveyType';
   }
 
   /**
-   * function to get userContext params
+   * Get userContext params.
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1';
   }
-}
 
+}

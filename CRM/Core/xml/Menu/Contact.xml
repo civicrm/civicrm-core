@@ -47,7 +47,7 @@
      <title>Get Image File</title>
      <page_callback>CRM_Contact_Page_ImageFile</page_callback>
      <access_arguments>*always allow*</access_arguments>
-  </item>  
+  </item>
   <item>
      <path>civicrm/contact/search/basic</path>
      <title>Find Contacts</title>
@@ -250,11 +250,6 @@
      <title>CiviCRM Blog</title>
      <page_callback>CRM_Dashlet_Page_Blog</page_callback>
   </item>
-  <item>
-    <path>civicrm/ajax/search</path>
-    <page_callback>CRM_Contact_Page_AJAX::search</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-</item>
 <item>
      <path>civicrm/ajax/relation</path>
      <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
@@ -274,12 +269,6 @@
 <item>
      <path>civicrm/ajax/customvalue</path>
      <page_callback>CRM_Contact_Page_AJAX::deleteCustomValue</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <page_type>3</page_type>
-</item>
-<item>
-     <path>civicrm/ajax/ed</path>
-     <page_callback>CRM_Contact_Page_AJAX::enableDisable</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
 </item>

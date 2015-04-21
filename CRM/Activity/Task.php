@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,23 +22,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
  */
 
 /**
- * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
- *
+ * Class to represent the actions that can be performed on a group of contacts
+ * used by the search forms.
  */
 class CRM_Activity_Task {
-  CONST
+  const
     DELETE_ACTIVITIES = 1,
     PRINT_ACTIVITIES = 2,
     EXPORT_ACTIVITIES = 3,
@@ -47,30 +45,27 @@ class CRM_Activity_Task {
     EMAIL_SMS = 6;
 
   /**
-   * the task array
+   * The task array.
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
   /**
-   * the optional task array
+   * The optional task array.
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
   /**
-   * These tasks are the core set of tasks that the user can perform
+   * These tasks are the core set of tasks that the user can perform.
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of contacts
    */
-  static function &tasks() {
+  public static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
@@ -126,8 +121,9 @@ class CRM_Activity_Task {
 
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCase', $config->enableComponents)) {
-        if ( CRM_Core_Permission::check('access all cases and activities') ||
-          CRM_Core_Permission::check('access my cases and activities') ) {
+        if (CRM_Core_Permission::check('access all cases and activities') ||
+          CRM_Core_Permission::check('access my cases and activities')
+        ) {
           self::$_tasks[6] = array(
             'title' => ts('File on Case'),
             'class' => 'CRM_Activity_Form_Task_FileOnCase',
@@ -147,14 +143,13 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of task titles
+   * These tasks are the core set of task titles.
    * on activity
    *
-   * @return array the set of task titles
-   * @static
-   * @access public
+   * @return array
+   *   the set of task titles
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
@@ -164,15 +159,15 @@ class CRM_Activity_Task {
   }
 
   /**
-   * show tasks selectively based on the permission level
+   * Show tasks selectively based on the permission level.
    * of the user
    *
    * @param int $permission
    *
-   * @return array set of tasks that are valid for the user
-   * @access public
+   * @return array
+   *   set of tasks that are valid for the user
    */
-  static function &permissionedTaskTitles($permission) {
+  public static function &permissionedTaskTitles($permission) {
     $tasks = array();
     if ($permission == CRM_Core_Permission::EDIT) {
       $tasks = self::taskTitles();
@@ -191,16 +186,15 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of tasks that the user can perform
+   * These tasks are the core set of tasks that the user can perform.
    * on activity
    *
    * @param int $value
    *
-   * @return array the set of tasks for a group of activity
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of activity
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
       // make the print task by default
@@ -211,5 +205,5 @@ class CRM_Activity_Task {
       self::$_tasks[$value]['result'],
     );
   }
-}
 
+}

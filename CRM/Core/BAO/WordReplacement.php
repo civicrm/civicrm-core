@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,59 +23,53 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
  */
 
 /**
- *
+ * Class CRM_Core_BAO_WordReplacement.
  */
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
-   * class constructor
-   *
-   * @access public
-   * @return \CRM_Core_DAO_WordReplacement
+   * Class constructor.
    */
-  /**
-   *
-   */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
-  /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.
-   *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
-   *
-   * @return object CRM_Core_DAO_WordRepalcement object
-   * @access public
-   * @static
-   */
 
-  static function retrieve(&$params, &$defaults) {
+  /**
+   * Function that must have never worked & should be removed.
+   *
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Core_DAO_WordRepalcement
+   */
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
   }
 
   /**
-   * Get the domain BAO
+   * Get the domain BAO.
    *
    * @param null $reset
    *
-   * @return null|object CRM_Core_BAO_WordRepalcement
-   * @access public
-   * @static
+   * @return null|CRM_Core_BAO_WordReplacement
    */
-  static function getWordReplacement($reset = NULL) {
+  public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
     if (!$wordReplacement || $reset) {
       $wordReplacement = new CRM_Core_BAO_WordReplacement();
@@ -89,15 +83,14 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
 
   /**
-   * Save the values of a WordReplacement
+   * Save the values of a WordReplacement.
    *
-   * @param $params
-   * @param $id
+   * @param array $params
+   * @param int $id
    *
-   * @return WordReplacement array
-   * @access public
+   * @return array
    */
-  static function edit(&$params, &$id) {
+  public static function edit(&$params, &$id) {
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
@@ -109,15 +102,14 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Create a new WordReplacement
+   * Create a new WordReplacement.
    *
-   * @param $params
+   * @param array $params
    *
-   * @return WordReplacement array
-   * @access public
+   * @return array
    */
-  static function create($params) {
-    if(array_key_exists("domain_id",$params) === FALSE) {
+  public static function create($params) {
+    if (array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
@@ -130,14 +122,14 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Delete website
+   * Delete website.
    *
-   * @param int $id WordReplacement id
+   * @param int $id
+   *   WordReplacement id.
    *
    * @return object
-   * @static
    */
-  static function del($id) {
+  public static function del($id) {
     $dao = new CRM_Core_DAO_WordReplacement();
     $dao->id = $id;
     $dao->delete();
@@ -148,9 +140,11 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Get all word-replacements in the form of an array
+   * Get all word-replacements in the form of an array.
    *
-   * @param int $id domain ID
+   * @param int $id
+   *   Domain ID.
+   *
    * @return array
    * @see civicrm_domain.locale_custom_strings
    */
@@ -160,14 +154,14 @@ SELECT find_word,replace_word,is_active,match_type
 FROM   civicrm_word_replacement
 WHERE  domain_id = %1
 ";
-    $params = array( 1 => array($id, 'Integer'));
+    $params = array(1 => array($id, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $overrides = array();
 
     while ($dao->fetch()) {
-      if ($dao->is_active==1) {
+      if ($dao->is_active == 1) {
         $overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
       }
       else {
@@ -193,9 +187,13 @@ WHERE  domain_id = %1
   }
 
   /**
-   * Rebuild
+   * Rebuild.
+   *
+   * @param bool $clearCaches
+   *
+   * @return bool
    */
-  static function rebuild($clearCaches = TRUE) {
+  public static function rebuild($clearCaches = TRUE) {
     $id = CRM_Core_Config::domainID();
     $stringOverride = self::getAllAsConfigArray($id);
     $params = array('locale_custom_strings' => serialize($stringOverride));
@@ -218,6 +216,8 @@ WHERE  domain_id = %1
   }
 
   /**
+   * Get word replacements for the api.
+   *
    * Get all the word-replacements stored in config-arrays
    * and convert them to params for the WordReplacement.create API.
    *
@@ -225,32 +225,35 @@ WHERE  domain_id = %1
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
-   * bugfix in both places.
+   * bug-fix in both places.
    *
-   * @param bool $rebuildEach whether to perform rebuild after each individual API call
-   * @return array Each item is $params for WordReplacement.create
+   * @param bool $rebuildEach
+   *   Whether to perform rebuild after each individual API call.
+   *
+   * @return array
+   *   Each item is $params for WordReplacement.create
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
-  static function getConfigArraysAsAPIParams($rebuildEach) {
+  public static function getConfigArraysAsAPIParams($rebuildEach) {
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
-                                                  'return' => array('locale_custom_strings'),
-                                                  ));
+      'return' => array('locale_custom_strings'),
+    ));
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
         $params = array();
         $params["domain_id"] = $value["id"];
         $params["options"] = array('wp-rebuild' => $rebuildEach);
-        // unserialize word match string
+        // Unserialize word match string.
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
           $wordMatchArray = array();
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-          // Traverse status array "enabled" "disabled"
+            // Traverse status array "enabled" "disabled"
             foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
               // Traverse Match Type array "wildcardMatch" "exactMatch"
               foreach ($matchTypes as $matchType => $words) {
                 $params["match_type"] = $matchType;
@@ -269,6 +272,8 @@ WHERE  domain_id = %1
   }
 
   /**
+   * Rebuild word replacements.
+   *
    * Get all the word-replacements stored in config-arrays
    * and write them out as records in civicrm_word_replacement.
    *
@@ -276,7 +281,7 @@ WHERE  domain_id = %1
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
    * step behaves consistently even as the BAO evolves in future versions.
    * However, if there's a bug in here prior to 4.4.0, we should apply the
-   * bugfix in both places.
+   * bug-fix in both places.
    */
   public static function rebuildWordReplacementTable() {
     civicrm_api3('word_replacement', 'replace', array(
@@ -285,5 +290,5 @@ WHERE  domain_id = %1
     ));
     CRM_Core_BAO_WordReplacement::rebuild();
   }
-}
 
+}

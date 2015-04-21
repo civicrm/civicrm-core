@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,13 +43,13 @@ return array(
     'name' => 'uploadDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Upload Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
+    'description' => NULL,
     'help_text' => '',
   ),
   'imageUploadDir' => array(
@@ -58,14 +58,14 @@ return array(
     'name' => 'imageUploadDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Image Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'customFileUploadDir' => array(
     'group_name' => 'Directory Preferences',
@@ -73,14 +73,14 @@ return array(
     'name' => 'customFileUploadDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Custom Files Upload Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'customTemplateDir' => array(
     'group_name' => 'Directory Preferences',
@@ -88,14 +88,14 @@ return array(
     'name' => 'customTemplateDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Custom Template Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'customPHPPathDir' => array(
     'group_name' => 'Directory Preferences',
@@ -103,14 +103,14 @@ return array(
     'name' => 'customPHPPathDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Custom PHP Path',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'extensionsDir' => array(
     'group_name' => 'Directory Preferences',
@@ -118,14 +118,14 @@ return array(
     'name' => 'extensionsDir',
     'type' => 'Url',
     'html_type' => 'Text',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'prefetch' => 1,
     'title' => 'Extensions Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
 
 

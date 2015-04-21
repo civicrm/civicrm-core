@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -37,14 +37,13 @@ class CRM_Contact_Form_ProfileContact {
   protected $_mode;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
@@ -66,7 +65,7 @@ class CRM_Contact_Form_ProfileContact {
     $requiredProfileFields = array(
       'Individual' => array('first_name', 'last_name'),
       'Organization' => array('organization_name', 'email'),
-      'Household' => array('household_name', 'email')
+      'Household' => array('household_name', 'email'),
     );
     $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_honoreeProfileId, $requiredProfileFields[$profileContactType]);
     if (!$validProfile) {
@@ -75,16 +74,12 @@ class CRM_Contact_Form_ProfileContact {
   }
 
   /**
-   * Function to build form for honoree contact / on behalf of organization.
+   * Build form for honoree contact / on behalf of organization.
    *
-   * @param $form              object  invoking Object
+   * @param CRM_Core_Form $form
    *
-   * @internal param string $contactType contact type
-   * @internal param string $title fieldset title
-   *
-   * @static
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->id = $form->_honoreeProfileId;
     if (!$ufGroup->find(TRUE)) {
@@ -93,11 +88,11 @@ class CRM_Contact_Form_ProfileContact {
 
     $prefix = 'honor';
     $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields($form->_honoreeProfileId, FALSE, NULL,
-        NULL, NULL,
-        FALSE, NULL,
-        TRUE, NULL,
-        CRM_Core_Permission::CREATE
-      );
+      NULL, NULL,
+      FALSE, NULL,
+      TRUE, NULL,
+      CRM_Core_Permission::CREATE
+    );
     $form->addElement('hidden', 'honoree_profile_id', $form->_honoreeProfileId);
     $form->assign('honoreeProfileFields', $honoreeProfileFields);
 
@@ -114,17 +109,17 @@ class CRM_Contact_Form_ProfileContact {
   /**
    * @param $form
    */
-  static function postProcess($form) {
+  public static function postProcess($form) {
     $params = $form->_params;
     if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
-      $honorId = null;
+      $honorId = NULL;
 
       //check if there is any duplicate contact
       $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
       $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
       $dedupeParams['check_permission'] = FALSE;
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
-      if(count($ids)) {
+      if (count($ids)) {
         $honorId = CRM_Utils_Array::value(0, $ids);
       }
 
@@ -154,10 +149,10 @@ class CRM_Contact_Form_ProfileContact {
           ),
           'honor_id' => $honorId,
           'honor_profile_id' => $params['honoree_profile_id'],
-          'honor_profile_values' => $params['honor']
+          'honor_profile_values' => $params['honor'],
         );
       }
     }
   }
-}
 
+}

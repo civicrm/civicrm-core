@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,40 +23,41 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_ACL_API {
 
   /**
-   * The various type of permissions
+   * The various type of permissions.
    *
    * @var int
    */
-  CONST EDIT = 1;
-  CONST VIEW = 2;
-  CONST DELETE = 3;
-  CONST CREATE = 4;
-  CONST SEARCH = 5;
-  CONST ALL = 6;
+  const EDIT = 1;
+  const VIEW = 2;
+  const DELETE = 3;
+  const CREATE = 4;
+  const SEARCH = 5;
+  const ALL = 6;
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
-   * @param string $str       the permission to check
-   * @param int    $contactID the contactID for whom the check is made
+   * @param string $str
+   *   The permission to check.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    *
-   * @return boolean true if yes, else false
-   * @static
-   * @access public
+   * @return bool
+   *   true if yes, else false
    */
-  static function check($str, $contactID = NULL) {
+  public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
@@ -71,24 +72,31 @@ class CRM_ACL_API {
   }
 
   /**
-   * Get the permissioned where clause for the user
+   * Get the permissioned where clause for the user.
    *
-   * @param int $type the type of permission needed
-   * @param  array $tables (reference ) add the tables that are needed for the select clause
-   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
-   * @param int    $contactID the contactID for whom the check is made
-   * @param bool   $onlyDeleted  whether to include only deleted contacts
-   * @param bool   $skipDeleteClause don't add delete clause if this is true,
-   *               this means it is handled by generating query
+   * @param int $type
+   *   The type of permission needed.
+   * @param array $tables
+   *   (reference ) add the tables that are needed for the select clause.
+   * @param array $whereTables
+   *   (reference ) add the tables that are needed for the where clause.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
+   * @param bool $onlyDeleted
+   *   Whether to include only deleted contacts.
+   * @param bool $skipDeleteClause
+   *   Don't add delete clause if this is true,.
+   *   this means it is handled by generating query
    *
-   * @return string the group where clause for this user
-   * @access public
+   * @return string
+   *   the group where clause for this user
    */
-  public static function whereClause($type,
+  public static function whereClause(
+    $type,
     &$tables,
     &$whereTables,
-    $contactID        = NULL,
-    $onlyDeleted      = FALSE,
+    $contactID = NULL,
+    $onlyDeleted = FALSE,
     $skipDeleteClause = FALSE
   ) {
     // the default value which is valid for rhe final AND
@@ -135,23 +143,25 @@ class CRM_ACL_API {
   }
 
   /**
-   * get all the groups the user has access to for the given operation
+   * Get all the groups the user has access to for the given operation.
    *
-   * @param int $type the type of permission needed
-   * @param int $contactID the contactID for whom the check is made
+   * @param int $type
+   *   The type of permission needed.
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    *
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
    *
-   * @return array the ids of the groups for which the user has permissions
-   * @access public
+   * @return array
+   *   the ids of the groups for which the user has permissions
    */
   public static function group(
     $type,
-    $contactID      = NULL,
-    $tableName      = 'civicrm_saved_search',
-    $allGroups      = NULL,
+    $contactID = NULL,
+    $tableName = 'civicrm_saved_search',
+    $allGroups = NULL,
     $includedGroups = NULL
   ) {
     if ($contactID == NULL) {
@@ -168,26 +178,27 @@ class CRM_ACL_API {
   }
 
   /**
-   * check if the user has access to this group for operation $type
+   * Check if the user has access to this group for operation $type
    *
-   * @param int $type the type of permission needed
-   * @param $groupID
-   * @param int $contactID the contactID for whom the check is made
-   *
+   * @param int $type
+   *   The type of permission needed.
+   * @param int $groupID
+   * @param int $contactID
+   *   The contactID for whom the check is made.
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
    * @param bool $flush
    *
-   * @return array the ids of the groups for which the user has permissions
-   * @access public
+   * @return array
+   *   the ids of the groups for which the user has permissions
    */
   public static function groupPermission(
     $type,
     $groupID,
-    $contactID      = NULL,
-    $tableName      = 'civicrm_saved_search',
-    $allGroups      = NULL,
+    $contactID = NULL,
+    $tableName = 'civicrm_saved_search',
+    $allGroups = NULL,
     $includedGroups = NULL,
     $flush = FALSE
   ) {
@@ -197,7 +208,7 @@ class CRM_ACL_API {
     //adding a way for unit tests to flush the cache
     if ($flush) {
       $cache = array();
-      return;
+      return NULL;
     }
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
@@ -218,5 +229,5 @@ class CRM_ACL_API {
 
     return in_array($groupID, $groups) ? TRUE : FALSE;
   }
-}
 
+}

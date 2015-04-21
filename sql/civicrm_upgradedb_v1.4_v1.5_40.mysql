@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -47,20 +47,20 @@ CREATE TABLE civicrm_membership_type (
      relationship_type_id int unsigned    COMMENT 'FK to Relationship Type ID',
      visibility varchar(64)    ,
      weight int    ,
-     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_type enabled' 
+     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_type enabled'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_member_of_contact_id ( member_of_contact_id ) ,  
+,      INDEX FKEY_member_of_contact_id ( member_of_contact_id ) ,
      FOREIGN KEY (member_of_contact_id) REFERENCES civicrm_contact(id)
-,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,  
+,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,
      FOREIGN KEY (contribution_type_id) REFERENCES civicrm_contribution_type(id)
-,      INDEX FKEY_relationship_type_id ( relationship_type_id ) ,  
+,      INDEX FKEY_relationship_type_id ( relationship_type_id ) ,
      FOREIGN KEY (relationship_type_id) REFERENCES civicrm_relationship_type(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -86,14 +86,14 @@ CREATE TABLE civicrm_membership_status (
      is_admin tinyint    COMMENT 'Is this status for admin/manual assignment only.',
      weight int    ,
      is_default tinyint    COMMENT 'Assign this status to a membership record if no other status match is found.',
-     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_status enabled.' 
+     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_status enabled.'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -114,18 +114,18 @@ CREATE TABLE civicrm_membership (
      end_date date    COMMENT 'Current membership period expire date.',
      source varchar(128)    ,
      status_id int unsigned NOT NULL   COMMENT 'FK to Membership Status',
-     is_override tinyint    COMMENT 'Admin users may set a manual status which overrides the calculated status. When this flag is true, automated status update scripts should NOT modify status for the record.' 
+     is_override tinyint    COMMENT 'Admin users may set a manual status which overrides the calculated status. When this flag is true, automated status update scripts should NOT modify status for the record.'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_contact_id ( contact_id ) ,  
+
+
+,      INDEX FKEY_contact_id ( contact_id ) ,
      FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
-,      INDEX FKEY_membership_type_id ( membership_type_id ) ,  
+,      INDEX FKEY_membership_type_id ( membership_type_id ) ,
      FOREIGN KEY (membership_type_id) REFERENCES civicrm_membership_type(id)
-,      INDEX FKEY_status_id ( status_id ) ,  
+,      INDEX FKEY_status_id ( status_id ) ,
      FOREIGN KEY (status_id) REFERENCES civicrm_membership_status(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -151,16 +151,16 @@ CREATE TABLE civicrm_membership_block (
      renewal_title varchar(255)    COMMENT 'Title for renewal',
      renewal_text text    COMMENT 'Text to display for member renewal',
      is_required tinyint   DEFAULT 0 COMMENT 'Is membership sign up optional',
-     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_block enabled' 
+     is_active tinyint   DEFAULT 1 COMMENT 'Is this membership_block enabled'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_entity_id ( entity_id ) ,  
+
+
+,      INDEX FKEY_entity_id ( entity_id ) ,
      FOREIGN KEY (entity_id) REFERENCES civicrm_contribution_page(id)
-,      INDEX FKEY_membership_type_default ( membership_type_default ) ,  
+,      INDEX FKEY_membership_type_default ( membership_type_default ) ,
      FOREIGN KEY (membership_type_default) REFERENCES civicrm_membership_type(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -179,18 +179,18 @@ CREATE TABLE civicrm_membership_log (
      start_date date    COMMENT 'New membership period start date',
      end_date date    COMMENT 'New membership period expiration date.',
      modified_id int unsigned    COMMENT 'FK to Contact ID of person under whose credentials this data modification was made.',
-     modified_date date    COMMENT 'Date this membership modification action was logged.' 
+     modified_date date    COMMENT 'Date this membership modification action was logged.'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_membership_id ( membership_id ) ,  
+
+
+,      INDEX FKEY_membership_id ( membership_id ) ,
      FOREIGN KEY (membership_id) REFERENCES civicrm_membership(id)
-,      INDEX FKEY_status_id ( status_id ) ,  
+,      INDEX FKEY_status_id ( status_id ) ,
      FOREIGN KEY (status_id) REFERENCES civicrm_membership_status(id)
-,      INDEX FKEY_modified_id ( modified_id ) ,  
+,      INDEX FKEY_modified_id ( modified_id ) ,
      FOREIGN KEY (modified_id) REFERENCES civicrm_contact(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -206,18 +206,18 @@ CREATE TABLE civicrm_membership_payment (
      id int unsigned NOT NULL AUTO_INCREMENT  ,
      membership_id int unsigned NOT NULL   COMMENT 'FK to Membership table',
      payment_entity_table varchar(128)    COMMENT 'Table being referenced for payment entity.',
-     payment_entity_id int unsigned    COMMENT 'FK to table with payment record (expected usage is civicrm_contribution).' 
+     payment_entity_id int unsigned    COMMENT 'FK to table with payment record (expected usage is civicrm_contribution).'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_payment_entity(
         payment_entity_table
       , payment_entity_id
   )
-  
-,      INDEX FKEY_membership_id ( membership_id ) ,  
+
+,      INDEX FKEY_membership_id ( membership_id ) ,
      FOREIGN KEY (membership_id) REFERENCES civicrm_membership(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -233,18 +233,18 @@ CREATE TABLE civicrm_option_group (
      name varchar(64) NOT NULL   COMMENT 'Option group name. Used as selection key by class properties which lookup options in civicrm_option_value.',
      description varchar(255)    COMMENT 'Option group description.',
      is_reserved tinyint    COMMENT 'Is this a predefined system option group (i.e. it can not be deleted)?',
-     is_active tinyint    COMMENT 'Is this option group active?' 
+     is_active tinyint    COMMENT 'Is this option group active?'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX option_group_name_domain_id(
         name
       , domain_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -267,18 +267,18 @@ CREATE TABLE civicrm_option_value (
      description varchar(255)    COMMENT 'Optional description.',
      is_optgroup tinyint   DEFAULT 0 COMMENT 'Is this row simply a display header? Expected usage is to render these as OPTGROUP tags within a SELECT field list of options?',
      is_reserved tinyint   DEFAULT 0 COMMENT 'Is this a predefined system object?',
-     is_active tinyint   DEFAULT 1 COMMENT 'Is this option active?' 
+     is_active tinyint   DEFAULT 1 COMMENT 'Is this option active?'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_option_group_id_value(
         value
       , option_group_id
   )
-  
-,      INDEX FKEY_option_group_id ( option_group_id ) ,  
+
+,      INDEX FKEY_option_group_id ( option_group_id ) ,
      FOREIGN KEY (option_group_id) REFERENCES civicrm_option_group(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -301,21 +301,21 @@ CREATE TABLE civicrm_project (
      start_date datetime    COMMENT 'Project start date.',
      end_date datetime    COMMENT 'Project end date.',
      is_active tinyint    COMMENT 'Is this record active? For Projects: can tasks be created for it, does it appear on project listings, etc.',
-     status_id int unsigned    COMMENT 'Configurable status value (e.g. Planned, Active, Closed...). FK to civicrm_option_value.' 
+     status_id int unsigned    COMMENT 'Configurable status value (e.g. Planned, Active, Closed...). FK to civicrm_option_value.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX UI_project_owner(
         id
       , owner_entity_table
       , owner_entity_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_status_id ( status_id ) ,  
+,      INDEX FKEY_status_id ( status_id ) ,
      FOREIGN KEY (status_id) REFERENCES civicrm_option_value(value)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -340,10 +340,10 @@ CREATE TABLE civicrm_task (
      due_date datetime    COMMENT 'Task due date.',
      priority_id int unsigned    COMMENT 'Configurable priority value (e.g. Critical, High, Medium...). FK to civicrm_option_value.',
      task_class varchar(255)    COMMENT 'Optional key to a process class related to this task (e.g. CRM_Quest_PreApp).',
-     is_active tinyint    COMMENT 'Is this record active? For tasks: can it be assigned, does it appear on open task listings, etc.' 
+     is_active tinyint    COMMENT 'Is this record active? For tasks: can it be assigned, does it appear on open task listings, etc.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX UI_task_parent(
         id
       , parent_entity_table
@@ -354,14 +354,14 @@ CREATE TABLE civicrm_task (
       , owner_entity_table
       , owner_entity_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_task_type_id ( task_type_id ) ,  
+,      INDEX FKEY_task_type_id ( task_type_id ) ,
      FOREIGN KEY (task_type_id) REFERENCES civicrm_option_value(value)
-,      INDEX FKEY_priority_id ( priority_id ) ,  
+,      INDEX FKEY_priority_id ( priority_id ) ,
      FOREIGN KEY (priority_id) REFERENCES civicrm_option_value(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -383,10 +383,10 @@ CREATE TABLE civicrm_task_status (
      status_detail text    COMMENT 'Encoded array of status details used for programmatic progress reporting and tracking.',
      status_id int unsigned    COMMENT 'Configurable status value (e.g. Not Started, In Progress, Completed, Deferred...). FK to civicrm_option_value.',
      create_date datetime    COMMENT 'Date this record was created (date work on task started).',
-     modified_date datetime    COMMENT 'Date-time of last update to this task_status record.' 
+     modified_date datetime    COMMENT 'Date-time of last update to this task_status record.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_task_status_responsible(
         task_id
       , responsible_entity_table
@@ -397,12 +397,12 @@ CREATE TABLE civicrm_task_status (
       , target_entity_table
       , target_entity_id
   )
-  
-,      INDEX FKEY_task_id ( task_id ) ,  
+
+,      INDEX FKEY_task_id ( task_id ) ,
      FOREIGN KEY (task_id) REFERENCES civicrm_task(id)
-,      INDEX FKEY_status_id ( status_id ) ,  
+,      INDEX FKEY_status_id ( status_id ) ,
      FOREIGN KEY (status_id) REFERENCES civicrm_option_value(value)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -421,18 +421,18 @@ CREATE TABLE civicrm_log (
      entity_id int unsigned NOT NULL   COMMENT 'Foreign key to the referenced item.',
      data text    COMMENT 'Updates does to this object if any.',
      modified_id int unsigned    COMMENT 'FK to Contact ID of person under whose credentials this data modification was made.',
-     modified_date datetime    COMMENT 'When was the referenced entity created or modified or deleted.' 
+     modified_date datetime    COMMENT 'When was the referenced entity created or modified or deleted.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_entity(
         entity_table
       , entity_id
   )
-  
-,      INDEX FKEY_modified_id ( modified_id ) ,  
+
+,      INDEX FKEY_modified_id ( modified_id ) ,
      FOREIGN KEY (modified_id) REFERENCES civicrm_contact(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -452,14 +452,14 @@ CREATE TABLE civicrm_file (
      uri varchar(255)    COMMENT 'uri of the file on disk',
      document mediumblob    COMMENT 'contents of the document',
      description varchar(255)    COMMENT 'Additional descriptive text regarding this attachment (optional).',
-     upload_date datetime    COMMENT 'Date and time that this attachment was uploaded or written to server.' 
+     upload_date datetime    COMMENT 'Date and time that this attachment was uploaded or written to server.'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_file_type_id ( file_type_id ) ,  
+
+
+,      INDEX FKEY_file_type_id ( file_type_id ) ,
      FOREIGN KEY (file_type_id) REFERENCES civicrm_option_value(value)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -475,10 +475,10 @@ CREATE TABLE civicrm_entity_file (
      id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'primary key',
      entity_table varchar(64)    COMMENT 'physical tablename for entity being joined to file, e.g. civicrm_contact',
      entity_id int unsigned NOT NULL   COMMENT 'FK to entity table specified in entity_table column.',
-     file_id int unsigned NOT NULL   COMMENT 'FK to civicrm_file' 
+     file_id int unsigned NOT NULL   COMMENT 'FK to civicrm_file'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_entity(
         entity_table
       , entity_id
@@ -488,10 +488,10 @@ CREATE TABLE civicrm_entity_file (
       , entity_id
       , file_id
   )
-  
-,      INDEX FKEY_file_id ( file_id ) ,  
+
+,      INDEX FKEY_file_id ( file_id ) ,
      FOREIGN KEY (file_id) REFERENCES civicrm_file(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -509,7 +509,7 @@ CREATE TABLE civicrm_entity_file (
 -- *******************************************************/
    ALTER TABLE `civicrm_contact` DROP INDEX `index_sort_name`;
     ALTER TABLE `civicrm_contact` DROP `hash`;
-  
+
    ALTER TABLE `civicrm_contact` ADD hash varchar(32) DEFAULT NULL COMMENT 'Key for validating requests related to this contact.';
    ALTER TABLE `civicrm_contact` ADD contact_sub_type varchar(64) DEFAULT NULL COMMENT 'May be used to over-ride contact view and edit templates.';
 
@@ -517,21 +517,21 @@ CREATE TABLE civicrm_entity_file (
 
    ALTER TABLE `civicrm_contact` ADD INDEX index_sort_name_domain(sort_name, domain_id, hash);
 
-   ALTER TABLE `civicrm_contact` ADD INDEX index_hash_domain(hash, domain_id);  
+   ALTER TABLE `civicrm_contact` ADD INDEX index_hash_domain(hash, domain_id);
 
 -- /*******************************************************
 -- *
 -- * fix preferred communication data
 -- *******************************************************/
   SELECT @domain_id := id from civicrm_domain;
-    INSERT INTO 
-    `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-    VALUES 
+    INSERT INTO
+    `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`)
+    VALUES
     (@domain_id, 'preferred_communication_method', 'Preferred Communication Method'     , 0, 1);
     SELECT @option_group_id_pcm := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 
-    INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+    INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
     VALUES
     (@option_group_id_pcm, 'Phone', 1, NULL, NULL, 0, NULL, 1, NULL, 0, 0, 1),
     (@option_group_id_pcm, 'Email', 2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1),
@@ -589,7 +589,7 @@ CREATE TABLE civicrm_entity_file (
   ALTER TABLE `civicrm_custom_value` ADD file_id int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_file';
   ALTER TABLE `civicrm_custom_value` ADD INDEX (`file_id`);
   ALTER TABLE `civicrm_custom_value` ADD FOREIGN KEY (`file_id`) REFERENCES `civicrm_file`(`id`);
-  
+
 
 -- /*******************************************************
 -- *
@@ -629,8 +629,8 @@ CREATE TABLE civicrm_entity_file (
 
   ALTER TABLE `civicrm_uf_group` ADD add_to_group_id int unsigned DEFAULT NULL COMMENT 'foreign key to civicrm_group_id';
   ALTER TABLE `civicrm_uf_group` ADD INDEX (`add_to_group_id`);
-  ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (`add_to_group_id`) REFERENCES `civicrm_group` (`id`);  
-  
+  ALTER TABLE `civicrm_uf_group` ADD FOREIGN KEY (`add_to_group_id`) REFERENCES `civicrm_group` (`id`);
+
   ALTER TABLE `civicrm_uf_group` ADD add_captcha tinyint DEFAULT 0 COMMENT 'Should a CAPTCHA widget be included this Profile form.';
 
   ALTER TABLE `civicrm_uf_group` ADD cancel_URL varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancle button clik .';

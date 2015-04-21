@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,24 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
  */
 
 /**
  * This class generates form components for search-result tasks
- *
  */
 class CRM_Contact_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed
    *
    * @var int
    */
@@ -87,22 +85,19 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   static protected $_searchFormValues;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @param
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
   /**
-   * @param $form
+   * Common pre-processing function.
+   *
+   * @param CRM_Core_Form $form
    * @param bool $useTable
    */
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
 
     $form->_contactIds = array();
     $form->_contactTypes = array();
@@ -259,7 +254,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
     }
 
-
     if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
@@ -278,8 +272,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Function to get the contact id for custom search
-   * we are not using prev/next table incase of custom search
+   * Get the contact id for custom search.
+   *
+   * we are not using prev/next table in case of custom search
    */
   public function getContactIds() {
     // need to perform action on all contacts
@@ -292,7 +287,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once(str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $fv = $this->get('formValues');
     $customClass = $this->get('customSearchClass');
@@ -327,64 +322,49 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
 
   /**
-   * This function sets the default values for the form. Relationship that in edit/view action
-   * the default values are retrieved from the database
+   * Set default values for the form. Relationship that in edit/view action.
    *
-   * @access public
+   * The default values are retrieved from the database.
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
 
   /**
-   * This function is used to add the rules for form.
-   *
-   * @return void
-   * @access public
+   * Add the rules for form.
    */
-  function addRules() {
+  public function addRules() {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Confirm Action'));
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
   }
 
-  //end of function
-
   /**
-   * simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Simple shell that derived classes can call to add form buttons.
    *
-   * @param string $title title of the main button
+   * Allows customized title for the main Submit
+   *
+   * @param string $title
+   *   Title of the main button.
    * @param string $nextType
+   *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @internal param string $type button type for the form after processing
-   *
-   * @return void
-   * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -400,12 +380,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * replace ids of household members in $this->_contactIds with the id of their household.
+   * Replace ids of household members in $this->_contactIds with the id of their household.
+   *
    * CRM-8338
-   *
-   * @access public
-   *
-   * @return void
    */
   public function mergeContactIdsByHousehold() {
     if (empty($this->_contactIds)) {
@@ -443,15 +420,15 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
 
       // Find related households.
-      $relationSelect      = "SELECT contact_household.id as household_id, {$contactA} as refContact ";
+      $relationSelect = "SELECT contact_household.id as household_id, {$contactA} as refContact ";
       $relationFrom = " FROM civicrm_contact contact_household
               INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_household.id AND crel.relationship_type_id = {$id} ";
 
       // Check for active relationship status only.
-      $today               = date('Ymd');
-      $relationActive      = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
-      $relationWhere       = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
-      $relationGroupBy     = " GROUP BY crel.{$contactA}";
+      $today = date('Ymd');
+      $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
+      $relationWhere = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
+      $relationGroupBy = " GROUP BY crel.{$contactA}";
       $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationGroupBy";
 
       $householdsDAO = CRM_Core_DAO::executeQuery($relationQueryString);
@@ -467,5 +444,66 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       $householdsDAO->free();
     }
   }
-}
 
+  /**
+   * Given this task's list of targets, produce a hidden group.
+   *
+   * @return array
+   *   Array(0 => int $groupID, 1 => int|NULL $ssID).
+   * @throws Exception
+   */
+  public function createHiddenGroup() {
+    // Did the user select "All" matches or cherry-pick a few records?
+    $searchParams = $this->controller->exportValues();
+    if ($searchParams['radio_ts'] == 'ts_sel') {
+      // Create a static group.
+
+      $randID = md5(time() . rand(1, 1000)); // groups require a unique name
+      $grpTitle = "Hidden Group {$randID}";
+      $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
+
+      if (!$grpID) {
+        $groupParams = array(
+          'title' => $grpTitle,
+          'is_active' => 1,
+          'is_hidden' => 1,
+          'group_type' => array('2' => 1),
+        );
+
+        $group = CRM_Contact_BAO_Group::create($groupParams);
+        $grpID = $group->id;
+
+        CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $group->id);
+
+        $newGroupTitle = "Hidden Group {$grpID}";
+        $groupParams = array(
+          'id' => $grpID,
+          'name' => CRM_Utils_String::titleToVar($newGroupTitle),
+          'title' => $newGroupTitle,
+          'group_type' => array('2' => 1),
+        );
+        $group = CRM_Contact_BAO_Group::create($groupParams);
+      }
+
+      // note at this point its a static group
+      return array($grpID, NULL);
+    }
+    else {
+      // Create a smart group.
+
+      $ssId = $this->get('ssID');
+      $hiddenSmartParams = array(
+        'group_type' => array('2' => 1),
+        'form_values' => $this->get('formValues'),
+        'saved_search_id' => $ssId,
+        'search_custom_id' => $this->get('customSearchID'),
+        'search_context' => $this->get('context'),
+      );
+
+      list($smartGroupId, $savedSearchId) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+      return array($smartGroupId, $savedSearchId);
+    }
+
+  }
+
+}

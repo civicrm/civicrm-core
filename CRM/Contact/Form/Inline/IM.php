@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,17 +39,17 @@
 class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
-   * ims of the contact that is been viewed
+   * Ims of the contact that is been viewed.
    */
   private $_ims = array();
 
   /**
-   * No of im blocks for inline edit
+   * No of im blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,10 +62,9 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for im object
+   * Build the form object elements for im object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -97,15 +96,16 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
-   * @return array $errors@static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
@@ -116,7 +116,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             if (!$primaryID && !empty($blockValues['im'])) {
-                $primaryID = $blockValues['im'];
+              $primaryID = $blockValues['im'];
             }
           }
         }
@@ -127,17 +127,16 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["im[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one IM can be marked as primary.');
+        $errors["im[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one IM can be marked as primary.');
       }
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -155,10 +154,9 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -171,4 +169,5 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     $this->log();
     $this->response();
   }
+
 }

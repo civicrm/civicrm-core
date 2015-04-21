@@ -35,7 +35,7 @@ if (strlen($query_string) > 0) {
   $pieces = parse_url($url);
 
   if (isset($pieces['fragment'])) {
-  $url = str_replace('#' . $pieces['fragment'], '', $url);
+    $url = str_replace('#' . $pieces['fragment'], '', $url);
   }
 
   // Handle additional query string params.

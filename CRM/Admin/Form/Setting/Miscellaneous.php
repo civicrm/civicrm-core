@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,7 +43,9 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'max_attachments' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'securityUpdateAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'versionCheckIgnoreDate' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -54,21 +56,19 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   public $_uploadMaxSize;
 
   /**
-   * Basic setup
+   * Basic setup.
    */
-
   public function preProcess() {
-    $config     = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $this->_uploadMaxSize = (int) ini_get('upload_max_filesize');
     // check for post max size
     CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'));
@@ -77,10 +77,9 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(FALSE);
 
     // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
-    $attribs = $domain->locales || !$validTriggerPermission ?
-      array('disabled' => 'disabled') : array();
+    $attribs = $domain->locales || !$validTriggerPermission ? array('disabled' => 'disabled') : array();
 
     $this->assign('validTriggerPermission', $validTriggerPermission);
     $this->addYesNo('logging', ts('Logging'), NULL, NULL, $attribs);
@@ -117,17 +116,19 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $options
+   *   Additional user data.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $options) {
+  public static function formRule($fields, $files, $options) {
     $errors = array();
 
     // validate max file size
@@ -158,20 +159,13 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $config = CRM_Core_Config::singleton();
     $params = $this->controller->exportValues($this->_name);
 
-    // update upload max size in $config
-    // Fixme: why are we storing this php setting in $config?
-    $hiddenSettings = array(
-      'maxImportFileSize' => CRM_Core_Config_Defaults::formatUnitSize(ini_get('upload_max_filesize'))
-    );
-    CRM_Core_BAO_ConfigSetting::create($hiddenSettings);
-
     // get current logging status
     $values = $this->exportValues();
 
     parent::postProcess();
 
     if ($config->logging != $values['logging']) {
-      $logging = new CRM_Logging_Schema;
+      $logging = new CRM_Logging_Schema();
       if ($values['logging']) {
         $logging->enableLogging();
       }
@@ -180,5 +174,5 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       }
     }
   }
-}
 
+}

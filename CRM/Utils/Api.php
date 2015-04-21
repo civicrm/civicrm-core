@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Utils_Api
@@ -31,41 +31,54 @@
 class CRM_Utils_Api {
   /**
    * Attempts to retrieve the API entity name from any calling class.
+   * FIXME: This is a bit hackish but the naming convention for forms is not very strict
    *
    * @param string|object $classNameOrObject
    *
    * @return string
    * @throws CRM_Core_Exception
    */
-  static function getEntityName($classNameOrObject) {
+  public static function getEntityName($classNameOrObject) {
     require_once 'api/api.php';
     $className = is_string($classNameOrObject) ? $classNameOrObject : get_class($classNameOrObject);
 
     // First try the obvious replacements
     $daoName = str_replace(array('_BAO_', '_Form_', '_Page_'), '_DAO_', $className);
-    $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 
     // If that didn't work, try a different pattern
-    if (!$shortName) {
+    if (!$entityName) {
       list(, $parent, , $child) = explode('_', $className);
       $daoName = "CRM_{$parent}_DAO_$child";
-      $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+      $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
 
     // If that didn't work, try a different pattern
-    if (!$shortName) {
+    if (!$entityName) {
       $daoName = "CRM_{$parent}_DAO_$parent";
-      $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+      $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
 
     // If that didn't work, try a different pattern
-    if (!$shortName) {
+    if (!$entityName) {
       $daoName = "CRM_Core_DAO_$child";
-      $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+      $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
-    if (!$shortName) {
+
+    // If that didn't work, try using just the trailing name
+    if (!$entityName) {
+      $entityName = CRM_Core_DAO_AllCoreTables::getFullName($child) ? $child : NULL;
+    }
+
+    // If that didn't work, try using just the leading name
+    if (!$entityName) {
+      $entityName = CRM_Core_DAO_AllCoreTables::getFullName($parent) ? $parent : NULL;
+    }
+
+    if (!$entityName) {
       throw new CRM_Core_Exception('Could not find api name for supplied class');
     }
-    return _civicrm_api_get_entity_name_from_camel($shortName);
+    return $entityName;
   }
+
 }

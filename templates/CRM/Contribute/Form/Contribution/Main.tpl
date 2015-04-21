@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 
 {* Callback snippet: Load payment processor *}
 {elseif $snippet}
-{include file="CRM/Core/BillingBlock.tpl" context="front-end"}
+{include file="CRM/Core/BillingBlock.tpl"}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
@@ -99,6 +99,13 @@
 
   {capture assign='reqMark'}<span class="marker" title="{ts}This field is required.{/ts}">*</span>{/capture}
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
+
+  {if $contact_id}
+    <div class="messages status no-popup crm-not-you-message">
+      {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
+    </div>
+  {/if}
+
   <div id="intro_text" class="crm-section intro_text-section">
     {$intro_text}
   </div>
@@ -156,10 +163,10 @@
         </span>
       {/if}
       <div id="recurHelp" class="description">
-				{ts}Your recurring contribution will be processed automatically.{/ts}
-				{if $is_recur_installments}
-					{ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
-				{/if}
+        {ts}Your recurring contribution will be processed automatically.{/ts}
+        {if $is_recur_installments}
+          {ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
+        {/if}
         {if $is_email_receipt}
           {ts}You will receive an email receipt for each recurring contribution.{/ts}
         {/if}
@@ -279,7 +286,7 @@
 
   <div id="billing-payment-block">
     {* If we have a payment processor, load it - otherwise it happens via ajax *}
-    {if $ppType}
+    {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
       {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
     {/if}
   </div>
@@ -353,12 +360,12 @@
   {/if}
   {literal}
 
-	cj('input[name="soft_credit_type_id"]').on('change', function() {
-		enableHonorType();
-	});
-	
+  cj('input[name="soft_credit_type_id"]').on('change', function() {
+    enableHonorType();
+  });
+
   function enableHonorType( ) {
-    var selectedValue = cj('input[name="soft_credit_type_id"]:checked'); 
+    var selectedValue = cj('input[name="soft_credit_type_id"]:checked');
     if ( selectedValue.val() > 0) {
       cj('#honorType').show();
     }
@@ -367,12 +374,12 @@
     }
   }
 
-	cj('input[id="is_recur"]').on('change', function() {
-		showRecurHelp();
-	});
+  cj('input[id="is_recur"]').on('change', function() {
+    showRecurHelp();
+  });
 
   function showRecurHelp( ) {
-    var showHelp = cj('input[id="is_recur"]:checked'); 
+    var showHelp = cj('input[id="is_recur"]:checked');
     if ( showHelp.val() > 0) {
       cj('#recurHelp').show();
     }
@@ -380,7 +387,7 @@
       cj('#recurHelp').hide();
     }
   }
-	
+
   function pcpAnonymous( ) {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {
@@ -435,8 +442,8 @@
 
   CRM.$(function($) {
     toggleConfirmButton();
-		enableHonorType();
-		showRecurHelp();
+    enableHonorType();
+    showRecurHelp();
   });
 
   function showHidePayPalExpressOption() {
@@ -460,15 +467,15 @@
     updatePriceSetHighlight();
 
     function toggleBillingBlockIfFree(){
-      var total_amount_tmp =  $(this).data('raw-total'); 
+      var total_amount_tmp =  $(this).data('raw-total');
       // Hide billing questions if this is free
       if (total_amount_tmp == 0){
         cj("#billing-payment-block").hide();
-        cj(".payment_options-group").hide();  
-      } 
+        cj(".payment_options-group").hide();
+      }
       else {
         cj("#billing-payment-block").show();
-        cj(".payment_options-group").show(); 
+        cj(".payment_options-group").show();
       }
     }
 

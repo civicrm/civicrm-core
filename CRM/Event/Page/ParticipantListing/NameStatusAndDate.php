@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
 
   protected $_pager;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
     // ensure that there is a particpant type for this
@@ -68,7 +68,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $fromClause = "
@@ -98,8 +98,8 @@ SELECT   civicrm_contact.id                as contact_id    ,
 ORDER BY $orderBy
 LIMIT    $offset, $rowCount";
 
-    $rows         = array();
-    $object       = CRM_Core_DAO::executeQuery($query, $params);
+    $rows = array();
+    $object = CRM_Core_DAO::executeQuery($query, $params);
     $statusLookup = CRM_Event_PseudoConstant::participantStatus();
     while ($object->fetch()) {
       $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
@@ -123,9 +123,9 @@ LIMIT    $offset, $rowCount";
   /**
    * @param $fromClause
    * @param $whereClause
-   * @param $whereParams
+   * @param array $whereParams
    */
-  function pager($fromClause, $whereClause, $whereParams) {
+  public function pager($fromClause, $whereClause, $whereParams) {
 
     $params = array();
 
@@ -151,19 +151,22 @@ SELECT count( civicrm_contact.id )
   /**
    * @return string
    */
-  function orderBy() {
+  public function orderBy() {
     static $headers = NULL;
     if (!$headers) {
       $headers = array();
-      $headers[1] = array('name' => ts('Name'),
+      $headers[1] = array(
+        'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
       );
-      $headers[2] = array('name' => ts('Status'),
+      $headers[2] = array(
+        'name' => ts('Status'),
         'sort' => 'civicrm_participant.status_id',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );
-      $headers[3] = array('name' => ts('Register Date'),
+      $headers[3] = array(
+        'name' => ts('Register Date'),
         'sort' => 'civicrm_participant.register_date',
         'direction' => CRM_Utils_Sort::DONTCARE,
       );
@@ -186,5 +189,5 @@ SELECT count( civicrm_contact.id )
 
     return $sort->orderBy();
   }
-}
 
+}

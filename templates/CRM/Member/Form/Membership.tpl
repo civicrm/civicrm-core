@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -135,9 +135,19 @@
           <br />
           <span class="description">{ts}First day of current continuous membership period. Start Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
         <tr class="crm-membership-form-block-end_date"><td class="label">{$form.end_date.label}</td>
-          <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
+          <td id="end-date-readonly">
+              {$endDate|crmDate}
+              <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
+                {ts}Over-ride end date{/ts}
+              </a>
+              {help id="override_end_date"}
+          </td>
+          <td id="end-date-editable">
+            {include file="CRM/common/jcalendar.tpl" elementName=end_date}
             <br />
-            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
+            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
+          </td>
+        </tr>
         {if !empty($form.auto_renew)}
           <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
             <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
@@ -169,7 +179,7 @@
           <tr class="crm-membership-form-block-total_amount">
             <td class="label">{$form.total_amount.label}</td>
             <td>{$form.total_amount.html}<br />
-              <span class="description">{ts}Membership payment amount.{/ts}</span></td>
+              <span class="description">{ts}Membership payment amount.{/ts}</span><div class="totaltaxAmount"></div></td>
           </tr>
           <tr class="crm-membership-form-block-contribution-contact">
             <td class="label">{$form.is_different_contribution_contact.label}</td>
@@ -233,7 +243,7 @@
                 <tr class="crm-membership-form-block-total_amount">
                   <td class="label">{$form.total_amount.label}</td>
                   <td>{$form.total_amount.html}<br />
-                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span></td>
+                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span><div class="totaltaxAmount"></div></td>
                 </tr>
                 <tr class="crm-membership-form-block-receive_date">
                   <td class="label">{$form.receive_date.label}</td>
@@ -341,7 +351,6 @@
 
     {literal}
     <script type="text/javascript">
-
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
@@ -374,13 +383,34 @@
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
         var term = cj('#num_terms').val();
+        var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
+        var taxRates = JSON.parse(taxRates);
+        var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
+        var currency = '{/literal}{$currency}{literal}';
+	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if ( term ) {
-          var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
-          cj("#total_amount").val( feeTotal.toFixed(2) );
+          if (!taxRate) {
+            var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          }
+          else {
+      var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
+          }
+          cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
         else {
-          cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+    if (taxRate) {
+            var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
+      cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
+          }
+          else {
+      var feeTotal = allMemberships[memType]['total_amount'];
+      cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+          }
         }
+        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+        cj('.totaltaxAmount').html(taxMessage);
       }
 
 
@@ -412,6 +442,24 @@
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
       });
+      
+      // give option to override end-date for auto-renew memberships
+      {/literal}
+      {if $isRecur && $endDate}
+        cj('#end-date-readonly').show();
+        cj('#end-date-editable').hide();
+      {else}
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-end-date').click( function( e ) {
+        e.preventDefault();
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      });
+
     });
 
     function setDifferentContactBlock( ) {
@@ -423,6 +471,7 @@
         cj('#record-different-contact').hide();
       }
     }
+    
     </script>
     {/literal}
 
@@ -519,18 +568,19 @@
             endDate = memberorgs[selectedorg].membership_end_date,
             org = $('option:selected', "select[name='membership_type_id[0]']").text();
           if (endDate) {
-            andEndDate = ' ' + ts("and end date of %1", {1:endDate});
+            andEndDate = '{/literal}{ts escape='js' 1='%1'}and end date of %1{/ts}{literal}';
+            andEndDate = ' ' + ts(andEndDate, {1:endDate});
           }
 
           alert = CRM.alert(
             // Mixing client-side variables with a translated string in smarty is awkward!
             ts({/literal}'{ts escape='js' 1='%1' 2='%2' 3='%3' 4='%4'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
               + '<ul><li><a href="' + memberorgs[selectedorg].renewUrl + '">'
-              + {/literal}'{ts escape='js''}Renew the existing membership instead{/ts}'
+              + {/literal}'{ts escape='js'}Renew the existing membership instead{/ts}'
               + '</a></li><li><a href="' + memberorgs[selectedorg].membershipTab + '">'
               + '{ts escape='js'}View all existing and / or expired memberships for this contact{/ts}'{literal}
               + '</a></li></ul>',
-            ts('Duplicate Membership?'), 'alert');
+            '{/literal}{ts escape='js'}Duplicate Membership?{/ts}{literal}', 'alert');
         }
       }
       checkExistingMemOrg();
@@ -707,16 +757,18 @@
         if (cid) {
           CRM.api('relationship', 'getcount', {contact_id: cid, membership_type_id: memType}, {
             success: function(result) {
-              var relatable = ' ' + result.result + ts(' contacts are ');
-              if(result.result === 0) {
-                relatable = ts(' No contacts are ');
+              var relatable;
+              if (result.result === 0) {
+                relatable = '{/literal}{ts escape='js'}No contacts are currently eligible to inherit this relationship.{/ts}{literal}';
               }
-              if(result.result === 1) {
-                relatable = ts(' One contact is ');
+              else if (result.result === 1) {
+                relatable = '{/literal}{ts escape='js'}One contact is currently eligible to inherit this relationship.{/ts}{literal}';
               }
-
-              var others = relatable + ts('currently eligible to inherit this relationship.');
-              cj('#max_related').siblings('.description').append(others);
+              else {
+                relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
+                relatable = ts(relatable, {1: result});
+              }
+              cj('#max_related').siblings('.description').append(' ' + relatable);
             }
           });
         }

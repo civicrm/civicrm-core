@@ -47,14 +47,14 @@
      {if $editActURL}
      <tr>
        <td colspan="2" {$valueStyle}>
-     <a href="{$editActURL}" title="{ts}Edit this activity{/ts}">{ts}Edit this activity{/ts}</a>
+     <a href="{$editActURL}" title="{ts}Edit activity{/ts}">{ts}Edit activity{/ts}</a>
        </td>
      </tr>
      {/if}
      {if $viewActURL}
      <tr>
        <td colspan="2" {$valueStyle}>
-     <a href="{$viewActURL}" title="{ts}View this activity{/ts}">{ts}View this activity{/ts}</a>
+     <a href="{$viewActURL}" title="{ts}View activity{/ts}">{ts}View activity{/ts}</a>
        </td>
      </tr>
      {/if}

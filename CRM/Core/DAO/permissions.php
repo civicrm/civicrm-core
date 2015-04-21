@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,21 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Decide what permissions to check for an api call
  * The contact must have all of the returned permissions for the api call to be allowed
  *
- * @param $entity: (str) api entity
- * @param $action: (str) api action
- * @param $params: (array) api params
+ * @param $entity : (str) api entity
+ * @param $action : (str) api action
+ * @param $params : (array) api params
  *
- * @return array of permissions to check for this entity-action combo
+ * @return array
+ *   Array of permissions to check for this entity-action combo
  */
 function _civicrm_api3_permissions($entity, $action, &$params) {
+  // FIXME: Lowercase entity_names are nonstandard but difficult to fix here
+  // because this function invokes hook_civicrm_alterAPIPermissions
   $entity = _civicrm_api_get_entity_name_from_camel($entity);
-  $action = strtolower($action);
 
   /**
    * @var array of permissions
@@ -64,6 +65,13 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     // catch-all, applies to create, get, delete, etc.
     // If an entity declares it's own 'default' action it will override this one
     'default' => array('administer CiviCRM'),
+  );
+
+  // Note: Additional permissions in DynamicFKAuthorization
+  $permissions['attachment'] = array(
+    'default' => array(
+      array('access CiviCRM', 'access AJAX API'),
+    ),
   );
 
   // Contact permissions
@@ -107,6 +115,14 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
+  // Allow non-admins to get and create tags to support tagset widget
+  // Delete is still reserved for admins
+  $permissions['tag'] = array(
+    'get' => array('access CiviCRM'),
+    'create' => array('access CiviCRM'),
+    'update' => array('access CiviCRM'),
+  );
+
   //relationship permissions
   $permissions['relationship'] = array(
     'get' => array(
@@ -122,7 +138,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit all contacts',
     ),
   );
-  
+
   // Activity permissions
   $permissions['activity'] = array(
     'delete' => array(
@@ -228,6 +244,58 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['group_contact'] = $permissions['group'];
   $permissions['group_nesting'] = $permissions['group'];
   $permissions['group_organization'] = $permissions['group'];
+
+  // CiviMail Permissions
+  $civiMailBasePerms = array(
+    // To get/preview/update, one must have least one of these perms:
+    // Mailing API implementations enforce nuances of create/approve/schedule permissions.
+    'access CiviMail',
+    'create mailings',
+    'schedule mailings',
+    'approve mailings',
+  );
+  $permissions['mailing'] = array(
+    'get' => array(
+      'access CiviCRM',
+      $civiMailBasePerms,
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      $civiMailBasePerms,
+      'delete in CiviMail',
+    ),
+    'submit' => array(
+      'access CiviCRM',
+      array('access CiviMail', 'schedule mailings'),
+    ),
+    'default' => array(
+      'access CiviCRM',
+      $civiMailBasePerms,
+    ),
+  );
+  $permissions['mailing_group'] = $permissions['mailing'];
+  $permissions['mailing_job'] = $permissions['mailing'];
+  $permissions['mailing_recipients'] = $permissions['mailing'];
+
+  $permissions['mailing_a_b'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'access CiviMail',
+      'delete in CiviMail',
+    ),
+    'submit' => array(
+      'access CiviCRM',
+      array('access CiviMail', 'schedule mailings'),
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'access CiviMail',
+    ),
+  );
 
   // Membership permissions
   $permissions['membership'] = array(

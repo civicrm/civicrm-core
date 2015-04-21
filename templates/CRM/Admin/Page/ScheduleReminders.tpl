@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -25,16 +25,22 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-
+{if $setTab eq 1}
+  {if $component eq 'event'}
+     {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
+  {/if}
+{else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
   {* include wysiwyg related files*}
   {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-  {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
-  <div class="help">
-    {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
-  </div>
+  {if !$component}
+    {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+    <div class="help">
+      {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+    </div>
+  {/if}
   {if $rows}
     <div id="reminder">
       {include file="CRM/Admin/Page/Reminders.tpl"}
@@ -46,6 +52,13 @@
     </div>
   {/if}
   <div class="action-link">
-    <a href="{crmURL q="action=add&reset=1"}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
+    {assign var='link' value="civicrm/admin/scheduleReminders"}
+    {if $component}
+      {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
+    {else}
+      {assign var='urlParams' value="action=add&reset=1"}
+    {/if}
+    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="circle-plus"}{ts}Add Reminder{/ts}{/crmButton}
   </div>
+{/if}
 {/if}

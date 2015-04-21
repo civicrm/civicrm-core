@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -71,11 +71,11 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    */
   protected $_parentId;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_entityTable = $this->get('entityTable');
-    $this->_entityId    = $this->get('entityId');
-    $this->_id          = $this->get('id');
-    $this->_parentId    = CRM_Utils_Array::value('parentId', $_GET, 0);
+    $this->_entityId = $this->get('entityId');
+    $this->_id = $this->get('id');
+    $this->_parentId = CRM_Utils_Array::value('parentId', $_GET, 0);
     if ($this->_parentId) {
       $this->assign('parentId', $this->_parentId);
     }
@@ -87,14 +87,13 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -114,10 +113,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -161,8 +159,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
 
   /**
    *
-   * @access public
-   *
    * @return void
    */
   public function postProcess() {
@@ -186,7 +182,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
       return;
     }
 
-    $params['id'] = null;
+    $params['id'] = NULL;
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
@@ -199,4 +195,5 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
   }
+
 }

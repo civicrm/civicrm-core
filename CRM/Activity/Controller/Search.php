@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,14 +22,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
  */
 
 /**
@@ -40,32 +39,38 @@
  *
  * Typically the first form will display the search criteria and it's results
  *
- * The second form is used to process search results with the asscociated actions
+ * The second form is used to process search results with the associated actions
  *
  */
 class CRM_Activity_Controller_Search extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param null $title
+   * @param bool $modal
+   * @param int|mixed|null $action
    */
-  function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
+  public function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
 
     parent::__construct($title, $modal);
 
     $this->_stateMachine = new CRM_Activity_StateMachine_Search($this, $action);
 
-    // create and instantiate the pages
+    // Create and instantiate the pages.
     $this->addPages($this->_stateMachine, $action);
 
-    // add all the actions
+    // Add all the actions.
     $this->addActions();
   }
 
   /**
+   * Getter for selectorName.
+   *
    * @return mixed
    */
   public function selectorName() {
     return $this->get('selectorName');
   }
-}
 
+}

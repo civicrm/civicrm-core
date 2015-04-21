@@ -1,0 +1,43 @@
+<form name="exampleForm" novalidate>
+  <table>
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Input</th>
+      <th>ngModel</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    <tr ng-repeat="(exName, example) in examples">
+      <td>{{exName}}</td>
+      <td>{{example.value}}</td>
+      <td>
+        <div class="crmMailing-schedule-outer" crm-mailing-radio-date="schedule" ng-model="example.value"
+             name="{{exName}}">
+
+          <div class="crmMailing-schedule-inner">
+            <div>
+              <input ng-model="schedule.mode" type="radio" name="send_{{exName}}" value="now" id="schedule-send-now"/>
+              <label for="schedule-send-now">{{ts('Send immediately')}}</label>
+            </div>
+            <div>
+              <input ng-model="schedule.mode" type="radio" name="send_{{exName}}" value="at" id="schedule-send-at"/>
+              <label for="schedule-send-at">{{ts('Send at:')}}</label>
+              <input crm-ui-datepicker ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"/>
+            </div>
+          </div>
+        </div>
+        </div>
+      </td>
+      <td>
+        <pre>{{exampleForm[exName]|json}}</pre>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+</form>

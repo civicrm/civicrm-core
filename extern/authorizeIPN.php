@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,11 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  */
 
@@ -38,5 +38,13 @@ $config = CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
 $log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 
-$authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
-$authorizeNetIPN->main();
+$authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN($_REQUEST);
+try {
+  $authorizeNetIPN->main();
+}
+catch (CRM_Core_Exception $e) {
+  CRM_Core_Error::debug_log_message($e->getMessage());
+  CRM_Core_Error::debug_var('error data', $e->getErrorData(), TRUE, TRUE);
+  CRM_Core_Error::debug_var('REQUEST', $_REQUEST, TRUE, TRUE);
+  echo "The transaction has failed. Please review the log for more detail";
+}

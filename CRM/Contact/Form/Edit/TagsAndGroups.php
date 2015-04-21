@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,43 +23,49 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_Form_Edit_TagsAndGroups {
 
   /**
-   * constant to determine which forms we are generating
+   * Constant to determine which forms we are generating.
    *
    * Used by both profile and edit contact
    */
-  CONST GROUP = 1, TAG = 2, ALL = 3;
+  const GROUP = 1, TAG = 2, ALL = 3;
 
   /**
-   * This function is to build form elements
+   * build form elements.
    * params object $form object of the form
    *
-   * @param Object $form the form object that we are operating on
-   * @param int $contactId contact id
-   * @param int $type what components are we interested in
-   * @param boolean $visibility visibility of the field
+   * @param CRM_Core_Form $form
+   *   The form object that we are operating on.
+   * @param int $contactId
+   *   Contact id.
+   * @param int $type
+   *   What components are we interested in.
+   * @param bool $visibility
+   *   Visibility of the field.
    * @param null $isRequired
-   * @param string $groupName if used for building group block
-   * @param string $tagName if used for building tag block
-   * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   * @param string $groupName
+   *   If used for building group block.
+   * @param string $tagName
+   *   If used for building tag block.
+   * @param string $fieldName
+   *   This is used in batch profile(i.e to build multiple blocks).
    *
    * @param string $groupElementType
    *
-   * @static
-   * @access public
    */
-  static function buildQuickForm(&$form,
+  public static function buildQuickForm(
+    &$form,
     $contactId = 0,
     $type = self::ALL,
     $visibility = FALSE,
@@ -124,7 +130,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         }
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
-          $form->add('select', $fName, ts('%1', array(1 => $groupName)), $groupsOptions, FALSE,
+          $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
             array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2')
           );
           $form->assign('groupCount', count($groupsOptions));
@@ -147,16 +153,31 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $fName = $fieldName;
       }
       $form->_tagGroup[$fName] = 1;
-      $elements = array();
-      $tag = CRM_Core_BAO_Tag::getTags();
 
-      foreach ($tag as $id => $name) {
-        $elements[] = $form->createElement('checkbox', $id, NULL, $name);
+      // get the list of all the categories
+      $tags = new CRM_Core_BAO_Tag();
+      $tree = $tags->getTree('civicrm_contact', TRUE);
+      // let's not load jstree if there are not children. This also fixes blank
+      // display at the beginning of checkboxes
+      $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
+      $form->assign('loadjsTree', FALSE);
+      if (!empty($loadJsTree)) {
+        // CODE FROM CRM/Tag/Form/Tag.php //
+        CRM_Core_Resources::singleton()
+          ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+          ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
+        $form->assign('loadjsTree', TRUE);
       }
-      if (!empty($elements)) {
-        $form->addGroup($elements, $fName, $tagName, '<br />');
-        $form->assign('tagCount', count($elements));
-      }
+
+      $elements = array();
+      self::climbtree($form, $tree, $elements);
+
+      $form->addGroup($elements, $fName, $tagName, '<br />');
+      $form->assign('tagCount', count($elements));
+      $form->assign('tree', $tree);
+      $form->assign('tag', $tree);
+      $form->assign('entityID', $contactId);
+      $form->assign('entityTable', 'civicrm_contact');
 
       if ($isRequired) {
         $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
@@ -164,27 +185,53 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
     $form->assign('tagGroup', $form->_tagGroup);
   }
 
   /**
-   * set defaults for relevant form elements
+   * Climb tree.
    *
-   * @param int $id the contact id
-   * @param array $defaults the defaults array to store the values in
-   * @param int $type what components are we interested in
-   * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   * @param $form
+   * @param $tree
+   * @param $elements
+   *
+   * @return mixed
+   */
+  public static function climbtree($form, $tree, &$elements) {
+    foreach ($tree as $tagID => $varValue) {
+      $tagAttribute = array(
+        'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
+        'id' => "tag_{$tagID}",
+      );
+
+      $elements[$tagID] = $form->createElement('checkbox', $tagID, '', $varValue['name'], $tagAttribute);
+
+      if (array_key_exists('children', $varValue)) {
+        self::climbtree($form, $varValue['children'], $elements);
+      }
+    }
+    return $elements;
+  }
+
+  /**
+   * Set defaults for relevant form elements.
+   *
+   * @param int $id
+   *   The contact id.
+   * @param array $defaults
+   *   The defaults array to store the values in.
+   * @param int $type
+   *   What components are we interested in.
+   * @param string $fieldName
+   *   This is used in batch profile(i.e to build multiple blocks).
    *
    * @param string $groupElementType
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
+  public static function setDefaults($id, &$defaults, $type = self::ALL, $fieldName = NULL, $groupElementType = 'checkbox') {
     $type = (int ) $type;
     if ($type & self::GROUP) {
       $fName = 'group';
@@ -221,12 +268,11 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void
@@ -256,4 +302,5 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       }
     }
   }
+
 }

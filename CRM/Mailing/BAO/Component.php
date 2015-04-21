@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,39 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_LocaationType object
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_LocaationType
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $component = new CRM_Mailing_DAO_Component();
     $component->copyValues($params);
     if ($component->find(TRUE)) {
@@ -66,43 +62,63 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return Object
+   *   DAO object on sucess, null otherwise
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Component', $id, 'is_active', $is_active);
   }
 
   /**
-   * Create and Update mailing component
+   * Create and Update mailing component.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids (deprecated) the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   (deprecated) the array that holds all the db ids.
    *
-   * @return object CRM_Mailing_BAO_Component object
+   * @return CRM_Mailing_BAO_Component
    *
-   * @access public
-   * @static
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     $component = new CRM_Mailing_DAO_Component();
-    $component->id = $id;
+    if ($id) {
+      $component->id = $id;
+      $component->find(TRUE);
+    }
+
     $component->copyValues($params);
     if (empty($id) && empty($params['body_text'])) {
       $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
     }
 
-    if ($component->is_default && !empty($id)) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}' AND id <> $id");
+    if ($component->is_default) {
+      if (!empty($id)) {
+        $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1 AND id <> %2';
+        $sqlParams = array(
+          1 => array($component->component_type, 'String'),
+          2 => array($id, 'Positive'),
+        );
+      }
+      else {
+        $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1';
+        $sqlParams = array(
+          1 => array($component->component_type, 'String'),
+        );
+      }
+      CRM_Core_DAO::executeQuery($sql, $sqlParams);
     }
 
     $component->save();
     return $component;
   }
+
 }

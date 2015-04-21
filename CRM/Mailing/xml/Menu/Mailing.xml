@@ -118,7 +118,7 @@
   </item>
   <item>
     <path>civicrm/mailing/optout</path>
-    <title>Optout</title>
+    <title>Opt-out</title>
     <page_callback>CRM_Mailing_Form_Optout</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
@@ -186,7 +186,7 @@
     <path>civicrm/mailing/schedule</path>
     <title>Schedule Mailing</title>
     <page_callback>CRM_Mailing_Form_Schedule</page_callback>
-    <access_arguments>schedule mailings</access_arguments>
+    <access_arguments>access CiviMail;schedule mailings</access_arguments>
     <weight>700</weight>
   </item>
   <item>
@@ -201,7 +201,7 @@
     <path>civicrm/mailing/approve</path>
     <title>Approve Mailing</title>
     <page_callback>CRM_Mailing_Form_Approve</page_callback>
-    <access_arguments>approve mailings</access_arguments>
+    <access_arguments>access CiviMail;approve mailings</access_arguments>
     <weight>850</weight>
   </item>
   <item>

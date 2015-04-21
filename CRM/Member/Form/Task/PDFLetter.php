@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,7 +40,7 @@
 class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
@@ -51,12 +51,11 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public $_cid = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
@@ -64,18 +63,17 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * Set defaults
+   * Set defaults.
    * (non-PHPdoc)
    * @see CRM_Core_Form::setDefaultValues()
    */
-  function setDefaultValues() {
-    return  CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
+  public function setDefaultValues() {
+    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
@@ -86,9 +84,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -103,7 +100,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * list available tokens, at time of writing these were
+   * List available tokens, at time of writing these were
    * {membership.id} => Membership ID
    * {membership.status} => Membership Status
    * {membership.type} => Membership Type
@@ -111,10 +108,10 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * {membership.join_date} => Membership Join Date
    * {membership.end_date} => Membership End Date
    * {membership.fee} => Membership Fee
-   * @return Ambigous <NULL, multitype:string Ambigous <string, string> >
+   * @return array
    */
   public function listTokens() {
     return CRM_Core_SelectValues::membershipTokens();
   }
-}
 
+}

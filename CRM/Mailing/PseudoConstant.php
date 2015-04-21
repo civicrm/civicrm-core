@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,39 +40,116 @@
 class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * mailing templates
+   * Status options for A/B tests.
    * @var array
-   * @static
+   */
+  private static $abStatus;
+
+  /**
+   * Test criteria for A/B tests.
+   * @var array
+   */
+  private static $abTestCriteria;
+
+  /**
+   * Winner criteria for A/B tests.
+   * @var array
+   */
+  private static $abWinnerCriteria;
+
+  /**
+   * Mailing templates
+   * @var array
    */
   private static $template;
 
   /**
-   * completed mailings
+   * Completed mailings
    * @var array
-   * @static
    */
   private static $completed;
 
   /**
-   * mailing components
+   * Mailing components
    * @var array
-   * @static
    */
   private static $component;
 
   /**
-   * default component id's, indexed by component type
+   * Default component id's, indexed by component type
    */
   private static $defaultComponent;
 
   /**
-   * Get all the mailing components of a particular type
+   * Mailing Types
+   * @var array
+   */
+  private static $mailingTypes;
+
+  /**
+   * @return array
+   */
+  public static function abStatus() {
+    if (!is_array(self::$abStatus)) {
+      self::$abStatus = array(
+        'Draft' => ts('Draft'),
+        'Testing' => ts('Testing'),
+        'Final' => ts('Final'),
+      );
+    }
+    return self::$abStatus;
+  }
+
+  /**
+   * @return array
+   */
+  public static function abTestCriteria() {
+    if (!is_array(self::$abTestCriteria)) {
+      self::$abTestCriteria = array(
+        'subject' => ts('Test different "Subject" lines'),
+        'from' => ts('Test different "From" lines'),
+        'full_email' => ts('Test entirely different emails'),
+      );
+    }
+    return self::$abTestCriteria;
+  }
+
+  /**
+   * @return array
+   */
+  public static function abWinnerCriteria() {
+    if (!is_array(self::$abWinnerCriteria)) {
+      self::$abWinnerCriteria  = array(
+        'open' => ts('Open'),
+        'unique_click' => ts('Total Unique Clicks'),
+        'link_click' => ts('Total Clicks on a particular link'),
+      );
+    }
+    return self::$abWinnerCriteria;
+  }
+
+  /**
+   * @return array
+   */
+  public static function mailingTypes() {
+    if (!is_array(self::$mailingTypes)) {
+      self::$mailingTypes  = array(
+        'standalone' => ts('Standalone'),
+        'experiment' => ts('Experimental'),
+        'winner' => ts('Winner'),
+      );
+    }
+    return self::$mailingTypes;
+  }
+
+  /**
+   * Get all the mailing components of a particular type.
    *
-   * @param $type the type of component needed
-   * @access public
+   * @param $type
+   *   The type of component needed.
    *
-   * @return array - array reference of all mailing components
-   * @static
+   * @return array
+   *   array reference of all mailing components
    */
   public static function &component($type = NULL) {
     $name = $type ? $type : 'ALL';
@@ -88,7 +165,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       else {
         // we need to add an additional filter for $type
         self::$component[$name] = array();
-
 
         $object = new CRM_Mailing_DAO_Component();
         $object->component_type = $type;
@@ -106,14 +182,15 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Determine the default mailing component of a given type
+   * Determine the default mailing component of a given type.
    *
-   * @param $type the type of component needed
-   * @param $undefined the value to use if no default is defined
-   * @access public
+   * @param $type
+   *   The type of component needed.
+   * @param $undefined
+   *   The value to use if no default is defined.
    *
-   * @return integer -The ID of the default mailing component.
-   * @static
+   * @return int
+   *   The ID of the default mailing component.
    */
   public static function &defaultComponent($type, $undefined = NULL) {
     if (!self::$defaultComponent) {
@@ -135,12 +212,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the mailing templates
+   * Get all the mailing templates.
    *
-   * @access public
    *
-   * @return array - array reference of all mailing templates if any
-   * @static
+   * @return array
+   *   array reference of all mailing templates if any
    */
   public static function &template() {
     if (!self::$template) {
@@ -150,14 +226,13 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the completed mailing
+   * Get all the completed mailing.
    *
-   * @access public
    *
    * @param null $mode
    *
-   * @return array - array reference of all mailing templates if any
-   * @static
+   * @return array
+   *   array reference of all mailing templates if any
    */
   public static function &completed($mode = NULL) {
     if (!self::$completed) {
@@ -187,19 +262,24 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
     if (!$options) {
       $options = array(
         'bounce' => array(
-          'N' => ts('Successful '), 'Y' => ts('Bounced '),
+          'N' => ts('Successful '),
+          'Y' => ts('Bounced '),
         ),
         'delivered' => array(
-          'Y' => ts('Successful '), 'N' => ts('Bounced '),
+          'Y' => ts('Successful '),
+          'N' => ts('Bounced '),
         ),
         'open' => array(
-          'Y' => ts('Opened '), 'N' => ts('Unopened/Hidden '),
+          'Y' => ts('Opened '),
+          'N' => ts('Unopened/Hidden '),
         ),
         'click' => array(
-          'Y' => ts('Clicked '), 'N' => ts('Not Clicked '),
+          'Y' => ts('Clicked '),
+          'N' => ts('Not Clicked '),
         ),
         'reply' => array(
-          'Y' => ts('Replied '), 'N' => ts('No Reply '),
+          'Y' => ts('Replied '),
+          'N' => ts('No Reply '),
         ),
       );
     }
@@ -210,15 +290,13 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
-   * @static
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'template') {
-   if (isset(self::$$name)) {
+    if (isset(self::$$name)) {
       self::$$name = NULL;
     }
   }
-}
 
+}

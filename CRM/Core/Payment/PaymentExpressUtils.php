@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -44,13 +44,13 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return string
    */
-  static function _valueXml($element, $value = NULL) {
+  public static function _valueXml($element, $value = NULL) {
     $nl = "\n";
 
     if (is_array($element)) {
       $xml = '';
       foreach ($element as $elem => $value) {
-          $xml .= self::_valueXml($elem, $value);
+        $xml .= self::_valueXml($elem, $value);
       }
       return $xml;
     }
@@ -59,22 +59,22 @@ class CRM_Core_Payment_PaymentExpressUtils {
 
   /**
    * @param $xml
-   * @param $name
+   * @param string $name
    *
    * @return mixed
    */
-  static function _xmlElement($xml, $name) {
+  public static function _xmlElement($xml, $name) {
     $value = preg_replace('/.*<' . $name . '[^>]*>(.*)<\/' . $name . '>.*/', '\1', $xml);
     return $value;
   }
 
   /**
    * @param $xml
-   * @param $name
+   * @param string $name
    *
    * @return mixed|null
    */
-  static function _xmlAttribute($xml, $name) {
+  public static function _xmlAttribute($xml, $name) {
     $value = preg_replace('/<.*' . $name . '="([^"]*)".*>/', '\1', $xml);
     return $value != $xml ? $value : NULL;
   }
@@ -85,7 +85,7 @@ class CRM_Core_Payment_PaymentExpressUtils {
    *
    * @return resource
    */
-  static function &_initCURL($query, $url) {
+  public static function &_initCURL($query, $url) {
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);

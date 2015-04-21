@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
 
 {if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
    <div class="messages crm-error">
-       <div class="icon red-icon alert-icon"></div>
+       <div class="icon red-icon ui-icon-alert"></div>
      {ts}Please correct the following errors in the form fields below:{/ts}
      <ul id="errorList">
      {foreach from=$form.errors key=errorName item=error}

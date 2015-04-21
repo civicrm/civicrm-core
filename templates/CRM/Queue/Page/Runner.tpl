@@ -18,7 +18,7 @@ CRM.$(function($) {
   // Note: Queue API provides "#remaining tasks" but not "#completed tasks" or "#total tasks".
   // To compute a %complete, we manually track #completed. This only works nicely if we
   // assume that the queue began with a fixed #tasks.
-  
+
   var queueRunnerData = {/literal}{$queueRunnerData|@json}{literal};
 
   var displayResponseData = function(data, textStatus, jqXHR) {
@@ -26,10 +26,10 @@ CRM.$(function($) {
       window.location.href = data.redirect_url;
       return;
     }
-    
+
     var pct = 100 * queueRunnerData.completed / (queueRunnerData.completed + queueRunnerData.numberOfItems);
     $("#crm-queue-runner-progress").progressbar({ value: pct });
-    
+
     if (data.is_error) {
       $("#crm-queue-runner-buttonset").show();
       if (queueRunnerData.isEnded) {
@@ -41,24 +41,24 @@ CRM.$(function($) {
     } else {
       $('#crm-queue-runner-title').text('Executed: ' + data.last_task_title);
     }
-    
+
     if (data.exception) {
       $('#crm-queue-runner-message').html('');
       $('<div></div>').html(data.exception).prependTo('#crm-queue-runner-message');
     }
-    
+
   };
-  
+
   var handleError = function(jqXHR, textStatus, errorThrown) {
     // Do this regardless of whether the response was well-formed
     $("#crm-queue-runner-buttonset").show();
-    
+
     var data = $.parseJSON(jqXHR.responseText)
     if (data) {
       displayResponseData(data);
     }
   };
-  
+
   var handleSuccess = function(data, textStatus, jqXHR) {
     if (!data.is_error) {
       queueRunnerData.completed++;
@@ -66,9 +66,9 @@ CRM.$(function($) {
     if (data.numberOfItems) {
       queueRunnerData.numberOfItems = parseInt(data.numberOfItems);
     }
-    
+
     displayResponseData(data);
-    
+
     // FIXME re-consider merits of is_continue in the corner-case of executing last step
     if (data.is_continue) {
       window.setTimeout(runNext, 50);
@@ -77,7 +77,7 @@ CRM.$(function($) {
       window.setTimeout(runNext, 50);
     }
   };
-  
+
   // Dequeue and execute the next item
   var runNext = function() {
     $.ajax({
@@ -94,12 +94,12 @@ CRM.$(function($) {
       success: handleSuccess
     });
   }
-  
+
   var retryNext = function() {
     $('#crm-queue-runner-message').html('');
     runNext();
   }
-  
+
   // Dequeue and the next item, then move on to runNext for the subsequent items
   var skipNext = function() {
     $.ajax({
@@ -117,9 +117,9 @@ CRM.$(function($) {
       success: handleSuccess
     });
   }
-  
+
   // Set up the UI
-  
+
   $("#crm-queue-runner-progress").progressbar({ value: 0 });
   if (queueRunnerData.buttons.retry == 1) {
   $("#crm-queue-runner-retry").button({

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,19 +40,15 @@
 abstract class CRM_Import_DataSource {
 
   /**
-   * Provides information about the data source
+   * Provides information about the data source.
    *
-   * @return array collection of info about this data source
-   *
-   * @access public
-   *
+   * @return array
+   *   collection of info about this data source
    */
   abstract public function getInfo();
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @access public
+   * Set variables up before form is built.
    */
   abstract public function preProcess(&$form);
 
@@ -61,18 +57,16 @@ abstract class CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return void (operates directly on form argument)
-   * @access public
+   * @return void
+   *   (operates directly on form argument)
    */
   abstract public function buildQuickForm(&$form);
 
   /**
-   * Function to process the form
-   *
-   * @access public
+   * Process the form submission.
    */
   abstract public function postProcess(&$params, &$db, &$form);
-}
 
+}

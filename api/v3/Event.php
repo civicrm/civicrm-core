@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,31 +27,19 @@
 
 /**
  *
- * File for the CiviCRM APIv3 event functions
+ * This api exposes CiviCRM Event.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Event
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Event.php 30964 2010-11-29 09:41:54Z shot $
- *
  */
 
 /**
- * Files required for this package
- */
-
-/**
- * Create a Event
+ * Create a Event.
  *
- * This API is used for creating a Event
+ * @param array $params
+ *   Input parameters.
  *
- * @param  array   $params   input parameters
- * Allowed @params array keys are:
- * {@getfields event_create}
- *
- * @return array API result Array.
- * @access public
+ * @return array
+ *   API result Array.
  */
 function civicrm_api3_event_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('event_type_id', 'template_id'));
@@ -69,26 +56,32 @@ function civicrm_api3_event_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_create_spec(&$params) {
   $params['start_date']['api.required'] = 1;
   $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
+  $params['is_template']['api.default'] = 0;
 }
 
 /**
- * Support for schema changes made in 4.2
+ * Support for schema changes made in 4.2.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ *
+ * @param array $params
  */
-function _civicrm_api3_event_create_legacy_support_42(&$params){
-  if(!empty($params['payment_processor_id'])){
+function _civicrm_api3_event_create_legacy_support_42(&$params) {
+  if (!empty($params['payment_processor_id'])) {
     $params['payment_processor'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['payment_processor_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
   }
 }
@@ -96,13 +89,10 @@ function _civicrm_api3_event_create_legacy_support_42(&$params){
 /**
  * Get Event record.
  *
+ * @param array $params
  *
- * @param  array  $params     an associative array of name/value property values of civicrm_event
- * {@getfields event_get}
- *
- * @return  Array of all found event property values.
- * @access public
- *
+ * @return array
+ *   Array of all found event property values.
  */
 function civicrm_api3_event_get($params) {
 
@@ -125,14 +115,7 @@ function civicrm_api3_event_get($params) {
   }
 
   $eventDAO = new CRM_Event_BAO_Event();
-  _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
-
-  if (!empty($params['is_template'])) {
-    $eventDAO->whereAdd( '( is_template = 1 )' );
-  }
-  elseif(empty($eventDAO->id)){
-    $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
-  }
+  _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE);
 
   if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
@@ -153,69 +136,68 @@ function civicrm_api3_event_get($params) {
     }
     _civicrm_api3_event_get_legacy_support_42($event, $eventDAO->id);
     _civicrm_api3_custom_data_get($event[$eventDAO->id], 'Event', $eventDAO->id, NULL, $eventDAO->event_type_id);
-    if(!empty($options['return'])) {
+    if (!empty($options['return'])) {
       $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
     }
   }
-  //end of the loop
 
-  return civicrm_api3_create_success($event, $params, 'event', 'get', $eventDAO);
+  return civicrm_api3_create_success($event, $params, 'Event', 'get', $eventDAO);
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_get_spec(&$params) {
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
 }
 
 /**
- * Support for schema changes made in 4.2
+ * Support for schema changes made in 4.2.
+ *
  * The main purpose of the API is to provide integrators a level of stability not provided by
  * the core code or schema - this means we have to provide support for api calls (where possible)
  * across schema changes.
+ *
+ * @param array $event
+ * @param int $event_id
  */
-function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id){
-  if(!empty($event[$event_id]['payment_processor'])){
-    $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR,$event[$event_id]['payment_processor']);
-    if(count($processors) == 3 ){
+function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
+  if (!empty($event[$event_id]['payment_processor'])) {
+    $processors = explode(CRM_Core_DAO::VALUE_SEPARATOR, $event[$event_id]['payment_processor']);
+    if (count($processors) == 3) {
       $event[$event_id]['payment_processor_id'] = $processors[1];
     }
   }
 }
 
 /**
- * Deletes an existing event
+ * Delete an existing Event.
  *
- * This API is used for deleting a event
+ * This API is used for deleting a event given its id.
  *
- * @param  Array  $params    array containing event_id to be deleted
+ * @param array $params
  *
- * @return boolean        true if success, error otherwise
- * @access public
- *   note API has legacy support for 'event_id'
- *  {@getfields event_delete}
+ * @return array
  */
 function civicrm_api3_event_delete($params) {
-
   return CRM_Event_BAO_Event::del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while deleting event'));
 }
-/*
 
 /**
- * Function to add 'is_full' & 'available_seats' to the return array. (this might be better in the BAO)
+ * Add 'is_full' & 'available_seats' to the return array.
+ *
+ * (this might be better in the BAO)
  * Default BAO function returns a string if full rather than a Bool - which is more appropriate to a form
  *
- * @param array $event return array of the event
- * @param int $event_id Id of the event to be updated
- *
- */
-/**
- * @param $event
- * @param $event_id
+ * @param array $event
+ *   Return array of the event.
+ * @param int $event_id
+ *   Id of the event to be updated.
  */
 function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $eventFullResult = CRM_Event_BAO_Participant::eventFull($event_id, 1);
@@ -230,9 +212,11 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 
 
 /**
- * @see _civicrm_api3_generic_getlist_params.
+ * Get event list parameters.
  *
- * @param $request array
+ * @see _civicrm_api3_generic_getlist_params
+ *
+ * @param array $request
  */
 function _civicrm_api3_event_getlist_params(&$request) {
   $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
@@ -245,10 +229,12 @@ function _civicrm_api3_event_getlist_params(&$request) {
 }
 
 /**
+ * Get event list output.
+ *
  * @see _civicrm_api3_generic_getlist_output
  *
- * @param $result array
- * @param $request array
+ * @param array $result
+ * @param array $request
  *
  * @return array
  */
@@ -259,16 +245,19 @@ function _civicrm_api3_event_getlist_output($result, $request) {
       $data = array(
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
-        'description' => array(CRM_Core_Pseudoconstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $row['event_type_id'])),
+        'description' => array(
+          CRM_Core_Pseudoconstant::getLabel(
+            'CRM_Event_BAO_Event',
+            'event_type_id',
+            $row['event_type_id']
+          ),
+        ),
       );
       if (!empty($row['start_date'])) {
         $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['start_date']);
       }
       if (!empty($row['summary'])) {
         $data['description'][] = $row['summary'];
-      }
-      foreach ($request['extra'] as $field) {
-        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
       }
       $output[] = $data;
     }

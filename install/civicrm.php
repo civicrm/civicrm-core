@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,24 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
+ * @param $filesDirectory
  */
 function civicrm_setup($filesDirectory) {
   global $crmPath, $sqlPath, $pkgPath, $tplPath;
   global $compileDir;
 
-  $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
-  set_include_path($crmPath . PATH_SEPARATOR .
-    $pkgPath . PATH_SEPARATOR .
-    get_include_path()
-  );
+  // Setup classloader
+  // This is needed to allow CiviCRM to be installed by drush.
+  // TODO: move to civicrm.drush.inc drush_civicrm_install()
+  global $crmPath;
+  require_once $crmPath . '/CRM/Core/ClassLoader.php';
+  CRM_Core_ClassLoader::singleton()->register();
 
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
@@ -63,7 +64,7 @@ function civicrm_setup($filesDirectory) {
 }
 
 /**
- * @param $name
+ * @param string $name
  * @param $buffer
  */
 function civicrm_write_file($name, &$buffer) {
@@ -71,7 +72,7 @@ function civicrm_write_file($name, &$buffer) {
   if (!$fd) {
     die("Cannot open $name");
   }
-  fputs($fd, $buffer);
+  fwrite($fd, $buffer);
   fclose($fd);
 }
 
@@ -130,7 +131,7 @@ function civicrm_main(&$config) {
 
 /**
  * @param $dsn
- * @param $fileName
+ * @param string $fileName
  * @param bool $lineMode
  */
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
@@ -209,14 +210,14 @@ function civicrm_config(&$config) {
   $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
   if ($installType == 'drupal') {
     if (version_compare(VERSION, '7.0-rc1') >= 0) {
-      $params['cms']       = 'Drupal';
+      $params['cms'] = 'Drupal';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
       $params['CMSdbHost'] = $config['drupal']['server'];
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
     elseif (version_compare(VERSION, '6.0') >= 0) {
-      $params['cms']       = 'Drupal6';
+      $params['cms'] = 'Drupal6';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
       $params['CMSdbHost'] = $config['drupal']['server'];
@@ -224,7 +225,7 @@ function civicrm_config(&$config) {
     }
   }
   else {
-    $params['cms']       = 'WordPress';
+    $params['cms'] = 'WordPress';
     $params['CMSdbUser'] = addslashes(DB_USER);
     $params['CMSdbPass'] = addslashes(DB_PASSWORD);
     $params['CMSdbHost'] = DB_HOST;
@@ -303,4 +304,3 @@ function civicrm_home_url() {
   $drupalURL = civicrm_cms_base();
   return $drupalURL . 'index.php?q=civicrm';
 }
-

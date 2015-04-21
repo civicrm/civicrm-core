@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Provider;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -35,22 +36,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 interface ProviderInterface {
   /**
    * @param array $apiRequest
-   * @return array structured response data (per civicrm_api3_create_success)
+   *   The full description of the API request.
+   * @return array
+   *   structured response data (per civicrm_api3_create_success)
    * @see civicrm_api3_create_success
    * @throws \API_Exception
    */
-  function invoke($apiRequest);
+  public function invoke($apiRequest);
 
   /**
    * @param int $version
+   *   API version.
    * @return array<string>
    */
-  function getEntityNames($version);
+  public function getEntityNames($version);
 
   /**
    * @param int $version
+   *   API version.
    * @param string $entity
+   *   API entity.
    * @return array<string>
    */
-  function getActionNames($version, $entity);
+  public function getActionNames($version, $entity);
+
 }

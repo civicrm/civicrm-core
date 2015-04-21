@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,20 +40,16 @@
 class CRM_Core_BAO_CustomOption {
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_CustomOption object
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_CustomOption
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $customOption = new CRM_Core_DAO_OptionValue();
     $customOption->copyValues($params);
     if ($customOption->find(TRUE)) {
@@ -64,16 +60,17 @@ class CRM_Core_BAO_CustomOption {
   }
 
   /**
-   * Returns all active options ordered by weight for a given field
+   * Returns all active options ordered by weight for a given field.
    *
-   * @param $fieldID
-   * @param  boolean $inactiveNeeded do we need inactive options ?
+   * @param int $fieldID
+   *   Field whose options are needed.
+   * @param bool $inactiveNeeded Do we need inactive options ?.
+   *   Do we need inactive options ?.
    *
-   * @internal param int $fieldId field whose options are needed
-   * @return array $customOption all active options for fieldId
-   * @static
+   * @return array
+   *   all active options for fieldId
    */
-  static function getCustomOption(
+  public static function getCustomOption(
     $fieldID,
     $inactiveNeeded = FALSE
   ) {
@@ -112,17 +109,19 @@ class CRM_Core_BAO_CustomOption {
    * Returns the option label for a custom field with a specific value. Handles all
    * custom field data and html types
    *
-   * @param $fieldId  int    the custom field ID
+   * @param int $fieldId
+   *   the custom field ID.
    * @pram  $value    string the value (typically from the DB) of this custom field
    * @param $value
-   * @param $htmlType string the html type of the field (optional)
-   * @param $dataType string the data type of the field (optional)
+   * @param string $htmlType
+   *   the html type of the field (optional).
+   * @param string $dataType
+   *   the data type of the field (optional).
    *
-   * @return string          the label to display for this custom field
-   * @static
-   * @access public
+   * @return string
+   *   the label to display for this custom field
    */
-  static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
+  public static function getOptionLabel($fieldId, $value, $htmlType = NULL, $dataType = NULL) {
     if (!$fieldId) {
       return NULL;
     }
@@ -153,7 +152,10 @@ WHERE  id = %1
       case 'Radio':
       case 'Autocomplete-Select':
         if (!in_array($dataType, array(
-          'Boolean', 'ContactReference'))) {
+          'Boolean',
+          'ContactReference',
+        ))
+        ) {
           $options = self::valuesByID($fieldId);
         }
     }
@@ -166,14 +168,13 @@ WHERE  id = %1
   }
 
   /**
-   * Function to delete Option
+   * Delete Option.
    *
-   * param $optionId integer option id
+   * @param $optionId integer
+   *   option id
    *
-   * @static
-   * @access public
    */
-  static function del($optionId) {
+  public static function del($optionId) {
     // get the customFieldID
     $query = "
 SELECT f.id as id, f.data_type as dataType
@@ -187,8 +188,8 @@ AND    g.id    = v.option_group_id";
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       if (in_array($dao->dataType,
-          array('Int', 'Float', 'Money', 'Boolean')
-        )) {
+        array('Int', 'Float', 'Money', 'Boolean')
+      )) {
         $value = 0;
       }
       else {
@@ -213,11 +214,11 @@ WHERE  id = %1";
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
-  static function updateCustomValues($params) {
+  public static function updateCustomValues($params) {
     $optionDAO = new CRM_Core_DAO_OptionValue();
     $optionDAO->id = $params['optionId'];
     $optionDAO->find(TRUE);
@@ -254,7 +255,8 @@ WHERE  id = %2";
             $dataType = $dao->dataType;
           }
           $queryParams = array(
-            1 => array($params['value'],
+            1 => array(
+              $params['value'],
               $dataType,
             ),
             2 => array(
@@ -269,10 +271,11 @@ WHERE  id = %2";
         case 'CheckBox':
           $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;
           $newString = CRM_Core_DAO::VALUE_SEPARATOR . $params['value'] . CRM_Core_DAO::VALUE_SEPARATOR;
-          $query     = "
+          $query = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = array(1 => array($oldString, 'String'),
+          $queryParams = array(
+            1 => array($oldString, 'String'),
             2 => array($newString, 'String'),
           );
           break;
@@ -285,12 +288,12 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
   }
 
   /**
-   * @param $customFieldID
-   * @param null $optionGroupID
+   * @param int $customFieldID
+   * @param int $optionGroupID
    *
    * @return array
    */
-  static function valuesByID($customFieldID, $optionGroupID = NULL) {
+  public static function valuesByID($customFieldID, $optionGroupID = NULL) {
     if (!$optionGroupID) {
       $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
         $customFieldID,
@@ -304,5 +307,5 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
 
     return $options;
   }
-}
 
+}

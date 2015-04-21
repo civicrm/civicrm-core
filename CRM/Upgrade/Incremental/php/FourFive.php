@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,12 +22,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,34 +39,36 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
   /**
-   * Compute any messages which should be displayed beforeupgrade
+   * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
    * @param $preUpgradeMessage
-   * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
+   * @param string $rev
+   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
    *
-   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
-  function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.5.alpha1') {
       $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Recurring Start and End Notification</li><li>Contributions - Recurring Updates</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages). (<a href="%1">learn more...</a>)', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Updating+System+Workflow+Message+Templates+after+Upgrades+-+method+1+-+kdiff'));
       $postUpgradeMessage .= '<br /><br />' . ts('This release allows you to view and edit multiple-record custom field sets in a table format which will be more usable in some cases. You can try out the format by navigating to Administer > Custom Data & Screens > Custom Fields. Click Settings for a custom field set and change Display Style to "Tab with Tables".');
@@ -85,10 +87,10 @@ class CRM_Upgrade_Incremental_php_FourFive {
    *
    * @return bool
    */
-  function upgrade_4_5_alpha1($rev) {
+  public function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
-    $this->addTask(ts('Upgrade DB to 4.5.alpha1: SQL'), 'task_4_5_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'task_4_5_x_runSql', $rev);
     $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
@@ -107,7 +109,8 @@ AND TABLE_SCHEMA = %1
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     if ($dao->fetch()) {
       if ($dao->CONSTRAINT_NAME == 'FK_civicrm_msg_template_pdf_format_id' ||
-        $dao->CONSTRAINT_NAME == 'pdf_format_id') {
+        $dao->CONSTRAINT_NAME == 'pdf_format_id'
+      ) {
         $sqlDropFK = "ALTER TABLE `civicrm_msg_template`
 DROP FOREIGN KEY `{$dao->CONSTRAINT_NAME}`,
 DROP KEY `{$dao->CONSTRAINT_NAME}`";
@@ -123,8 +126,8 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool
    */
-  function upgrade_4_5_beta9($rev) {
-    $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
+  public function upgrade_4_5_beta9($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'task_4_5_x_runSql', $rev);
 
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
@@ -137,7 +140,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         FROM {$tableName}")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(1 => $startId, 2 => $endId));
+        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(
+            1 => $startId,
+            2 => $endId,
+          ));
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }
     }
@@ -147,17 +153,19 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   /**
    * (Queue Task Callback)
    *
-   * Function to update the line items
+   * update the line items
    *
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param $startId int, the first/lowest entity ID to convert
-   * @param $endId int, the last/highest entity ID to convert
+   * @param int $startId
+   *   the first/lowest entity ID to convert.
+   * @param int $endId
+   *   the last/highest entity ID to convert.
    * @param
    *
    * @return bool
    */
-  static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
+  public static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
 
     $sqlParams = array(
       1 => array($startId, 'Integer'),
@@ -223,9 +231,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
-  static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
+  public static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
     $query = "SELECT `value` FROM `civicrm_setting` WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $dao->fetch();
@@ -246,12 +255,13 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @param CRM_Queue_TaskContext $ctx
    *
-   * @return bool TRUE for success
+   * @return bool
+   *   TRUE for success
    */
-  static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
+  public static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
     $query = "ALTER TABLE `civicrm_uf_join`
     ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module'";
-      CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
 
     $honorTypes = array_keys(CRM_Core_OptionGroup::values('honor_type'));
     $ufGroupDAO = new CRM_Core_DAO_UFGroup();
@@ -262,15 +272,15 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     if ($dao->N) {
-      $domain = new CRM_Core_DAO_Domain;
+      $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       while ($dao->fetch()) {
         $honorParams = array('soft_credit' => array('soft_credit_types' => $honorTypes));
         if ($domain->locales) {
           $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
-            $honor_block_title =  "honor_block_title_{$locale}";
-            $honor_block_text =  "honor_block_text_{$locale}";
+            $honor_block_title = "honor_block_title_{$locale}";
+            $honor_block_text = "honor_block_text_{$locale}";
             $honorParams['soft_credit'] += array(
               $locale => array(
                 'honor_block_title' => $dao->$honor_block_title,
@@ -303,9 +313,97 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_5_9($rev) {
+    // Task to process sql.
+    $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
+
+    return TRUE;
+  }
+
+  /**
+   * Update saved search for multi-select custom fields on DB upgrade
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool TRUE for success
+   */
+  static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT id, form_values FROM civicrm_saved_search";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $copy = $formValues = unserialize($dao->form_values);
+      $update = FALSE;
+      foreach ($copy as $field => $data_value) {
+        if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
+          // Now check for CiviCRM_OP_OR as either key or value in the data_value array.
+          // This is the conclusive evidence of an old-style data format.
+          if(array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
+            // We have old style data. Mark this record to be updated.
+            $update = TRUE;
+            $op = 'and';
+            if(!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
+              // fatal error?
+              continue;
+            }
+            $fieldID= $matches[1];
+            if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
+              // This indicates data structure identified by jamie in the form:
+              // value1 => 1, value2 => , value3 => 1.
+              $data_value = array_keys($data_value, 1);
+
+              // If CiviCRM_OP_OR - change OP from default to OR
+              if($data_value['CiviCRM_OP_OR'] == 1) {
+                $op = 'or';
+              }
+              unset($data_value['CiviCRM_OP_OR']);
+            }
+            else {
+              // The value is here, but it is not set as a key.
+              // This is using the style identified by Monish - the existence of the value
+              // indicates an OR search and values are set in the form of:
+              // 0 => value1, 1 => value1, 3 => value2.
+              $key = array_search('CiviCRM_OP_OR', $data_value);
+              $op = 'or';
+              unset($data_value[$key]);
+            }
+
+            //If only Or operator has been chosen, means we need to select all values and
+            //so to execute OR operation between these values according to new data structure
+            if (count($data_value) == 0 && $op == 'or') {
+              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
+              foreach ($customOption as $option) {
+                $data_value[] = CRM_Utils_Array::value('value', $option);
+              }
+            }
+
+            $formValues[$field] = $data_value;
+            $formValues["${field}_operator"] = $op;
+          }
+        }
+      }
+
+      if ($update) {
+        $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
+        CRM_Core_DAO::executeQuery($sql,
+          array(
+            array(serialize($formValues), 'String'),
+            array($dao->id, 'Integer'),
+          )
+        );
+      }
+    }
+    return TRUE;
+  }
+
+
+  /**
    * (Queue Task Callback)
    */
-  static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
+  public static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
@@ -335,4 +433,5 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     );
     $queue->createItem($task, array('weight' => -1));
   }
+
 }

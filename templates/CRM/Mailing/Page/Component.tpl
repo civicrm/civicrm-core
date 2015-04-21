@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,6 @@
        {strip}
        {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
        <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
         <th>{ts}Name{/ts}</th>
@@ -63,7 +62,7 @@
        {if $action ne 1 and $action ne 2}
   <br/>
        <div class="action-link">
-       <a href="{crmURL q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Mailing Component{/ts}</span></a>
+       {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Mailing Component{/ts}{/crmButton}
        </div>
        {/if}
     </div>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class handles downloads of remotely-provided extensions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -46,7 +46,8 @@ class CRM_Extension_Downloader {
 
   /**
    * @param CRM_Extension_Manager $manager
-   * @param string $containerDir the place to store downloaded & extracted extensions
+   * @param string $containerDir
+   *   The place to store downloaded & extracted extensions.
    * @param string $tmpDir
    */
   public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
@@ -56,14 +57,15 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * Determine whether downloading is supported
+   * Determine whether downloading is supported.
    *
-   * @return array list of error messages; empty if OK
+   * @return array
+   *   list of error messages; empty if OK
    */
   public function checkRequirements() {
     $errors = array();
 
-    if (!$this->containerDir || !is_dir($this->containerDir) || !is_writeable($this->containerDir)) {
+    if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
       $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
       $errors[] = array(
@@ -74,7 +76,7 @@ class CRM_Extension_Downloader {
             //1 => $this->containerDir,
             1 => $url,
           )
-        )
+        ),
       );
     }
 
@@ -85,7 +87,7 @@ class CRM_Extension_Downloader {
       );
     }
 
-    if (empty($errors) && ! CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
+    if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
       CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
       CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
     }
@@ -94,11 +96,14 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * Install or upgrade an extension from a remote URL
+   * Install or upgrade an extension from a remote URL.
    *
-   * @param string $key the name of the extension being installed
-   * @param string $downloadUrl URL of a .zip file
-   * @return bool TRUE for success
+   * @param string $key
+   *   The name of the extension being installed.
+   * @param string $downloadUrl
+   *   URL of a .zip file.
+   * @return bool
+   *   TRUE for success
    * @throws CRM_Extension_Exception
    */
   public function download($key, $downloadUrl) {
@@ -109,16 +114,16 @@ class CRM_Extension_Downloader {
       CRM_Core_Error::fatal('Cannot install this extension - downloadUrl is not set!');
     }
 
-    if (! $this->fetch($downloadUrl, $filename)) {
+    if (!$this->fetch($downloadUrl, $filename)) {
       return FALSE;
     }
 
     $extractedZipPath = $this->extractFiles($key, $filename);
-    if (! $extractedZipPath) {
+    if (!$extractedZipPath) {
       return FALSE;
     }
 
-    if (! $this->validateFiles($key, $extractedZipPath)) {
+    if (!$this->validateFiles($key, $extractedZipPath)) {
       return FALSE;
     }
 
@@ -130,26 +135,33 @@ class CRM_Extension_Downloader {
   /**
    * Download the remote zipfile.
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
-   * @return boolean Whether the download was successful.
+   * @param string $remoteFile
+   *   URL of a .zip file.
+   * @param string $localFile
+   *   Path at which to store the .zip file.
+   * @return bool
+   *   Whether the download was successful.
    */
   public function fetch($remoteFile, $localFile) {
     $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);
     switch ($result) {
       case CRM_Utils_HttpClient::STATUS_OK:
         return TRUE;
+
       default:
         return FALSE;
     }
   }
 
   /**
-   * Extract an extension from a zip file
+   * Extract an extension from a zip file.
    *
-   * @param string $key the name of the extension being installed; this usually matches the basedir in the .zip
-   * @param string $zipFile the local path to a .zip file
-   * @return string|FALSE zip file path
+   * @param string $key
+   *   The name of the extension being installed; this usually matches the basedir in the .zip.
+   * @param string $zipFile
+   *   The local path to a .zip file.
+   * @return string|FALSE
+   *   zip file path
    */
   public function extractFiles($key, $zipFile) {
     $config = CRM_Core_Config::singleton();
@@ -191,7 +203,7 @@ class CRM_Extension_Downloader {
    *
    * @return bool
    */
-  function validateFiles($key, $extractedZipPath) {
+  public function validateFiles($key, $extractedZipPath) {
     $filename = $extractedZipPath . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME;
     if (!is_readable($filename)) {
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', array(1 => $filename)), ts('Installation Error'), 'error');
@@ -200,7 +212,8 @@ class CRM_Extension_Downloader {
 
     try {
       $newInfo = CRM_Extension_Info::loadFromFile($filename);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', array(1 => $filename)), ts('Installation Error'), 'error');
       return FALSE;
     }

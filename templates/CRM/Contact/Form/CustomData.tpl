@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,11 +27,11 @@
 {if $cdType || $postedInfo}
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
-     <div class="html-adjust">{$form.buttons.html}</div>
+     <div class="crm-submit-buttons">{$form.buttons.html}</div>
    {/if}
 {else}
     <div id="customData"></div>
-    <div class="html-adjust">{$form.buttons.html}</div>
+    <div class="crm-submit-buttons">{$form.buttons.html}</div>
 
     {*include custom data js file*}
     {include file="CRM/common/customData.tpl"}

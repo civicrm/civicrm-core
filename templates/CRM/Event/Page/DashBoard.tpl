@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
   <table class="form-layout-compressed">
      <tr>
     <td><a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Events{/ts}</span></a></td>
-    <td><a href="{$newEventURL}" class="button"><span><div class="icon add-icon"></div>{ts}New Event{/ts}</span></a></td>
+    <td><a href="{$newEventURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Event{/ts}</span></a></td>
      </tr>
   </table>
     </div>
@@ -57,7 +57,16 @@
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
     <tr class="crm-event_{$id}">
-        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a></td>
+        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a>
+            {if $values.is_repeating_event}
+                <br/>
+                {if $values.is_repeating_event eq $id}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Parent{/ts})</span>
+                {else}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Child{/ts})</span>
+                {/if}
+            {/if}
+        </td>
         <td class="crm-event-id">{$id}</td>
         <td class="crm-event-eventType">{$values.eventType}</td>
         <td class="crm-event-isPublic">{$values.isPublic}</td>

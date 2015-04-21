@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\Core\DAO\Event;
 
@@ -43,7 +43,11 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
    */
   public $result;
 
-  function __construct($object, $result) {
+  /**
+   * @param $object
+   * @param $result
+   */
+  public function __construct($object, $result) {
     $this->object = $object;
     $this->result = $result;
   }

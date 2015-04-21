@@ -20,5 +20,5 @@ CRM.$(function($) {
         // D7 hack, restore toolbar position (CRM-15341)
         $('#toolbar').css('z-index', '');
       }
-    })
+    });
 });

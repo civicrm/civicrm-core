@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,6 +34,9 @@
  */
 
 /**
+ * @param $params
+ * @param $smarty
+ * @return string|void
  */
 function smarty_function_crmAPI($params, &$smarty) {
   if (!array_key_exists('action', $params)) {
@@ -62,7 +65,7 @@ function smarty_function_crmAPI($params, &$smarty) {
   }
 
   if (!empty($result['is_error'])) {
-    $smarty->trigger_error("{crmAPI} ".$result["error_message"]);
+    $smarty->trigger_error("{crmAPI} " . $result["error_message"]);
   }
 
   if (!array_key_exists('var', $params)) {
@@ -75,7 +78,3 @@ function smarty_function_crmAPI($params, &$smarty) {
     $smarty->assign($params["var"], $result);
   }
 }
-
-
-
-

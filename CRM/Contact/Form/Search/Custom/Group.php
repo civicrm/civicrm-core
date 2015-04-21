@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_Group
-  extends CRM_Contact_Form_Search_Custom_Base
-  implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
 
@@ -48,7 +46,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_columns = array(
       ts('Contact ID') => 'contact_id',
@@ -65,11 +63,9 @@ class CRM_Contact_Form_Search_Custom_Group
 
     //define variables
     $this->_allSearch = FALSE;
-    $this->_groups    = FALSE;
-    $this->_tags      = FALSE;
-    $this->_andOr     = CRM_Utils_Array::value('andOr', $this->_formValues);
-
-
+    $this->_groups = FALSE;
+    $this->_tags = FALSE;
+    $this->_andOr = CRM_Utils_Array::value('andOr', $this->_formValues);
     //make easy to check conditions for groups and tags are
     //selected or it is empty search
     if (empty($this->_includeGroups) && empty($this->_excludeGroups) &&
@@ -84,7 +80,7 @@ class CRM_Contact_Form_Search_Custom_Group
     $this->_tags = (!empty($this->_includeTags) || !empty($this->_excludeTags));
   }
 
-  function __destruct() {
+  public function __destruct() {
     // mysql drops the tables when connectiomn is terminated
     // cannot drop tables here, since the search might be used
     // in other parts after the object is destroyed
@@ -93,7 +89,7 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     $this->setTitle(ts('Include / Exclude Search'));
 
@@ -154,14 +150,12 @@ class CRM_Contact_Form_Search_Custom_Group
     $form->assign('elements', array('includeGroups', 'excludeGroups', 'andOr', 'includeTags', 'excludeTags'));
   }
 
-  /*
-   * Set search form field defaults here.
-   */
   /**
+   * Set search form field defaults here.
    * @return array
    */
-  function setDefaultValues() {
-    $defaults = array( 'andOr' => '1' );
+  public function setDefaultValues() {
+    $defaults = array('andOr' => '1');
 
     if (!empty($this->_formValues)) {
       $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');
@@ -179,13 +173,13 @@ class CRM_Contact_Form_Search_Custom_Group
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param NULL $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
    *
    * @return string
    */
-  function all(
+  public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -229,7 +223,7 @@ class CRM_Contact_Form_Search_Custom_Group
       // adding a groupBy clause and saving it as a smart group messes up the query and
       // bad things happen
       // andrew hunt seemed to have rewritten this piece when he worked on this search
-      $groupBy = null;
+      $groupBy = NULL;
     }
 
     $sql = "SELECT $selectClause $from WHERE  $where $groupBy";
@@ -264,7 +258,7 @@ class CRM_Contact_Form_Search_Custom_Group
    * @return string
    * @throws Exception
    */
-  function from() {
+  public function from() {
 
     $iGroups = $xGroups = $iTags = $xTags = 0;
 
@@ -356,8 +350,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
                  SELECT              civicrm_contact.id as contact_id, ''
                  FROM                civicrm_contact";
       }
-
-
       //used only when exclude group is selected
       if ($xGroups != 0) {
         $includeGroup .= " LEFT JOIN        Xg_{$this->_tableName}
@@ -567,7 +559,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     if ($includeContactIDs) {
       $contactIDs = array();
 
@@ -593,12 +585,13 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /*
-     * Functions below generally don't need to be modified
-     */
-  /**
-   * @return mixed
+   * Functions below generally don't need to be modified
    */
-  function count() {
+
+  /**
+   * @inheritDoc
+   */
+  public function count() {
     $sql = $this->all();
 
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -608,40 +601,40 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param NULL $sort
    * @param bool $returnSQL
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
   /**
    * @return array
    */
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
   /**
-   * @return null
+   * @return NULL
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -653,8 +646,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /**
    * @param string $tableAlias
    */
-  function buildACLClause($tableAlias = 'contact') {
+  public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
-}
 
+}

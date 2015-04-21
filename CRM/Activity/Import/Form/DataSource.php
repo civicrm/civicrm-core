@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,10 +39,9 @@
 class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
@@ -52,22 +51,24 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
+    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize . 'm', TRUE);
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
 
     $this->assign('uploadSize', $uploadSize);
     $this->setMaxFileSize($uploadFileSize);
     $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
+          1 => $uploadSize,
+          2 => $uploadFileSize,
+        )), 'maxfilesize', $uploadFileSize);
     $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
@@ -90,9 +91,9 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
 
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-        'Import Activity',
-        'name'
-      ));
+      'Import Activity',
+      'name'
+    ));
     $this->assign('savedMapping', $mappingArray);
     $this->add('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
 
@@ -102,9 +103,8 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->setDefaults(array(
-      'onDuplicate' =>
-        CRM_Import_Parser::DUPLICATE_SKIP,
-      ));
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ));
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
@@ -112,7 +112,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     $this->addButtons(array(
         array(
           'type' => 'upload',
-          'name' => ts('Continue >>'),
+          'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
@@ -125,19 +125,18 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Process the uploaded file
+   * Process the uploaded file.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');
 
-    $fileName         = $this->controller->exportValue($this->_name, 'uploadFile');
+    $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
     $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
-    $onDuplicate      = $this->controller->exportValue($this->_name, 'onDuplicate');
-    $dateFormats      = $this->controller->exportValue($this->_name, 'dateFormats');
-    $savedMapping     = $this->controller->exportValue($this->_name, 'savedMapping');
+    $onDuplicate = $this->controller->exportValue($this->_name, 'onDuplicate');
+    $dateFormats = $this->controller->exportValue($this->_name, 'dateFormats');
+    $savedMapping = $this->controller->exportValue($this->_name, 'savedMapping');
 
     $this->set('onDuplicate', $onDuplicate);
     $this->set('dateFormats', $dateFormats);
@@ -167,10 +166,9 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Upload Data');
   }
-}
 
+}

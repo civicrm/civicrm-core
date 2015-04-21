@@ -6,17 +6,24 @@
 interface API_Wrapper {
 
   /**
-   * @param $apiRequest
+   * Interface for interpreting api input.
    *
-   * @return modified $apiRequest
+   * @param array $apiRequest
+   *
+   * @return array
+   *   modified $apiRequest
    */
-  function fromApiInput($apiRequest);
+  public function fromApiInput($apiRequest);
 
   /**
-   * @param $apiRequest
-   * @param $result
+   * Interface for interpreting api output.
    *
-   * @return modified $result
+   * @param array $apiRequest
+   * @param array $result
+   *
+   * @return array
+   *   modified $result
    */
-  function toApiOutput($apiRequest, $result);
+  public function toApiOutput($apiRequest, $result);
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,17 +39,17 @@
 class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
   /**
-   * websitess of the contact that is been viewed
+   * Websitess of the contact that is been viewed.
    */
   private $_websites = array();
 
   /**
-   * No of website blocks for inline edit
+   * No of website blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -61,10 +61,9 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for website object
+   * Build the form object elements for website object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -95,10 +94,9 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -117,18 +115,18 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
 
     // Process / save websites
-    CRM_Core_BAO_Website::create($params['website'], $this->_contactId, true);
+    CRM_Core_BAO_Website::create($params['website'], $this->_contactId, TRUE);
 
     $this->log();
     $this->response();
   }
+
 }

@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -50,13 +50,13 @@ CREATE TABLE civicrm_event (
      is_monetary tinyint   DEFAULT 1 COMMENT 'Is this a PAID event? If true, one or more fee amounts must be set and a Payment Processor must be configured for Online Event Registration.',
      contribution_type_id int unsigned   DEFAULT 0 COMMENT 'Contribution type assigned to paid event registrations for this event. Required if is_monetary is true.',
      is_map tinyint   DEFAULT 0 COMMENT 'Include a map block on the Event Information page when geocode info is available and a mapping provider has been specified?',
-     is_active tinyint   DEFAULT 0 COMMENT 'Is this Event enabled or disabled/cancelled?' 
+     is_active tinyint   DEFAULT 0 COMMENT 'Is this Event enabled or disabled/cancelled?'
 ,
     PRIMARY KEY ( id )
 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -82,10 +82,10 @@ CREATE TABLE civicrm_event_page (
      default_fee_id int unsigned NOT NULL   COMMENT 'FK to civicrm_custom_option.',
      thankyou_title varchar(255)   DEFAULT NULL COMMENT 'Title for ThankYou page.',
      thankyou_text text    COMMENT 'ThankYou Text.',
-     thankyou_footer_text text    COMMENT 'Footer message.' 
+     thankyou_footer_text text    COMMENT 'Footer message.'
 ,
     PRIMARY KEY ( id )
- 
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -104,15 +104,15 @@ CREATE TABLE civicrm_participant (
      register_date datetime    COMMENT 'When did contact register for event?',
      source varchar(128)    COMMENT 'Source of this event registration.',
      event_level varchar(255)    COMMENT 'Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that we store the label value rather than an FK as the label stored in custom_option may change, but we dont want that to change the label in place at time of this registration.',
-     is_test tinyint   DEFAULT 0  
+     is_test tinyint   DEFAULT 0
 ,
     PRIMARY KEY ( id )
-  
-,      INDEX FKEY_contact_id ( contact_id ) ,  
+
+,      INDEX FKEY_contact_id ( contact_id ) ,
      FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
-,      INDEX FKEY_event_id ( event_id ) ,  
+,      INDEX FKEY_event_id ( event_id ) ,
      FOREIGN KEY (event_id) REFERENCES civicrm_event(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -126,13 +126,13 @@ CREATE TABLE civicrm_participant_payment (
      id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Participant Payment Id',
      participant_id int unsigned NOT NULL   COMMENT 'Participant Id (FK)',
      payment_entity_table varchar(128)    COMMENT 'Table being referenced for payment entity (expected usage is civicrm_contribution).',
-     payment_entity_id int unsigned NOT NULL   COMMENT 'FK to table with payment record (e.g. civicrm_contribution.id).' 
+     payment_entity_id int unsigned NOT NULL   COMMENT 'FK to table with payment record (e.g. civicrm_contribution.id).'
 ,
     PRIMARY KEY ( id )
-  
-,      INDEX FKEY_participant_id ( participant_id ) ,  
+
+,      INDEX FKEY_participant_id ( participant_id ) ,
      FOREIGN KEY (participant_id) REFERENCES civicrm_participant(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -145,10 +145,10 @@ CREATE TABLE civicrm_currency (
 
      id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Currency Id',
      name varchar(64)    COMMENT 'Currency Name',
-     symbol varchar(8)    COMMENT 'Currency Symbol' 
+     symbol varchar(8)    COMMENT 'Currency Symbol'
 ,
     PRIMARY KEY ( id )
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
@@ -174,7 +174,7 @@ CREATE TABLE civicrm_currency (
 -- * civicrm_contact
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE `civicrm_contact` ADD INDEX `UI_external_identifier` (`external_identifier`);
 
 -- /*******************************************************
@@ -196,7 +196,7 @@ CREATE TABLE civicrm_currency (
 -- /*******************************************************
 -- *
 -- * civicrm_custom_value
--- *  
+-- *
 -- *******************************************************/
 
   ALTER TABLE `civicrm_custom_value` MODIFY float_data double NULL DEFAULT NULL COMMENT 'stores data for ext property data_type = float.';
@@ -228,7 +228,7 @@ CREATE TABLE civicrm_currency (
 
 -- /*******************************************************
 -- *
--- * civicrm_membership_type 
+-- * civicrm_membership_type
 -- *
 -- *******************************************************/
 
@@ -302,12 +302,12 @@ CREATE TABLE civicrm_currency (
 -- *******************************************************/
 
   SELECT @domain_id := id from civicrm_domain;
-  INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-  VALUES 
+  INSERT INTO `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`)
+  VALUES
         (@domain_id, 'participant_status', 'Participant Status', 0, 1),
         (@domain_id, 'participant_role', 'Participant Role', 0, 1),
               (@domain_id, 'event_type', 'Event Type', 0, 1);
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_option_value
@@ -317,8 +317,8 @@ CREATE TABLE civicrm_currency (
   SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'participant_status';
   SELECT @option_group_id_pRole := max(id) from civicrm_option_group where name = 'participant_role';
   SELECT @option_group_id_etype := max(id) from civicrm_option_group where name = 'event_type';
-  
-  INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+
+  INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
   VALUES
     (@option_group_id_ps, 'Registered', 1, 'Registered', NULL, 0, NULL, 1, NULL, 0, 1, 1),
     (@option_group_id_ps, 'Attended',   2, 'Attended',   NULL, 0, NULL, 2, NULL, 0, 0, 1),
@@ -329,7 +329,7 @@ CREATE TABLE civicrm_currency (
     (@option_group_id_pRole, 'Volunteer', 2, 'Volunteer', NULL, 0, NULL, 2, NULL, 0, 0, 1),
     (@option_group_id_pRole, 'Host',      3, 'Host',      NULL, 0, NULL, 3, NULL, 0, 0, 1),
     (@option_group_id_pRole, 'Speaker',   4, 'Speaker',   NULL, 0, NULL, 4, NULL, 0, 0, 1),
-  
+
     (@option_group_id_etype, 'Conference', 1, 'Conference',  NULL, 0, NULL, 1, NULL, 0, 0, 1 ),
     (@option_group_id_etype, 'Exhibition', 2, 'Exhibition',  NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
     (@option_group_id_etype, 'Fundraiser', 3, 'Fundraiser',  NULL, 0, NULL, 3, NULL, 0, 0, 1 ),

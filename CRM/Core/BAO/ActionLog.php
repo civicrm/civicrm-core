@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,12 +24,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,14 +40,13 @@
 class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
 
   /**
-   * Create or update an action log entry
+   * Create or update an action log entry.
    *
-   * @param $params
+   * @param array $params
    *
-   * @return actionLog array
-   * @access public
+   * @return array
    */
-  static function create($params) {
+  public static function create($params) {
     $actionLog = new CRM_Core_DAO_ActionLog();
 
     $params['action_date_time'] = CRM_Utils_Array::value('action_date_time', $params, date('YmdHis'));
@@ -73,5 +72,5 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
 
     return $actionLog;
   }
-}
 
+}

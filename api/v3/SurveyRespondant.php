@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People (c) 2010                              |
  +--------------------------------------------------------------------+
@@ -27,29 +26,33 @@
  */
 
 /**
- * File for the CiviCRM APIv3 Survey Respondant functions
+ * This api exposes CiviCRM Survey Respondant.
+ *
+ * @deprecated - api currently not supported
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Survey
  */
 
 /**
+ * Notify caller of deprecated function.
+ *
  * @deprecated api notice
- * @return string to indicate this entire api entity is deprecated
+ * @return string
+ *   String output indicates this entire api entity as deprecated
  */
 function _civicrm_api3_survey_respondant_deprecation() {
-  return 'The survey_respondant api is not currently supported.';
+  return 'The SurveyRespondant api is not currently supported.';
 }
 
 /**
- * Get the list of signatories
+ * Get the list of signatories.
  *
- * @param  array   $params           (reference ) input parameters
- *
- * @return array (reference )        contribution_id of created or updated record
- * @static void
- * @access public
  * @deprecated - api currently not supported
+ *
+ * @param array $params
+ *   input parameters.
+ *
+ * @return array
  */
 function civicrm_api3_survey_respondant_get(&$params) {
 
@@ -65,7 +68,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
   $interviewerID = NULL;
   if (array_key_exists('interviewer_id', $params)) {
     $interviewerID = $params['interviewer_id'];
-}
+  }
 
   $statusIds = array();
   if (array_key_exists('status_id', $params)) {
@@ -74,11 +77,16 @@ function civicrm_api3_survey_respondant_get(&$params) {
 
   $respondants = CRM_Campaign_BAO_Survey::getSurveyActivities($surveyID, $interviewerID, $statusIds);
 
-  return (civicrm_api3_create_success($respondants, $params));
+  return (civicrm_api3_create_success($respondants, $params, 'SurveyRespondant', 'get'));
 }
 
 /**
+ * Count survey respondents.
+ *
  * @deprecated - api currently not supported
+ *
+ * @param array $params
+ * @return array
  */
 function &civicrm_api3_survey_respondant_count($params) {
 
@@ -93,4 +101,3 @@ function &civicrm_api3_survey_respondant_count($params) {
   }
   return ($signaturesCount);
 }
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,10 +43,8 @@ class CRM_Core_Joomla {
    * to the smarty instance
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function sidebarLeft() {
+  public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();
 
     if ($config->userFrameworkFrontend) {
@@ -73,5 +71,5 @@ class CRM_Core_Joomla {
     $sidebarLeft = $template->fetch('CRM/Block/blocks.tpl');
     $template->assign_by_ref('sidebarLeft', $sidebarLeft);
   }
-}
 
+}

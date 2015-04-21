@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,8 +82,9 @@
     <td class="view-value">
       {$form.target_contact_id.html}
       {if $action eq 1 or $single eq false}
-      <br/>
-      {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      <div class="crm-is-multi-activity-wrapper">
+        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      </div>
       {/if}
     </td>
   </tr>
@@ -103,7 +104,7 @@
           {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+            <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
           {/if}
         {/if}
       </td>
@@ -207,6 +208,14 @@
     </tr>
   {/if}
 
+  {if $action eq 2 OR $action eq 1}
+    <tr class="crm-activity-form-block-recurring_activity">
+      <td colspan="2">
+        {include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=true}
+      </td>
+    </tr>
+  {/if}
+
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
@@ -241,18 +250,23 @@
       {literal}
         <script type="text/javascript">
           CRM.$(function($) {
-            $('.crm-accordion-body').each( function() {
+            var $form = $('form.{/literal}{$form.formClass}{literal}');
+            $('.crm-accordion-body', $form).each( function() {
               //open tab if form rule throws error
               if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
                 $(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-            $('#swap_target_assignee').click(function() {
-              var assignees = $('#assignee_contact_id').select2("data");
-              var targets = $('#target_contact_id').select2("data");
-              $('#assignee_contact_id').select2("data", targets);
-              $('#target_contact_id').select2("data", assignees);
-              return false;
+            function toggleMultiActivityCheckbox() {
+              $('.crm-is-multi-activity-wrapper').toggle(!!($(this).val() && $(this).val().indexOf(',') > 0));
+            }
+            $('[name=target_contact_id]', $form).each(toggleMultiActivityCheckbox).change(toggleMultiActivityCheckbox);
+            $('#swap_target_assignee').click(function(e) {
+              e.preventDefault();
+              var assignees = $('#assignee_contact_id', $form).select2("data");
+              var targets = $('#target_contact_id', $form).select2("data");
+              $('#assignee_contact_id', $form).select2("data", targets);
+              $('#target_contact_id', $form).select2("data", assignees).change();
             });
           });
         </script>
@@ -272,7 +286,7 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=update&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
     {/if}
 
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete activities')}
@@ -284,7 +298,7 @@
     {/if}
   {/if}
   {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
-    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File On Case{/ts}</span></a>
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><div class="icon ui-icon-clipboard"></div>{ts}File on Case{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
@@ -310,3 +324,4 @@
   {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,55 +23,50 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 
 /**
- * This class generates form components for processing a ontribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
-   *Variable defined for Contribution Page Id
-   *
+   * Variable defined for Contribution Page Id.
    */
-
   public $_pageId = NULL;
   public $_id = NULL;
   public $_component = NULL;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   public $_single;
 
   /**
-   * the default values for the form
+   * The default values for the form.
    *
    * @var array
-   * @protected
    */
   protected $_defaults;
 
 
   public function preProcess() {
-    $session          = CRM_Core_Session::singleton();
-    $config           = CRM_Core_Config::singleton();
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
-    $this->_pageId    = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_pageId = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
@@ -119,7 +114,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {
       foreach ($this->_fields as $name => $dontcare) {
@@ -142,10 +137,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
@@ -189,7 +183,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-
     if ($this->_component == 'contribute') {
       $this->assign('campaignName', CRM_Contribute_PseudoConstant::contributionPage($this->_pageId));
     }
@@ -199,7 +192,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     if ($this->_single) {
       $button = array(
-        array('type' => 'next',
+        array(
+          'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
@@ -213,7 +207,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     else {
       $button[] = array(
         'type' => 'next',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       );
@@ -223,19 +217,19 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
-   * @internal param array $options additional user data
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {
@@ -249,9 +243,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -295,5 +288,5 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params, $contactID, 'email');
   }
-}
 
+}

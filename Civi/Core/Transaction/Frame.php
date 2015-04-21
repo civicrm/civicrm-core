@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\Core\Transaction;
 
@@ -33,7 +33,7 @@ namespace Civi\Core\Transaction;
  * and any nested frames are SQL savepoints (SAVEPOINT foo/ROLLBACK TO SAVEPOINT).
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 class Frame {
 
@@ -99,16 +99,22 @@ class Frame {
     $this->refCount--;
   }
 
+  /**
+   * @return bool
+   */
   public function isEmpty() {
     return ($this->refCount == 0);
   }
 
+  /**
+   * @return bool
+   */
   public function isRollbackOnly() {
     return !$this->doCommit;
   }
 
   public function setRollbackOnly() {
-    $this->doCommit = false;
+    $this->doCommit = FALSE;
   }
 
   public function begin() {
@@ -120,7 +126,7 @@ class Frame {
   }
 
   /**
-   * @param type $newState
+   * @param int $newState
    * @void
    */
   public function finish($newState = self::F_DONE) {
@@ -152,26 +158,29 @@ class Frame {
   }
 
   /**
-   * Add a transaction callback
+   * Add a transaction callback.
    *
    * Pre-condition: isActive()
    *
-   * @param int $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param mixed $callback A PHP callback
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param mixed $callback
+   *   A PHP callback.
    * @param array|NULL $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
+   * @param null $id
    */
-  public function addCallback($phase, $callback, $params = null, $id = NULL) {
+  public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {
       $this->callbacks[$phase][$id] = array(
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params))
+        'parameters' => (is_array($params) ? $params : array($params)),
       );
     }
     else {
       $this->callbacks[$phase][] = array(
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params))
+        'parameters' => (is_array($params) ? $params : array($params)),
       );
     }
   }

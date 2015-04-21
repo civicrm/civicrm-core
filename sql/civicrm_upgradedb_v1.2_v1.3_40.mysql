@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -40,7 +40,7 @@ CREATE TABLE civicrm_accept_credit_card (
      name varchar(64)    COMMENT ' Credit Card Type as defined by the payment processor.',
      title varchar(64)    COMMENT 'Descriptive Credit Card Name.',
      is_reserved tinyint    COMMENT 'Is this a predefined system object?',
-     is_active tinyint    COMMENT 'Is this property active?' 
+     is_active tinyint    COMMENT 'Is this property active?'
 ,
     PRIMARY KEY ( id )
 
@@ -67,25 +67,25 @@ CREATE TABLE civicrm_contribution_type (
      description varchar(255)    COMMENT 'Contribution Type Description.',
      is_deductible tinyint   DEFAULT 1 COMMENT 'Is this contribution type tax-deductible? If true, contributions of this type may be fully OR partially deductible - non-deductible amount is stored in the Contribution record.',
      is_reserved tinyint    COMMENT 'Is this a predefined system object?',
-     is_active tinyint    COMMENT 'Is this property active?' 
+     is_active tinyint    COMMENT 'Is this property active?'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX UI_name_domain_id(
         name
       , domain_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
 -- *
 -- * civicrm_payment_instrument
 -- *
--- * 
+-- *
 -- *
 -- *******************************************************/
 
@@ -97,18 +97,18 @@ CREATE TABLE civicrm_payment_instrument (
      name varchar(64)    COMMENT ' Payment Instrument Name.',
      description varchar(255)    COMMENT ' Payment Instrument Description.',
      is_reserved tinyint    COMMENT 'Is this a predefined system object?',
-     is_active tinyint    COMMENT 'Is this property active?' 
+     is_active tinyint    COMMENT 'Is this property active?'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX UI_name_domain_id(
         name
       , domain_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -119,7 +119,7 @@ CREATE TABLE civicrm_payment_instrument (
 -- *
 -- *
 -- *******************************************************/
- 
+
    CREATE TABLE civicrm_contribution (
 
 
@@ -140,10 +140,10 @@ CREATE TABLE civicrm_payment_instrument (
      cancel_reason text    ,
      receipt_date datetime    COMMENT 'when (if) receipt was sent; populated automatically for online donations w/ automatic receipting',
      thankyou_date datetime    COMMENT 'when (if) was donor thanked',
-     source varchar(255)    COMMENT 'Origin of this Contribution.' 
+     source varchar(255)    COMMENT 'Origin of this Contribution.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     UNIQUE INDEX UI_contrib_trxn_id_domain_id(
         trxn_id
       , domain_id
@@ -152,16 +152,16 @@ CREATE TABLE civicrm_payment_instrument (
         invoice_id
       , domain_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_contact_id ( contact_id ) ,  
+,      INDEX FKEY_contact_id ( contact_id ) ,
      FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
-,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,  
+,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,
      FOREIGN KEY (contribution_type_id) REFERENCES civicrm_contribution_type(id)
-,      INDEX FKEY_payment_instrument_id ( payment_instrument_id ) ,  
+,      INDEX FKEY_payment_instrument_id ( payment_instrument_id ) ,
      FOREIGN KEY (payment_instrument_id) REFERENCES civicrm_payment_instrument(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -194,40 +194,40 @@ CREATE TABLE civicrm_payment_instrument (
      cc_receipt varchar(255)    COMMENT 'comma-separated list of email addresses to cc each time a receipt is sent',
      bcc_receipt varchar(255)    COMMENT 'comma-separated list of email addresses to bcc each time a receipt is sent',
      receipt_text text    COMMENT 'text to include above standard receipt info on receipt email; emails are text-only, so do not allow html for now',
-     is_active tinyint    COMMENT 'Is this property active?' 
+     is_active tinyint    COMMENT 'Is this property active?'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,  
+,      INDEX FKEY_contribution_type_id ( contribution_type_id ) ,
      FOREIGN KEY (contribution_type_id) REFERENCES civicrm_contribution_type(id)
-  
+
 )  TYPE=InnoDB  ;
 
 -- /*******************************************************
 -- *
 -- * civicrm_dupe_match
 -- *
--- * 
+-- *
 -- *
 -- *******************************************************/
-  
+
 CREATE TABLE civicrm_dupe_match (
 
 
      id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique DupeMatch ID',
      domain_id int unsigned NOT NULL   COMMENT 'Which Domain owns this contact',
      entity_table varchar(64) NOT NULL   COMMENT 'Name Of Entity Table',
-     rule varchar(255) NOT NULL   COMMENT 'String that can Contains valid civicrm core or custom field name,parenthesis,,AND,OR ' 
+     rule varchar(255) NOT NULL   COMMENT 'String that can Contains valid civicrm core or custom field name,parenthesis,,AND,OR '
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -235,10 +235,10 @@ CREATE TABLE civicrm_dupe_match (
 -- *
 -- * civicrm_financial_trxn
 -- *
--- * 
+-- *
 -- *
 -- *******************************************************/
-  
+
    CREATE TABLE civicrm_financial_trxn (
 
 
@@ -254,10 +254,10 @@ CREATE TABLE civicrm_dupe_match (
      currency varchar(64) NOT NULL   COMMENT '3 character string, value derived from payment processor config setting.',
      payment_processor varchar(64) NOT NULL   COMMENT 'derived from Processor setting in civicrm.settings.php.',
      trxn_id varchar(255) NOT NULL   COMMENT 'unique processor transaction id, bank id + trans id,... depending on payment_method',
-     trxn_result_code varchar(255)    COMMENT 'processor result code' 
+     trxn_result_code varchar(255)    COMMENT 'processor result code'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_entity(
         entity_table
       , entity_id
@@ -266,10 +266,10 @@ CREATE TABLE civicrm_dupe_match (
         trxn_id
       , domain_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -278,7 +278,7 @@ CREATE TABLE civicrm_dupe_match (
 -- *
 -- * civicrm_module_profile
 -- *
--- * 
+-- *
 -- *
 -- *******************************************************/
 
@@ -291,28 +291,28 @@ CREATE TABLE civicrm_dupe_match (
      entity_table varchar(64)    COMMENT 'physical tablename for entity being extended by this data, e.g. civicrm_contact',
      entity_id int unsigned NOT NULL   COMMENT 'FK to record in the entity table specified by entity_table column.',
      uf_group_id int unsigned NOT NULL   COMMENT 'Which form does this field belong to.',
-     weight int NOT NULL  DEFAULT 1 COMMENT 'each internal or external module uses this to order multiple profiles associated with an entity_id' 
+     weight int NOT NULL  DEFAULT 1 COMMENT 'each internal or external module uses this to order multiple profiles associated with an entity_id'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_entity(
         entity_table
       , entity_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      INDEX FKEY_uf_group_id ( uf_group_id ) ,  
+,      INDEX FKEY_uf_group_id ( uf_group_id ) ,
      FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
-  
+
 )  TYPE=InnoDB  ;
-  
+
 
 -- /*******************************************************
 -- *
 -- * civicrm_uf_join
 -- *
--- * 
+-- *
 -- *
 -- *******************************************************/
 
@@ -325,19 +325,19 @@ CREATE TABLE civicrm_dupe_match (
      entity_table varchar(64)    COMMENT 'Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.',
      entity_id int unsigned    COMMENT 'Foreign key to the referenced item.',
      weight int NOT NULL  DEFAULT 1 COMMENT 'Controls display order when multiple user framework groups are setup for concurrent display.',
-     uf_group_id int unsigned NOT NULL   COMMENT 'Which form does this field belong to.' 
+     uf_group_id int unsigned NOT NULL   COMMENT 'Which form does this field belong to.'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_entity(
         entity_table
       , entity_id
   )
-  
-,      INDEX FKEY_uf_group_id ( uf_group_id ) ,  
+
+,      INDEX FKEY_uf_group_id ( uf_group_id ) ,
      FOREIGN KEY (uf_group_id) REFERENCES civicrm_uf_group(id)
-  
-)  TYPE=InnoDB  ;    
+
+)  TYPE=InnoDB  ;
 
 
 -- /*******************************************************
@@ -348,12 +348,12 @@ CREATE TABLE civicrm_dupe_match (
 
    INSERT INTO `civicrm_contribution_type` VALUES (1, 1, 'Donation', NULL, NULL, 1, 0, 1);
    INSERT INTO `civicrm_contribution_type` VALUES (2, 1, 'Member Dues', NULL, NULL, 1, 0, 1);
-   INSERT INTO `civicrm_contribution_type` VALUES (3, 1, 'Campaign Contribution', NULL, NULL, 0, 0, 1);   
+   INSERT INTO `civicrm_contribution_type` VALUES (3, 1, 'Campaign Contribution', NULL, NULL, 0, 0, 1);
 
    INSERT INTO `civicrm_payment_instrument` VALUES (1, 1, 'Credit Card', NULL, 1, 1);
    INSERT INTO `civicrm_payment_instrument` VALUES (2, 1, 'Debit Card', NULL, 1, 1);
    INSERT INTO `civicrm_payment_instrument` VALUES (3, 1, 'Cash', NULL, 1, 1);
-   INSERT INTO `civicrm_payment_instrument` VALUES (4, 1, 'Check', NULL, 1, 1); 
+   INSERT INTO `civicrm_payment_instrument` VALUES (4, 1, 'Check', NULL, 1, 1);
    INSERT INTO `civicrm_payment_instrument` VALUES (5, 1, 'EFT', NULL, 1, 1);
 
    INSERT INTO `civicrm_dupe_match` VALUES (1, 1, 'contact_individual', 'first_name AND last_name AND email');
@@ -364,7 +364,7 @@ CREATE TABLE civicrm_dupe_match (
 -- * Modify the civicrm_uf_group  Table Structure
 -- *
 -- *******************************************************/
-  
+
     ALTER TABLE `civicrm_uf_group` DROP `weight` ;
 
 
@@ -376,14 +376,14 @@ CREATE TABLE civicrm_dupe_match (
 
    ALTER TABLE `civicrm_uf_field` DROP `is_registration` ,
                                   DROP `is_match` ;
-   
+
    ALTER TABLE `civicrm_uf_field` ADD `location_type_id` INT UNSIGNED COMMENT 'Location type of this mapping, if required';
-   ALTER TABLE `civicrm_uf_field` ADD INDEX (`location_type_id`);  
+   ALTER TABLE `civicrm_uf_field` ADD INDEX (`location_type_id`);
    ALTER TABLE `civicrm_uf_field` ADD FOREIGN KEY (`location_type_id`) REFERENCES `civicrm_location_type` (`id`);
 
    ALTER TABLE `civicrm_uf_field` ADD `phone_type` VARCHAR( 64 )   COMMENT 'Phone type, if required';
- 
-   
+
+
 
 -- /*******************************************************
 -- *
@@ -391,11 +391,11 @@ CREATE TABLE civicrm_dupe_match (
 -- *
 -- *******************************************************/
 
-   
+
     ALTER TABLE `civicrm_custom_option` ADD `entity_table` VARCHAR( 64 )  COMMENT 'Name of table where item being referenced is stored.' ;
     UPDATE `civicrm_custom_option` SET `entity_table` = 'civicrm_custom_field' ;
 
-    ALTER TABLE `civicrm_custom_option` ADD `entity_id`  INT( 10 ) UNSIGNED DEFAULT '0' NOT NULL; 
+    ALTER TABLE `civicrm_custom_option` ADD `entity_id`  INT( 10 ) UNSIGNED DEFAULT '0' NOT NULL;
     UPDATE `civicrm_custom_option` SET entity_id = custom_field_id;
 
     ALTER TABLE `civicrm_custom_option` DROP KEY `UI_label_custom_field_id`;
@@ -431,7 +431,7 @@ CREATE TABLE civicrm_dupe_match (
 -- * Modify the  civicrm_custom_field Table Structure
 -- *
 -- *******************************************************/
-   
+
    ALTER TABLE `civicrm_custom_field` CHANGE `html_type` `html_type` ENUM( 'Text', 'TextArea', 'Select', 'Multi-Select', 'Radio', 'CheckBox', 'Select Date', 'Select State/Province', 'Select Country' ) DEFAULT NULL COMMENT 'HTML types plus several built-in extended types.';
 
 
@@ -440,7 +440,7 @@ CREATE TABLE civicrm_dupe_match (
 -- * Drop Old Tables
 -- *
 -- *******************************************************/
- 
+
    DROP TABLE IF EXISTS civicrm_donation_page;
 
 

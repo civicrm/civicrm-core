@@ -1,8 +1,8 @@
- {*
+{*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,13 +30,16 @@
   CRM.config.userFramework = {$config->userFramework|@json_encode};
   CRM.config.resourceBase = {$config->resourceBase|@json_encode};
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
+  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$config->dateInputFormat|@json_encode};
+  CRM.config.timeIs24Hr = {if $config->timeInputFormat eq 2}true{else}false{/if};
+  CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode};
 
-  // Contact create links
-  if (CRM.profileCreate !== false) CRM.profileCreate = {$contactCreate|@json_encode};
+  // Merge entityRef settings
+  CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
   CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
-  CRM.formatMoney('init', {$moneyFormat});
+  CRM.formatMoney('init', false, {$moneyFormat});
 
   // Localize select2
   $.fn.select2.defaults.formatNoMatches = "{ts escape='js'}None found.{/ts}";

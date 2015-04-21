@@ -74,5 +74,5 @@
      <path>civicrm/report/chart</path>
      <page_callback>CRM_Report_Form::uploadChartImage</page_callback>
      <access_arguments>access CiviReport</access_arguments>
-  </item> 
+  </item>
 </menu>

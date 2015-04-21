@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\Core\Transaction;
 
 /**
  *
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 class Manager {
 
@@ -63,17 +63,19 @@ class Manager {
   }
 
   /**
-   * @param CRM_Core_DAO $dao handle for the DB connection that will execute transaction statements
+   * @param CRM_Core_DAO $dao
+   *   Handle for the DB connection that will execute transaction statements.
    *   (all we really care about is the query() function)
    */
-  function __construct($dao) {
+  public function __construct($dao) {
     $this->dao = $dao;
   }
 
   /**
    * Increment the transaction count / add a new transaction level
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    */
@@ -151,16 +153,17 @@ class Manager {
    * @return \Civi\Core\Transaction\Frame
    */
   public function getBaseFrame() {
-    if (empty($this->frames)) return NULL;
-    return $this->frames[count($this->frames)-1];
+    if (empty($this->frames)) {
+      return NULL;
+    }
+    return $this->frames[count($this->frames) - 1];
   }
 
   /**
    * @return \Civi\Core\Transaction\Frame
    */
   protected function createBaseFrame() {
-    return new Frame($this->dao, 'BEGIN', 'COMMIT', 'ROLLBACK');
-    ;
+    return new Frame($this->dao, 'BEGIN', 'COMMIT', 'ROLLBACK');;
   }
 
   /**

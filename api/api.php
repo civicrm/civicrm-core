@@ -1,16 +1,14 @@
 <?php
 
 /**
- * File for the CiviCRM APIv3 API wrapper
+ * @file CiviCRM APIv3 API wrapper.
  *
  * @package CiviCRM_APIv3
- * @subpackage API
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: api.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**
+ * CiviCRM API wrapper function.
+ *
  * @param string $entity
  *   type of entities to deal with
  * @param string $action
@@ -26,11 +24,16 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 }
 
 /**
- * Version 3 wrapper for civicrm_api. Throws exception
+ * Version 3 wrapper for civicrm_api.
  *
- * @param string $entity type of entities to deal with
- * @param string $action create, get, delete or some special action name.
- * @param array $params array to be passed to function
+ * Throws exception.
+ *
+ * @param string $entity
+ *   Type of entities to deal with.
+ * @param string $action
+ *   Create, get, delete or some special action name.
+ * @param array $params
+ *   Array to be passed to function.
  *
  * @throws CiviCRM_API3_Exception
  * @return array
@@ -38,37 +41,43 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 function civicrm_api3($entity, $action, $params = array()) {
   $params['version'] = 3;
   $result = civicrm_api($entity, $action, $params);
-  if(is_array($result) && !empty($result['is_error'])){
+  if (is_array($result) && !empty($result['is_error'])) {
     throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
   }
   return $result;
 }
 
 /**
- * Function to call getfields from api wrapper. This function ensures that settings that could alter
- * getfields output (e.g. action for all api & profile_id for profile api ) are consistently passed in.
+ * Call getfields from api wrapper.
  *
- * We check whether the api call is 'getfields' because if getfields is being called we return an empty array
- * as no alias swapping, validation or default filling is done on getfields & we want to avoid a loop
+ * This function ensures that settings that
+ * could alter getfields output (e.g. action for all api & profile_id for
+ * profile api ) are consistently passed in.
+ *
+ * We check whether the api call is 'getfields' because if getfields is
+ * being called we return an empty array as no alias swapping, validation or
+ * default filling is done on getfields & we want to avoid a loop
  *
  * @todo other output modifiers include contact_type
  *
  * @param array $apiRequest
- * @return array getfields output
+ *
+ * @return array
+ *   getfields output
  */
 function _civicrm_api3_api_getfields(&$apiRequest) {
   if (strtolower($apiRequest['action'] == 'getfields')) {
     // the main param getfields takes is 'action' - however this param is not compatible with REST
     // so we accept 'api_action' as an alias of action on getfields
     if (!empty($apiRequest['params']['api_action'])) {
-    //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
-     // unset($apiRequest['params']['api_action']);
+      //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
+      // unset($apiRequest['params']['api_action']);
     }
     return array('action' => array('api.aliases' => array('api_action')));
   }
   $getFieldsParams = array('action' => $apiRequest['action']);
   $entity = $apiRequest['entity'];
-  if($entity == 'profile' && array_key_exists('profile_id', $apiRequest['params'])) {
+  if ($entity == 'Profile' && array_key_exists('profile_id', $apiRequest['params'])) {
     $getFieldsParams['profile_id'] = $apiRequest['params']['profile_id'];
   }
   $fields = civicrm_api3($entity, 'getfields', $getFieldsParams);
@@ -83,11 +92,8 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *
  * @param $result
  *
- * @internal param array $params (reference ) input parameters
- *
- * @return boolean true if error, false otherwise
- * @static void
- * @access public
+ * @return bool
+ *   true if error, false otherwise
  */
 function civicrm_error($result) {
   if (is_array($result)) {
@@ -99,39 +105,37 @@ function civicrm_error($result) {
 }
 
 /**
- * @param $entity
- * @param null $version
+ * Get camel case version of entity name.
  *
- * @return string
+ * @param string|null $entity
+ *
+ * @return string|null
  */
-function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  $fragments = explode('_', $entity);
-  foreach ($fragments as & $fragment) {
-    $fragment = ucfirst($fragment);
-  }
-  // Special case: UFGroup, UFJoin, UFMatch, UFField
-  if ($fragments[0] === 'Uf') {
-    $fragments[0] = 'UF';
-  }
-  return implode('', $fragments);
+function _civicrm_api_get_camel_name($entity) {
+  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
 }
 
 /**
- * Swap out any $values vars - ie. the value after $value is swapped for the parent $result
+ * Swap out any $values vars.
+ *
+ * Ie. the value after $value is swapped for the parent $result
  * 'activity_type_id' => '$value.testfield',
-   'tag_id'  => '$value.api.tag.create.id',
-    'tag1_id' => '$value.api.entity.create.0.id'
+ * 'tag_id'  => '$value.api.tag.create.id',
+ * 'tag1_id' => '$value.api.entity.create.0.id'
+ *
+ * @param array $params
+ * @param array $parentResult
+ * @param string $separator
  */
-function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResult, $separator = '.') {
-
+function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
 
   foreach ($params as $field => $value) {
 
     if (is_string($value) && substr($value, 0, 6) == '$value') {
-      $valuesubstitute = substr($value, 7);
+      $valueSubstitute = substr($value, 7);
 
-      if (!empty($parentResult[$valuesubstitute])) {
-        $params[$field] = $parentResult[$valuesubstitute];
+      if (!empty($parentResult[$valueSubstitute])) {
+        $params[$field] = $parentResult[$valueSubstitute];
       }
       else {
 
@@ -146,8 +150,8 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
           $fieldname .= "." . array_shift($stringParts);
           if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
             $arrayLocation = $parentResult[$fieldname];
-            foreach ($stringParts as $key => $value) {
-              $arrayLocation = CRM_Utils_Array::value($value, $arrayLocation);
+            foreach ($stringParts as $key => $innerValue) {
+              $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
             }
             $params[$field] = $arrayLocation;
           }
@@ -159,15 +163,17 @@ function _civicrm_api_replace_variables($entity, $action, &$params, &$parentResu
 }
 
 /**
- * Convert possibly camel name to underscore separated entity name
+ * Convert possibly camel name to underscore separated entity name.
  *
- * @param string $entity entity name in various formats e.g. Contribution, contribution, OptionValue, option_value, UFJoin, uf_join
- * @return string $entity entity name in underscore separated format
+ * @param string $entity
+ *   Entity name in various formats e.g. Contribution, contribution,
+ *   OptionValue, option_value, UFJoin, uf_join.
  *
- * FIXME: Why isn't this called first thing in civicrm_api wrapper?
+ * @return string
+ *   Entity name in underscore separated format.
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
-  if ($entity == strtolower($entity)) {
+  if (!$entity || $entity === strtolower($entity)) {
     return $entity;
   }
   else {
@@ -181,12 +187,14 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 }
 
 /**
- * Having a DAO object find the entity name
- * @param object $bao DAO being passed in
+ * Having a DAO object find the entity name.
+ *
+ * @param object $bao
+ *   DAO being passed in.
+ *
  * @return string
  */
-function _civicrm_api_get_entity_name_from_dao($bao){
+function _civicrm_api_get_entity_name_from_dao($bao) {
   $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return _civicrm_api_get_entity_name_from_camel(CRM_Core_DAO_AllCoreTables::getBriefName($daoName));
+  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 }
-

@@ -1,52 +1,52 @@
 <?php
 /*
  +----------------------------------------------------------------------------+
- | Elavon (Nova) Virtual Merchant Core Payment Module for CiviCRM version 4.5 |
+ | Elavon (Nova) Virtual Merchant Core Payment Module for CiviCRM version 4.6 |
  +----------------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0            |
  |                                                                            |
  | Written & Contributed by Eileen McNaughton - Nov March 2008                |
  +----------------------------------------------------------------------------+
-*/
+ */
 
 /**
- -----------------------------------------------------------------------------------------------
- The basic functionality of this processor is that variables from the $params object are transformed
- into xml. The xml is submitted to the processor's https site
- using curl and the response is translated back into an array using the processor's function.
-
- If an array ($params) is returned to the calling function the values from
- the array are merged into the calling functions array.
-
- If an result of class error is returned it is treated as a failure. No error denotes a success. Be
- WARY of this when coding
-
- -----------------------------------------------------------------------------------------------
- **/
+ * -----------------------------------------------------------------------------------------------
+ * The basic functionality of this processor is that variables from the $params object are transformed
+ * into xml. The xml is submitted to the processor's https site
+ * using curl and the response is translated back into an array using the processor's function.
+ *
+ * If an array ($params) is returned to the calling function the values from
+ * the array are merged into the calling functions array.
+ *
+ * If an result of class error is returned it is treated as a failure. No error denotes a success. Be
+ * WARY of this when coding
+ *
+ * -----------------------------------------------------------------------------------------------
+ */
 class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
-  CONST
-  CHARSET = 'UFT-8';
+  const
+    CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
-   * @static
+   * @var CRM_Core_Payment_Elavon
    */
   static private $_singleton = NULL;
 
-  /**********************************************************
-   * Constructor
+  /**
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
-   * @return \CRM_Core_Payment_Elavon *******************************************************
+   * @return CRM_Core_Payment_Elavon
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -54,35 +54,17 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
-   *
-   * @param string $mode the mode of operation: live or test
-   *
-   * @param object $paymentProcessor
-   *
-   * @return object
-   * @static
-   */
-  static function &singleton($mode, &$paymentProcessor) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_Elavon($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  /**********************************************************
    * This function is set up and put here to make the mapping of fields
    * from the params object  as visually clear as possible for easy editing
    *
-   *  Comment out irrelevant fields
-   **********************************************************/
-  function mapProcessorFieldstoParams($params) {
+   * Comment out irrelevant fields
+   * @param $params
+   * @return array
+   */
+  public function mapProcessorFieldstoParams($params) {
 
-    /**********************************************************
-     * compile array
-     * Payment Processor field name fields from $params array
-     **********************************************************/
+    // compile array
+    // Payment Processor field name fields from $params array
     // credit card name
     $requestFields['ssl_first_name'] = $params['billing_first_name'];
     // credit card name
@@ -114,7 +96,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $requestFields['ssl_customer_code'] = '1111';
     $requestFields['ssl_salestax'] = 0.0;
 
-
     /************************************************************************************
      *  Fields available from civiCRM not implemented for Elavon
      *
@@ -130,11 +111,14 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $requestFields;
   }
 
-  /**********************************************************
+  /**
    * This function sends request and receives response from
    * the processor
-   **********************************************************/
-  function doDirectPayment(&$params) {
+   * @param array $params
+   * @return array|object
+   * @throws Exception
+   */
+  public function doDirectPayment(&$params) {
     if (isset($params['is_recur']) && $params['is_recur'] == TRUE) {
       CRM_Core_Error::fatal(ts('Elavon - recurring payments not implemented'));
     }
@@ -143,17 +127,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       CRM_Core_Error::fatal(ts('Elavon / Nova Virtual Merchant Gateway requires curl with SSL support'));
     }
 
-    /*
-         *Create the array of variables to be sent to the processor from the $params array
-         * passed into this function
-         */
-
+    //Create the array of variables to be sent to the processor from the $params array
+    // passed into this function
     $requestFields = self::mapProcessorFieldstoParams($params);
 
-    /*
-         * define variables for connecting with the gateway
-         */
-
+    // define variables for connecting with the gateway
     $requestFields['ssl_merchant_id'] = $this->_paymentProcessor['user_name'];
     $requestFields['ssl_user_id'] = $this->_paymentProcessor['password'];
     $requestFields['ssl_pin'] = $this->_paymentProcessor['signature'];
@@ -166,21 +144,15 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $requestFields);
 
-    /**********************************************************
-     * Check to see if we have a duplicate before we send
-     **********************************************************/
+    // Check to see if we have a duplicate before we send
     if ($this->_checkDupe($params['invoiceID'])) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
-    /**********************************************************
-     * Convert to XML using function below
-     **********************************************************/
+    // Convert to XML using function below
     $xml = self::buildXML($requestFields);
 
-    /**********************************************************
-     * Send to the payment processor using cURL
-     **********************************************************/
+    // Send to the payment processor using cURL
 
     $chHost = $host . '?xmldata=' . $xml;
 
@@ -201,29 +173,26 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     }
 
-    /**********************************************************
-     * Send the data out over the wire
-     **********************************************************/
+    // Send the data out over the wire
     $responseData = curl_exec($ch);
 
-    /**********************************************************
-     * See if we had a curl error - if so tell 'em and bail out
-     *
-     * NOTE: curl_error does not return a logical value (see its documentation), but
-     *       a string, which is empty when there was no error.
-     **********************************************************/
+    // See if we had a curl error - if so tell 'em and bail out
+    // NOTE: curl_error does not return a logical value (see its documentation), but
+    // a string, which is empty when there was no error.
     if ((curl_errno($ch) > 0) || (strlen(curl_error($ch)) > 0)) {
       curl_close($ch);
       $errorNum = curl_errno($ch);
       $errorDesc = curl_error($ch);
 
       // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum = 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc . " Try this link for more information http://curl.haxx.se/docs/sslcerts.html");
       }
@@ -231,51 +200,40 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       return self::errorExit($errorNum, "Curl error - " . $errorDesc . " your key is located at " . $key . " the url is " . $host . " xml is " . $requestxml . " processor response = " . $processorResponse);
     }
 
-    /**********************************************************
-     * If null data returned - tell 'em and bail out
-     *
-     * NOTE: You will not necessarily get a string back, if the request failed for
-     *       any reason, the return value will be the boolean false.
-     **********************************************************/
+    // If null data returned - tell 'em and bail out
+    // NOTE: You will not necessarily get a string back, if the request failed for
+    // any reason, the return value will be the boolean false.
     if (($responseData === FALSE) || (strlen($responseData) == 0)) {
       curl_close($ch);
       return self::errorExit(9006, "Error: Connection to payment gateway failed - no data returned.");
     }
 
-    /**********************************************************
-     // If gateway returned no data - tell 'em and bail out
-     **********************************************************/
+    // If gateway returned no data - tell 'em and bail out
     if (empty($responseData)) {
       curl_close($ch);
       return self::errorExit(9007, "Error: No data returned from payment gateway.");
     }
 
-    /**********************************************************
-     // Success so far - close the curl and check the data
-     **********************************************************/
+    // Success so far - close the curl and check the data
     curl_close($ch);
 
-    /**********************************************************
-     * Payment successfully sent to gateway - process the response now
-     **********************************************************/
+    // Payment successfully sent to gateway - process the response now
 
     $processorResponse = self::decodeXMLResponse($responseData);
-    /*success in test mode returns response "APPROVED"
-         * test mode always returns trxn_id = 0
-         * fix for CRM-2566
-         **********************************************************/
-
+    // success in test mode returns response "APPROVED"
+    // test mode always returns trxn_id = 0
+    // fix for CRM-2566
 
     if ($processorResponse['errorCode']) {
       return self::errorExit(9010, "Error: [" . $processorResponse['errorCode'] . " " . $processorResponse['errorName'] . " " . $processorResponse['errorMessage'] . "] - from payment processor");
     }
     if ($processorResponse['ssl_result_message'] == "APPROVED") {
       if ($this->_mode == 'test') {
-        $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
-        $p                 = array();
-        $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
-        $trxn_id           = str_replace('test', '', $trxn_id);
-        $trxn_id           = intval($trxn_id) + 1;
+        $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
+        $p = array();
+        $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+        $trxn_id = str_replace('test', '', $trxn_id);
+        $trxn_id = intval($trxn_id) + 1;
         $params['trxn_id'] = sprintf('test%08d', $trxn_id);
         return $params;
       }
@@ -289,12 +247,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       return self::errorExit(9009, "Error: [" . $processorResponse['ssl_result_message'] . " " . $processorResponse['ssl_result'] . "] - from payment processor");
     }
     else {
-      /*
-             * Success !
-             */
-
-      if ($this->_mode == 'test') {}
-      else {
+      // Success !
+      if ($this->_mode != 'test') {
         // 'trxn_id' is varchar(255) field. returned value is length 37
         $params['trxn_id'] = $processorResponse['ssl_txn_id'];
       }
@@ -304,25 +258,29 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       return $params;
     }
   }
-  // end function doDirectPayment
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Checks to see if invoice_id already exists in db.
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $invoiceId
+   *   The ID to check.
    *
-   * @return bool                  True if ID exists, else false
+   * @return bool
+   *   True if ID exists, else false
    */
-  function _checkDupe($invoiceId) {
+  public function _checkDupe($invoiceId) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $invoiceId;
     return $contribution->find();
   }
 
-  /**************************************************
-   * Produces error message and returns from class
-   **************************************************/
-  function &errorExit($errorCode = NULL, $errorMessage = NULL) {
+  /**
+   * Produces error message and returns from class.
+   * @param string $errorCode
+   * @param string $errorMessage
+   * @return CRM_Core_Error
+   */
+  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -333,29 +291,24 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $e;
   }
 
-  /**************************************************
+  /**
    * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
-  function doTransferCheckout(&$params, $component) {
+   */
+  public function doTransferCheckout(&$params, $component) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /********************************************************************************************
-   * This public function checks to see if we have the right processor config values set
+  /**
+   * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *  register any credit card details
    *
-   * @return null|string
-   * @internal param string $mode the mode we are operating in (live or test) - not used
+   * @return string|null
+   *   $errorMsg if any errors found - null if OK
    *
-   * returns string $errorMsg if any errors found - null if OK
-   *
-   ******************************************************************************************
    */
-  //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
-  // CiviCRM V2.0 Declaration
-  function checkConfig() {
+  public function checkConfig() {
     $errorMsg = array();
 
     if (empty($this->_paymentProcessor['user_name'])) {
@@ -373,13 +326,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
       return NULL;
     }
   }
-  //end check config
+
   /**
    * @param $requestFields
    *
    * @return string
    */
-  function buildXML($requestFields) {
+  public function buildXML($requestFields) {
     $xmlFieldLength['ssl_first_name'] = 15;
     // credit card name
     $xmlFieldLength['ssl_last_name'] = 15;
@@ -424,7 +377,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    *
    * @return string
    */
-  function tidyStringforXML($value, $fieldlength) {
+  public function tidyStringforXML($value, $fieldlength) {
     // the xml is posted to a url so must not contain spaces etc. It also needs to be cut off at a certain
     // length to match the processor's field length. The cut needs to be made after spaces etc are
     // transformed but must not include a partial transformed character e.g. %20 must be in or out not half-way
@@ -436,13 +389,17 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $xmlString;
   }
 
-  /************************************************************************
+  /**
    * Simple function to use in place of the 'simplexml_load_string' call.
    *
    * It returns the NodeValue for a given NodeName
    * or returns an empty string.
-   ************************************************************************/
-  function GetNodeValue($NodeName, &$strXML) {
+   *
+   * @param string $NodeName
+   * @param string $strXML
+   * @return string
+   */
+  public function GetNodeValue($NodeName, &$strXML) {
     $OpeningNodeName = "<" . $NodeName . ">";
     $ClosingNodeName = "</" . $NodeName . ">";
 
@@ -465,15 +422,12 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * @param $Xml
+   * @param string $Xml
    *
    * @return mixed
    */
-  function decodeXMLresponse($Xml) {
-
-    /**
-     * $xtr = simplexml_load_string($Xml) or die ("Unable to load XML string!");
-     **/
+  public function decodeXMLresponse($Xml) {
+    $processorResponse = array();
 
     $processorResponse['ssl_result'] = self::GetNodeValue("ssl_result", $Xml);
     $processorResponse['ssl_result_message'] = self::GetNodeValue("ssl_result_message", $Xml);
@@ -487,5 +441,5 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
     return $processorResponse;
   }
-}
 
+}

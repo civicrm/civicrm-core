@@ -71,13 +71,13 @@
 					.attr('id', options.listClass + index);
 
 				$container = $("<div></div>")
-					.addClass(options.containerClass) 
-					.attr('id', options.containerClass + index); 
+					.addClass(options.containerClass)
+					.attr('id', options.containerClass + index);
 
 				buildSelect();
 
 				$select.change(selectChangeEvent)
-					.click(selectClickEvent); 
+					.click(selectClickEvent);
 
 				$original.change(originalChangeEvent)
 					.wrap($container).before($select).before($ol);
@@ -102,31 +102,31 @@
 
 						$(this).children("li").each(function(n) {
 
-							$option = $('#' + $(this).attr('rel')); 
+							$option = $('#' + $(this).attr('rel'));
 
 							if($(this).is(".ui-sortable-helper")) {
-								updatedOptionId = $option.attr('id'); 
+								updatedOptionId = $option.attr('id');
 								return;
 							}
 
-							$original.append($option); 
-						}); 
+							$original.append($option);
+						});
 
-						if(updatedOptionId) triggerOriginalChange(updatedOptionId, 'sort'); 
+						if(updatedOptionId) triggerOriginalChange(updatedOptionId, 'sort');
 					}
 
-				}).addClass(options.listSortableClass); 
+				}).addClass(options.listSortableClass);
 			}
 
 			function selectChangeEvent(e) {
-				
+
 				// an item has been selected on the regular select we created
 				// check to make sure it's not an IE screwup, and add it to the list
 
 				if($.browser.msie && $.browser.version < 7 && !ieClick) return;
-				var id = $(this).children("option:selected").slice(0,1).attr('rel'); 
-				addListItem(id); 	
-				ieClick = false; 
+				var id = $(this).children("option:selected").slice(0,1).attr('rel');
+				addListItem(id);
+				ieClick = false;
 				triggerOriginalChange(id, 'add'); // for use by user-defined callbacks
 			}
 
@@ -136,7 +136,7 @@
 				// making sure a click preceded the change() event reduces the chance
 				// if unintended items being added. there may be a better solution?
 
-				ieClick = true; 
+				ieClick = true;
 			}
 
 			function originalChangeEvent(e) {
@@ -145,8 +145,8 @@
 				// on the original <select multiple>, so rebuild ours
 
 				if(ignoreOriginalChangeEvent) {
-					ignoreOriginalChangeEvent = false; 
-					return; 
+					ignoreOriginalChangeEvent = false;
+					return;
 				}
 
 				$select.empty();
@@ -163,31 +163,31 @@
 				// build or rebuild the new select that the user
 				// will select items from
 
-				buildingSelect = true; 
+				buildingSelect = true;
 
 				// add a first option to be the home option / default selectLabel
-				$select.prepend("<option>" + $original.attr('title') + "</option>"); 
+				$select.prepend("<option>" + $original.attr('title') + "</option>");
 
 				$original.children("option").each(function(n) {
 
-					var $t = $(this); 
-					var id; 
+					var $t = $(this);
+					var id;
 
-					if(!$t.attr('id')) $t.attr('id', 'asm' + index + 'option' + n); 
+					if(!$t.attr('id')) $t.attr('id', 'asm' + index + 'option' + n);
 					id = $t.attr('id');
-					classes = $t.attr('class'); 
+					classes = $t.attr('class');
 
 					if($t.is(":selected")) {
-						addListItem(id); 
-						addSelectOption(id, classes, true); 						
+						addListItem(id);
+						addSelectOption(id, classes, true);
 					} else {
-						addSelectOption(id,classes); 
+						addSelectOption(id,classes);
 					}
 				});
 
 				if(!options.debugMode) $original.hide(); // IE6 requires this on every buildSelect()
 				selectFirstItem();
-				buildingSelect = false; 
+				buildingSelect = false;
 			}
 
 			function addSelectOption(optionId, optionClasses, disabled) {
@@ -195,17 +195,17 @@
 				// add an <option> to the <select>
 				// used only by buildSelect()
 
-				if(disabled == undefined) var disabled = false; 
+				if(disabled == undefined) disabled = false;
 
-				var $O = $('#' + optionId); 
+				var $O = $('#' + optionId);
 				var $option = $("<option>" + $O.text() + "</option>")
 					.val($O.val())
 					.attr('rel', optionId)
 					.addClass(optionClasses);
 
-				if(disabled) disableSelectOption($option); 
+				if(disabled) disableSelectOption($option);
 
-				$select.append($option); 
+				$select.append($option);
 			}
 
 			function selectFirstItem() {
@@ -244,7 +244,7 @@
 
 				// add a new item to the html list
 
-				var $O = $('#' + optionId); 
+				var $O = $('#' + optionId);
 
 				if(!$O) return; // this is the first item, selectLabel
 
@@ -252,14 +252,14 @@
 					.attr("href", "#")
 					.addClass(options.removeClass)
 					.prepend(options.removeLabel)
-					.click(function() { 
-						dropListItem($(this).parent('li').attr('rel')); 
-						return false; 
-					}); 
+					.click(function() {
+						dropListItem($(this).parent('li').attr('rel'));
+						return false;
+					});
 
 				var $itemLabel = $("<span></span>")
 					.addClass(options.listItemLabelClass)
-					.html($O.html()); 
+					.html($O.html());
 
 				var $item = $("<li></li>")
 					.attr('rel', optionId)
@@ -275,32 +275,32 @@
 				}
 
 				if(options.addItemTarget == 'top' && !buildingSelect) {
-					$ol.prepend($item); 
-					if(options.sortable) $original.prepend($O); 
+					$ol.prepend($item);
+					if(options.sortable) $original.prepend($O);
 				} else {
-					$ol.append($item); 
-					if(options.sortable) $original.append($O); 
+					$ol.append($item);
+					if(options.sortable) $original.append($O);
 				}
 
-				addListItemShow($item); 
+				addListItemShow($item);
 
 				disableSelectOption($("[rel=" + optionId + "]", $select));
 
 				if(!buildingSelect) {
-					setHighlight($item, options.highlightAddedLabel); 
+					setHighlight($item, options.highlightAddedLabel);
 					selectFirstItem();
-					if(options.sortable) $ol.sortable("refresh"); 	
+					if(options.sortable) $ol.sortable("refresh");
 				}
-				
+
 				if(options.respectParents) {
-				
+
 				if($O.hasClass('child')) {
 					parentName = $O.attr('class').split('parent-')[1];
 					parentName = parentName.split(' ')[0];
 					parentId = $('.option-'+parentName).attr('rel');
 					addListItem(parentId);
-					};
-				};
+					}
+				}
 			}
 
 			function addListItemShow($item) {
@@ -312,15 +312,15 @@
 					$item.animate({
 						opacity: "show",
 						height: "show"
-					}, 100, "swing", function() { 
+					}, 100, "swing", function() {
 						$item.animate({
 							height: "+=2px"
 						}, 50, "swing", function() {
 							$item.animate({
 								height: "-=2px"
-							}, 25, "swing"); 
-						}); 
-					}); 
+							}, 25, "swing");
+						});
+					});
 				} else {
 					$item.show();
 				}
@@ -330,19 +330,19 @@
 
 				// remove an item from the html list
 
-				if(highlightItem == undefined) var highlightItem = true; 
-				var $O = $('#' + optionId); 
+				if(highlightItem == undefined) highlightItem = true;
+				var $O = $('#' + optionId);
 
 				$O.prop('selected', false);
 				$item = $ol.children("li[rel=" + optionId + "]");
 
-				dropListItemHide($item); 
+				dropListItemHide($item);
 				enableSelectOption($("[rel=" + optionId + "]", options.removeWhenAdded ? $selectRemoved : $select));
 
-				if(highlightItem) setHighlight($item, options.highlightRemovedLabel); 
+				if(highlightItem) setHighlight($item, options.highlightRemovedLabel);
 
-				triggerOriginalChange(optionId, 'drop'); 
-				
+				triggerOriginalChange(optionId, 'drop');
+
 			}
 
 			function dropListItemHide($item) {
@@ -363,13 +363,13 @@
 						}, 50, "swing", function() {
 							$prevItem.animate({
 								height: "+=2px"
-							}, 100, "swing"); 
-						}); 
-						$item.remove(); 
-					}); 
-					
+							}, 100, "swing");
+						});
+						$item.remove();
+					});
+
 				} else {
-					$item.remove(); 
+					$item.remove();
 				}
 			}
 
@@ -379,7 +379,7 @@
 				// directly after the <select> single
 				// fade it in quickly, then fade it out
 
-				if(!options.highlight) return; 
+				if(!options.highlight) return;
 
 				$select.next("#" + options.highlightClass + index).remove();
 
@@ -387,13 +387,13 @@
 					.hide()
 					.addClass(options.highlightClass)
 					.attr('id', options.highlightClass + index)
-					.html(label + $item.children("." + options.listItemLabelClass).slice(0,1).text()); 
-					
-				$select.after($highlight); 
+					.html(label + $item.children("." + options.listItemLabelClass).slice(0,1).text());
+
+				$select.after($highlight);
 
 				$highlight.fadeIn("fast", function() {
-					setTimeout(function() { $highlight.fadeOut("slow"); }, 50); 
-				}); 
+					setTimeout(function() { $highlight.fadeOut("slow"); }, 50);
+				});
 			}
 
 			function triggerOriginalChange(optionId, type) {
@@ -401,8 +401,8 @@
 				// trigger a change event on the original select multiple
 				// so that other scripts can pick them up
 
-				ignoreOriginalChangeEvent = true; 
-				$option = $("#" + optionId); 
+				ignoreOriginalChangeEvent = true;
+				$option = $("#" + optionId);
 
 				$original.trigger('change', [{
 					'option': $option,

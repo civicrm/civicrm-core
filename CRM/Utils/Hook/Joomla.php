@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,27 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
   /**
-   *Invoke hooks
+   * Invoke hooks.
    *
-   * @param int $numParams Number of parameters to pass to the hook
-   * @param mixed $arg1 parameter to be passed to the hook
-   * @param mixed $arg2 parameter to be passed to the hook
-   * @param mixed $arg3 parameter to be passed to the hook
-   * @param mixed $arg4 parameter to be passed to the hook
-   * @param mixed $arg5 parameter to be passed to the hook
-   * @param mixed $arg6 parameter to be passed to the hook
-   * @param string $fnSuffix function suffix, this is effectively the hook name
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param mixed $arg1
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg2
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg3
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg4
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg5
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg6
+   *   Parameter to be passed to the hook.
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
    *
    * @return mixed
    */
@@ -60,9 +67,10 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
-                  $fnSuffix
+  public function invoke(
+    $numParams,
+    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
+    $fnSuffix
   ) {
     // ensure that we are running in a joomla context
     // we've not yet figured out how to bootstrap joomla, so we should
@@ -118,5 +126,5 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       return $result;
     }
   }
-}
 
+}

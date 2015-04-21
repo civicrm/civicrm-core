@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Core_Page_File extends CRM_Core_Page {
 
-  function run() {
-    $eid    = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
-    $fid    = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
-    $id     = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $quest  = CRM_Utils_Request::retrieve('quest', 'String', $this);
+  public function run() {
+    $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
+    $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $quest = CRM_Utils_Request::retrieve('quest', 'String', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid, NULL, $quest);
@@ -69,5 +69,5 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       );
     }
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,15 +45,14 @@
 {if $action NEQ 8 and $priceField}
   <div class="action-link">
     {if !$isReserved}
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-      <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>
+      {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
   <div id="field_page">
   {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
     <table id="options" class="row-highlight">
       <thead>
        <tr>
@@ -65,6 +64,10 @@
           <th>{ts}Active On{/ts}</th>
           <th>{ts}Expire On{/ts}</th>
           <th>{ts}Price{/ts}</th>
+          {if $getTaxDetails}
+            <th>{ts}Tax Label{/ts}</th>
+            <th>{ts}Tax Amount{/ts}</th>
+          {/if}
           <th></th>
       </tr>
       </thead>
@@ -73,11 +76,18 @@
         <td class="crm-editable" data-field="label">{$row.label}</td>
         <td>{$row.html_type_display}</td>
         <td class="nowrap">{$row.weight}</td>
-        <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+        <td class="crm-editable" data-field="is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
         <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
         <td>{if $row.html_type eq "Text"}{$row.price|crmMoney}{else}<a class="action-item" href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
+        {if $getTaxDetails}
+            <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
+                    {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                {/if}
+      </td>
+            <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
+        {/if}
         <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
@@ -86,9 +96,9 @@
   </div>
   <div class="action-link">
     {if !$isReserved}
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-    <a href="{crmURL p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field"}" class="button"><span><div class="icon preview-icon"></div>{ts}Preview (all fields){/ts}</span></a>
+    {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
 
 {else}
@@ -98,7 +108,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

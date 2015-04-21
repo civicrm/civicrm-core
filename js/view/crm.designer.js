@@ -52,7 +52,7 @@
       CRM.designerApp.vent.on('ufSaved', this.onUfSaved, this);
     },
     onClose: function() {
-      this.undoAlert && this.undoAlert.close && this.undoAlert.close();
+      if (this.undoAlert && this.undoAlert.close) this.undoAlert.close();
       CRM.designerApp.vent.off('ufUnsaved', this.onUfChanged, this);
     },
     onUfChanged: function(isUfUnsaved) {
@@ -69,7 +69,7 @@
         title: ts('Edit Profile'),
         modal: true,
         width: '75%',
-        height: parseInt($(window).height() *.8, 10),
+        height: parseInt($(window).height() * 0.8, 10),
         minWidth: 500,
         minHeight: 600, // to allow dropping in big whitespace, coordinate with min-height of .crm-designer-fields
         open: function() {
@@ -84,11 +84,11 @@
               return designerDialog.oldOnBeforeUnload.apply(arguments);
             }
           };
-          designerDialog.undoAlert && designerDialog.undoAlert.close && designerDialog.undoAlert.close();
+          if (designerDialog.undoAlert && designerDialog.undoAlert.close) designerDialog.undoAlert.close();
           designerDialog.isDialogOpen = true;
           // Initialize new dialog if we are not re-opening unsaved changes
           if (designerDialog.undoState === false) {
-            designerDialog.designerRegion && designerDialog.designerRegion.close && designerDialog.designerRegion.close();
+            if (designerDialog.designerRegion && designerDialog.designerRegion.close) designerDialog.designerRegion.close();
             designerDialog.$el.block();
             designerDialog.options.findCreateUfGroupModel({
               onLoad: function(ufGroupModel) {
@@ -112,7 +112,7 @@
           window.onbeforeunload = designerDialog.oldOnBeforeUnload;
           designerDialog.isDialogOpen = false;
 
-          designerDialog.undoAlert && designerDialog.undoAlert.close && designerDialog.undoAlert.close();
+          if (designerDialog.undoAlert && designerDialog.undoAlert.close) designerDialog.undoAlert.close();
           if (designerDialog.isUfUnsaved) {
             designerDialog.undoAlert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: designerDialog.model.get('title')}) + '</p><a href="#" class="crm-undo">' + ts('Restore') + '</a>', ts('Unsaved Changes'), 'alert', {expires: 60000});
             $('.ui-notify-message a.crm-undo').button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
@@ -254,7 +254,7 @@
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
         $('.crm-designer-canvas > *, .crm-designer-palette-region').show();
-        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));;
+        $('.crm-designer-preview').button('option', {icons: {primary: 'ui-icon-search'}}).find('span').text(ts('Preview'));
         return;
       }
       if (this.model.getRel('ufFieldCollection').hasDuplicates()) {
@@ -357,7 +357,7 @@
               }
             });
           }
-        })
+        });
       });
 
       this.$('.crm-designer-palette-tree').jstree({
@@ -381,7 +381,7 @@
           connectToSortable: '.crm-designer-fields' // FIXME: tight canvas/palette coupling
         });
         paletteView.model.getRel('ufFieldCollection').each(function(ufFieldModel) {
-          paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'))
+          paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'));
         });
         paletteView.$('.crm-designer-palette-add a').replaceWith('<button>' + $('.crm-designer-palette-add a').first().text() + '</<button>');
         paletteView.$('.crm-designer-palette-tree > ul').append('<li><button id="crm-designer-add-custom-set">+ ' + ts('Add Set of Custom Fields') + '</button></li>');
@@ -452,7 +452,7 @@
       CRM.loadForm(url, {refreshAction: ['next']})
         .on('crmFormSuccess', function(e, data) {
           // When form switches to create custom field context, modify button behavior to only continue for "save and new"
-          data.customField && ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
+          if (data.customField) ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
           paletteView.doRefresh(data.customField ? 'custom_' + data.id : null);
         });
     },
@@ -484,7 +484,7 @@
       }
     },
     toggleAll: function(e) {
-      if ($('.crm-designer-palette-search input').val() == '') {
+      if (_.isEmpty($('.crm-designer-palette-search input').val())) {
         $('.crm-designer-palette-tree').jstree($(e.target).attr('rel'));
       }
       e.preventDefault();
@@ -494,7 +494,7 @@
       this.openTreeNodes = [];
       this.$('.crm-designer-palette-section.jstree-open').each(function() {
         paletteView.openTreeNodes.push($(this).data('section'));
-      })
+      });
     }
   });
 
@@ -541,7 +541,7 @@
             ufFieldCanvasView.model.getRel('ufFieldCollection'),
             {skipWeights: true}
           );
-          if (null == ufFieldModel) {
+          if (_.isEmpty(ufFieldModel)) {
             ufFieldCanvasView.$('.crm-designer-fields .ui-draggable').remove();
           } else {
             // Move from end to the 'dropped' position
@@ -623,7 +623,7 @@
         model: this.model,
         fieldSchema: this.model.getFieldSchema()
       }));
-      this.onChangeIsDuplicate(this.model, this.model.get('is_duplicate'))
+      this.onChangeIsDuplicate(this.model, this.model.get('is_duplicate'));
       if (!this.expanded) {
         this.detail.$el.hide();
       }
@@ -660,8 +660,8 @@
           }
         });
         if (this.model.get('field_name').split('_')[0] == 'custom') {
-          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">&raquo; ' + ts('Edit Custom Field') + '</button>');
-          this.$('button.crm-designer-edit-custom').button().attr('title', ts('Edit global settings for this custom field.'));
+          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">' + ts('Edit Custom Field') + '</button>');
+          this.$('button.crm-designer-edit-custom').button({icons: {primary: 'ui-icon-pencil'}}).attr('title', ts('Edit global settings for this custom field.'));
         }
       }
     },
@@ -672,23 +672,9 @@
         reset: 1,
         id: this.model.get('field_name').split('_')[1]
       });
-      var form1 = CRM.loadForm(url, {openInline: '.crm-custom-field-form-block-data_type a'})
+      var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
           $(this).prepend('<div class="messages status"><div class="icon inform-icon"></div>' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
-          var $link = $('.action-link a', this);
-          if ($link.length) {
-            $link.detach();
-            var buttons = {};
-            buttons[$link.text()] = function() {
-              var form2 = CRM.loadForm($link.attr('href'), {
-                dialog: {
-                  width: '60%',
-                  height: '70%'
-                }
-              });
-            };
-            $(this).dialog('option', 'buttons', buttons);
-          }
         });
     },
     onChangeIsDuplicate: function(model, value, options) {
@@ -724,6 +710,9 @@
       if (this.options.fieldSchema.civiIsPhone) {
         result = result + '-' + CRM.PseudoConstant.phoneType[this.model.get('phone_type_id')];
       }
+      if (this.options.fieldSchema.civiIsWebsite) {
+        result = result + '-' + CRM.PseudoConstant.websiteType[this.model.get('website_type_id')];
+      }
       if (this.options.fieldSchema.civiIsLocation) {
         var locType = this.model.get('location_type_id') ? CRM.PseudoConstant.locationType[this.model.get('location_type_id')] : ts('Primary');
         result = result + ' (' + locType + ')';
@@ -758,9 +747,12 @@
   CRM.Designer.UFFieldDetailView = Backbone.View.extend({
     initialize: function() {
       // FIXME: hide/display 'in_selector' if 'visibility' is one of the public options
-      var fields = ['location_type_id', 'phone_type_id', 'label', 'is_multi_summary', 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_pre', 'help_post', 'is_active'];
+      var fields = ['location_type_id', 'website_type_id', 'phone_type_id', 'label', 'is_multi_summary', 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_pre', 'help_post', 'is_active'];
       if (! this.options.fieldSchema.civiIsLocation) {
         fields = _.without(fields, 'location_type_id');
+      }
+      if (! this.options.fieldSchema.civiIsWebsite) {
+        fields = _.without(fields, 'website_type_id');
       }
       if (! this.options.fieldSchema.civiIsPhone) {
         fields = _.without(fields, 'phone_type_id');

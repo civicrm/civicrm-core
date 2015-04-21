@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,20 +41,19 @@
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
-    $this->_params      = $this->get('params');
-    $this->_lineItem    = $this->get('lineItem');
-    $this->_part        = $this->get('part');
+    $this->_params = $this->get('params');
+    $this->_lineItem = $this->get('lineItem');
+    $this->_part = $this->get('part');
     $this->_totalAmount = $this->get('totalAmount');
     $this->_receiveDate = $this->get('receiveDate');
-    $this->_trxnId      = $this->get('trxnId');
-    $finalAmount        = $this->get('finalAmount');
+    $this->_trxnId = $this->get('trxnId');
+    $finalAmount = $this->get('finalAmount');
     $this->assign('finalAmount', $finalAmount);
     $participantInfo = $this->get('participantInfo');
     $this->assign('part', $this->_part);
@@ -68,13 +67,12 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * overwrite action, since we are only showing elements in frozen mode
+   * Overwrite action, since we are only showing elements in frozen mode
    * no help display needed
    *
    * @return int
-   * @access public
    */
-  function getAction() {
+  public function getAction() {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
@@ -84,10 +82,9 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
@@ -98,18 +95,50 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $getTaxDetails = FALSE;
+    $taxAmount = 0;
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
-      foreach ($this->_lineItem as $key => $value) {
-        if (!empty($value)) {
-          $lineItemForTemplate[$key] = $value;
+      if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
+        foreach ($this->_lineItem as $key => $value) {
+          if (!empty($value)) {
+            $lineItemForTemplate[$key] = $value;
+            if ($invoicing) {
+              foreach ($value as $v) {
+                if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+                  $taxAmount += $v['tax_amount'];
+                  $getTaxDetails = TRUE;
+                }
+              }
+            }
+          }
         }
       }
       if (!empty($lineItemForTemplate)) {
         $this->assign('lineItem', $lineItemForTemplate);
       }
     }
+    else {
+      if ($invoicing) {
+        foreach ($this->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $v) {
+            if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+              $taxAmount += $v['tax_amount'];
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+    }
 
+    if ($invoicing) {
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('taxTerm', $taxTerm);
+    }
     $this->assign('totalAmount', $this->_totalAmount);
 
     $hookDiscount = $this->get('hookDiscount');
@@ -190,10 +219,10 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('isRequireApproval', $isRequireApproval);
 
     // find pcp info
-    $dao               = new CRM_PCP_DAO_PCPBlock();
+    $dao = new CRM_PCP_DAO_PCPBlock();
     $dao->entity_table = 'civicrm_event';
-    $dao->entity_id    = $this->_eventId;
-    $dao->is_active    = 1;
+    $dao->entity_id = $this->_eventId;
+    $dao->is_active = 1;
     $dao->find(TRUE);
 
     if ($dao->id) {
@@ -209,23 +238,21 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
-  public function postProcess() {}
-  //end of function
+  public function postProcess() {
+  }
 
   /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Thank You Page');
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Work-around for CRM-13120 - The "create" action incorrectly returns string literal "null"
  * when the actual value is NULL or "". Rewrite the output.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  */
 
@@ -57,7 +57,7 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
@@ -86,7 +86,7 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   /**
    * @param $apiRequest
@@ -98,8 +98,10 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
     $lowerAction = strtolower($apiRequest['action']);
     if ($lowerAction === 'create') {
       return parent::toApiOutput($apiRequest, $result);
-    } else {
+    }
+    else {
       return $result;
     }
   }
+
 }

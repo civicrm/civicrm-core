@@ -35,11 +35,11 @@ SELECT @csgId        := max(id) from civicrm_option_group where name = 'case_sta
   {foreach from=$locales item=locale}
     UPDATE civicrm_option_value SET name = 'Open' where option_group_id = @csgId AND label_{$locale} = 'Ongoing';
     UPDATE civicrm_option_value SET name = 'Closed' where option_group_id = @csgId AND label_{$locale} = 'Resolved';
-  {/foreach}  
+  {/foreach}
 {else}
   UPDATE civicrm_option_value SET name = 'Open' where option_group_id = @csgId AND label = 'Ongoing';
   UPDATE civicrm_option_value SET name = 'Closed' where option_group_id = @csgId AND label = 'Resolved';
-{/if}  
+{/if}
 
 -- /*******************************************************
 -- *
@@ -73,7 +73,7 @@ INSERT INTO `civicrm_option_value` ( `option_group_id`, {localize field='label'}
 INSERT INTO `civicrm_option_value` ( `option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`,  `is_optgroup`, `is_reserved`, `is_active`, `component_id` )
 (SELECT @option_group_id_activity_type, {localize}'{ts escape="sql"}ADC referral{/ts}'{/localize}, (SELECT @max_val := @max_val+1), 'ADC referral',  NULL, 0,  0, (SELECT @max_val := @max_val+1),  0, 0, 1, @caseCompId
  FROM dual WHERE NOT EXISTS (SELECT * FROM `civicrm_option_value`  WHERE `name` = 'ADC referral'));
- 
+
 -- /*******************************************************
 -- *
 -- * Relationship Types

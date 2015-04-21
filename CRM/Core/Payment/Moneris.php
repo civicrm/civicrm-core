@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,39 +23,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
  * @author Alan Dixon
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
-   * @return \CRM_Core_Payment_Moneris
+   * @param null $paymentForm
+   * @param bool $force
+   *
+   * @throws \Exception
    */
-  function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Moneris');
@@ -79,33 +82,17 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
-   *
-   * @param string $mode the mode of operation: live or test
-   *
-   * @param object $paymentProcessor
-   *
-   * @return object
-   * @static
-   */
-  static function &singleton($mode, &$paymentProcessor) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_Moneris($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
-   * @return array the result in an nice formatted array (or an error object)
+   * @return array
+   *   the result in an nice formatted array (or an error object)
    * @abstract
    */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     //make sure i've been called correctly ...
     if (!$this->_profile) {
       return self::error('Unexpected error, missing profile');
@@ -114,11 +101,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
       return self::error('Invalid currency selection, must be $CAD');
     }
     /* unused params: cvv not yet implemented, payment action ingored (should test for 'Sale' value?)
-        [cvv2] => 000
-        [ip_address] => 192.168.0.103
-        [payment_action] => Sale
-        [contact_type] => Individual
-        [geo_coord_id] => 1 */
+    [cvv2] => 000
+    [ip_address] => 192.168.0.103
+    [payment_action] => Sale
+    [contact_type] => Individual
+    [geo_coord_id] => 1 */
 
     //this code based on Moneris example code #
     //create an mpgCustInfo object
@@ -163,10 +150,10 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     // add a recurring payment if requested
     if ($params['is_recur'] && $params['installments'] > 1) {
       //Recur Variables
-      $recurUnit     = $params['frequency_unit'];
+      $recurUnit = $params['frequency_unit'];
       $recurInterval = $params['frequency_interval'];
-      $next          = time();
-      $day           = 60 * 60 * 24;
+      $next = time();
+      $day = 60 * 60 * 24;
       switch ($recurUnit) {
         case 'day':
           $next += $recurInterval * $day;
@@ -254,7 +241,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return bool
    */
-  function isError(&$response) {
+  public function isError(&$response) {
     $responseCode = $response->getResponseCode();
     if (is_null($responseCode)) {
       return TRUE;
@@ -268,13 +255,13 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return TRUE;
   }
 
-  // ignore for now, more elaborate error handling later.
   /**
+   * ignore for now, more elaborate error handling later.
    * @param $response
    *
    * @return object
    */
-  function &checkResult(&$response) {
+  public function &checkResult(&$response) {
     return $response;
 
     $errors = $response->getErrors();
@@ -305,7 +292,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return object
    */
-  function &error($error = NULL) {
+  public function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
       $e->push($error->getResponseCode(),
@@ -326,12 +313,12 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
-   * @return string the error message if any
-   * @public
+   * @return string
+   *   the error message if any
    */
-  function checkConfig() {
+  public function checkConfig() {
     $error = array();
 
     if (empty($this->_paymentProcessor['signature'])) {
@@ -349,5 +336,5 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
       return NULL;
     }
   }
-}
 
+}

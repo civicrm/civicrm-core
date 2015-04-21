@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,13 +60,12 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL}" class="button"><span><div class="icon add-icon"></div> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 
     {if $rows}
           {include file="CRM/Case/Form/Selector.tpl"}
-          {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
     {else}
        <div class="messages status no-popup">
           <div class="icon inform-icon"></div>

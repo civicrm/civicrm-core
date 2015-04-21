@@ -29,6 +29,39 @@ INSERT INTO `civicrm_navigation`
 VALUES
   ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
 
+CREATE TABLE IF NOT EXISTS `civicrm_mailing_abtest` (
+     `id` int unsigned NOT NULL AUTO_INCREMENT  ,
+     `name` varchar(128)    COMMENT 'Name of the A/B test',
+     `status` varchar(32)    COMMENT 'Status',
+     `mailing_id_a` int unsigned    COMMENT 'The first experimental mailing (\"A\" condition)',
+     `mailing_id_b` int unsigned    COMMENT 'The second experimental mailing (\"B\" condition)',
+     `mailing_id_c` int unsigned    COMMENT 'The final, general mailing (derived from A or B)',
+     `domain_id` int unsigned    COMMENT 'Which site is this mailing for',
+     `testing_criteria_id` int unsigned    ,
+     `winner_criteria_id` int unsigned    ,
+     `specific_url` varchar(255)    COMMENT 'What specific url to track',
+     `declare_winning_time` datetime    COMMENT 'In how much time to declare winner',
+     `group_percentage` int unsigned
+,
+    PRIMARY KEY ( `id` )
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- Insert menu items under "Mailings" for A/B Tests
+SELECT @parent_id := id from `civicrm_navigation` where name = 'Mailings' AND domain_id = {$domainID};
+SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Find Mass SMS' and `parent_id` = @parent_id;
+
+UPDATE `civicrm_navigation`
+SET `weight` = `weight`+2
+WHERE `parent_id` = @parent_id
+AND `weight` > @add_weight_id;
+
+INSERT INTO `civicrm_navigation`
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+( {$domainID}, 'civicrm/a/#/abtest/new',                            '{ts escape="sql" skip="true"}New A/B Test{/ts}', 'New A/B Test',                                        'access CiviMail,create mailings', 'OR', @parent_id  , '1', NULL, @add_weight_id + 1 ),
+( {$domainID}, 'civicrm/a/#/abtest',                                '{ts escape="sql" skip="true"}Manage A/B Tests{/ts}', 'Manage A/B Tests',                                'access CiviMail,create mailings', 'OR', @parent_id, '1', 1, @add_weight_id + 2 );
+
+
 -- New activity types required for Print and Email Invoice
 SELECT @option_group_id_act     := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
@@ -46,9 +79,9 @@ SELECT @option_group_id_udOpt_wt  := MAX(weight) FROM civicrm_option_value WHERE
 SELECT @option_group_id_udOpt_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_udOpt;
 
 INSERT INTO
-   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
-   (@option_group_id_udOpt, {localize}'{ts escape="sql"}Invoices / Credit Notes{/ts}'{/localize}, @option_group_id_udOpt_val+1, 'Invoices / Credit Notes', NULL, 0, NULL, @option_group_id_udOpt_wt+1, NULL, 0, 0, 1, NULL, NULL);
+   (@option_group_id_udOpt, {localize}'{ts escape="sql"}Invoices / Credit Notes{/ts}'{/localize}, @option_group_id_udOpt_val+1, 'Invoices / Credit Notes', NULL, 0, NULL, @option_group_id_udOpt_wt+1, 0, 0, 1, NULL, NULL);
 
 -- Add new column creditnote_id in contribution table
 ALTER TABLE `civicrm_contribution` ADD `creditnote_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'unique credit note id, system generated or passed in';
@@ -68,6 +101,14 @@ CREATE TABLE IF NOT EXISTS `civicrm_recurring_entity` (
   `mode` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1-this entity, 2-this and the following entities, 3-all the entities',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=87 ;
+
+-- add batch type for pledge payments
+SELECT @option_group_id := id FROM civicrm_option_group WHERE name = 'batch_type';
+
+SELECT @max_option_value:= max(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id;
+
+INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}`label`{/localize}, value, name,weight)
+VALUES (@option_group_id, {localize}'{ts escape="sql"}Pledge Payment{/ts}'{/localize}, @max_option_value+1, 'Pledge Payment','3');
 
 --CRM-12281: To update name of Latvian provinces.
 UPDATE `civicrm_state_province` SET `name` = (N'Jūrmala') where `id` = 3552;
@@ -96,3 +137,19 @@ VALUES
 
 -- CRM-15557--
 ALTER TABLE civicrm_line_item MODIFY COLUMN qty decimal(20,2);
+
+-- CRM-15740
+ALTER TABLE `civicrm_mailing_trackable_url` CHANGE `url` `url` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'The URL to be tracked.';
+
+-- CRM-15765 missing Indonesian provinces and revise outdated names
+INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`)
+VALUES (NULL, 1102, "SR", "Sulawesi Barat"), (NULL, 1102, "KT", "Kalimantan Tengah"), (NULL, 1102, "KU", "Kalimantan Utara");
+
+UPDATE `civicrm_state_province` SET `name`='Kepulauan Bangka Belitung' WHERE `id` = 3056;
+UPDATE `civicrm_state_province` SET `name`='Papua Barat', `abbreviation`='PB' WHERE `id` = 3060;
+UPDATE `civicrm_state_province` SET `name`='DKI Jakarta' WHERE `id` = 3083;
+UPDATE `civicrm_state_province` SET `name`='DI Yogyakarta' WHERE `id` = 3085;
+UPDATE `civicrm_state_province` SET `abbreviation`='KI' WHERE `id` = 3066;
+
+-- CRM-15203 Handle MembershipPayment records while upgrade
+INSERT INTO civicrm_membership_payment (contribution_id, membership_id) select cc.id, cm.id FROM civicrm_contribution cc LEFT JOIN civicrm_membership_payment cmp ON cc.id = cmp.contribution_id LEFT JOIN civicrm_membership cm ON cc.contribution_recur_id = cm.contribution_recur_id WHERE cc.contribution_recur_id IS NOT NULL AND cmp.id IS NULL AND cm.id IS NOT NULL;

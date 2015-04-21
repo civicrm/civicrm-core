@@ -1,10 +1,24 @@
 // http://civicrm.org/licensing
 (function($, _) {
+  // FIXME: Much of this code is redundant with CRM.loadForm
 
   var ajaxFormParams = {
     dataType:'json',
     beforeSubmit: function(arr, $form, options) {
       $form.block();
+    },
+    beforeSerialize: function(form, options) {
+      // Copied from crm.ajax.js
+      if (window.CKEDITOR && window.CKEDITOR.instances) {
+        $.each(CKEDITOR.instances, function() {
+          if (this.updateElement) this.updateElement();
+        });
+      }
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function() {
+          this.save();
+        });
+      }
     },
     success: requestHandler,
     error: errorHandler
@@ -59,7 +73,7 @@
       o.trigger('crmFormSuccess', [response]);
       $('.crm-inline-edit-container').addClass('crm-edit-ready');
       var data = o.data('edit-params');
-      var dependent = o.data('dependent-fields') || [];
+      var dependent = $((o.data('dependent-fields') || []).join(','));
       // Clone the add-new link if replacing it, and queue the clone to be refreshed as a dependent block
       if (o.hasClass('add-new') && response.addressId) {
         data.aid = response.addressId;
@@ -77,7 +91,7 @@
         var locNo = clData.locno++;
         cl.attr('id', cl.attr('id').replace(locNo, clData.locno)).removeClass('form');
         o.closest('.crm-summary-block').after(clone);
-        $.merge(dependent, $('.crm-inline-edit', clone));
+        dependent = dependent.add($('.crm-inline-edit', clone));
       }
       $('a.ui-notify-close', '#crm-notification-container').click();
       // Delete an address
@@ -87,18 +101,8 @@
       }
       else {
         // Reload this block plus all dependent blocks
-        var update = $.merge([o], dependent);
-        _.each(update, reloadBlock);
+        reloadBlock(dependent.add(o));
         CRM.status(ts('Saved'));
-      }
-      // Update changelog tab and contact footer
-      if (response.changeLog && response.changeLog.count) {
-        CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
-      }
-      $("#crm-record-log").replaceWith(response.changeLog.markup);
-      // Refresh tab contents - Simple logging
-      if (!CRM.reloadChangeLogTab && $('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
-        $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
     }
     else {
@@ -125,7 +129,7 @@
       var errorTag = o.find('.update_oplock_ts');
       if (errorTag.length > 0) {
         $('<span>')
-          .addClass('crm-lock-button')
+          .addClass('crm-lock-button css_right')
           .appendTo(errorTag);
 
         var buttonContainer = o.find('.crm-lock-button');
@@ -254,22 +258,18 @@
         e.preventDefault();
       })
       // Delete an address
-      .on('click', '.crm-inline-edit.address .delete-button', function() {
+      .on('click', '.crm-inline-edit.address .delete-button', function(e) {
          var $block = $(this).closest('.crm-inline-edit.address');
-         CRM.confirm(function() {
-            CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
-              function(data) {
-                CRM.status(ts('Address Deleted'));
+         CRM.confirm({message: ts('Are you sure you want to delete this address?')})
+           .on('crmConfirm:yes', function() {
+            CRM.api3('address', 'delete', {id: $block.data('edit-params').aid}, true)
+              .done(function(data) {
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
                 $block.remove();
-              }
+                reloadBlock('.crm-inline-edit.address:not(.add-new)');
+              });
             });
-          },
-          {
-          message: ts('Are you sure you want to delete this address?')
-          }
-        );
-        return false;
+        e.preventDefault();
       })
       // add more and set focus to new row
       .on('click', '.add-more-inline', function(e) {
@@ -320,13 +320,81 @@
         }
         $('#crm-contact-actions-list').hide();
       })
+      .on('crmFormSuccess crmLoad', function(e, data) {
+        // Update changelog tab and contact footer
+        if (data && data.changeLog) {
+          if (data.changeLog.count) {
+            CRM.tabHeader.updateCount('#tab_log', data.changeLog.count);
+          }
+          if (data.changeLog.markup) {
+            $("#crm-record-log").replaceWith(data.changeLog.markup);
+          }
+        }
+      })
       .on('crmFormSuccess', function(e, data) {
-        // Reload changelog whenever an inline or popup form submits
-        CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
+        // Refresh changeLog - advanced logging
+        if (CRM.reloadChangeLogTab) {
+          CRM.reloadChangeLogTab();
+        }
+        // Refresh changeLog - simple logging
+        // If we didn't get a changelog count in the response, force refresh the changelog tab to populate it
+        else {
+          CRM.tabHeader.resetTab('#tab_log', !(data && data.changeLog && data.changeLog.count));
+        }
         // Refresh dependent blocks
         if (data && data.reloadBlocks) {
-          _.each(data.reloadBlocks, reloadBlock);
+          reloadBlock(data.reloadBlocks.join(','));
         }
       });
+
+    /**
+     * Make contact summary fit in small screens
+     */
+    function onResize() {
+      var contactwidth = $('#crm-container #mainTabContainer').width();
+      if (contactwidth < 600) {
+        $('#crm-container #mainTabContainer').addClass('narrowpage');
+        $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
+          if (index > 1) {
+            if (index % 2 === 0) {
+              $(this).parent().after('<tr class="narrowadded"></tr>');
+            }
+            var item = $(this);
+            $(this).parent().next().append(item);
+          }
+        });
+      }
+      else {
+        $('#crm-container #mainTabContainer.narrowpage').removeClass('narrowpage');
+        $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each(function () {
+          var nitem = $(this);
+          var parent = $(this).parent();
+          $(this).parent().prev().append(nitem);
+          if (parent.children().size() === 0) {
+            parent.remove();
+          }
+        });
+        $('#crm-container #mainTabContainer.narrowpage #contactTopBar tr.added').detach();
+      }
+      var cformwidth = $('#crm-container #Contact .contact_basic_information-section').width();
+
+      if (cformwidth < 720) {
+        $('#crm-container .contact_basic_information-section').addClass('narrowform');
+        $('#crm-container .contact_basic_information-section table.form-layout-compressed td .helpicon').parent().addClass('hashelpicon');
+        if (cformwidth < 480) {
+          $('#crm-container .contact_basic_information-section').addClass('xnarrowform');
+        }
+        else {
+          $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
+        }
+      }
+      else {
+        $('#crm-container .contact_basic_information-section.narrowform').removeClass('narrowform');
+        $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
+      }
+    }
+
+    onResize();
+    $(window).resize(onResize);
   });
 })(CRM.$, CRM._);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,13 +41,12 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * Constants for number of options for data types of multiple option.
    */
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   /**
-   * the custom group id saved to the session for an update
+   * The custom group id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
@@ -55,7 +54,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * The field id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -63,12 +61,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * The default custom data/input types, when editing the field
    *
    * @var array
-   * @access protected
    */
   protected $_defaultDataType;
 
   /**
-   * array of custom field values if update mode
+   * Array of custom field values if update mode.
    */
   protected $_values;
 
@@ -76,7 +73,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * Array for valid combinations of data_type & html_type
    *
    * @var array
-   * @static
    */
   private static $_dataTypeValues = NULL;
   private static $_dataTypeKeys = NULL;
@@ -86,12 +82,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   private static $_dataToLabels = NULL;
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @param null
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!(self::$_dataTypeKeys)) {
@@ -136,42 +129,50 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     if (self::$_dataToLabels == NULL) {
       self::$_dataToLabels = array(
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
-          'Radio' => ts('Radio'), 'CheckBox' => ts('CheckBox'), 'Multi-Select' => ts('Multi-Select'),
+        array(
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
+          'Radio' => ts('Radio'),
+          'CheckBox' => ts('CheckBox'),
+          'Multi-Select' => ts('Multi-Select'),
           'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
-          'Autocomplete-Select' => ts('Autocomplete Select'),
+          'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('Text' => ts('Text'), 'Select' => ts('Select'),
+        array(
+          'Text' => ts('Text'),
+          'Select' => ts('Select'),
           'Radio' => ts('Radio'),
         ),
-        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('RichTextEditor')),
+        array('TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')),
         array('Date' => ts('Select Date')),
         array('Radio' => ts('Radio')),
         array('StateProvince' => ts('Select State/Province'), 'Multi-Select' => ts('Multi-Select State/Province')),
-        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country ')),
+        array('Country' => ts('Select Country'), 'Multi-Select' => ts('Multi-Select Country')),
         array('File' => ts('Select File')),
         array('Link' => ts('Link')),
-        array('ContactReference' => ts('Autocomplete Select')),
+        array('ContactReference' => ts('Autocomplete-Select')),
       );
     }
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array    array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     if ($this->_id) {
@@ -242,6 +243,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
       $defaults['option_status[' . $i . ']'] = 1;
       $defaults['option_weight[' . $i . ']'] = $i;
+      $defaults['option_value[' . $i . ']'] = $i;
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -262,7 +264,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->assign('dontShowLink', $dontShowLink);
     }
     if ($this->_action & CRM_Core_Action::ADD &&
-      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')) {
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')
+    ) {
       $defaults['in_selector'] = 1;
     }
 
@@ -270,12 +273,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_gid) {
@@ -328,7 +328,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $optionTypes = array('1' => ts('Create a new set of options'));
     }
     else {
-      $optionTypes = array('1' => ts('Create a new set of options'),
+      $optionTypes = array(
+        '1' => ts('Create a new set of options'),
         '2' => ts('Reuse an existing set'),
       );
 
@@ -336,7 +337,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         'option_group_id',
         ts('Multiple Choice Option Sets'),
         array(
-          '' => ts('- select -')) + $optionGroups
+          '' => ts('- select -'),
+        ) + $optionGroups
       );
     }
 
@@ -344,9 +346,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       ts('Option Type'),
       $optionTypes,
       array(
-        'onclick' => "showOptionSelect();"), '<br/>'
+        'onclick' => "showOptionSelect();",
+      ), '<br/>'
     );
-
 
     $contactGroups = CRM_Core_PseudoConstant::group();
     asort($contactGroups);
@@ -518,7 +520,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     // is searchable by range?
-    $searchRange   = array();
+    $searchRange = array();
     $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
     $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
@@ -559,33 +561,36 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
-   * @static
-   * @access public
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $default = CRM_Utils_Array::value('default_value', $fields);
 
     $errors = array();
 
+    self::clearEmptyOptions($fields);
+
     //validate field label as well as name.
-    $title  = $fields['label'];
-    $name   = CRM_Utils_String::munge($title, '_', 64);
-    $gId    = $self->_gid;  // CRM-7564
-    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
-    $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
-        2 => array($title, 'String'),
-        3 => array((int)$self->_id, 'Integer'),
-        4 => array($gId, 'Integer'),
-      ));
+    $title = $fields['label'];
+    $name = CRM_Utils_String::munge($title, '_', 64);
+    $gId = $self->_gid;  // CRM-7564
+    $query = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
+    $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(
+      1 => array($name, 'String'),
+      2 => array($title, 'String'),
+      3 => array((int) $self->_id, 'Integer'),
+      4 => array($gId, 'Integer'),
+    ));
     if ($fldCnt) {
       $errors['label'] = ts('Custom field \'%1\' already exists in Database.', array(1 => $title));
     }
@@ -595,7 +600,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       // gives the ascii value
       $asciiValue = ord($title{0});
       if ($asciiValue >= 48 && $asciiValue <= 57) {
-        $errors['label'] = ts("Field's Name should not start with digit");
+        $errors['label'] = ts("Name cannot not start with a digit");
       }
     }
 
@@ -614,19 +619,19 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       switch ($dataType) {
         case 'Int':
           if (!CRM_Utils_Rule::integer($default)) {
-            $errors['default_value'] = ts('Please enter a valid integer as default value.');
+            $errors['default_value'] = ts('Please enter a valid integer.');
           }
           break;
 
         case 'Float':
           if (!CRM_Utils_Rule::numeric($default)) {
-            $errors['default_value'] = ts('Please enter a valid number as default value.');
+            $errors['default_value'] = ts('Please enter a valid number.');
           }
           break;
 
         case 'Money':
           if (!CRM_Utils_Rule::money($default)) {
-            $errors['default_value'] = ts('Please enter a valid number value.');
+            $errors['default_value'] = ts('Please enter a valid number.');
           }
           break;
 
@@ -697,8 +702,8 @@ SELECT count(*)
      *  Incomplete row checking is also required.
      */
     $_flagOption = $_rowError = 0;
-    $_showHide   = new CRM_Core_ShowHideBlocks('', '');
-    $dataType    = self::$_dataTypeKeys[$fields['data_type'][0]];
+    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $dataType = self::$_dataTypeKeys[$fields['data_type'][0]];
     if (isset($fields['data_type'][1])) {
       $dataField = $fields['data_type'][1];
     }
@@ -717,7 +722,7 @@ SELECT count(*)
             $nextIndex = $start + 1;
             while ($nextIndex <= self::NUM_OPTION) {
               if ($fields['option_value'][$start] == $fields['option_value'][$nextIndex] &&
-                !empty($fields['option_value'][$nextIndex])
+                strlen($fields['option_value'][$nextIndex])
               ) {
                 $errors['option_value[' . $start . ']'] = ts('Duplicate Option values');
                 $errors['option_value[' . $nextIndex . ']'] = ts('Duplicate Option values');
@@ -828,7 +833,8 @@ FROM   civicrm_custom_field
 WHERE  data_type != %1
 AND    option_group_id = %2";
         $params = array(
-          1 => array(self::$_dataTypeKeys[$fields['data_type'][0]],
+          1 => array(
+            self::$_dataTypeKeys[$fields['data_type'][0]],
             'String',
           ),
           2 => array($fields['option_group_id'], 'Integer'),
@@ -890,30 +896,32 @@ AND    option_group_id = %2";
   }
 
   /**
-   * Process the form
-   *
-   * @param null
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+    self::clearEmptyOptions($params);
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $dataTypeKey         = $this->_defaultDataType[0];
+      $dataTypeKey = $this->_defaultDataType[0];
       $params['data_type'] = self::$_dataTypeKeys[$this->_defaultDataType[0]];
       $params['html_type'] = self::$_dataToHTML[$this->_defaultDataType[0]][$this->_defaultDataType[1]];
     }
     else {
-      $dataTypeKey         = $params['data_type'][0];
+      $dataTypeKey = $params['data_type'][0];
       $params['html_type'] = self::$_dataToHTML[$params['data_type'][0]][$params['data_type'][1]];
       $params['data_type'] = self::$_dataTypeKeys[$params['data_type'][0]];
     }
 
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, array(
-      1, 2, 3, 5))) {
+      1,
+      2,
+      3,
+      5,
+    ))) {
       if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;
       }
@@ -1002,18 +1010,33 @@ SELECT id
     if ($buttonName == $this->getButtonName('next', 'new')) {
       $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
-          'reset=1&action=add&gid=' . $this->_gid
-        ));
+        'reset=1&action=add&gid=' . $this->_gid
+      ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field',
-          'reset=1&action=browse&gid=' . $this->_gid
-        ));
+        'reset=1&action=browse&gid=' . $this->_gid
+      ));
     }
     $session->setStatus($msg, ts('Saved'), 'success');
 
     // Add data when in ajax contect
     $this->ajaxResponse['customField'] = $customField->toArray();
   }
-}
 
+  /**
+   * Removes value from fields with no label.
+   *
+   * This allows default values to be set in the form, but ignored in post-processing.
+   *
+   * @param array $fields
+   */
+  public static function clearEmptyOptions(&$fields) {
+    foreach ($fields['option_label'] as $i => $label) {
+      if (!strlen(trim($label))) {
+        $fields['option_value'][$i] = '';
+      }
+    }
+  }
+
+}

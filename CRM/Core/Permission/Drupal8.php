@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -36,6 +36,29 @@
 /**
  *
  */
-class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
+class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
+  /**
+   * Given a permission string, check for access requirements
+   *
+   * @param string $str
+   *   The permission to check.
+   *
+   * @param null $contactID
+   *
+   * @return bool
+   */
+  public function check($str, $contactID = NULL) {
+    $str = $this->translatePermission($str, 'Drupal', array(
+      'view user account' => 'access user profiles',
+    ));
+
+    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
+    return \Drupal::currentUser()->hasPermission($str);
+  }
 
 }

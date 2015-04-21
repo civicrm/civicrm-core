@@ -1,5 +1,6 @@
 <?php
 namespace Civi\CiUtil;
+
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -7,14 +8,14 @@ use Symfony\Component\Finder\Finder;
  */
 class PHPUnitScanner {
   /**
-   * @return array<string> class names
+   * @param $path
+   * @return array <string> class names
    */
-  static function _findTestClasses($path) {
-//    print_r(array(
-//      'loading' => $path,
-//      get_included_files()
-//    ));
-
+  public static function _findTestClasses($path) {
+    //    print_r(array(
+    //      'loading' => $path,
+    //      get_included_files()
+    //    ));
     $origClasses = get_declared_classes();
     require_once $path;
     $newClasses = get_declared_classes();
@@ -26,9 +27,11 @@ class PHPUnitScanner {
   }
 
   /**
+   * @param $paths
    * @return array (string $file => string $class)
+   * @throws \Exception
    */
-  static function findTestClasses($paths) {
+  public static function findTestClasses($paths) {
     $testClasses = array();
     $finder = new Finder();
 
@@ -65,13 +68,15 @@ class PHPUnitScanner {
   }
 
   /**
-   * @param array $testClasses
-   * @return array each element is an array with keys:
+   * @param array $paths
+   *
+   * @return array
+   *   each element is an array with keys:
    *   - file: string
    *   - class: string
    *   - method: string
    */
-  static function findTestsByPath($paths) {
+  public static function findTestsByPath($paths) {
     $r = array();
     $testClasses = self::findTestClasses($paths);
     foreach ($testClasses as $testFile => $testClass) {
@@ -81,11 +86,12 @@ class PHPUnitScanner {
           $r[] = array(
             'file' => $testFile,
             'class' => $testClass,
-            'method' => $method->name
+            'method' => $method->name,
           );
         }
       }
     }
     return $r;
   }
+
 }

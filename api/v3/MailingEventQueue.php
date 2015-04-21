@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,17 +29,13 @@
  * APIv3 functions for registering/processing mailing group events.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
  */
 
 /**
- * Handle a confirm event
+ * Handle a queue event.
  *
  * @param array $params
- *   Associative array of property.
+ *   Array of property.
  *
  * @throws Exception
  * @return array
@@ -58,7 +54,10 @@ function civicrm_api3_mailing_event_queue_create($params) {
 }
 
 /**
+ * Get mailing event queue record.
+ *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_event_queue_get($params) {
@@ -66,7 +65,10 @@ function civicrm_api3_mailing_event_queue_get($params) {
 }
 
 /**
+ * Delete mailing event queue record.
+ *
  * @param array $params
+ *
  * @return array
  * @throws \API_Exception
  */
@@ -75,11 +77,12 @@ function civicrm_api3_mailing_event_queue_delete($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
+ * The metadata is used for setting defaults, documentation & validation.
+ *
  * @param array $params
- *   Array or parameters determined by getfields.
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
   $params['job_id']['api.required'] = 1;

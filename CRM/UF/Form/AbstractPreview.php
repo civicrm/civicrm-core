@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,7 +41,7 @@
 class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
 
   /**
-   * the fields needed to build this form
+   * The fields needed to build this form.
    *
    * @var array
    */
@@ -50,7 +50,8 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   /**
    * Set the profile/field structure for this form
    *
-   * @param array $fields list of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields
+   * @param array $fields
+   *   List of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields.
    * @param bool $isSingleField
    * @param bool $flag
    */
@@ -72,13 +73,13 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($field['name'])) {
@@ -93,10 +94,9 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     foreach ($this->_fields as $name => $field) {
@@ -107,10 +107,9 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
@@ -118,4 +117,5 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }
+
 }

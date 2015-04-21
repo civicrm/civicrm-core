@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,7 +52,7 @@
         </tr>
         <tr class="crm-mail-form-block-replyTo">
             <td class="label">{$form.replyTo.label}</td><td>{$form.replyTo.html}<br />
-            <span class="description">{ts}Check to enable Reply To functionality for CiviMail.{/ts}</span></td>
+            <span class="description">{ts}Allow CiviMail users to send mailings with a custom Reply-To header.{/ts}</span></td>
         </tr>
       </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

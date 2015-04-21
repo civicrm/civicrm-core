@@ -17,10 +17,12 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
   }
 
   /**
-   * Create a query to find references to a particular record
+   * Create a query to find references to a particular record.
    *
-   * @param CRM_Core_DAO $targetDao the instance for which we want references
-   * @return CRM_Core_DAO a query-handle (like the result of CRM_Core_DAO::executeQuery)
+   * @param CRM_Core_DAO $targetDao
+   *   The instance for which we want references.
+   * @return CRM_Core_DAO
+   *   a query-handle (like the result of CRM_Core_DAO::executeQuery)
    */
   public function findReferences($targetDao) {
     $refColumn = $this->getReferenceKey();
@@ -28,7 +30,6 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
 
     $params = array(
       1 => array($targetDao->$targetColumn, 'String'),
-
       // If anyone complains about $targetDao::getTableName(), then could use
       // "{get_class($targetDao)}::getTableName();"
       2 => array($targetDao::getTableName(), 'String'),
@@ -55,7 +56,6 @@ EOS;
     $targetColumn = $this->getTargetKey();
     $params = array(
       1 => array($targetDao->$targetColumn, 'String'),
-
       // If anyone complains about $targetDao::getTableName(), then could use
       // "{get_class($targetDao)}::getTableName();"
       2 => array($targetDao::getTableName(), 'String'),
@@ -73,7 +73,7 @@ EOS;
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => CRM_Core_DAO::singleValueQuery($sql, $params)
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     );
   }
 

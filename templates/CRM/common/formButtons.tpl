@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,8 +35,12 @@
         {else}
           {assign var='html' value=$form.buttons.$key.html}
         {/if}
-        {capture assign=validate}{$key|crmBtnValidate}{/capture}
-        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}"{if $buttonStyle} style="{$buttonStyle}"{/if}>{$html|crmAddClass:$validate}</span>
+        {crmGetAttribute html=$html attr='crm-icon' assign='icon'}
+        {crmGetAttribute html=$html attr='disabled' assign='disabled'}
+        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $icon} crm-icon-button{/if}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
+          {if $icon}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/if}
+          {$html}
+        </span>
     {/if}
   {/foreach}
 {/crmRegion}

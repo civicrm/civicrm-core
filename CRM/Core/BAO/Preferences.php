@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,9 +39,9 @@
 class CRM_Core_BAO_Preferences {
 
   /**
-   * @param $params
+   * @param array $params
    */
-  static function fixAndStoreDirAndURL(&$params) {
+  public static function fixAndStoreDirAndURL(&$params) {
     $sql = "
 SELECT v.name as valueName, g.name as optionName
 FROM   civicrm_option_value v,
@@ -54,7 +54,7 @@ AND    v.is_active = 1
 
     $dirParams = array();
     $urlParams = array();
-    $dao       = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!isset($params[$dao->valueName])) {
         continue;
@@ -78,10 +78,10 @@ AND    v.is_active = 1
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param string $type
    */
-  static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
+  public static function storeDirectoryOrURLPreferences(&$params, $type = 'directory') {
     $optionName = ($type == 'directory') ? 'directory_preferences' : 'url_preferences';
 
     $sql = "
@@ -102,7 +102,8 @@ AND    v.name = %3
       else {
         $value = CRM_Utils_System::relativeURL($value);
       }
-      $sqlParams = array(1 => array($value, 'String'),
+      $sqlParams = array(
+        1 => array($value, 'String'),
         2 => array($optionName, 'String'),
         3 => array($name, 'String'),
       );
@@ -111,10 +112,10 @@ AND    v.name = %3
   }
 
   /**
-   * @param $params
+   * @param array $params
    * @param bool $setInConfig
    */
-  static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
+  public static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if ($setInConfig) {
       $config = CRM_Core_Config::singleton();
     }
@@ -128,7 +129,6 @@ OR       g.name = 'url_preferences' )
 AND    v.option_group_id = g.id
 AND    v.is_active = 1
 ";
-
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
@@ -148,5 +148,5 @@ AND    v.is_active = 1
       }
     }
   }
-}
 
+}

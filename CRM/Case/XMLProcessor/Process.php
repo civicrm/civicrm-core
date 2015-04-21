@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   /**
    * @param $caseType
-   * @param $params
+   * @param array $params
    *
+   * @return bool
    * @throws Exception
    */
-  function run($caseType, &$params) {
+  public function run($caseType, &$params) {
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts("Configuration file could not be retrieved for case type = '%1' %2.",
-          array(1 => $caseType, 2 => $docLink)
-        ));
+        array(1 => $caseType, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -65,13 +66,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return array|bool|mixed
    * @throws Exception
    */
-  function get($caseType, $fieldSet, $isLabel = FALSE, $maskAction = FALSE) {
+  public function get($caseType, $fieldSet, $isLabel = FALSE, $maskAction = FALSE) {
     $xml = $this->retrieve($caseType);
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
-          array(1 => $caseType, 2 => $docLink)
-        ));
+        array(1 => $caseType, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -89,13 +90,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $xml
-   * @param $params
+   * @param array $params
    *
    * @throws Exception
    */
-  function process($xml, &$params) {
+  public function process($xml, &$params) {
     $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
-    $activitySetName  = CRM_Utils_Array::value('activitySetName', $params);
+    $activitySetName = CRM_Utils_Array::value('activitySetName', $params);
     $activityTypeName = CRM_Utils_Array::value('activityTypeName', $params);
 
     if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
@@ -104,8 +105,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
           if ((int ) $relationshipTypeXML->creator == 1) {
             if (!$this->createRelationships((string ) $relationshipTypeXML->name,
-                $params
-              )) {
+              $params
+            )
+            ) {
               CRM_Core_Error::fatal();
               return FALSE;
             }
@@ -142,11 +144,12 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $activitySetXML
-   * @param $params
+   * @param array $params
    */
-  function processStandardTimeline($activitySetXML, &$params) {
+  public function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
-      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)) {
+      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
+    ) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
     }
@@ -160,9 +163,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param $activitySetXML
-   * @param $params
+   * @param array $params
    */
-  function processActivitySet($activitySetXML, &$params) {
+  public function processActivitySet($activitySetXML, &$params) {
     foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
       foreach ($activityTypesXML as $activityTypeXML) {
         $this->createActivity($activityTypeXML, $params);
@@ -176,7 +179,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    *
    * @return array|mixed
    */
-  function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
+  public function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
     $relationshipTypes = &$this->allRelationshipTypes();
 
     $result = array();
@@ -202,13 +205,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $relationshipTypeName
-   * @param $params
+   * @param string $relationshipTypeName
+   * @param array $params
    *
    * @return bool
    * @throws Exception
    */
-  function createRelationships($relationshipTypeName, &$params) {
+  public function createRelationships($relationshipTypeName, &$params) {
     $relationshipTypes = &$this->allRelationshipTypes();
     // get the relationship id
     $relationshipTypeID = array_search($relationshipTypeName, $relationshipTypes);
@@ -216,8 +219,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($relationshipTypeID === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
-          array(1 => $relationshipTypeName, 2 => $docLink)
-        ));
+        array(1 => $relationshipTypeName, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -245,11 +248,11 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
-  function createRelationship(&$params) {
+  public function createRelationship(&$params) {
     $dao = new CRM_Contact_DAO_Relationship();
     $dao->copyValues($params);
     // only create a relationship if it does not exist
@@ -267,13 +270,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function activityTypes($activityTypesXML, $maxInst = FALSE, $isLabel = FALSE, $maskAction = FALSE) {
+  public function activityTypes($activityTypesXML, $maxInst = FALSE, $isLabel = FALSE, $maskAction = FALSE) {
     $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
     $result = array();
     foreach ($activityTypesXML as $activityTypeXML) {
       foreach ($activityTypeXML as $recordXML) {
         $activityTypeName = (string ) $recordXML->name;
-        $maxInstances     = (string ) $recordXML->max_instances;
+        $maxInstances = (string ) $recordXML->max_instances;
         $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
 
         if ($activityTypeInfo['id']) {
@@ -312,7 +315,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param SimpleXMLElement $caseTypeXML
    * @return array<string> symbolic activity-type names
    */
-  function getDeclaredActivityTypes($caseTypeXML) {
+  public function getDeclaredActivityTypes($caseTypeXML) {
     $result = array();
 
     if (!empty($caseTypeXML->ActivityTypes) && $caseTypeXML->ActivityTypes->ActivityType) {
@@ -340,7 +343,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param SimpleXMLElement $caseTypeXML
    * @return array<string> symbolic relationship-type names
    */
-  function getDeclaredRelationshipTypes($caseTypeXML) {
+  public function getDeclaredRelationshipTypes($caseTypeXML) {
     $result = array();
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
@@ -355,9 +358,9 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
-  function deleteEmptyActivity(&$params) {
+  public function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -375,11 +378,11 @@ AND    a.is_current_revision = 1
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return bool
    */
-  function isActivityPresent(&$params) {
+  public function isActivityPresent(&$params) {
     $query = "
 SELECT     count(a.id)
 FROM       civicrm_activity a
@@ -389,7 +392,8 @@ AND        ca.case_id = %2
 AND        a.is_deleted = 0
 ";
 
-    $sqlParams = array(1 => array($params['activityTypeID'], 'Integer'),
+    $sqlParams = array(
+      1 => array($params['activityTypeID'], 'Integer'),
       2 => array($params['caseID'], 'Integer'),
     );
     $count = CRM_Core_DAO::singleValueQuery($query, $sqlParams);
@@ -403,22 +407,22 @@ AND        a.is_deleted = 0
 
   /**
    * @param $activityTypeXML
-   * @param $params
+   * @param array $params
    *
    * @return bool
    * @throws CRM_Core_Exception
    * @throws Exception
    */
-  function createActivity($activityTypeXML, &$params) {
+  public function createActivity($activityTypeXML, &$params) {
     $activityTypeName = (string) $activityTypeXML->name;
-    $activityTypes    = &$this->allActivityTypes(TRUE, TRUE);
+    $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
     $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
 
     if (!$activityTypeInfo) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
       CRM_Core_Error::fatal(ts('Activity type %1, found in case configuration file, is not present in the database %2',
-          array(1 => $activityTypeName, 2 => $docLink)
-        ));
+        array(1 => $activityTypeName, 2 => $docLink)
+      ));
       return FALSE;
     }
 
@@ -492,9 +496,9 @@ AND        a.is_deleted = 0
       // Add parameters for attachments
 
       $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-      for ( $i = 1; $i <= $numAttachments; $i++ ) {
+      for ($i = 1; $i <= $numAttachments; $i++) {
         $attachName = "attachFile_$i";
-        if ( isset( $params[$attachName] ) && !empty( $params[$attachName] ) ) {
+        if (isset($params[$attachName]) && !empty($params[$attachName])) {
           $activityParams[$attachName] = $params[$attachName];
         }
       }
@@ -576,7 +580,7 @@ AND        a.is_deleted = 0
    *
    * @return array
    */
-  static function activitySets($activitySetsXML) {
+  public static function activitySets($activitySetsXML) {
     $result = array();
     foreach ($activitySetsXML as $activitySetXML) {
       foreach ($activitySetXML as $recordXML) {
@@ -596,7 +600,7 @@ AND        a.is_deleted = 0
    * @return array|bool|mixed
    * @throws Exception
    */
-  function getMaxInstance($caseType, $activityTypeName = NULL) {
+  public function getMaxInstance($caseType, $activityTypeName = NULL) {
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
@@ -613,7 +617,7 @@ AND        a.is_deleted = 0
    *
    * @return array|mixed
    */
-  function getCaseManagerRoleId($caseType) {
+  public function getCaseManagerRoleId($caseType) {
     $xml = $this->retrieve($caseType);
     return $this->caseRoles($xml->CaseRoles, TRUE);
   }
@@ -622,7 +626,7 @@ AND        a.is_deleted = 0
    * @param string $caseType
    * @return array<\Civi\CCase\CaseChangeListener>
    */
-  function getListeners($caseType) {
+  public function getListeners($caseType) {
     $xml = $this->retrieve($caseType);
     $listeners = array();
     if ($xml->Listeners && $xml->Listeners->Listener) {
@@ -637,17 +641,18 @@ AND        a.is_deleted = 0
   /**
    * @return int
    */
-  function getRedactActivityEmail() {
+  public function getRedactActivityEmail() {
     $xml = $this->retrieve("Settings");
     return ( string ) $xml->RedactActivityEmail ? 1 : 0;
   }
 
   /**
-   * Retrieves AllowMultipleCaseClients setting
+   * Retrieves AllowMultipleCaseClients setting.
    *
-   * @return string 1 if allowed, 0 if not
+   * @return string
+   *   1 if allowed, 0 if not
    */
-  function getAllowMultipleCaseClients() {
+  public function getAllowMultipleCaseClients() {
     $xml = $this->retrieve("Settings");
     if ($xml) {
       return ( string ) $xml->AllowMultipleCaseClients ? 1 : 0;
@@ -656,13 +661,14 @@ AND        a.is_deleted = 0
   }
 
   /**
-   * Retrieves NaturalActivityTypeSort setting
+   * Retrieves NaturalActivityTypeSort setting.
    *
-   * @return string 1 if natural, 0 if alphabetic
+   * @return string
+   *   1 if natural, 0 if alphabetic
    */
-  function getNaturalActivityTypeSort() {
+  public function getNaturalActivityTypeSort() {
     $xml = $this->retrieve("Settings");
     return ( string ) $xml->NaturalActivityTypeSort ? 1 : 0;
   }
-}
 
+}

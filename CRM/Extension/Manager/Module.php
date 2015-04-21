@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -60,12 +60,13 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   /**
    * @param CRM_Extension_Info $info
-   * @param $hookName
+   * @param string $hookName
    */
   private function callHook(CRM_Extension_Info $info, $hookName) {
     try {
       $file = $this->mapper->keyToPath($info->key);
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       return;
     }
     if (!file_exists($file)) {
@@ -107,5 +108,5 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
   public function onPreEnable(CRM_Extension_Info $info) {
     $this->callHook($info, 'enable');
   }
-}
 
+}

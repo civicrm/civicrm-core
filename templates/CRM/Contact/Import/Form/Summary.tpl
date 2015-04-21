@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@
     <p>
     {ts}<strong>Import has completed successfully.</strong> The information below summarizes the results.{/ts}
     </p>
-    
+
    {if $unMatchCount }
         <p class="error">
         {ts count=$unMatchCount plural='CiviCRM has detected mismatched contact IDs. These records have not been updated.'}CiviCRM has detected mismatched contact ID. This record has not been updated.{/ts}
@@ -42,8 +42,8 @@
         <p class="error">
         {ts 1=$downloadMismatchRecordsUrl}You can <a href='%1'>Download Mismatched Contacts</a>. You may then correct them, and import the new file with the corrected data.{/ts}
         </p>
-    {/if} 
-   
+    {/if}
+
     {if $invalidRowCount }
         <p class="error">
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
@@ -77,8 +77,8 @@
         {ts 1=$downloadAddressRecordsUrl}You can <a href='%1'>Download Street Address Records </a>. You may then edit those contact records and update the street address accordingly.{/ts}
         </p>
     {/if}
- </div> 
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>   
+ </div>
+ <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
  <table id="summary-counts" class="report">
     <tr><td class="label">{ts}Total Rows{/ts}</td>
@@ -96,7 +96,7 @@
         </td>
     </tr>
     {/if}
-    
+
     {if $unMatchCount }
     <tr class="error"><td class="label">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
@@ -107,7 +107,7 @@
         </td>
     </tr>
     {/if}
-    
+
     {if $conflictRowCount}
     <tr class="error"><td class="label">{ts}Conflicting Rows (skipped){/ts}</td>
         <td class="data">{$conflictRowCount}</td>
@@ -129,7 +129,7 @@
         </td>
     </tr>
     {/if}
-    
+
     <tr><td class="label">{ts}Total Contacts{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Total number of contact records created or modified during the import.{/ts}</td>
@@ -164,7 +164,7 @@
     {/if}
 
  </table>
- 
+
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
- 
+

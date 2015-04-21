@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -55,20 +54,22 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   protected $_contactType = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return '';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links[$this->_pageViewType])) {
       // helper variable for nicer formatting
       $links = array();
@@ -80,17 +81,17 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // names and titles
       $links[CRM_Core_Action::VIEW] = array(
         'name' => ts('View'),
-        'title' => ts('View %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('View %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::UPDATE] = array(
         'name' => ts('Edit'),
-        'title' => ts('Edit %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('Edit %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       $links[CRM_Core_Action::DELETE] = array(
         'name' => ts('Delete'),
-        'title' => ts('Delete %1', array( 1 => $this->_customGroupTitle . ' record')),
+        'title' => ts('Delete %1', array(1 => $this->_customGroupTitle . ' record')),
       );
 
       // urls and queryStrings
@@ -118,9 +119,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         // copy action
         $links[CRM_Core_Action::COPY] = array(
           'name' => ts('Copy'),
-          'title' => ts('Copy %1', array( 1 => $this->_customGroupTitle . ' record')),
+          'title' => ts('Copy %1', array(1 => $this->_customGroupTitle . ' record')),
           'url' => 'civicrm/contact/view/cd/edit',
-          'qs' => 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%&mode=copy'
+          'qs' => 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%&mode=copy',
         );
       }
 
@@ -130,17 +131,15 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Run the page
+   * Run the page.
    *
    * This method is called after the page is created. It checks for the type
    * of action and executes that action. Finally it calls the parent's run
    * method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action, default to 'browse'
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
 
@@ -165,12 +164,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse the listing
+   * Browse the listing.
    *
    * @return void
-   * @access public
    */
-  function browse() {
+  public function browse() {
     $dateFields = NULL;
     $cgcount = 0;
     $dateFieldsVals = NULL;
@@ -182,7 +180,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         NULL,
         CRM_Core_Permission::EDIT
       );
-      $multiRecordFields = array( );
+      $multiRecordFields = array();
       $fieldIDs = NULL;
       $result = NULL;
       $multiRecordFieldsWithSummaryListing = CRM_Core_BAO_UFGroup::shiftMultiRecordFields($fields, $multiRecordFields, TRUE);
@@ -221,12 +219,19 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $this->_customGroupTitle = $groupDetail[$customGroupId]['title'];
     }
     if ($fieldIDs && !empty($fieldIDs) && $this->_contactId) {
-      $options = array( );
-      $returnProperities = array('html_type', 'data_type', 'date_format', 'time_format');
+      $options = array();
+      $returnProperities = array(
+        'html_type',
+        'data_type',
+        'date_format',
+        'time_format',
+        'default_value',
+        'is_required',
+      );
       foreach ($fieldIDs as $key => $fieldID) {
         $fieldIDs[$key] = !is_numeric($fieldID) ? CRM_Core_BAO_CustomField::getKeyID($fieldID) : $fieldID;
         $param = array('id' => $fieldIDs[$key]);
-        $returnValues = array( );
+        $returnValues = array();
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $param, $returnValues, $returnProperities);
         if ($returnValues['data_type'] == 'Date') {
           $dateFields[$fieldIDs[$key]] = 1;
@@ -241,9 +246,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
         $options[$fieldIDs[$key]]['attributes']['html_type'] = $returnValues['html_type'];
         $options[$fieldIDs[$key]]['attributes']['data_type'] = $returnValues['data_type'];
+        $options[$fieldIDs[$key]]['attributes']['is_required'] = !empty($returnValues['is_required']);
+        $options[$fieldIDs[$key]]['attributes']['default_value'] = CRM_Utils_Array::value('default_value', $returnValues);
 
-        $options[$fieldIDs[$key]]['attributes']['format'] =
-          $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
+        $options[$fieldIDs[$key]]['attributes']['format']
+          = $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
         $options[$fieldIDs[$key]]['attributes']['time_format'] = CRM_Utils_Array::value('time_format', $returnValues);
       }
 
@@ -262,7 +269,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           $singleField = CRM_Core_BAO_CustomField::getKeyID($nonListingFieldIds[0]);
           $fieldIdInput = $singleField;
           $singleField = array($singleField);
-          $fieldInput  = $singleField;
+          $fieldInput = $singleField;
         }
         $customGroupInfo = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldInput);
         $this->_customGroupTitle = $customGroupInfo[$fieldIdInput]['groupTitle'];
@@ -298,14 +305,55 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 // assign to $result
                 $customValue = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
               }
-              if (!$customValue) {
+              // FIXME: getDisplayValue should always return a string so why is this necessary?
+              if (!$customValue && $customValue !== '0') {
                 $customValue = "";
               }
 
+              // Set field attributes to support crmEditable
+              // Note that $fieldAttributes[data-type] actually refers to the html type not the sql data type
+              // TODO: Not all widget types and validation rules are supported by crmEditable so some fields will not be in-place editable
+              $fieldAttributes = array('class' => "crmf-custom_{$fieldId}_$recId");
+              $editable = FALSE;
+              if ($linkAction & CRM_Core_Action::UPDATE) {
+                $spec = $options[$fieldId]['attributes'];
+                switch ($spec['html_type']) {
+                  case 'Text':
+                    // Other data types like money would require some extra validation
+                    // FIXME: crmEditable currently does not support any validation rules :(
+                    $supportedDataTypes = array('Float', 'String', 'Int');
+                    $editable = in_array($spec['data_type'], $supportedDataTypes);
+                    break;
+
+                  case 'TextArea':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = 'textarea';
+                    break;
+
+                  case 'Radio':
+                  case 'Select':
+                  case 'Select Country':
+                  case 'Select State/Province':
+                    $editable = TRUE;
+                    $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
+                    if (!$spec['is_required']) {
+                      $fieldAttributes['data-empty-option'] = ts('- none -');
+                    }
+                    break;
+                }
+              }
+              if ($editable) {
+                $fieldAttributes['class'] .= ' crm-editable';
+              }
+              $attributes[$fieldId][$recId] = $fieldAttributes;
+
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
-                $actionParams = array('recordId' => $recId, 'gid' => $this->_profileId,
-                  'id' => $this->_contactId);
+                $actionParams = array(
+                  'recordId' => $recId,
+                  'gid' => $this->_profileId,
+                  'id' => $this->_contactId,
+                );
                 $op = 'profile.multiValue.row';
               }
               else {
@@ -325,7 +373,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                   'key' => CRM_Core_Key::get('civicrm/ajax/customvalue'),
                 );
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
-                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="'. htmlspecialchars(json_encode($deleteData)) .'"';
+                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="' . htmlspecialchars(json_encode($deleteData)) . '"';
                 $links[CRM_Core_Action::DELETE]['class'] = 'delete-custom-row';
               }
               if (!empty($pageCheckSum)) {
@@ -349,47 +397,51 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       }
     }
 
-    $headers = array(  );
+    $headers = array();
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
         $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
       }
     }
     $this->assign('dateFields', $dateFields);
-    $this->assign('dateFieldsVals',$dateFieldsVals);
+    $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);
     $this->assign('records', $result);
+    $this->assign('attributes', $attributes);
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string  classname of edit form
+   * @return string
+   *   classname of edit form
    */
-  function editForm() {
+  public function editForm() {
     return '';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string  name of this page
+   * @return string
+   *   name of this page
    */
-  function editName() {
+  public function editName() {
     return '';
   }
 
   /**
-   * Get user context
+   * Get user context.
    *
    * @param null $mode
    *
-   * @return string  user context
+   * @return string
+   *   user context
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return '';
   }
-}
 
+}

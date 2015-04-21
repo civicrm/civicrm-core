@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -47,7 +47,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   protected $_componentClause = NULL;
 
   /**
-   * the task being performed
+   * The task being performed
    *
    * @var int
    */
@@ -75,18 +75,18 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   protected $_voterIds;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @param
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $values = $this->controller->exportValues('Search');
 
-    $this->_task   = $values['task'];
+    $this->_task = $values['task'];
     $campaignTasks = CRM_Campaign_Task::tasks();
-    $taskName      = CRM_Utils_Array::value($this->_task, $campaignTasks);
+    $taskName = CRM_Utils_Array::value($this->_task, $campaignTasks);
     $this->assign('taskName', $taskName);
 
     $ids = array();
@@ -98,9 +98,9 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
       }
     }
     else {
-      $qfKey    = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
       $cacheKey = "civicrm search {$qfKey}";
-      $allCids  = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+      $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
       $ids = array_keys($allCids[$cacheKey]);
       $this->assign('totalSelectedVoters', count($ids));
     }
@@ -114,8 +114,8 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
     $this->assign('totalSelectedContacts', count($this->_contactIds));
 
     //set the context for redirection for any task actions
-    $session   = CRM_Core_Session::singleton();
-    $qfKey     = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $session = CRM_Core_Session::singleton();
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
       $urlParams .= '&qfKey=' . $qfKey;
@@ -132,20 +132,19 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to.
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
+   * @param string $title
+   *   Title of the main button.
    * @param string $nextType
+   *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
    *
-   * @internal param string $type button type for the form after processing
-   *
    * @return void
-   * @access public
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -159,5 +158,5 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

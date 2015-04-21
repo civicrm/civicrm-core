@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,21 +41,22 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   /**
    * This is a contructor of the class.
    */
-  function __construct() {}
+  public function __construct() {
+  }
 
   /**
-   * Function is used to format the individual contact values
+   * Function is used to format the individual contact values.
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array  $contact  contact object
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $contact
+   *   Contact object.
    *
-   * @return object CRM_Contact_BAO_Contact object
-   * @access public
-   * @static
+   * @return CRM_Contact_BAO_Contact
    */
-  static function format(&$params, &$contact) {
+  public static function format(&$params, &$contact) {
     if (!self::dataExists($params)) {
-      return;
+      return NULL;
     }
 
     // "null" value for example is passed by dedupe merge in order to empty.
@@ -66,13 +67,13 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    $sortName   = $displayName = '';
-    $firstName  = CRM_Utils_Array::value('first_name', $params, '');
+    $sortName = $displayName = '';
+    $firstName = CRM_Utils_Array::value('first_name', $params, '');
     $middleName = CRM_Utils_Array::value('middle_name', $params, '');
-    $lastName   = CRM_Utils_Array::value('last_name', $params, '');
-    $nickName   = CRM_Utils_Array::value('nick_name', $params, '');
-    $prefix_id  = CRM_Utils_Array::value('prefix_id', $params, '');
-    $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
+    $lastName = CRM_Utils_Array::value('last_name', $params, '');
+    $nickName = CRM_Utils_Array::value('nick_name', $params, '');
+    $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
+    $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
     $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
 
     // get prefix and suffix names
@@ -125,12 +126,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
         foreach (array('last', 'middle', 'first', 'nick') as $name) {
           $phpName = "{$name}Name";
-          $dbName  = "{$name}_name";
-          $value   = $individual->$dbName;
+          $dbName = "{$name}_name";
+          $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
-            $params[$dbName]  = $value;
+            $params[$dbName] = $value;
             $contact->$dbName = $value;
-            $$phpName         = $value;
+            $$phpName = $value;
           }
           elseif (array_key_exists($dbName, $params)) {
             $$phpName = $params[$dbName];
@@ -141,7 +142,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
 
         foreach (array('prefix', 'suffix') as $name) {
-          $dbName  = "{$name}_id";
+          $dbName = "{$name}_id";
 
           $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
@@ -167,8 +168,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
         if (in_array('formal_title', $useDBNames)) {
           $params['formal_title'] = $individual->formal_title;
-          $contact->formal_title  = $individual->formal_title;
-          $formalTitle            = $individual->formal_title;
+          $contact->formal_title = $individual->formal_title;
+          $formalTitle = $individual->formal_title;
         }
         elseif (array_key_exists('formal_title', $params)) {
           $formalTitle = $params['formal_title'];
@@ -272,7 +273,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $format = CRM_Utils_Date::getDateFormat('birth');
     if ($date = CRM_Utils_Array::value('birth_date', $params)) {
       if (in_array($format, array(
-        'dd-mm', 'mm/dd'))) {
+        'dd-mm',
+        'mm/dd',
+      ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
           $separator = '-';
@@ -280,15 +283,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'))) {
+        'yy-mm',
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'))) {
+        'M yy',
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'))) {
+        'yy',
+      ))) {
         $date = $date . '-01-01';
       }
       $contact->birth_date = CRM_Utils_Date::processDate($date);
@@ -299,7 +305,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
     if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
       if (in_array($format, array(
-        'dd-mm', 'mm/dd'))) {
+        'dd-mm',
+        'mm/dd',
+      ))) {
         $separator = '/';
         if ($format == 'dd-mm') {
           $separator = '-';
@@ -307,15 +315,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         $date = $date . $separator . '1902';
       }
       elseif (in_array($format, array(
-        'yy-mm'))) {
+        'yy-mm',
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'M yy'))) {
+        'M yy',
+      ))) {
         $date = $date . '-01';
       }
       elseif (in_array($format, array(
-        'yy'))) {
+        'yy',
+      ))) {
         $date = $date . '-01-01';
       }
 
@@ -333,14 +344,16 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * regenerates display_name for contacts with given prefixes/suffixes
+   * Regenerates display_name for contacts with given prefixes/suffixes
    *
-   * @param array $ids     the array with the prefix/suffix id governing which contacts to regenerate
-   * @param int   $action  the action describing whether prefix/suffix was UPDATED or DELETED
+   * @param array $ids
+   *   The array with the prefix/suffix id governing which contacts to regenerate.
+   * @param int $action
+   *   The action describing whether prefix/suffix was UPDATED or DELETED.
    *
    * @return void
    */
-  static function updateDisplayNames(&$ids, $action) {
+  public static function updateDisplayNames(&$ids, $action) {
     // get the proper field name (prefix_id or suffix_id) and its value
     $fieldName = '';
     foreach ($ids as $key => $value) {
@@ -361,8 +374,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     // query for the affected individuals
-    $fieldValue          = CRM_Utils_Type::escape($fieldValue, 'Integer');
-    $contact             = new CRM_Contact_BAO_Contact();
+    $fieldValue = CRM_Utils_Type::escape($fieldValue, 'Integer');
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->$fieldName = $fieldValue;
     $contact->find();
 
@@ -380,31 +393,31 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * creates display name
+   * Creates display name.
    *
-   * @return string  the constructed display name
+   * @return string
+   *   the constructed display name
    */
-  function displayName() {
+  public function displayName() {
     $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
     return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $suffix[$this->suffix_id]));
   }
 
   /**
-   * Check if there is data to create the object
+   * Check if there is data to create the object.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function dataExists(&$params) {
+  public static function dataExists(&$params) {
     if ($params['contact_type'] == 'Individual') {
       return TRUE;
     }
 
     return FALSE;
   }
-}
 
+}

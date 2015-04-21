@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,21 +39,20 @@
 class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
 
   /**
-   * Are we forced to run a search
+   * Are we forced to run a search.
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
-    $this->_search    = CRM_Utils_Array::value('search', $_GET);
-    $this->_force     = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
+   */
+  public function preProcess() {
+    $this->_search = CRM_Utils_Array::value('search', $_GET);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE, FALSE);
     $this->_searchTab = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, 'survey');
 
     //when we do load tab, lets load the default objects.
@@ -70,13 +69,12 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     if ($this->_search) {
       return;
     }
@@ -88,7 +86,8 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $surveyTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     $this->add('select', 'activity_type_id',
       ts('Activity Type'), array(
-        '' => ts('- select -')) + $surveyTypes
+        '' => ts('- select -'),
+      ) + $surveyTypes
     );
     $this->set('surveyTypes', $surveyTypes);
     $this->assign('surveyTypes', json_encode($surveyTypes));
@@ -112,5 +111,5 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $this->set('searchParams', $this->_searchParams);
     $this->assign('searchParams', json_encode($this->_searchParams));
   }
-}
 
+}

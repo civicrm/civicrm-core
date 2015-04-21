@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,15 +32,14 @@
     <div class="crm-block crm-form-block crm-report-field-form-block">
         {include file="CRM/Report/Form/Fields.tpl" componentName='Grant'}
     </div>
-    
+
     <div class="crm-block crm-content-block crm-report-form-block">
         {*include actions*}
         {include file="CRM/Report/Form/Actions.tpl"}
 
         {*include the graph*}
         {include file="CRM/Report/Form/Layout/Graph.tpl"}
-    
-            
+
     {if $printOnly}
         <h1>{$reportTitle}</h1>
         <div id="report-date">{$reportDate}</div>
@@ -63,7 +62,7 @@
 
     <h3>{ts}Summary Statistics{/ts}</h2>
     <table class="report-layout display">
-      <tr> 
+      <tr>
         <th class="statistics" scope="row"></th>
         <th class="statistics right" scope="row">Count</th>
         <th class="statistics right" scope="row">Amount</th>
@@ -73,11 +72,11 @@
              <td>{$val.title}</td>
              <td class="right">{$val.count}</td>
              <td class="right">{$val.amount|crmMoney}</td>
-           </tr>      
+           </tr>
         {/foreach}
     </table>
     {/if}
- 
+
     {if !empty($grantStatistics)}
     <h3>{ts}Statistics Breakdown{/ts}</h3>
     <table class="report-layout display">
@@ -94,7 +93,7 @@
               <td class="right">
                 {foreach from=$row.currency key=fld item=val}
                    {$val.value|crmMoney:$fld} ({$val.percentage}%)&nbsp;&nbsp;
-                {/foreach} 
+                {/foreach}
               </td>
            </tr>
          {if $row.unassigned_count}
@@ -104,7 +103,7 @@
               <td class="right">
                 {foreach from=$row.unassigned_currency key=fld item=val}
                    {$val.value|crmMoney:$fld} ({$val.percentage}%)&nbsp;&nbsp;
-                {/foreach} 
+                {/foreach}
               </td>
            </tr>
          {/if}

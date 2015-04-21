@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,15 +39,14 @@
 class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path
    */
   private $_userContext;
 
@@ -70,18 +69,20 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
   private $_allowAjaxReleaseButton;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_votingTab = $this->get('votingTab');
     $this->_reserveToInterview = $this->get('reserveToInterview');
     if ($this->_reserveToInterview || $this->_votingTab) {
       //user came from voting tab / reserve form.
       foreach (array(
-                 'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId',
+               ) as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
       //get the target voter ids.
@@ -96,36 +97,32 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
       $this->_interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->get('formValues'));
     }
 
-    if ( $this->_surveyId ) {
+    if ($this->_surveyId) {
       $params = array('id' => $this->_surveyId);
       CRM_Campaign_BAO_Survey::retrieve($params, $this->_surveyDetails);
     }
 
-    $orderClause = false;
-    $buttonName  = $this->controller->getButtonName();
-    if ( $buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
+    $orderClause = FALSE;
+    $buttonName = $this->controller->getButtonName();
+    if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
-    elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
-      $orderByParams =
-        array(
-          1 =>
-          array(
+    elseif (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
+      $orderByParams
+        = array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
-            'order'  => 'ASC',
+            'order' => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
@@ -133,13 +130,13 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     }
 
     $orderBy = array();
-    if ( !empty($orderByParams) ) {
-      foreach ( $orderByParams as $key => $val ) {
+    if (!empty($orderByParams)) {
+      foreach ($orderByParams as $key => $val) {
         if (!empty($val['column'])) {
           $orderBy[] = "{$val['column']} {$val['order']}";
         }
       }
-      if ( !empty($orderBy) ) {
+      if (!empty($orderBy)) {
         $orderClause = "ORDER BY " . implode(', ', $orderBy);
       }
     }
@@ -147,7 +144,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $this->_contactIds = array_unique($this->_contactIds);
     if (!empty($this->_contactIds) && $orderClause) {
       $clause = 'contact_a.id IN ( ' . implode(',', $this->_contactIds) . ' ) ';
-      $sql    = "
+      $sql = "
 SELECT contact_a.id
 FROM civicrm_contact contact_a
 LEFT JOIN civicrm_address ON contact_a.id = civicrm_address.contact_id
@@ -160,7 +157,6 @@ WHERE {$clause}
         $this->_contactIds[] = $dao->id;
       }
     }
-
 
     //get the contact read only fields to display.
     $readOnlyFields = array_merge(array(
@@ -183,8 +179,8 @@ WHERE {$clause}
 
     $activityIds = array();
     foreach ($this->_contactIds as $key => $voterId) {
-      $actVals    = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
-      $statusId   = CRM_Utils_Array::value('status_id', $actVals);
+      $actVals = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
+      $statusId = CRM_Utils_Array::value('status_id', $actVals);
       $activityId = CRM_Utils_Array::value('activity_id', $actVals);
       if ($activityId &&
         $statusId &&
@@ -234,7 +230,7 @@ WHERE {$clause}
     $this->assign('surveyValues', $this->_surveyValues);
 
     $result = CRM_Campaign_BAO_Survey::getReportID($this->_surveyId);
-    $this->assign("instanceId",$result);
+    $this->assign("instanceId", $result);
 
     //get the survey result options.
     $this->_resultOptions = $this->get('resultOptions');
@@ -261,8 +257,9 @@ WHERE {$clause}
     CRM_Utils_System::setTitle(ts('Record %1 Responses', array(1 => $activityTypes[$this->_surveyTypeId])));
   }
 
-  function validateIds() {
-    $required = array('surveyId' => ts('Could not find Survey.'),
+  public function validateIds() {
+    $required = array(
+      'surveyId' => ts('Could not find Survey.'),
       'interviewerId' => ts('Could not find Interviewer.'),
       'contactIds' => ts('No respondents are currently reserved for you to interview.'),
       'resultOptions' => ts('Oops. It looks like there is no response option configured.'),
@@ -283,25 +280,28 @@ WHERE {$clause}
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->assign('surveyTypeId', $this->_surveyTypeId);
 
-    $options =
-      array('' => ' - none - ',
-        'civicrm_address.street_name'     => 'Street Name',
+    $options
+      = array(
+        '' => ' - none - ',
+        'civicrm_address.street_name' => 'Street Name',
         'civicrm_address.street_number%2' => 'Odd / Even Street Number',
-        'civicrm_address.street_number'   => 'Street Number',
-        'contact_a.sort_name'             => 'Respondent Name',
+        'civicrm_address.street_number' => 'Street Number',
+        'contact_a.sort_name' => 'Respondent Name',
       );
     for ($i = 1; $i < count($options); $i++) {
       $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
-      $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array('ASC' => 'Ascending', 'DESC' => 'Descending'));
+      $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array(
+          'ASC' => 'Ascending',
+          'DESC' => 'Descending',
+        ));
     }
 
     //pickup the uf fields.
@@ -312,7 +312,7 @@ WHERE {$clause}
     foreach ($this->_contactIds as $contactId) {
       //build the profile fields.
       foreach ($this->_surveyFields as $name => $field) {
-        if ($field){
+        if ($field) {
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contactId);
         }
       }
@@ -321,8 +321,9 @@ WHERE {$clause}
       if (!empty($this->_resultOptions)) {
         $this->add('select', "field[$contactId][result]", ts('Result'),
           array(
-            '' => ts('- select -')) +
-            array_combine($this->_resultOptions, $this->_resultOptions)
+            '' => ts('- select -'),
+          ) +
+          array_combine($this->_resultOptions, $this->_resultOptions)
         );
       }
 
@@ -344,11 +345,13 @@ WHERE {$clause}
     }
 
     $buttons = array(
-      array('type' => 'cancel',
+      array(
+        'type' => 'cancel',
         'name' => ts('Done'),
         'subName' => 'interview',
         'isDefault' => TRUE,
-      ));
+      ),
+    );
 
     $buttons[] = array(
       'type' => 'submit',
@@ -383,13 +386,12 @@ WHERE {$clause}
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     //load default data for only contact fields.
     $contactFields = $defaults = array();
     foreach ($this->_surveyFields as $name => $field) {
@@ -405,36 +407,31 @@ WHERE {$clause}
       }
     }
 
-    if ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
-      $defaults['order_bys'] =
-        array(
-          1 =>
-          array(
+    if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
+      $defaults['order_bys']
+        = array(
+          1 => array(
             'column' => 'civicrm_address.street_name',
-            'order'  => 'ASC',
+            'order' => 'ASC',
           ),
-          2 =>
-          array(
+          2 => array(
             'column' => 'civicrm_address.street_number%2',
             'order' => 'ASC',
           ),
-          3 =>
-          array(
+          3 => array(
             'column' => 'civicrm_address.street_number',
             'order' => 'ASC',
           ),
-          4 =>
-          array(
+          4 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
         );
     }
     else {
-      $defaults['order_bys'] =
-        array(
-          1 =>
-          array(
+      $defaults['order_bys']
+        = array(
+          1 => array(
             'column' => 'contact_a.sort_name',
             'order' => 'ASC',
           ),
@@ -444,9 +441,8 @@ WHERE {$clause}
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -459,22 +455,24 @@ WHERE {$clause}
     elseif ($buttonName == '_qf_Interview_next_interviewToRelease') {
       //get ready to jump to release form.
       foreach (array(
-                 'surveyId', 'contactIds', 'interviewerId') as $fld) {
+                 'surveyId',
+                 'contactIds',
+                 'interviewerId',
+               ) as $fld) {
         $this->controller->set($fld, $this->{"_$fld"});
       }
       $this->controller->set('interviewToRelease', TRUE);
     }
 
     // vote is done through ajax
-    return;
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return mixed
    */
-  static function registerInterview($params) {
+  public static function registerInterview($params) {
     $activityId = CRM_Utils_Array::value('activity_id', $params);
     $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);
     if (!is_array($params) || !$surveyTypeId || !$activityId) {
@@ -548,8 +546,7 @@ WHERE {$clause}
     $subject = '';
     $surveyTitle = CRM_Utils_Array::value('surveyTitle', $params);
     if ($surveyTitle) {
-      $subject = ts('%1', array(1 => $surveyTitle));
-      $subject .= ' - ';
+      $subject = $surveyTitle . ' - ';
     }
     $subject .= ts('Respondent Interview');
 
@@ -563,7 +560,7 @@ WHERE {$clause}
       'source_contact_id' => 'source_contact',
       'location' => 'activity_location',
       'campaign_id' => 'activity_campaign_id',
-      'duration' => 'activity_duration'
+      'duration' => 'activity_duration',
     );
     foreach ($activityParams as $key => $field) {
       if (!empty($params[$field])) {
@@ -580,15 +577,15 @@ WHERE {$clause}
     return $activityId;
   }
 
-  function getVoterIds() {
+  public function getVoterIds() {
     if (!$this->_interviewerId) {
       $session = CRM_Core_Session::singleton();
       $this->_interviewerId = $session->get('userID');
     }
     if (!$this->_surveyId) {
       // use default survey id
-      $dao             = new CRM_Campaign_DAO_Survey();
-      $dao->is_active  = 1;
+      $dao = new CRM_Campaign_DAO_Survey();
+      $dao->is_active = 1;
       $dao->is_default = 1;
       $dao->find(TRUE);
       $this->_surveyId = $dao->id;
@@ -607,12 +604,14 @@ WHERE {$clause}
         $statusIds
       );
       $this->_contactIds = array();
-      foreach ($surveyActivities as $val) $this->_contactIds[$val['voter_id']] = $val['voter_id'];
+      foreach ($surveyActivities as $val) {
+        $this->_contactIds[$val['voter_id']] = $val['voter_id'];
+      }
       $this->set('contactIds', $this->_contactIds);
     }
   }
 
-  function filterVoterIds() {
+  public function filterVoterIds() {
     //do the cleanup later on.
     if (!is_array($this->_contactIds)) {
       return;
@@ -662,5 +661,5 @@ INNER JOIN  {$tempTableName} ON ( {$tempTableName}.survey_contact_id = contact.i
       }
     }
   }
-}
 
+}

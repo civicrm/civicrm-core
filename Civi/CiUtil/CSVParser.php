@@ -7,10 +7,12 @@ namespace Civi\CiUtil;
 class CSVParser {
 
   /**
-   * @param string $csvContent content; each row in the row csv should start with two cells:
+   * @param string $csvContent
+   *   Content; each row in the row csv should start with two cells:.
    *   - cell 0: the test name
    *   - cell 1: the test status
-   * @return array (string $testName => string $status)
+   * @return array
+   *   (string $testName => string $status)
    */
   public static function parseResults($csvContent) {
     $fh = fopen('php://memory', 'r+');

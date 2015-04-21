@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,32 +45,30 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
    * This method is called after the page is created.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $addressId = CRM_Utils_Request::retrieve('aid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, $_REQUEST);
 
     $address = array();
-    if ( $addressId > 0 ) {
+    if ($addressId > 0) {
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
 
       $entityBlock = array('id' => $addressId);
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
       if (!empty($address)) {
-        foreach ($address as $key =>& $value) {
+        foreach ($address as $key => & $value) {
           $value['location_type'] = $locationTypes[$value['location_type_id']];
         }
       }
     }
 
     // we just need current address block
-    $currentAddressBlock['address'][$locBlockNo] = array_pop( $address );
+    $currentAddressBlock['address'][$locBlockNo] = array_pop($address);
 
-    if ( !empty( $currentAddressBlock['address'][$locBlockNo] ) ) {
+    if (!empty($currentAddressBlock['address'][$locBlockNo])) {
       // get contact name of shared contact names
       $sharedAddresses = array();
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($currentAddressBlock['address']);
@@ -86,23 +84,23 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       }
 
       // add custom data of type address
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree( 'Address',
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address',
         $this, $currentAddressBlock['address'][$locBlockNo]['id']
       );
 
       // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-      $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView( $this, $groupTree, FALSE, NULL, "dnc_");
+      $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
       $this->assign("dnc_viewCustomData", NULL);
 
       $this->assign('add', $currentAddressBlock['address'][$locBlockNo]);
       $this->assign('sharedAddresses', $sharedAddresses);
     }
-    $contact = new CRM_Contact_BAO_Contact( );
+    $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactId;
-    $contact->find(true);
-    $privacy = array( );
-    foreach ( CRM_Contact_BAO_Contact::$_commPrefs as $name ) {
-      if ( isset( $contact->$name ) ) {
+    $contact->find(TRUE);
+    $privacy = array();
+    foreach (CRM_Contact_BAO_Contact::$_commPrefs as $name) {
+      if (isset($contact->$name)) {
         $privacy[$name] = $contact->$name;
       }
     }
@@ -118,5 +116,5 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     // finally call parent
     parent::run();
   }
-}
 
+}
