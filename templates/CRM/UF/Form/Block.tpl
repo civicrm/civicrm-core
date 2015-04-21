@@ -66,7 +66,7 @@
       {elseif $n}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_pre && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
@@ -147,7 +147,7 @@
         {/if}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_post && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}
