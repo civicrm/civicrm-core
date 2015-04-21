@@ -995,4 +995,45 @@ class CRM_Core_SelectValues {
     );
   }
 
+  /**
+   * Relative Date Terms.
+   *
+   * @return array
+   */
+  public static function getRelativeDateTerms() {
+    return array(
+      'previous' => ts('Previous'),
+      'previous_2' => ts('Previous 2'),
+      'previous_before' => ts('Prior to Previous'),
+      'before_previous' => ts('All Prior to Previous'),
+      'earlier' => ts('To End of Previous'),
+      'greater_previous' => ts('From End of Previous'),
+      'greater' => ts('From Start Of Current'),
+      'current' => ts('Current'),
+      'ending_3' => ts('Last 3'),
+      'ending_2' => ts('Last 2'),
+      'ending' => ts('Last'),
+      'this' => ts('This'),
+      'starting' => ts('Upcoming'),
+      'less' => ts('To End of'),
+      'next' => ts('Next'),
+    );
+  }
+
+  /**
+   * Relative Date Units.
+   *
+   * @return array
+   */
+  public static function getRelativeDateUnits() {
+    return array(
+      'year' => ts('Years'),
+      'fiscal_year' => ts('Fiscal Years'),
+      'quarter' => ts('Quarters'),
+      'month' => ts('Months'),
+      'week' => ts('Weeks'),
+      'day' => ts('Days'),
+    );
+  }
+
 }
