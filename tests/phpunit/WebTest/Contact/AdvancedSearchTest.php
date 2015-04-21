@@ -222,7 +222,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
     $this->waitForAjaxContent();
-    $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr//td/a[text()='adv$firstName, $firstName']");
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
     // click to edit search
