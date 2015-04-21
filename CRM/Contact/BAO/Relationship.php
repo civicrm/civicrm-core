@@ -1491,7 +1491,9 @@ SELECT relationship_type_id, relationship_direction
             $relDirection = $dao->relationship_direction;
           }
           $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
-          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds) && !empty($membershipValues['owner_membership_id'])) {
+          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds
+          //CRM-16300 check if owner membership exist for related membership
+          ) && !empty($membershipValues['owner_membership_id']) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
           continue;
@@ -1555,7 +1557,8 @@ SELECT relationship_type_id, relationship_direction
 
             if ($action & CRM_Core_Action::UPDATE) {
               //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds) && !empty($values[$relatedContactId]['memberships'])) {
+              if (in_array($relTypeId, $relTypeIds
+              ) && !empty($values[$relatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
                 continue;
               }
               //delete the membership record for related
@@ -1590,8 +1593,8 @@ SELECT count(*)
             $relIds = CRM_Utils_Array::value('relationship_ids', $params);
           }
           if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
-          $relIds
-          ) && !empty($membershipValues['owner_membership_id'])) {
+          $relIds) && !empty($membershipValues['owner_membership_id']
+          ) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
         }
@@ -1601,9 +1604,21 @@ SELECT count(*)
 
   /**
    * Helper function to check whether to delete the membership or not.
+   *
+   * Function takes a list of related membership types and if it is not also passed a
+   * relationship ID of that types evaluates whether the membership should be deleted.
+   *
+   * @param array $membershipTypeRelationshipTypeIDs
+   *   Relation type IDs related to the given membership type.
+   * @param int $contactId
+   * @param int $mainRelatedContactId
+   * @param int $relTypeId
+   * @param array $relIds
+   *
+   * @return bool
    */
-  public static function isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
-    if (in_array($relTypeId, $relTypeIds)) {
+  public static function isDeleteRelatedMembership($membershipTypeRelationshipTypeIDs, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
+    if (empty($membershipTypeRelationshipTypeIDs) || in_array($relTypeId, $membershipTypeRelationshipTypeIDs)) {
       return FALSE;
     }
 
@@ -1617,14 +1632,15 @@ SELECT count(*)
     );
 
     if ($contactId == $mainRelatedContactId) {
-      $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " )  AND contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $relIds) . ")", $relParamas);
+      $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " )  AND
+contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $relIds) . ")", $relParamas);
       if ($recordsFound) {
         return FALSE;
       }
       return TRUE;
     }
 
-    $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $relTypeIds) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
+    $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
 
     if ($recordsFound) {
       return FALSE;

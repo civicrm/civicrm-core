@@ -207,7 +207,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    * @param $hash
    * @param bool $otherAmount
    */
-  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
     // Select membership type 1
@@ -220,10 +220,10 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label[contains(text(),'$memTypeId')]");
 
     }
-    if (!$otherAmount) {
+    if (!$otherAmount && $amountSection) {
       $this->click("xpath=//div[@class='crm-section contribution_amount-section']/div[2]//span/label[text()='No thank you']");
     }
-    else {
+    elseif ($amountSection) {
       $this->type("xpath=//div[@class='content other_amount-content']/input", $otherAmount);
     }
     if ($payLater) {
@@ -242,7 +242,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->type("postal_code-1", "94117");
     $this->select("country-1", "value=1228");
     $this->select("state_province-1", "value=1001");
-    if (!$payLater) {
+    if (!$payLater && $amountSection) {
       //Credit Card Info
       $this->select("credit_card_type", "value=Visa");
       $this->type("credit_card_number", "4111111111111111");
@@ -351,6 +351,117 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
       'Online Contribution Page' => $contributionTitle,
     );
     $this->webtestVerifyTabularData($expected);
+  }
+
+  /**
+   * CRM-16302 - To check whether membership, contribution are
+   * created for free membership signup.
+   */
+  public function testOnlineMembershipCreateWithZeroContribution() {
+    //login with admin credentials & make sure we do have required permissions.
+    $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
+    $this->changePermissions($permissions);
+
+    $hash = substr(sha1(rand()), 0, 7);
+    $rand = 2 * rand(2, 50);
+    $amountSection = $payLater = $allowOtherAmount = $onBehalf = $pledges = $recurring = FALSE;
+    $premiums = $widget = $pcp = $isSeparatePayment = $membershipsRequired = $fixedAmount = $friend = FALSE;
+    $memberships = TRUE;
+    $memPriceSetId = NULL;
+    $profilePreId = 1;
+    $profilePostId = NULL;
+    $contributionTitle = "Title $hash";
+    $pageId = $this->webtestAddContributionPage($hash,
+      $rand,
+      $contributionTitle,
+      NULL,
+      $amountSection,
+      $payLater,
+      $onBehalf,
+      $pledges,
+      $recurring,
+      $memberships,
+      $memPriceSetId,
+      $friend,
+      $profilePreId,
+      $profilePostId,
+      $premiums,
+      $widget,
+      $pcp,
+      FALSE,
+      FALSE,
+      $isSeparatePayment,
+      FALSE,
+      $allowOtherAmount,
+      TRUE,
+      'Member Dues',
+      $fixedAmount,
+      $membershipsRequired
+    );
+    $memTypeParams = $this->webtestAddMembershipType('rolling', 1, 'year', 'no', 0);
+    $memTypeTitle = $memTypeParams['membership_type'];
+    $memTypeId = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[1]/div[text()='{$memTypeTitle}']/../../td[12]/span/a[3]@href"));
+    $memTypeId = $memTypeId[1];
+
+    // edit contribution page amounts tab to uncheck real time monetary transaction
+    $this->openCiviPage("admin/contribute/membership", "reset=1&action=update&id={$pageId}", '_qf_MembershipBlock_next-bottom');
+    $this->click("membership_type_$memTypeId");
+    $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
+    $text = "'MembershipBlock' information has been saved.";
+    $this->waitForText('crm-notification-container', $text);
+    $this->click('link=Amounts');
+    $this->waitForElementPresent('_qf_Amount_cancel-bottom');
+    $this->click('is_monetary');
+    $this->clickLink('_qf_Amount_upload_done-bottom');
+    $text = "'Amount' information has been saved.";
+    $this->waitForText('crm-notification-container', $text);
+
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+
+    //logout
+    $this->webtestLogout();
+
+    $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection);
+
+    // Log in using webtestLogin() method
+    $this->webtestLogin();
+
+    //Find Contribution
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+    $this->type("sort_name", "$lastName $firstName");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+
+    //View Contribution Record and verify data
+    $expected = array(
+      'From' => "{$firstName} {$lastName}",
+      'Financial Type' => 'Member Dues',
+      'Total Amount' => '0.00',
+      'Contribution Status' => 'Completed',
+      'Received Into' => 'Deposit Bank Account',
+      'Source' => "Online Contribution: $contributionTitle",
+      'Online Contribution Page' => $contributionTitle,
+    );
+    $this->webtestVerifyTabularData($expected);
+
+    //Find Member
+    $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
+
+    $this->type("sort_name", "$lastName $firstName");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
+    $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+
+    //View Membership Record
+    $verifyData = array(
+      'Member' => $firstName . ' ' . $lastName,
+      'Membership Type' => $memTypeTitle,
+      'Source' => 'Online Contribution:' . ' ' . $contributionTitle,
+      'Status' => 'New',
+    );
+
+    $this->webtestVerifyTabularData($verifyData);
   }
 
 }

@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmMailing').controller('ViewRecipCtrl', function EditRecipCtrl($scope) {
+  angular.module('crmMailing').controller('ViewRecipCtrl', function ViewRecipCtrl($scope) {
     $scope.getIncludesAsString = function(mailing) {
       var first = true;
       var names = '';

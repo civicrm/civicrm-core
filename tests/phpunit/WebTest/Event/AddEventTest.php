@@ -770,9 +770,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->select2("event_id", $eventTitle, FALSE);
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a");
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[contains(text(),
      '{$secParticipant['last_name']}, {$secParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[contains(text(),
     '{$thirdParticipant['last_name']}, {$thirdParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
 
     //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present

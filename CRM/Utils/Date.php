@@ -1395,7 +1395,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
-            $from = self::intervalAdd('month', -1, $to);
+            $from = self::intervalAdd('day', -30, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
 

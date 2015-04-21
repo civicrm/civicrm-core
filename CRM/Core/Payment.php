@@ -620,10 +620,7 @@ abstract class CRM_Core_Payment {
       }
       else {
         // Legacy or extension as module instance
-        if (empty($paymentClass)) {
-          $paymentClass = 'CRM_Core_' . $dao->class_name;
-
-        }
+        $paymentClass = 'CRM_Core_' . $dao->class_name;
       }
 
       $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
