@@ -811,6 +811,14 @@ LIMIT {$offset}, {$rowCount}
       return CRM_Utils_System::permissionDenied();
     }
 
+    //CRM-16306 - Refresh contact tabs which might have been affected
+    if (!empty($_GET['updatetabCounts']) && CRM_Utils_Type::escape($_GET['updatetabCounts'], 'Boolean')) {
+      $tabCount['tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $contactID);
+      $tabCount['tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $contactID);
+      echo json_encode($tabCount);
+      CRM_Utils_System::civiExit();
+    }
+
     $sortMapper = array(
       0 => 'relation',
       1 => 'sort_name',

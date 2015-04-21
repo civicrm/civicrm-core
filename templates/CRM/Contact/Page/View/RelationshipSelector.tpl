@@ -106,9 +106,19 @@
           {/literal}{if $context eq 'current'}{literal}
           if ($('#tab_rel').length) {
             CRM.tabHeader.updateCount($('#tab_rel'), currentoTable.fnSettings().fnRecordsTotal());
+
             // Refresh contact tabs which might have been affected
-            CRM.tabHeader.updateCount($('#tab_member'), currentoTable.fnSettings().fnRecordsTotal());
-            CRM.tabHeader.updateCount($('#tab_contribute'), currentoTable.fnSettings().fnRecordsTotal());
+            $.getJSON(CRM.url('civicrm/ajax/contactrelationships'), {
+              'cid': {/literal}{$contactId}{literal},
+              'type': 'method',
+              'class_name': 'CRM_Contact_Page_AJAX',
+              'fn_name': 'contactrelationships',
+              'updatetabCounts': true,
+            },
+            function(tabCounts) {
+              CRM.tabHeader.updateCount($('#tab_member'), tabCounts.tab_member);
+              CRM.tabHeader.updateCount($('#tab_contribute'), tabCounts.tab_contribute);
+            },'json');
           }
           {/literal}{/if}{literal}
         },
