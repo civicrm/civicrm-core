@@ -91,9 +91,9 @@ CRM.$(function($) {
       // In case select2 widget hasn't been initialized yet, we have to get the data from the dom
       // FIXME: waiting for select2 initialization would be better, but not sure how
       if ($(this).data('select2')) {
-        isRepeating = $(this).select2('data')['api.RecurringEntity.getcount'];
+        isRepeating = $(this).select2('data').extra.is_recur;
       } else {
-        isRepeating = $(this).data('entityValue')[0]['api.RecurringEntity.getcount'];
+        isRepeating = $(this).data('entityValue')[0].extra.is_recur;
       }
     }
     if (isRepeating) {
