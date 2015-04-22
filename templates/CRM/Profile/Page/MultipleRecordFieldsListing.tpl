@@ -50,11 +50,7 @@
             {foreach from=$records key=recId item=rows}
               <tr class="{cycle values="odd-row,even-row"}">
                 {foreach from=$headers key=hrecId item=head}
-                  {if $dateFieldsVals.$hrecId.$recId}
-                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
-                  {else}
-                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
-                  {/if}
+                  <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
                 {/foreach}
                 <td>{$rows.action}</td>
                 {foreach from=$dateFieldsVals key=fid item=rec}

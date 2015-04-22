@@ -235,8 +235,19 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $param, $returnValues, $returnProperities);
         if ($returnValues['data_type'] == 'Date') {
           $dateFields[$fieldIDs[$key]] = 1;
-        }
 
+          //set date and time format
+          switch (!empty($returnValues['time_format'])) {
+            case 2:
+              $timeFormat = "G:i";
+              break;
+            default:
+              $timeFormat = "g:iA";
+              break;
+          }
+          $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
+          $dateFormat = CRM_Utils_Array::value($returnValues['date_format'], $actualPHPFormats) . " " . $timeFormat;
+        }
         $optionValuePairs = CRM_Core_BAO_CustomOption::getCustomOption($fieldIDs[$key]);
         if (!empty($optionValuePairs)) {
           foreach ($optionValuePairs as $optionPairs) {
@@ -300,6 +311,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
                 // formated date capture value capture
                 $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
+                $result[$recId][$fieldId] = CRM_Utils_Date::processDate($dateFieldsVals[$fieldId][$recId], NULL, FALSE, $dateFormat);
               }
               else {
                 // assign to $result
