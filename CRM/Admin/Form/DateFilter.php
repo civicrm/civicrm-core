@@ -43,6 +43,7 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
   public function preProcess() {
     $this->set('gName', 'relative_date_filters');
     parent::preprocess();
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Page/DateFilter.js');
   }
 
   /**
@@ -58,8 +59,9 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
     return $defaults;
   }
   public function buildQuickForm() {
-      parent::buildQuickForm();
-      $this->add('select', 'relative_terms', ts('Relative Date Terms'), CRM_Core_SelectValues::getRelativeDateTerms(), FALSE, array('class' => 'required'));
-      $this->add('select', 'units', ts('Units'), CRM_Core_SelectValues::getRelativeDateUnits(), FALSE, array('class' => 'required'));
+    parent::buildQuickForm();
+    $this->add('select', 'relative_terms', ts('Relative Date Terms'), CRM_Core_SelectValues::getRelativeDateTerms(), FALSE, array('class' => 'required'));
+    $this->add('select', 'units', ts('Units'), CRM_Core_SelectValues::getRelativeDateUnits(), FALSE, array('class' => 'required'));
   }
+
 }
