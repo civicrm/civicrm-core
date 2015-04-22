@@ -241,6 +241,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
             case 2:
               $timeFormat = "G:i";
               break;
+
             default:
               $timeFormat = "g:iA";
               break;
