@@ -117,7 +117,7 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
         }
         // delete participant only if it is not an additional participant
         // or if it is additional and its primary participant is not selected in $this->_participantIds.
-        elseif ($primaryParticipantId == NULL || ($primaryParticipantId != NULL && !CRM_Utils_Array::crmInArray($primaryParticipantId, $this->_participantIds))) {
+        elseif (empty($primaryParticipantId) || (!in_array($primaryParticipantId, $this->_participantIds))) {
           CRM_Event_BAO_Participant::deleteParticipant($participantId);
           $deletedParticipants++;
         }
