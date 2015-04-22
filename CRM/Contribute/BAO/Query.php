@@ -855,11 +855,8 @@ class CRM_Contribute_BAO_Query {
 
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
-      array(
-        '' => ts('- any -'),
-      ) +
       CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE, array('class' => 'crm-select2')
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     $form->addSelect('payment_instrument_id',
