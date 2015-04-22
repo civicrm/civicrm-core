@@ -207,7 +207,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   public static function preProcessEntityRef($field) {
     $val = $field->getValue();
     // Temporarily convert string values to an array
-    if (!is_array($val)) {
+    if (!$val) {
+     $val = array();
+    }
+    elseif (!is_array($val)) {
       // Try to auto-detect method of serialization
       $val = strpos($val, ',') ? explode(',', str_replace(', ', ',', $val)) : (array) CRM_Utils_Array::explodePadded($val);
     }
