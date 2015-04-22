@@ -1178,7 +1178,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
     $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
-    $name = isset($props['name_id']) ? $props['name_id'] : $name;
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $props['context'] == 'search') {

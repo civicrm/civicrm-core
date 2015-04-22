@@ -130,8 +130,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
           NULL => ts('- none -'),
         ) + $this->_fields, FALSE, $disabled
       );
-      $this->addField('rule_length', array('entity' => 'Rule', 'name_id' => "length_$count") + $attributes);
-      $this->addField('rule_weight', array('entity' => 'Rule', 'name_id' => "weight_$count") + $attributes);
+      $this->addField("length_$count", array('entity' => 'Rule', 'name' => 'rule_length') + $attributes);
+      $this->addField("weight_$count", array('entity' => 'Rule', 'name' => 'rule_weight') + $attributes);
     }
 
     $this->addField('threshold', array('label' => ts("Weight Threshold to Consider Contacts 'Matching':")) + $attributes);
