@@ -1177,8 +1177,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Get field metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
+    $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $props['context'] == 'search') {
@@ -1205,21 +1204,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($props['options']);
       }
       else {
-        $options = $fieldSpec['options'];
+        $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-
-      // The placeholder is only used for select-elements.
-      if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
-      }
-
+      //@TODO AdvMulti-Select is deprecated, drop support.
       if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
-      }
-      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
-        $props['class'] .= ' huge';
-        $props['multiple'] = 'multiple';
       }
       // Set default options-url value.
       if ((!isset($props['options-url']))) {
@@ -1234,6 +1223,26 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (isset($props['options-url'])) {
           unset($props['options-url']);
         }
+      }
+    }
+    //Use select2 library for following widgets.
+    $isSelect2 = (in_array($widget, array(
+          'Select',
+          'Multi-Select',
+          'Select State/Province',
+          'Multi-Select State/Province',
+          'Select Country',
+          'Multi-Select Country',
+    )));
+    if ($isSelect2) {
+      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
+        $props['class'] .= ' huge';
+        $props['multiple'] = 'multiple';
+      }
+      // The placeholder is only used for select-elements.
+      if (!array_key_exists('placeholder', $props)) {
+        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
@@ -1254,7 +1263,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //case 'Select Date':
       //TODO: Add date formats
       //TODO: Add javascript template for dates.
-      // case 'Radio':
+      case 'Radio':
+        $separator = isset($props['separator']) ? $props['separator'] : NULL;
+        unset($props['separator']);
+        if (!isset($props['allowClear'])) {
+          $props['allowClear'] = !$required;
+        }
+        $this->addRadio($name, $label, $options, $props, $separator, $required);
+        break;
+
       case 'Select':
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
@@ -1264,7 +1281,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         break;
 
       //case 'AdvMulti-Select':
-      //case 'CheckBox':
+      case 'CheckBox':
+        $this->add('checkbox', $name, $label, NULL, $required);
+        break;
+
       case 'File':
         // We should not build upload file in search mode.
         if (isset($props['context']) && $props['context'] == 'search') {
