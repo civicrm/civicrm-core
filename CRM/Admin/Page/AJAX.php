@@ -340,4 +340,18 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
+  /**
+   * Used to preview date filters on civicrm/admin/relative_date_filters.
+   */
+  public static function previewRelativeDateFilter() {
+    //$previewDate = CRM_Utils_Type::escape($_GET['previewDate'], 'Date');
+    $previewDate = "2016-02-29";
+    $relativeTerms = CRM_Utils_Type::escape($_GET['relativeTerms'], 'String');
+    $Units = CRM_Utils_Type::escape($_GET['Units'], 'String');
+    // do the preview call here
+    $result['fromDate'] = 'FROM!';
+    $result['toDate'] = 'TO!';
+    CRM_Utils_JSON::output($result);
+  }
+
 }
