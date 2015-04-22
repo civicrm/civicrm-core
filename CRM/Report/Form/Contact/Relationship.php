@@ -231,6 +231,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
+            'start_date' => array(
+            'title' => ts('Start Date'),
+            'type' => CRM_Utils_Type::T_DATE,
+            ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+            'type' => CRM_Utils_Type::T_DATE,
+            ),
+
+
         ),
         'grouping' => 'relation-fields',
       ),
