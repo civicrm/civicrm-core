@@ -45,6 +45,13 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   protected $_rgid;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'RuleGroup';
+  }
+
+  /**
    * Pre processing.
    *
    * @return void
@@ -99,17 +106,14 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $foo = CRM_Core_DAO::getAttribute('CRM_Dedupe_DAO_Rule', 'title');
-
-    $this->add('text', 'title', ts('Rule Name'), array('maxlength' => 255, 'class' => 'huge'), TRUE);
+    $this->addField('title', array('label' => ts('Rule Name')), TRUE);
     $this->addRule('title', ts('A duplicate matching rule with this name already exists. Please select another name.'),
       'objectExists', array('CRM_Dedupe_DAO_RuleGroup', $this->_rgid, 'title')
     );
 
-    $this->addRadio('used', ts('Usage'), $this->_options, NULL, NULL, TRUE);
-
+    $this->addField('used', array('label' => ts('Usage')), TRUE);
     $disabled = array();
-    $reserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
+    $reserved = $this->addField('is_reserved', array('label' => ts('Reserved?')));
     if (!empty($this->_defaults['is_reserved'])) {
       $reserved->freeze();
       $disabled = array('disabled' => TRUE);
@@ -126,11 +130,11 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
           NULL => ts('- none -'),
         ) + $this->_fields, FALSE, $disabled
       );
-      $this->add('text', "length_$count", ts('Length'), $attributes);
-      $this->add('text', "weight_$count", ts('Weight'), $attributes);
+      $this->addField("length_$count", array('entity' => 'Rule', 'name' => 'rule_length') + $attributes);
+      $this->addField("weight_$count", array('entity' => 'Rule', 'name' => 'rule_weight') + $attributes);
     }
 
-    $this->add('text', 'threshold', ts("Weight Threshold to Consider Contacts 'Matching':"), $attributes);
+    $this->addField('threshold', array('label' => ts("Weight Threshold to Consider Contacts 'Matching':")) + $attributes);
 
     $this->assign('contact_type', $this->_contactType);
 
