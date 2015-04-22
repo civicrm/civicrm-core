@@ -2220,6 +2220,8 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
 
       break;
     }
+    // Filter out event templates.
+    $params['condition'] = 'is_template = 0';
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
