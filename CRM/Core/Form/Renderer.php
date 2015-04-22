@@ -207,7 +207,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   public static function preProcessEntityRef($field) {
     $val = $field->getValue();
     // Temporarily convert string values to an array
-    if (!$val) {
+    if (!$val || ($val && !is_numeric($val))) {
      $val = array();
     }
     elseif (!is_array($val)) {
