@@ -5658,10 +5658,16 @@ AND   displayRelType.is_active = 1
    * @return array
    */
   public static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
-    $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
+
     if ($fieldName == 'activity_type_id') {
       $pseduoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    }
+    elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
+      $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
+    }
+    else {
+      $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     }
 
     //For those $fieldName which don't have any associated pseudoconstant defined
