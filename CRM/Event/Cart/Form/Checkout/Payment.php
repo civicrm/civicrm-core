@@ -253,6 +253,17 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $price_set = $price_sets[$price_set_id];
       $price_set_amount = array();
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
+      $discountcode = $this->_price_values['discountcode'];
+      if ($discountcode != null ){
+            $discounted_event_ids = array();
+            $discounted_event_ids = _cividiscount_get_discounted_event_ids();
+            if (array_search($event_in_cart->event_id, $discounted_event_ids) != null){
+                $this->apply_discount($discountcode, $price_set_amount, $cost);
+            }
+            else {
+                //This event not eligible for discount
+            }
+      }   
       $cost = $event_price_values['amount'];
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
@@ -649,7 +660,22 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
-
+    $params['receive_date'] = $contribution->receive_date;
+    //LSE now write to line items in database
+    $lineItem = array();
+    $lineItems = array();
+    $entityTable = 'civicrm_participant';
+    $entityId = $mer_participant->id;
+    foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
+      $lineItem = $this->retrieve_event_line_item($event_in_cart);
+           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
+ 
+       foreach ($this->cart->get_events_in_carts_by_main_event_id($event_in_cart->event_id) as $subevent) {
+        $lineItem = $this->retrieve_event_line_item($subevent, 'subevent');
+            CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
+ 
+      }
+    }
     return $contribution;
   }
 
@@ -720,5 +746,86 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     return $defaults;
   }
+  
+  /**
+  * Prepare line item data for database
+  */
+  function retrieve_event_line_item(&$event_in_cart, $class = NULL) {
+    $lineItems = array();
+    $price_set_id = CRM_Price_BAO_PriceSet::getFor("civicrm_event", $event_in_cart->event_id);
+
+    //$amount_level = NULL;
+    if ($price_set_id) {
+      $params['line_items'] = $price_set_id;
+      $event_price_values = array();
+      foreach ($this->_price_values as $key => $value) {
+        if (preg_match("/event_{$event_in_cart->event_id}_(price.*)/", $key, $matches)) {
+          $event_price_values[$matches[1]] = $value;
+        }
+      }
+      $price_sets       = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE);
+      $price_set        = $price_sets[$price_set_id];
+      $price_set_amount = array();
+       //apply discount code
+      CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
+      $discountcode = $this->_price_values['discountcode'];
+      if ($discountcode != null){
+            $discounted_event_ids = array();
+            $discounted_event_ids = _cividiscount_get_discounted_event_ids();
+            if (array_search($event_in_cart->id, $discounted_event_ids) != null){
+               $this->apply_discount($discountcode, $price_set_amount, $cost);
+            }
+            else {
+                //This event not eligible for discount
+            }
+      } 
+      $lineItems[$price_set_id] = $price_set_amount;
+      return $lineItems;
+    }
+   }
+   
+/**
+*Apply discount code to price set
+*/
+  function apply_discount($discountcode, &$price_set_amount, &$cost){
+    $discounts = array();
+    $discounted = array();
+    $discounted_priceset_ids = array();
+    $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();
+  
+    $discounts = _cividiscount_get_discounts();
+    foreach ($discounts as $key => $discvalue){
+        if ($key == $discountcode){
+        //check priceset and is_active
+            $today = Date('Y-m-d');
+            $diff1 = date_diff(date_create($today), date_create($discvalue['active_on']) );
+            if ($diff1->days > 0){
+                $active1 = true;
+            }
+            if ($discvalue['expire_on'] != null){
+                $diff2 = date_diff(date_create($today), date_create($discvalue['expire_on']) );
+                if ($diff2->days > 0 )
+                    $active2 = true;
+            } else {
+                $active2 = true;
+            }
+            if ($discvalue['is_active'] == true && ($discvalue['count_max'] == 0 || ($discvalue['count_max'] > $discvalue['count_use'])) && $active1 == true && $active2 == true )  {
+                foreach ($price_set_amount as $key=>$price){
+                    if ( array_search($price['price_field_value_id'],$discounted_priceset_ids) != null ){
+                        $discounted = _cividiscount_calc_discount($price['line_total'], $price['label'], $discvalue, $autodiscount, "USD");
+                        $price_set_amount[$key]['line_total'] = $discounted[0];
+                        $cost += $discounted[0];
+                        $price_set_amount[$key]['label'] = $discounted[1];
+                    }
+                }
+            }
+        }
+    }
+    if(!empty($discountcode) && empty($discounted)) {
+          $form->set('discountCodeErrorMsg', ts('The discount code you entered is invalid.'));
+    }
+ 
+  }
+
 
 }
