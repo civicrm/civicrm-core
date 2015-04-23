@@ -1455,10 +1455,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $memParams = array('contact_id' => $cid);
       $memberships = array();
 
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active);
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active, TRUE);
 
       if (empty($memberships)) {
         continue;
+      }
+
+      //get ownerMembershipIds for related Membership
+      //this is to handle memberships being deleted and recreated
+      if (!empty($memberships['owner_membership_ids'])) {
+        $ownerMemIds[$cid]= $memberships['owner_membership_ids'];
+        unset($memberships['owner_membership_ids']);
       }
 
       $values[$cid]['memberships'] = $memberships;
@@ -1558,9 +1565,11 @@ SELECT relationship_type_id, relationship_direction
             if ($action & CRM_Core_Action::UPDATE) {
               //if updated relationship is already related to contact don't delete existing inherited membership
               if (in_array($relTypeId, $relTypeIds
-              ) && !empty($values[$relatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
+              ) && !empty($values[$relatedContactId]['memberships']) && !empty($ownerMemIds
+              ) && in_array($membershipValues['owner_membership_id'], $ownerMemIds[$relatedContactId])) {
                 continue;
               }
+
               //delete the membership record for related
               //contact before creating new membership record.
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
