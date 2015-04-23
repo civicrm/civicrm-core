@@ -1836,11 +1836,15 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if (!$contactId) {
       return 0;
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
 
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
-      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} ";
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution'
+      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
+      AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+      AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") ";
 
     $contactSoftCreditContributionsSQL = "
       SELECT contribution.id
