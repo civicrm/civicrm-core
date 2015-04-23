@@ -276,7 +276,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
     if (!empty($id)) {
       if (is_array($id)) {
-        $query .= " AND `id` IN (". implode(',', $id) . ")";
+        $query .= " AND `id` IN (" . implode(',', $id) . ")";
       }
       else {
         $query .= " AND `id` = {$id}";
