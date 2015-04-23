@@ -1464,7 +1464,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       //get ownerMembershipIds for related Membership
       //this is to handle memberships being deleted and recreated
       if (!empty($memberships['owner_membership_ids'])) {
-        $ownerMemIds[$cid]= $memberships['owner_membership_ids'];
+        $ownerMemIds[$cid] = $memberships['owner_membership_ids'];
         unset($memberships['owner_membership_ids']);
       }
 
