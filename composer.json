@@ -9,7 +9,7 @@
     "dompdf/dompdf" : "0.6.*",
     "symfony/dependency-injection": "2.3.*",
     "symfony/event-dispatcher": "2.3.*",
-    "psr/log": "1.0.0",
+    "psr/log": "~1.0.0",
     "symfony/finder": "2.3.*",
     "totten/ca-config": "~13.02"
   },
