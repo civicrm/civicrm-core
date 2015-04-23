@@ -1127,6 +1127,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     }
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
 
     $query = "
       SELECT count(*) as count,
@@ -1134,11 +1135,14 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
              avg(total_amount) as average,
              currency
         FROM civicrm_contribution b
+        LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution'
        WHERE b.contact_id IN ( $contactIDs )
          AND b.contribution_status_id = 1
          AND b.is_test = 0
          AND b.receive_date >= $startDate
          AND b.receive_date <  $endDate
+         AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
       GROUP BY currency
       ";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
