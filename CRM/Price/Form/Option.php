@@ -113,6 +113,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    if ($this->_action == CRM_Core_Action::UPDATE) {
+      $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_oid, 'financial_type_id');
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'edit');
+      if (!array_key_exists($finTypeId, $financialTypes)) {
+        CRM_Core_Error::fatal(ts("You do not have permission to access this page"));
+      }
+    }
     if ($this->_action == CRM_Core_Action::DELETE) {
       $this->addButtons(array(
           array(
