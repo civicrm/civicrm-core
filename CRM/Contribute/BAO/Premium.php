@@ -123,7 +123,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
-      $dao->financial_type_id = array_keys($financialTypes);
+      $dao->whereAdd('financial_type_id IN (' . implode(',' , array_keys($financialTypes)) . ')');
       $dao->orderBy('weight');
       $dao->find();
 

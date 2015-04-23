@@ -156,6 +156,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
+    $fieldValueDAO->whereAdd('financial_type_id IN (' . implode(',' , array_keys($financialTypes)) . ')');
     $fieldValueDAO->orderBy($orderBy, 'label');
     if ($isActive) {
       $fieldValueDAO->is_active = 1;
@@ -163,9 +164,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueDAO->find();
 
     while ($fieldValueDAO->fetch()) {
-      if (!in_array($fieldValueDAO->financial_type_id, array_keys($financialTypes))) {
-        continue;
-      }
       CRM_Core_DAO::storeValues($fieldValueDAO, $values[$fieldValueDAO->id]);
     }
 
