@@ -1137,7 +1137,12 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-
+    $additionalWhere = " AND b.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $additionalWhere = " 
+         AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    }
     $query = "
       SELECT count(*) as count,
              sum(total_amount) as amount,
@@ -1150,8 +1155,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
          AND b.is_test = 0
          AND b.receive_date >= $startDate
          AND b.receive_date <  $endDate
-         AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         $additionalWhere
       GROUP BY currency
       ";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -1850,14 +1854,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return 0;
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-
+    $additionalWhere = " AND contribution.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $additionalWhere = " 
+         AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    }
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
       LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution'
       WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
-      AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-      AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") ";
+      $additionalWhere ";
 
     $contactSoftCreditContributionsSQL = "
       SELECT contribution.id

@@ -115,6 +115,10 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     $dao->entity_id = $pageID;
     $dao->premiums_active = 1;
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+    $addWhere = "financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $addWhere = "financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    }
 
     if ($dao->find(TRUE)) {
       $premiumID = $dao->id;
@@ -123,7 +127,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
-      $dao->whereAdd('financial_type_id IN (' . implode(',' , array_keys($financialTypes)) . ')');
+      $dao->whereAdd($addWhere);
       $dao->orderBy('weight');
       $dao->find();
 
