@@ -754,15 +754,24 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($endDate) {
       $where[] = "receive_date <= '" . CRM_Utils_Type::escape($endDate, 'Timestamp') . "'";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes); 
+    if ($financialTypes) {
+      $where[] = "c.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $where[] = "i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    } 
+    else {
+      $where[] = "c.financial_type_id IN (0)";
+    }
 
     $whereCond = implode(' AND ', $where);
 
     $query = "
     SELECT  sum( total_amount ) as total_amount,
-            count( civicrm_contribution.id ) as total_count,
+            count( c.id ) as total_count,
             currency
-      FROM  civicrm_contribution
-INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.contact_id )
+      FROM  civicrm_contribution c
+INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
+LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table = 'civicrm_contribution' )
      WHERE  $whereCond
        AND  ( is_test = 0 OR is_test IS NULL )
        AND  contact.is_deleted = 0
@@ -1128,7 +1137,12 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-
+    $additionalWhere = " AND b.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $additionalWhere = " 
+         AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    }
     $query = "
       SELECT count(*) as count,
              sum(total_amount) as amount,
@@ -1141,8 +1155,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
          AND b.is_test = 0
          AND b.receive_date >= $startDate
          AND b.receive_date <  $endDate
-         AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         $additionalWhere
       GROUP BY currency
       ";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -1841,14 +1854,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return 0;
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-
+    $additionalWhere = " AND contribution.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $additionalWhere = " 
+         AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    }
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
       LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution'
       WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
-      AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-      AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") ";
+      $additionalWhere ";
 
     $contactSoftCreditContributionsSQL = "
       SELECT contribution.id
