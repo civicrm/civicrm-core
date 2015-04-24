@@ -13,11 +13,6 @@
     <required>true</required>
     <comment>Event</comment>
     <add>1.7</add>
-   <pseudoconstant>
-      <table>civicrm_event</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>title</labelColumn>
-    </pseudoconstant>
   </field>
   <primaryKey>
     <name>id</name>
