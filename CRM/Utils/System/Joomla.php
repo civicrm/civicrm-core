@@ -386,11 +386,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
-          list($hash, $salt) = explode(':', $dbPassword);
-          $cryptpass = md5($password . $salt);
-          if ($hash != $cryptpass) {
+        list($hash, $salt) = explode(':', $dbPassword);
+        $cryptpass = md5($password . $salt);
+        if ($hash != $cryptpass) {
             return FALSE;
-        }
+         }
       }
       else {
         if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
