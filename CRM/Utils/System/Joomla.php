@@ -389,8 +389,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         list($hash, $salt) = explode(':', $dbPassword);
         $cryptpass = md5($password . $salt);
         if ($hash != $cryptpass) {
-            return FALSE;
-         }
+          return FALSE;
+        }
       }
       else {
         if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) {
