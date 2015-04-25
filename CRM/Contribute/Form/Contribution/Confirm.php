@@ -1562,6 +1562,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       && $form->_membershipBlock['is_separate_payment'] === '0'
       && isset($params['selectMembership'])
       && $form->_values['is_allow_other_amount'] == '1'
+      // CRM-16331
+      && !empty($form->_membershipTypeValues)
+      && !empty($form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
     ) {
       $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
     }
