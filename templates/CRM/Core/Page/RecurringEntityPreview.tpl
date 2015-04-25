@@ -48,7 +48,7 @@
 {/if}
 
 <h3>
-  {ts}A recurring set will be created with the following dates.{/ts}
+  {ts}A repeating set will be created with the following dates.{/ts}
 </h3>
 <table class="display row-highlight">
   <thead><tr>
