@@ -82,8 +82,11 @@ class CRM_Utils_Check {
           $messages = $this->checkAll();
         }
         $statusMessages = array();
+        $statusType = 'alert';
+
         foreach ($messages as $message) {
           if ($filter === TRUE || call_user_func($filter, $message)) {
+            $statusType = (isImportantAlert($message)) ? 'error' : $statusType;
             $statusMessages[] = $message->getMessage();
             $statusTitle = $message->getTitle();
           }
@@ -98,7 +101,7 @@ class CRM_Utils_Check {
             $statusMessage = array_shift($statusMessages);
           }
           // TODO: add link to status page
-          CRM_Core_Session::setStatus($statusMessage, $statusTitle);
+          CRM_Core_Session::setStatus($statusMessage, $statusTitle, $statusType);
         }
       }
     }
