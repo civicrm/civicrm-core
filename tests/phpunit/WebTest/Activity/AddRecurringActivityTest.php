@@ -111,7 +111,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
     $this->type('start_action_offset', $occurrences);
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForTextPresent('A recurring set will be created with the following dates.');
+    $this->waitForTextPresent('A repeating set will be created with the following dates.');
 
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Continue']");
     $this->waitForPageToLoad();
