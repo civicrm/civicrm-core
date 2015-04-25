@@ -262,7 +262,7 @@ ORDER BY contact_a.sort_name';
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $this->buildACLClause('contact_a');
 
-    $from "
+    $from = "
         civicrm_activity activity
             LEFT JOIN civicrm_activity_contact target
                  ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
