@@ -614,7 +614,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $this->callAPIFailure('relationship', 'create', $params, 'Relationship already exists');
 
-    $this->callAPISuccess('relationship', 'delete', array('id' => $result['id'],));
+    $this->callAPISuccess('relationship', 'delete', array('id' => $result['id']));
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
@@ -837,7 +837,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params = array(
       'id' => $relationship['id'],
     );
-     $this->callAPISuccess('relationship', 'delete', $params);
+    $this->callAPISuccess('relationship', 'delete', $params);
     $this->relationshipTypeDelete($this->_relTypeID);
   }
 
