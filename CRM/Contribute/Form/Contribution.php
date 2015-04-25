@@ -1257,19 +1257,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
+    // unclear whether params is potentially altered here - would prefer not to pass by reference.
+    $params = $this->processFormCustomFields($params, $this->_id);
 
-    // Build custom data getFields array
-    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
-      CRM_Utils_Array::value('financial_type_id', $params)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
-      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
-      $this->_id,
-      'Contribution'
-    );
+
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
@@ -1907,6 +1898,28 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $line;
     }
     return $line;
+  }
+
+  /**
+   * Process the custom fields that have been passed in.
+   *
+   * @param array $params
+   *
+   * @return array mixed
+   */
+  protected function processFormCustomFields($params, $contribution_id) {
+    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
+      CRM_Utils_Array::value('financial_type_id', $params)
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
+      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
+    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $customFields,
+      $contribution_id,
+      'Contribution'
+    );
+    return $params;
   }
 
 }
