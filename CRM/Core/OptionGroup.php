@@ -591,12 +591,14 @@ SELECT v.label
    * @param string $field
    * @param string $fieldType
    * @param bool $active
+   * @param bool $localize
+   *   if true, localize the results before returning.
    *
    * @return array
    */
   public static function getRowValues(
     $groupName, $fieldValue, $field = 'name',
-    $fieldType = 'String', $active = TRUE
+    $fieldType = 'String', $active = TRUE, $localize = FALSE
   ) {
     $query = "
 SELECT v.id, v.label, v.value, v.name, v.weight, v.description
@@ -631,6 +633,13 @@ WHERE  v.option_group_id = g.id
         $row[$fld] = $dao->$fld;
       }
     }
+
+    if ($localize) {
+      foreach (array('label', 'description') as $f) {
+        $row[$f] = ts($row[$f]);
+      }
+    }
+
     return $row;
   }
 
