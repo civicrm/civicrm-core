@@ -39,7 +39,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   protected $_options;
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
-  
+
   /**
    * @param $formValues
    */
@@ -231,7 +231,7 @@ contact_a.sort_name    as sort_name,
 
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
+    }
 
     return $from;
   }
@@ -282,7 +282,7 @@ contact_a.sort_name    as sort_name,
     if (!empty($clause)) {
       $where .= ' AND ' . implode(' AND ', $clause);
     }
-    
+
     $where .= "{$this->_where} ";
 
     return $this->whereClause($where, $params);
@@ -368,5 +368,6 @@ contact_a.sort_name    as sort_name,
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
-  }  
+  }
+
 }

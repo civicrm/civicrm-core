@@ -130,7 +130,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -183,7 +183,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     $this->buildACLClause('contact_a');
     if ($this->_aclWhere) {
       $where .= " AND {$this->_aclWhere} ";
-    } 
+    }
     $sql = "
 SELECT     $select
 FROM       civicrm_contact AS contact_a {$this->_aclFrom}
@@ -397,7 +397,7 @@ AND      c.receive_date < {$this->start_date_1}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-  
+
   /**
    * @param string $tableAlias
    */

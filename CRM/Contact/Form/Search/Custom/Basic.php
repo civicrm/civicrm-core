@@ -185,7 +185,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $from .= "{$this->_aclFrom}";
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
+    }
     return $from;
   }
 
@@ -214,7 +214,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   public function getQueryObj() {
     return $this->_query;
   }
-  
+
   /**
    * @param string $tableAlias
    */

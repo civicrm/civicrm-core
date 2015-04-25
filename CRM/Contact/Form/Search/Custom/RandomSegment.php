@@ -295,7 +295,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       }
     }
     $this->buildACLClause('contact_a');
-    
+
     $from = "FROM civicrm_contact contact_a";
 
     $fromTail = "LEFT JOIN civicrm_email ON ( contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1 )";
@@ -333,10 +333,10 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
-    
+    }
+
     return $from;
-       
+
   }
 
   /**

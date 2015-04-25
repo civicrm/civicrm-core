@@ -285,8 +285,7 @@ ORDER BY contact_a.sort_name';
 
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
-    } 
-
+    }
     return $from;
   }
 
@@ -387,7 +386,7 @@ ORDER BY contact_a.sort_name';
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -420,7 +419,7 @@ ORDER BY contact_a.sort_name';
   public function summary() {
     return NULL;
   }
-  
+
   /**
    * @param string $tableAlias
    */

@@ -147,7 +147,7 @@ WHERE  $where
    */
   public function from() {
     $this->buildACLClause('contact_a');
-    $from ="
+    $from = "
       civicrm_contribution,
       civicrm_contact contact_a
       LEFT JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact' AND
@@ -156,7 +156,7 @@ WHERE  $where
      ";
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
-    } 
+    }
     return $from;
   }
 
@@ -233,7 +233,7 @@ WHERE  $where
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -273,4 +273,5 @@ WHERE  $where
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }

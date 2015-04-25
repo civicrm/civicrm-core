@@ -151,8 +151,8 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
 ";
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
-  return $from;
+    }
+    return $from;
   }
 
   /**
@@ -241,4 +241,5 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }

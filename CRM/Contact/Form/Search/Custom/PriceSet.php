@@ -318,8 +318,8 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
 ";
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
-    
+    }
+
     return $from;
   }
 
@@ -370,4 +370,5 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }

@@ -376,7 +376,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
     // end if( $this->_groups ) condition
     $this->buildACLClause('contact_a');
-    
+
     $from = "FROM civicrm_contact contact_a";
 
     /* We need to join to this again to get the date_added value */
@@ -391,8 +391,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
-    } 
-    
+    }
+
     return $from;
   }
 
@@ -455,4 +455,5 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }

@@ -186,7 +186,7 @@ civicrm_contact AS contact_a {$this->aclFrom}
 ";
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
-    } 
+    }
     return $from;
   }
 
@@ -279,7 +279,7 @@ civicrm_contact AS contact_a {$this->aclFrom}
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -319,4 +319,5 @@ civicrm_contact AS contact_a {$this->aclFrom}
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
+
 }
