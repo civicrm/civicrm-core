@@ -62,18 +62,14 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
       $user = JFactory::getUser();
+      $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
 
       // If we are coming from REST we don't have a user but we do have the api_key for a user.
-      if ($user->id === 0) {
+      if ($user->id === 0 && !is_null($api_key)) {
         // This is a codeblock copied from /Civicrm/Utils/REST
         $uid = NULL;
         if (!$uid) {
           $store      = NULL;
-          $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
-
-          if (empty($api_key)) {
-            return CRM_Utils_Rest::error("FATAL: mandatory param 'api_key' (user key) missing");
-          }
 
           $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
 
