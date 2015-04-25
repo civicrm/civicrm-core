@@ -81,10 +81,24 @@ class CRM_Utils_Check {
         if ($messages === NULL) {
           $messages = $this->checkAll();
         }
+        $statusMessages = array();
         foreach ($messages as $message) {
           if ($filter === TRUE || call_user_func($filter, $message)) {
-            CRM_Core_Session::setStatus($message->getMessage(), $message->getTitle());
+            $statusMessages[] = $message->getMessage();
+            $statusTitle = $message->getTitle();
           }
+        }
+
+        if (count($statusMessages)) {
+          if (count($statusMessages) > 1) {
+            $statusTitle = ts('Multiple Alerts');
+            $statusMessage = '<ul><li>' . implode('</li><li>',$statusMessages) . '</li></ul>';
+          }
+          else {
+            $statusMessage = array_shift($statusMessages);
+          }
+          // TODO: add link to status page
+          CRM_Core_Session::setStatus($statusMessage, $statusTitle);
         }
       }
     }
