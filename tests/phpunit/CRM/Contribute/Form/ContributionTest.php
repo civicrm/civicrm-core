@@ -64,6 +64,13 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_eventID;
 
   /**
+   * Payment instrument mapping.
+   *
+   * @var array
+   */
+  protected $paymentInstruments = array();
+
+  /**
    * Setup function.
    */
   public function setUp() {
@@ -105,6 +112,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'min_amount' => 10,
       'max_amount' => 1000,
     );
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $this->paymentInstruments = $instruments['values'];
   }
 
   /**
@@ -125,7 +134,48 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date' => '04/21/2015',
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
     ));
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitCreditCard() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+    ));
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitEmailReceipt() {
+    $form = new CRM_Contribute_Form_Contribution();
+    require_once 'CiviTest/CiviMailUtils.php';
+    $mut = new CiviMailUtils($this, TRUE);
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+    ));
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $mut->checkMailLog(array(
+        '<p>Please print this receipt for your records.</p>',
+      )
+    );
+    $mut->stop();
   }
 }
