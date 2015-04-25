@@ -67,7 +67,7 @@ class CRM_Utils_Check {
    *   By default, only show warnings and errors.
    *   Set TRUE to show all messages.
    */
-  public function showPeriodicAlerts($messages = NULL, $filter = array(__CLASS__, 'isImportantAlert')) {
+  public function showPeriodicAlerts($messages = NULL, $filter = array(__CLASS__, 'severityMap')) {
     if (CRM_Core_Permission::check('administer CiviCRM')
       && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
     ) {
@@ -85,8 +85,8 @@ class CRM_Utils_Check {
         $statusType = 'alert';
 
         foreach ($messages as $message) {
-          if ($filter === TRUE || call_user_func($filter, $message)) {
-            $statusType = (isImportantAlert($message)) ? 'error' : $statusType;
+          if ($filter === TRUE || call_user_func($filter, $message->getSeverity()) >= 3) {
+            $statusType = (call_user_func($filter, $message->getSeverity()) >= 4) ? 'error' : $statusType;
             $statusMessages[] = $message->getMessage();
             $statusTitle = $message->getTitle();
           }
@@ -108,18 +108,27 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Determine if a message is important enough to harass the administrator about.
+   * Get the integer value (useful for thresholds) of the severity.
    *
-   * @param CRM_Utils_Check_Message $message
+   * @param integer|const $severity
+   *   the value to look up
+   * @param bool $reverse
+   *   whether to find the constant from the integer
    * @return bool
    */
-  protected static function isImportantAlert($message) {
-    return in_array($message->getLevel(), array(
-      \Psr\Log\LogLevel::WARNING,
-      \Psr\Log\LogLevel::ALERT,
-      \Psr\Log\LogLevel::CRITICAL,
-      \Psr\Log\LogLevel::EMERGENCY,
-    ));
+  public static function severityMap($severity, $reverse = FALSE) {
+    // See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+    $levels = array(
+      \Psr\Log\LogLevel::EMERGENCY => 7,
+      \Psr\Log\LogLevel::ALERT => 6,
+      \Psr\Log\LogLevel::CRITICAL => 5,
+      \Psr\Log\LogLevel::ERROR => 4,
+      \Psr\Log\LogLevel::WARNING => 3,
+      \Psr\Log\LogLevel::NOTICE => 2,
+      \Psr\Log\LogLevel::INFO => 1,
+      \Psr\Log\LogLevel::DEBUG => 0,
+    );
+    return ($reverse) ? array_search($severity, $levels) : $levels[$severity];
   }
 
   /**
