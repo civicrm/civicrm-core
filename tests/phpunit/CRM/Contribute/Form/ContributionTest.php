@@ -178,4 +178,5 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     );
     $mut->stop();
   }
+
 }
