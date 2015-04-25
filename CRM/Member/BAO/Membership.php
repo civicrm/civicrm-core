@@ -1636,7 +1636,7 @@ AND civicrm_membership.is_test = %2";
           $format
         ),
         'membership_type_id' => $currentMembership['membership_type_id'],
-        'max_related' => $currentMembership['max_related'],
+        'max_related' => CRM_Utils_Array::value('max_related', $currentMembership, 0),
       );
 
       $session = CRM_Core_Session::singleton();
