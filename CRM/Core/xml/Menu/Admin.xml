@@ -714,6 +714,11 @@
        <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+       <path>civicrm/ajax/previewRelativeDateFilter</path>
+       <page_callback>CRM_Admin_Page_AJAX::previewRelativeDateFilter</page_callback>
+       <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/admin/tplstrings/add</path>
      <page_callback>CRM_Admin_Form_Persistent</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
