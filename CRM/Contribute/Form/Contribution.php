@@ -1432,13 +1432,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
     if (!empty($submittedValues['price_set_id']) && $this->_action & CRM_Core_Action::UPDATE) {
-      $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
-      $lineID = key($line);
-      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
-      $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
-      if ($quickConfig) {
-        CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_contribution');
-      }
+      $line = $this->deleteLineItemsIfUpdatingQuickConfig($this->_id);
     }
 
     // Process price set and get total amount and line items.
@@ -1891,6 +1885,28 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $contribution;
       //Offline Contribution ends.
     }
+  }
+
+  /**
+   * This functionality deleting line items in an edit situation - presumably for the purpose of recreating them.
+   *
+   * But we really need to explain this adequately.
+   *
+   * @param int $contribution_id
+   *
+   * @return array
+   *   Array of line items as they were prior to deletion.
+   */
+  protected function deleteLineItemsIfUpdatingQuickConfig($contribution_id) {
+    $line = CRM_Price_BAO_LineItem::getLineItems($contribution_id, 'contribution');
+    $lineID = key($line);
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
+    $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
+    if ($quickConfig) {
+      CRM_Price_BAO_LineItem::deleteLineItems($contribution_id, 'civicrm_contribution');
+      return $line;
+    }
+    return $line;
   }
 
 }
