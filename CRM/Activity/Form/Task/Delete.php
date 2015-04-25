@@ -91,7 +91,7 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 activity could not be deleted.', array('plural' => '%count activities could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
     }
   }
 
