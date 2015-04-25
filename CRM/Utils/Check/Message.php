@@ -103,6 +103,14 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Alias for Level
+   * @return string
+   **/
+  public function getSeverity() {
+    return $this->getLevel();
+  }
+
+  /**
    * @return array
    */
   public function toArray() {
