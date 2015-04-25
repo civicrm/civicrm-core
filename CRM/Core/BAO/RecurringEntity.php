@@ -533,6 +533,40 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
+   * Finds the position of this entity as well as total count of the repeating set
+   *
+   * @param $entityId
+   * @param $entityTable
+   * @return array|null
+   */
+  static public function getPositionAndCount($entityId, $entityTable) {
+    $position = $count = 0;
+
+    $query = "
+      SELECT entity_id
+      FROM civicrm_recurring_entity
+      WHERE parent_id = (SELECT parent_id FROM civicrm_recurring_entity WHERE entity_id = %1 AND entity_table = %2) AND entity_table = %2";
+
+    $dao = CRM_Core_DAO::executeQuery($query,
+      array(
+        1 => array($entityId, 'Integer'),
+        2 => array($entityTable, 'String'),
+      )
+    );
+
+    while ($dao->fetch()) {
+      ++$count;
+      if ($dao->entity_id <= $entityId) {
+        ++$position;
+      }
+    }
+    if ($count) {
+      return array($position, $count);
+    }
+    return NULL;
+  }
+
+  /**
    * This function copies the information from parent entity and creates other entities with same information.
    *
    * @param string $entityTable
