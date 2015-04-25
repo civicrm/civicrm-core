@@ -1163,12 +1163,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentParams['contactID'] = $this->_contactID;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $params['financial_type_id'];
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $params['financial_type_id'];
 
     // Add some financial type details to the params list
     // if folks need to use it.
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $financialType->name;
     $paymentParams['contributionPageID'] = NULL;
 
     if (!empty($this->_params['is_email_receipt'])) {
@@ -1192,7 +1192,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_params,
         NULL,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         TRUE,
         FALSE,
         $isTest,
@@ -1244,7 +1244,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Result has all the stuff we need
     // lets archive it to a financial transaction
-    if ($contributionType->is_deductible) {
+    if ($financialType->is_deductible) {
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
@@ -1266,7 +1266,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_params,
         $result,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         FALSE, FALSE,
         $isTest,
         $this->_lineItem
@@ -1682,14 +1682,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // CRM-11956
       // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
       // if non_deductible_amount does NOT exist - then calculate it depending on:
-      // $ContributionType->is_deductible and whether there is a product (premium).
+      // $financialType>is_deductible and whether there is a product (premium).
       if (empty($params['non_deductible_amount'])) {
-        $contributionType = new CRM_Financial_DAO_FinancialType();
-        $contributionType->id = $params['financial_type_id'];
-        if (!$contributionType->find(TRUE)) {
+        $financialType = new CRM_Financial_DAO_FinancialType();
+        $financialType->id = $params['financial_type_id'];
+        if (!$financialType->find(TRUE)) {
           CRM_Core_Error::fatal('Could not find a system table');
         }
-        if ($contributionType->is_deductible) {
+        if ($financialType->is_deductible) {
 
           if (isset($formValues['product_name'][0])) {
             $selectProduct = $formValues['product_name'][0];
