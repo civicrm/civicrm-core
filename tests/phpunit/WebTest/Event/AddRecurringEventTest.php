@@ -62,7 +62,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $this->select('start_action_offset', $occurrences);
     $this->multiselect2('exclude_date_list', array('05/11/2015', '05/12/2015'), TRUE);
     $this->click('_qf_Repeat_submit-bottom');
-    $this->waitForTextPresent('A recurring set will be created with the following dates.');
+    $this->waitForTextPresent('A repeating set will be created with the following dates.');
     $this->click("xpath=//button//span[text()='Continue']");
     $this->waitForAjaxContent();
     $this->checkCRMAlert('Repeat Configuration has been saved');
