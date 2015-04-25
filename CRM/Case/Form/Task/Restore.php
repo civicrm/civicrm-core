@@ -93,7 +93,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be restored.', array('plural' => '%count could not be restored.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 case could not be restored.', array('plural' => '%count cases could not be restored.', 'count' => $failed)), ts('Error'), 'error');
     }
   }
 

@@ -132,7 +132,7 @@
             <td class="label">{$form.recaptchaOptions.label}</td>
             <td>{$form.recaptchaOptions.html}<br />
               <span class="description">
-                {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
+                {ts}You can specify the reCAPTCHA theme options as comma separated data. For example: <code>theme: 'blackglass', lang: 'fr'</code>.{/ts}
                 <br />
                 {ts 1='href="https://developers.google.com/recaptcha/docs/display#config" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
               </span>
