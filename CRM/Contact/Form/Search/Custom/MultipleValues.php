@@ -285,8 +285,6 @@ contact_a.sort_name    as sort_name,
 
     $where .= "{$this->_where} ";
 
-    $where .= "{$this->_where} ";
-
     return $this->whereClause($where, $params);
   }
 
