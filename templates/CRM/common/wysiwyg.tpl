@@ -34,6 +34,6 @@
         <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
         <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
     {elseif $defaultWysiwygEditor eq 2}
-        <script type="text/javascript" src="{$config->resourceBase}packages/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="{$config->resourceBase}bower_components/ckeditor/ckeditor.js"></script>
     {/if}
 {/if}
