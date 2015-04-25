@@ -153,7 +153,7 @@ class CRM_Utils_Check {
    *   Array of messages
    * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
-  public function checkAll() {
+  public function checkAll($showHushed = false) {
     $checks = array();
     $checks[] = new CRM_Utils_Check_Security();
     $checks[] = new CRM_Utils_Check_Env();
@@ -175,6 +175,11 @@ class CRM_Utils_Check {
     }
 
     CRM_Utils_Hook::check($messages);
+
+    //TODO
+    if ($showHushed) {
+      $messages[] = new CRM_Utils_Check_Message('ShowHushed', '<h2>SHOWING HUSHED [NOT]</h2>', 'Show Hushed', \Psr\Log\LogLevel::INFO);
+    }
 
     return $messages;
   }
