@@ -66,7 +66,8 @@ class CRM_Utils_Check_Env {
           2 => $sqlNow,
           3 => $phpNow,
         )),
-        ts('Environment Settings')
+        ts('Environment Settings'),
+        \Psr\Log\LogLevel::ERROR
       );
     }
 
@@ -85,7 +86,8 @@ class CRM_Utils_Check_Env {
         'checkDebug',
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1'))),
-        ts('Debug Mode')
+        ts('Debug Mode'),
+        \Psr\Log\LogLevel::WARNING
       );
     }
 
@@ -108,7 +110,8 @@ class CRM_Utils_Check_Env {
         'checkOutboundMail',
         ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))),
-        ts('Outbound Email Settings')
+        ts('Outbound Email Settings'),
+        \Psr\Log\LogLevel::WARNING
       );
     }
 
