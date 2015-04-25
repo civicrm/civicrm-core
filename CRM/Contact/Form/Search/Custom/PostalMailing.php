@@ -123,7 +123,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
 ";
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
-    } 
+    }
     return $from;
   }
 

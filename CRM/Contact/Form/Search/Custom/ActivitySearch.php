@@ -286,6 +286,7 @@ ORDER BY contact_a.sort_name';
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
     }
+
     return $from;
   }
 

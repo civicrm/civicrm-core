@@ -226,6 +226,10 @@ LEFT JOIN civicrm_group_contact cgc ON ( cgc.contact_id = contact_a.id AND cgc.s
       $this->_where .= " AND {$this->_aclWhere} ";
     }
 
+    if ($this->_aclWhere) {
+      $this->_where .= " AND {$this->_aclWhere} ";
+    }
+
     return $f;
   }
 
