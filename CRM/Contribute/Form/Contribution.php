@@ -1863,4 +1863,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 
+  /**
+   * Wrapper for unit testing the post process submit function.
+   *
+   * (If we expose through api we can get default additions 'for free').
+   *
+   * @param array $params
+   */
+  public function testSubmit($params) {
+    $defaults = array(
+      'soft_credit_contact_id' => array(),
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'cancel_date' => '',
+      'cancel_date_time' => '',
+    );
+
+    $this->submit(array_merge($defaults, $params));
+  }
+
 }
