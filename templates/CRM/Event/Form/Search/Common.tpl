@@ -88,13 +88,11 @@ CRM.$(function($) {
   function toggleRecurrigCheckbox() {
     var isRepeating = false;
     if ($(this).val()) {
-      // In case select2 widget hasn't been initialized yet, we have to get the data from the dom
-      // FIXME: waiting for select2 initialization would be better, but not sure how
-      if ($(this).data('select2')) {
-        isRepeating = $(this).select2('data')['api.RecurringEntity.getcount'];
-      } else {
-        isRepeating = $(this).data('entityValue')[0]['api.RecurringEntity.getcount'];
+      // Workaround: In some cases this code gets called before the select2 initialization.
+      if (!$(this).data('select2')) {
+        $(this).crmEntityRef();
       }
+      isRepeating = $(this).select2('data').extra.is_recur;
     }
     if (isRepeating) {
       $('.crm-event-form-block-event_include_repeating_events').show();

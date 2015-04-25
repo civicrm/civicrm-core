@@ -77,8 +77,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $eventTitle = "Fall Fundraiser Dinner";
     $this->type("title", $eventTitle);
     $this->click("_qf_SearchEvent_refresh");
-    $this->assertTrue($this->isTextPresent("Recurring Event - (Child)"));
-    $this->assertTrue($this->isTextPresent("Recurring Event - (Parent)"));
+    $this->assertTrue($this->isTextPresent("Repeating"));
 
     //Update Mode Cascade Changes
     $this->click('event-configure-1');

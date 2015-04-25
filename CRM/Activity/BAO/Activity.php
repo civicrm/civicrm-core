@@ -867,7 +867,7 @@ ORDER BY    fixed_sort_order
 
       // if deleted, wrap in <del>
       if ($dao->is_deleted) {
-        $dao->contact_name = "<del>{$dao->contact_name}</dao>";
+        $dao->contact_name = "<del>{$dao->contact_name}</del>";
       }
 
       if ($dao->record_type_id == $sourceID && $dao->contact_id) {
@@ -2599,7 +2599,9 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $values['activity_id']
         );
 
-        $contactActivities[$activityId]['is_recurring_activity'] = $values['is_recurring_activity'];
+        if ($values['is_recurring_activity']) {
+          $contactActivities[$activityId]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
+        }
       }
     }
 
