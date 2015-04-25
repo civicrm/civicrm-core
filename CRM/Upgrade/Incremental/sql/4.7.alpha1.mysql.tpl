@@ -1,5 +1,9 @@
 {* file to handle db changes in 4.7.alpha1 during upgrade *}
 
+-- Add new columns for multilingual purpose
+ALTER TABLE `civicrm_action_schedule` ADD COLUMN `filter_contact_language` varchar(128) DEFAULT NULL COMMENT 'Used for multilingual installation';
+ALTER TABLE `civicrm_action_schedule` ADD COLUMN `communication_language` varchar(8) DEFAULT NULL COMMENT 'Used for multilingual installation';
+
 -- CRM-16354
 SELECT @option_group_id_wysiwyg := max(id) from civicrm_option_group where name = 'wysiwyg_editor';
 
