@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_query;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
@@ -178,7 +180,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    * @return string
    */
   public function from() {
-    return $this->_query->_fromClause;
+    $this->buildACLClause('contact_a');
+    $from = $this->_query->_fromClause;
+    $from .= "{$this->_aclFrom}";
+    if ($this->_aclWhere) {
+      $this->_where .= " AND {$this->_aclWhere} ";
+    } 
+    return $from;
   }
 
   /**
@@ -205,6 +213,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    */
   public function getQueryObj() {
     return $this->_query;
+  }
+  
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

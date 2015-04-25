@@ -37,6 +37,8 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   protected $_eventID = NULL;
 
   protected $_tableName = NULL;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   public $_permissionedComponent;
 
   /**
@@ -309,10 +311,16 @@ contact_a.display_name   as display_name";
    * @return string
    */
   public function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM       civicrm_contact contact_a
-INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id )
+INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id ) {$this->_aclFrom}
 ";
+    if ($this->_aclWhere) {
+      $this->_where .= " AND {$this->_aclWhere} ";
+    } 
+    
+    return $from;
   }
 
   /**
@@ -356,4 +364,10 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
     }
   }
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
 }

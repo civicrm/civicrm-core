@@ -33,6 +33,8 @@
  *
  */
 class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   /**
    * @param $formValues
    */
@@ -111,13 +113,18 @@ state_province.name     as state_province
    * @return string
    */
   public function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM      civicrm_group_contact as cgc,
           civicrm_contact       as contact_a
 LEFT JOIN civicrm_address address               ON (address.contact_id       = contact_a.id AND
                                                     address.is_primary       = 1 )
-LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.state_province_id
+LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.state_province_id {$this->_aclFrom}
 ";
+    if ($this->_aclWhere) {
+      $this->_where .= " {$this->_aclWhere} ";
+    } 
+    return $from;
   }
 
   /**
@@ -145,7 +152,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
     $clause[] = "contact_a.contact_type IN ('Individual','Household')";
 
     if (!empty($clause)) {
-      $where = implode(' AND ', $clause);
+      $where = "{$this->_where} AND " . implode(' AND ', $clause);
     }
 
     return $this->whereClause($where, $params);
@@ -156,6 +163,13 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }
