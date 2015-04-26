@@ -746,6 +746,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $settingsFiles = CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
     foreach ($settingsFiles as $file) {
       $settings = include $file;
+      $dupes = array_intersect($settingMetaData, $settings);
+      if (count($dupes)) {
+        throw new CRM_Core_Exception("Duplicate Setting Name Detected in $file. ", 0, $dupes);
+      }
       $settingMetaData = array_merge($settingMetaData, $settings);
     }
     CRM_Core_BAO_Cache::setItem($settingMetaData, 'CiviCRM setting Spec', 'All');
