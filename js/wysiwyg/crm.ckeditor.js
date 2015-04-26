@@ -5,7 +5,7 @@
     return CKEDITOR.instances[name];
   }
 
-  CRM.wysiwyg['supportsFileUploads'] =  true;
+  CRM.wysiwyg.supportsFileUploads =  true;
   CRM.wysiwyg.create =  function(item) {
     //var browseUrl = CRM.config.userFrameworkResourceUrl + "packages/kcfinder/browse.php";
     var browseUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/browse.php";

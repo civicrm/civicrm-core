@@ -839,7 +839,7 @@ CRM.strings = CRM.strings || {};
           CRM.wysiwyg.create(this);
         }
       })
-    })
+    });
     .on('dialogopen', function(e) {
       var $el = $(e.target);
       // Modal dialogs should disable scrollbars
