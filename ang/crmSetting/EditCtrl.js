@@ -1,11 +1,28 @@
 (function(angular, $, _) {
-  
+  angular.module('crmSetting').config(function($routeProvider) {
+      $routeProvider.when('/settings', {
+        controller: 'CrmSettingEditCtrl',
+        templateUrl: '~/crmSetting/EditCtrl.html',
+        // If you need to look up data when opening the page, list it out
+        // under "resolve".
+        resolve: {
+          myContact: function(crmApi) {
+            return crmApi('Contact', 'getsingle', {
+              id: 'user_contact_id',
+              return: ['first_name', 'last_name']
+            });
+          }
+        }
+      });
+
+    }
+  );
+
   // The controller uses *injection*. This default injects a few things:
   //   $scope -- This is the set of variables shared between JS and HTML.
   //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
   //   myContact -- The current contact, defined above in config().
-  
-  angular.module('crmSetting').controller('AdminSettingCtrl', function($scope, crmApi, crmStatus, crmUiHelp, myContact) {
+  angular.module('crmSetting').controller('CrmSettingEditCtrl', function($scope, crmApi, crmStatus, crmUiHelp, myContact) {
  
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts(null);
