@@ -66,7 +66,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       );
 
       //CRM-16087 removed additional call to function relatedMemberships which is already called by disableEnableRelationship
-      //resulting in memership being created twice
+      //resulting in membership being created twice
       if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
         $action = CRM_Core_Action::DISABLE;
         $active = FALSE;
@@ -176,7 +176,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
       $relationshipIds = array();
       foreach ($params['contact_check'] as $key => $value) {
-        $errors = '';
         // check if the relationship is valid between contacts.
         // step 1: check if the relationship is valid if not valid skip and keep the count
         // step 2: check the if two contacts already have a relationship if yes skip and keep the count
@@ -680,7 +679,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id
    *   Relationship id.
    *
-   * @param $action
+   * @param int $action
+   * @param array $params
+   * @param array $ids
+   * @param bool $active
    */
   public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
