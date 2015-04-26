@@ -225,10 +225,6 @@ class CRM_Core_OptionValue {
       $params['label'] = $params['name'];
     }
 
-    // set name to label if it's not set - but *only* for ADD action (CRM-3522)
-    if (($action & CRM_Core_Action::ADD) && empty($params['name']) && $params['label']) {
-      $params['name'] = $params['label'];
-    }
     if ($action & CRM_Core_Action::UPDATE) {
       $ids['optionValue'] = $optionValueID;
     }

@@ -78,9 +78,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (CRM_Utils_Array::value('label', $params, NULL) === NULL) {
       $params['label'] = $params['name'];
     }
-    if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
-      $params['name'] = $params['label'];
-    }
     if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
       $params['weight'] = self::getDefaultWeight($params);
     }
@@ -167,8 +164,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $ids
    *   Reference array contains the id.
    *
-   *
-   * @return CRM_Core_DAO_OptionValue
+   * @return \CRM_Core_DAO_OptionValue
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update
@@ -181,6 +178,37 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
       $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
+
+      // set name from label if it's not set
+      if (empty($params['name']) && !empty($params['label'])) {
+        $params['name'] = CRM_Utils_String::munge($params['label'], '_', 255);
+      }
+
+      // Label must be unique
+      if (isset($params['label']) && strlen($params['label']) &&
+        CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE label = %1', array(1 => array($params['label'], 'String')))
+      ) {
+        throw new CRM_Core_Exception('Cannot create option_value with duplicate label');
+      }
+
+      // Append number to the name if not already unique
+      $names = array();
+      $sql = 'SELECT name FROM civicrm_option_value WHERE name LIKE %1 AND option_group_id = %2';
+      $p = array(
+        1 => array($params['name'] . '%', 'String'),
+        2 => array($params['option_group_id'], 'Integer'),
+      );
+      $dao = CRM_Core_DAO::executeQuery($sql, $p);
+      while ($dao->fetch()) {
+        $names[] = $dao->name;
+      }
+      if (in_array($params['name'], $names)) {
+        $suffix = 1;
+        while (in_array($params['name'] . "_$suffix", $names)) {
+          $suffix++;
+        }
+        $params['name'] .= "_$suffix";
+      }
     }
 
     // action is taken depending upon the mode
@@ -203,7 +231,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       CRM_Core_DAO::executeQuery($query, $p);
     }
 
-    // CRM-13814 : evalute option group id
+    // CRM-13814 : evaluate option group id
     if (!array_key_exists('option_group_id', $params) && !empty($ids['optionValue'])) {
       $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
         $ids['optionValue'], 'option_group_id', 'id'
