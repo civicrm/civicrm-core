@@ -833,7 +833,11 @@ CRM.strings = CRM.strings || {};
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
       $('textarea.crm-wysiwyg', e.target).each(function() {
-        CRM.wysiwyg.create(this);
+        if ($(this).hasClass("collapsed")) {
+          CRM.wysiwyg.createPlain(this);
+        } else {
+          CRM.wysiwyg.create(this);
+        }
       })
     })
     .on('dialogopen', function(e) {
