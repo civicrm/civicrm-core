@@ -31,6 +31,7 @@
     <title>Setting Name</title>
     <type>varchar</type>
     <length>255</length>
+    <unique>true</unique>
     <comment>Unique name for setting</comment>
     <add>4.1</add>
   </field>
