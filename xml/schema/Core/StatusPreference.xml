@@ -39,9 +39,12 @@
   </foreignKey>
   <field>
     <name>name</name>
-    <title>Status Preference Name</title>
-    <type>int unsigned</type>
+    <title>Status Check Name</title>
+    <type>varchar</type>
+    <length>255</length>
     <import>true</import>
+    <required>true</required>
+    <comment>Name of the status check this preference references.</comment>
     <add>4.7</add>
   </field>
   <index>
