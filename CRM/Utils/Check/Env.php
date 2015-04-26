@@ -45,7 +45,8 @@ class CRM_Utils_Check_Env {
       $this->checkDebug(),
       $this->checkOutboundMail(),
       $this->checkDomainNameEmail(),
-      $this->checkDefaultMailbox()
+      $this->checkDefaultMailbox(),
+      $this->checkLastCron()
     );
     return $messages;
   }
@@ -174,12 +175,61 @@ class CRM_Utils_Check_Env {
     ) {
       $message = new CRM_Utils_Check_Message(
         'checkDefaultMailbox',
-        ts('Please configure a default mailbox for CiviMail.',
+        ts('Please configure a <a href="%1">default mailbox</a> for CiviMail.',
           array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', "reset=1"))),
         ts('Configure Default Mailbox'),
         \Psr\Log\LogLevel::WARNING
       );
       $message->addHelp(ts('Learn more in the <a href="%1">user guide</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Checks if cron has run in a reasonable amount of time
+   * @return array
+   */
+
+  public function checkLastCron() {
+    $messages = array();
+
+    $statusPreference = new CRM_Core_DAO_StatusPreference();
+    $statusPreference->domain_id = CRM_Core_Config::domainID();
+    $statusPreference->name = 'checkLastCron';
+
+    $statusPreference->find(TRUE);
+
+    $lastCron = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StatusPreference', $statusPreference->id, 'check_info');
+
+    $msg = ts('Last cron run at %1', array(1 => CRM_Utils_Date::customFormat(date('c', $lastCron))));
+    if ($lastCron > gmdate('U') - 3600) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkLastCron',
+        $msg,
+        ts('Cron Running OK'),
+        \Psr\Log\LogLevel::INFO
+      );
+    }
+    elseif ($lastCron > gmdate('U') - 86400) {
+      $message = new CRM_Utils_Check_Message(
+        'checkLastCron',
+        $msg,
+        ts('Cron Not Running'),
+        \Psr\Log\LogLevel::WARNING
+      );
+      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $messages[] = $message;
+    }
+    elseif ($lastCron <= gmdate('U') - 86400) {
+      $message = new CRM_Utils_Check_Message(
+        'checkLastCron',
+        $msg,
+        ts('Cron Not Running'),
+        \Psr\Log\LogLevel::ERROR
+      );
+      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
       $messages[] = $message;
     }
 
