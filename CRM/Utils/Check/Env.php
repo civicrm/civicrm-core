@@ -147,12 +147,15 @@ class CRM_Utils_Check_Env {
       $msg = ts("Please enter your organization's <a href=\"%1\">name and primary address</a>.",
         array(1 => $fixEmailUrl));
     }
-    $messages[] = new CRM_Utils_Check_Message(
-      'checkDomainNameEmail',
-      $msg,
-      ts('Complete Setup'),
-      \Psr\Log\LogLevel::WARNING
-    );
+
+    if (!empty($msg)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkDomainNameEmail',
+        $msg,
+        ts('Complete Setup'),
+        \Psr\Log\LogLevel::WARNING
+      );
+    }
 
     return $messages;
   }

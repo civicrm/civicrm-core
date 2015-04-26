@@ -47,8 +47,14 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
    */
   public static function create($params) {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
-    if (array_key_exists("domain_id", $params) === FALSE) {
-      $params["domain_id"] = CRM_Core_Config::domainID();
+
+    if (empty($params['id']) && CRM_Utils_Array::value('name', $params)) {
+      $searchParams = array(
+        'domain_id' => CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID()),
+        'name' => $params['name'],
+      );
+
+      $statusPreference->find(TRUE);
     }
 
     $statusPreference->copyValues($params);
