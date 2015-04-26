@@ -85,6 +85,13 @@ class CRM_Core_JobManager {
       }
     }
     $this->logEntry('Finishing scheduled jobs execution.');
+
+    // Set last cron date for the status check
+    $statusPref = array(
+      'name' => 'checkLastCron',
+      'check_info' => gmdate('U'),
+    );
+    CRM_Core_BAO_StatusPreference::create($statusPref);
   }
 
   /**
