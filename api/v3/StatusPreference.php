@@ -65,3 +65,13 @@ function civicrm_api3_status_preference_get($params) {
 function civicrm_api3_status_preference_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_status_preference_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
+}
