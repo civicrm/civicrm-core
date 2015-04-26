@@ -1260,7 +1260,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // unclear whether params is potentially altered here - would prefer not to pass by reference.
     $params = $this->processFormCustomFields($params, $this->_id);
 
-
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
