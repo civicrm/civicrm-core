@@ -346,11 +346,13 @@ LIMIT $limit";
   public static function previewRelativeDateFilter() {
     //$previewDate = CRM_Utils_Type::escape($_GET['previewDate'], 'Date');
     $previewDate = "2016-02-29";
-    $relativeTerms = CRM_Utils_Type::escape($_GET['relativeTerms'], 'String');
-    $Units = CRM_Utils_Type::escape($_GET['Units'], 'String');
+    $relativeTerm = CRM_Utils_Type::escape($_GET['relativeTerms'], 'String');
+    $Unit = CRM_Utils_Type::escape($_GET['Units'], 'String');
+    $dates = CRM_Utils_Date::relativeToAbsolute($relativeTerm, $Unit);
     // do the preview call here
-    $result['fromDate'] = 'FROM!';
-    $result['toDate'] = 'TO!';
+    $fromDate = CRM_Utils_Date::formatDate($dates['from'], 1);
+    $result['fromDate'] = $fromDate;
+    $result['toDate'] = $dates['to'];
     CRM_Utils_JSON::output($result);
   }
 
