@@ -491,12 +491,8 @@ class CRM_Activity_Page_AJAX {
     foreach ($activities as $key => $value) {
       //Check if recurring activity
       if (!empty($value['is_recurring_activity'])) {
-        if ($key == $value['is_recurring_activity']) {
-          $activities[$key]['activity_type'] = $activities[$key]['activity_type'] . '<br/><span class="bold">Recurring Activity - (Parent)</span>';
-        }
-        else {
-          $activities[$key]['activity_type'] = $activities[$key]['activity_type'] . '<br/><span class="bold">Recurring Activity - (Child)</span>';
-        }
+        $repeat = $value['is_recurring_activity'];
+        $activities[$key]['activity_type'] .= '<br/><span class="bold">' . ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1])) . '</span>';
       }
     }
 

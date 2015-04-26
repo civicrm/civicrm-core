@@ -897,7 +897,7 @@ class CRM_Core_Permission {
 
     if (is_array($allCompPermissions)) {
       foreach ($allCompPermissions as $name => $permissions) {
-        if (in_array($permission, $permissions)) {
+        if (array_key_exists($permission, $permissions)) {
           $componentName = $name;
           break;
         }
