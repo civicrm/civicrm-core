@@ -2225,6 +2225,13 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     $params = array();
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
+      case 'id':
+        // Filter out event templates when validating an event id.
+        if ($context == 'validate') {
+          $params['condition'] = 'is_template = 0';
+        }
+        break;
+
       case 'financial_type_id':
         // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
         return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
