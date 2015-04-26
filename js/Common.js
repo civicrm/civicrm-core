@@ -832,13 +832,16 @@ CRM.strings = CRM.strings || {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
-      $('textarea.crm-wysiwyg', e.target).each(function() {
-        if ($(this).hasClass("collapsed")) {
-          CRM.wysiwyg.createPlain(this);
-        } else {
-          CRM.wysiwyg.create(this);
-        }
-      });
+      $('textarea.crm-wysiwyg', e.target)
+        .not('.wysiwyg-enabled')
+        .addClass('wysiwyg-enabled')
+        .each(function() {
+          if ($(this).hasClass("collapsed")) {
+            CRM.wysiwyg.createPlain(this);
+          } else {
+            CRM.wysiwyg.create(this);
+          }
+        });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
