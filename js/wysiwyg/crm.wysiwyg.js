@@ -9,9 +9,9 @@
       CRM.wysiwyg.destroy(item);
       $(item).hide().next('.replace-plain').show().html($(item).val());
     });
-  };
+  }
   CRM.wysiwyg = {};
-  CRM.wysiwyg['supportsFileUploads'] =  false;
+  CRM.wysiwyg.supportsFileUploads =  false;
   CRM.wysiwyg.create = _.noop;
   CRM.wysiwyg.destroy = _.noop;
   CRM.wysiwyg.updateElement = _.noop;
