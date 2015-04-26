@@ -62,6 +62,7 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
     parent::buildQuickForm();
     $this->add('select', 'relative_terms', ts('Relative Date Terms'), CRM_Core_SelectValues::getRelativeDateTerms(), FALSE, array('class' => 'required'));
     $this->add('select', 'units', ts('Units'), CRM_Core_SelectValues::getRelativeDateUnits(), FALSE, array('class' => 'required'));
+    $this->addDate('preview_date', ts('Preview Date'), false);
   }
 
 }
