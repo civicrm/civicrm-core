@@ -50,7 +50,6 @@
   <index>
     <name>UI_status_pref_name</name>
     <fieldName>name</fieldName>
-    <unique>true</unique>
     <add>4.7</add>
   </index>
   <field>
@@ -76,6 +75,14 @@
     <type>varchar</type>
     <length>255</length>
     <comment>These settings are per-check, and can't be compared across checks.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>check_info</name>
+    <title>Check Info</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>These values are per-check, and can't be compared across checks.</comment>
     <add>4.7</add>
   </field>
 </table>
