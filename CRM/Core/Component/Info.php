@@ -119,7 +119,20 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
-    return array();
+    $result = array();
+    $result['crmSetting'] = array(
+      'ext' => 'civicrm',
+      'js' => array(
+        'ang/crmSetting.js',
+        'ang/crmSetting/*.js',
+        'ang/crmSetting/*/*.js',
+      ),
+      'css' => array('ang/crmSetting.css'),
+      'partials' => array('ang/crmSetting'),
+    );
+
+    return $result; 
+    //return array();
   }
 
   /**
