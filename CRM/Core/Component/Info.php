@@ -131,8 +131,7 @@ abstract class CRM_Core_Component_Info {
       'partials' => array('ang/crmSetting'),
     );
 
-    return $result; 
-    //return array();
+    return $result;
   }
 
   /**
