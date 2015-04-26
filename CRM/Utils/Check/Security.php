@@ -111,7 +111,7 @@ class CRM_Utils_Check_Security {
           $messages[] = new CRM_Utils_Check_Message(
             'checkLogFileIsNotAccessible',
             ts($msg, array(1 => $log_url, 2 => $docs_url)),
-            ts('Security Warning'),
+            ts('Debug Log Downloadable'),
             \Psr\Log\LogLevel::CRITICAL
           );
         }
@@ -159,7 +159,7 @@ class CRM_Utils_Check_Security {
               2 => $privateDir,
               3 => $heuristicUrl,
             )),
-          ts('Security Warning'),
+          ts('Private Files Readable'),
           \Psr\Log\LogLevel::WARNING
         );
       }
@@ -206,7 +206,7 @@ class CRM_Utils_Check_Security {
         $messages[] = new CRM_Utils_Check_Message(
           'checkDirectoriesAreNotBrowseable',
           ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url)),
-          ts('Security Warning'),
+          ts('Browseable Directories'),
           \Psr\Log\LogLevel::ERROR
         );
       }
@@ -255,7 +255,7 @@ class CRM_Utils_Check_Security {
         $messages[] = new CRM_Utils_Check_Message(
           'checkFilesAreNotPresent',
           ts('File \'%1\' presents a security risk and should be deleted.', array(1 => $file)),
-          ts('Security Warning'),
+          ts('Unsafe Files'),
           $file[1]
         );
       }
