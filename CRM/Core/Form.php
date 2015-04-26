@@ -271,6 +271,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
+    if ($type == 'wysiwyg') {
+      if ($attributes === '') {
+        $attributes = array();
+      }
+      $attributes = ((array) $attributes) + array('class' => '');
+      $attributes['class'] .= ' crm-wysiwyg';
+      $type = "textarea";
+    }
     if ($type == 'select' && is_array($extra)) {
       // Normalize this property
       if (!empty($extra['multiple'])) {
