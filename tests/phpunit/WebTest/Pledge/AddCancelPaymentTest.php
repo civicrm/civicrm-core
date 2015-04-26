@@ -89,6 +89,7 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
 
     //Check whether the next two payments are done or not
+    $this->waitForAjaxContent();
     $this->waitForElementPresent("xpath=//form[@id='Search']//div/table/tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]", "Completed");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]", "Completed");

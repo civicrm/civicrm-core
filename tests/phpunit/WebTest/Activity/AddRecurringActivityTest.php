@@ -111,7 +111,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
     $this->type('start_action_offset', $occurrences);
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForTextPresent('A recurring set will be created with the following dates.');
+    $this->waitForTextPresent('A repeating set will be created with the following dates.');
 
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Continue']");
     $this->waitForPageToLoad();
@@ -131,8 +131,7 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
 
     $this->assertEquals($occurrences, $countOfActivities);
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Child)"));
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Parent)"));
+    $this->assertTrue($this->isTextPresent("Repeating"));
 
     //Cascade changes
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td/span/a[text()='Edit']");

@@ -241,9 +241,20 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit groups',
     ),
   );
-  $permissions['group_contact'] = $permissions['group'];
+
   $permissions['group_nesting'] = $permissions['group'];
   $permissions['group_organization'] = $permissions['group'];
+
+  //Group Contact permission
+  $permissions['group_contact'] = array(
+    'get' => array(
+      'access CiviCRM',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'edit all contacts',
+    ),
+  );
 
   // CiviMail Permissions
   $civiMailBasePerms = array(
