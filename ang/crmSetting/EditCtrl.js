@@ -3,13 +3,12 @@
       $routeProvider.when('/settings', {
         controller: 'CrmSettingEditCtrl',
         templateUrl: '~/crmSetting/EditCtrl.html',
-        // If you need to look up data when opening the page, list it out
-        // under "resolve".
+
+        // Fetch settings metadata when opening the page
         resolve: {
-          myContact: function(crmApi) {
-            return crmApi('Contact', 'getsingle', {
-              id: 'user_contact_id',
-              return: ['first_name', 'last_name']
+          settingsFields: function(crmApi) {
+            return crmApi('Setting', 'getfields', {}).then(function (response) {
+              return _.groupBy(response.values, 'group_name');
             });
           }
         }
@@ -21,16 +20,16 @@
   // The controller uses *injection*. This default injects a few things:
   //   $scope -- This is the set of variables shared between JS and HTML.
   //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   myContact -- The current contact, defined above in config().
-  angular.module('crmSetting').controller('CrmSettingEditCtrl', function($scope, crmApi, crmStatus, crmUiHelp, myContact) {
+  //   settingsFields -- Defined above in config().
+  angular.module('crmSetting').controller('CrmSettingEditCtrl', function($scope, crmApi, crmStatus, crmUiHelp, settingsFields) {
  
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts(null);
     //var hs = $scope.hs = crmUiHelp({file: 'CRM/settings/SettingsCtrl'}); // See: templates/CRM/settings/SettingsCtrl.hlp
-    
-    var hs = $scope.hs = ''; 
-    // We have myContact available in JS. We also want to reference it in HTML.
-    $scope.myContact = myContact;
+    var hs = $scope.hs = '';
+
+    // Make settingsFields available to the HTML layer.
+    $scope.settingsFields = settingsFields;
 
     $scope.save = function save() {
       return crmStatus(
