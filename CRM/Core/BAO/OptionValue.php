@@ -185,8 +185,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       }
 
       // Label must be unique
+      $p = array(
+        1 => array($params['label'], 'String'),
+        2 => array($params['option_group_id'], 'Integer'),
+      );
       if (isset($params['label']) && strlen($params['label']) &&
-        CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE label = %1', array(1 => array($params['label'], 'String')))
+        CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE label = %1 AND option_group_id = %2', $p)
       ) {
         throw new CRM_Core_Exception('Cannot create option_value with duplicate label');
       }
@@ -194,10 +198,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       // Append number to the name if not already unique
       $names = array();
       $sql = 'SELECT name FROM civicrm_option_value WHERE name LIKE %1 AND option_group_id = %2';
-      $p = array(
-        1 => array($params['name'] . '%', 'String'),
-        2 => array($params['option_group_id'], 'Integer'),
-      );
+      $p[1] = array($params['name'] . '%', 'String');
       $dao = CRM_Core_DAO::executeQuery($sql, $p);
       while ($dao->fetch()) {
         $names[] = $dao->name;

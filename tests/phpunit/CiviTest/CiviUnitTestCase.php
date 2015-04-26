@@ -2972,9 +2972,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $_REQUEST = $this->_params;
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
-    $optionValue = $this->callAPISuccess('option_value', 'create', array(
-      'option_group_id' => $optionGroupID,
+
+    // civicrm_api3 would throuw an exception if this option already exists, so using the old wrapper since we don't care
+    civicrm_api('option_value', 'create', array(
+      'version' => 3,
+      'option_group_id' => 'acl_role',
       'label' => 'pick me',
       'value' => 55,
     ));
