@@ -49,7 +49,7 @@
       </tr>
       <tr class="crm-admin-options-form-block-preview">
         <td class="label">Preview (doesn't work yet)</td>
-        <td>When run on (date selector here, defaults to today), this filter will run from (FROM) to (TO).</td>
+        <td>When run on {include file="CRM/common/jcalendar.tpl" elementName=preview_date}, this filter will run from <span id="relative-date-preview-from"></span> to <span id="relative-date-preview-to"></span>.</td>
       </tr>
       <tr class="crm-admin-options-form-block-value">
         <td class="label">{$form.value.label} (For debugging purposes only)</td>
