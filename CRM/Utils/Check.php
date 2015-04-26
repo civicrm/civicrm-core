@@ -84,12 +84,11 @@ class CRM_Utils_Check {
         $statusMessages = array();
         $statusType = 'alert';
 
-        uasort($messages, array(__CLASS__, 'severitySort'));
         foreach ($messages as $message) {
           if ($filter === TRUE || call_user_func($filter, $message->getSeverity()) >= 3) {
             $statusType = (call_user_func($filter, $message->getSeverity()) >= 4) ? 'error' : $statusType;
-             $statusMessage = $message->getMessage();
-             $statusMessages[] = $statusTitle = $message->getTitle();
+            $statusMessage = $message->getMessage();
+            $statusMessages[] = $statusTitle = $message->getTitle();
           }
         }
 
@@ -117,7 +116,7 @@ class CRM_Utils_Check {
     $aSeverity = $a->getSeverity();
     $bSeverity = $b->getSeverity();
     if ($aSeverity == $bSeverity) {
-      return 0;
+      return strcmp($a->getName(), $b->getName());
     }
     return (self::severityMap($aSeverity) > self::severityMap($bSeverity));
   }
@@ -207,6 +206,8 @@ class CRM_Utils_Check {
     if ($showHushed) {
       $messages[] = new CRM_Utils_Check_Message('ShowHushed', '<h2>SHOWING HUSHED [NOT]</h2>', 'Show Hushed', \Psr\Log\LogLevel::INFO);
     }
+
+    uasort($messages, array(__CLASS__, 'severitySort'));
 
     return $messages;
   }
