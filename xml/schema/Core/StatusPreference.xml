@@ -67,6 +67,7 @@
     <type>int unsigned</type>
     <import>true</import>
     <comment>Hush messages up to but excluding this severity.</comment>
+    <default>1</default>
     <add>4.7</add>
   </field>
   <field>
