@@ -43,7 +43,9 @@ class CRM_Utils_Check_Env {
     $messages = array_merge(
       $this->checkMysqlTime(),
       $this->checkDebug(),
-      $this->checkOutboundMail()
+      $this->checkOutboundMail(),
+      $this->checkDomainNameEmail(),
+      $this->checkDefaultMailbox()
     );
     return $messages;
   }
@@ -66,7 +68,7 @@ class CRM_Utils_Check_Env {
           2 => $sqlNow,
           3 => $phpNow,
         )),
-        ts('Environment Settings'),
+        ts('Timestamp Mismatch'),
         \Psr\Log\LogLevel::ERROR
       );
     }
@@ -86,7 +88,7 @@ class CRM_Utils_Check_Env {
         'checkDebug',
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1'))),
-        ts('Debug Mode'),
+        ts('Debug Mode Enabled'),
         \Psr\Log\LogLevel::WARNING
       );
     }
@@ -110,7 +112,7 @@ class CRM_Utils_Check_Env {
         'checkOutboundMail',
         ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))),
-        ts('Outbound Email Settings'),
+        ts('Outbound Email Disabled'),
         \Psr\Log\LogLevel::WARNING
       );
     }
@@ -118,4 +120,66 @@ class CRM_Utils_Check_Env {
     return $messages;
   }
 
+  /**
+   * Check that domain email and org name are set
+   * @return array
+   */
+
+  public function checkDomainNameEmail() {
+    $messages = array();
+
+    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $domainName = $domain->name;
+    $fixEmailUrl = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
+
+    if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
+      if (!$domainName || $domainName == 'Default Domain Name') {
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address, and default FROM Email Address</a> (for system-generated emails).",
+          array(1 => $fixEmailUrl));
+      }
+      else {
+        $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
+          array(1 => $fixEmailUrl));
+      }
+    }
+    elseif (!$domainName || $domainName == 'Default Domain Name') {
+      $msg = ts("Please enter your organization's <a href=\"%1\">name and primary address</a>.",
+        array(1 => $fixEmailUrl));
+    }
+    $messages[] = new CRM_Utils_Check_Message(
+      'checkDomainNameEmail',
+      $msg,
+      ts('Complete Setup'),
+      \Psr\Log\LogLevel::WARNING
+    );
+
+    return $messages;
+  }
+
+  /**
+   * Checks if a default bounce handling mailbox is set up
+   * @return array
+   */
+
+  public function checkDefaultMailbox() {
+    $messages = array();
+    $config = CRM_Core_Config::singleton();
+
+    if (in_array('CiviMail', $config->enableComponents) &&
+      CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
+    ) {
+      $message = new CRM_Utils_Check_Message(
+        'checkDefaultMailbox',
+        ts('Please configure a default mailbox for CiviMail.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', "reset=1"))),
+        ts('Configure Default Mailbox'),
+        \Psr\Log\LogLevel::WARNING
+      );
+      $message->addHelp(ts('Learn more in the <a href="%1">user guide</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
 }
