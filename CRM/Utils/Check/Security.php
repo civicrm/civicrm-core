@@ -56,15 +56,15 @@ class CRM_Utils_Check_Security {
    *
    * @return array<CRM_Utils_Check_Message>
    */
-  public function checkAll(){
-    if (CRM_Core_Permission::check('administer CiviCRM')){
+  public function checkAll() {
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
       $messages = array_merge(
        $this->checkLogFileIsNotAccessible(),
        $this->checkUploadsAreNotAccessible(),
        $this->checkDirectoriesAreNotBrowseable(),
        $this->checkFilesAreNotPresent()
        );
-     return $messages;
+      return $messages;
     }
     return array();
   }
