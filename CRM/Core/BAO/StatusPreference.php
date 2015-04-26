@@ -49,10 +49,8 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
 
     if (empty($params['id']) && CRM_Utils_Array::value('name', $params)) {
-      $searchParams = array(
-        'domain_id' => CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID()),
-        'name' => $params['name'],
-      );
+      $statusPreference->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $statusPreference->name = $params['name'];
 
       $statusPreference->find(TRUE);
     }
