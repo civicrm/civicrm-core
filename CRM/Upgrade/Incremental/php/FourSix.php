@@ -56,6 +56,9 @@ class CRM_Upgrade_Incremental_php_FourSix {
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if (!$this->validateUniqueSettingNames()) {
+      CRM_Core_Error::fatal("Database unique constraint will fail. Rename duplicate settings table name fields before upgrading.");
+    }
   }
 
   /**
@@ -218,6 +221,21 @@ class CRM_Upgrade_Incremental_php_FourSix {
       CRM_Core_DAO::executeQuery($query);
     }
     return TRUE;
+  }
+
+  public function upgrade_4_6_3($rev) {
+    $upgrade = new CRM_Upgrade_Form();
+    $upgrade->processSQL($rev);
+  }
+
+  /**
+   * confirm that it is okay to add a unique constraint to civicrm_setting
+   * @return boolean
+   */
+  public function validateUniqueSettingNames() {
+    $query = 'select name, count(*) from civicrm_setting GROUP BY name HAVING count(*) > 1;';
+    $dao = CRM_Core_DAO::executeQuery($query);
+    return ($dao->N == 0);
   }
 
 }
