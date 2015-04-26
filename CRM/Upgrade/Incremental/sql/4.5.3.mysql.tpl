@@ -10,6 +10,3 @@ ON DUPLICATE KEY UPDATE is_reserved = 1;
 
 -- CRM-15558
 ALTER TABLE `civicrm_mailing_bounce_type` CHANGE `name` `name` VARCHAR( 24 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Type of bounce';
-
--- CRM-16356
-ALTER TABLE `civicrm_setting` ADD UNIQUE (name);
