@@ -84,11 +84,12 @@ class CRM_Utils_Check {
         $statusMessages = array();
         $statusType = 'alert';
 
+        uasort($messages, array(__CLASS__, 'severitySort'));
         foreach ($messages as $message) {
           if ($filter === TRUE || call_user_func($filter, $message->getSeverity()) >= 3) {
             $statusType = (call_user_func($filter, $message->getSeverity()) >= 4) ? 'error' : $statusType;
-            $statusMessages[] = $message->getMessage();
-            $statusTitle = $message->getTitle();
+             $statusMessage = $message->getMessage();
+             $statusMessages[] = $statusTitle = $message->getTitle();
           }
         }
 
@@ -97,14 +98,28 @@ class CRM_Utils_Check {
             $statusTitle = ts('Multiple Alerts');
             $statusMessage = '<ul><li>' . implode('</li><li>',$statusMessages) . '</li></ul>';
           }
-          else {
-            $statusMessage = array_shift($statusMessages);
-          }
+
           // TODO: add link to status page
           CRM_Core_Session::setStatus($statusMessage, $statusTitle, $statusType);
         }
       }
     }
+  }
+
+  /**
+   * Sort messages based upon severity
+   *
+   * @param CRM_Utils_Check_Message $a
+   * @param CRM_Utils_Check_Message $b
+   * @return integer
+   */
+  public function severitySort($a, $b) {
+    $aSeverity = $a->getSeverity();
+    $bSeverity = $b->getSeverity();
+    if ($aSeverity == $bSeverity) {
+      return 0;
+    }
+    return (self::severityMap($aSeverity) > self::severityMap($bSeverity));
   }
 
   /**
