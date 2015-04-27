@@ -1459,6 +1459,22 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
+
+    // START CRM-15829 UPDATES
+    // acceptable statuses: one must consider active as well as pending, therefore get an array of status IDs of memebrships statuses that can be added to a contact.
+    $params = array();
+
+    $membershipStatus = new CRM_Member_DAO_MembershipStatus();
+    $membershipStatus->copyValues($params);
+    $membershipStatus->find();
+    while ($membershipStatus->fetch()) {
+      if($membershipStatus->is_current_member == '1'
+        || $membershipStatus->id == '5'
+        ) {
+        $membershipStatusRecordIds[] = $membershipStatus->id;
+      }
+    }
+
     // Now get the active memberships for all the contacts.
     // If contact have any valid membership(s), then add it to
     // 'values' array.
@@ -1466,10 +1482,26 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $memParams = array('contact_id' => $cid);
       $memberships = array();
 
+      // START CRM-15829 UPDATES
+      // Since we want PENDING memberships to, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
+
+      /*
       CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active);
+      */
+
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, false);
 
       if (empty($memberships)) {
         continue;
+      }
+
+      // START CRM-15829 UPDATES
+      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1463
+      foreach($memberships as $key => $membership) {
+
+        if(in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
+          $filteredMemberships[$key] = $membership;
+        }
       }
 
       $values[$cid]['memberships'] = $memberships;
