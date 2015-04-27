@@ -199,11 +199,15 @@ class CRM_Utils_Check_Env {
     $statusPreference->domain_id = CRM_Core_Config::domainID();
     $statusPreference->name = 'checkLastCron';
 
-    $statusPreference->find(TRUE);
+    if ($statusPreference->find(TRUE)) {
+      $lastCron = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StatusPreference', $statusPreference->id, 'check_info');
+      $msg = ts('Last cron run at %1.', array(1 => CRM_Utils_Date::customFormat(date('c', $lastCron))));
+    }
+    else {
+      $lastCron = 0;
+      $msg = ts('No cron runs have been recorded.');
+    }
 
-    $lastCron = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StatusPreference', $statusPreference->id, 'check_info');
-
-    $msg = ts('Last cron run at %1', array(1 => CRM_Utils_Date::customFormat(date('c', $lastCron))));
     if ($lastCron > gmdate('U') - 3600) {
       $messages[] = new CRM_Utils_Check_Message(
         'checkLastCron',
@@ -222,7 +226,7 @@ class CRM_Utils_Check_Env {
       $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
       $messages[] = $message;
     }
-    elseif ($lastCron <= gmdate('U') - 86400) {
+    else {
       $message = new CRM_Utils_Check_Message(
         'checkLastCron',
         $msg,
@@ -234,5 +238,29 @@ class CRM_Utils_Check_Env {
     }
 
     return $messages;
+  }
+
+  /**
+   * Checks if new versions are available
+   * @return array
+   */
+
+  public function checkVersion() {
+    $messages = array();
+
+    // check turned off:
+    // return message with status of notice saying check is turned off
+
+    // up-to-date
+    // return message with status of info saying it's okay
+
+    // new non-security release
+    // warning
+
+    // new security release
+    // critical
+
+    // release is eol
+    // error
   }
 }
