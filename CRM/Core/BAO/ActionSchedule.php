@@ -815,6 +815,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       }
       $entityJoinClause .= $extraOn;
 
+
       $query = "
 SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
@@ -827,7 +828,15 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         array(1 => array($actionSchedule->id, 'Integer'))
       );
 
+      $multilingual = CRM_Core_I18n::isMultilingual();
       while ($dao->fetch()) {
+        // switch language if necessary
+        if ($multilingual) {
+          $cid = $dao->contactID;
+          $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'preferred_language');
+          CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
+        }
+
         $entityTokenParams = array();
         foreach ($tokenFields as $field) {
           if ($field == 'location') {
@@ -1233,6 +1242,23 @@ reminder.action_schedule_id = %1";
 
       if ($table != 'civicrm_contact e') {
         $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
+      } 
+
+      $multilingual = CRM_Core_I18n::isMultilingual();
+      if ($multilingual && !empty($actionSchedule->filter_contact_language)) {
+        $tableAlias = ($table != 'civicrm_contact e') ? 'c' : 'e';
+
+        // get language filter for the schedule
+        $filter_contact_language = explode(CRM_Core_DAO::VALUE_SEPARATOR, $actionSchedule->filter_contact_language);
+        $w = '';
+        if (($key = array_search(CRM_Core_I18n::NONE, $filter_contact_language)) !== false) {
+          $w .= "{$tableAlias}.preferred_language IS NULL OR {$tableAlias}.preferred_language = '' OR ";
+          unset($filter_contact_language[$key]);
+        }
+        if (count($filter_contact_language) > 0) {
+          $w .= "{$tableAlias}.preferred_language IN ('" . implode("','", $filter_contact_language) . "')";
+        }
+        $where[] = "($w)";
       }
 
       if ($actionSchedule->start_action_date) {
@@ -1530,6 +1556,35 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     }
 
     return $options;
+  }
+
+  /**
+   * @param $communication_language
+   * @param $preferred_language
+   */
+  public static function setCommunicationLanguage($communication_language, $preferred_language) {
+    $config = CRM_Core_Config::singleton();
+    $language = $config->lcMessages;
+ 
+    // prepare the language for the email
+    if ($communication_language == CRM_Core_I18n::AUTO) {
+      if (!empty($preferred_language)) {
+        $language = $preferred_language;
+      }
+    }
+    else {
+      $language = $communication_language;
+    }
+
+    // language not in the existing language, use default
+    $locales = CRM_Core_I18n::getLocales();
+    if (!in_array($language, $locales)) {
+      $language = $config->lcMessages;
+    }
+
+    // change the language
+    $i18n = CRM_Core_I18n::singleton();
+    $i18n->setLanguage($language);
   }
 
 }
