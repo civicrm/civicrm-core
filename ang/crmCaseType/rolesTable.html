@@ -25,11 +25,11 @@ Required vars: caseType
   <tfoot>
 	  <tr class="addRow">
 	    <td colspan="4">
-	      {{ts('Add role:')}}
 	      <span crm-add-name
 	           crm-options="relationshipTypeNames"
 	           crm-var="newRole"
 	           crm-on-add="addRole(caseType.definition.caseRoles, newRole)"
+             placeholder="{{ts('Add role')}}"
 	              />
 	    </td>
 	  </tr>
