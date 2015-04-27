@@ -505,6 +505,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $amount = $avg = array();
     while ($dao->fetch()) {
       $amount[] = CRM_Utils_Money::format($dao->amount, $dao->currency);
       $avg[] = CRM_Utils_Money::format(round(($dao->amount /
