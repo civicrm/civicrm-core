@@ -808,6 +808,15 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
     $last_primary = NULL;
     foreach ($rows as $rowNum => $row) {
+      //handle gender
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+          $row['civicrm_contact_gender_id'] = $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
       // Highlight primary contact and amount row
       if (is_numeric($rowNum) ||
         ($last_primary && ($rowNum == "{$last_primary}_total"))
@@ -842,15 +851,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
-      }
-
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
       }
 
       // display birthday in the configured custom format
