@@ -618,7 +618,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $sharedContact->id = $relationship->contact_id_a;
         $sharedContact->find(TRUE);
 
+        // CRM-15881 UPDATES
+        // CRM-15881: changed FROM relationship->relationship_type_id == 4 TO relationship->relationship_type_id == 5.
+        // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
+
+        /*
         if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
+        */
+
+        if ($relationship->relationship_type_id == 5 && $relationship->contact_id_b == $sharedContact->employer_id) {
+
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }
       }
