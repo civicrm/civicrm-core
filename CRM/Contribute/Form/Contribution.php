@@ -1163,12 +1163,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentParams['contactID'] = $this->_contactID;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $params['financial_type_id'];
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $params['financial_type_id'];
 
     // Add some financial type details to the params list
     // if folks need to use it.
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $financialType->name;
     $paymentParams['contributionPageID'] = NULL;
 
     if (!empty($this->_params['is_email_receipt'])) {
@@ -1192,7 +1192,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_params,
         NULL,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         TRUE,
         FALSE,
         $isTest,
@@ -1244,7 +1244,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Result has all the stuff we need
     // lets archive it to a financial transaction
-    if ($contributionType->is_deductible) {
+    if ($financialType->is_deductible) {
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
@@ -1257,25 +1257,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
+    // unclear whether params is potentially altered here - would prefer not to pass by reference.
+    $params = $this->processFormCustomFields($params, $this->_id);
 
-    // Build custom data getFields array
-    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
-      CRM_Utils_Array::value('financial_type_id', $params)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
-      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
-      $this->_id,
-      'Contribution'
-    );
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
         $result,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         FALSE, FALSE,
         $isTest,
         $this->_lineItem
@@ -1432,13 +1422,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
     if (!empty($submittedValues['price_set_id']) && $this->_action & CRM_Core_Action::UPDATE) {
-      $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
-      $lineID = key($line);
-      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
-      $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
-      if ($quickConfig) {
-        CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_contribution');
-      }
+      $this->deleteLineItemsIfUpdatingQuickConfig($this->_id);
     }
 
     // Process price set and get total amount and line items.
@@ -1697,14 +1681,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // CRM-11956
       // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
       // if non_deductible_amount does NOT exist - then calculate it depending on:
-      // $ContributionType->is_deductible and whether there is a product (premium).
+      // $financialType>is_deductible and whether there is a product (premium).
       if (empty($params['non_deductible_amount'])) {
-        $contributionType = new CRM_Financial_DAO_FinancialType();
-        $contributionType->id = $params['financial_type_id'];
-        if (!$contributionType->find(TRUE)) {
-          CRM_Core_Error::fatal('Could not find a system table');
-        }
-        if ($contributionType->is_deductible) {
+        $financialType = new CRM_Financial_DAO_FinancialType();
+        $financialType->id = $params['financial_type_id'];
+
+        if ($financialType->is_deductible) {
 
           if (isset($formValues['product_name'][0])) {
             $selectProduct = $formValues['product_name'][0];
@@ -1891,6 +1873,45 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $contribution;
       //Offline Contribution ends.
     }
+  }
+
+  /**
+   * This functionality deleting line items in an edit situation - presumably for the purpose of recreating them.
+   *
+   * But we really need to explain this adequately.
+   *
+   * @param int $contribution_id
+   */
+  protected function deleteLineItemsIfUpdatingQuickConfig($contribution_id) {
+    $line = CRM_Price_BAO_LineItem::getLineItems($contribution_id, 'contribution');
+    $lineID = key($line);
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
+    $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
+    if ($quickConfig) {
+      CRM_Price_BAO_LineItem::deleteLineItems($contribution_id, 'civicrm_contribution');
+    }
+  }
+
+  /**
+   * Process the custom fields that have been passed in.
+   *
+   * @param array $params
+   *
+   * @return array mixed
+   */
+  protected function processFormCustomFields($params, $contribution_id) {
+    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
+      CRM_Utils_Array::value('financial_type_id', $params)
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
+      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
+    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $customFields,
+      $contribution_id,
+      'Contribution'
+    );
+    return $params;
   }
 
 }
