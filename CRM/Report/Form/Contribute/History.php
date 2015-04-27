@@ -43,7 +43,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contact',
     'Individual',
-    'Contribution'
+    'Contribution',
   );
 
   protected $_referenceYear = array(
