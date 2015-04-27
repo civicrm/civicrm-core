@@ -114,12 +114,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
-          'sort_name' => array(
-            'title' => ts('Last Name, First Name'),
-            'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'ASC',
-          ),
           'first_name' => array(
             'name' => 'first_name',
             'title' => ts('First Name'),
