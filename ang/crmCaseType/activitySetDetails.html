@@ -7,13 +7,13 @@ Required vars: activitySet
   <tr>
     <td class="label">{{ts('Label')}}</td>
     <td>
-      <input type="text" name="label" ng-model="activitySet.label"/>
+      <input type="text" name="label" class="crm-form-text" ng-model="activitySet.label"/>
     </td>
   </tr>
   <tr>
     <td class="label">{{ts('Name')}}</td>
     <td>
-      <input type="text" name="name" ng-model="activitySet.name" ng-disabled="locks.activitySetName" />
+      <input type="text" name="name" class="crm-form-text" ng-model="activitySet.name" ng-disabled="locks.activitySetName" />
       <a crm-ui-lock binding="locks.activitySetName"></a>
 
     </td>
