@@ -320,6 +320,7 @@ class CRM_Core_DAO extends DB_DataObject {
     global $dbLocale;
     if ($i18nRewrite and $dbLocale) {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
+//watchdog('debug', $query);
     }
 
     return parent::query($query);

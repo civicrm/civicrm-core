@@ -35,6 +35,14 @@
 class CRM_Core_I18n {
 
   /**
+   * Constants for communication preferences.
+   *
+   * @var int
+   */
+  const NONE = 'none', AUTO = 'auto';
+
+
+  /**
    * A PHP-gettext instance for string translation;
    * should stay null if the strings are not to be translated (en_US).
    */
@@ -509,6 +517,75 @@ class CRM_Core_I18n {
     }
 
     return FALSE;
+  }
+
+
+  /**
+   * Is the CiviCRM in multilingual mode.
+   *
+   * @return Bool
+   *   True if CiviCRM is in multilingual mode.
+   */
+  public static function isMultilingual() {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    return (bool) $domain->locales;
+  }
+
+  /**
+   * Get the enabled locales list
+   *
+   * @return array
+   */
+  public static function getLocales() {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    return $domain->locales;
+  }
+
+  /**
+   * Change the processing language without changing the current user language
+   *
+   * @param $language
+   *   Language (for example 'en_US', or 'fr_CA').
+   *   True if the domain was changed for an extension.
+   */
+  public function setLanguage($language) {
+
+ 
+    $config = CRM_Core_Config::singleton();
+    if ($this->_nativegettext) {
+      $locale = $language . '.utf8';
+      putenv("LANG=$locale");
+
+      setlocale(LC_TIME, $locale);
+      setlocale(LC_MESSAGES, $locale);
+      setlocale(LC_CTYPE, $locale);
+
+      bindtextdomain('civicrm', $config->gettextResourceDir);
+      bind_textdomain_codeset('civicrm', 'UTF-8');
+      textdomain('civicrm');
+
+      $this->_phpgettext = new CRM_Core_I18n_NativeGettext();
+      $this->_extensioncache['civicrm'] = 'civicrm';
+    }
+    else {
+      // phpgettext
+      require_once 'PHPgettext/streams.php';
+      require_once 'PHPgettext/gettext.php';
+
+      $mo_file = $config->gettextResourceDir . $language . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+
+      $streamer = new FileReader($mo_file);
+      $this->_phpgettext = new gettext_reader($streamer);
+      $this->_extensioncache['civicrm'] = $this->_phpgettext;
+
+    }
+
+    // for sql queries
+    global $dbLocale;
+    $dbLocale = "_{$language}";
+
   }
 
   /**

@@ -273,13 +273,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       foreach ($locales as $locale) {
         $languageFilter[$locale] = $languages[$locale];
       }
-      $languageFilter['none'] = ts('Contacts with no preferred language');
+      $languageFilter[CRM_Core_I18n::NONE] = ts('Contacts with no preferred language');
       $element = $this->add('select', 'filter_contact_language', ts('Recipients language'), $languageFilter, FALSE,
         array('multiple' => TRUE, 'class' => 'crm-select2', 'placeholder' => TRUE));
 
       $communicationLanguage = array();
       $communicationLanguage[''] = ts('System default language');
-      $communicationLanguage['auto'] = ts('Follow recipient preferred language');
+      $communicationLanguage[CRM_Core_I18n::AUTO] = ts('Follow recipient preferred language');
       foreach ($locales as $locale) {
         $communicationLanguage[$locale] = $languages[$locale];
       }
