@@ -464,9 +464,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'PDFFilename' => 'Invoice.pdf',
       );
       $session = CRM_Core_Session::singleton();
+      $contactID = $session->get('userID');
       //CRM-16319 - we dont store in userID in case the user is doing multiple
       //transactions etc
-      $contactID = empty($session->get('userID')) ? $session->get('transaction.userID') : $session->get('userID');
+      if (empty($contactID)) {
+        $contactID = $session->get('transaction.userID');
+      }
       $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
       $emails = array();
       $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
