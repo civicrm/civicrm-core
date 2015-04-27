@@ -74,4 +74,6 @@ function civicrm_api3_status_preference_delete($params) {
  */
 function _civicrm_api3_status_preference_create_spec(&$params) {
   $params['name']['api.required'] = 1;
+  // Status Preference can be integer OR a string.
+  $params['minimum_report_severity']['type'] = 2;
 }
