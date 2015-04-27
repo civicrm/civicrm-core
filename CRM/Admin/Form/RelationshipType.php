@@ -101,6 +101,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
     }
+
+    $this->assign('relationship_type_id', $this->_id);
+
   }
 
   /**
