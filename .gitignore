@@ -109,7 +109,6 @@ CRM/Queue/DAO
 CRM/Report/DAO
 CRM/SMS/DAO
 CRM/Standalone/OpenID/DAO
-CRM/Utils/Api.php
 bin/setup.conf
 civicrm-version.php
 civicrm-version.txt
