@@ -114,6 +114,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC',
+          ),
           'first_name' => array(
             'name' => 'first_name',
             'title' => ts('First Name'),
@@ -479,9 +485,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     if (!empty($this->_groupBy)) {
       $this->_groupBy = "ORDER BY " . implode(', ', $this->_groupBy) .
         ", {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    else {
-      $this->_groupBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name";
     }
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id " .
       $this->_groupBy;
