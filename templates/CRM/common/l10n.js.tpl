@@ -52,6 +52,32 @@
   // Localize jQuery UI
   $.ui.dialog.prototype.options.closeText = "{ts escape='js'}Close{/ts}";
 
+  // Localize jQuery DataTables
+  // Note the first two defaults set here aren't localization related,
+  // but need to be set globally for all DataTables.
+  $.extend( $.fn.dataTable.defaults, {ldelim}
+    "searching": false,
+    "jQueryUI": true,
+    "language": {ldelim}
+      "emptyTable": "{ts escape='js'}None found.{/ts}",
+      "info":  "{ts escape='js' '1=_START_ 2=_END_ 3=_TOTAL_}Showing %1 to %2 of %3 entries{/ts}",
+      "infoEmpty": "{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}",
+      "infoFiltered": "{ts escape='js' 1=_MAX_}(filtered from %1 total entries){/ts}",
+      "infoPostFix": "",
+      "thousands": {$config->monetaryThousandSeparator|json_encode},
+      "lengthMenu": "{ts escape='js' 1=_MENU_}Show %1 entries{/ts}",
+      "loadingRecords": " ",
+      "processing": " ",
+      "zeroRecords": "{ts escape='js'}None found.{/ts}",
+      "paginate": {ldelim}
+        "first": "{ts escape='js'}First{/ts}",
+        "last": "{ts escape='js'}Last{/ts}",
+        "next": "{ts escape='js'}Next{/ts}",
+        "previous": "{ts escape='js'}Previous{/ts}"
+      {rdelim}
+    {rdelim}
+  {rdelim});
+
   // Localize strings for jQuery.validate
   var messages = {ldelim}
     required: "{ts escape='js'}This field is required.{/ts}",
