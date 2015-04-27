@@ -131,6 +131,11 @@ class CRM_Utils_Check {
    * @return bool
    */
   public static function severityMap($severity, $reverse = FALSE) {
+    // Lowercase string-based severities
+    if (!$reverse) {
+      $severity = strtolower($severity);
+    }
+
     // See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
     $levels = array(
       \Psr\Log\LogLevel::EMERGENCY => 7,
