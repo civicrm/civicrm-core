@@ -108,4 +108,23 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
   }
 
+  /**
+   * Test creating a severity by name, not integer.
+   */
+  public function testCreateSeverityByName() {
+    // Any permutation of uppercase/lowercase should work.
+    $this->_params['minimum_report_severity'] = 'cRItical';
+    $result = $this->callAPIAndDocument('StatusPreference', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $id = $result['id'];
+    $this->assertEquals(5, $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
+  }
+
+  /**
+   * Test creating an invalid severity by name.
+   */
+  public function testCreateSeverityWithInvalidName() {
+    $this->_params['minimum_report_severity'] = 'wdsadasdarning';
+    $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
+  }
+
 }
