@@ -1872,6 +1872,7 @@ AND cc.sort_name LIKE '%$name%'";
    *   associated array of contact relationships
    */
   public static function getContactRelationshipSelector(&$params) {
+    dsm($params);
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
@@ -1933,17 +1934,21 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
+        $relationship = array();
+
+        $relationship['DT_RowClass'] = $values['is_active'];
+
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
           FALSE,
           $values['cid']
         );
-        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
+        $relationship['contact_name'] = $icon . ' ' . CRM_Utils_System::href(
             $values['name'],
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+        $relationship['relationship_type'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -1952,32 +1957,38 @@ AND cc.sort_name LIKE '%$name%'";
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+            $relationship['contact_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+            $relationship['relationship_type'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
           }
         }
 
         if (!empty($values['description'])) {
-          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+          $relationship['relationship_type'] .= "<p class='description'>{$values['description']}</p>";
         }
 
-        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
-        $contactRelationships[$relationshipId]['city'] = $values['city'];
-        $contactRelationships[$relationshipId]['state'] = $values['state'];
-        $contactRelationships[$relationshipId]['email'] = $values['email'];
-        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
-        $contactRelationships[$relationshipId]['links'] = $values['action'];
-        $contactRelationships[$relationshipId]['id'] = $values['id'];
-        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+        $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $relationship['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $relationship['city'] = $values['city'];
+        $relationship['state'] = $values['state'];
+        $relationship['email'] = $values['email'];
+        $relationship['phone'] = $values['phone'];
+        $relationship['links'] = $values['action'];
+
+        array_push($contactRelationships, $relationship);
       }
     }
-    return $contactRelationships;
+
+    $relationshipsDT = array();
+    $relationshipsDT['data'] = $contactRelationships;
+    $relationshipsDT['recordsTotal'] = $params['total'];
+    $relationshipsDT['recordsFiltered'] = $params['total'];
+
+    return $relationshipsDT;
   }
 
 }

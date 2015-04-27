@@ -662,6 +662,41 @@ CRM.strings = CRM.strings || {};
     });
   };
 
+  $.fn.crmAjaxTable = function() {
+    return $(this).each(function() {
+
+      // Generate columns from the table on the page
+      var columns = [];
+      $('table th').each( function() { 
+        var column = {};
+        column['data'] = $(this).attr('data-id');
+        column['title'] = $(this).html();
+        if ($(this).hasClass('nosort')) {
+          column['orderable'] = false;
+        }
+        columns.push(column);
+      });
+
+      //Declare the defaults for DataTables
+      var defaults = {
+        "filter": false,
+        "processing": true,
+        "serverSide": true,
+        "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "columns": columns,
+        "jQueryUI": true,
+        "pageLength": 25
+      };
+
+      //Include any table specific data
+      var settings = $.extend(true, defaults, $(this).data('table'));
+
+      //Make the DataTables call
+      $(this).DataTable(settings);
+
+    });
+  };
+
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -822,6 +857,15 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('table.crm-sortable', e.target)
+        .DataTable({
+          "searching": false,
+          "processing": true,
+          "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+          "jQueryUI": true,
+          "pageLength": 25,
+        });
+      $('table.crm-ajax-table', e.target).crmAjaxTable();
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }

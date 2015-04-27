@@ -455,26 +455,20 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getContactActivity() {
-    $contactID = CRM_Utils_Type::escape($_POST['contact_id'], 'Integer');
+    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
-    $sortMapper = array(
-      0 => 'activity_type',
-      1 => 'subject',
-      2 => 'source_contact_name',
-      3 => '',
-      4 => '',
-      5 => 'activity_date_time',
-      6 => 'status_id',
-    );
+    $sortMapper = array();
+    foreach ($_GET['columns'] as $key => $value) {
+      $sortMapper[$key] = $value['data'];
+    };
 
-    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
 
-    $params = $_POST;
+    $params = $_GET;
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
@@ -534,22 +528,7 @@ class CRM_Activity_Page_AJAX {
       );
     }
 
-    $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements = array(
-      'activity_type',
-      'subject',
-      'source_contact',
-      'target_contact',
-      'assignee_contact',
-      'activity_date',
-      'status',
-      'links',
-      'class',
-    );
-
-    header('Content-Type: application/json');
-    echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($activities);
   }
 
 }
