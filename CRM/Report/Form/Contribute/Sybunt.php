@@ -43,7 +43,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contact',
     'Individual',
-    'Contribution'
+    'Contribution',
   );
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');

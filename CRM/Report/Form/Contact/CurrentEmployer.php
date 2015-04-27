@@ -115,7 +115,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           'sort_name' => array('title' => ts('Employee Name')),
           'source' => array(
             'title' => ts('Contact Source'),
-            'type'	 => CRM_Utils_Type::T_STRING,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'id' => array(
             'title' => ts('Contact ID'),
