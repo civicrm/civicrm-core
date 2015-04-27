@@ -100,4 +100,12 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->assertEquals($statusPreference['values'][$id]['minimum_report_severity'], $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
   }
 
+  /**
+   * Ensure you can't create a StatusPref with minimum_report_severity > 8.
+   */
+  public function testCreateInvalidMinimumReportSeverity() {
+    $this->_params['minimum_report_severity'] = 45;
+    $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
+  }
+
 }
