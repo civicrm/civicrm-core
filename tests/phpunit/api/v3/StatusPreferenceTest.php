@@ -47,6 +47,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
     $this->_params = array(
       'name' => 'test_check',
+      'domain_id' => 1,
       'hush_until' => '20151212',
       'minimum_report_severity' => 4,
       'check_info' => NULL,
@@ -56,14 +57,15 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
   public function testCreateStatusPreference() {
     $result = $this->callAPIAndDocument('StatusPreference', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
-    $this->assertEquals('test_check', $result['values'][1]['name'], 'In line ' . __LINE__);
-    $this->assertEquals(4, $result['values'][1]['minimum_report_severity'], 'In line ' . __LINE__);
+    $id = $result['id'];
+    $this->assertEquals('test_check', $result['values'][$id]['name'], 'In line ' . __LINE__);
+    $this->assertEquals(4, $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
 
     $this->callAPISuccess('StatusPreference', 'delete', array('id' => $result['id']));
   }
 
   public function testDeleteStatusPreference() {
-    //create one
+    // create one
     $create = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
 
     $result = $this->callAPIAndDocument('StatusPreference', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
@@ -73,6 +75,29 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
       'id' => $create['id'],
     ));
     $this->assertEquals(0, $get['count'], 'Status Preference not successfully deleted In line ' . __LINE__);
+  }
+
+  /**
+   * Test a get with empty params.
+   */
+  public function testStatusPreferenceGetEmptyParams() {
+    $result = $this->callAPISuccess('StatusPreference', 'Get', array());
+  }
+
+  /**
+   * Test a StatusPreference get.
+   */
+  public function testStatusPreferenceGet() {
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $id = $statusPreference['id'];
+    $params = array(
+      'id' => $id,
+    );
+    $result = $this->callAPIAndDocument('StatusPreference', 'Get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals($statusPreference['values'][$id]['name'], $result['values'][$id]['name'], 'In line ' . __LINE__);
+    $this->assertEquals($statusPreference['values'][$id]['domain_id'], $result['values'][$id]['domain_id'], 'In line ' . __LINE__);
+    $this->assertEquals('2015-12-12', $result['values'][$id]['hush_until'], 'In line ' . __LINE__);
+    $this->assertEquals($statusPreference['values'][$id]['minimum_report_severity'], $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
   }
 
 }
