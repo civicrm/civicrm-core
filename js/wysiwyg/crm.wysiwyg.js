@@ -4,8 +4,7 @@
     $(item).show();
     $(item).next('.replace-plain').hide();
     CRM.wysiwyg.create(item);
-    $(item).on( 'blur', function( e ) {
-      CRM.wysiwyg.updateElement(item);
+    $(item).on('blur', function() {
       CRM.wysiwyg.destroy(item);
       $(item).hide().next('.replace-plain').show().html($(item).val());
     });
@@ -15,11 +14,29 @@
   CRM.wysiwyg.create = _.noop;
   CRM.wysiwyg.destroy = _.noop;
   CRM.wysiwyg.updateElement = _.noop;
-  CRM.wysiwyg.val = function(item) {
+  CRM.wysiwyg.getVal = function(item) {
     return $(item).val();
   };
-  CRM.wysiwyg.insertText = _.noop;
-  CRM.wysiwyg.insertHTML = _.noop;
+  CRM.wysiwyg.setVal = function(item, val) {
+    return $(item).val(val);
+  };
+  CRM.wysiwyg.insert = function(item, text) {
+    CRM.wysiwyg.insertIntoTextarea(item, text);
+  };
+  CRM.wysiwyg.insertIntoTextarea = function(item, text) {
+    var origVal = $(item).val();
+    var origPos = item[0].selectionStart;
+    var newVal = origVal + text;
+    $(item).val(newVal);
+    var newPos = (origPos + text.length);
+    item[0].selectionStart = newPos;
+    item[0].selectionEnd = newPos;
+    $(item).triggerHandler('change');
+    CRM.wysiwyg.focus(item);
+  };
+  CRM.wysiwyg.focus = function(item) {
+    $(item).focus();
+  };
   CRM.wysiwyg.createPlain = function(item) {
     $(item)
       .hide()
@@ -31,4 +48,5 @@
       openWysiwyg(item);
     });
   };
+
 })(CRM.$, CRM._);
