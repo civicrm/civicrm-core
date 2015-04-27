@@ -52,7 +52,6 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
     if (!CRM_Utils_Rule::integer($params['minimum_report_severity'])) {
       $params['minimum_report_severity'] = CRM_Utils_Check::severityMap($params['minimum_report_severity']);
     }
-    CRM_Core_Error::debug('severity', $params['minimum_report_severity']);
     if ($params['minimum_report_severity'] > 8) {
       CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 8 (Emergency).'));
     }
