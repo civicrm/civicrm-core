@@ -75,12 +75,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
           'gender_id' => array(
             'title' => ts('Gender'),
           ),
@@ -90,6 +84,12 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'age' => array(
             'title' => ts('Age'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'filters' => array(
@@ -111,6 +111,12 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
             'title' => ts('Birth Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
@@ -120,6 +126,10 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
             'default_weight' => '0',
             'default_order' => 'ASC',
           ),
+          'first_name' => array(
+            'name' => 'first_name',
+            'title' => ts('First Name'),
+          ),
           'gender_id' => array(
             'name' => 'gender_id',
             'title' => ts('Gender'),
@@ -127,6 +137,12 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'birth_date' => array(
             'name' => 'birth_date',
             'title' => ts('Birth Date'),
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
       ),
