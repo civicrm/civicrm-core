@@ -1577,8 +1577,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     }
 
     // language not in the existing language, use default
-    $locales = CRM_Core_I18n::getLocales();
-    if (!in_array($language, $locales)) {
+    $languages = CRM_Core_I18n::languages(TRUE);
+    if (!in_array($language, $languages)) {
       $language = $config->lcMessages;
     }
 
