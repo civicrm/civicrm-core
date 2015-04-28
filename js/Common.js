@@ -676,7 +676,7 @@ CRM.strings = CRM.strings || {};
             $.each(this.attributes, function() {
               if(this.name.match("^cell-")) {
                 var cellAttr = this.name.substring(5);
-                var cellValue = this.value                
+                var cellValue = this.value;
                 $('tbody tr', settings.nTable).each( function() {
                   $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
                 });
