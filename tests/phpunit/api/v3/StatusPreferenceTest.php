@@ -49,7 +49,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
       'name' => 'test_check',
       'domain_id' => 1,
       'hush_until' => '20151212',
-      'minimum_report_severity' => 4,
+      'ignore_severity' => 4,
       'check_info' => NULL,
     );
   }
@@ -59,7 +59,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $id = $result['id'];
     $this->assertEquals('test_check', $result['values'][$id]['name'], 'In line ' . __LINE__);
-    $this->assertEquals(4, $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
+    $this->assertEquals(4, $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
 
     $this->callAPISuccess('StatusPreference', 'delete', array('id' => $result['id']));
   }
@@ -97,14 +97,14 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->assertEquals($statusPreference['values'][$id]['name'], $result['values'][$id]['name'], 'In line ' . __LINE__);
     $this->assertEquals($statusPreference['values'][$id]['domain_id'], $result['values'][$id]['domain_id'], 'In line ' . __LINE__);
     $this->assertEquals('2015-12-12', $result['values'][$id]['hush_until'], 'In line ' . __LINE__);
-    $this->assertEquals($statusPreference['values'][$id]['minimum_report_severity'], $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
+    $this->assertEquals($statusPreference['values'][$id]['ignore_severity'], $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
   }
 
   /**
-   * Ensure you can't create a StatusPref with minimum_report_severity > 8.
+   * Ensure you can't create a StatusPref with ignore_severity > 7.
    */
   public function testCreateInvalidMinimumReportSeverity() {
-    $this->_params['minimum_report_severity'] = 45;
+    $this->_params['ignore_severity'] = 45;
     $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
   }
 
@@ -113,17 +113,17 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
    */
   public function testCreateSeverityByName() {
     // Any permutation of uppercase/lowercase should work.
-    $this->_params['minimum_report_severity'] = 'cRItical';
+    $this->_params['ignore_severity'] = 'cRItical';
     $result = $this->callAPIAndDocument('StatusPreference', 'create', $this->_params, __FUNCTION__, __FILE__);
     $id = $result['id'];
-    $this->assertEquals(5, $result['values'][$id]['minimum_report_severity'], 'In line ' . __LINE__);
+    $this->assertEquals(5, $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
   }
 
   /**
    * Test creating an invalid severity by name.
    */
   public function testCreateSeverityWithInvalidName() {
-    $this->_params['minimum_report_severity'] = 'wdsadasdarning';
+    $this->_params['ignore_severity'] = 'wdsadasdarning';
     $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
   }
 

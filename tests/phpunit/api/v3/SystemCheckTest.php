@@ -72,7 +72,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function testSystemCheckHushForever() {
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'minimum_report_severity' => 4,
+      'ignore_severity' => 4,
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $result = $this->callAPISuccess('System', 'check', array());
@@ -92,7 +92,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $tomorrow = new DateTime('tomorrow');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'minimum_report_severity' => 4,
+      'ignore_severity' => 4,
       'hush_until' => $tomorrow->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
@@ -113,7 +113,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $today = new DateTime('today');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'minimum_report_severity' => 4,
+      'ignore_severity' => 4,
       'hush_until' => $today->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
@@ -134,7 +134,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $yesterday = new DateTime('yesterday');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'minimum_report_severity' => 4,
+      'ignore_severity' => 4,
       'hush_until' => $yesterday->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
