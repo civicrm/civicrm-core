@@ -167,8 +167,11 @@ elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
 	//$content_dir = WP_CONTENT_DIR;
 	//$settings_dir = $content_dir . DIRECTORY_SEPARATOR . 'civicrm' . 'settings';
-	//$upload_dir      = wp_upload_dir();
-	//$files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
+	$upload_dir      = wp_upload_dir();
+	$files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
+  /*$alreadyInstalled = file_exists($files_dirname . CIVICRM_DIRECTORY_SEPARATOR .
+    'civicrm.settings.php'
+    );*/
   $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
     'civicrm.settings.php'
   );
@@ -485,16 +488,16 @@ class InstallRequirements {
     }
     elseif ($installType == 'wordpress') {
 	    // make sure that we can write to plugins/civicrm  and uploads/civicrm/
-	    $content_dir   = WP_CONTENT_DIR;
-	    $settings_dir  = $content_dir . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'settings';
+	    //$content_dir   = WP_CONTENT_DIR;
+	    //$settings_dir  = $content_dir . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'settings';
 	    $upload_dir    = wp_upload_dir();
-	    $files_dirname = $content_dir . DIRECTORY_SEPARATOR . 'civicrm';
+	    $files_dirname = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm';
 	    if ( ! file_exists( $files_dirname ) ) {
 		    wp_mkdir_p( $files_dirname );
 	    }
-	    if ( ! file_exists( $settings_dir ) ) {
+	    /*if ( ! file_exists( $settings_dir ) ) {
 		    wp_mkdir_p( $settings_dir );
-	    }
+	    }*/
 	    $writableDirectories = array( $files_dirname, $cmsPath );
 	    //$writableDirectories = array(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files', $cmsPath);
 	    //TODO: Sample Code to download packages currently testing with download of full zip
