@@ -355,14 +355,13 @@
     // Example:
     //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
     //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
-    // TODO Consider ways to separate the plain-text/rich-text implementations
     .directive('crmUiInsertRx', function() {
       return {
         link: function(scope, element, attrs) {
           scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
             CRM.wysiwyg.insert(element, tokenName);
             $(element).select2('close').select2('val', '');
-            CRM.wysiwyg.focus();
+            CRM.wysiwyg.focus(element);
           });
         }
       };
@@ -380,28 +379,21 @@
             return;
           }
 
-
           if (attr.ngBlur) {
-            $(elm).on('blur', function(){
-              $timeout(function(){
+            $(elm).on('blur', function() {
+              $timeout(function() {
                 scope.$eval(attr.ngBlur);
               });
             });
           }
 
-          $(elm).on('paste', function () {
-            scope.$apply(function () {
+          $(elm).on('paste change keypress', function() {
+            scope.$apply(function() {
               ngModel.$setViewValue(CRM.wysiwyg.getVal(elm));
             });
           });
 
-          $(elm).on('keypress', function () {
-            $timeout(function () {
-              ngModel.$setViewValue(CRM.wysiwyg.getVal(elm));
-            });
-          });
-
-          ngModel.$render = function (value) {
+          ngModel.$render = function(value) {
             CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
           };
         }
