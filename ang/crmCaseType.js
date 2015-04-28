@@ -78,21 +78,12 @@
   ]);
 
   // Add a new record by name.
-  // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
+  // Ex: <crmAddName crm-options="[{id:a, text:'Alpha'}, {id:b, text:'Beta'}]" crm-var="newItem" placeholder="{{ts('Add letter')}}" crm-on-add="callMyCreateFunction(newItem)" />
   crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
       template: '<input class="add-activity crm-action-menu action-icon-plus" type="hidden" />',
       link: function(scope, element, attrs) {
-        /// Format list of options for select2's "data"
-        var getFormattedOptions = function() {
-          return {
-            results: _.map(scope[attrs.crmOptions], function(option){
-              return {id: option, text: option};
-            })
-          };
-        };
-
         var input = $('input', element);
 
         scope._resetSelection = function() {
@@ -102,7 +93,7 @@
         };
 
         $(input).select2({
-          data: getFormattedOptions,
+          data: scope[attrs.crmOptions],
           createSearchChoice: function(term) {
             return {id: term, text: term};
           },
@@ -116,7 +107,7 @@
         });
 
         scope.$watch(attrs.crmOptions, function(value) {
-          $(input).select2('data', getFormattedOptions);
+          $(input).select2('data', scope[attrs.crmOptions]);
           $(input).select2('val', '');
         });
       }
@@ -127,10 +118,13 @@
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
-    $scope.activityTypes = apiCalls.actTypes.values;
+    $scope.activityTypes = _.map(apiCalls.actTypes.values, function(item) {
+      return {id: item.name, text: item.label};
+    });
     $scope.activityTypeNames = _.pluck(apiCalls.actTypes.values, 'name');
-    $scope.activityTypes = apiCalls.actTypes.values;
-    $scope.relationshipTypeNames = _.pluck(apiCalls.relTypes.values, CRM.crmCaseType.REL_TYPE_CNAME); // CRM_Case_XMLProcessor::REL_TYPE_CNAME
+    $scope.relationshipTypes = _.map(apiCalls.relTypes.values, function(item) {
+      return {id: item[CRM.crmCaseType.REL_TYPE_CNAME], text: item[CRM.crmCaseType.REL_TYPE_CNAME]};
+    });
     $scope.locks = {caseTypeName: true, activitySetName: true};
 
     $scope.workflows = {
@@ -197,9 +191,6 @@
         roles.push({
           name: roleName
         });
-      }
-      if (!_.contains($scope.relationshipTypeNames, roleName)) {
-        $scope.relationshipTypeNames.push(roleName);
       }
     };
 
