@@ -43,10 +43,10 @@
 {/htxt}
 
 {htxt id="filter_contact_language"}
-  {ts}You can limt the recipient of the reminder to contact with the specified preferred language. You can also choose to add contacts that have no preferred language defined.{/ts}
+  {ts}You can limit the recipient of the reminder to contacts with the specified preferred language. You can also choose to add contacts that have no preferred language defined.{/ts}
 {/htxt}
 
 {htxt id="communication_language"}
-  {ts}This is the language of the communication. If there are template translation or tokens, it will follow this preferrence. By default, it follows the system default language.{/ts}
+  {ts}This is the communication language. If there are template translation or tokens, they will be localized accordingly. By default, the system default language will be used.{/ts}
 {/htxt}
 
