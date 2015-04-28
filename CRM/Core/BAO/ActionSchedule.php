@@ -814,7 +814,6 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       }
       $entityJoinClause .= $extraOn;
 
-
       $query = "
 SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
@@ -1241,7 +1240,7 @@ reminder.action_schedule_id = %1";
 
       if ($table != 'civicrm_contact e') {
         $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
-      } 
+      }
 
       $multilingual = CRM_Core_I18n::isMultilingual();
       if ($multilingual && !empty($actionSchedule->filter_contact_language)) {
@@ -1250,7 +1249,7 @@ reminder.action_schedule_id = %1";
         // get language filter for the schedule
         $filter_contact_language = explode(CRM_Core_DAO::VALUE_SEPARATOR, $actionSchedule->filter_contact_language);
         $w = '';
-        if (($key = array_search(CRM_Core_I18n::NONE, $filter_contact_language)) !== false) {
+        if (($key = array_search(CRM_Core_I18n::NONE, $filter_contact_language)) !== FALSE) {
           $w .= "{$tableAlias}.preferred_language IS NULL OR {$tableAlias}.preferred_language = '' OR ";
           unset($filter_contact_language[$key]);
         }
@@ -1564,7 +1563,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   public static function setCommunicationLanguage($communication_language, $preferred_language) {
     $config = CRM_Core_Config::singleton();
     $language = $config->lcMessages;
- 
+
     // prepare the language for the email
     if ($communication_language == CRM_Core_I18n::AUTO) {
       if (!empty($preferred_language)) {
