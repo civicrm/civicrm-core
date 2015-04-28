@@ -259,9 +259,17 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
-        'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
-      );
+      //CRM-15829 UPDATES
+      // When adding memberships to a contact and If a status its is pending then there is no need to perform these calculations. Otherwise it will errernously not realise the pending state and set ot to NEW or GRACE depending on the date ranges.
+      if (isset($params['status_id']) && $params['status_id'] == 5) {
+        $calcStatus['id'] = $params['status_id'];
+      }
+      else {
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
+          'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
+        );
+      }
+
       if (empty($calcStatus)) {
         // Redirect the form in case of error
         // @todo this redirect in the BAO layer is really bad & should be moved to the form layer

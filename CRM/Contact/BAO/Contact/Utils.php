@@ -434,11 +434,14 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly organization contact id).
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
-    $query = "UPDATE civicrm_contact
-SET organization_name=NULL, employer_id = NULL
-WHERE id={$contactId}; ";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    // CRM-15881 UPDATES
+    // Updated query slightly to bind $contactId variable instead of passing it into the query string directly, to avoid risk of SQL injection.
+    $query = 'UPDATE civicrm_contact
+      SET organization_name = NULL, employer_id = NULL
+      WHERE id = %1 ';
+    $parameters[1] = array($contactId, 'Integer');
+    $dao = CRM_Core_DAO::executeQuery($query, $parameters);
 
     // need to handle related meberships. CRM-3792
     if ($employerId) {
