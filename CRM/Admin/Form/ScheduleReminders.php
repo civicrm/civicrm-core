@@ -260,29 +260,20 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     // multilingual only options
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $multilingual = (bool) $domain->locales;
+    $multilingual = CRM_Core_I18n::isMultilingual();
     if ($multilingual) {
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('multilingual', $multilingual);
 
-      $languageFilter = array();
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-      $languages = CRM_Core_I18n::languages();
-      foreach ($locales as $locale) {
-        $languageFilter[$locale] = $languages[$locale];
-      }
-      $languageFilter[CRM_Core_I18n::NONE] = ts('Contacts with no preferred language');
+      $languages = CRM_Core_I18n::languages(TRUE);
+      $languageFilter = $languages + array(CRM_Core_I18n::NONE => ts('Contacts with no preferred language'));
       $element = $this->add('select', 'filter_contact_language', ts('Recipients language'), $languageFilter, FALSE,
         array('multiple' => TRUE, 'class' => 'crm-select2', 'placeholder' => TRUE));
 
-      $communicationLanguage = array();
-      $communicationLanguage[''] = ts('System default language');
-      $communicationLanguage[CRM_Core_I18n::AUTO] = ts('Follow recipient preferred language');
-      foreach ($locales as $locale) {
-        $communicationLanguage[$locale] = $languages[$locale];
-      }
+      $communicationLanguage = $languages + array(
+        '' => ts('System default language'),
+        CRM_Core_I18n::AUTO => ts('Follow recipient preferred language')
+      );
       $this->add('select', 'communication_language', ts('Communication language'), $communicationLanguage);
     }
 
