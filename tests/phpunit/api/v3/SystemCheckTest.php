@@ -82,7 +82,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
 
   /**
@@ -92,7 +92,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $tomorrow = new DateTime('tomorrow');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'ignore_severity' => 4,
+      'ignore_severity' => 7,
       'hush_until' => $tomorrow->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
@@ -103,7 +103,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
 
   /**
@@ -113,7 +113,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $today = new DateTime('today');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'ignore_severity' => 4,
+      'ignore_severity' => 7,
       'hush_until' => $today->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
@@ -124,7 +124,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    $this->assertArrayHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+    $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
 
   /**
@@ -134,7 +134,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $yesterday = new DateTime('yesterday');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'ignore_severity' => 4,
+      'ignore_severity' => 7,
       'hush_until' => $yesterday->format('Y-m-d'),
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
@@ -147,7 +147,64 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     }
     fwrite(STDERR, 'yesterday');
     fwrite(STDERR, print_r($yesterday->format('Y-m-d'), TRUE));
-    $this->assertArrayHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+    $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
+  }
+
+  /**
+   *    Items hushed above current severity should be hidden.
+   */
+  public function testSystemCheckHushAboveSeverity() {
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'ignore_severity' => 4,
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+  }
+
+  /**
+   *    Items hushed at current severity should be hidden.
+   */
+  public function testSystemCheckHushAtSeverity() {
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'ignore_severity' => 3,
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
+  }
+
+  /**
+   *    Items hushed below current severity should be shown.
+   */
+  public function testSystemCheckHushBelowSeverity() {
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'ignore_severity' => 2,
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
 
 }
