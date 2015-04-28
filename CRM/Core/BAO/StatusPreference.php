@@ -61,7 +61,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 7.'));
     }
     // If severity is now blank, you have an invalid severity string.
-    if (!$params['ignore_severity']) {
+    if (is_null($params['ignore_severity'])) {
       CRM_Core_Error::fatal(ts('Invalid string passed as severity level.'));
     }
 
