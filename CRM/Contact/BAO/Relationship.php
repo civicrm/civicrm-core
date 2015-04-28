@@ -621,11 +621,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         // CRM-15881 UPDATES
         // CRM-15881: changed FROM relationship->relationship_type_id == 4 TO relationship->relationship_type_id == 5.
         // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
-
-        /*
-        if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
-        */
-
         if ($relationship->relationship_type_id == 5 && $relationship->contact_id_b == $sharedContact->employer_id) {
 
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
@@ -1459,7 +1454,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
-
     // START CRM-15829 UPDATES
     // acceptable statuses: one must consider active as well as pending, therefore get an array of status IDs of memebrships statuses that can be added to a contact.
     $params = array();
@@ -1468,7 +1462,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $membershipStatus->copyValues($params);
     $membershipStatus->find();
     while ($membershipStatus->fetch()) {
-      if($membershipStatus->is_current_member == '1'
+      if ($membershipStatus->is_current_member == '1'
         || $membershipStatus->id == '5'
         ) {
         $membershipStatusRecordIds[] = $membershipStatus->id;
@@ -1484,12 +1478,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
       // START CRM-15829 UPDATES
       // Since we want PENDING memberships to, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
-
-      /*
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active);
-      */
-
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, false);
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE);
 
       if (empty($memberships)) {
         continue;
@@ -1497,9 +1486,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
       // START CRM-15829 UPDATES
       // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1463
-      foreach($memberships as $key => $membership) {
-
-        if(in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
+      foreach ($memberships as $key => $membership) {
+        if (in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
           $filteredMemberships[$key] = $membership;
         }
       }
@@ -1510,7 +1498,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // done with 'values' array.
     // Finally add / edit / delete memberships for the related contacts
-
     foreach ($values as $cid => $details) {
       if (!array_key_exists('memberships', $details)) {
         continue;

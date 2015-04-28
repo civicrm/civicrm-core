@@ -261,16 +261,10 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
       //CRM-15829 UPDATES
       // When adding memberships to a contact and If a status its is pending then there is no need to perform these calculations. Otherwise it will errernously not realise the pending state and set ot to NEW or GRACE depending on the date ranges.
-
-      /*
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
-        'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
-      );
-      */
-
-      if(isset($params['status_id']) && $params['status_id'] == 5) {
+      if (isset($params['status_id']) && $params['status_id'] == 5) {
         $calcStatus['id'] = $params['status_id'];
-      } else {
+      }
+      else {
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
           'today', $excludeIsAdmin, CRM_Utils_Array::value('membership_type_id', $params), $params
         );

@@ -443,7 +443,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           // If not is_active then is_current_employer needs to be set false as well! Logically a contact cannot be a current employee of a disabled employer relationship.
           // If this is not done, then the below process will go ahead and disable the organization_name and employer_id fields in the contact record (which is what is wanted) but then further down will be re-enabled becuase is_current_employer is not false, therefore undoing what was done correctly.
           if(!$params['is_active']) {
-            $params['is_current_employer'] = false;
+            $params['is_current_employer'] = FALSE;
           }
 
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
