@@ -66,6 +66,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $this->assertEquals($testedCheck['severity'], 'warning', ' in line ' . __LINE__);
   }
 
+  /**
+   *    Permanently hushed items should never show up.
+   */
   public function testSystemCheckHushForever() {
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
@@ -82,6 +85,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
   }
 
+  /**
+   *    Items hushed through tomorrow shouldn't show up.
+   */
   public function testSystemCheckHushFuture() {
     $tomorrow = new DateTime('tomorrow');
     $this->_params = array(
@@ -97,10 +103,51 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    fwrite(STDERR, print_r($statusPreference, TRUE));
-    fwrite(STDERR, 'tomorrow?');
-    fwrite(STDERR, print_r($tomorrow->format('Y-m-d'), TRUE));
     $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+  }
+
+  /**
+   *    Items hushed through today should show up.
+   */
+  public function testSystemCheckHushToday() {
+    $today = new DateTime('today');
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'minimum_report_severity' => 4,
+      'hush_until' => $today->format('Y-m-d'),
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    $this->assertArrayHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+  }
+
+  /**
+   *    Items hushed through yesterday should show up.
+   */
+  public function testSystemCheckHushYesterday() {
+    $yesterday = new DateTime('yesterday');
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'minimum_report_severity' => 4,
+      'hush_until' => $yesterday->format('Y-m-d'),
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    fwrite(STDERR, 'yesterday');
+    fwrite(STDERR, print_r($yesterday->format('Y-m-d'), TRUE));
+    $this->assertArrayHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
   }
 
 }
