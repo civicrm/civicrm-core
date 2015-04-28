@@ -59,25 +59,17 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $_fromEmails = array();
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $params = array();
+    $params['action'] = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+    $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
+    $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
+
+    $this->setContextVariables($params);
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
     $this->assign('contactID', $this->_contactID);
-
-    if ($this->_mode) {
-      $this->assignPaymentRelatedVariables();
-    }
-
-    if ($this->_id) {
-      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
-      $this->_membershipIDs[] = $this->_id;
-    }
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
@@ -221,6 +213,31 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->_contributorDisplayName = $this->_memberDisplayName;
       $this->_contributorEmail = $this->_memberEmail;
     }
+  }
+
+  protected function setContextVariables($params) {
+    $variables = array(
+      'action' => '_action',
+      'context' => '_context',
+      'id' => '_id',
+      'cid' => '_contactID',
+      'mode' => '_mode',
+    );
+    foreach ($variables as $paramKey => $classVar) {
+      if (isset($params[$paramKey]) && !isset($this->$classVar)) {
+        $this->$classVar = $params[$paramKey];
+      }
+    }
+
+    if ($this->_mode) {
+      $this->assignPaymentRelatedVariables();
+    }
+
+    if ($this->_id) {
+      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      $this->_membershipIDs[] = $this->_id;
+    }
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
 }
