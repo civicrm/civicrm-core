@@ -394,7 +394,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $defaults['recipient_manual_id'] = $defaults['recipient_manual'];
       }
       if ($contactLanguage = CRM_Utils_Array::value('filter_contact_language', $defaults)) {
-        $defaults['filter_contact_language'] =  explode(CRM_Core_DAO::VALUE_SEPARATOR, $contactLanguage);
+        $defaults['filter_contact_language'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contactLanguage);
       }
     }
 
@@ -519,9 +519,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     // multilingual options
-    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, null);
+    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, NULL);
     $params['filter_contact_language'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['filter_contact_language']);
-    $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, null);
+    $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, NULL);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
