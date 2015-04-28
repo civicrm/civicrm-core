@@ -1986,7 +1986,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
         if ($format = CRM_Utils_Array::value('date_format', $field)) {
           if (array_key_exists($format, $actualPHPFormats)) {
-            $customTimeFormat = (array)CRM_Utils_Array::value($format, $actualPHPFormats);
+            $customTimeFormat = (array) CRM_Utils_Array::value($format, $actualPHPFormats);
             switch ($timeFormat) {
               case 1:
                 $customTimeFormat[] = 'g:iA';
@@ -1999,7 +1999,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               default:
                 // if time is not selected remove time from value
                 $value = substr($value, 0, 10);
-						}
+            }
             $customFormat = implode(" ", $customTimeFormat);
           }
         }
