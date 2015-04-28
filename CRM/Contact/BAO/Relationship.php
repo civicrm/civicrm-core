@@ -1943,8 +1943,8 @@ AND cc.sort_name LIKE '%$name%'";
         }
 
         $relationship['DT_RowData'] = array();
-        $relationship['DT_RowData']['entity'] = 'relationship'; 
-        $relationship['DT_RowData']['id'] = $values['id']; 
+        $relationship['DT_RowData']['entity'] = 'relationship';
+        $relationship['DT_RowData']['id'] = $values['id'];
 
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
