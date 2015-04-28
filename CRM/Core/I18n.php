@@ -541,7 +541,6 @@ class CRM_Core_I18n {
    *   True if the domain was changed for an extension.
    */
   public function setLanguage($language) {
-
  
     $config = CRM_Core_Config::singleton();
     if ($this->_nativegettext) {
