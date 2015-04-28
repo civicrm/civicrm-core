@@ -48,20 +48,20 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
   public static function create($params) {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
 
-    // Default severity level is 1 (INFO).
-    if (!$params['minimum_report_severity']) {
-      $params['minimum_report_severity'] = 1;
+    // Default severity level to ignore is 0 (DEBUG).
+    if (!$params['ignore_severity']) {
+      $params['ignore_severity'] = 0;
     }
-    // Severity can be either text ('critical') or an integer <= 8.
+    // Severity can be either text ('critical') or an integer <= 7.
     // It's a magic number, but based on PSR-3 standards.
-    if (!CRM_Utils_Rule::integer($params['minimum_report_severity'])) {
-      $params['minimum_report_severity'] = CRM_Utils_Check::severityMap($params['minimum_report_severity']);
+    if (!CRM_Utils_Rule::integer($params['ignore_severity'])) {
+      $params['ignore_severity'] = CRM_Utils_Check::severityMap($params['ignore_severity']);
     }
-    if ($params['minimum_report_severity'] > 8) {
-      CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 8.'));
+    if ($params['ignore_severity'] > 7) {
+      CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 7.'));
     }
     // If severity is now blank, you have an invalid severity string.
-    if (!$params['minimum_report_severity']) {
+    if (!$params['ignore_severity']) {
       CRM_Core_Error::fatal(ts('Invalid string passed as severity level.'));
     }
 
