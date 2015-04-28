@@ -79,8 +79,27 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    fwrite(STDERR, print_r($result, TRUE));
-    fwrite(STDERR, print_r($testedCheck, TRUE));
+    $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
+  }
+
+  public function testSystemCheckHushFuture() {
+    $tomorrow = new DateTime('tomorrow');
+    $this->_params = array(
+      'name' => 'checkDefaultMailbox',
+      'minimum_report_severity' => 4,
+      'hush_until' => $tomorrow->format('Y-m-d'),
+    );
+    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check', array());
+    foreach ($result['values'] as $check) {
+      if ($check['name'] == 'checkDefaultMailbox') {
+        $testedCheck = $check;
+        break;
+      }
+    }
+    fwrite(STDERR, print_r($statusPreference, TRUE));
+    fwrite(STDERR, 'tomorrow?');
+    fwrite(STDERR, print_r($tomorrow->format('Y-m-d'), TRUE));
     $this->assertArrayNotHasKey('name', $testedCheck, 'warning', ' in line ' . __LINE__);
   }
 
