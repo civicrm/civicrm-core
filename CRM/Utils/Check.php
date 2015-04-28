@@ -207,14 +207,56 @@ class CRM_Utils_Check {
 
     CRM_Utils_Hook::check($messages);
 
-    //TODO
-    if ($showHushed) {
-      $messages[] = new CRM_Utils_Check_Message('ShowHushed', '<h2>SHOWING HUSHED [NOT]</h2>', 'Show Hushed', \Psr\Log\LogLevel::INFO);
+    if (!$showHushed) {
+      foreach ($messages as $key => $message) {
+        $hush = self::checkHushSnooze($message);
+        if ($hush) {
+          unset($messages[$key]);
+        }
+      }
     }
 
     uasort($messages, array(__CLASS__, 'severitySort'));
 
+CRM_Core_Error::debug('messages', $messages);
     return $messages;
   }
 
+  /**
+   * Evaluate if a system check should be hushed/snoozed.
+   *
+   * @return bool
+   *   TRUE means hush/snooze, FALSE means display.
+   */
+  public function checkHushSnooze($message) {
+    // My pseudocode:
+    //   If current_date < statusPreference->date, unset the $message.
+    // CRM_Core_Error::debug('message', $message);
+    $statusPreferenceParams = array(
+      'name' => $message->getName(),
+      'domain_id' => CRM_Core_Config::domainID(),
+    );
+    // Check if there's a StatusPreference matching this name/domain.
+    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
+    if ($statusPreference['id']) {
+      // If so, compare severity to StatusPreference->severity.
+      $spid = $statusPreference['id'];
+      $severity = self::severityMap($message->getSeverity());
+      if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
+        CRM_Core_Error::debug('snooze', 'possible snooze/hush!');
+        // A hush or a snooze has been set.  Find out which.
+        if ($statusPreference['values'][$spid]['hush_until']) {
+          // Snooze.
+          CRM_Core_Error::debug('snoozepath', 'snooze');
+          $today = new DateTime();
+        }
+        else {
+          // Hush.
+          CRM_Core_Error::debug('hushpath', 'hush');
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
 }
