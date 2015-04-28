@@ -63,23 +63,30 @@ class CiviCaseTestCase extends CiviUnitTestCase {
         'format.only_id' => 1,
       )
     );
+    $existing = $this->callAPISuccess('option_value', 'get', array(
+      'option_group_id' => 'activity_type',
+      'component_id' => 7,
+    ));
+    $existing = CRM_Utils_Array::collect('name', $existing['values']);
     $optionValues = array(
-      'Medical evaluation' => 'Medical evaluation',
-      'Mental health evaluation' => "Mental health evaluation",
-      'Secure temporary housing' => 'Secure temporary housing',
-      'Long-term housing plan' => 'Long-term housing plan',
-      'ADC referral' => 'ADC referral',
-      'Income and benefits stabilization' => 'Income and benefits stabilization',
+      'Medical evaluation',
+      'Mental health evaluation',
+      'Secure temporary housing',
+      'Long-term housing plan',
+      'ADC referral',
+      'Income and benefits stabilization',
     );
-    foreach ($optionValues as $name => $label) {
-      $activityTypes = $this->callAPISuccess('option_value', 'Create', array(
-        'option_group_id' => 2,
-        'name' => $name,
-        'label' => $label,
-        'component_id' => 7,
-      ));
-      // store for cleanup
-      $this->optionValues[] = $activityTypes['id'];
+    foreach ($optionValues as $label) {
+      if (!in_array($label, $existing)) {
+        $activityTypes = $this->callAPISuccess('option_value', 'Create', array(
+          'option_group_id' => 'activity_type',
+          'name' => $label,
+          'label' => $label,
+          'component_id' => 7,
+        ));
+        // store for cleanup
+        $this->optionValues[] = $activityTypes['id'];
+      }
     }
 
     // We used to be inconsistent about "HousingSupport" vs "housing_support".

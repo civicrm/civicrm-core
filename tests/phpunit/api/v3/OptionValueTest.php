@@ -252,6 +252,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $optionValue = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue);
     $params['weight'] = 4;
+    $params['label'] = 'my2@z.com';
     $optionValue2 = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue2);
     $options = $this->callAPISuccess('option_value', 'get', array('option_group_id' => $optionGroup['id']));
@@ -346,6 +347,48 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'is_active',
     ));
     $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+  }
+
+  /**
+   * Api should not allow duplicate labels
+   */
+  public function testCreateDuplicateLabels() {
+    $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'label' => 'Cats',
+    ));
+    $this->callAPIFailure('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'label' => 'Cats',
+    ));
+  }
+
+  /**
+   * Api should not munge labels if using as names, and prevent duplicates
+   */
+  public function testCreateNamesFromLabels() {
+    $result = $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'label' => '$pecial<char>"&acters"',
+      'sequential' => 1,
+    ));
+    $this->assertEquals('_pecial_char_acters_', $result['values'][0]['name']);
+    // This label will get munged to the same value as above,
+    // Api should append _1 to the end to ensure it is unique
+    $result = $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'label' => '$pecial<char>"&acters"!',
+      'sequential' => 1,
+    ));
+    $this->assertEquals('_pecial_char_acters__1', $result['values'][0]['name']);
+    // This label will get munged to the same value as above,
+    // Api should append _2 to the end to ensure it is unique
+    $result = $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'label' => '$pecial(char)"&acters"!',
+      'sequential' => 1,
+    ));
+    $this->assertEquals('_pecial_char_acters__2', $result['values'][0]['name']);
   }
 
 }
