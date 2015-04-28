@@ -95,7 +95,7 @@ class CRM_Utils_Check {
         if (count($statusMessages)) {
           if (count($statusMessages) > 1) {
             $statusTitle = ts('Multiple Alerts');
-            $statusMessage = '<ul><li>' . implode('</li><li>',$statusMessages) . '</li></ul>';
+            $statusMessage = '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
           }
 
           // TODO: add link to status page
@@ -110,7 +110,7 @@ class CRM_Utils_Check {
    *
    * @param CRM_Utils_Check_Message $a
    * @param CRM_Utils_Check_Message $b
-   * @return integer
+   * @return int
    */
   public function severitySort($a, $b) {
     $aSeverity = $a->getSeverity();
@@ -124,7 +124,7 @@ class CRM_Utils_Check {
   /**
    * Get the integer value (useful for thresholds) of the severity.
    *
-   * @param integer|const $severity
+   * @param int|const $severity
    *   the value to look up
    * @param bool $reverse
    *   whether to find the constant from the integer
@@ -184,7 +184,7 @@ class CRM_Utils_Check {
    *   Array of messages
    * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
-  public function checkAll($showHushed = false) {
+  public function checkAll($showHushed = FALSE) {
     $checks = array();
     $checks[] = new CRM_Utils_Check_Security();
     $checks[] = new CRM_Utils_Check_Env();
