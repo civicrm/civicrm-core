@@ -675,7 +675,11 @@ CRM.strings = CRM.strings || {};
           $('thead th', settings.nTable).each( function( index ) {
             $.each(this.attributes, function() {
               if(this.name.match("^cell-")) {
-                $('tbody td:eq(' + index + ')').attr( this.name.substring(5), this.value );
+                var cellAttr = this.name.substring(5);
+                var cellValue = this.value                
+                $('tbody tr', settings.nTable).each( function() {
+                  $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
+                });
               }
             });
           });

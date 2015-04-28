@@ -2509,8 +2509,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         }
 
         $activity['DT_RowData'] = array();
-        $activity['DT_RowData']['entity'] = 'activity'; 
-        $activity['DT_RowData']['id'] = $activityId; 
+        $activity['DT_RowData']['entity'] = 'activity';
+        $activity['DT_RowData']['id'] = $activityId;
 
         $activity['activity_type'] = $values['activity_type'];
         $activity['subject'] = $values['subject'];
