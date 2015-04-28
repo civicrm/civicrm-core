@@ -541,16 +541,6 @@ class CRM_Core_I18n {
     return (bool) $domain->locales;
   }
 
-  /**
-   * Get the enabled locales list
-   *
-   * @return array
-   */
-  public static function getLocales() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    return $domain->locales;
-  }
 
   /**
    * Change the processing language without changing the current user language
