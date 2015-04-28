@@ -57,16 +57,16 @@
     <title>Hush Status Notifications Until</title>
     <type>date</type>
     <import>true</import>
-    <comment>expires minimum_date_severity.  NULL never hushes.</comment>
+    <comment>expires ignore_severity.  NULL never hushes.</comment>
     <default>NULL</default>
     <add>4.7</add>
   </field>
   <field>
-    <name>minimum_report_severity</name>
-    <title>Minimum Report Severity</title>
+    <name>ignore_severity</name>
+    <title>Ignore Severity</title>
     <type>int unsigned</type>
     <import>true</import>
-    <comment>Hush messages up to but excluding this severity.</comment>
+    <comment>Hush messages up to and including this severity.</comment>
     <default>1</default>
     <add>4.7</add>
   </field>
