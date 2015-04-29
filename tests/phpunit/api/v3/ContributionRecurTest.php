@@ -78,8 +78,11 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     // create token
     $this->createLoggedInUser();
     $paymentProcessor = $this->processorCreate();
-    $token = $this->callAPISuccess('PaymentToken', 'create', array('payment_processor_id' => $paymentProcessor->id, 'token' => 'hhh',
-      'contact_id' => $this->individualCreate()));
+    $token = $this->callAPISuccess('PaymentToken', 'create', array(
+      'payment_processor_id' => $paymentProcessor->id,
+      'token' => 'hhh',
+      'contact_id' => $this->individualCreate(),
+    ));
     $params['payment_token_id'] = $token['id'];
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->assertEquals(1, $result['count']);
