@@ -1351,50 +1351,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @param string $name
-   * @param $label
-   * @param $attributes
-   * @param bool $forceTextarea
-   */
-  public function addWysiwyg($name, $label, $attributes, $forceTextarea = FALSE) {
-    // 1. Get configuration option for editor (tinymce, ckeditor, pure textarea)
-    // 2. Based on the option, initialise proper editor
-    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'editor_id'
-    );
-    $editor = strtolower(CRM_Utils_Array::value($editorID,
-      CRM_Core_OptionGroup::values('wysiwyg_editor')
-    ));
-    if (!$editor || $forceTextarea) {
-      $editor = 'textarea';
-    }
-    if ($editor == 'joomla default editor') {
-      $editor = 'joomlaeditor';
-    }
-
-    if ($editor == 'drupal default editor') {
-      $editor = 'drupalwysiwyg';
-    }
-
-    //lets add the editor as a attribute
-    $attributes['editor'] = $editor;
-
-    $this->addElement($editor, $name, $label, $attributes);
-    $this->assign('editor', $editor);
-
-    // include wysiwyg editor js files
-    // FIXME: This code does not make any sense
-    $includeWysiwygEditor = FALSE;
-    $includeWysiwygEditor = $this->get('includeWysiwygEditor');
-    if (!$includeWysiwygEditor) {
-      $includeWysiwygEditor = TRUE;
-      $this->set('includeWysiwygEditor', $includeWysiwygEditor);
-    }
-
-    $this->assign('includeWysiwygEditor', $includeWysiwygEditor);
-  }
-
-  /**
    * @param int $id
    * @param $title
    * @param null $required

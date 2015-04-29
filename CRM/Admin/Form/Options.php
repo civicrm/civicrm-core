@@ -238,7 +238,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
     else {
       // Hard-coding attributes here since description is still stored as varchar and not text in the schema. dgg
-      $this->addWysiwyg('description',
+      $this->add('wysiwyg', 'description',
         ts('Description'),
         array('rows' => 4, 'cols' => 80),
         $required
