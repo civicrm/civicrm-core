@@ -381,6 +381,21 @@ class CRM_Core_CodeGen_Specification {
         }
       }
     }
+
+    // in multilingual context popup, we need extra information to create appropriate widget
+    if ($fieldXML->localizable) {
+      if (isset($fieldXML->html)) {
+        $field['widget'] = (array) $fieldXML->html;
+      }
+      else {
+        // default
+        $field['widget'] = array('type' => 'Text');
+      }
+      if (isset($fieldXML->required)) {
+        $field['widget']['required'] = $this->value('required', $fieldXML);
+      }
+    }
+
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach
@@ -395,7 +410,7 @@ class CRM_Core_CodeGen_Specification {
         'labelColumn',
         // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
         'nameColumn',
-        // Where clause snippet (will be joined to the rest of the query with AND operator)
+		// Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback funtion incase of static arrays
         'callback',
