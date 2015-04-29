@@ -1,0 +1,10 @@
+<div class="crm-section">
+  <div class="label">
+    <label>{{widgetData.label}}:</label>
+  </div>
+  <div class="content">
+    <select class="big crm-form-select" id="{{widgetData.name}}" name="{{widgetData.name}}">
+      <option ng-repeat="(key, opt) in widgetData.options" value="opt.value">{{opt.label}}</option>
+    </select>
+  </div>
+</div>

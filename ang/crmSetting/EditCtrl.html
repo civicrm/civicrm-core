@@ -1,5 +1,6 @@
 <div class="crm-container">
   <div crm-ui-debug="settingsFields"></div>
+  <div crm-ui-debug="settingsValues"></div>
 
   <form name="myForm" crm-ui-id-scope>
 
@@ -10,10 +11,7 @@
     </div>
 
     <div ng-repeat="(group_name, fields) in settingsFields" crm-ui-accordion="{title: group_name, collapsed: true}">
-      <div ng-repeat="field in fields">
-        <!-- placeholder: we will have real fields in here later -->
-        {{field.title}}
-      </div>
+      <div ng-repeat="field in fields" crm-field-build="field"></div>
     </div>
 
     <!-- everything below this is boilerplate and is being kept for reference only -->
