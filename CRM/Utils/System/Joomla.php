@@ -465,6 +465,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function setUFLocale($civicrm_language) {
+    // TODO
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getVersion() {
     if (class_exists('JVersion')) {
       $version = new JVersion();
