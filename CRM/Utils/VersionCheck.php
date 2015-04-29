@@ -173,50 +173,78 @@ class CRM_Utils_VersionCheck {
     return "$a.$b";
   }
 
-  /**
-   * @return bool
-   */
-  public function isSecurityUpdateAvailable() {
-    $thisVersion = $this->getReleaseInfo($this->localVersion);
-    $localVersionDate = CRM_Utils_Array::value('date', $thisVersion, 0);
-    foreach ($this->versionInfo as $majorVersion) {
-      foreach ($majorVersion['releases'] as $release) {
-        if (!empty($release['security']) && $release['date'] > $localVersionDate
-          && version_compare($this->localVersion, $release['version']) < 0
-        ) {
-          if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
-            return TRUE;
-          }
-        }
-      }
-    }
-  }
 
   /**
    * Get the latest version number if it's newer than the local one
    *
-   * @return string|null
-   *   Returns version number of the latest release if it is greater than the local version
+   * @return array
+   *   Returns version number of the latest release if it is greater than the local version,
+   *   along with the type of upgrade (regular/security) needed and the status of the major
+   *   version
    */
   public function isNewerVersionAvailable() {
-    $newerVersion = NULL;
+    $return = array(
+      'version' => NULL,
+      'upgrade' => NULL,
+      'status' => NULL,
+    );
+
     if ($this->versionInfo && $this->localVersion) {
-      foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
-        $release = $this->checkBranchForNewVersion($majorVersion);
-        if ($release) {
-          // If we have a release with the same majorVersion as local, return it
-          if ($majorVersionNumber == $this->localMajorVersion) {
-            return $release;
-          }
-          // Search outside the local majorVersion (excluding non-stable)
-          elseif ($majorVersion['status'] != 'testing') {
-            // We found a new release but don't return yet, keep searching newer majorVersions
-            $newerVersion = $release;
-          }
+      if (isset($this->versionInfo[$this->localMajorVersion])) {
+        switch(CRM_Utils_Array::value('status', $this->versionInfo[$this->localMajorVersion])) {
+          case 'stable':
+          case 'lts':
+          case 'testing':
+            // look for latest version in this major version
+            $releases = $this->checkBranchForNewVersion($this->versionInfo[$this->localMajorVersion]);
+            if ($releases['newest']) {
+              $return['version'] = $releases['newest'];
+
+              // check for intervening security releases
+              $return['upgrade'] = ($releases['security']) ? 'security' : 'regular';
+            }
+            break;
+
+          case 'eol':
+          default:
+            // look for latest version ever
+            foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
+              if ($majorVersionNumber < $this->localMajorVersion || $majorVersion['status'] == 'testing') {
+                continue;
+              }
+              $releases = $this->checkBranchForNewVersion($this->versionInfo[$majorVersionNumber]);
+
+              if ($releases['newest']) {
+                $return['version'] = $releases['newest'];
+
+                // check for intervening security releases
+                $return['upgrade'] = ($releases['security'] || $return['upgrade'] == 'security') ? 'security' : 'regular';
+              }
+            }
+        }
+        $return['status'] = $this->versionInfo[$this->localMajorVersion]['status'];
+      }
+      else {
+        // Figure if the version is really old or really new
+        $wayOld = TRUE;
+
+        foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
+          $wayOld = ($this->localMajorVersion < $majorVersionNumber);
+        }
+
+        if ($wayOld) {
+          $releases = $this->checkBranchForNewVersion($majorVersion);
+
+          $return = array(
+            'version' => $releases['newest'],
+            'upgrade' => 'security',
+            'status' => 'eol',
+          );
         }
       }
     }
-    return $newerVersion;
+
+    return $return;
   }
 
   /**
@@ -224,12 +252,18 @@ class CRM_Utils_VersionCheck {
    * @return null|string
    */
   private function checkBranchForNewVersion($majorVersion) {
-    $newerVersion = NULL;
+    $newerVersion = array(
+      'newest' => NULL,
+      'security' => NULL,
+    );
     if (!empty($majorVersion['releases'])) {
       foreach ($majorVersion['releases'] as $release) {
         if (version_compare($this->localVersion, $release['version']) < 0) {
           if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
-            $newerVersion = $release['version'];
+            $newerVersion['newest'] = $release['version'];
+            if (CRM_Utils_Array::value('security',$release)) {
+              $newerVersion['security'] = $release['version'];
+            }
           }
         }
       }

@@ -118,7 +118,7 @@ class CRM_Utils_Check {
     if ($aSeverity == $bSeverity) {
       return strcmp($a->getName(), $b->getName());
     }
-    return (self::severityMap($aSeverity) > self::severityMap($bSeverity));
+    return (self::severityMap($aSeverity) < self::severityMap($bSeverity));
   }
 
   /**

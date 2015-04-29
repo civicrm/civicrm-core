@@ -46,7 +46,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
    * @return array
    */
   public static function create($params) {
-    $statusPreference = new CRM_Core_DAO_StatusPreference();
+    $statusPreference = new CRM_Core_BAO_StatusPreference();
 
     // Default severity level to ignore is 0 (DEBUG).
     if (!$params['ignore_severity']) {
