@@ -39,23 +39,18 @@
           <span class="description">{ts}The option label is displayed to users.{/ts}</span>
         </td>
       </tr>
-      <tr class="crm-admin-options-form-block-relative-terms">
+      <tr class="crm-admin-options-form-block-relative-terms crm-admin-relative-date-select">
         <td class="label">{$form.relative_terms.label}</td>
         <td>{$form.relative_terms.html}</td>
       </tr>
-      <tr class="crm-admin-options-form-block-units">
+      <tr class="crm-admin-options-form-block-units crm-admin-relative-date-select">
         <td class="label">{$form.units.label}</td>
         <td>{$form.units.html}</td>
       </tr>
       <tr class="crm-admin-options-form-block-preview">
-        <td class="label">Preview (doesn't work yet)</td>
+        <td class="label">Preview</td>
         <td>When run on {include file="CRM/common/jcalendar.tpl" elementName=preview_date}, this filter will run from <span id="relative-date-preview-from"></span> to <span id="relative-date-preview-to"></span>.</td>
-      </tr>
-      <tr class="crm-admin-options-form-block-value">
-        <td class="label">{$form.value.label} (For debugging purposes only)</td>
-        <td>{$form.value.html}<br />
-           <span class="description"><div class="icon ui-icon-alert"></div>{ts}Changing the date filter will break Smart Groups and reports which use this filter. This change can not be undone except by restoring the previous value.{/ts}</span>
-        </td>
+        <span class="description"><div class="icon ui-icon-alert"></div>{ts}Changing the date filter will break Smart Groups and reports which use this filter. This change can not be undone except by restoring the previous value.{/ts}</span>
       </tr>
       <tr class="crm-admin-options-form-block-description">
         <td class="label">{$form.description.label}</td>
