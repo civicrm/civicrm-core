@@ -1980,38 +1980,30 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
     switch ($dataType) {
       case 'Date':
-        $customTimeFormat = '';
         $customFormat = NULL;
 
-        switch ($timeFormat) {
-          case 1:
-            $customTimeFormat = '%l:%M %P';
-            break;
-
-          case 2:
-            $customTimeFormat = '%H:%M';
-            break;
-
-          default:
-            // if time is not selected remove time from value
-            $value = substr($value, 0, 10);
-        }
-
-        $supportableFormats = array(
-          'mm/dd' => "%B %E%f $customTimeFormat",
-          'dd-mm' => "%E%f %B $customTimeFormat",
-          'yy' => "%Y $customTimeFormat",
-          'M yy' => "%b %Y $customTimeFormat",
-          'yy-mm' => "%Y-%m $customTimeFormat",
-        );
+        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
 
         if ($format = CRM_Utils_Array::value('date_format', $field)) {
-          if (array_key_exists($format, $supportableFormats)) {
-            $customFormat = $supportableFormats["$format"];
+          if (array_key_exists($format, $actualPHPFormats)) {
+            $customTimeFormat = (array) CRM_Utils_Array::value($format, $actualPHPFormats);
+            switch ($timeFormat) {
+              case 1:
+                $customTimeFormat[] = 'g:iA';
+                break;
+
+              case 2:
+                $customTimeFormat[] = 'G:i';
+                break;
+
+              default:
+                // if time is not selected remove time from value
+                $value = substr($value, 0, 10);
+            }
+            $customFormat = implode(" ", $customTimeFormat);
           }
         }
-
-        $retValue = CRM_Utils_Date::customFormat($value, $customFormat);
+        $retValue = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
         break;
 
       case 'Boolean':
