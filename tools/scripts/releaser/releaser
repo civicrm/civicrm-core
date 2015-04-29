@@ -235,7 +235,7 @@ function do_publish_versions() {
 
       json=$(php -r "
         require 'releaser_json.php';
-        update_version_status('$json', '4.2', '$new_status_for_previous_stable');
+        update_version_status('$json', '$current_stable_version', '$new_status_for_previous_stable');
       ")
     fi
   fi

@@ -35,7 +35,6 @@ function add_release($json, $major_version, $release_properties_json) {
   $versions = json_decode($json, TRUE);
   $release_properties = json_decode($release_properties_json, TRUE);
   if (array_key_exists('security', $release_properties)) {
-    mylog($release_properties, '$release_properties');
     if ($release_properties['security'] == 'false') {
       unset($release_properties['security']);
     }
