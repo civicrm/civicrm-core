@@ -83,27 +83,27 @@
   </field> 
  <field> 
     <name>billing_first_name</name> 
-    <type>string</type> 
+    <type>varchar</type> 
     <length>255</length> 
     <comment>Billing first name at the time of token creation. Useful for fraud forensics</comment> 
     <add>4.7</add> 
   </field> 
  <field> 
     <name>billing_middle_name</name> 
-    <type>string</type> 
+    <type>varchar</type> 
     <length>255</length> 
     <comment>Billing middle name at the time of token creation. Useful for fraud forensics</comment> 
     <add>4.7</add> 
   </field> 
  <field> 
     <name>billing_last_name</name> 
-    <type>string</type> 
+    <type>varchar</type> 
     <length>255</length> 
     <comment>Billing last name at the time of token creation. Useful for fraud forensics</comment> 
     <add>4.7</add> 
   </field> 
  <field> 
-    <name>partial_account_number</name> 
+    <name>masked_account_number</name> 
     <type>varchar</type> 
     <length>255</length> 
     <comment>Holds the part of the card number or account details that may be retained or displayed</comment> 
