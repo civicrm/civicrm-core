@@ -350,7 +350,8 @@ LIMIT $limit";
     $Unit = CRM_Utils_Type::escape($_GET['Units'], 'String');
     $dates = CRM_Utils_Date::relativeToAbsolute($relativeTerm, $Unit);
     // do the preview call here
-    $fromDate = CRM_Utils_Date::formatDate($dates['from'], 1);
+    $fromDate = CRM_Utils_Date::customFormat($dates['from'], $config->dateformatFull);
+    $toDate = CRM_Utils_Date::customFormat($dates['to'], $config->dateformatFull);
     $result['fromDate'] = $fromDate;
     $result['toDate'] = $dates['to'];
     CRM_Utils_JSON::output($result);
