@@ -31,18 +31,24 @@
       $(item).triggerHandler('change');
       CRM.wysiwyg.focus(item);
     },
+    // Create a "collapsed" textarea that expands into a wysiwyg when clicked
     createCollapsed: function(item) {
       $(item)
         .hide()
-        .after('<div class="replace-plain" tabindex="0"></div>')
         .on('blur', function () {
           CRM.wysiwyg.destroy(item);
           $(item).hide().next('.replace-plain').show().html($(item).val());
+        })
+        .after('<div class="replace-plain" tabindex="0"></div>');
+      $(item).next('.replace-plain')
+        .attr('title', ts('Click to edit'))
+        .html($(item).val())
+        .on('click keypress', function (e) {
+          // Stop browser from opening clicked links
+          e.preventDefault();
+          $(item).show().next('.replace-plain').hide();
+          CRM.wysiwyg.create(item);
         });
-      $(item).next('.replace-plain').attr('title', ts('Click to edit')).on('click keypress', function () {
-        $(item).show().next('.replace-plain').hide();
-        CRM.wysiwyg.create(item);
-      });
     }
   };
 })(CRM.$, CRM._);
