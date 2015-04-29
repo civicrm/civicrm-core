@@ -121,11 +121,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
       $this->addElement('text', 'new_title', ts('Title - New Membership'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_title'));
 
-      $this->addWysiwyg('new_text', ts('Introductory Message - New Memberships'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_text'));
+      $this->add('wysiwyg', 'new_text', ts('Introductory Message - New Memberships'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_text'));
 
       $this->addElement('text', 'renewal_title', ts('Title - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_title'));
 
-      $this->addWysiwyg('renewal_text', ts('Introductory Message - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_text'));
+      $this->add('wysiwyg', 'renewal_text', ts('Introductory Message - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_text'));
 
       $this->addElement('checkbox', 'is_required', ts('Require Membership Signup'));
       $this->addElement('checkbox', 'display_min_fee', ts('Display Membership Fee'));

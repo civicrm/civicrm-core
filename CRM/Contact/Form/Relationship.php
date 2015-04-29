@@ -311,8 +311,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       );
       return;
     }
-    // Just in case custom data includes a rich text field
-    $this->assign('includeWysiwygEditor', TRUE);
 
     // Select list
     $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);

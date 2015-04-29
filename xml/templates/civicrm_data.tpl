@@ -377,7 +377,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Downloaded Invoice{/ts}', 49, 'Downloaded Invoice',      NULL, 1, NULL, 49, '{ts escape="sql"}Downloaded Invoice.{/ts}',0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Emailed Invoice{/ts}', 50, 'Emailed Invoice',      NULL, 1, NULL, 50, '{ts escape="sql"}Emailed Invoice.{/ts}',0, 1, 1, NULL, NULL),
  -- for manual contact merge
-   (@option_group_id_act, '{ts escape="sql"}Contact Merged{/ts}', 51, 'Contact Merged', NULL, 1, NULL, 51, '{ts escape="sql"}Contact Merged{/ts}',0, 1, 1, NULL, NULL), 
+   (@option_group_id_act, '{ts escape="sql"}Contact Merged{/ts}', 51, 'Contact Merged', NULL, 1, NULL, 51, '{ts escape="sql"}Contact Merged{/ts}',0, 1, 1, NULL, NULL),
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}',      1, 'Female',      NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',        2, 'Male',        NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
@@ -661,11 +661,7 @@ VALUES
   (@option_group_id_sfe, 'docx', 12, 'docx',  NULL, 0, 0, 12, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_sfe, 'xlsx', 13, 'xlsx',  NULL, 0, 0, 13, NULL, 0, 0, 1, NULL, NULL),
 
-
-  (@option_group_id_we, 'TinyMCE',  1, 'TinyMCE',  NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_we, 'CKEditor', 2, 'CKEditor', NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
-  (@option_group_id_we, 'Joomla Default Editor', 3, 'Joomla Default Editor', NULL, 0, NULL, 3, NULL, 0, 1, 1, NULL, NULL),
-  (@option_group_id_we, 'Drupal Default Editor', 4, 'Drupal Default Editor', NULL, 0, NULL, 4, NULL, 0, 1, 1, NULL, NULL),
 
   (@option_group_id_mt, '{ts escape="sql"}Search Builder{/ts}',      1, 'Search Builder',      NULL, 0, 0,    1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_mt, '{ts escape="sql"}Import Contact{/ts}',      2, 'Import Contact',      NULL, 0, 0,    2, NULL, 0, 1, 1, NULL, NULL),
@@ -1668,4 +1664,3 @@ VALUES
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched Gift{/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Personal Campaign Page{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Gift{/ts}'{/localize}, 11, 'gift', 11, 0, 1, 1);
-

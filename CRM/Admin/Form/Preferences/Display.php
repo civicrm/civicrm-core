@@ -131,11 +131,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       $defaults['sort_name_format'] = $this->_config->sort_name_format;
     }
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
-      $defaults['wysiwyg_input_format'] = variable_get('civicrm_wysiwyg_input_format', 0);
-    }
-
     return $defaults;
   }
 
@@ -145,7 +140,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * @return void
    */
   public function buildQuickForm() {
-    $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
+    $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor');
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
@@ -154,36 +149,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $config = CRM_Core_Config::singleton();
     $extra = array();
 
-    //if not using Joomla, remove Joomla default editor option
-    if ($config->userFramework != 'Joomla') {
-      unset($wysiwyg_options[3]);
-    }
-
-    $drupal_wysiwyg = FALSE;
-    if (!$config->userSystem->is_drupal || !module_exists("wysiwyg")) {
-      unset($wysiwyg_options[4]);
-    }
-    else {
-      $extra['onchange'] = '
-      if (this.value==4) {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").show();
-      }
-      else {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide()
-      }';
-
-      $formats = filter_formats();
-      $format_options = array();
-      foreach ($formats as $id => $format) {
-        $format_options[$id] = $format->name;
-      }
-      $drupal_wysiwyg = TRUE;
-    }
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
-
-    if ($drupal_wysiwyg) {
-      $this->addElement('select', 'wysiwyg_input_format', ts('Input Format'), $format_options, NULL);
-    }
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
@@ -226,16 +192,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       CRM_Core_BAO_OptionValue::updateOptionWeights($opGroupId, array_flip($preferenceWeights));
     }
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
-      variable_set('civicrm_wysiwyg_input_format', $this->_params['wysiwyg_input_format']);
-    }
-
     $this->_config->editor_id = $this->_params['editor_id'];
-
-    // set default editor to session if changed
-    $session = CRM_Core_Session::singleton();
-    $session->set('defaultWysiwygEditor', $this->_params['editor_id']);
 
     $this->postProcessCommon();
   }

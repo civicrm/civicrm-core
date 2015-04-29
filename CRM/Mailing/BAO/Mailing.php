@@ -2663,7 +2663,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
-      $form->addWysiwyg('html_message',
+      $form->add('wysiwyg', 'html_message',
         ts('HTML Format'),
         array(
           'cols' => '80',
@@ -2763,7 +2763,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     );
     $form->add('text', 'saveTemplateName', ts('Template Title'));
 
-    $form->addWysiwyg('html_message',
+    $form->add('wysiwyg', 'html_message',
       ts('Your Letter'),
       array(
         'cols' => '80',

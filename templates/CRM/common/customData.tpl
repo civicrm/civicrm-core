@@ -23,10 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* include wysiwyg related files*}
-{if !$includeWysiwygEditor}
-    {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{/if}
 {literal}
 <script type="text/javascript">
 CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple ) {
