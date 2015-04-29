@@ -226,16 +226,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       CRM_Core_BAO_OptionValue::updateOptionWeights($opGroupId, array_flip($preferenceWeights));
     }
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal == '1' && module_exists("wysiwyg")) {
-      variable_set('civicrm_wysiwyg_input_format', $this->_params['wysiwyg_input_format']);
-    }
-
     $this->_config->editor_id = $this->_params['editor_id'];
-
-    // set default editor to session if changed
-    $session = CRM_Core_Session::singleton();
-    $session->set('defaultWysiwygEditor', $this->_params['editor_id']);
 
     $this->postProcessCommon();
   }
