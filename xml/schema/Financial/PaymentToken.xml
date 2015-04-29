@@ -63,11 +63,17 @@
   </field> 
   <field> 
     <name>created_id</name> 
-    <type>int unsigned</type> 
-    <length>255</length> 
+    <type>int unsigned</type>  
     <comment>Contact ID of token creator</comment> 
     <add>4.7</add> 
   </field> 
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.7</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field> 
     <name>expiry_date</name> 
     <type>datetime</type> 
