@@ -52,8 +52,8 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   }
 
   /**
-   *    Ensure that without any SystemPreference set, checkDefaultMailbox shows
-   *    up.
+   * Ensure that without any StatusPreference set, checkDefaultMailbox shows
+   * up.
    */
   public function testSystemCheckBasic() {
     $result = $this->callAPISuccess('System', 'check', array());
@@ -67,12 +67,12 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   }
 
   /**
-   *    Permanently hushed items should never show up.
+   * Permanently hushed items should never show up.
    */
   public function testSystemCheckHushForever() {
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
-      'ignore_severity' => 4,
+      'ignore_severity' => 7,
     );
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $result = $this->callAPISuccess('System', 'check', array());
@@ -80,6 +80,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
+      }
+      else {
+        $testedCheck = array();
       }
     }
     $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
@@ -102,6 +105,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = $check;
         break;
       }
+      else {
+        $testedCheck = array();
+      }
     }
     $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
@@ -122,6 +128,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
+      }
+      else {
+        $testedCheck = array();
       }
     }
     $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
@@ -144,9 +153,10 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = $check;
         break;
       }
+      else {
+        $testedCheck = array();
+      }
     }
-    fwrite(STDERR, 'yesterday');
-    fwrite(STDERR, print_r($yesterday->format('Y-m-d'), TRUE));
     $this->assertArrayHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
 
@@ -164,6 +174,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
+      }
+      else {
+        $testedCheck = array();
       }
     }
     $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
@@ -184,6 +197,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $testedCheck = $check;
         break;
       }
+      else {
+        $testedCheck = array();
+      }
     }
     $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
   }
@@ -202,6 +218,9 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
+      }
+      else {
+        $testedCheck = array();
       }
     }
     $this->assertArrayNotHasKey('name', $testedCheck, ' in line ' . __LINE__);
