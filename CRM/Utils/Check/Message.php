@@ -76,6 +76,10 @@ class CRM_Utils_Check_Message {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
+    // Handle non-integer severity levels.
+    if (!CRM_Utils_Rule::integer($level)) {
+      $level = CRM_Utils_Check::severityMap($level);
+    }
     $this->level = $level;
   }
 
