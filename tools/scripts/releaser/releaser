@@ -207,8 +207,6 @@ function do_publish() {
 #################################################
 ## Publish version data to versions.json
 function do_publish_versions() {
-  # FIXME: Is this racy when doing concurrent security releases?
-
   # Turn off command echoing, because it makes input prompts hard to read.
   set +x
 
