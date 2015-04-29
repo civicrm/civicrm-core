@@ -58,9 +58,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('payment_token', 'create', $this->params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck(array_merge($this->params, array( //your parameters here.
-                                                        $this->params
-                                                        )), $result['id'], 'payment_token', TRUE);
+    $this->getAndCheck(array_merge($this->params, array($this->params,)), $result['id'], 'payment_token', TRUE);
   }
 
   public function testGetPaymentToken() {
@@ -81,4 +79,3 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   }
 
 }
-
