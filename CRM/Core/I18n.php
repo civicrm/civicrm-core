@@ -540,9 +540,14 @@ class CRM_Core_I18n {
    *   Language (for example 'en_US', or 'fr_CA').
    *   True if the domain was changed for an extension.
    */
-  public function setLanguage($language) {
+  public function setLocale($language) {
 
     $config = CRM_Core_Config::singleton();
+
+    // Change the language of the CMS as well, for URLs.
+    CRM_Utils_System::setUFLocale($language);
+
+    // change the gettext ressources
     if ($this->_nativegettext) {
       $locale = $language . '.utf8';
       putenv("LANG=$locale");

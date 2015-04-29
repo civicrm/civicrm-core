@@ -430,6 +430,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    global $language;
+
+    $langcode = substr($civicrm_language, 0, 2);
+    $languages = language_list();
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Perform any post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
