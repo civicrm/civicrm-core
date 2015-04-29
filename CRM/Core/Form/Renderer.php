@@ -120,7 +120,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
-      elseif ($element->getAttribute('type') == 'text' && ! empty($element->getAttribute('format'))) {
+      elseif ($element->getAttribute('type') == 'text' && !empty($element->getAttribute('format'))) {
         $this->renderFrozenDate($el, $element);
       }
 
