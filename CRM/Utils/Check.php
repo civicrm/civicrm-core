@@ -234,13 +234,16 @@ class CRM_Utils_Check {
     );
     // Check if there's a StatusPreference matching this name/domain.
     $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    if ($statusPreference['id']) {
-      // If so, compare severity to StatusPreference->severity.
+    $spid = FALSE;
+    if (isset($statusPreference['id'])) {
       $spid = $statusPreference['id'];
+    }
+    if ($spid) {
+      // If so, compare severity to StatusPreference->severity.
       $severity = self::severityMap($message->getSeverity());
       if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
         // A hush or a snooze has been set.  Find out which.
-        if ($statusPreference['values'][$spid]['hush_until']) {
+        if (isset($statusPreference['values'][$spid]['hush_until'])) {
           // Snooze is set.
           $today = new DateTime();
           $snoozeDate = new DateTime($statusPreference['values'][$spid]['hush_until']);
