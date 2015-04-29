@@ -53,6 +53,20 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    */
   protected $_contactId;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'GroupContact';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
   public function preProcess() {
     $this->_contactId = $this->get('contactId');
     $this->_groupContactId = $this->get('groupContactId');
@@ -101,10 +115,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->add('select', 'group_id', '', $groupSelect, TRUE, array(
-          'class' => 'crm-select2 crm-action-menu action-icon-plus',
-          'placeholder' => $msg,
-        ));
+      $this->addField('group_id', array('class' => 'crm-action-menu action-icon-plus', 'placeholder' => $msg, 'options' => $groupSelect));
 
       $this->addButtons(array(
           array(
