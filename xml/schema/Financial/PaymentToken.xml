@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+
+<table> 
+  <base>CRM/Financial</base> 
+  <class>PaymentToken</class> 
+  <name>civicrm_payment_token</name> 
+  <comment>Payment Token</comment> 
+  <add>4.7</add> 
+  <field> 
+    <name>id</name> 
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment>Payment Token ID</comment> 
+    <add>4.7</add> 
+  </field> 
+  <primaryKey> 
+    <name>id</name> 
+    <autoincrement>true</autoincrement> 
+  </primaryKey> 
+  <field> 
+    <name>contact_id</name> 
+    <title>Contact ID</title> 
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment>FK to Contact ID for the owner of the token</comment> 
+    <add>4.7</add> 
+  </field> 
+  <foreignKey> 
+    <name>contact_id</name> 
+    <table>civicrm_contact</table> 
+    <key>id</key> 
+    <add>4.7</add> 
+    <onDelete>CASCADE</onDelete> 
+  </foreignKey> 
+  <field> 
+    <name>payment_processor_id</name> 
+    <title>Payment Processor ID</title> 
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment></comment> 
+    <add>4.7</add> 
+  </field> 
+  <foreignKey> 
+    <name>payment_processor_id</name> 
+    <table>civicrm_payment_processor</table> 
+    <key>id</key> 
+    <add>4.7</add> 
+    <onDelete>RESTRICT</onDelete> 
+  </foreignKey> 
+  <field> 
+    <name>token</name> 
+    <type>varchar</type> 
+    <length>255</length> 
+    <required>true</required> 
+    <comment>Externally provided token string</comment> 
+    <add>4.7</add> 
+  </field> 
+  <field> 
+    <name>created_date</name> 
+    <type>timestamp</type> 
+    <comment>Date created</comment> 
+    <add>4.7</add> 
+  </field> 
+  <field> 
+    <name>created_id</name> 
+    <type>int unsigned</type> 
+    <length>255</length> 
+    <comment>Contact ID of token creator</comment> 
+    <add>4.7</add> 
+  </field> 
+  <field> 
+    <name>expiry_date</name> 
+    <type>datetime</type> 
+    <comment>Date this token expires</comment> 
+    <add>4.7</add> 
+  </field> 
+  <field> 
+    <name>email</name> 
+    <length>255</length> 
+    <type>varchar</type> 
+    <comment>Email at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.7</add> 
+  </field> 
+ <field> 
+    <name>billing_first_name</name> 
+    <type>string</type> 
+    <length>255</length> 
+    <comment>Billing first name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.7</add> 
+  </field> 
+ <field> 
+    <name>billing_middle_name</name> 
+    <type>string</type> 
+    <length>255</length> 
+    <comment>Billing middle name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.7</add> 
+  </field> 
+ <field> 
+    <name>billing_last_name</name> 
+    <type>string</type> 
+    <length>255</length> 
+    <comment>Billing last name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.7</add> 
+  </field> 
+ <field> 
+    <name>partial_account_number</name> 
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>Holds the part of the card number or account details that may be retained or displayed</comment> 
+    <add>4.7</add> 
+  </field> 
+  <field> 
+    <name>ip_address</name> 
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>IP used when creating the token. Useful for fraud forensics</comment> 
+    <add>4.7</add> 
+  </field> 
+</table> 
