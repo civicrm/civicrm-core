@@ -43,7 +43,12 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
   public function preProcess() {
     $this->set('gName', 'relative_date_filters');
     parent::preprocess();
+    $session = CRM_Core_Session::singleton();
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Admin/Page/DateFilter.js');
+    $url = "civicrm/admin/relative_date_filters";
+    $params = "reset=1";
+    $session->pushUserContext(CRM_Utils_System::url($url, $params));
+
   }
 
   /**
@@ -54,8 +59,11 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
    * @return array
    */
   public function setDefaultValues() {
+    // FIXME: Move this code into the BAO once we have a new syntax.
     $defaults = parent::setDefaultValues();
-    //FIXME: Parse Value into relative date terms and units
+    // FIXME: This doesn't work.
+    $defaults['relative_terms'] = strstr($defaults['value'], ".", TRUE);
+    CRM_Core_Error::debug('defaults', $defaults);
     return $defaults;
   }
   public function buildQuickForm() {
@@ -65,4 +73,20 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
     $this->addDate('preview_date', ts('Preview Date'), false);
   }
 
+  public function postProcess() {
+    $params = $this->exportValues();
+    // FIXME: This line will change when we implement a new relative date filter
+    // syntax.
+    $params['value'] = $params['relative_terms'] . "." . $params['units'];
+    $groupParams = array('name' => ($this->_gName));
+    $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
+
+    CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(
+      1 => $this->_gLabel,
+      2 => $optionValue->label,
+    )), ts('Saved'), 'success');
+
+//    $this->controller->setDestination( $url ); 
+    CRM_Core_Error::debug_var('xaxaxa', $this->controller);
+  }
 }
