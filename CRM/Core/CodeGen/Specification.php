@@ -410,7 +410,7 @@ class CRM_Core_CodeGen_Specification {
         'labelColumn',
         // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
         'nameColumn',
-		// Where clause snippet (will be joined to the rest of the query with AND operator)
+	// Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback funtion incase of static arrays
         'callback',

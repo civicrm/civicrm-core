@@ -66,16 +66,15 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $widget = $widgets[$table][$field];
 
     // attributes
-    $attributes = array('css' => '');
+    $attributes = array('class' => '');
     if (isset($widget['rows'])) {
       $attributes['rows'] = $widget['rows'];
     }
     if (isset($widget['cols'])) {
       $attributes['cols'] = $widget['cols'];
     }
-    // FIXME: should have this
     $required = !empty($widget['required']);
-    
+
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
       $name = "{$field}_{$locale}";
@@ -83,8 +82,8 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
         $attributes['class'] .= ' default-lang';
       }
       if ($widget['type'] == 'RichTextEditor') {
-        $attributes['click_wysiwyg'] = TRUE;
-        $this->addWysiwyg($name, $languages[$locale], $attributes, $required);
+        $attributes['class'] = ' collapsed';
+        $this->add('wysiwyg', $name, $languages[$locale], $attributes, $required);
       }
       else {
         $this->add($widget['type'], $name, $languages[$locale], $attributes, $required);
