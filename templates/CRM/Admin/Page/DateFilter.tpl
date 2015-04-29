@@ -31,6 +31,10 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
   {include file="CRM/Admin/Form/DateFilter.tpl"}
 {else}
+  <div class="action-link">
+    <a href="{crmURL q="action=add&reset=1"}" id="newDateFilter" class="button"><span><div
+          class="icon ui-icon-circle-plus"></div>{ts}Add Relative Date Filter{/ts}</span></a>
+  </div>
 
   {if $rows}
     <div id="date-filters">
