@@ -98,6 +98,16 @@
       <td class="label">{$form.mode.label}</td>
       <td>{$form.mode.html}</td>
     </tr>
+    {if $multilingual}
+    <tr class="crm-scheduleReminder-form-block-filter-contact-language">
+      <td class="label">{$form.filter_contact_language.label}</td>
+      <td>{$form.filter_contact_language.html} {help id="filter_contact_language"}</td>
+    </tr>
+    <tr class="crm-scheduleReminder-form-block-communication-language">
+      <td class="label">{$form.communication_language.label}</td>
+      <td>{$form.communication_language.html} {help id="communication_language"}</td>
+    </tr>
+    {/if}
     <tr class="crm-scheduleReminder-form-block-active">
       <td class="label"></td>
       <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>

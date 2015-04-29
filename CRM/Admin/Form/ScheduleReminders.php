@@ -247,6 +247,25 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       CRM_Core_PseudoConstant::nestedGroup('Mailing'), FALSE, array('class' => 'crm-select2 huge')
     );
 
+    // multilingual only options
+    $multilingual = CRM_Core_I18n::isMultilingual();
+    if ($multilingual) {
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('multilingual', $multilingual);
+
+      $languages = CRM_Core_I18n::languages(TRUE);
+      $languageFilter = $languages + array(CRM_Core_I18n::NONE => ts('Contacts with no preferred language'));
+      $element = $this->add('select', 'filter_contact_language', ts('Recipients language'), $languageFilter, FALSE,
+        array('multiple' => TRUE, 'class' => 'crm-select2', 'placeholder' => TRUE));
+
+      $communicationLanguage = array(
+        '' => ts('System default language'),
+        CRM_Core_I18n::AUTO => ts('Follow recipient preferred language'),
+      );
+      $communicationLanguage = $communicationLanguage + $languages;
+      $this->add('select', 'communication_language', ts('Communication language'), $communicationLanguage);
+    }
+
     CRM_Mailing_BAO_Mailing::commonCompose($this);
 
     $this->add('text', 'subject', ts('Subject'),
@@ -366,6 +385,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       elseif (!empty($defaults['recipient_manual'])) {
         $defaults['recipient'] = 'manual';
         $defaults['recipient_manual_id'] = $defaults['recipient_manual'];
+      }
+      if ($contactLanguage = CRM_Utils_Array::value('filter_contact_language', $defaults)) {
+        $defaults['filter_contact_language'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contactLanguage);
       }
     }
 
@@ -491,6 +513,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['end_action'] = 'null';
       $params['end_date'] = 'null';
     }
+
+    // multilingual options
+    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, NULL);
+    $params['filter_contact_language'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['filter_contact_language']);
+    $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, NULL);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;

@@ -332,4 +332,18 @@
     <comment>Used for repeating entity</comment>
     <add>4.6</add>
   </field>
+  <field>
+    <name>filter_contact_language</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Used for multilingual installation</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>communication_language</name>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Used for multilingual installation</comment>
+    <add>4.7</add>
+  </field>
 </table>
