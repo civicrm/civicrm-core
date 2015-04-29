@@ -438,7 +438,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
         }
       }
-      $this->setMessage(ts('The relationship has been updated'));
+      if (empty($outcome['saved']) && !empty($update)) {
+        $outcome['saved'] = $update;
+      }
+      $this->setMessage($outcome);
     }
     // Create mode (could be 1 or more relationships)
     else {

@@ -171,12 +171,14 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       TRUE
     );
 
-    $this->add('text',
-      'value',
-      ts('Value'),
-      CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
-      TRUE
-    );
+    if ($this->_gName != 'activity_type') {
+      $this->add('text',
+        'value',
+        ts('Value'),
+        CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
+        TRUE
+      );
+    }
 
     if (!in_array($this->_gName, array(
         'email_greeting',
