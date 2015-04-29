@@ -25,6 +25,9 @@
       editor.config.filebrowserUploadUrl = uploadUrl + '&type=files';
       editor.config.filebrowserImageUploadUrl = uploadUrl + '&type=images';
       editor.config.filebrowserFlashUploadUrl = uploadUrl + '&type=flash';
+      editor.on('focus', function() {
+        $(item).trigger('focus');
+      });
       editor.on('blur', function() {
         editor.updateElement();
         $(item).trigger("blur");

@@ -157,8 +157,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'details' => array(
         'type' => 'wysiwyg',
         'label' => ts('Details'),
-        // forces a smaller edit window
-        'attributes' => array('rows' => 4, 'cols' => 60),
+        'attributes' => array('class' => 'huge'),
         'required' => FALSE,
       ),
       'status_id' => array(
@@ -664,10 +663,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $attribute = CRM_Utils_Array::value('attributes', $values);
         $required = !empty($values['required']);
 
-        if ($values['type'] == 'wysiwyg') {
-          $this->addWysiwyg($field, $values['label'], $attribute, $required);
-        }
-        elseif ($values['type'] == 'select' && empty($attribute)) {
+        if ($values['type'] == 'select' && empty($attribute)) {
           $this->addSelect($field, array('entity' => 'activity'), $required);
         }
         elseif ($values['type'] == 'entityRef') {
