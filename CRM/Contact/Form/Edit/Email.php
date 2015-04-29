@@ -115,7 +115,7 @@ class CRM_Contact_Form_Edit_Email {
           array('rows' => 2, 'cols' => 40)
         );
 
-        $form->addWysiwyg("email[$blockId][signature_html]", ts('Signature (HTML)'),
+        $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
           array('rows' => 2, 'cols' => 40)
         );
       }

@@ -187,7 +187,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->addElement('hidden', 'activity_type_id', $petitionTypeID);
 
     // script / instructions / description of petition purpose
-    $this->addWysiwyg('instructions', ts('Introduction'), $attributes['instructions']);
+    $this->add('wysiwyg', 'instructions', ts('Introduction'), $attributes['instructions']);
 
     // Campaign id
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
@@ -211,7 +211,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     // thank you title and text (html allowed in text)
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'thankyou_title'));
-    $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'thankyou_text'));
+    $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'thankyou_text'));
 
     // bypass email confirmation?
     $this->add('checkbox', 'bypass_confirm', ts('Bypass email confirmation'));
