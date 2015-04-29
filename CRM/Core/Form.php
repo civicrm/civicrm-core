@@ -1252,6 +1252,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
+        $props['size'] = isset($props['size']) ? $props['size'] : 60;
         $this->add('text', $name, $label, $props, $required);
         break;
 
@@ -1259,7 +1260,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->add('hidden', $name, $label, $props, $required);
         break;
 
-      //case 'TextArea':
+      case 'TextArea':
+        //Set default columns and rows for textarea.
+        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
+        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        $this->addElement('textarea', $name, $label, $props, $required);
+        break;
+
       //case 'Select Date':
       //TODO: Add date formats
       //TODO: Add javascript template for dates.
