@@ -381,7 +381,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       exit();
     }
 	  $upload_dir    = wp_upload_dir();
-	  $settingsDir = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm';
+	  $settingsDir = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
 	  if (defined('CIVICRM_SETTINGS_PATH')) {
 		  CRM_Utils_File::restrictAccessSettings( $settingsDir );
 	  }
