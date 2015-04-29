@@ -82,7 +82,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
         $attributes['class'] .= ' default-lang';
       }
       if ($widget['type'] == 'RichTextEditor') {
-        $attributes['class'] = ' collapsed';
+        $attributes['class'] .= ' collapsed';
         $this->add('wysiwyg', $name, $languages[$locale], $attributes, $required);
       }
       else {
