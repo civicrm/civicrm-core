@@ -649,6 +649,12 @@ input.crm-form-entityref {
   padding: 4px;
 }
 
+.crm-container .status.crm-ok {
+  border-color: #B0D730;
+  background-color: #F1F8EB;
+  color: #3E3E3E;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
 }
