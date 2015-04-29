@@ -272,46 +272,6 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
-   * Alert the site admin of new versions of CiviCRM.
-   * Show the message once a day
-   */
-  public function versionAlert() {
-    $versionAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1);
-    $securityAlertSetting = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityUpdateAlert', NULL, 3);
-    $settingsUrl = CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1', FALSE, NULL, FALSE, FALSE, TRUE);
-    if (CRM_Core_Permission::check('administer CiviCRM') && $securityAlertSetting > 1 && $this->isSecurityUpdateAvailable()) {
-      $session = CRM_Core_Session::singleton();
-      if ($session->timer('version_alert', 24 * 60 * 60)) {
-        $msg = ts('This version of CiviCRM requires a security update.') .
-          '<ul>
-            <li><a href="https://civicrm.org/advisory">' . ts('Read advisory') . '</a></li>
-            <li><a href="https://civicrm.org/download">' . ts('Download now') . '</a></li>
-            <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
-          </ul>';
-        $session->setStatus($msg, ts('Security Alert'), 'alert');
-        CRM_Core_Resources::singleton()
-          ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
-      }
-    }
-    elseif (CRM_Core_Permission::check('administer CiviCRM') && $versionAlertSetting > 1) {
-      $newerVersion = $this->isNewerVersionAvailable();
-      if ($newerVersion) {
-        $session = CRM_Core_Session::singleton();
-        if ($session->timer('version_alert', 24 * 60 * 60)) {
-          $msg = ts('A newer version of CiviCRM is available: %1', array(1 => $newerVersion)) .
-            '<ul>
-              <li><a href="https://civicrm.org/download">' . ts('Download now') . '</a></li>
-              <li><a class="crm-setVersionCheckIgnoreDate" href="' . $settingsUrl . '">' . ts('Suppress this message') . '</a></li>
-            </ul>';
-          $session->setStatus($msg, ts('Update Available'), 'info');
-          CRM_Core_Resources::singleton()
-            ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/versionCheckOptions.js');
-        }
-      }
-    }
-  }
-
-  /**
    * Collect info about the site to be sent as pingback data.
    */
   private function getSiteStats() {
