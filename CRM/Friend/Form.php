@@ -195,7 +195,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
     );
     $email->freeze();
 
-    $this->addWysiwyg('suggested_message', ts('Your Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'suggested_message'));
+    $this->add('wysiwyg', 'suggested_message', ts('Your Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'suggested_message'));
     $friend = array();
     $mailLimit = self::NUM_OPTION;
     if ($this->_entityTable == 'civicrm_pcp') {

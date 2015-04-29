@@ -42,9 +42,6 @@
     </div>
 {/if}
 
-{* include wysiwyg related files*}
-{include file="CRM/common/wysiwyg.tpl"}
-
 {if isset($browserPrint) and $browserPrint}
 {* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
 <div id="printer-friendly">

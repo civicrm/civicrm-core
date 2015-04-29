@@ -989,7 +989,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes['maxlength'] = $field->text_length;
         }
-        $qf->addWysiwyg($elementName, $label, $attributes, $search);
+        $qf->add('wysiwyg', $elementName, $label, $attributes, $search);
         break;
 
       case 'Autocomplete-Select':

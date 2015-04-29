@@ -335,8 +335,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->assign('defaultSubtypes', json_encode($this->_subtypes));
 
     // help text
-    $this->addWysiwyg('help_pre', ts('Pre-form Help'), $attributes['help_pre']);
-    $this->addWysiwyg('help_post', ts('Post-form Help'), $attributes['help_post']);
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), $attributes['help_pre']);
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
 
     // weight
     $this->add('text', 'weight', ts('Order'), $attributes['weight'], TRUE);

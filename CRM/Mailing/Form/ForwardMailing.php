@@ -83,7 +83,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
     //insert message Text by selecting "Select Template option"
     $this->add('textarea', 'forward_comment', ts('Comment'), array('cols' => '80', 'rows' => '8'));
-    $this->addWysiwyg('html_comment',
+    $this->add('wysiwyg', 'html_comment',
       ts('HTML Message'),
       array('cols' => '80', 'rows' => '8')
     );
