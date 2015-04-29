@@ -140,7 +140,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * @return void
    */
   public function buildQuickForm() {
-    $wysiwyg_options = array('' => ts('Textarea')) + CRM_Core_OptionGroup::values('wysiwyg_editor');
+    $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor');
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');

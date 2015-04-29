@@ -2,5 +2,11 @@
 
 -- CRM-16354
 SELECT @option_group_id_wysiwyg := max(id) from civicrm_option_group where name = 'wysiwyg_editor';
-DELETE FROM civicrm_option_value WHERE name IN ('TinyMCE', 'Joomla Default Editor', 'Drupal Default Editor')
+
+UPDATE civicrm_option_group SET name = 'Textarea', {localize field='label'}label = 'Textarea'{/localize}
+  WHERE value = 1 AND option_group_id = @option_group_id_wysiwyg;
+
+DELETE FROM civicrm_option_value WHERE name IN ('Joomla Default Editor', 'Drupal Default Editor')
   AND option_group_id = @option_group_id_wysiwyg;
+
+UPDATE civicrm_option_group SET is_active = 1, is_reserved = 1 WHERE option_group_id = @option_group_id_wysiwyg;
