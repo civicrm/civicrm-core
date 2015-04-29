@@ -46,7 +46,8 @@ class CRM_Utils_Check_Env {
       $this->checkOutboundMail(),
       $this->checkDomainNameEmail(),
       $this->checkDefaultMailbox(),
-      $this->checkLastCron()
+      $this->checkLastCron(),
+      $this->checkVersion()
     );
     return $messages;
   }
@@ -223,7 +224,7 @@ class CRM_Utils_Check_Env {
         ts('Cron Not Running'),
         \Psr\Log\LogLevel::WARNING
       );
-      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs')));
       $messages[] = $message;
     }
     else {
@@ -233,7 +234,7 @@ class CRM_Utils_Check_Env {
         ts('Cron Not Running'),
         \Psr\Log\LogLevel::ERROR
       );
-      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://book.civicrm.org/user/advanced-configuration/email-system-configuration/')));
+      $message->addHelp(ts('Learn more in the <a href="%1">Administrator\'s Guide supplement</a>', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs')));
       $messages[] = $message;
     }
 
@@ -248,19 +249,61 @@ class CRM_Utils_Check_Env {
   public function checkVersion() {
     $messages = array();
 
-    // check turned off:
-    // return message with status of notice saying check is turned off
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1)) {
+      $vc =   CRM_Utils_VersionCheck::singleton();
+      $newerVersion = $vc->isNewerVersionAvailable();
 
-    // up-to-date
-    // return message with status of info saying it's okay
+      if ($newerVersion['version']) {
+        $vInfo = array(
+          1 => $newerVersion['version'],
+          2 => $vc->localVersion,
+        );
+        if ($newerVersion['status'] == 'lts') {
+          $vInfo[1] .= ' ' . ts('(long-term support)');  // LTS = long-term support version
+        }
 
-    // new non-security release
-    // warning
+        if ($newerVersion['upgrade'] == 'security') {
+          // For most new versions, just make them notice
+          $severity = \Psr\Log\LogLevel::CRITICAL;
+          $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
+        }
+        elseif ($newerVersion['status'] == 'eol') {
+          // Warn about EOL
+          $severity = \Psr\Log\LogLevel::WARNING;
+          $message = ts('New version %1 is available. The site is currently running %2, which has reached its end of life.', $vInfo);
+        }
+        else {
+          // For most new versions, just make them notice
+          $severity = \Psr\Log\LogLevel::NOTICE;
+          $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
+        }
+      }
+      else {
+        $vNum = $vc->localVersion;
+        if ($newerVersion['status'] == 'lts') {
+          $vNum .= ' ' . ts('(long-term support)');  // LTS = long-term support version
+        }
 
-    // new security release
-    // critical
+        $severity = \Psr\Log\LogLevel::INFO;
+        $message = ts('Version %1 is up-to-date.', array(1 => $vNum));
+      }
 
-    // release is eol
-    // error
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkVersion',
+        $message,
+        ts('Update Status'),
+        $severity
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkVersion',
+        ts('The check for new versions of CiviCRM has been disabled.'),
+        ts('Update Check Disabled'),
+        \Psr\Log\LogLevel::NOTICE
+      );
+    }
+
+    return $messages;
   }
 }
