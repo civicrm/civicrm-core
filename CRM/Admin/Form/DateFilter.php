@@ -61,11 +61,12 @@ class CRM_Admin_Form_DateFilter extends CRM_Admin_Form_Options {
   public function setDefaultValues() {
     // FIXME: Move this code into the BAO once we have a new syntax.
     $defaults = parent::setDefaultValues();
-    // FIXME: This doesn't work.
     $defaults['relative_terms'] = strstr($defaults['value'], ".", TRUE);
-    CRM_Core_Error::debug('defaults', $defaults);
+    $defaults['units'] = substr($defaults['value'], strpos($defaults['value'], ".")+1);
+
     return $defaults;
   }
+
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->add('select', 'relative_terms', ts('Relative Date Terms'), CRM_Core_SelectValues::getRelativeDateTerms(), FALSE, array('class' => 'required'));
