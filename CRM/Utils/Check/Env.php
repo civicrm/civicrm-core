@@ -47,7 +47,11 @@ class CRM_Utils_Check_Env {
       $this->checkDomainNameEmail(),
       $this->checkDefaultMailbox(),
       $this->checkLastCron(),
-      $this->checkVersion()
+      $this->checkVersion(),
+      $this->checkExtensions(),
+      $this->checkExtensionUpgrades(),
+      $this->checkDbVersion(),
+      $this->checkDbEngine()
     );
     return $messages;
   }
@@ -306,4 +310,231 @@ class CRM_Utils_Check_Env {
 
     return $messages;
   }
+
+  /**
+   * Checks if extensions are set up properly
+   * @return array
+   */
+
+  public function checkExtensions() {
+    $messages = array();
+    $extensionSystem = CRM_Extension_System::singleton();
+    $mapper = $extensionSystem->getMapper();
+    $manager = $extensionSystem->getManager();
+    $remotes = $extensionSystem->getBrowser()->getExtensions();
+
+    if ($extensionSystem->getDefaultContainer()) {
+      $basedir = $extensionSystem->getDefaultContainer()->baseDir;
+    }
+
+    if (empty($basedir)) {
+      // no extension directory
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('Your extensions directory is not set.  Click <a href="%1">here</a> to set the extensions directory.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/path', 'reset=1'))),
+        ts('Extensions directory not writable'),
+        \Psr\Log\LogLevel::NOTICE
+      );
+      return $messages;
+    }
+
+    if (!is_dir($basedir)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('The path to your extensions directory is not a directory.  Please check your file system.'),
+        ts('Extensions directory incorrect'),
+        \Psr\Log\LogLevel::ERROR
+      );
+      return $messages;
+    }
+    elseif (!is_writable($basedir)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('Your extensions directory is not writable.  Please change your file permissions.'),
+        ts('Extensions directory not writable'),
+        \Psr\Log\LogLevel::ERROR
+      );
+      return $messages;
+    }
+
+    if (empty($extensionSystem->getDefaultContainer()->baseUrl)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'))),
+        ts('Extensions directory not writable'),
+        \Psr\Log\LogLevel::ERROR
+      );
+      return $messages;
+    }
+
+    $keys = array_keys($manager->getStatuses());
+    sort($keys);
+    $severity = 1;
+    $msgArray = $okextensions = array();
+    foreach ($keys as $key) {
+      try {
+        $obj = $mapper->keyToInfo($key);
+      }
+      catch (CRM_Extension_Exception $ex) {
+        $severity = 4;
+        $msgArray[] = ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key));
+        continue;
+      }
+      $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
+      switch ($row['status']) {
+        case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
+          $severity = 4;
+          $msgArray[] = ts('%1 extension (%2) is installed but missing files.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key));
+          break;
+
+        case CRM_Extension_Manager::STATUS_INSTALLED:
+          if (CRM_Utils_Array::value($key, $remotes)) {
+            if (version_compare($row['version'], $remotes[$key]->version, '<')) {
+              $severity = ($severity < 3) ? 3 : $severity;
+              $msgArray[] = ts('%1 extension (%2) is upgradeable to version %3.', array(1 => CRM_Utils_Array::value('label', $row), 2 => $key, 3 => $remotes[$key]->version));
+            }
+            else {
+              $okextensions[] = CRM_Utils_Array::value('label', $row) ? "{$row['label']} ($key)" : $key;
+            }
+          }
+          else {
+            $okextensions[] = CRM_Utils_Array::value('label', $row) ? "{$row['label']} ($key)" : $key;
+          }
+          break;
+
+        case CRM_Extension_Manager::STATUS_UNINSTALLED:
+        case CRM_Extension_Manager::STATUS_DISABLED:
+        case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
+        default:
+      }
+    }
+    $msg = implode('  ', $msgArray);
+    if (empty($msgArray)) {
+      $msg = (empty($okextensions)) ? ts('No extensions installed.') : ts('Extensions are up-to-date:') . ' ' . implode(', ', $okextensions);
+    }
+    elseif (!empty($okextensions)) {
+      $msg .= '  ' . ts('Other extensions are up-to-date:') . ' ' . implode(', ', $okextensions);
+    }
+    $returnValues = array( // OK, return several data rows
+      array('status' => $return, 'message' => $msg),
+    );
+
+    $messages[] = new CRM_Utils_Check_Message(
+      'checkExtensions',
+      $msg,
+      ts('Extension Updates'),
+      CRM_Utils_Check::severityMap($severity, TRUE)
+    );
+
+    return $messages;
+  }
+
+
+  /**
+   * Checks if extensions are set up properly
+   * @return array
+   */
+  public function checkExtensionUpgrades() {
+    $messages = array();
+
+    if (CRM_Extension_Upgrades::hasPending()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensionUpgrades',
+        ts('Extension upgrades are pending.  Please visit <a href="%1">the upgrade page</a> to run them.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/extensions/upgrade', 'reset=1'))),
+        ts('Run Extension Upgrades'),
+        \Psr\Log\LogLevel::ERROR
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Checks if CiviCRM database version is up-to-date
+   * @return array
+   */
+
+  public function checkDbVersion() {
+    $messages = array();
+    $dbVersion = CRM_Core_BAO_Domain::version();
+    $upgradeUrl = CRM_Utils_System::url("civicrm/upgrade", "reset=1");
+
+    if (!$dbVersion) {
+      // if db.ver missing
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkDbVersion',
+        ts('Version information found to be missing in database. You will need to determine the correct version corresponding to your current database state.'),
+        ts('Database Version Missing'),
+        \Psr\Log\LogLevel::ERROR
+      );
+    }
+    elseif (!CRM_Utils_System::isVersionFormatValid($dbVersion)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkDbVersion',
+        ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.'),
+        ts('Database Version Invalid'),
+        \Psr\Log\LogLevel::ERROR
+      );
+    }
+    elseif (stripos($dbVersion, 'upgrade')) {
+      // if db.ver indicates a partially upgraded db
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkDbVersion',
+        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the <a href=\'%1\'>upgrade process</a> again.', array(1 => $upgradeUrl)),
+        ts('Database Partially Upgraded'),
+        \Psr\Log\LogLevel::ALERT
+      );
+    }
+    else {
+      $codeVersion = CRM_Utils_System::version();
+
+      // if db.ver < code.ver, time to upgrade
+      if (version_compare($dbVersion, $codeVersion) < 0) {
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkDbVersion',
+          ts('New codebase version detected. You must visit <a href=\'%1\'>upgrade screen</a> to upgrade the database.', array(1 => $upgradeUrl)),
+          ts('Database Upgrade Required'),
+          \Psr\Log\LogLevel::ALERT
+        );
+      }
+
+      // if db.ver > code.ver, sth really wrong
+      if (version_compare($dbVersion, $codeVersion) > 0) {
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkDbVersion',
+          ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state.
+            You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase
+            you were using until you resolve this problem.<br/>OR if this is a manual install from git, you might want to fix civicrm-version.php file.',
+              array(1 => $dbVersion, 2 => $codeVersion)
+            ),
+          ts('Database In Unexpected Version'),
+          \Psr\Log\LogLevel::ERROR
+        );
+      }
+    }
+
+    return $messages;
+  }
+
+  /**
+   * ensure that all CiviCRM tables are InnoDB
+   * @return array
+   */
+
+  public function checkDbEngine() {
+    $messages = array();
+
+    if (CRM_Core_DAO::isDBMyISAM(150)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkDbEngine',
+        ts('Your database is configured to use the MyISAM database engine. CiviCRM requires InnoDB. You will need to convert any MyISAM tables in your database to InnoDB. Using MyISAM tables will result in data integrity issues.'),
+        ts('MyISAM Database Engine'),
+        \Psr\Log\LogLevel::ERROR
+      );
+    }
+    return $messages;
+  }
+
 }
