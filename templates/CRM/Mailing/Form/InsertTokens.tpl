@@ -23,11 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-{* Include a modified version of jquery-fieldselection
- * FIXME: we use this plugin for so little it's hard to justify having it at all *}
-<script type="text/javascript" src="{$config->resourceBase}packages/jquery/plugins/jquery-fieldselection.js"></script>
-
 <script type="text/javascript">
 cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
