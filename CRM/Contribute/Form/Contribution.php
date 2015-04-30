@@ -989,7 +989,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
-    $contribution = $this->submit($submittedValues);
+    $contribution = $this->submit($submittedValues, $this->_action);
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
     if ($this->_context == 'standalone') {
@@ -1410,7 +1410,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @param array $params
    */
-  public function testSubmit($params) {
+  public function testSubmit($params, $action) {
     $defaults = array(
       'soft_credit_contact_id' => array(),
       'receipt_date' => '',
@@ -1419,19 +1419,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'cancel_date_time' => '',
     );
 
-    $this->submit(array_merge($defaults, $params));
+    $this->submit(array_merge($defaults, $params), $action);
   }
 
   /**
    * @param array $submittedValues
    *
+   * @param int $action
+   *   Action constant
+   *    - CRM_Core_Action::UPDATE
+   *
    * @return array
    * @throws \Exception
    */
-  protected function submit($submittedValues) {
+  protected function submit($submittedValues, $action) {
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
-    if (!empty($submittedValues['price_set_id']) && $this->_action & CRM_Core_Action::UPDATE) {
+    if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
@@ -1738,7 +1742,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // process associated membership / participant, CRM-4395
       $relatedComponentStatusMsg = NULL;
-      if ($contribution->id && $this->_action & CRM_Core_Action::UPDATE) {
+      if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
         $relatedComponentStatusMsg = $this->updateRelatedComponent($contribution->id,
           $contribution->contribution_status_id,
           CRM_Utils_Array::value('contribution_status_id',
@@ -1766,10 +1770,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
-        if ($this->_action & CRM_Core_Action::ADD) {
+        if ($action & CRM_Core_Action::ADD) {
           $line = $lineItem;
         }
-        elseif ($this->_action & CRM_Core_Action::UPDATE) {
+        elseif ($action & CRM_Core_Action::UPDATE) {
           $line = $this->_lineItems;
         }
         foreach ($line as $key => $value) {
@@ -1788,7 +1792,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       if ($invoicing) {
-        if ($this->_action & CRM_Core_Action::UPDATE) {
+        if ($action & CRM_Core_Action::UPDATE) {
           if (isset($submittedValues['tax_amount'])) {
             $totalTaxAmount = $submittedValues['tax_amount'];
           }
@@ -1830,8 +1834,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
 
       //update pledge payment status.
-      if ((($this->_ppID && $contribution->id) && $this->_action & CRM_Core_Action::ADD) ||
-        (($pledgePaymentId) && $this->_action & CRM_Core_Action::UPDATE)
+      if ((($this->_ppID && $contribution->id) && $action & CRM_Core_Action::ADD) ||
+        (($pledgePaymentId) && $action & CRM_Core_Action::UPDATE)
       ) {
 
         if ($this->_ppID) {
@@ -1858,10 +1862,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
         $updatePledgePaymentStatus = FALSE;
         //do only if either the status or the amount has changed
-        if ($this->_action & CRM_Core_Action::ADD) {
+        if ($action & CRM_Core_Action::ADD) {
           $updatePledgePaymentStatus = TRUE;
         }
-        elseif ($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
+        elseif ($action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
             ($this->_defaults['total_amount'] != $formValues['total_amount']))
         ) {
           $updatePledgePaymentStatus = TRUE;
