@@ -1825,7 +1825,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'id',
         'contribution_id'
       );
-      $this->updateRelatedPledge($action, $pledgePaymentID, $contribution, $pledgePaymentId, $formValues);
+      $this->updateRelatedPledge($action, $pledgePaymentID, $contribution, $pledgePaymentId, $formValues,
+        $formValues['total_amount'], $this->_defaults['total_amount']);
 
 
       $statusMsg = ts('The contribution record has been saved.');
@@ -1851,8 +1852,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param int $pledgePaymentId
    * @param $formValues
+   * @param float $total_amount
+   * @param float $original_total_amount
    */
-  protected function updateRelatedPledge($action, $pledgePaymentID, $contribution, $pledgePaymentId, $formValues) {
+  protected function updateRelatedPledge(
+    $action,
+    $pledgePaymentID,
+    $contribution,
+    $pledgePaymentId,
+    $formValues,
+    $total_amount,
+    $original_total_amount
+  ) {
     if ((($pledgePaymentID && $contribution->id) && $action & CRM_Core_Action::ADD) ||
       (($pledgePaymentId) && $action & CRM_Core_Action::UPDATE)
     ) {
@@ -1885,7 +1896,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $updatePledgePaymentStatus = TRUE;
       }
       elseif ($action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
-          ($this->_defaults['total_amount'] != $formValues['total_amount']))
+          ($original_total_amount != $total_amount))
       ) {
         $updatePledgePaymentStatus = TRUE;
       }
