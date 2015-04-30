@@ -2514,6 +2514,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
         $activity['activity_type'] = $values['activity_type'];
         $activity['subject'] = $values['subject'];
+
+        $activity['source_contact_name'] = '';
         if ($params['contact_id'] == $values['source_contact_id']) {
           $activity['source_contact_name'] = $values['source_contact_name'];
         }
@@ -2525,6 +2527,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['source_contact_name'] = '<em>n/a</em>';
         }
 
+        $activity['target_contact_name'] = '';
         if (isset($values['mailingId']) && !empty($values['mailingId'])) {
           $activity['target_contact'] = CRM_Utils_System::href($values['recipients'],
             'civicrm/mailing/report/event',
@@ -2548,6 +2551,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['target_contact_name'] = '<em>n/a</em>';
         }
 
+        $activity['assignee_contact_name'] = '';
         if (empty($values['assignee_contact_name'])) {
           $activity['assignee_contact_name'] = '<em>n/a</em>';
         }
