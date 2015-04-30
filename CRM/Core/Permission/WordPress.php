@@ -58,7 +58,23 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       return TRUE;
     }
 
-    require_once ABSPATH . WPINC . '/pluggable.php';
+	//CRM-15629
+	// During some extern/* calls we don't bootstrap CMS hence
+	// below constants are not set. In such cases, we don't need to
+	// check permission, hence directly return TRUE
+	if ( ! defined( 'ABSPATH' ) || ! defined( 'WPINC' ) ) {
+		  return TRUE;
+	}
+	//End CRM-15629
+	//CRM-15629 proposed  Not perfect
+	if ( ! defined( ABSPATH ) || ! defined( WPINC ) ) {
+	  $path = $_SERVER['DOCUMENT_ROOT'];
+	  $path .= "/wp-load.php";
+	  require_once( $path );
+	}
+	//End CRM-15629 proposed
+
+	  require_once ABSPATH . WPINC . '/pluggable.php';
 
     // for administrators give them all permissions
     if (!function_exists('current_user_can')) {
