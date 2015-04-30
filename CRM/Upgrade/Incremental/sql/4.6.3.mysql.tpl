@@ -1,10 +1,9 @@
 {* file to handle db changes in 4.6.3 during upgrade *}
 
-
--- 
+--
 --  CRM-16367: adding the shared payment token table
 --
-CREATE TABLE `civicrm_payment_token` (
+CREATE TABLE IF NOT EXISTS `civicrm_payment_token` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Payment Token ID',
      `contact_id` int unsigned NOT NULL   COMMENT 'FK to Contact ID for the owner of the token',
@@ -18,14 +17,15 @@ CREATE TABLE `civicrm_payment_token` (
      `billing_middle_name` varchar(255)    COMMENT 'Billing middle name at the time of token creation. Useful for fraud forensics',
      `billing_last_name` varchar(255)    COMMENT 'Billing last name at the time of token creation. Useful for fraud forensics',
      `masked_account_number` varchar(255)    COMMENT 'Holds the part of the card number or account details that may be retained or displayed',
-     `ip_address` varchar(255)    COMMENT 'IP used when creating the token. Useful for fraud forensics',
-    PRIMARY KEY ( `id` ),          
-    CONSTRAINT FK_civicrm_payment_token_contact_id FOREIGN KEY (`contact_id`) 
-       REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,          
-    CONSTRAINT FK_civicrm_payment_token_payment_processor_id FOREIGN KEY (`payment_processor_id`) 
-      REFERENCES `civicrm_payment_processor`(`id`) ON DELETE RESTRICT,          
-    CONSTRAINT FK_civicrm_payment_token_created_id FOREIGN KEY (`created_id`) 
+     `ip_address` varchar(255)    COMMENT 'IP used when creating the token. Useful for fraud forensics' ,
+    PRIMARY KEY ( `id` ),
+    CONSTRAINT FK_civicrm_payment_token_contact_id FOREIGN KEY (`contact_id`)
+      REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
+    CONSTRAINT FK_civicrm_payment_token_payment_processor_id FOREIGN KEY (`payment_processor_id`)
+      REFERENCES `civicrm_payment_processor`(`id`) ON DELETE RESTRICT,
+    CONSTRAINT FK_civicrm_payment_token_created_id FOREIGN KEY (`created_id`)
       REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
-
-)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
-
+)
+ENGINE=InnoDB DEFAULT
+CHARACTER SET utf8
+COLLATE utf8_unicode_ci;
