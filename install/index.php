@@ -78,13 +78,17 @@ CRM_Core_ClassLoader::singleton()->register();
 // Load civicrm database config
 if (isset($_REQUEST['mysql'])) {
   $databaseConfig = $_REQUEST['mysql'];
-}
-else {
+} else if ( $installType == 'wordpress' ) {
+	//WP Database Data
+	$database     = DB_NAME;
+	$username     = DB_USER;
+	$password     = DB_PASSWORD;
+	$server       = DB_HOST;
   $databaseConfig = array(
-    "server" => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
+	  "server"   => $server,
+	  "username" => $username,
+	  "password" => $password,
+	  "database" => $database,
   );
 }
 
@@ -161,6 +165,13 @@ if ($installType == 'drupal') {
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
+	//$content_dir = WP_CONTENT_DIR;
+	//$settings_dir = $content_dir . DIRECTORY_SEPARATOR . 'civicrm' . 'settings';
+	$upload_dir      = wp_upload_dir();
+	$files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
+  /*$alreadyInstalled = file_exists($files_dirname . CIVICRM_DIRECTORY_SEPARATOR .
+    'civicrm.settings.php'
+    );*/
   $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
     'civicrm.settings.php'
   );
@@ -234,6 +245,7 @@ if ($installType == 'drupal') {
 }
 elseif ($installType == 'wordpress') {
   //HACK for now
+	//TODO: what does this actually do?
   $civicrm_version['cms'] = 'WordPress';
 
   // Ensure that they have downloaded the correct version of CiviCRM
@@ -475,8 +487,30 @@ class InstallRequirements {
       );
     }
     elseif ($installType == 'wordpress') {
-      // make sure that we can write to plugins/civicrm  and plugins/files/
-      $writableDirectories = array(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files', $cmsPath);
+	    // make sure that we can write to plugins/civicrm  and uploads/civicrm/
+	    //$content_dir   = WP_CONTENT_DIR;
+	    //$settings_dir  = $content_dir . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'settings';
+	    $upload_dir    = wp_upload_dir();
+	    $files_dirname = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm';
+	    if ( ! file_exists( $files_dirname ) ) {
+		    wp_mkdir_p( $files_dirname );
+	    }
+	    /*if ( ! file_exists( $settings_dir ) ) {
+		    wp_mkdir_p( $settings_dir );
+	    }*/
+	    $writableDirectories = array( $files_dirname, $cmsPath );
+	    //$writableDirectories = array(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files', $cmsPath);
+	    //TODO: Sample Code to download packages currently testing with download of full zip
+	    /*
+	    $dlcontent_dir = WP_CONTENT_DIR;
+	    $dlfiles_dirname = $dlcontent_dir . DIRECTORY_SEPARATOR . 'civicrm';
+	    $wpcv_url = "http://sourceforge.net/projects/civicrm/files/civicrm-stable/4.6.2/civicrm-4.6.2-wordpress.zip";
+	    $permfile = $dlfiles_dirname . DIRECTORY_SEPARATOR . 'civicrm.zip';
+	    $tmpfile = download_url( $wpcv_url, $timeout = 300 );
+	    copy( $tmpfile, $permfile );
+	    unlink( $tmpfile ); // must unlink afterwards
+	    */
+
     }
 
     foreach ($writableDirectories as $dir) {
