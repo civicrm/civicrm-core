@@ -33,7 +33,7 @@
     <title>Contribution Page Introduction Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -249,7 +249,7 @@
     <title>Thank-you Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
     </html>
@@ -262,7 +262,7 @@
     <title>Thank-you Footer</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
     </html>
@@ -357,7 +357,7 @@
     <title>Footer Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
