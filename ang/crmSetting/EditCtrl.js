@@ -10,26 +10,31 @@
             return crmApi('Setting', 'getfields', {}).then(function (response) {
               return _.groupBy(response.values, 'group_name');
             });
+          },
+          settingsValues: function(crmApi) {
+            return crmApi('Setting', 'get', {}).then(function (response) {
+              return response.values;
+            });
           }
         }
       });
-
     }
   );
 
   // The controller uses *injection*. This default injects a few things:
   //   $scope -- This is the set of variables shared between JS and HTML.
   //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   settingsFields -- Defined above in config().
-  angular.module('crmSetting').controller('CrmSettingEditCtrl', function($scope, crmApi, crmStatus, crmUiHelp, settingsFields) {
+  //   settingsFields, settingsValues -- Defined above in config().
+  angular.module('crmSetting').controller('CrmSettingEditCtrl', function($scope, crmApi, crmStatus, crmUiHelp, settingsFields, settingsValues) {
  
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts(null);
     //var hs = $scope.hs = crmUiHelp({file: 'CRM/settings/SettingsCtrl'}); // See: templates/CRM/settings/SettingsCtrl.hlp
     var hs = $scope.hs = '';
 
-    // Make settingsFields available to the HTML layer.
+    // Make data available to the HTML layer.
     $scope.settingsFields = settingsFields;
+    $scope.settingsValues = settingsValues;
 
     $scope.save = function save() {
       return crmStatus(
