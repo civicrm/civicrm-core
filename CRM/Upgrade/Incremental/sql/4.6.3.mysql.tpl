@@ -1,10 +1,7 @@
 {* file to handle db changes in 4.6.3 during upgrade *}
 
---
 --  CRM-16367: adding the shared payment token table
---
 CREATE TABLE IF NOT EXISTS `civicrm_payment_token` (
-
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Payment Token ID',
      `contact_id` int unsigned NOT NULL   COMMENT 'FK to Contact ID for the owner of the token',
      `payment_processor_id` int unsigned NOT NULL   ,
@@ -29,3 +26,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_payment_token` (
 ENGINE=InnoDB DEFAULT
 CHARACTER SET utf8
 COLLATE utf8_unicode_ci;
+
+--  CRM-16367: adding a reference to the token table to the recurring contributions table.
+ALTER TABLE civicrm_contribution_recur
+  ADD COLUMN `payment_token_id` int(10) unsigned DEFAULT NULL COMMENT 'Optionally used to store a link to a payment token used for this recurring contribution.',
+  ADD CONSTRAINT `FK_civicrm_contribution_recur_payment_token_id` FOREIGN KEY (`payment_token_id`) REFERENCES `civicrm_payment_token` (`id`) ON DELETE SET NULL;
