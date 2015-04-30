@@ -716,11 +716,9 @@ class CRM_Core_Resources {
       "js/crm.ajax.js",
     );
     // add wysiwyg editor
-    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'editor_id'
-    );
+    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
     $editor = CRM_Utils_Array::value($editorID,
-      CRM_Core_OptionGroup::values('wysiwyg_editor')
+      CRM_Core_OptionGroup::values('wysiwyg_editor', FALSE, FALSE, FALSE, NULL, 'name')
     );
     $items[] = "js/wysiwyg/crm.wysiwyg.js";
     if ($editor == "CKEditor") {
