@@ -2240,7 +2240,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, CRM_Core_PseudoConstant::worldRegion(), $required, $selectAttributes);
     }
     elseif ($fieldName == 'signature_html') {
-      $form->addWysiwyg($name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
+      $form->add('wysiwyg', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
     }
     elseif ($fieldName == 'signature_text') {
       $form->add('textarea', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
@@ -2258,7 +2258,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif ($fieldName == 'activity_details') {
-      $form->addWysiwyg($fieldName, $title, array('rows' => 4, 'cols' => 60), $required);
+      $form->add('wysiwyg', $fieldName, $title, array('rows' => 4, 'cols' => 60), $required);
     }
     elseif ($fieldName == 'activity_duration') {
       $form->add('text', $name, $title, $attributes, $required);

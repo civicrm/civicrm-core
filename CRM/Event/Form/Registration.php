@@ -1196,6 +1196,8 @@ WHERE  v.option_group_id = g.id
   /**
    * Reset values for all options those are full.
    *
+   * @param array $optionFullIds
+   * @param $form
    */
   public static function resetElementValue($optionFullIds = array(), &$form) {
     if (!is_array($optionFullIds) ||
@@ -1266,6 +1268,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @param string $elementName
    * @param array $optionIds
+   * @param CRM_Core_form $form
    */
   public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
     if (empty($elementName) ||

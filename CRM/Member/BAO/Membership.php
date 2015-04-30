@@ -194,10 +194,10 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param bool $active
    *   Do you want only active memberships to.
    *                        be returned
-   *
+   * @param bool $relatedMemberships
    * @return CRM_Member_BAO_Membership|null the found object or null
    */
-  public static function &getValues(&$params, &$values, $active = FALSE) {
+  public static function &getValues(&$params, &$values, $active = FALSE, $relatedMemberships = FALSE) {
     if (empty($params)) {
       return NULL;
     }
@@ -218,6 +218,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
       CRM_Core_DAO::storeValues($membership, $values[$membership->id]);
       $memberships[$membership->id] = $membership;
+      if ($relatedMemberships && !empty($membership->owner_membership_id)) {
+        $values['owner_membership_ids'][] = $membership->owner_membership_id;
+      }
     }
 
     return $memberships;
@@ -1636,7 +1639,7 @@ AND civicrm_membership.is_test = %2";
           $format
         ),
         'membership_type_id' => $currentMembership['membership_type_id'],
-        'max_related' => $currentMembership['max_related'],
+        'max_related' => CRM_Utils_Array::value('max_related', $currentMembership, 0),
       );
 
       $session = CRM_Core_Session::singleton();

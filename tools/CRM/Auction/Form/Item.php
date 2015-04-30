@@ -141,7 +141,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
       TRUE
     );
 
-    $this->addWysiwyg('description',
+    $this->add('wysiwyg', 'description',
       ts('Complete Description'),
       $attributes['description']
     );

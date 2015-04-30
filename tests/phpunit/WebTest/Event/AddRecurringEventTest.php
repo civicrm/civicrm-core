@@ -62,7 +62,7 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $this->select('start_action_offset', $occurrences);
     $this->multiselect2('exclude_date_list', array('05/11/2015', '05/12/2015'), TRUE);
     $this->click('_qf_Repeat_submit-bottom');
-    $this->waitForTextPresent('A recurring set will be created with the following dates.');
+    $this->waitForTextPresent('A repeating set will be created with the following dates.');
     $this->click("xpath=//button//span[text()='Continue']");
     $this->waitForAjaxContent();
     $this->checkCRMAlert('Repeat Configuration has been saved');
@@ -77,14 +77,13 @@ class WebTest_Event_AddRecurringEventTest extends CiviSeleniumTestCase {
     $eventTitle = "Fall Fundraiser Dinner";
     $this->type("title", $eventTitle);
     $this->click("_qf_SearchEvent_refresh");
-    $this->assertTrue($this->isTextPresent("Recurring Event - (Child)"));
-    $this->assertTrue($this->isTextPresent("Recurring Event - (Parent)"));
+    $this->assertTrue($this->isTextPresent("Repeating"));
 
     //Update Mode Cascade Changes
     $this->click('event-configure-1');
     $this->waitForElementPresent("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
     $this->click("xpath=//span[@id='event-configure-1']/ul[@class='panel']/li/a[text()='Info and Settings']");
-    $this->waitForElementPresent('_qf_EventInfo_cancel-bottom');
+    $this->waitForTextPresent("Event Title");
     $this->type('title', 'CiviCon');
     $this->click('_qf_EventInfo_upload_done-top');
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");

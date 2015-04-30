@@ -546,11 +546,6 @@ class CRM_Event_BAO_Query {
         'entity' => 'event',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),
-        'api' => array(
-          'params' => array(
-            'api.RecurringEntity.getcount' => array('entity_id' => "\$value.id", 'entity_table' => "civicrm_event"),
-          ),
-        ),
       )
     );
     $form->addEntityRef('event_type_id', ts('Event Type'), array(

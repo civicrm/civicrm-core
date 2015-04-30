@@ -248,7 +248,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-    $this->assign('includeWysiwygEditor', TRUE);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -319,15 +318,10 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
-        $isRecurringEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
+        $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
-        if ($isRecurringEvent) {
-          if ($dao->id == $isRecurringEvent) {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Parent)';
-          }
-          else {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Child)';
-          }
+        if ($repeat) {
+          $manageEvent[$dao->id]['repeat'] = ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
         }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 

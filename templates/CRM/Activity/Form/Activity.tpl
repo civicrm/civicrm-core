@@ -155,13 +155,11 @@
     <td class="label">{$form.details.label}</td>
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-      {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+      {$form.details.html}
       </td>
       {else}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-       {if $defaultWysiwygEditor eq 0}{$form.details.html|crmStripAlternatives|crmAddClass:huge}{else}{$form.details.html|crmStripAlternatives}{/if}
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>

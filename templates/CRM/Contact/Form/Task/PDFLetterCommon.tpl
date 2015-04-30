@@ -92,13 +92,10 @@
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
-     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
    </div>
     <div class="clear"></div>
     <div class='html'>
-  {if $editor EQ 'textarea'}
-      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Customize Data & Screens &raquo; Display Preferences).{/ts}</div>
-  {/if}
   {$form.html_message.html}<br />
     </div>
 

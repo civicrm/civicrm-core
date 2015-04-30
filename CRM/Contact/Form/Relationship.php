@@ -99,7 +99,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_values;
 
   /**
-   * Casid if it called from case context
+   * Case id if it called from case context
    */
   public $_caseId;
 
@@ -107,6 +107,20 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @var mixed
    */
   public $_cdType;
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Relationship';
+  }
 
   public function preProcess() {
     //custom data related code
@@ -297,8 +311,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       );
       return;
     }
-    // Just in case custom data includes a rich text field
-    $this->assign('includeWysiwygEditor', TRUE);
 
     // Select list
     $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);
@@ -438,7 +450,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
         }
       }
-      $this->setMessage(ts('The relationship has been updated'));
+      if (empty($outcome['saved']) && !empty($update)) {
+        $outcome['saved'] = $update;
+      }
+      $this->setMessage($outcome);
     }
     // Create mode (could be 1 or more relationships)
     else {

@@ -1661,23 +1661,6 @@ input.crm-form-entityref {
   padding: 3px;
 }
 
-/* class for text area resizer jquery plugin*/
-div.grippie {
-  background: #EEEEEE url('../i/grippie.png') no-repeat scroll center 2px;
-  border-color: #DDDDDD;
-  border-style: solid;
-  border-width: 0pt 1px 1px;
-  cursor: s-resize;
-  height: 9px;
-  overflow: hidden;
-}
-.crm-container .resizable-textarea textarea {
-  display: block;
-  margin-bottom: 0pt;
-  width: 95%;
-  height: 20%;
-}
-
 .crm-container ul li.crm-tab-button {
   border-bottom: 0 none;
   float: left;

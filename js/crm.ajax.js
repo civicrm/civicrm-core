@@ -431,18 +431,6 @@
             }
           }
         },
-        beforeSerialize: function(form, options) {
-          if (window.CKEDITOR && window.CKEDITOR.instances) {
-            $.each(CKEDITOR.instances, function() {
-              if (this.updateElement) this.updateElement();
-            });
-          }
-          if (window.tinyMCE && tinyMCE.editors) {
-            $.each(tinyMCE.editors, function() {
-              this.save();
-            });
-          }
-        },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
             if (this && this.close) this.close();
@@ -566,6 +554,12 @@
       // Destroy old unsaved dialog
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      })
+      // Ensure wysiwyg content is updated prior to ajax submit
+      .on('form-pre-serialize', function(e) {
+        $('.crm-wysiwyg-enabled', e.target).each(function() {
+          CRM.wysiwyg.updateElement(this);
+        });
       })
       // Auto-resize dialogs when loading content
       .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {

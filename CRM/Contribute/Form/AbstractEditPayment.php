@@ -439,7 +439,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
+      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))

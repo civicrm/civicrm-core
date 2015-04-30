@@ -355,31 +355,13 @@
     // Example:
     //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
     //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
-    // TODO Consider ways to separate the plain-text/rich-text implementations
     .directive('crmUiInsertRx', function() {
       return {
         link: function(scope, element, attrs) {
           scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
-            var id = element.attr('id');
-            if (CKEDITOR.instances[id]) {
-              CKEDITOR.instances[id].insertText(tokenName);
-              $(element).select2('close').select2('val', '');
-              CKEDITOR.instances[id].focus();
-            }
-            else {
-              var crmForEl = $('#' + id);
-              var origVal = crmForEl.val();
-              var origPos = crmForEl[0].selectionStart;
-              var newVal = origVal.substring(0, origPos) + tokenName + origVal.substring(origPos, origVal.length);
-              crmForEl.val(newVal);
-              var newPos = (origPos + tokenName.length);
-              crmForEl[0].selectionStart = newPos;
-              crmForEl[0].selectionEnd = newPos;
-
-              $(element).select2('close').select2('val', '');
-              crmForEl.triggerHandler('change');
-              crmForEl.focus();
-            }
+            CRM.wysiwyg.insert(element, tokenName);
+            $(element).select2('close').select2('val', '');
+            CRM.wysiwyg.focus(element);
           });
         }
       };
@@ -391,47 +373,28 @@
       return {
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
-          var ck = CKEDITOR.replace(elm[0]);
 
-          if (ck) {
-            _.extend(ck.config, {
-              width: '94%',
-              height: '400',
-              filebrowserBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=files',
-              filebrowserImageBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=images',
-              filebrowserFlashBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=flash',
-              filebrowserUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=files',
-              filebrowserImageUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=images',
-              filebrowserFlashUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=flash',
-            });
-          }
-
+          var editor = CRM.wysiwyg.create(elm);
           if (!ngModel) {
             return;
           }
 
           if (attr.ngBlur) {
-            ck.on('blur', function(){
-              $timeout(function(){
+            $(elm).on('blur', function() {
+              $timeout(function() {
                 scope.$eval(attr.ngBlur);
               });
             });
           }
 
-          ck.on('pasteState', function () {
-            scope.$apply(function () {
-              ngModel.$setViewValue(ck.getData());
+          $(elm).on('paste change keypress', function() {
+            scope.$apply(function() {
+              ngModel.$setViewValue(CRM.wysiwyg.getVal(elm));
             });
           });
 
-          ck.on('insertText', function () {
-            $timeout(function () {
-              ngModel.$setViewValue(ck.getData());
-            });
-          });
-
-          ngModel.$render = function (value) {
-            ck.setData(ngModel.$viewValue);
+          ngModel.$render = function(value) {
+            CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
           };
         }
       };

@@ -89,6 +89,10 @@
     <type>varchar</type>
     <length>255</length>
     <comment>subject of note description</comment>
+    <html>
+      <type>Text</type>
+      <size>60</size>
+    </html>
     <add>1.5</add>
   </field>
   <field>
