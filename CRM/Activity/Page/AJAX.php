@@ -109,7 +109,7 @@ class CRM_Activity_Page_AJAX {
     $globalRelationshipsDT['data'] = $relationships;
     $globalRelationshipsDT['recordsTotal'] = $params['total'];
     $globalRelationshipsDT['recordsFiltered'] = $params['total'];
-    
+
     CRM_Utils_JSON::output($globalRelationshipsDT);
   }
 
@@ -172,7 +172,7 @@ class CRM_Activity_Page_AJAX {
     $clientRelationshipsDT['data'] = $relationships;
     $clientRelationshipsDT['recordsTotal'] = $params['total'];
     $clientRelationshipsDT['recordsFiltered'] = $params['total'];
-    
+
     CRM_Utils_JSON::output($clientRelationshipsDT);
   }
 
