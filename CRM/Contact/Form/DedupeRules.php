@@ -115,7 +115,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     $disabled = array();
     $reserved = $this->addField('is_reserved', array('label' => ts('Reserved?')));
     if (!empty($this->_defaults['is_reserved'])) {
-      $reserved->freeze();
+      //$reserved->freeze();
       $disabled = array('disabled' => TRUE);
     }
 
