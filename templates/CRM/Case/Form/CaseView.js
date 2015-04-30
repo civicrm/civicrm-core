@@ -204,7 +204,7 @@
               if (!$(this).val()) {
                 $(this).crmError(ts('Please select a value'));
               }
-            })
+            });
           }
           return submission;
         }
@@ -244,4 +244,4 @@
         }
       });
   });
-}(cj, CRM))
+}(cj, CRM));
