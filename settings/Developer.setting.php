@@ -59,7 +59,7 @@ return array(
     'name' => 'debug_enabled',
     'config_key' => 'debug', // we can't call the setting debug as that has other meanings in api
     'type' => 'Boolean',
-    'quick_form_type' => 'Radio',
+    'html_type' => 'Radio',
     'default' => '0',
     'add' => '4.3',
     'section_title' => array('General Settings', 'Developer Preferences'),
@@ -75,7 +75,7 @@ return array(
     'group' => 'developer',
     'name' => 'backtrace',
     'type' => 'Boolean',
-    'quick_form_type' => 'Radio',
+    'html_type' => 'Radio',
     'default' => '0',
     'add' => '4.3',
     'section_title' => array('General Settings', 'Developer Preferences'),

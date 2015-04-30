@@ -72,7 +72,7 @@ return array(
     'group_name' => 'Address Preferences',
     'group' => 'address',
     'name' => 'address_standardization_url',
-    'type' => 'Url',
+    'type' => 'Link',
     'html_type' => 'Text',
     'default' => NULL,
     'add' => '4.1',
