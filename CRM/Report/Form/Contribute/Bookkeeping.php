@@ -475,6 +475,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     else {
       $this->_where = 'WHERE ' . implode(' AND ', $clauses);
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function postProcess() {
