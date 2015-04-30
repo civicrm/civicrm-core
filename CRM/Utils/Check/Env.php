@@ -342,7 +342,8 @@ class CRM_Utils_Check_Env {
     if (!is_dir($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         'checkExtensions',
-        ts('The path to your extensions directory is not a directory.  Please check your file system.'),
+        ts('Your extensions directory path points to %1, which is not a directory.  Please check your file system.',
+          array(1 => $basedir)),
         ts('Extensions directory incorrect'),
         \Psr\Log\LogLevel::ERROR
       );
@@ -351,7 +352,8 @@ class CRM_Utils_Check_Env {
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         'checkExtensions',
-        ts('Your extensions directory is not writable.  Please change your file permissions.'),
+        ts('Your extensions directory, %1, is not writable.  Please change your file permissions.',
+          array(1 => $basedir)),
         ts('Extensions directory not writable'),
         \Psr\Log\LogLevel::ERROR
       );
