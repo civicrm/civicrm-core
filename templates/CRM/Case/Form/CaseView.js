@@ -2,11 +2,7 @@
 (function($, CRM) {
 
   function refresh(table) {
-    if (table) {
-      $(table).dataTable().fnDraw();
-    } else {
-      $('#crm-main-content-wrapper').crmSnippet('refresh');
-    }
+    $('#crm-main-content-wrapper').crmSnippet('refresh');
   }
 
   function open(url, options, table) {
