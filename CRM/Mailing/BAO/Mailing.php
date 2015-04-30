@@ -3046,18 +3046,17 @@ AND        m.id = %1
     // format params and add links
     $contactMailings = array();
     foreach ($mailings as $mailingId => $values) {
-      $contactMailings[$mailingId]['subject'] = $values['subject'];
-      $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
-        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
-
-      $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
+      $mailing = array();
+      $mailing['subject'] = $values['subject'];
+      $mailing['creator_name'] = CRM_Utils_System::href(
         $values['creator_name'],
         'civicrm/contact/view',
         "reset=1&cid={$values['creator_id']}");
-
+      $mailing['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
+        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
+      $mailing['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = "Opens: " .
+      $mailing['openstats'] = "Opens: " .
         CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
         "<br />Clicks: " .
         CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
@@ -3083,7 +3082,7 @@ AND        m.id = %1
         $mailingKey = $hash;
       }
 
-      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
+      $mailing['links'] = CRM_Core_Action::formLink(
         $actionLinks,
         NULL,
         array(
@@ -3097,9 +3096,16 @@ AND        m.id = %1
         'Mailing',
         $values['mailing_id']
       );
+
+      array_push($contactMailings, $mailing);
     }
 
-    return $contactMailings;
+    $contactMailingsDT = array();
+    $contactMailingsDT['data'] = $contactMailings;
+    $contactMailingsDT['recordsTotal'] = $params['total'];
+    $contactMailingsDT['recordsFiltered'] = $params['total'];
+
+    return $contactMailingsDT;
   }
 
   /**
