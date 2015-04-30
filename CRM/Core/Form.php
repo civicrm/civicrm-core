@@ -1272,9 +1272,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->addElement('textarea', $name, $label, $props, $required);
         break;
 
-      //case 'Select Date':
-      //TODO: Add date formats
-      //TODO: Add javascript template for dates.
+      case 'Select Date':
+        //TODO: add range support
+        //TODO: Add date formats
+        //TODO: Add javascript template for dates.
+        $this->addDate($name, $label, $required, $props);     
+        break;
+
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
         unset($props['separator']);
