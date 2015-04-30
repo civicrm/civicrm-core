@@ -218,4 +218,5 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($pledgePayment['actual_amount'], 50);
     $this->assertEquals(1, $pledgePayment['status_id']);
   }
+
 }

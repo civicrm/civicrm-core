@@ -1828,7 +1828,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->updateRelatedPledge($action, $pledgePaymentID, $contribution, $pledgePaymentId, $formValues,
         $formValues['total_amount'], $this->_defaults['total_amount']);
 
-
       $statusMsg = ts('The contribution record has been saved.');
       if (!empty($formValues['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
