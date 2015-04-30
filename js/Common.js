@@ -834,7 +834,7 @@ CRM.strings = CRM.strings || {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
-      $('textarea.crm-wysiwyg', e.target)
+      $('textarea.crm-form-wysiwyg', e.target)
         .not('.crm-wysiwyg-enabled')
         .addClass('crm-wysiwyg-enabled')
         .each(function() {
