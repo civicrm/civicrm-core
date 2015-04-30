@@ -23,11 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-{* Include a modified version of jquery-fieldselection
- * FIXME: we use this plugin for so little it's hard to justify having it at all *}
-<script type="text/javascript" src="{$config->resourceBase}packages/jquery/plugins/jquery-fieldselection.js"></script>
-
 <script type="text/javascript">
 cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
@@ -256,10 +251,8 @@ CRM.$(function($) {
       placeholder: '{/literal}{ts escape='js'}Tokens{/ts}{literal}'
     });
 
-  $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
-  $('.resizable-textarea textarea').css( 'width', '99%' );
-  $('.grippie').css( 'margin-right', '3px');
-  $('.accordion .head').hover( function() { $(this).addClass( "ui-state-hover");
+  $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ")
+    .hover( function() { $(this).addClass( "ui-state-hover");
   }, function() { $(this).removeClass( "ui-state-hover");
   }).bind('click', function() {
     var checkClass = $(this).find('span').attr( 'class' );
