@@ -929,6 +929,62 @@ class CiviCRM_For_WordPress {
     // add resources for back end
     $this->add_core_resources( FALSE );
 
+    // check setting for path to wp-load.php
+    $this->add_wpload_setting();
+
+  }
+
+
+  /**
+   * When CiviCRM is loaded in WP Admin, check for the existence of a setting
+   * which holds the path to wp-load.php. This is the only reliable way to
+   * bootstrap WordPress from CiviCRM.
+   *
+   * CMW: I'm not entirely happy with this approach, because the value will be
+   * different for different installs (e.g. when a dev site is migrated to live)
+   * A better approach would be to store this setting in civicrm.settings.php as
+   * a constant, but doing that involves a complicated process of getting a new
+   * setting registered in the installer.
+   *
+   * Also, it needs to be decided whether this value should be tied to a CiviCRM
+   * 'domain', since a single CiviCRM install could potentially be used by a
+   * number of WordPress installs. This is not relevant to its use in WordPress
+   * Multisite, because the path to wp-load.php is common to all sites on the
+   * network.
+   *
+   * My final concern is that the value will only be set *after* someone visits
+   * CiviCRM in the back end. I have restricted it to this so as not to add
+   * overhead to the front end, but there remains the possibility that the value
+   * could be missing. To repeat: this would be better in civicrm.settings.php.
+   *
+   * To get the path to wp-load.php, use:
+   * $path = CRM_Core_BAO_Setting::getItem('CiviCRM Preferences', 'wpLoadPhp');
+   *
+   * @return void
+   */
+  public function add_wpload_setting() {
+
+    if (!$this->initialize()) {
+      return;
+    }
+
+    // get path to wp-load.php
+    $path = ABSPATH . 'wp-load.php';
+
+    // get the setting, if it exists
+    $setting = CRM_Core_BAO_Setting::getItem('CiviCRM Preferences', 'wpLoadPhp');
+
+    // if we don't have one, create it
+    if ( is_null( $setting ) ) {
+      CRM_Core_BAO_Setting::setItem($path, 'CiviCRM Preferences', 'wpLoadPhp');
+    }
+
+    // is it different to the one we've stored?
+    if ( $setting !== $path ) {
+      // yes - set new path (this could be because we've changed server or location)
+      CRM_Core_BAO_Setting::setItem($path, 'CiviCRM Preferences', 'wpLoadPhp');
+    }
+
   }
 
 
