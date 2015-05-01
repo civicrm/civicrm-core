@@ -214,7 +214,7 @@
           resizable: true,
           options: {yes: ts('Save'), no: ts('Cancel')},
           open: function() {
-            miniForms[target].pre && miniForms[target].pre.call(this, $el.data());
+            if (miniForms[target].pre) miniForms[target].pre.call(this, $el.data());
           }
         })
           .on('dialogclose', function() {
