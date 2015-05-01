@@ -135,7 +135,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-    ));
+    ),
+      CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
   }
 
@@ -151,7 +152,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
-    ));
+    ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
   }
 
@@ -170,13 +171,52 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
-    ));
+    ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
         '<p>Please print this receipt for your records.</p>',
       )
     );
     $mut->stop();
+  }
+
+  /**
+   * Test that a contribution is assigned against a pledge.
+   */
+  public function testUpdatePledge() {
+    $pledge = $this->callAPISuccess('pledge', 'create', array(
+      'contact_id' => $this->_individualId,
+      'pledge_create_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
+      'amount' => 100.00,
+      'pledge_status_id' => '2',
+      'pledge_financial_type_id' => '1',
+      'pledge_original_installment_amount' => 20,
+      'frequency_interval' => 5,
+      'frequency_unit' => 'year',
+      'frequency_day' => 15,
+      'installments' => 2,
+      'sequential' => 1,
+    ));
+    $pledgePaymentID = $this->callAPISuccess('pledge_payment', 'getvalue', array(
+      'pledge_id' => $pledge['id'],
+      'options' => array('limit' => 1),
+      'return' => 'id',
+    ));
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'pledge_payment_id' => $pledgePaymentID,
+    ), CRM_Core_Action::ADD);
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'getsingle', array('id' => $pledgePaymentID));
+    $this->assertNotEmpty($pledgePayment['contribution_id']);
+    $this->assertEquals($pledgePayment['actual_amount'], 50);
+    $this->assertEquals(1, $pledgePayment['status_id']);
   }
 
 }
