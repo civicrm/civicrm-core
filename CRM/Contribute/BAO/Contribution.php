@@ -3723,6 +3723,9 @@ WHERE con.id = {$contributionId}
   /**
    * Update related pledge payment payments.
    *
+   * This function has been refactored out of the back office contribution form and may
+   * still overlap with other functions.
+   *
    * @param string $action
    * @param int $pledgePaymentID
    * @param int $contributionID
@@ -3732,7 +3735,7 @@ WHERE con.id = {$contributionId}
    * @param int $contribution_status_id
    * @param int $original_contribution_status_id
    */
-  protected function updateRelatedPledge(
+  public static function updateRelatedPledge(
     $action,
     $pledgePaymentID,
     $contributionID,
