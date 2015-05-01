@@ -639,6 +639,10 @@ class CRM_Utils_Array {
     if (is_array($values)) {
       return $values;
     }
+    // Empty string -> empty array
+    if ($values === '') {
+      return array();
+    }
     return explode($delim, trim((string) $values, $delim));
   }
 
