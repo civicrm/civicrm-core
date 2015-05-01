@@ -255,9 +255,27 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
     }
 
-    // add header files
-    CRM_Core_Resources::singleton()->addCoreResources('html-header');
-    $profile = CRM_Core_Region::instance('html-header')->render('', FALSE) . $profile;
+    // Create a custom CRM_Extension_System object that contains a 
+    // CRM_Extension_Mapper configured to produce URLs with absolute 
+    // links so the js and css files have absolute paths.
+    $sys = CRM_Extension_System::singleton();
+    $ext_mapper = new CRM_Extension_Mapper(
+      $sys->getFullContainer(),
+      $sys->getCache(),
+      'mapper',
+      NULL,
+      $config->userFrameworkBaseURL
+    );
+    $cache = new CRM_Utils_Cache_SqlGroup(array(
+      'group' => 'js-strings',
+      'prefetch' => FALSE,
+    ));
+    $res = new CRM_Core_Resources($ext_mapper, $cache, 'resCacheCode');
+
+    // Create our own custom region call html-header-profile so we don't
+    // conflict with the html-header in use by the site.
+    $res->addCoreResources('html-header-profile');
+    $profile = CRM_Core_Region::instance('html-header-profile')->render('', FALSE) . $profile;
 
     $this->assign('profile', htmlentities($profile, ENT_NOQUOTES, 'UTF-8'));
     //get the title of uf group
