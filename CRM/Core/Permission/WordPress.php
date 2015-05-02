@@ -66,7 +66,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       return TRUE;
     }
 
-    if (!defined( ABSPATH ) || !defined( WPINC ) ) {
+    if (!defined(ABSPATH) || !defined(WPINC)) {
       require_once 'CRM/Utils/System.php';
       CRM_Utils_System::loadBootStrap();
     }
