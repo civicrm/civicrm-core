@@ -48,7 +48,7 @@
   <field>
     <name>rule_length</name>
     <type>int unsigned</type>
-    <comment>The lenght of the matching substring</comment>
+    <comment>The length of the matching substring</comment>
     <add>1.8</add>
     <html>
       <type>Text</type>

@@ -90,7 +90,7 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //now select the criteria
-    //click report criteria accordian
+    //click report criteria accordion
     $this->click("xpath=//div[@id='mainTabContainer']/ul/li[3]/a");
     $this->waitForElementPresent('_qf_Detail_submit_next');
 

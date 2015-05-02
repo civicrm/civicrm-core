@@ -302,7 +302,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
 
   /**
-   * Update option value with 'id' paramter and the value to update
+   * Update option value with 'id' parameter and the value to update
    * and not passing option group id
    */
   public function testUpdateOptionValueNoGroupId() {
@@ -322,7 +322,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Update option value with 'id' paramter and the value to update
+   * Update option value with 'id' parameter and the value to update
    * and as well as option group id
    */
   public function testUpdateOptionValueWithGroupId() {

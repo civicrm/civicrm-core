@@ -155,7 +155,7 @@ class ChainSubscriber implements EventSubscriberInterface {
           if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
             //e.g. if event_id is in the values returned & subentity is event
             //then pass in event_id as 'id' don't do this for contact as it
-            //does some wierd things like returning primary email &
+            //does some weird things like returning primary email &
             //thus limiting the ability to chain email
             //TODO - this might need the camel treatment
             $subParams['id'] = $parentAPIValues[$subEntity . "_id"];

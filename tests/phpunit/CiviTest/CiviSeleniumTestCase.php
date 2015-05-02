@@ -2259,7 +2259,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Type and select first occurance of autocomplete.
+   * Type and select first occurrence of autocomplete.
    * @param $fieldName
    * @param $label
    * @param bool $multiple

@@ -95,13 +95,13 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     // fill in decision Date
     $this->webtestFillDate('decision_date', 'now');
 
-    // fill in money transfered date
+    // fill in money transferred date
     $this->webtestFillDate('money_transfer_date', 'now');
 
     // fill in grant due Date
     $this->webtestFillDate('grant_due_date', 'now');
 
-    // check  grant report recieved.
+    // check  grant report received.
     $this->check('grant_report_received');
 
     // grant rationale

@@ -652,7 +652,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email1);
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    $this->type("street_address-1", "Test street addres");
+    $this->type("street_address-1", "Test street address");
     $this->type("city-1", "Mumbai");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
@@ -700,7 +700,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email2);
     $this->type("first_name", $participantfname);
     $this->type("last_name", $participantlname);
-    $this->type("street_address-1", "participant street addres");
+    $this->type("street_address-1", "participant street address");
     $this->type("city-1", "pune");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
@@ -743,7 +743,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email4);
     $this->type("first_name", $firstName2);
     $this->type("last_name", $lastName2);
-    $this->type("street_address-1", "Test street addres");
+    $this->type("street_address-1", "Test street address");
     $this->type("city-1", "Mumbai");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
@@ -789,7 +789,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email3);
     $this->type("first_name", $participantfname2);
     $this->type("last_name", $participantlname2);
-    $this->type("street_address-1", "participant street addres");
+    $this->type("street_address-1", "participant street address");
     $this->type("city-1", "pune");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
