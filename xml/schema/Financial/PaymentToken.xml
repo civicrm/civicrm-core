@@ -62,7 +62,8 @@
     <name>created_date</name>
     <title>Created Date</title>
     <type>timestamp</type> 
-    <comment>Date created</comment> 
+    <comment>Date created</comment>
+    <default>CURRENT_TIMESTAMP</default>
     <add>4.6</add> 
   </field> 
   <field> 
