@@ -1121,9 +1121,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('type', $specs, "the _spec function for $entityName field $field does not specify the type");
       switch ($specs['type']) {
         case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIMESTAMP:
           $entity[$fieldName] = '2012-05-20';
           break;
+        
+        case CRM_Utils_Type::T_TIMESTAMP:
+          // 4.6 doesn't support timestamp updates from 4.7 we should uncomment this. See CRM-16204
+          continue;
 
         //case CRM_Utils_Type::T_DATETIME:
 
