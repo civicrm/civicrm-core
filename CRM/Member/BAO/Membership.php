@@ -1420,7 +1420,7 @@ AND civicrm_membership.is_test = %2";
     }
 
     //CRM-15232: Check if membership is created and on the basis of it use
-    //membership reciept template to send payment reciept
+    //membership receipt template to send payment receipt
     if (count($createdMemberships)) {
       $form->_values['isMembership'] = TRUE;
     }

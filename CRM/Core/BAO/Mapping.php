@@ -563,7 +563,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        // sort everything BUT the contactType which is sorted seperately by
+        // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
         if (!in_array($key, $contactType)) {
           asort($mapperFields[$key]);

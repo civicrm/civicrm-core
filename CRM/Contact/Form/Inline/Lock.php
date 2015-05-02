@@ -34,7 +34,7 @@
  */
 
 /**
- * Auxilary class to provide support for locking (and ignoring locks on)
+ * Auxiliary class to provide support for locking (and ignoring locks on)
  * contact records.
  */
 class CRM_Contact_Form_Inline_Lock {

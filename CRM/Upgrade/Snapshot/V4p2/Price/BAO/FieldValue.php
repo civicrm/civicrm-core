@@ -178,7 +178,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    *
    */
   public static function setIsActive($id, $is_active) {

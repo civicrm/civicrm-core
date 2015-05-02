@@ -727,7 +727,7 @@ class CRM_Utils_Date {
    *                             format is 2007-12-21 )
    *
    * @return string
-   *   Return the customized todays date (Y-m-d)
+   *   Return the customized today's date (Y-m-d)
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
     if (is_null($dayParams) || empty($dayParams)) {

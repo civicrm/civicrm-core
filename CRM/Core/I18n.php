@@ -490,7 +490,7 @@ class CRM_Core_I18n {
         }
       }
       catch (CRM_Extension_Exception $e) {
-        // Intentionally not translating this string to avoid possible infinit loops
+        // Intentionally not translating this string to avoid possible infinite loops
         // Only developers should see this string, if they made a mistake in their ts() usage.
         CRM_Core_Session::setStatus('Unknown extension key in a translation string: ' . $key, '', 'error');
         $this->_extensioncache[$key] = FALSE;

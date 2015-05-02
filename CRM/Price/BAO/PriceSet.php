@@ -100,7 +100,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
@@ -1339,7 +1339,7 @@ GROUP BY     mt.member_of_contact_id";
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);

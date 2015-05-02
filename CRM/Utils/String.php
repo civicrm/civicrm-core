@@ -413,7 +413,7 @@ class CRM_Utils_String {
     if (preg_match('/^(y(es)?|t(rue)?|1)$/i', $str)) {
       return '1';
     }
-    elseif (preg_match('/^(n(o)?|f(alse)?|0)$/i', $str)) {
+    elseif (preg_match('/^(n(o)?|f(else)?|0)$/i', $str)) {
       return '0';
     }
     else {

@@ -510,7 +510,7 @@ class CRM_Utils_Rule {
    */
   public static function boolean($value) {
     return preg_match(
-      '/(^(1|0)$)|(^(Y(es)?|N(o)?)$)|(^(T(rue)?|F(alse)?)$)/i', $value
+      '/(^(1|0)$)|(^(Y(es)?|N(o)?)$)|(^(T(rue)?|F(else)?)$)/i', $value
     ) ? TRUE : FALSE;
   }
 

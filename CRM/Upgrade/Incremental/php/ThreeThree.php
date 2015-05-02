@@ -248,7 +248,7 @@ WHERE id = %2
     CRM_Core_DAO::executeQuery($updatePriceField, array(), TRUE, NULL, FALSE, FALSE);
 
     // as the table 'civicrm_price_field' is localised and column 'count' is dropped
-    // after the views are rebuild, we need to rebuild views to avoid invalid refrence of table.
+    // after the views are rebuild, we need to rebuild views to avoid invalid reference of table.
     if ($upgrade->multilingual) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($upgrade->locales, $rev);
     }
