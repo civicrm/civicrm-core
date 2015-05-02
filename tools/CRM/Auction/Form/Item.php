@@ -185,7 +185,7 @@ class CRM_Auction_Form_Item extends CRM_Core_Form {
       );
       if ($name == 'quantity') {
         $this->addRule($name,
-          ts('%1 should be a postive number',
+          ts('%1 should be a positive number',
             array(1 => $title)
           ),
           'positiveInteger'

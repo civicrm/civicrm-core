@@ -256,7 +256,7 @@ function _multisite_get_domain_group($permission = 1) {
       */
       return NULL;
     }
-    // We will check for the possiblility of the acl_enabled setting being deliberately set to 0
+    // We will check for the possibility of the acl_enabled setting being deliberately set to 0
     if($permission){
      $aclsEnabled = civicrm_api('setting', 'getvalue', array(
       'version' => 3,

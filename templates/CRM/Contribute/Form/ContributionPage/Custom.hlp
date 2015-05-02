@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="contrib-profile-title"}
-  {ts}Contributer Profiles{/ts}
+  {ts}Contributor Profiles{/ts}
 {/htxt}
 {htxt id="contrib-profile"}
 <p>
