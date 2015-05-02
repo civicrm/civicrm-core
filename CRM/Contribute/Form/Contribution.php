@@ -901,9 +901,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return bool|array
    *   true if no errors, else array of errors
    */
-  public static function formRule($fields,
-    /** @noinspection PhpUnusedParameterInspection */
-    $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     // Check for Credit Card Contribution.
