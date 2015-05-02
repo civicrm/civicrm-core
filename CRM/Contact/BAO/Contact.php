@@ -327,7 +327,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $contact = self::add($params);
     if (!$contact) {
-      // Not dying here is stupid, since we get into wierd situation and into a bug that
+      // Not dying here is stupid, since we get into weird situation and into a bug that
       // is impossible to figure out for the user or for us
       // CRM-7925
       CRM_Core_Error::fatal();

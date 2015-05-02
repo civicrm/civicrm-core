@@ -53,7 +53,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    * @return void
    */
   public static function buildQuickForm(&$form) {
-    // since the pcm - preferred comminication method is logically
+    // since the pcm - preferred communication method is logically
     // grouped hence we'll use groups of HTML_QuickForm
 
     // checkboxes for DO NOT phone, email, mail

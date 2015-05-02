@@ -220,7 +220,7 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-          CRM_Core_Error::fatal('T_TIME shouldnt be used.');
+          CRM_Core_Error::fatal('T_TIME shouldn't be used.');
           //$object->$dbName='000000';
           //break;
         case CRM_Utils_Type::T_CCNUM:
@@ -2384,7 +2384,7 @@ SELECT contact_id
     }
 
     // the string is longer than the length and we need a uniq string
-    // for the same tablename we need the same uniq string everytime
+    // for the same tablename we need the same uniq string every time
     // hence we use md5 on the string, which is not random
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);

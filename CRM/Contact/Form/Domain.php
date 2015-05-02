@@ -209,7 +209,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     // check for state/country mapping
     $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
     // $errors === TRUE means no errors from above formRule excution,
-    // so declaring $errors to array for futher processing
+    // so declaring $errors to array for further processing
     if ($errors === TRUE) {
       $errors = array();
     }

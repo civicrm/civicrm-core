@@ -782,7 +782,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * This function will take NVPString and convert it to an Associative Array and it will decode the response.
-   * It is usefull to search for a particular key and displaying arrays.
+   * It is useful to search for a particular key and displaying arrays.
    * @nvpstr is NVPString.
    * @nvpArray is Associative Array.
    */
@@ -790,7 +790,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = array();
 
     while (strlen($str)) {
-      // postion of key
+      // position of key
       $keyPos = strpos($str, '=');
 
       // position of value

@@ -113,7 +113,7 @@ class CRM_Core_BAO_ConfigSetting {
       }
     }
 
-    //keep user preferred language upto date, CRM-7746
+    //keep user preferred language up to date, CRM-7746
     $session = CRM_Core_Session::singleton();
     $lcMessages = CRM_Utils_Array::value('lcMessages', $params);
     if ($lcMessages && $session->get('userID')) {

@@ -228,7 +228,7 @@ class CRM_Activity_Page_AJAX {
         $caseRelationships[$key]['relation'] = $caseRoles[$value['relation_type']];
         unset($caseRoles[$value['relation_type']]);
       }
-      // mark orginal case relationships record to use on setting edit links below
+      // mark original case relationships record to use on setting edit links below
       $caseRelationships[$key]['source'] = 'caseRel';
     }
 

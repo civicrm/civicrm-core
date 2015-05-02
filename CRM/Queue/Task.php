@@ -26,7 +26,7 @@
  */
 
 /**
- * A task is an item that can be enqueued and later exectued
+ * A task is an item that can be enqueued and later executed
  */
 class CRM_Queue_Task {
 

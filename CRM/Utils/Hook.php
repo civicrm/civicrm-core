@@ -1340,7 +1340,7 @@ abstract class CRM_Utils_Hook {
    *   float $x x position in user units
    *   float $y y position in user units
    *   boolean $reseth if true reset the last cell height (default true).
-   *   int $stretch stretch carachter mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
+   *   int $stretch stretch character mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
    *                necessary</li><li>2 = forced horizontal scaling</li><li>3 = character spacing only if
    *                necessary</li><li>4 = forced character spacing</li></ul>
    *   boolean $ishtml set to true if $txt is HTML content (default = false).

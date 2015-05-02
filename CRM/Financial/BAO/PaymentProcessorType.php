@@ -76,7 +76,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    *
    */
   public static function setIsActive($id, $is_active) {

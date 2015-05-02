@@ -2877,7 +2877,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $contactId
    *
    * @return array
-   *   assoicated formatted array
+   *   associated formatted array
    */
   public static function formatFields($params, $contactId = NULL) {
     if ($contactId) {
