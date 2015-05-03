@@ -197,10 +197,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param array $params
    * @param int $contributionID
    * @param int $premiumID
-   * @param NULL $options
+   * @param array $options
    * @return void
    */
-  public static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
+  public static function processPremium(&$params, $contributionID, $premiumID = NULL, $options = array()) {
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
     $dao->product_id = $params['product_name'][0];
