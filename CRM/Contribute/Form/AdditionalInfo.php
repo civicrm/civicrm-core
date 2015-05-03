@@ -375,12 +375,13 @@ class CRM_Contribute_Form_AdditionalInfo {
       ) {
         $productDAO = new CRM_Contribute_DAO_Product();
         $productDAO->id = $params['product_name'][0];
+        $productOptionID = $params['product_name'][1];
         $productDAO->find(TRUE);
         $params['product_name'] = $productDAO->name;
         $params['product_sku'] = $productDAO->sku;
 
-        if (empty($params['product_option']) && !empty($form->_options[$params['product_name'][0]])) {
-          $params['product_option'] = $form->_options[$params['product_name'][0]][$params['product_name'][1]];
+        if (empty($params['product_option']) && !empty($form->_options[$productDAO->id])) {
+          $params['product_option'] = $form->_options[$productDAO->id][$productOptionID];
         }
       }
 

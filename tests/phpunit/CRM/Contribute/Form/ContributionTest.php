@@ -241,6 +241,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testPremiumUpdate() {
     $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
@@ -251,9 +252,17 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'product_name' => array($this->products[0]['id'], 1),
       'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
     ), CRM_Core_Action::ADD);
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
+    $mut->checkMailLog(array(
+      'Premium Information',
+      'Smurf',
+      'clumsy smurf',
+    ));
+    $mut->stop();
   }
 
 }
