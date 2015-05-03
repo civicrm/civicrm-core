@@ -1714,9 +1714,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (empty($params['non_deductible_amount'])) {
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
-        if (!$contributionType->find(TRUE)) {
-          CRM_Core_Error::fatal('Could not find a system table');
-        }
+
         if ($contributionType->is_deductible) {
 
           if (isset($formValues['product_name'][0])) {
