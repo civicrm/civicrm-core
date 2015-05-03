@@ -1715,44 +1715,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;
       }
+      $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
 
-      // CRM-11956
-      // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
-      // if non_deductible_amount does NOT exist - then calculate it depending on:
-      // $ContributionType->is_deductible and whether there is a product (premium).
-      if (empty($params['non_deductible_amount'])) {
-        $contributionType = new CRM_Financial_DAO_FinancialType();
-        $contributionType->id = $params['financial_type_id'];
-
-        if ($contributionType->is_deductible) {
-
-          if (isset($formValues['product_name'][0])) {
-            $selectProduct = $formValues['product_name'][0];
-          }
-          // if there is a product - compare the value to the contribution amount
-          if (isset($selectProduct)) {
-            $productDAO = new CRM_Contribute_DAO_Product();
-            $productDAO->id = $selectProduct;
-            $productDAO->find(TRUE);
-            // product value exceeds contribution amount
-            if ($params['total_amount'] < $productDAO->price) {
-              $params['non_deductible_amount'] = $params['total_amount'];
-            }
-            // product value does NOT exceed contribution amount
-            else {
-              $params['non_deductible_amount'] = $productDAO->price;
-            }
-          }
-          // contribution is deductible - but there is no product
-          else {
-            $params['non_deductible_amount'] = '0.00';
-          }
-        }
-        // contribution is NOT deductible
-        else {
-          $params['non_deductible_amount'] = $params['total_amount'];
-        }
-      }
 
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
@@ -1870,6 +1834,59 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
       }
     }
+  }
+
+  /**
+   * Calculate non deductible amount.
+   *
+   * CRM-11956
+   * if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
+   * if non_deductible_amount does NOT exist - then calculate it depending on:
+   * $financialType->is_deductible and whether there is a product (premium).
+   *
+   * @param $params
+   * @param $formValues
+   *
+   * @return array
+   */
+  protected function calculateNonDeductibleAmount($params, $formValues) {
+    if (!empty($params['non_deductible_amount'])) {
+      return $params['non_deductible_amount'];
+    }
+    if (empty($params['non_deductible_amount'])) {
+      $contributionType = new CRM_Financial_DAO_FinancialType();
+      $contributionType->id = $params['financial_type_id'];
+
+      if ($contributionType->is_deductible) {
+
+        if (isset($formValues['product_name'][0])) {
+          $selectProduct = $formValues['product_name'][0];
+        }
+        // if there is a product - compare the value to the contribution amount
+        if (isset($selectProduct)) {
+          $productDAO = new CRM_Contribute_DAO_Product();
+          $productDAO->id = $selectProduct;
+          $productDAO->find(TRUE);
+          // product value exceeds contribution amount
+          if ($params['total_amount'] < $productDAO->price) {
+            return $params['total_amount'];
+          }
+          // product value does NOT exceed contribution amount
+          else {
+            return $productDAO->price;
+          }
+        }
+        // contribution is deductible - but there is no product
+        else {
+          return '0.00';
+        }
+      }
+      // contribution is NOT deductible
+      else {
+        return $params['total_amount'];
+      }
+    }
+    return 0;
   }
 
 }
