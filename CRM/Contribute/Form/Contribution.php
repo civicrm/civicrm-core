@@ -213,9 +213,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Status message to be shown to the user.
    *
-   * @var string
+   * @var array
    */
-  protected $statusMessage;
+  protected $statusMessage = array();
 
   /**
    * Status message title to be shown to the user.
@@ -499,6 +499,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+
     //@todo document the purpose of cdType (if still in use)
     if ($this->_cdType) {
       CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -1297,15 +1298,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($contribution->id && isset($params['note'])) {
       CRM_Contribute_Form_AdditionalInfo::processNote($params, $contactID, $contribution->id, NULL);
     }
+
     //process premium
     if ($contribution->id && isset($params['product_name'][0])) {
       CRM_Contribute_Form_AdditionalInfo::processPremium($params, $contribution->id, NULL, $this->_options);
     }
 
     if ($contribution->id) {
-      $this->statusMessage = ts('The contribution record has been processed.');
+      array_unshift($this->statusMessage, ts('The contribution record has been processed.'));
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
-        $this->statusMessage .= ' ' . ts('A receipt has been emailed to the contributor.');
+        $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
       }
       $this->statusMessageTitle = ts('Complete');
     }
@@ -1427,6 +1429,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $existingContribution
     );
 
+    CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
+
     $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
   }
 
@@ -1445,6 +1449,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function submit($submittedValues, $action, $pledgePaymentID) {
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
+
     if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
@@ -1609,6 +1614,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($submittedValues['contact_id'])) {
       $this->_contactID = $submittedValues['contact_id'];
     }
+    $formValues = $submittedValues;
 
     // Credit Card Contribution.
     if ($this->_mode) {
@@ -1619,11 +1625,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues = $this->unsetCreditCardFields($submittedValues);
 
       // get the required field value only.
-      $formValues = $submittedValues;
+
       $params = $ids = array();
 
       $params['contact_id'] = $this->_contactID;
-
       $params['currency'] = $this->getCurrency($submittedValues);
 
       $fields = array(
@@ -1748,9 +1753,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
       // process associated membership / participant, CRM-4395
-      $relatedComponentStatusMsg = NULL;
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
-        $relatedComponentStatusMsg = $this->updateRelatedComponent($contribution->id,
+        $this->statusMessage[] = $this->updateRelatedComponent($contribution->id,
           $contribution->contribution_status_id,
           CRM_Utils_Array::value('contribution_status_id',
             $this->_values
@@ -1770,7 +1774,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $this->_premiumID, $this->_options
         );
       }
-      $this->statusMessage = ts('The contribution record has been saved.');
+      array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
@@ -1784,21 +1788,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
-          $this->statusMessage .= ' ' . ts('A receipt has been emailed to the contributor.');
+          $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
         }
       }
 
-      if ($relatedComponentStatusMsg) {
-        $this->statusMessage .= ' ' . $relatedComponentStatusMsg;
-      }
       $this->statusMessageTitle = ts('Saved');
 
-
-      //Offline Contribution ends.
     }
 
-
-    CRM_Core_Session::setStatus($this->statusMessage, $this->statusMessageTitle, 'success');
+    CRM_Core_Session::setStatus(implode(' ', $this->statusMessage), $this->statusMessageTitle, 'success');
 
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       $action,
@@ -1806,9 +1804,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution->id,
       (CRM_Utils_Array::value('option_type', $formValues) == 2) ? TRUE : FALSE,
       $formValues['total_amount'],
-      $this->_defaults['total_amount'],
+      CRM_Utils_Array::value('total_amount', $this->_defaults),
       $formValues['contribution_status_id'],
-      $this->_defaults['contribution_status_id']
+      CRM_Utils_Array::value('contribution_status_id', $this->_defaults)
     );
     return $contribution;
   }
