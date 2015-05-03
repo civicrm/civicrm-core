@@ -71,6 +71,13 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $paymentInstruments = array();
 
   /**
+   * Products.
+   *
+   * @var array
+   */
+  protected $products = array();
+
+  /**
    * Setup function.
    */
   public function setUp() {
@@ -114,6 +121,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     );
     $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->paymentInstruments = $instruments['values'];
+    $product1 = $this->callAPISuccess('product', 'create', array(
+      'name' => 'Smurf',
+      'options' => 'brainy smurf, clumsy smurf, papa smurf',
+    ));
+
+    $this->products[] = $product1['values'][$product1['id']];
   }
 
   /**
@@ -221,6 +234,26 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertNotEmpty($pledgePayment['contribution_id']);
     $this->assertEquals($pledgePayment['actual_amount'], 50);
     $this->assertEquals(1, $pledgePayment['status_id']);
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
+  public function testPremiumUpdate() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'product_name' => array($this->products[0]['id'], 1),
+      'fulfilled_date' => '',
+    ), CRM_Core_Action::ADD);
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
+    $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
   }
 
 }
