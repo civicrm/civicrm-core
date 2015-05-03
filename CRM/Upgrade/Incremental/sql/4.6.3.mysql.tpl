@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_payment_token` (
      `contact_id` int unsigned NOT NULL   COMMENT 'FK to Contact ID for the owner of the token',
      `payment_processor_id` int unsigned NOT NULL   ,
      `token` varchar(255) NOT NULL   COMMENT 'Externally provided token string',
-     `created_date` timestamp    COMMENT 'Date created',
+     `created_date` timestamp   DEFAULT CURRENT_TIMESTAMP COMMENT 'Date created',
      `created_id` int unsigned    COMMENT 'Contact ID of token creator',
      `expiry_date` datetime    COMMENT 'Date this token expires',
      `email` varchar(255)    COMMENT 'Email at the time of token creation. Useful for fraud forensics',
