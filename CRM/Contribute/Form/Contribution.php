@@ -211,6 +211,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userDisplayName;
 
   /**
+   * Status message to be shown to the user.
+   *
+   * @var string
+   */
+  protected $statusMessage;
+
+  /**
+   * Status message title to be shown to the user.
+   *
+   * Generally the payment processor message title is 'Complete' and offline is 'Saved'
+   * although this might not be a good fit with the broad range of processors.
+   *
+   * @var string
+   */
+  protected $statusMessageTitle;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -1286,11 +1303,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($contribution->id) {
-      $statusMsg = ts('The contribution record has been processed.');
+      $this->statusMessage = ts('The contribution record has been processed.');
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
-        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+        $this->statusMessage .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
-      CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+      $this->statusMessageTitle = ts('Complete');
     }
     return $contribution;
   }
@@ -1755,7 +1772,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $this->_premiumID, $this->_options
         );
       }
-      $statusMsg = ts('The contribution record has been saved.');
+      $this->statusMessage = ts('The contribution record has been saved.');
 
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
@@ -1769,17 +1786,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
-          $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+          $this->statusMessage .= ' ' . ts('A receipt has been emailed to the contributor.');
         }
       }
 
       if ($relatedComponentStatusMsg) {
-        $statusMsg .= ' ' . $relatedComponentStatusMsg;
+        $this->statusMessage .= ' ' . $relatedComponentStatusMsg;
       }
+      $this->statusMessageTitle = ts('Saved');
 
-      CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+
       //Offline Contribution ends.
     }
+
+
+    CRM_Core_Session::setStatus($this->statusMessage, $this->statusMessageTitle, 'success');
 
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       $action,
