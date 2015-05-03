@@ -263,7 +263,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @return void
    */
-  public static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
+  public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     //process note
     $noteParams = array(
       'entity_table' => 'civicrm_contribution',

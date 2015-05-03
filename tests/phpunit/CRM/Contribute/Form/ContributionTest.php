@@ -144,6 +144,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(array('civicrm_note'));
   }
 
   /**
@@ -308,4 +309,61 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitWithNote() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'note' => 'Super cool and interesting stuff',
+    ),
+      CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
+    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitWithNoteCreditCard() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'note' => 'Super cool and interesting stuff',
+    ) + $this->getCreditCardParams (),
+      CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
+    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+  }
+
+  /**
+   * Get parameters for credit card submit calls.
+   *
+   * @return array
+   *   Credit card specific parameters.
+   */
+  function getCreditCardParams() {
+    return array(
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
+      'credit_card_number' => '411111111111111',
+    );
+  }
 }
+
