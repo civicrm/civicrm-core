@@ -1411,6 +1411,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'receipt_date_time' => '',
       'cancel_date' => '',
       'cancel_date_time' => '',
+      'hidden_Premium' => 1,
     );
     if (!empty($params['id'])) {
       $existingContribution = civicrm_api3('contribution', 'getsingle', array(
@@ -1432,6 +1433,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
 
     $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
+
   }
 
   /**
