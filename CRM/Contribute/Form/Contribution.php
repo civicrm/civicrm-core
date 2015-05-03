@@ -1294,11 +1294,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $sendReceipt = CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE);
     }
 
-    //process the note
-    if ($contribution->id && isset($params['note'])) {
-      CRM_Contribute_Form_AdditionalInfo::processNote($params, $contactID, $contribution->id, NULL);
-    }
-
     if ($contribution->id) {
       array_unshift($this->statusMessage, ts('The contribution record has been processed.'));
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
@@ -1772,17 +1767,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
 
-      //process  note
-      if ($contribution->id && isset($formValues['note'])) {
-        CRM_Contribute_Form_AdditionalInfo::processNote($formValues, $this->_contactID, $contribution->id, $this->_noteID);
-      }
-
-      //process premium
-      if ($contribution->id && isset($formValues['product_name'][0])) {
-        CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
-          $this->_premiumID, $this->_options
-        );
-      }
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
@@ -1803,6 +1787,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $this->statusMessageTitle = ts('Saved');
 
+    }
+
+    if ($contribution->id && isset($formValues['product_name'][0])) {
+      CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
+        $this->_premiumID, $this->_options
+      );
+    }
+
+    if ($contribution->id && isset($submittedValues['note'])) {
+      CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
     CRM_Core_Session::setStatus(implode(' ', $this->statusMessage), $this->statusMessageTitle, 'success');
