@@ -1757,56 +1757,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $statusMsg = ts('The contribution record has been saved.');
 
-      // assign tax calculation for contribution receipts
-      $taxRate = array();
-      $getTaxDetails = FALSE;
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      if ($invoicing) {
-        if ($action & CRM_Core_Action::ADD) {
-          $line = $lineItem;
-        }
-        elseif ($action & CRM_Core_Action::UPDATE) {
-          $line = $this->_lineItems;
-        }
-        foreach ($line as $key => $value) {
-          foreach ($value as $v) {
-            if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-              $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
-            }
-            else {
-              if (isset($v['tax_rate'])) {
-                $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
-                $getTaxDetails = TRUE;
-              }
-            }
-          }
-        }
-      }
-
-      if ($invoicing) {
-        if ($action & CRM_Core_Action::UPDATE) {
-          if (isset($submittedValues['tax_amount'])) {
-            $totalTaxAmount = $submittedValues['tax_amount'];
-          }
-          else {
-            $totalTaxAmount = $this->_values['tax_amount'];
-          }
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          $this->assign('dataArray', $taxRate);
-        }
-        else {
-          if (!empty($submittedValues['price_set_id'])) {
-            $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
-            $this->assign('getTaxDetails', $getTaxDetails);
-            $this->assign('dataArray', $taxRate);
-            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
-          }
-          else {
-            $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
-          }
-        }
-      }
+      $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
       //send receipt mail.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
@@ -1841,6 +1792,64 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_defaults['contribution_status_id']
     );
     return $contribution;
+  }
+
+  /**
+   * Assign tax calculations to contribution receipts.
+   *
+   * @param array $submittedValues
+   * @param int $action
+   * @param array $lineItem
+   */
+  protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
+
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    if (!CRM_Utils_Array::value('invoicing', $invoiceSettings)) {
+      return;
+    }
+    $taxRate = array();
+    $getTaxDetails = FALSE;
+    if ($action & CRM_Core_Action::ADD) {
+      $line = $lineItem;
+    }
+    elseif ($action & CRM_Core_Action::UPDATE) {
+      $line = $this->_lineItems;
+    }
+    foreach ($line as $key => $value) {
+      foreach ($value as $v) {
+        if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
+          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+        }
+        else {
+          if (isset($v['tax_rate'])) {
+            $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+            $getTaxDetails = TRUE;
+          }
+        }
+      }
+    }
+
+    if ($action & CRM_Core_Action::UPDATE) {
+      if (isset($submittedValues['tax_amount'])) {
+        $totalTaxAmount = $submittedValues['tax_amount'];
+      }
+      else {
+        $totalTaxAmount = $this->_values['tax_amount'];
+      }
+      $this->assign('totalTaxAmount', $totalTaxAmount);
+      $this->assign('dataArray', $taxRate);
+    }
+    else {
+      if (!empty($submittedValues['price_set_id'])) {
+        $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
+        $this->assign('getTaxDetails', $getTaxDetails);
+        $this->assign('dataArray', $taxRate);
+        $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+      }
+      else {
+        $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
+      }
+    }
   }
 
 }
