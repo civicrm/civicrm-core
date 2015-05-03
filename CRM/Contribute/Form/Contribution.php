@@ -1717,7 +1717,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
 
-
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
       // process associated membership / participant, CRM-4395

@@ -345,7 +345,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
       'note' => 'Super cool and interesting stuff',
-    ) + $this->getCreditCardParams (),
+    ) + $this->getCreditCardParams(),
       CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
@@ -358,7 +358,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * @return array
    *   Credit card specific parameters.
    */
-  function getCreditCardParams() {
+  protected function getCreditCardParams() {
     return array(
       'payment_processor_id' => $this->paymentProcessor->id,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
