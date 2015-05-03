@@ -89,7 +89,7 @@ abstract class CRM_Core_Payment {
    * @return CRM_Core_Payment
    * @throws \CRM_Core_Exception
    */
-  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  public static function singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     // make sure paymentProcessor is not empty
     // CRM-7424
     if (empty($paymentProcessor)) {
