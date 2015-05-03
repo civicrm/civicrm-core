@@ -3720,4 +3720,73 @@ WHERE con.id = {$contributionId}
     }
   }
 
+  /**
+   * Update related pledge payment payments.
+   *
+   * This function has been refactored out of the back office contribution form and may
+   * still overlap with other functions.
+   *
+   * @param string $action
+   * @param int $pledgePaymentID
+   * @param int $contributionID
+   * @param bool $adjustTotalAmount
+   * @param float $total_amount
+   * @param float $original_total_amount
+   * @param int $contribution_status_id
+   * @param int $original_contribution_status_id
+   */
+  public static function updateRelatedPledge(
+    $action,
+    $pledgePaymentID,
+    $contributionID,
+    $adjustTotalAmount,
+    $total_amount,
+    $original_total_amount,
+    $contribution_status_id,
+    $original_contribution_status_id
+  ) {
+    if (!$pledgePaymentID || $action & CRM_Core_Action::ADD && !$contributionID) {
+      return;
+    }
+
+    if ($pledgePaymentID) {
+      //store contribution id in payment record.
+      CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentID, 'contribution_id', $contributionID);
+    }
+    else {
+      $pledgePaymentID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+        $contributionID,
+        'id',
+        'contribution_id'
+      );
+    }
+    $pledgeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+      $contributionID,
+      'pledge_id',
+      'contribution_id'
+    );
+
+    $updatePledgePaymentStatus = FALSE;
+
+    // If either the status or the amount has changed we update the pledge status.
+    if ($action & CRM_Core_Action::ADD) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+    elseif ($action & CRM_Core_Action::UPDATE && (($original_contribution_status_id != $contribution_status_id) ||
+        ($original_total_amount != $total_amount))
+    ) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+
+    if ($updatePledgePaymentStatus) {
+      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID,
+        array($pledgePaymentID),
+        $contribution_status_id,
+        NULL,
+        $total_amount,
+        $adjustTotalAmount
+      );
+    }
+  }
+
 }

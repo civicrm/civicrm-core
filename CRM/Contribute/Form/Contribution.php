@@ -488,6 +488,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
     $allPanes = array();
+    $recurJs = NULL;
     //tax rate from financialType
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     $this->assign('currencies', json_encode(CRM_Core_OptionGroup::values('currencies_enabled')));
@@ -523,8 +524,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     // use to build form during form rule.
     $this->assign('buildPriceSet', $buildPriceSet);
-
-    $showAdditionalInfo = FALSE;
 
     $defaults = $this->_values;
     $additionalDetailFields = array(
@@ -569,12 +568,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $billingPanes = array();
     if ($this->_mode) {
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
-        $buildRecurBlock = TRUE;
         foreach ($this->billingPane as $name => $label) {
           if (!empty($this->billingFieldSets[$name]['fields'])) {
             // @todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
             $billingPanes[$label] = $this->generatePane(CRM_Utils_String::convertStringToCamel($name), $defaults);
           }
+        }
+        if (!empty($this->_recurPaymentProcessors)) {
+          CRM_Contribute_Form_Contribution_Main::buildRecur($this);
+          $this->setDefaults(array('is_recur' => 0));
+          $this->assign('buildRecurBlock', TRUE);
+          $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
         }
       }
     }
@@ -582,14 +586,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     foreach ($paneNames as $name => $type) {
       $allPanes[$name] = $this->generatePane($type, $defaults);
     }
-    if (empty($this->_recurPaymentProcessors)) {
-      $buildRecurBlock = FALSE;
-    }
-    if ($buildRecurBlock) {
-      CRM_Contribute_Form_Contribution_Main::buildRecur($this);
-      $this->setDefaults(array('is_recur' => 0));
-    }
-    $this->assign('buildRecurBlock', $buildRecurBlock);
+
     $qfKey = $this->controller->_key;
     $this->assign('qfKey', $qfKey);
     $this->assign('billingPanes', $billingPanes);
@@ -744,10 +741,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('textarea', 'cancel_reason', ts('Cancellation / Refund Reason'), $attributes['cancel_reason']);
 
-    $recurJs = NULL;
-    if ($buildRecurBlock) {
-      $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
-    }
     $element = $this->add('select',
       'payment_processor_id',
       ts('Payment Processor'),
@@ -1020,9 +1013,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param array $submittedValues
    * @param array $lineItem
    *
-   * @throws CRM_Core_Exception
+   * @return bool|\CRM_Contribute_DAO_Contribution
    */
-  protected function processCreditCard($submittedValues, $lineItem, $pledgePaymentID) {
+  protected function processCreditCard($submittedValues, $lineItem) {
     $sendReceipt = $contribution = FALSE;
 
     $unsetParams = array(
@@ -1292,19 +1285,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Contribute_Form_AdditionalInfo::processPremium($params, $contribution->id, NULL, $this->_options);
     }
 
-    //update pledge payment status.
-    if ($this->_ppID && $contribution->id) {
-      // Store contribution id in payment record.
-      CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $this->_ppID, 'contribution_id', $contribution->id);
-
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID,
-        array($this->_ppID),
-        $contribution->contribution_status_id,
-        NULL,
-        $contribution->total_amount
-      );
-    }
-
     if ($contribution->id) {
       $statusMsg = ts('The contribution record has been processed.');
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
@@ -1312,6 +1292,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
     }
+    return $contribution;
   }
 
   /**
@@ -1402,6 +1383,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * (If we expose through api we can get default additions 'for free').
    *
    * @param array $params
+   * @param int $action
    */
   public function testSubmit($params, $action) {
     $defaults = array(
@@ -1410,6 +1392,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'receipt_date_time' => '',
       'cancel_date' => '',
       'cancel_date_time' => '',
+    );
+    if (!empty($params['id'])) {
+      $existingContribution = civicrm_api3('contribution', 'getsingle', array(
+        'id' => $params['id'],
+      ));
+    }
+    else {
+      $existingContribution = array();
+    }
+
+    $this->_defaults['contribution_status_id'] = CRM_Utils_Array::value('contribution_status_id',
+      $existingContribution
+    );
+
+    $this->_defaults['total_amount'] = CRM_Utils_Array::value('total_amount',
+      $existingContribution
     );
 
     $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
@@ -1421,6 +1419,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param int $action
    *   Action constant
    *    - CRM_Core_Action::UPDATE
+   *
+   * @param $pledgePaymentID
    *
    * @return array
    * @throws \Exception
@@ -1595,8 +1595,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Credit Card Contribution.
     if ($this->_mode) {
-      $this->processCreditCard($submittedValues, $lineItem, $pledgePaymentID);
-      return FALSE;
+      $contribution = $this->processCreditCard($submittedValues, $lineItem);
     }
     else {
       // Offline Contribution.
@@ -1756,6 +1755,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $this->_premiumID, $this->_options
         );
       }
+      $statusMsg = ts('The contribution record has been saved.');
 
       // assign tax calculation for contribution receipts
       $taxRate = array();
@@ -1817,20 +1817,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
-        $sendReceipt = CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues);
-      }
-
-      $pledgePaymentId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
-        $contribution->id,
-        'id',
-        'contribution_id'
-      );
-      $this->updateRelatedPledge($action, $pledgePaymentID, $contribution, $pledgePaymentId, $formValues,
-        $formValues['total_amount'], $this->_defaults['total_amount']);
-
-      $statusMsg = ts('The contribution record has been saved.');
-      if (!empty($formValues['is_email_receipt']) && $sendReceipt) {
-        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+        if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
+          $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+        }
       }
 
       if ($relatedComponentStatusMsg) {
@@ -1838,78 +1827,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
-      return $contribution;
       //Offline Contribution ends.
     }
-  }
 
-  /**
-   * Update related pledge payment status.
-   *
-   * @param string $action
-   * @param int $pledgePaymentID
-   * @param CRM_Contribute_BAO_Contribution $contribution
-   * @param int $pledgePaymentId
-   * @param $formValues
-   * @param float $total_amount
-   * @param float $original_total_amount
-   */
-  protected function updateRelatedPledge(
-    $action,
-    $pledgePaymentID,
-    $contribution,
-    $pledgePaymentId,
-    $formValues,
-    $total_amount,
-    $original_total_amount
-  ) {
-    if ((($pledgePaymentID && $contribution->id) && $action & CRM_Core_Action::ADD) ||
-      (($pledgePaymentId) && $action & CRM_Core_Action::UPDATE)
-    ) {
-
-      if ($pledgePaymentID) {
-        //store contribution id in payment record.
-        CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentID, 'contribution_id', $contribution->id);
-      }
-      else {
-        $pledgePaymentID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
-          $contribution->id,
-          'id',
-          'contribution_id'
-        );
-      }
-      $pledgeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
-        $contribution->id,
-        'pledge_id',
-        'contribution_id'
-      );
-
-      $adjustTotalAmount = FALSE;
-      if (CRM_Utils_Array::value('option_type', $formValues) == 2) {
-        $adjustTotalAmount = TRUE;
-      }
-
-      $updatePledgePaymentStatus = FALSE;
-      //do only if either the status or the amount has changed
-      if ($action & CRM_Core_Action::ADD) {
-        $updatePledgePaymentStatus = TRUE;
-      }
-      elseif ($action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
-          ($original_total_amount != $total_amount))
-      ) {
-        $updatePledgePaymentStatus = TRUE;
-      }
-
-      if ($updatePledgePaymentStatus) {
-        CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID,
-          array($pledgePaymentID),
-          $contribution->contribution_status_id,
-          NULL,
-          $contribution->total_amount,
-          $adjustTotalAmount
-        );
-      }
-    }
+    CRM_Contribute_BAO_Contribution::updateRelatedPledge(
+      $action,
+      $pledgePaymentID,
+      $contribution->id,
+      (CRM_Utils_Array::value('option_type', $formValues) == 2) ? TRUE : FALSE,
+      $formValues['total_amount'],
+      $this->_defaults['total_amount'],
+      $formValues['contribution_status_id'],
+      $this->_defaults['contribution_status_id']
+    );
+    return $contribution;
   }
 
 }
