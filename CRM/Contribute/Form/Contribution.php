@@ -1057,7 +1057,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //Get the require fields value only.
     $params = $this->_params = $submittedValues;
 
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor_id'],
       $this->_mode
     );
 
@@ -1299,11 +1299,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Contribute_Form_AdditionalInfo::processNote($params, $contactID, $contribution->id, NULL);
     }
 
-    //process premium
-    if ($contribution->id && isset($params['product_name'][0])) {
-      CRM_Contribute_Form_AdditionalInfo::processPremium($params, $contribution->id, NULL, $this->_options);
-    }
-
     if ($contribution->id) {
       array_unshift($this->statusMessage, ts('The contribution record has been processed.'));
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
@@ -1403,8 +1398,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @param array $params
    * @param int $action
+   * @param string|null $creditCardMode
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params, $action) {
+  public function testSubmit($params, $action, $creditCardMode = NULL) {
     $defaults = array(
       'soft_credit_contact_id' => array(),
       'receipt_date' => '',
@@ -1430,8 +1428,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $existingContribution
     );
 
+    if ($creditCardMode) {
+      $this->_mode = $creditCardMode;
+    }
+
+    // Required because processCreditCard calls set method on this.
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $this->controller = new CRM_Core_Controller();
+
     CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
 
+    $this->_fields = array();
     $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
 
   }

@@ -78,12 +78,20 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $products = array();
 
   /**
+   * Dummy payment processor.
+   *
+   * @var array
+   */
+  protected $paymentProcessor = array();
+
+  /**
    * Setup function.
    */
   public function setUp() {
-    parent::setUp();
-
     $this->_apiversion = 3;
+    parent::setUp();
+    $this->createLoggedInUser();
+
     $this->_individualId = $this->individualCreate();
     $paymentProcessor = $this->processorCreate();
     $this->_params = array(
@@ -127,6 +135,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ));
 
     $this->products[] = $product1['values'][$product1['id']];
+    $this->paymentProcessor = $this->processorCreate();
+
   }
 
   /**
@@ -255,6 +265,39 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
     ), CRM_Core_Action::ADD);
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
+    $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
+    $mut->checkMailLog(array(
+      'Premium Information',
+      'Smurf',
+      'clumsy smurf',
+    ));
+    $mut->stop();
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
+  public function testPremiumUpdateCreditCard() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'product_name' => array($this->products[0]['id'], 1),
+      'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
+      'credit_card_number' => '411111111111111',
+    ), CRM_Core_Action::ADD,
+    'live');
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $mut->checkMailLog(array(
