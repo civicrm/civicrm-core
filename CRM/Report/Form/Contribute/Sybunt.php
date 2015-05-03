@@ -514,17 +514,17 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $previous_year = $current_year - 1;
     $previous_two_year = $current_year - 2;
     $previous_three_year = $current_year - 3;
-    $up to = $current_year - 4;
+    $upto = $current_year - 4;
 
     $interval[$previous_year] = $previous_year;
     $interval[$previous_two_year] = $previous_two_year;
     $interval[$previous_three_year] = $previous_three_year;
-    $interval["upto_{$up to}"] = "Up To {$up to}";
+    $interval["upto_{$upto}"] = "Up To {$upto}";
 
     foreach ($rows as $key => $row) {
-      $display["upto_{$up to}"]
-        = CRM_Utils_Array::value("upto_{$up to}", $display)
-        + CRM_Utils_Array::value("civicrm_upto_{$up to}", $row);
+      $display["upto_{$upto}"]
+        = CRM_Utils_Array::value("upto_{$upto}", $display)
+        + CRM_Utils_Array::value("civicrm_upto_{$upto}", $row);
       $display[$previous_year]
         = CRM_Utils_Array::value($previous_year, $display)
         + CRM_Utils_Array::value($previous_year, $row);
