@@ -365,5 +365,5 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_number' => '411111111111111',
     );
   }
-}
 
+}

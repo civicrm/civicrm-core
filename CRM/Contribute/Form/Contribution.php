@@ -1790,7 +1790,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($contribution->id && isset($formValues['product_name'][0])) {
-      CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
+      CRM_Contribute_Form_AdditionalInfo::processPremium($submittedValues, $contribution->id,
         $this->_premiumID, $this->_options
       );
     }
