@@ -135,6 +135,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
     ),
       CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
@@ -152,6 +153,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contribution_status_id' => 1,
     ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
   }
@@ -171,6 +173,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
+      'contribution_status_id' => 1,
     ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
@@ -212,6 +215,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'pledge_payment_id' => $pledgePaymentID,
+      'contribution_status_id' => 1,
     ), CRM_Core_Action::ADD);
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'getsingle', array('id' => $pledgePaymentID));
     $this->assertNotEmpty($pledgePayment['contribution_id']);
