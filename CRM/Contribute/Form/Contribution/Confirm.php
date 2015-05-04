@@ -1318,7 +1318,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType, $online);
     $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online);
 
-
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
     if ($isEmailReceipt) {
