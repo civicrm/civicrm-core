@@ -1198,6 +1198,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $result = array();
     if ($paymentParams['amount'] > 0.0) {
       // force a re-get of the payment processor in case the form changed it, CRM-7179
+      // NOTE - I expect this is not obsolete.
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
       try {
         $result = $payment->doPayment($paymentParams, 'contribute');
@@ -1213,6 +1214,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         if (!empty($this->_ppID)) {
           $urlParams .= "&context=pledge&ppid={$this->_ppID}";
         }
+
         CRM_Core_Error::statusBounce($message, $urlParams, ts('Payment Processor Error'));
       }
     }
@@ -1250,15 +1252,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
 
-    // Build custom data getFields array
-    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
-      CRM_Utils_Array::value('financial_type_id', $params)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
-      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
+     CRM_Core_BAO_CustomField::postProcess($params,
+      array(),
       $this->_id,
       'Contribution'
     );
