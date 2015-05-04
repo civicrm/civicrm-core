@@ -335,6 +335,7 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_source':
       case 'contribution_trxn_id':
       case 'contribution_check_number':
+      case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE):
         $qillName = $name;
@@ -347,11 +348,12 @@ class CRM_Contribute_BAO_Query {
               'contribution_trxn_id',
               'contribution_check_number',
               'contribution_payment_instrument_id',
+              'contribution_contact_id',
             )
           )
         ) {
           $name = str_replace('contribution_', '', $name);
-          if (!in_array($name, array('source', 'id'))) {
+          if (!in_array($name, array('source', 'id', 'contact_id'))) {
             $qillName = str_replace('contribution_', '', $qillName);
           }
         }
