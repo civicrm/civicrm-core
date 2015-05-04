@@ -234,6 +234,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
+        $individualTaxAmount = 0;
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
@@ -270,6 +271,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if (empty($v['first_name'])) {
             $this->_part[$k]['info'] = $append;
           }
+
+          /*CRM-16320 */
+          $individual[$k]['totalAmtWithTax'] = $this->_amount[$k]['amount'];
+          $individual[$k]['totalTaxAmt'] = $individualTaxAmount + $v['tax_amount'];
           $this->_totalAmount = $this->_totalAmount + $this->_amount[$k]['amount'];
           if (!empty($v['is_primary'])) {
             $this->set('primaryParticipantAmount', $this->_amount[$k]['amount']);
@@ -283,7 +288,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($invoicing) {
         $this->assign('totalTaxAmount', $taxAmount);
         $this->assign('taxTerm', $taxTerm);
+        $this->assign('individual', $individual);
+        $this->set('individual', $individual);
       }
+
       $this->assign('part', $this->_part);
       $this->set('part', $this->_part);
       $this->assign('amounts', $this->_amount);
@@ -935,6 +943,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $lineItem = array();
             if ($lineItemValue = CRM_Utils_Array::value($participantNum, $lineItems)) {
               $lineItem[] = $lineItemValue;
+            }
+            if ($invoicing) {
+              $individual = $this->get('individual');
+              $dataArray[key($dataArray)] = $individual[$participantNum]['totalTaxAmt'];
+              $this->assign('dataArray', $dataArray);
+              $this->assign('totalAmount', $individual[$participantNum]['totalAmtWithTax']);
+              $this->assign('totalTaxAmount', $individual[$participantNum]['totalTaxAmt']);
+              $this->assign('individual', array($individual[$participantNum]));
             }
             $this->assign('lineItem', $lineItem);
           }
