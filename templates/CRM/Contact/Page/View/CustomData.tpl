@@ -24,6 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 {* template for custom data *}
+{assign var="customDataGroupName" value=$customDataGroup.name}
+{foreach from=$viewCustomData item=customGroupWrapper}
+{foreach from=$customGroupWrapper item=customGroup key=customGroupId}
+{assign var="customRegion" value='contact-custom-data-'|cat:$customGroup.name}
+{crmRegion name=$customRegion}
+{if $customGroup.help_pre}
+  <div class="messages help">{$customGroup.help_pre}</div>
+{/if}
 {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
   {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
 {/if}
@@ -76,3 +84,9 @@
   </script>
 {/if}
 {/if}
+{if $customGroup.help_post}
+  <div class="messages help">{$customGroup.help_post}</div>
+{/if}
+{/crmRegion}
+{/foreach}
+{/foreach}
