@@ -1188,7 +1188,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         TRUE,
         FALSE,
         $isTest,
-        $this->_lineItem
+        $this->_lineItem,
+        $this->_bltID
       );
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
@@ -1266,7 +1267,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $financialType,
         FALSE, FALSE,
         $isTest,
-        $lineItem
+        $lineItem,
+        $form->_bltID
       );
     }
 
