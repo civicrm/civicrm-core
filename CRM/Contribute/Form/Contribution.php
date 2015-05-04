@@ -1253,12 +1253,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
 
-     CRM_Core_BAO_CustomField::postProcess($params,
-      array(),
-      $this->_id,
-      'Contribution'
-    );
-
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
