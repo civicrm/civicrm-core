@@ -1268,7 +1268,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         FALSE, FALSE,
         $isTest,
         $lineItem,
-        $form->_bltID
+        $this->_bltID
       );
     }
 
