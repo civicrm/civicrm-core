@@ -305,7 +305,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $reloadConfig = FALSE;
 
     $fields = $result = array();
-    $fieldsToGet = self::validateSettingsInput(array_flip($settingsToReturn), $fields, FALSE);
+    $fieldsToGet = self::validateSettingsInput(array_flip($settingsToReturn), $fields, FALSE, $params['filters']);
     foreach ($domains as $domainID) {
       if ($domainID != CRM_Core_Config::domainID()) {
         $reloadConfig = TRUE;
@@ -549,19 +549,20 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * This function filters on the fields like 'version' & 'debug' that are not settings
    *
-   * @param array $params
-   *   Parameters as passed into API.
+   * @param array $names
+   *   Setting Names to validate
    * @param array $fields
    *   Empty array to be populated with fields metadata.
    * @param bool $createMode
+   *  default TRUE
+   * @param array $filters
+   *   passed to setting getFields
    *
    * @throws api_Exception
    * @return array
    *   name => value array of the fields to be set (with extraneous removed)
    */
-  public static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
-    $group = CRM_Utils_Array::value('group', $params);
-
+  public static function validateSettingsInput($names, &$fields, $createMode = TRUE, $filters = NULL) {
     $ignoredParams = array(
       'version',
       'id',
@@ -581,8 +582,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'options',
       'prettyprint',
     );
-    $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
-    $getFieldsParams = array('version' => 3);
+    $settingParams = array_diff_key($names, array_fill_keys($ignoredParams, TRUE));
+    $getFieldsParams = array('version' => 3, 'filters' => $filters);
     if (count($settingParams) == 1) {
       // ie we are only setting one field - we'll pass it into getfields for efficiency
       list($name) = array_keys($settingParams);
@@ -745,6 +746,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $settingsFiles = CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
     foreach ($settingsFiles as $file) {
       $settings = include $file;
+      $dupes = array_intersect($settingMetaData, $settings);
+      if (count($dupes)) {
+        throw new CRM_Core_Exception("Duplicate Setting Name Detected in $file. ", 0, $dupes);
+      }
       $settingMetaData = array_merge($settingMetaData, $settings);
     }
     CRM_Core_BAO_Cache::setItem($settingMetaData, 'CiviCRM setting Spec', 'All');
