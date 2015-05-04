@@ -1108,11 +1108,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
 
-    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD && isset($this->_paymentFields)) {
-      if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
-        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      }
+    if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
+       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
 
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
