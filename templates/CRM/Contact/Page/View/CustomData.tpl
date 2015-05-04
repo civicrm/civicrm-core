@@ -24,17 +24,32 @@
  +--------------------------------------------------------------------+
 *}
 {* template for custom data *}
-{if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
-  {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
-{/if}
+{assign var="customDataGroupName" value=$customDataGroup.name}
+{foreach from=$viewCustomData item=customGroupWrapper}
+  {foreach from=$customGroupWrapper item=customGroup key=customGroupId}
+    {assign var="customRegion" value='contact-custom-data-'|cat:$customGroup.name}
+    {crmRegion name=$customRegion}
+      {if $customGroup.help_pre}
+        <div class="messages help">{$customGroup.help_pre}</div>
+      {/if}
+      {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
+        {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
+      {/if}
 
-{strip}
-  {if $action eq 16 or $action eq 4} {* Browse or View actions *}
-    <div class="form-item">
-      {include file="CRM/Custom/Page/CustomDataView.tpl"}
-    </div>
-  {/if}
-{/strip}
+      {strip}
+        {if $action eq 16 or $action eq 4} {* Browse or View actions *}
+          <div class="form-item">
+            {include file="CRM/Custom/Page/CustomDataView.tpl"}
+          </div>
+        {/if}
+      {/strip}
+      {if $customGroup.help_post}
+        <div class="messages help">{$customGroup.help_post}</div>
+      {/if}
+    {/crmRegion}
+  {/foreach}
+{/foreach}
+
 
 {if $mainEditForm}
   <script type="text/javascript">
