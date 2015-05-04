@@ -1276,7 +1276,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //TODO: add range support
         //TODO: Add date formats
         //TODO: Add javascript template for dates.
-        $this->addDate($name, $label, $required, $props);     
+        $this->addDate($name, $label, $required, $props);
         break;
 
       case 'Radio':
