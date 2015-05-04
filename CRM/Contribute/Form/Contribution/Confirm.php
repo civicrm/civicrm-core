@@ -148,6 +148,61 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Get non-deductible amount.
+   *
+   * This is a bit too much about wierd form interpretation to be this deep.
+   *
+   * CRM-11885
+   *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
+   * it.
+   * @param $params
+   * @param $financialType
+   * @param $online
+   *
+   * @return array
+   */
+  protected static function getNonDeductibleAmount($params, $financialType, $online) {
+    if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
+      return $params['non_deductible_amount'];
+    }
+    else {
+      if ($financialType->is_deductible) {
+        if ($online && isset($params['selectProduct'])) {
+          $selectProduct = CRM_Utils_Array::value('selectProduct', $params);
+        }
+        if (!$online && isset($params['product_name'][0])) {
+          $selectProduct = $params['product_name'][0];
+        }
+        // if there is a product - compare the value to the contribution amount
+        if (isset($selectProduct) &&
+          $selectProduct != 'no_thanks'
+        ) {
+          $productDAO = new CRM_Contribute_DAO_Product();
+          $productDAO->id = $selectProduct;
+          $productDAO->find(TRUE);
+          // product value exceeds contribution amount
+          if ($params['amount'] < $productDAO->price) {
+            $nonDeductibleAmount = $params['amount'];
+            return $nonDeductibleAmount;
+          }
+          // product value does NOT exceed contribution amount
+          else {
+            return $productDAO->price;
+          }
+        }
+        // contribution is deductible - but there is no product
+        else {
+          return '0.00';
+        }
+      }
+      // contribution is NOT deductible
+      else {
+        return $params['amount'];
+      }
+    }
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -1254,49 +1309,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $form->_values);
     }
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType, $online);
+    $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online);
 
-    // CRM-11885
-    // if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep it.
-    if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
-      $nonDeductibleAmount = $params['non_deductible_amount'];
-    }
-    // if non_deductible_amount does NOT exist - then calculate it depending on:
-    // $contributionType->is_deductible and whether there is a product (premium).
-    else {
-      //if ($contributionType->is_deductible && $deductibleMode) {
-      if ($financialType->is_deductible) {
-        if ($online && isset($params['selectProduct'])) {
-          $selectProduct = CRM_Utils_Array::value('selectProduct', $params);
-        }
-        if (!$online && isset($params['product_name'][0])) {
-          $selectProduct = $params['product_name'][0];
-        }
-        // if there is a product - compare the value to the contribution amount
-        if (isset($selectProduct) &&
-          $selectProduct != 'no_thanks'
-        ) {
-          $productDAO = new CRM_Contribute_DAO_Product();
-          $productDAO->id = $selectProduct;
-          $productDAO->find(TRUE);
-          // product value exceeds contribution amount
-          if ($params['amount'] < $productDAO->price) {
-            $nonDeductibleAmount = $params['amount'];
-          }
-          // product value does NOT exceed contribution amount
-          else {
-            $nonDeductibleAmount = $productDAO->price;
-          }
-        }
-        // contribution is deductible - but there is no product
-        else {
-          $nonDeductibleAmount = '0.00';
-        }
-      }
-      // contribution is NOT deductible
-      else {
-        $nonDeductibleAmount = $params['amount'];
-      }
-    }
 
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
