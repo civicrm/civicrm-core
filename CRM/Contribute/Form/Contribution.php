@@ -1039,7 +1039,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $contribution = FALSE;
 
-     $isTest = ($this->_mode == 'test') ? 1 : 0;
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
     // @todo - I don't believe this would ever BE set. I can't find anywhere in the code.
     // It would be better to pass line item out to functions than $this->_lineItem as
@@ -1112,8 +1112,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
-       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
 
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
