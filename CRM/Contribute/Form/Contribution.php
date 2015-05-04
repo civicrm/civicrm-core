@@ -211,6 +211,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userDisplayName;
 
   /**
+   * Status message to be shown to the user.
+   *
+   * @var array
+   */
+  protected $statusMessage = array();
+
+  /**
+   * Status message title to be shown to the user.
+   *
+   * Generally the payment processor message title is 'Complete' and offline is 'Saved'
+   * although this might not be a good fit with the broad range of processors.
+   *
+   * @var string
+   */
+  protected $statusMessageTitle;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -482,6 +499,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+
     //@todo document the purpose of cdType (if still in use)
     if ($this->_cdType) {
       CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -1039,7 +1057,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //Get the require fields value only.
     $params = $this->_params = $submittedValues;
 
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor_id'],
       $this->_mode
     );
 
@@ -1149,12 +1167,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentParams['contactID'] = $this->_contactID;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $params['financial_type_id'];
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $params['financial_type_id'];
 
     // Add some financial type details to the params list
     // if folks need to use it.
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $financialType->name;
     $paymentParams['contributionPageID'] = NULL;
 
     if (!empty($this->_params['is_email_receipt'])) {
@@ -1178,7 +1196,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_params,
         NULL,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         TRUE,
         FALSE,
         $isTest,
@@ -1230,7 +1248,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Result has all the stuff we need
     // lets archive it to a financial transaction
-    if ($contributionType->is_deductible) {
+    if ($financialType->is_deductible) {
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
@@ -1261,7 +1279,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_params,
         $result,
         $this->_contactID,
-        $contributionType,
+        $financialType,
         FALSE, FALSE,
         $isTest,
         $this->_lineItem
@@ -1276,21 +1294,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $sendReceipt = CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE);
     }
 
-    //process the note
-    if ($contribution->id && isset($params['note'])) {
-      CRM_Contribute_Form_AdditionalInfo::processNote($params, $contactID, $contribution->id, NULL);
-    }
-    //process premium
-    if ($contribution->id && isset($params['product_name'][0])) {
-      CRM_Contribute_Form_AdditionalInfo::processPremium($params, $contribution->id, NULL, $this->_options);
-    }
-
     if ($contribution->id) {
-      $statusMsg = ts('The contribution record has been processed.');
+      array_unshift($this->statusMessage, ts('The contribution record has been processed.'));
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
-        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+        $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
       }
-      CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+      $this->statusMessageTitle = ts('Complete');
     }
     return $contribution;
   }
@@ -1384,14 +1393,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @param array $params
    * @param int $action
+   * @param string|null $creditCardMode
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params, $action) {
+  public function testSubmit($params, $action, $creditCardMode = NULL) {
     $defaults = array(
       'soft_credit_contact_id' => array(),
       'receipt_date' => '',
       'receipt_date_time' => '',
       'cancel_date' => '',
       'cancel_date_time' => '',
+      'hidden_Premium' => 1,
     );
     if (!empty($params['id'])) {
       $existingContribution = civicrm_api3('contribution', 'getsingle', array(
@@ -1410,7 +1423,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $existingContribution
     );
 
+    if ($creditCardMode) {
+      $this->_mode = $creditCardMode;
+    }
+
+    // Required because processCreditCard calls set method on this.
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $this->controller = new CRM_Core_Controller();
+
+    CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
+
+    $this->_fields = array();
     $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
+
   }
 
   /**
@@ -1428,6 +1453,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function submit($submittedValues, $action, $pledgePaymentID) {
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
+
     if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
@@ -1592,6 +1618,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($submittedValues['contact_id'])) {
       $this->_contactID = $submittedValues['contact_id'];
     }
+    $formValues = $submittedValues;
 
     // Credit Card Contribution.
     if ($this->_mode) {
@@ -1602,11 +1629,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues = $this->unsetCreditCardFields($submittedValues);
 
       // get the required field value only.
-      $formValues = $submittedValues;
+
       $params = $ids = array();
 
       $params['contact_id'] = $this->_contactID;
-
       $params['currency'] = $this->getCurrency($submittedValues);
 
       $fields = array(
@@ -1689,53 +1715,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;
       }
-
-      // CRM-11956
-      // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
-      // if non_deductible_amount does NOT exist - then calculate it depending on:
-      // $ContributionType->is_deductible and whether there is a product (premium).
-      if (empty($params['non_deductible_amount'])) {
-        $contributionType = new CRM_Financial_DAO_FinancialType();
-        $contributionType->id = $params['financial_type_id'];
-        if (!$contributionType->find(TRUE)) {
-          CRM_Core_Error::fatal('Could not find a system table');
-        }
-        if ($contributionType->is_deductible) {
-
-          if (isset($formValues['product_name'][0])) {
-            $selectProduct = $formValues['product_name'][0];
-          }
-          // if there is a product - compare the value to the contribution amount
-          if (isset($selectProduct)) {
-            $productDAO = new CRM_Contribute_DAO_Product();
-            $productDAO->id = $selectProduct;
-            $productDAO->find(TRUE);
-            // product value exceeds contribution amount
-            if ($params['total_amount'] < $productDAO->price) {
-              $params['non_deductible_amount'] = $params['total_amount'];
-            }
-            // product value does NOT exceed contribution amount
-            else {
-              $params['non_deductible_amount'] = $productDAO->price;
-            }
-          }
-          // contribution is deductible - but there is no product
-          else {
-            $params['non_deductible_amount'] = '0.00';
-          }
-        }
-        // contribution is NOT deductible
-        else {
-          $params['non_deductible_amount'] = $params['total_amount'];
-        }
-      }
+      $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
 
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
       // process associated membership / participant, CRM-4395
-      $relatedComponentStatusMsg = NULL;
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
-        $relatedComponentStatusMsg = $this->updateRelatedComponent($contribution->id,
+        $this->statusMessage[] = $this->updateRelatedComponent($contribution->id,
           $contribution->contribution_status_id,
           CRM_Utils_Array::value('contribution_status_id',
             $this->_values
@@ -1744,69 +1730,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
 
-      //process  note
-      if ($contribution->id && isset($formValues['note'])) {
-        CRM_Contribute_Form_AdditionalInfo::processNote($formValues, $this->_contactID, $contribution->id, $this->_noteID);
-      }
+      array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
-      //process premium
-      if ($contribution->id && isset($formValues['product_name'][0])) {
-        CRM_Contribute_Form_AdditionalInfo::processPremium($formValues, $contribution->id,
-          $this->_premiumID, $this->_options
-        );
-      }
-      $statusMsg = ts('The contribution record has been saved.');
-
-      // assign tax calculation for contribution receipts
-      $taxRate = array();
-      $getTaxDetails = FALSE;
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      if ($invoicing) {
-        if ($action & CRM_Core_Action::ADD) {
-          $line = $lineItem;
-        }
-        elseif ($action & CRM_Core_Action::UPDATE) {
-          $line = $this->_lineItems;
-        }
-        foreach ($line as $key => $value) {
-          foreach ($value as $v) {
-            if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-              $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
-            }
-            else {
-              if (isset($v['tax_rate'])) {
-                $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
-                $getTaxDetails = TRUE;
-              }
-            }
-          }
-        }
-      }
-
-      if ($invoicing) {
-        if ($action & CRM_Core_Action::UPDATE) {
-          if (isset($submittedValues['tax_amount'])) {
-            $totalTaxAmount = $submittedValues['tax_amount'];
-          }
-          else {
-            $totalTaxAmount = $this->_values['tax_amount'];
-          }
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          $this->assign('dataArray', $taxRate);
-        }
-        else {
-          if (!empty($submittedValues['price_set_id'])) {
-            $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
-            $this->assign('getTaxDetails', $getTaxDetails);
-            $this->assign('dataArray', $taxRate);
-            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
-          }
-          else {
-            $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
-          }
-        }
-      }
+      $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
       //send receipt mail.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
@@ -1818,17 +1744,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
-          $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+          $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
         }
       }
 
-      if ($relatedComponentStatusMsg) {
-        $statusMsg .= ' ' . $relatedComponentStatusMsg;
-      }
+      $this->statusMessageTitle = ts('Saved');
 
-      CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
-      //Offline Contribution ends.
     }
+
+    if ($contribution->id && isset($formValues['product_name'][0])) {
+      CRM_Contribute_Form_AdditionalInfo::processPremium($submittedValues, $contribution->id,
+        $this->_premiumID, $this->_options
+      );
+    }
+
+    if ($contribution->id && isset($submittedValues['note'])) {
+      CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
+    }
+
+    CRM_Core_Session::setStatus(implode(' ', $this->statusMessage), $this->statusMessageTitle, 'success');
 
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       $action,
@@ -1836,11 +1770,122 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution->id,
       (CRM_Utils_Array::value('option_type', $formValues) == 2) ? TRUE : FALSE,
       $formValues['total_amount'],
-      $this->_defaults['total_amount'],
+      CRM_Utils_Array::value('total_amount', $this->_defaults),
       $formValues['contribution_status_id'],
-      $this->_defaults['contribution_status_id']
+      CRM_Utils_Array::value('contribution_status_id', $this->_defaults)
     );
     return $contribution;
+  }
+
+  /**
+   * Assign tax calculations to contribution receipts.
+   *
+   * @param array $submittedValues
+   * @param int $action
+   * @param array $lineItem
+   */
+  protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
+
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    if (!CRM_Utils_Array::value('invoicing', $invoiceSettings)) {
+      return;
+    }
+    $taxRate = array();
+    $getTaxDetails = FALSE;
+    if ($action & CRM_Core_Action::ADD) {
+      $line = $lineItem;
+    }
+    elseif ($action & CRM_Core_Action::UPDATE) {
+      $line = $this->_lineItems;
+    }
+    foreach ($line as $key => $value) {
+      foreach ($value as $v) {
+        if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
+          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+        }
+        else {
+          if (isset($v['tax_rate'])) {
+            $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+            $getTaxDetails = TRUE;
+          }
+        }
+      }
+    }
+
+    if ($action & CRM_Core_Action::UPDATE) {
+      if (isset($submittedValues['tax_amount'])) {
+        $totalTaxAmount = $submittedValues['tax_amount'];
+      }
+      else {
+        $totalTaxAmount = $this->_values['tax_amount'];
+      }
+      $this->assign('totalTaxAmount', $totalTaxAmount);
+      $this->assign('dataArray', $taxRate);
+    }
+    else {
+      if (!empty($submittedValues['price_set_id'])) {
+        $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
+        $this->assign('getTaxDetails', $getTaxDetails);
+        $this->assign('dataArray', $taxRate);
+        $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+      }
+      else {
+        $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
+      }
+    }
+  }
+
+  /**
+   * Calculate non deductible amount.
+   *
+   * CRM-11956
+   * if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
+   * if non_deductible_amount does NOT exist - then calculate it depending on:
+   * $financialType->is_deductible and whether there is a product (premium).
+   *
+   * @param $params
+   * @param $formValues
+   *
+   * @return array
+   */
+  protected function calculateNonDeductibleAmount($params, $formValues) {
+    if (!empty($params['non_deductible_amount'])) {
+      return $params['non_deductible_amount'];
+    }
+    if (empty($params['non_deductible_amount'])) {
+      $contributionType = new CRM_Financial_DAO_FinancialType();
+      $contributionType->id = $params['financial_type_id'];
+
+      if ($contributionType->is_deductible) {
+
+        if (isset($formValues['product_name'][0])) {
+          $selectProduct = $formValues['product_name'][0];
+        }
+        // if there is a product - compare the value to the contribution amount
+        if (isset($selectProduct)) {
+          $productDAO = new CRM_Contribute_DAO_Product();
+          $productDAO->id = $selectProduct;
+          $productDAO->find(TRUE);
+          // product value exceeds contribution amount
+          if ($params['total_amount'] < $productDAO->price) {
+            return $params['total_amount'];
+          }
+          // product value does NOT exceed contribution amount
+          else {
+            return $productDAO->price;
+          }
+        }
+        // contribution is deductible - but there is no product
+        else {
+          return '0.00';
+        }
+      }
+      // contribution is NOT deductible
+      else {
+        return $params['total_amount'];
+      }
+    }
+    return 0;
   }
 
 }

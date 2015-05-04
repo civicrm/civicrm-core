@@ -71,12 +71,27 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $paymentInstruments = array();
 
   /**
+   * Products.
+   *
+   * @var array
+   */
+  protected $products = array();
+
+  /**
+   * Dummy payment processor.
+   *
+   * @var array
+   */
+  protected $paymentProcessor = array();
+
+  /**
    * Setup function.
    */
   public function setUp() {
-    parent::setUp();
-
     $this->_apiversion = 3;
+    parent::setUp();
+    $this->createLoggedInUser();
+
     $this->_individualId = $this->individualCreate();
     $paymentProcessor = $this->processorCreate();
     $this->_params = array(
@@ -114,6 +129,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     );
     $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->paymentInstruments = $instruments['values'];
+    $product1 = $this->callAPISuccess('product', 'create', array(
+      'name' => 'Smurf',
+      'options' => 'brainy smurf, clumsy smurf, papa smurf',
+    ));
+
+    $this->products[] = $product1['values'][$product1['id']];
+    $this->paymentProcessor = $this->processorCreate();
+
   }
 
   /**
@@ -121,6 +144,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(array('civicrm_note'));
   }
 
   /**
@@ -221,6 +245,125 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertNotEmpty($pledgePayment['contribution_id']);
     $this->assertEquals($pledgePayment['actual_amount'], 50);
     $this->assertEquals(1, $pledgePayment['status_id']);
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
+  public function testPremiumUpdate() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'product_name' => array($this->products[0]['id'], 1),
+      'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+    ), CRM_Core_Action::ADD);
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
+    $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
+    $mut->checkMailLog(array(
+      'Premium Information',
+      'Smurf',
+      'clumsy smurf',
+    ));
+    $mut->stop();
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
+  public function testPremiumUpdateCreditCard() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'product_name' => array($this->products[0]['id'], 1),
+      'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
+      'credit_card_number' => '411111111111111',
+    ), CRM_Core_Action::ADD,
+    'live');
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
+    $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
+    $mut->checkMailLog(array(
+      'Premium Information',
+      'Smurf',
+      'clumsy smurf',
+    ));
+    $mut->stop();
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitWithNote() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'note' => 'Super cool and interesting stuff',
+    ),
+      CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
+    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitWithNoteCreditCard() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'note' => 'Super cool and interesting stuff',
+    ) + $this->getCreditCardParams(),
+      CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
+    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+  }
+
+  /**
+   * Get parameters for credit card submit calls.
+   *
+   * @return array
+   *   Credit card specific parameters.
+   */
+  protected function getCreditCardParams() {
+    return array(
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
+      'credit_card_number' => '411111111111111',
+    );
   }
 
 }

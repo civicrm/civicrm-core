@@ -139,7 +139,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @return object
    *   $note CRM_Core_BAO_Note object
    */
-  public static function &add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return CRM_Core_DAO::$_nullObject;

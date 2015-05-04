@@ -2515,6 +2515,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $tablesToTruncate = array(
       'civicrm_contribution',
       'civicrm_contribution_soft',
+      'civicrm_contribution_product',
       'civicrm_financial_trxn',
       'civicrm_financial_item',
       'civicrm_contribution_recur',
