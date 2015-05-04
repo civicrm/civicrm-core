@@ -1036,32 +1036,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function processCreditCard($submittedValues, $lineItem) {
     $contribution = FALSE;
 
-    $unsetParams = array(
-      'trxn_id',
-      'payment_instrument_id',
-      'contribution_status_id',
-      'cancel_date',
-      'cancel_reason',
-    );
-    foreach ($unsetParams as $key) {
-      if (isset($submittedValues[$key])) {
-        unset($submittedValues[$key]);
-      }
-    }
-    $isTest = ($this->_mode == 'test') ? 1 : 0;
+     $isTest = ($this->_mode == 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
+    // @todo - I don't believe this would ever BE set. I can't find anywhere in the code.
+    // It would be better to pass line item out to functions than $this->_lineItem as
+    // we don't know what is being changed where.
     if (empty($this->_lineItem) && !empty($lineItem)) {
       $this->_lineItem = $lineItem;
     }
 
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($submittedValues['payment_processor_id'],
-      $this->_mode
-    );
-
-    // Get the payment processor id as per mode.
-    $this->_params['payment_processor'] = $this->_paymentProcessor['id'];
+    $this->_paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
+    $this->_paymentProcessor = $this->_paymentObject->getPaymentProcessor();
 
     $params = $this->_params = $submittedValues;
+
+    // Mapping requiring documentation.
+    $this->_params['payment_processor'] = $submittedValues['payment_processor_id'];
 
     $now = date('YmdHis');
     $fields = array();
@@ -1118,7 +1108,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
 
-    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD && !isset($this->_paymentFields)) {
+    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD && isset($this->_paymentFields)) {
       if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
         $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
         $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
@@ -1614,7 +1604,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Credit Card Contribution.
     if ($this->_mode) {
-      $contribution = $this->processCreditCard($submittedValues, $lineItem);
+      $paramsSetByPaymentProcessingSubsystem = array(
+        'trxn_id',
+        'payment_instrument_id',
+        'contribution_status_id',
+        'cancel_date',
+        'cancel_reason',
+      );
+      foreach ($paramsSetByPaymentProcessingSubsystem as $key) {
+        if (isset($formValues[$key])) {
+          unset($formValues[$key]);
+        }
+      }
+      $contribution = $this->processCreditCard($formValues, $lineItem);
+      foreach ($paramsSetByPaymentProcessingSubsystem as $key) {
+        $formValues[$key] = $contribution->$key;
+      }
     }
     else {
       // Offline Contribution.
@@ -1744,7 +1749,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     }
 
-    if ($contribution->id && isset($formValues['product_name'][0])) {
+    if ($contribution->id && !empty($formValues['product_name'][0])) {
       CRM_Contribute_Form_AdditionalInfo::processPremium($submittedValues, $contribution->id,
         $this->_premiumID, $this->_options
       );
