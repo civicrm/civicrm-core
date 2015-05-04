@@ -1031,9 +1031,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param array $submittedValues
    * @param array $lineItem
    *
+   * @param int $contactID
+   *   Contact ID
+   *
    * @return bool|\CRM_Contribute_DAO_Contribution
    */
-  protected function processCreditCard($submittedValues, $lineItem) {
+  protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $contribution = FALSE;
 
      $isTest = ($this->_mode == 'test') ? 1 : 0;
@@ -1060,7 +1063,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
       list($this->userDisplayName,
         $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       $this->assign('displayName', $this->userDisplayName);
     }
 
@@ -1092,10 +1095,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       unset($params['source']);
     }
     CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
-      $this->_contactID,
+      $contactID,
       NULL, NULL,
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $this->_contactID,
+        $contactID,
         'contact_type'
       )
     );
@@ -1149,7 +1152,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
     $paymentParams = $this->_params;
-    $paymentParams['contactID'] = $this->_contactID;
+    $paymentParams['contactID'] = $contactID;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -1180,7 +1183,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
         NULL,
-        $this->_contactID,
+        $contactID,
         $financialType,
         TRUE,
         FALSE,
@@ -1203,7 +1206,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $message = ts("Payment Processor Error message") . $e->getMessage();
         $this->cleanupDBAfterPaymentFailure($paymentParams, $message);
         // Set the contribution mode.
-        $urlParams = "action=add&cid={$this->_contactID}";
+        $urlParams = "action=add&cid={$contactID}";
         if ($this->_mode) {
           $urlParams .= "&mode={$this->_mode}";
         }
@@ -1259,22 +1262,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_id,
       'Contribution'
     );
+
     if (empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
         $result,
-        $this->_contactID,
+        $contactID,
         $financialType,
         FALSE, FALSE,
         $isTest,
-        $this->_lineItem
+        $lineItem
       );
     }
 
     // Send receipt mail.
     if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
-      $this->_params['contact_id'] = $this->_contactID;
+      $this->_params['contact_id'] = $contactID;
       $this->_params['contribution_id'] = $contribution->id;
       if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE)) {
         $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
@@ -1614,7 +1618,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           unset($formValues[$key]);
         }
       }
-      $contribution = $this->processCreditCard($formValues, $lineItem);
+      $contribution = $this->processCreditCard($formValues, $lineItem, $this->_contactID);
       foreach ($paramsSetByPaymentProcessingSubsystem as $key) {
         $formValues[$key] = $contribution->$key;
       }

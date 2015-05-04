@@ -185,6 +185,31 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function on the contribution page.
    */
+  public function testSubmitCreditCardInvalidExpiry() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
+      'credit_card_number' => '411111111111111',
+    ), CRM_Core_Action::ADD,
+    'live');
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $lineItem = $this->callAPISuccessGetSingle('line_item', array());
+    $this->assertEquals('50.00', $lineItem['unit_price']);
+    $this->assertEquals('50.00', $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(1, $lineItem['financial_type_id']);
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
     require_once 'CiviTest/CiviMailUtils.php';
