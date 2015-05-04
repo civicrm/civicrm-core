@@ -1375,7 +1375,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           TRUE,
           FALSE,
           $isTest,
-          $lineItems
+          $lineItems,
+          $this->_bltID
         );
 
         //create new soft-credit record, CRM-13981

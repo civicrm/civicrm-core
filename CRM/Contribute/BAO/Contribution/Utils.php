@@ -120,7 +120,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contributionType,
         TRUE, TRUE,
         $isTest,
-        $lineItems
+        $lineItems,
+        $form->_bltID
       );
 
       if ($contribution) {
@@ -240,7 +241,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $contributionType,
           TRUE, TRUE,
           $isTest,
-          $lineItems
+          $lineItems,
+          $form->_bltID
         );
 
         // restore cached values (part of fix for CRM-14354)
@@ -320,7 +322,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $contactID, $contributionType,
           $pending, TRUE,
           $isTest,
-          $lineItems
+          $lineItems,
+          $form->_bltID
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
