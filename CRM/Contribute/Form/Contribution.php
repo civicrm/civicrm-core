@@ -1034,7 +1034,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return bool|\CRM_Contribute_DAO_Contribution
    */
   protected function processCreditCard($submittedValues, $lineItem) {
-    $sendReceipt = $contribution = FALSE;
+    $contribution = FALSE;
 
     $unsetParams = array(
       'trxn_id',
@@ -1054,16 +1054,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_lineItem = $lineItem;
     }
 
-    //Get the require fields value only.
-    $params = $this->_params = $submittedValues;
-
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor_id'],
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($submittedValues['payment_processor_id'],
       $this->_mode
     );
 
     // Get the payment processor id as per mode.
-    $this->_params['payment_processor'] = $params['payment_processor_id']
-      = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $this->_params['payment_processor'] = $this->_paymentProcessor['id'];
+
+    $params = $this->_params = $submittedValues;
 
     $now = date('YmdHis');
     $fields = array();
@@ -1090,10 +1088,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
     $fields["address_name-{$this->_bltID}"] = 1;
-    $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $this->_contactID,
-      'contact_type'
-    );
 
     $nameFields = array('first_name', 'middle_name', 'last_name');
     foreach ($nameFields as $name) {
@@ -1107,10 +1101,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($params['source'])) {
       unset($params['source']);
     }
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
+    CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
       $this->_contactID,
       NULL, NULL,
-      $ctype
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+        $this->_contactID,
+        'contact_type'
+      )
     );
 
     // add all the additional payment params we need
@@ -1120,14 +1117,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
-    $legacyCreditCardExpiryCheck = FALSE;
+
     if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD && !isset($this->_paymentFields)) {
-      $legacyCreditCardExpiryCheck = TRUE;
+      if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
+        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      }
     }
-    if ($legacyCreditCardExpiryCheck || in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-    }
+
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
     $this->_params['amount_level'] = 0;
@@ -1291,16 +1288,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
       $this->_params['contact_id'] = $this->_contactID;
       $this->_params['contribution_id'] = $contribution->id;
-      $sendReceipt = CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE);
-    }
-
-    if ($contribution->id) {
-      array_unshift($this->statusMessage, ts('The contribution record has been processed.'));
-      if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
+      if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE)) {
         $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
       }
-      $this->statusMessageTitle = ts('Complete');
     }
+
     return $contribution;
   }
 
