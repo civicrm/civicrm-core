@@ -52,7 +52,7 @@ class System {
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
 
-        $this->cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
+        $this->cache[$id] = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
       }
     }
     return $this->cache[$id];
