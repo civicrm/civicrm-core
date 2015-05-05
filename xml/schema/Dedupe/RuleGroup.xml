@@ -46,7 +46,7 @@
     <name>level</name>
     <type>enum</type>
     <values>Strict, Fuzzy</values>
-    <comment>Whether the rule should be used for cases where strict maching of the given contact type is required or a fuzzy one</comment>
+    <comment>Whether the rule should be used for cases where strict matching of the given contact type is required or a fuzzy one</comment>
     <add>2.1</add>
     <drop>4.3</drop>
   </field>

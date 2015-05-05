@@ -75,13 +75,13 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     // fill in decision Date
     $this->webtestFillDate('decision_date');
 
-    // fill in money transfered date
+    // fill in money transferred date
     $this->webtestFillDate('money_transfer_date');
 
     // fill in grant due Date
     $this->webtestFillDate('grant_due_date');
 
-    // check  grant report recieved.
+    // check  grant report received.
     $this->check("grant_report_received");
 
     // grant  note

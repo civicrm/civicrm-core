@@ -412,7 +412,7 @@ class CRM_Core_CodeGen_Specification {
         'nameColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
-        // callback funtion incase of static arrays
+        // callback function incase of static arrays
         'callback',
         // Path to options edit form
         'optionEditPath',
@@ -575,7 +575,7 @@ class CRM_Core_CodeGen_Specification {
       'key' => trim($this->value('key', $foreignXML)),
       'import' => $this->value('import', $foreignXML, FALSE),
       'export' => $this->value('import', $foreignXML, FALSE),
-      // we do this matching in a seperate phase (resolveForeignKeys)
+      // we do this matching in a separate phase (resolveForeignKeys)
       'className' => NULL,
       'onDelete' => $this->value('onDelete', $foreignXML, FALSE),
     );

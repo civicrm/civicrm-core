@@ -434,7 +434,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $className::endPostProcess($this, $params);
     }
 
-    // 5. auto populate activites
+    // 5. auto populate activities
 
     // 6. set status
     CRM_Core_Session::setStatus($params['statusMsg'], ts('Saved'), 'success');

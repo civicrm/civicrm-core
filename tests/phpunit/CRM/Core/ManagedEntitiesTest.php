@@ -377,7 +377,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
-    // then destory module; note that decls go away
+    // then destroy module; note that decls go away
     unset($this->modules['one']);
     $me = new CRM_Core_ManagedEntities($this->modules, array());
     $me->reconcile();

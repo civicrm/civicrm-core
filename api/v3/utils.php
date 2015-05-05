@@ -1183,7 +1183,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @param string $daoName
  * @param bool $return
  *
- * @daoName string DAO to check params agains
+ * @daoName string DAO to check params against
  *
  * @return bool
  *   Should the missing fields be returned as an array (core error created as default)
@@ -1297,7 +1297,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
     return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
   }
   elseif (is_a($bao, 'CRM_Core_Error')) {
-    //some wierd circular thing means the error takes itself as an argument
+    //some weird circular thing means the error takes itself as an argument
     $msg = $bao->getMessages($bao);
     // the api deals with entities on a one-by-one basis. However, the contribution bao pushes entities
     // onto the error object - presumably because the contribution import is not handling multiple errors correctly

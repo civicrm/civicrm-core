@@ -792,8 +792,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $ids = implode(',', $priceFieldIDS);
 
         $count = CRM_Price_BAO_PriceSet::getMembershipCount($ids);
-        foreach ($count as $id => $occurance) {
-          if ($occurance > 1) {
+        foreach ($count as $id => $occurrence) {
+          if ($occurrence > 1) {
             $errors['_qf_default'] = ts('Select at most one option associated with the same membership type.');
           }
         }
@@ -1358,7 +1358,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
       // CRM-7137 -for recurring membership,
-      // we do need contribution and recuring records.
+      // we do need contribution and recurring records.
       $result = NULL;
       if (!empty($paymentParams['is_recur'])) {
         $contributionType = new CRM_Financial_DAO_FinancialType();

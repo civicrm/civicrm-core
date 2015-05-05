@@ -2922,7 +2922,7 @@ WHERE  contribution_id = %1 ";
         $params['entity_id'] = $financialTxn->id;
       }
     }
-    // record line items and finacial items
+    // record line items and financial items
     if (empty($params['skipLineItem'])) {
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }

@@ -278,7 +278,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
    * support id in API but in this case the underlying tables are crying out for a restructure
-   * & it just doesn't make sense, on the otherhand Event need id to be existant as pseudo property
+   * & it just doesn't make sense, on the otherhand Event need id to be existent as pseudo property
    * is been associated with it, so we need to bypass for get api otherwise it will through pseudo_match validation
    *
    * @param bool $sequential
@@ -1018,7 +1018,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
+    $this->markTestIncomplete("fixing this test to test the api functions fails on numerous tests
       which will either create a completely blank entity (batch, participant status) or
       have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
     return;

@@ -84,7 +84,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Set up variables to build the form.
    *
    * @return void
-   * @acess protected
    */
   public function preProcess() {
     $this->_id = $this->get('id');
