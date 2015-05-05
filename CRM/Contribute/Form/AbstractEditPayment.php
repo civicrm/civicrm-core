@@ -74,6 +74,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var array
    */
   protected $_paymentProcessors = array();
+
+  /**
+   * Instance of the payment processor object.
+   *
+   * @var CRM_Core_Payment
+   */
+  protected $_paymentObject;
+
   /**
    * The id of the contribution that we are processing.
    *

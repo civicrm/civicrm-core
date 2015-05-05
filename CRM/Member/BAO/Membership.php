@@ -2260,7 +2260,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $pending,
       TRUE,
       $isTest,
-      $lineItems
+      $lineItems,
+      $form->_bltID
     );
     return $membershipContribution;
   }

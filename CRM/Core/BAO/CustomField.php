@@ -2234,7 +2234,8 @@ ORDER BY html_type";
 
   /**
    * @param array $params
-   * @param $customFields
+   * @param array $customFields
+   *   Unused parameter
    * @param int $entityID
    * @param $customFieldExtends
    * @param bool $inline
@@ -2243,7 +2244,7 @@ ORDER BY html_type";
    */
   public static function postProcess(
     &$params,
-    &$customFields,
+    $customFields,
     $entityID,
     $customFieldExtends,
     $inline = FALSE
