@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * This class generates form components for processing a contribution.
  */
@@ -990,10 +992,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ));
       return;
     }
-
-    // Get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
-    $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
+
+    try {
+      // Get the submitted form values.
+      $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
+    }
+    catch (PaymentProcessorException $e) {
+      // Set the contribution mode.
+      $urlParams = "action=add&cid={$this->_contactID}";
+      if ($this->_mode) {
+        $urlParams .= "&mode={$this->_mode}";
+      }
+      if (!empty($this->_ppID)) {
+        $urlParams .= "&context=pledge&ppid={$this->_ppID}";
+      }
+
+      CRM_Core_Error::statusBounce($e->getMessage(), $urlParams, ts('Payment Processor Error'));
+    }
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
     if ($this->_context == 'standalone') {
@@ -1035,6 +1051,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *   Contact ID
    *
    * @return bool|\CRM_Contribute_DAO_Contribution
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $contribution = FALSE;
@@ -1050,6 +1068,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->_paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
     $this->_paymentProcessor = $this->_paymentObject->getPaymentProcessor();
+
+    // Set source if not set
+    if (empty($submittedValues['source'])) {
+      $userID = CRM_Core_Session::singleton()->get('userID');
+      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
+        'sort_name'
+      );
+      $submittedValues['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
+    }
 
     $params = $this->_params = $submittedValues;
 
@@ -1175,53 +1202,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentParams['receive_date'] = $this->_params['receive_date'];
     }
 
-    // For recurring contribution, create Contribution Record first.
-    // Contribution ID, Recurring ID and Contact ID needed
-    // When we get a callback from the payment processor, CRM-7115
-
-    if (!empty($paymentParams['is_recur'])) {
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
-        $this->_params,
-        NULL,
-        $contactID,
-        $financialType,
-        TRUE,
-        FALSE,
-        $isTest,
-        $this->_lineItem,
-        $this->_bltID
-      );
-      $paymentParams['contributionID'] = $contribution->id;
-      $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
-      $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-      $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-    }
-    $result = array();
-    if ($paymentParams['amount'] > 0.0) {
-      // force a re-get of the payment processor in case the form changed it, CRM-7179
-      // NOTE - I expect this is not obsolete.
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
-      try {
-        $result = $payment->doPayment($paymentParams, 'contribute');
-      }
-      catch (CRM_Core_Exception $e) {
-        $message = ts("Payment Processor Error message") . $e->getMessage();
-        $this->cleanupDBAfterPaymentFailure($paymentParams, $message);
-        // Set the contribution mode.
-        $urlParams = "action=add&cid={$contactID}";
-        if ($this->_mode) {
-          $urlParams .= "&mode={$this->_mode}";
-        }
-        if (!empty($this->_ppID)) {
-          $urlParams .= "&context=pledge&ppid={$this->_ppID}";
-        }
-
-        CRM_Core_Error::statusBounce($message, $urlParams, ts('Payment Processor Error'));
-      }
-    }
-
-    $this->_params = array_merge($this->_params, $result);
-
     $this->_params['receive_date'] = $now;
 
     if (!empty($this->_params['is_email_receipt'])) {
@@ -1234,7 +1214,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->set('params', $this->_params);
-    $this->assign('trxn_id', $result['trxn_id']);
+
     $this->assign('receive_date', $this->_params['receive_date']);
 
     // Result has all the stuff we need
@@ -1244,28 +1224,56 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
 
-    // Set source if not set
-    if (empty($this->_params['source'])) {
-      $userID = CRM_Core_Session::singleton()->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
-    }
+    $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
+      $this->_params,
+      NULL,
+      $contactID,
+      $financialType,
+      TRUE,
+      FALSE,
+      $isTest,
+      $lineItem,
+      $this->_bltID
+    );
 
-    if (empty($paymentParams['is_recur'])) {
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
-        $this->_params,
-        $result,
-        $contactID,
-        $financialType,
-        FALSE, FALSE,
-        $isTest,
-        $lineItem,
-        $this->_bltID
-      );
-    }
+    $paymentParams['contributionID'] = $contribution->id;
+    $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
+    $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
+    $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
 
+    if ($paymentParams['amount'] > 0.0) {
+      // force a re-get of the payment processor in case the form changed it, CRM-7179
+      // NOTE - I expect this is not obsolete.
+      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      try {
+        $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+        $result = $payment->doPayment($paymentParams, 'contribute');
+        $this->assign('trxn_id', $result['trxn_id']);
+        $contribution->trxn_id = $result['trxn_id'];
+        /* Our scenarios here are
+         *  1) the payment failed & an Exception should have been thrown
+         *  2) the payment succeeded but the payment is not immediate (for example a recurring payment
+         *     with a delayed start)
+         *  3) the payment succeeded with an immediate payment.
+         *
+         * The doPayment function ensures that contribution_status_id is always set
+         * as historically we have had to guess from the context - ie doDirectPayment
+         * = error or success, unless it is a recurring contribution in which case it is pending.
+         */
+        if (!isset($result['contribution_status_id']) || $result['contribution_status_id'] ==
+          array_search('Completed', $statuses)) {
+          civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => $result['trxn_id']));
+        }
+        else {
+          // Save the trxn_id.
+          $contribution->save();
+        }
+      }
+      catch (PaymentProcessorException $e) {
+        CRM_Contribute_BAO_Contribution::failPayment($contribution->id, $e->getMessage());
+        throw new PaymentProcessorException($e->getMessage());
+      }
+    }
     // Send receipt mail.
     if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
@@ -1277,32 +1285,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     return $contribution;
-  }
-
-  /**
-   * Clean up DB after payment fails.
-   *
-   * This function removes related DB entries. Note that it has been agreed in principle,
-   * but not implemented, that contributions should be retained as 'Failed' rather than
-   * deleted.
-   *
-   * @todo it doesn't clean up line items.
-   *
-   * @param array $paymentParams
-   * @param string $message
-   */
-  public function cleanupDBAfterPaymentFailure($paymentParams, $message) {
-    // Make sure to cleanup db for recurring case.
-    if (!empty($paymentParams['contributionID'])) {
-      CRM_Core_Error::debug_log_message($message .
-        "contact id={$this->_contactID} (deleting contribution {$paymentParams['contributionID']}");
-      CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-    }
-    if (!empty($paymentParams['contributionRecurID'])) {
-      CRM_Core_Error::debug_log_message($message .
-        "contact id={$this->_contactID} (deleting recurring contribution {$paymentParams['contributionRecurID']}");
-      CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-    }
   }
 
   /**
