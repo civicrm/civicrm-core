@@ -74,7 +74,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     self::preProcessPaymentOptions($this);
 
-    // Make the contributionPageID avilable to the template
+    // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', CRM_Utils_Array::value('is_share', $this->_values));
     $this->assign('isConfirmEnabled', CRM_Utils_Array::value('is_confirm_enabled', $this->_values));
@@ -940,8 +940,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $priceFieldIDS['id'] = $fields['priceSetId'];
           $self->set('memberPriceFieldIDS', $priceFieldIDS);
           $count = CRM_Price_BAO_PriceSet::getMembershipCount($ids);
-          foreach ($count as $id => $occurance) {
-            if ($occurance > 1) {
+          foreach ($count as $id => $occurrence) {
+            if ($occurrence > 1) {
               $errors['_qf_default'] = ts('You have selected multiple memberships for the same organization or entity. Please review your selections and choose only one membership per entity. Contact the site administrator if you need assistance.');
             }
           }

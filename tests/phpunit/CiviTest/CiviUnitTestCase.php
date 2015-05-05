@@ -2264,7 +2264,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $description
    *   Descriptive text for the example file.
    * @param string $exampleName
-   *   Name for this example file (CamelCase) - if ommitted the action name will be substituted.
+   *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
   private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
@@ -2552,7 +2552,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity
    * @param array $params
-   *   Params array to check agains.
+   *   Params array to check against.
    * @param int $id
    *   Id of the entity concerned.
    * @param string $entity
@@ -3060,7 +3060,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @todo this isn't a great place to put it - but really it belongs on a class that extends
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
-   * & the best protection agains that is the functions this class affords
+   * & the best protection against that is the functions this class affords
    * @param array $params
    * @return int $result['id'] payment processor id
    */

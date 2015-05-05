@@ -1235,7 +1235,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   of key value consist of address blocks.
    *
    * @return array
-   *   as array of sucess/fails for each address block
+   *   as array of success/fails for each address block
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();

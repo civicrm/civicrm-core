@@ -75,7 +75,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
@@ -133,8 +133,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $occurrences = $financialType->findReferences();
     if ($occurrences) {
       $tables = array();
-      foreach ($occurrences as $occurence) {
-        $className = get_class($occurence);
+      foreach ($occurrences as $occurrence) {
+        $className = get_class($occurrence);
         if (!in_array($className, $ignoreTables)) {
           $tables[] = $className;
         }

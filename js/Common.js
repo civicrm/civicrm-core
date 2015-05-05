@@ -1340,7 +1340,7 @@ CRM.strings = CRM.strings || {};
   /**
    * Clientside currency formatting
    * @param number value
-   * @param [optional] boolean onlyNumber - if true, we return formated amount without currency sign
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */

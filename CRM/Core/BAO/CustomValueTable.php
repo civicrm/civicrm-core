@@ -616,7 +616,7 @@ AND    cf.id IN ( $fieldIDList )
    * To get the values of custom fields with IDs 13 and 43 for contact ID 1327, use:
    * $params = array( 'entityID' => 1327, 'custom_13' => 1, 'custom_43' => 1 );
    *
-   * Entity Type will be infered by the custom fields you request
+   * Entity Type will be inferred by the custom fields you request
    * Specify $params['entityType'] if you do not supply any custom fields to return
    * and entity type is other than Contact
    *

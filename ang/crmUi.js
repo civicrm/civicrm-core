@@ -6,7 +6,7 @@
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
-    // WISHLIST: crmCollapsed should support two-way/continous binding
+    // WISHLIST: crmCollapsed should support two-way/continuous binding
     .directive('crmUiAccordion', function() {
       return {
         scope: {

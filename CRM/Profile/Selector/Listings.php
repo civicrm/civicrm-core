@@ -42,7 +42,7 @@
 class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * Array of supported links, currenly view and edit
+   * Array of supported links, currently view and edit
    *
    * @var array
    */

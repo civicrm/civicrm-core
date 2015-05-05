@@ -403,7 +403,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       case 'civicrm_uf_match':
         // normal queries won't work for uf_match since that will lead to violation of unique constraint,
-        // failing to meet intended result. Therefore we introduce this additonal query:
+        // failing to meet intended result. Therefore we introduce this additional query:
         $sqls[] = "DELETE FROM civicrm_uf_match WHERE contact_id = {$mainId}";
         break;
     }

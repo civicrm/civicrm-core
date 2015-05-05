@@ -208,10 +208,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $tags = array();
     }
     // We need to build a list of tags ordered by hierarchy and sorted by
-    // name. The heirarchy will be communicated by an accumulation of
+    // name. The hierarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
-    // query and build the heirarchy with the algorithm below.
+    // query and build the hierarchy with the algorithm below.
     $args = array(1 => array('%' . $usedFor . '%', 'String'));
     $query = "SELECT id, name, parent_id, is_tagset, is_selectable
                   FROM civicrm_tag
@@ -323,7 +323,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    */
   public static function del($id) {
     // since this is a destructive operation, lets make sure
-    // id is a postive number
+    // id is a positive number
     CRM_Utils_Type::validate($id, 'Positive');
 
     // delete all crm_entity_tag records with the selected tag id

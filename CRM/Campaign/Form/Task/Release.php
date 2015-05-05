@@ -154,7 +154,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       }
     }
 
-    //set survey activites as deleted = true.
+    //set survey activities as deleted = true.
     if (!empty($deleteActivityIds)) {
       $query = 'UPDATE civicrm_activity SET is_deleted = 1 WHERE id IN ( ' . implode(', ', $deleteActivityIds) . ' )';
       CRM_Core_DAO::executeQuery($query);

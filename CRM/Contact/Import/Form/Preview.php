@@ -306,7 +306,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $importJob->setFormVariables($this);
 
-    // check if there is any error occured
+    // check if there is any error occurred
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
     $errorMessage = array();
@@ -571,7 +571,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // check if there is any error occurred
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();

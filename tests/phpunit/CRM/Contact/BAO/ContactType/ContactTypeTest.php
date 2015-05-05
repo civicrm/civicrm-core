@@ -168,7 +168,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $params = array(
       'label' => 'subType',
       'name' => 'subType',
-      // non existant
+      // non existent
       'parent_id' => 100,
       'is_active' => 1,
     );

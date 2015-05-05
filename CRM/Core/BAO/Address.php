@@ -206,7 +206,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    */
   public static function fixAddress(&$params) {
     if (!empty($params['billing_street_address'])) {
-      //Check address is comming from online contribution / registration page
+      //Check address is coming from online contribution / registration page
       //Fixed :CRM-5076
       $billing = array(
         'street_address' => 'billing_street_address',

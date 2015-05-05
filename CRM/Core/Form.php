@@ -488,7 +488,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // call the form hook
-    // also call the hook function so any modules can set thier own custom defaults
+    // also call the hook function so any modules can set their own custom defaults
     // the user can do both the form and set default values with this hook
     CRM_Utils_Hook::buildForm(get_class($this), $this);
 
@@ -1252,7 +1252,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
-    // TODO: refactor switch statement, to seperate methods.
+    // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
       case 'Text':
       case 'Link':

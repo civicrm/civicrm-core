@@ -335,7 +335,7 @@ class CRM_Contact_Page_AJAX {
     $config->userSystem->checkUserNameEmailExists($params, $errors);
 
     if (isset($errors['cms_name']) || isset($errors['name'])) {
-      //user name is not availble
+      //user name is not available
       $user = array('name' => 'no');
       CRM_Utils_JSON::output($user);
     }
@@ -383,7 +383,7 @@ class CRM_Contact_Page_AJAX {
       else {
         $cid = CRM_Utils_Array::value('cid', $_GET);
         if ($cid) {
-          //check cid for interger
+          //check cid for integer
           $contIDS = explode(',', $cid);
           foreach ($contIDS as $contID) {
             CRM_Utils_Type::escape($contID, 'Integer');
@@ -478,7 +478,7 @@ LIMIT {$offset}, {$rowCount}
     else {
       $cid = CRM_Utils_Array::value('cid', $_GET);
       if ($cid) {
-        //check cid for interger
+        //check cid for integer
         $contIDS = explode(',', $cid);
         foreach ($contIDS as $contID) {
           CRM_Utils_Type::escape($contID, 'Integer');

@@ -89,7 +89,7 @@ class CRM_Core_OptionGroup {
    * This function retrieves all the values for the specific option group by name
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
    * @param string $name
    *   name of the option group.
@@ -201,7 +201,7 @@ WHERE  v.option_group_id = g.id
    * This function retrieves all the values for the specific option group by id.
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
    * @param int $id
    *   id of the option group.
