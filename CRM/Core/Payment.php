@@ -509,7 +509,7 @@ abstract class CRM_Core_Payment {
     else {
       $result = $this->doDirectPayment($params, $component);
       if (is_array($result) && !isset($result['contribution_status_id'])) {
-        if ($params['is_recur']) {
+        if (!empty($params['is_recur'])) {
           // See comment block.
           $paymentParams['contribution_status_id'] = array_search('Pending', $statuses);
         }
