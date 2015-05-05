@@ -764,6 +764,21 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
+   * Update contribution to failed. In 4.7 CRM-16417 goes for a more complete approach
+   *
+   * @param $id
+   * @param $message
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function failContribution($id, $message) {
+    civicrm_api3('contribution', 'create', array('id' => $id, 'contribution_status_id' => 'Failed', 'source' => $message));
+    CRM_Core_Error::debug_log_message("Setting contribution status to failed for contribution id " . $id);
+    return TRUE;
+  }
+
+  /**
    * Check if there is a contribution with the same trxn_id or invoice_id
    *
    * @param array  $params (reference ) an assoc array of name/value pairs
