@@ -879,11 +879,7 @@ WHERE  id = %1";
     if (is_array($lineItem)) {
       foreach ($lineItem as $values) {
         $totalParticipant += $values['participant_count'];
-        if ($values['html_type'] == 'Text') {
-          $amount_level[] = $values['label'] . ' - ' . $values['qty'];
-          continue;
-        }
-        $amount_level[] = $values['label'];
+        $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
       }
     }
 
