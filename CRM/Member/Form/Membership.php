@@ -160,7 +160,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         if (count($cMemTypes) > 0) {
           $memberorgs = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($cMemTypes);
           $mems_by_org = array();
-          foreach ($contactMemberships as $memid => $mem) {
+          foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = CRM_Utils_Array::value($mem['membership_type_id'], $memberorgs);
             if (!empty($mem['membership_end_date'])) {
               $mem['membership_end_date'] = CRM_Utils_Date::customformat($mem['membership_end_date']);
@@ -313,6 +313,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       unset($defaults['record_contribution']);
     }
 
+    $subscriptionCancelled = FALSE;
     if (!empty($defaults['id'])) {
       $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id);
     }
@@ -792,7 +793,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $ids = implode(',', $priceFieldIDS);
 
         $count = CRM_Price_BAO_PriceSet::getMembershipCount($ids);
-        foreach ($count as $id => $occurrence) {
+        foreach ($count as $occurrence) {
           if ($occurrence > 1) {
             $errors['_qf_default'] = ts('Select at most one option associated with the same membership type.');
           }
@@ -1441,7 +1442,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           'start_date' => 'startDate',
           'end_date' => 'endDate',
         );
-        foreach ($memberDates as $dp => $dv) {
+        foreach ($memberDates as $dv) {
           $$dv = NULL;
           foreach ($this->_memTypeSelected as $memType) {
             $membershipTypeValues[$memType][$dv] = NULL;
@@ -1659,7 +1660,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
-
+    $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       //end date can be modified by hooks, so if end date is set then use it.
       $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
@@ -1775,6 +1776,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
 
     if ($form->_mode) {
+      $name = '';
       if (!empty($form->_params['billing_first_name'])) {
         $name = $form->_params['billing_first_name'];
       }
