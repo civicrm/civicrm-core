@@ -67,7 +67,7 @@
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <length>10</length>
     <add>4.3</add>
