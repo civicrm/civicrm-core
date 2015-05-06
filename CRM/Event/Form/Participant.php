@@ -1050,7 +1050,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       unset($params['amount']);
     }
     $params['register_date'] = CRM_Utils_Date::processDate($params['register_date'], $params['register_date_time']);
-    $params['receive_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $params));
+    $params['receive_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $params), CRM_Utils_Array::value('receive_date_time', $params));
     $params['contact_id'] = $this->_contactId;
 
     // overwrite actual payment amount if entered
