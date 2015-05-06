@@ -2049,9 +2049,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $partUpdateFeeAmt['id'] = $participantId;
     $getUpdatedLineItems = "SELECT *
 FROM civicrm_line_item
-WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)
-      ";
-    $getUpdatedLineItemsDAO =  CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
+    $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
     while ($getUpdatedLineItemsDAO->fetch()) {
       $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }
