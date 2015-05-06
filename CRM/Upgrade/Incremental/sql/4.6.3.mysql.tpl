@@ -3,3 +3,6 @@
 UPDATE civicrm_navigation
 SET permission = 'access CiviMail', permission_operator = ''
 WHERE name = 'New A/B Test' OR name = 'Manage A/B Tests';
+
+--CRM-16320
+{include file='../CRM/Upgrade/4.6.3.msg_template/civicrm_msg_template.tpl'}
