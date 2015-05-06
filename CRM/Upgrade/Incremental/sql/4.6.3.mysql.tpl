@@ -8,17 +8,18 @@ WHERE name = 'New A/B Test' OR name = 'Manage A/B Tests';
 {include file='../CRM/Upgrade/4.6.3.msg_template/civicrm_msg_template.tpl'}
 
 -- CRM-16452 Missing administrative divisions for Georgia
+SELECT @country_id := id from civicrm_country where name = 'Georgia' AND iso_code = 'GE';
 INSERT INTO civicrm_state_province (country_id, abbreviation, name)
   VALUES
-    (1081, "AB", "Abkhazia"),
-    (1081, "AJ", "Adjara"),
-    (1081, "TB", "Tbilisi"),
-    (1081, "GU", "Guria"),
-    (1081, "IM", "Imereti"),
-    (1081, "KA", "Kakheti"),
-    (1081, "KK", "Kvemo Kartli"),
-    (1081, "MM", "Mtskheta-Mtianeti"),
-    (1081, "RL", "Racha-Lechkhumi and Kvemo Svaneti"),
-    (1081, "SZ", "Samegrelo-Zemo Svaneti"),
-    (1081, "SJ", "Samtskhe-Javakheti"),
-    (1081, "SK", "Shida Kartli");
+    (@country_id, "AB", "Abkhazia"),
+    (@country_id, "AJ", "Adjara"),
+    (@country_id, "TB", "Tbilisi"),
+    (@country_id, "GU", "Guria"),
+    (@country_id, "IM", "Imereti"),
+    (@country_id, "KA", "Kakheti"),
+    (@country_id, "KK", "Kvemo Kartli"),
+    (@country_id, "MM", "Mtskheta-Mtianeti"),
+    (@country_id, "RL", "Racha-Lechkhumi and Kvemo Svaneti"),
+    (@country_id, "SZ", "Samegrelo-Zemo Svaneti"),
+    (@country_id, "SJ", "Samtskhe-Javakheti"),
+    (@country_id, "SK", "Shida Kartli");
