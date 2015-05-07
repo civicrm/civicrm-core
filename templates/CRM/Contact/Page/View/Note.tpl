@@ -202,36 +202,16 @@
 {* show browse table for any action *}
 <div id="notes">
     {strip}
-    {include file="CRM/common/jsortable.tpl"}
-
-    <script type="text/javascript">
-    {literal}
-      CRM.$(function($) {
-        var tabId = $('.dataTable').attr('id');
-
-        $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
-          "fn": function () {
-            $('#'+ tabId +' tr').each( function() {
-              drawCommentRows(this.id)
-            });
-          },
-          "sName": "user"
-        } );
-      });
-
-    {/literal}
-    </script>
-
-        <table id="options" class="display">
+        <table id="options" class="display crm-sortable" data-order='[[3,"desc"]]'>
         <thead>
         <tr>
-          <th></th>
+          <th data-orderable="false"></th>
           <th>{ts}Note{/ts}</th>
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Date{/ts}</th>
           <th>{ts}Created By{/ts}</th>
-          <th>{ts}Attachment(s){/ts}</th>
-          <th></th>
+          <th data-orderable="false">{ts}Attachment(s){/ts}</th>
+          <th data-orderable="false"></th>
         </tr>
         </thead>
 
