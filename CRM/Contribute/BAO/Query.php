@@ -330,7 +330,6 @@ class CRM_Contribute_BAO_Query {
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'contribution_page_id':
-      case 'contribution_status_id':
       case 'contribution_id':
       case 'contribution_currency_type':
       case 'contribution_currency':
