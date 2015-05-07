@@ -662,6 +662,38 @@ CRM.strings = CRM.strings || {};
     });
   };
 
+  $.fn.crmAjaxTable = function() {
+    return $(this).each(function() {
+      //Declare the defaults for DataTables
+      var defaults = {
+        "processing": true,
+        "serverSide": true,
+        "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "pageLength": 25,
+        "drawCallback": function(settings) {
+          //Add data attributes to cells
+          $('thead th', settings.nTable).each( function( index ) {
+            $.each(this.attributes, function() {
+              if(this.name.match("^cell-")) {
+                var cellAttr = this.name.substring(5);
+                var cellValue = this.value;
+                $('tbody tr', settings.nTable).each( function() {
+                  $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
+                });
+              }
+            });
+          });
+          //Reload table after draw
+          $(settings.nTable).trigger('crmLoad');
+        }
+      };
+      //Include any table specific data
+      var settings = $.extend(true, defaults, $(this).data('table'));
+      //Make the DataTables call
+      $(this).DataTable(settings);
+    });
+  };
+
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -824,6 +856,8 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('table.crm-sortable', e.target).DataTable();
+      $('table.crm-ajax-table', e.target).crmAjaxTable();
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }

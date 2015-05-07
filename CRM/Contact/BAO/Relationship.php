@@ -1933,7 +1933,7 @@ AND cc.sort_name LIKE '%$name%'";
           $relationshipStatus, 0, 1, 0, NULL, NULL, $permissionedContacts);
       }
       else {
-        // FIX ME: we cannot directly determine total permissioned relationship, hence re-fire query
+        // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
         $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
           $relationshipStatus,
           0, 0, 0,
@@ -1944,17 +1944,28 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
+        $relationship = array();
+
+        $relationship['DT_RowClass'] = 'crm-entity';
+        if ($values['is_active'] == 0) {
+          $relationship['DT_RowClass'] .= ' disabled';
+        }
+
+        $relationship['DT_RowData'] = array();
+        $relationship['DT_RowData']['entity'] = 'relationship';
+        $relationship['DT_RowData']['id'] = $values['id'];
+
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
           FALSE,
           $values['cid']
         );
-        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
+        $relationship['sort_name'] = $icon . ' ' . CRM_Utils_System::href(
             $values['name'],
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+        $relationship['relation'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -1963,32 +1974,38 @@ AND cc.sort_name LIKE '%$name%'";
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
           }
         }
 
         if (!empty($values['description'])) {
-          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+          $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
         }
 
-        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
-        $contactRelationships[$relationshipId]['city'] = $values['city'];
-        $contactRelationships[$relationshipId]['state'] = $values['state'];
-        $contactRelationships[$relationshipId]['email'] = $values['email'];
-        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
-        $contactRelationships[$relationshipId]['links'] = $values['action'];
-        $contactRelationships[$relationshipId]['id'] = $values['id'];
-        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+        $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $relationship['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $relationship['city'] = $values['city'];
+        $relationship['state'] = $values['state'];
+        $relationship['email'] = $values['email'];
+        $relationship['phone'] = $values['phone'];
+        $relationship['links'] = $values['action'];
+
+        array_push($contactRelationships, $relationship);
       }
     }
-    return $contactRelationships;
+
+    $relationshipsDT = array();
+    $relationshipsDT['data'] = $contactRelationships;
+    $relationshipsDT['recordsTotal'] = $params['total'];
+    $relationshipsDT['recordsFiltered'] = $params['total'];
+
+    return $relationshipsDT;
   }
 
 }
