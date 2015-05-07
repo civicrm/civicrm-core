@@ -150,7 +150,7 @@
     }
     else if (!input.hasClass('hasDatepicker')) {
       input.addClass('dateplugin').datepicker({
-        dateFormat: 'yymmdd',
+        dateFormat: 'yy-mm-dd',
         changeMonth: true,
         changeYear: true,
         yearRange: '-100:+20'
