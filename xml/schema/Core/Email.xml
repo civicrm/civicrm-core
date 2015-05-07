@@ -60,7 +60,7 @@
     <length>254</length>
     <html>
       <type>Text</type>
-      <size>MEDIUM</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/e.?mail/i</headerPattern>

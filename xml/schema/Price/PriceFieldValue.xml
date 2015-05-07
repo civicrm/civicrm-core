@@ -74,7 +74,7 @@
     <length>512</length>
     <html>
       <type>Text</type>
-      <size>EIGHT</size>
+      <size>8</size>
     </html>
     <required>true</required>
     <comment>Price field option amount</comment>
