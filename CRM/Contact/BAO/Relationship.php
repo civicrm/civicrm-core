@@ -618,7 +618,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $sharedContact->id = $relationship->contact_id_a;
         $sharedContact->find(TRUE);
 
-        if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
+        // CRM-15881 UPDATES
+        // CRM-15881: changed FROM relationship->relationship_type_id == 4 TO relationship->relationship_type_id == 5.
+        // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
+        if ($relationship->relationship_type_id == 5 && $relationship->contact_id_b == $sharedContact->employer_id) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }
       }
@@ -1450,6 +1453,21 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
+    // START CRM-15829 UPDATES
+    // acceptable statuses: one must consider active as well as pending, therefore get an array of status IDs of memebrships statuses that can be added to a contact.
+    $params = array();
+
+    $membershipStatus = new CRM_Member_DAO_MembershipStatus();
+    $membershipStatus->copyValues($params);
+    $membershipStatus->find();
+    while ($membershipStatus->fetch()) {
+      if ($membershipStatus->is_current_member == '1'
+        || $membershipStatus->id == '5'
+        ) {
+        $membershipStatusRecordIds[] = $membershipStatus->id;
+      }
+    }
+
     // Now get the active memberships for all the contacts.
     // If contact have any valid membership(s), then add it to
     // 'values' array.
@@ -1457,11 +1475,22 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $memParams = array('contact_id' => $cid);
       $memberships = array();
 
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active, TRUE);
+      // START CRM-15829 UPDATES
+      // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE);
 
       if (empty($memberships)) {
         continue;
       }
+
+      // START CRM-15829 UPDATES
+      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1456
+      foreach ($memberships as $key => $membership) {
+        if (in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
+          $filteredMemberships[$key] = $membership;
+        }
+      }
+      $memberships = $filteredMemberships;
 
       //get ownerMembershipIds for related Membership
       //this is to handle memberships being deleted and recreated
