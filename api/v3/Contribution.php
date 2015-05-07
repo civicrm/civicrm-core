@@ -445,8 +445,9 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
     $contribution->contribution_status_id = $params['contribution_status_id'];
     $contribution->receive_date = $params['receive_date'];
-    // Have not set trxn_id to required but an e-notice if not provided seems appropriate.
-    $input['trxn_id'] = $params['trxn_id'];
+
+    $passThroughParams = array('trxn_id', 'total_amount', 'campaign_id', 'fee_amount');
+    $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
     $params = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
   }
@@ -480,7 +481,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   }
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
-  $input['amount'] = $contribution->total_amount;
+  $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
+
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
   }

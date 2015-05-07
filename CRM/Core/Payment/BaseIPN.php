@@ -69,12 +69,18 @@ class CRM_Core_Payment_BaseIPN {
    * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
    * and didn't update your IPN URL.
    *
-   * @param array $input interpreted values from the values returned through the IPN
-   * @param array $ids more interpreted values (ids) from the values returned through the IPN
-   * @param array $objects an empty array that will be populated with loaded object
-   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
-   * @param integer $paymentProcessorID Id of the payment processor ID in use
-   * @return boolean
+   * @param array $input
+   *   Interpreted values from the values returned through the IPN.
+   * @param array $ids
+   *   More interpreted values (ids) from the values returned through the IPN.
+   * @param array $objects
+   *   An empty array that will be populated with loaded object.
+   * @param bool $required
+   *   Boolean Return FALSE if the relevant objects don't exist.
+   * @param int $paymentProcessorID
+   *   Id of the payment processor ID in use.
+   *
+   * @return bool
    */
   function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
@@ -116,7 +122,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Load objects related to contribution
+   * Load objects related to contribution.
    *
    * @input array information from Payment processor
    * @param array $ids
@@ -519,9 +525,29 @@ LIMIT 1;";
     $isNewContribution = FALSE;
     if (empty($contribution->id)) {
       $isNewContribution = TRUE;
+      if (!empty($input['amount']) &&  $input['amount'] != $contribution->total_amount) {
+        $contribution->total_amount = $input['amount'];
+        // The BAO does this stuff but we are actually kinda bypassing it here (bad code! go sit in the corner)
+        // so we have to handle net_amount in this (naughty) code.
+        if (isset($input['fee_amount']) && is_numeric($input['fee_amount'])) {
+          $contribution->fee_amount = $input['fee_amount'];
+        }
+        $contribution->net_amount = $contribution->total_amount - $contribution->fee_amount;
+      }
+      if (!empty($input['campaign_id'])) {
+        $contribution->campaign_id = $input['campaign_id'];
+      }
     }
 
-    $contribution->contribution_status_id = 1;
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ));
+
+    // @todo this section should call the api  in order to have hooks called &
+    // because all this 'messiness' setting variables could be avoided
+    // by letting the api resolve pseudoconstants & copy set values and format dates.
+    $contribution->contribution_status_id = $contributionStatuses['Completed'];
     $contribution->is_test = $input['is_test'];
 
     // CRM-15960 If we don't have a value we 'want' for the amounts, leave it to the BAO to sort out.
@@ -550,6 +576,7 @@ LIMIT 1;";
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
+
     $contribution->save();
 
     //add line items for recurring payments
@@ -899,7 +926,18 @@ LIMIT 1;";
     $lineSets = array();
 
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItems($originalContributionID, 'contribution');    if (!empty($lineItems)) {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    if (count($lineItems) == 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        if ($lineItem['line_total'] != $contribution->total_amount) {
+          // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
+          // if there is only one line item, and the UI should prevent this situation for those with more than one.
+          $lineItems[$index]['line_total'] = $contribution->total_amount;
+          $lineItems[$index]['unit_price'] = round($contribution->total_amount / $lineItems[$index]['qty'], 2);
+        }
+      }
+    }
+    if (!empty($lineItems)) {
       foreach ($lineItems as $key => $value) {
         $priceField = new CRM_Price_DAO_PriceField();
         $priceField->id = $value['price_field_id'];
