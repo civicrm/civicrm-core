@@ -532,7 +532,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm
 {$this->_aliases['civicrm_contribution']}.currency                    as currency
 {$this->_from} {$this->_where} {$group} {$this->_having}";
 
-
     if ($softCredit) {
       $this->from();
       $softSQL = "SELECT
