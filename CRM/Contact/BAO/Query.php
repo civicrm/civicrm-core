@@ -2081,22 +2081,10 @@ class CRM_Contact_BAO_Query {
         TRUE
       );
     }
-    elseif ($name === 'birth_date') {
+    elseif ($name === 'birth_date' || $name === 'deceased_date') {
       $date = CRM_Utils_Date::processDate($value);
       $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
 
-      if ($date) {
-        $date = CRM_Utils_Date::customFormat($date);
-        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
-      }
-      else {
-        $this->_qill[$grouping][] = "$field[title] $op";
-      }
-      self::$_openedPanes[ts('Demographics')] = TRUE;
-    }
-    elseif ($name === 'deceased_date') {
-      $date = CRM_Utils_Date::processDate($value);
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
       if ($date) {
         $date = CRM_Utils_Date::customFormat($date);
         $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
@@ -2115,6 +2103,17 @@ class CRM_Contact_BAO_Query {
       if (is_int($value)) {
         $this->_where[$grouping][] = self::buildClause($field['where'], $op, $value);
         $this->_qill[$grouping][] = "$field[title] $op $value";
+      }
+    }
+    elseif ($name === 'created_date' || $name == 'modified_date') {
+      $date = CRM_Utils_Date::processDate($value);
+      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
+      if ($date) {
+        $date = CRM_Utils_Date::customFormat($date);
+        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
+      }
+      else {
+        $this->_qill[$grouping][] = "$field[title] $op";
       }
     }
     elseif ($name === 'name') {
