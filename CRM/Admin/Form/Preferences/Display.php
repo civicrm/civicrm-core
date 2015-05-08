@@ -117,17 +117,10 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     if ($this->_config->editor_id) {
       $defaults['editor_id'] = $this->_config->editor_id;
     }
-    if (empty($this->_config->display_name_format)) {
-      $defaults['display_name_format'] = "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
-    }
-    else {
+    if ($this->_config->display_name_format) {
       $defaults['display_name_format'] = $this->_config->display_name_format;
     }
-
-    if (empty($this->_config->sort_name_format)) {
-      $defaults['sort_name_format'] = "{contact.last_name}{, }{contact.first_name}";
-    }
-    else {
+    if ($this->_config->sort_name_format) {
       $defaults['sort_name_format'] = $this->_config->sort_name_format;
     }
 
