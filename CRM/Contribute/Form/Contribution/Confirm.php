@@ -505,6 +505,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $params['selectMembership'],
           FALSE
         );
+        if (!empty($params['auto_renew'])) {
+          $this->assign('auto_renew', TRUE);
+        }
       }
       else {
         $this->assign('membershipBlock', FALSE);
