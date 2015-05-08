@@ -1294,7 +1294,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       //case 'AdvMulti-Select':
       case 'CheckBox':
-        $this->add('checkbox', $name, $label, NULL, $required);
+        $text = isset($props['text']) ? $props['text'] : NULL;
+        unset($props['text']);
+        $this->addElement('checkbox', $name, $label, $text, $props);
         break;
 
       case 'File':
