@@ -161,9 +161,6 @@
           if ($('#billingcheckbox').prop('checked')) {
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
-          }
-
-          if (orig_id == '#billing_country_id-5') {
             $(orig_id).change();
           }
         });
@@ -186,6 +183,7 @@
             orig_id = select_ids[id];
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
+            $(orig_id).change();
           }
         } else {
           $('.billing_name_address-group').show(200);
