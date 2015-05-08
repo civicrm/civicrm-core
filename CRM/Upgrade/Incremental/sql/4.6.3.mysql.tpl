@@ -23,3 +23,12 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name)
     (@country_id, "SZ", "Samegrelo-Zemo Svaneti"),
     (@country_id, "SJ", "Samtskhe-Javakheti"),
     (@country_id, "SK", "Shida Kartli");
+
+--CRM-16391 and CRM-16392
+UPDATE civicrm_uf_field
+SET {localize field="label"}label = '{ts escape="sql"}Financial Type{/ts}'{/localize}
+WHERE field_type = 'Contribution' AND field_name='financial_type';
+
+UPDATE civicrm_uf_field
+SET {localize field="label"}label = '{ts escape="sql"}Membership Type{/ts}'{/localize}
+WHERE field_type = 'Membership' AND field_name='membership_type';
