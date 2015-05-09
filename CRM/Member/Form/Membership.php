@@ -1177,7 +1177,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
 
       $membershipTypeValues[$memType]['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-        $customFields,
         $this->_id,
         'Membership'
       );
