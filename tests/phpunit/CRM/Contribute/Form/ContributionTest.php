@@ -205,8 +205,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'live');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId,
-        'contribution_status_id' => 'Pending'), 1);
+      $this->callAPISuccessGetCount('Contribution', array(
+        'contact_id' => $this->_individualId,
+        'contribution_status_id' => 'Pending',
+      ), 1);
       $lineItem = $this->callAPISuccessGetSingle('line_item', array());
       $this->assertEquals('50.00', $lineItem['unit_price']);
       $this->assertEquals('50.00', $lineItem['line_total']);

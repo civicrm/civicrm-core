@@ -7,4 +7,3 @@ namespace Civi\Payment\Exception;
 class PaymentProcessorException extends \CRM_Core_Exception {
 
 }
-
