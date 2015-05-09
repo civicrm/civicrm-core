@@ -360,7 +360,6 @@ class CRM_Core_BAO_CustomValueTable {
    */
   public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
-      array(),
       $entityID,
       $customFieldExtends
     );

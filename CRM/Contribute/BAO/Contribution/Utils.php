@@ -798,7 +798,6 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
       )
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       CRM_Utils_Array::value('id', $params, NULL),
       'Contribution'
     );

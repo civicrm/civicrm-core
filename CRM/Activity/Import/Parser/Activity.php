@@ -298,7 +298,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      CRM_Core_DAO::$_nullObject,
       NULL,
       'Activity'
     );

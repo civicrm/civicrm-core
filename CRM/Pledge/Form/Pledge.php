@@ -569,7 +569,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Pledge');
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-        $customFields,
         $this->_id,
         'Pledge'
       );

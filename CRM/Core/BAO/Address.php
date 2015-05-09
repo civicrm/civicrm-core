@@ -170,7 +170,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
       if (!empty($customFields)) {
         $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
-          $customFields,
           $address->id,
           'Address',
           TRUE

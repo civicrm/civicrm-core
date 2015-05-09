@@ -463,7 +463,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           NULL,
           'Contribution'
         );
@@ -674,7 +673,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $customFields,
           $key,
           'Membership',
           $membershipTypeId
