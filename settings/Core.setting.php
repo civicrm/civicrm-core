@@ -741,7 +741,8 @@ return array(
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
-    'prefetch' => 1,  // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'prefetch' => 1,
+    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'default' => '',
     'add' => '4.6',
     'title' => 'WordPress Path to wp-load.php',
