@@ -1260,7 +1260,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //add custom data for participant
       CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-        CRM_Core_DAO::$_nullArray,
         'civicrm_participant',
         $participants[0]->id,
         'Participant'
