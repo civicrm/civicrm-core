@@ -755,7 +755,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-      CRM_Core_DAO::$_nullArray,
       'civicrm_participant',
       $participant->id,
       'Participant'
