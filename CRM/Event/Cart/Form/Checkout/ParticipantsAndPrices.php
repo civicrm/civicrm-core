@@ -7,6 +7,9 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   public $price_fields_for_event;
   public $_values = NULL;
 
+  /**
+   * Pre process function.
+   */
   public function preProcess() {
     parent::preProcess();
 
@@ -17,6 +20,9 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
   }
 
+  /**
+   * Build quick form.
+   */
   public function buildQuickForm() {
     $this->price_fields_for_event = array();
     foreach ($this->cart->get_main_event_participants() as $participant) {
@@ -28,7 +34,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
     //If events in cart have discounts the textbox for discount code will be displayed at the top, as long as this
     //form name is added to cividiscount
-    //$this->addElement('text', 'discountcode', ts('If you have a discount code, enter it here'));
     $this->assign('events_in_carts', $this->cart->get_main_events_in_carts());
     $this->assign('price_fields_for_event', $this->price_fields_for_event);
     $this->addButtons(
@@ -52,9 +57,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   }
 
   /**
-   * @param $contact
+   * Get the primary emil for the contact.
    *
-   * @return null
+   * @param CRM_Contact_BAO_Contact $contact
+   *
+   * @return string
    */
   public static function primary_email_from_contact($contact) {
     foreach ($contact->email as $email) {
@@ -217,7 +224,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           }
         }
       }
-    } 
+    }
     return $defaults;
   }
 
