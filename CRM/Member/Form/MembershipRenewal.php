@@ -107,7 +107,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
       $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this);
     }
 
     parent::preProcess();
@@ -156,8 +156,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * @return array
+   *   Default values.
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -240,12 +240,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
     parent::buildQuickForm();
@@ -492,7 +490,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    */
   public function postProcess() {
 
-    $ids = array();
     $config = CRM_Core_Config::singleton();
 
     // get the submitted form values.
