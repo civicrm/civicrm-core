@@ -1123,7 +1123,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_DATE:
           $entity[$fieldName] = '2012-05-20';
           break;
-        
+
         case CRM_Utils_Type::T_TIMESTAMP:
           // 4.6 doesn't support timestamp updates from 4.7 we should uncomment this. See CRM-16204
           continue;
