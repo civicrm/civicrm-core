@@ -1295,6 +1295,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributeMode = $form->_contributeMode;
     $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
+    // How do these vary from params? These are currently passed to
+    // - custom data function....
+    $formParams = $form->_params;
+    $isSeparateMembershipPayment = empty($formParams['separate_membership_payment']) ? FALSE : TRUE;
+    $pledgeID = empty($formParams['pledge_id']) ? NULL : $formParams['pledge_id'];
+    if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
+      (!empty($formParams['is_pledge']) || $pledgeID)) {
+      $isPledge = TRUE;
+    }
+    else {
+      $isPledge = FALSE;
+    }
+
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
@@ -1366,7 +1379,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
-        $totalTaxAmount = 0;
         $dataArray = array();
         foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
           foreach ($lineItemValue as $key => $value) {
@@ -1400,12 +1412,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
 
     //handle pledge stuff.
-    if (empty($form->_params['separate_membership_payment']) && !empty($form->_values['pledge_block_id']) &&
-      (!empty($form->_params['is_pledge']) || !empty($form->_values['pledge_id']))
-    ) {
-
-      if (!empty($form->_values['pledge_id'])) {
-
+    if ($isPledge) {
+      if ($pledgeID) {
         //when user doing pledge payments.
         //update the schedule when payment(s) are made
         foreach ($form->_params['pledge_amount'] as $paymentId => $dontCare) {
@@ -1427,7 +1435,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         //update pledge status according to the new payment statuses
-        CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($form->_values['pledge_id']);
+        CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID);
       }
       else {
         //when user creating pledge record.

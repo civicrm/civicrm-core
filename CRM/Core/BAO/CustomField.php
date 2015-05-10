@@ -1565,7 +1565,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   Custom field id.
    * @param array $customFormatted
    *   Formatted array.
-   * @param mix $value
+   * @param mixed $value
    *   Value of custom field.
    * @param string $customFieldExtend
    *   Custom field extends.
