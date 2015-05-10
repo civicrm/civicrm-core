@@ -1224,7 +1224,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
 
-    $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
+    $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
       NULL,
       $contactID,

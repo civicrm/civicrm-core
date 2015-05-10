@@ -1368,7 +1368,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           CRM_Core_Error::fatal('Could not find a system table');
         }
 
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
+        $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           $result,
           $this->_contributorContactID,
