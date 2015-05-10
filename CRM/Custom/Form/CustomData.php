@@ -46,8 +46,6 @@ class CRM_Custom_Form_CustomData {
    * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
-   *
-   * @return void
    */
   public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,
@@ -160,7 +158,6 @@ class CRM_Custom_Form_CustomData {
 
   /**
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     $form->addElement('hidden', 'hidden_custom', 1);

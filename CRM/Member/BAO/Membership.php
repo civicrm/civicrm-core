@@ -1407,7 +1407,6 @@ AND civicrm_membership.is_test = %2";
     foreach ($createdMemberships as $createdMembership) {
       CRM_Core_BAO_CustomValueTable::postProcess(
         $form->_params,
-        CRM_Core_DAO::$_nullArray,
         'civicrm_membership',
         $createdMembership->id,
         'Membership'
