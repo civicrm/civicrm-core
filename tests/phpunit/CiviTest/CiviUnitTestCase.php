@@ -1805,7 +1805,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Function to create Group for a contact
+   * Function to create a Campaign.
+   *
+   * @param array $params
+   *   Optional parameters.
+   *
+   * @return int
+   *   Campaign ID.
+   */
+  public function campaignCreate($params = array()) {
+    $this->enableCiviCampaign();
+    $campaign = $this->callAPISuccess('campaign', 'create', array_merge(array(
+      'name' => 'big_campaign',
+      'title' => 'Campaign',
+    ), $params));
+    return $campaign['id'];
+  }
+
+  /**
+   * Create Group for a contact.
    *
    * @param int $contactId
    */
