@@ -473,7 +473,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         )
       );
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $customFields,
         $this->_activityId,
         'Activity'
       );

@@ -365,7 +365,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Utils_Array::value('campaign_type_id', $params)
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_campaignId,
       'Campaign'
     );

@@ -297,7 +297,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType
