@@ -858,6 +858,21 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
+   * React to a financial transaction (payment) failure.
+   *
+   * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
+   * payments is important for forensic and outreach reasons.
+   *
+   * This function updates the financial transaction records to failed.
+   *
+   * @todo in principle we also think it makes sense to add an activity - this part would be a second step as
+   * the first change is likely to go into the LTS.
+   */
+  public static function failPayment($contributionID, $message) {
+
+  }
+
+  /**
    * Check if there is a contribution with the same trxn_id or invoice_id.
    *
    * @param array $input

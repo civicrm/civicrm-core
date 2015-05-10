@@ -26,6 +26,7 @@
  */
 
 use Civi\Payment\System;
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * Class CRM_Core_Payment.
@@ -481,25 +482,45 @@ abstract class CRM_Core_Payment {
    * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
    * more agnostic.
    *
+   * Payment processors should set contribution_status_id. This function adds some historical defaults ie. the
+   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
+   * doTransferCheckout would not traditionally come back.
+   *
+   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
+   * to be Pending.
+   *
    * @param array $params
    *
-   * @param $component
+   * @param string $component
    *
    * @return array
-   *   (modified)
-   * @throws CRM_Core_Exception
+   *   Result array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
+      if (is_array($result) && !isset($result['contribution_status_id'])) {
+        $result['contribution_status_id'] = array_search('Pending', $statuses);
+      }
     }
     else {
       $result = $this->doDirectPayment($params, $component);
+      if (is_array($result) && !isset($result['contribution_status_id'])) {
+        if (!empty($params['is_recur'])) {
+          // See comment block.
+          $paymentParams['contribution_status_id'] = array_search('Pending', $statuses);
+        }
+        else {
+          $result['contribution_status_id'] = array_search('Completed', $statuses);
+        }
+      }
     }
     if (is_a($result, 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
-    //CRM-15767 - Submit Credit Card Contribution not being saved
     return $result;
   }
 
