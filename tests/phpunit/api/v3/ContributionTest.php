@@ -1454,7 +1454,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $lineItem1['values'][0], array(
         'line_total' => '400.00',
         'unit_price' => '400.00',
-    ));
+      )
+    );
 
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'] + 1,
