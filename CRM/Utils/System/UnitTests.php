@@ -53,6 +53,20 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
+   * Bootstrap the phony CMS.
+   *
+   * @param string $name
+   *   Optional username for login.
+   * @param string $pass
+   *   Optional password for login.
+   *
+   * @return bool
+   */
+  public function loadBootStrap($name = NULL, $pass = NULL) {
+    return TRUE;
+  }
+
+  /**
    * @inheritDoc
    */
   public function mapConfigToSSL() {
