@@ -1485,6 +1485,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
       // START CRM-15829 UPDATES
       // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1456
+      $filteredMemberships = array();
       foreach ($memberships as $key => $membership) {
         if (in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
           $filteredMemberships[$key] = $membership;
