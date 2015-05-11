@@ -662,11 +662,17 @@ class CRM_Utils_System {
      * We typically call authenticate only when we need to bootstrap the CMS
      * directly via Civi and hence bypass the normal CMS auth and bootstrap
      * process typically done in CLI and cron scripts. See: CRM-12648
+     *
+     * Q: Can we move this to the userSystem class so that it can be tuned
+     * per-CMS? For example, when dealing with UnitTests UF, there's no
+     * userFrameworkDSN.
      */
     $session = CRM_Core_Session::singleton();
     $session->set('civicrmInitSession', TRUE);
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
+    if ($config->userFrameworkDSN) {
+      $dbDrupal = DB::connect($config->userFrameworkDSN);
+    }
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
