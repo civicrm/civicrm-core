@@ -63,7 +63,24 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     return;
   }
 
-  function mapConfigToSSL() {
+  /**
+   * Bootstrap the phony CMS.
+   *
+   * @param string $name
+   *   Optional username for login.
+   * @param string $pass
+   *   Optional password for login.
+   *
+   * @return bool
+   */
+  public function loadBootStrap($name = NULL, $pass = NULL) {
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }

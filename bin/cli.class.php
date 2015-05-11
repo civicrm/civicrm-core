@@ -199,7 +199,12 @@ class civicrm_cli {
 
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
-    require_once ('civicrm.config.php');
+    if (getenv('CIVICRM_SETTINGS')) {
+      require_once getenv('CIVICRM_SETTINGS');
+    }
+    else {
+      require_once 'civicrm.config.php';
+    }
     // autoload
     if ( !class_exists('CRM_Core_ClassLoader') ) {
       require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
