@@ -115,6 +115,9 @@ class civicrm_cli {
       $this->_log($result['error_message']);
       return FALSE;
     }
+    elseif ($this->_output === 'json') {
+      echo json_encode($result, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0);
+    }
     elseif ($this->_output) {
       print_r($result['values']);
     }
@@ -175,6 +178,9 @@ class civicrm_cli {
       }
       elseif ($arg == '-o' || $arg == '--output') {
         $this->_output = TRUE;
+      }
+      elseif ($arg == '--json') {
+        $this->_output = 'json';
       }
       elseif ($arg == '-j' || $arg == '--joblog') {
         $this->_joblog = TRUE;
@@ -300,12 +306,13 @@ class civicrm_cli {
    * @return string
    */
   private function _getUsage() {
-    $out = "Usage: cli.php -e entity -a action [-u user] [-s site] [--output] [PARAMS]\n";
+    $out = "Usage: cli.php -e entity -a action [-u user] [-s site] [--output|--json] [PARAMS]\n";
     $out .= "  entity is the name of the entity, e.g. Contact, Event, etc.\n";
     $out .= "  action is the name of the action e.g. Get, Create, etc.\n";
     $out .= "  user is an optional username to run the script as\n";
     $out .= "  site is the domain name of the web site (for Drupal multi site installs)\n";
-    $out .= "  --output will print the result from the api call\n";
+    $out .= "  --output will pretty print the result from the api call\n";
+    $out .= "  --json will print the result from the api call as JSON\n";
     $out .= "  PARAMS is one or more --param=value combinations to pass to the api\n";
     return ts($out);
   }
