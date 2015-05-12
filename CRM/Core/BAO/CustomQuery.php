@@ -371,6 +371,7 @@ SELECT label, value
                       continue;
                     }
 
+                    $k = CRM_Core_DAO::escapeString($k);
                     $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $k . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
                   }
                 }
