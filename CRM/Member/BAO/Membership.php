@@ -2251,7 +2251,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     //so for differentiating membership contribution from
     //main contribution.
     $form->_params['separate_membership_payment'] = 1;
-    $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
+    $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
       $tempParams,
       $result,
       $contactID,

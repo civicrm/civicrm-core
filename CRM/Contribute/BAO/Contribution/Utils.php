@@ -112,7 +112,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       // when we get a callback from the payment processor
       // also add the contact ID and contribution ID to the params list
       $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
+      $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
         NULL,
@@ -233,7 +233,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
           unset($paymentParams['is_recur']);
         }
 
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
+        $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
           $form,
           $paymentParams,
           NULL,
@@ -317,7 +317,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $pending = TRUE;
       }
       if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
+        $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
           $form->_params, $result,
           $contactID, $contributionType,
           $pending, TRUE,
