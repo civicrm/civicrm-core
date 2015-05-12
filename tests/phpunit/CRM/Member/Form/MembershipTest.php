@@ -1,4 +1,29 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
 
 /**
  *  File for the MembershipTest class
@@ -6,26 +31,7 @@
  *  (PHP 5)
  *
  * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- * @copyright Copyright CiviCRM LLC (C) 2009
- * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
- *              GNU Affero General Public License version 3
- * @package   CiviCRM
  *
- *   This file is part of CiviCRM
- *
- *   CiviCRM is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Affero General Public License
- *   as published by the Free Software Foundation; either version 3 of
- *   the License, or (at your option) any later version.
- *
- *   CiviCRM is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public
- *   License along with this program.  If not, see
- *   <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -36,11 +42,44 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'HTML/QuickForm/Page.php';
 
 /**
- *  Test APIv2 civicrm_activity_* functions
+ *  Test CRM_Member_Form_Membership functions.
  *
  * @package   CiviCRM
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
+
+  /**
+   * Assume empty database with just civicrm_data.
+   */
+  protected $_individualId;
+  protected $_contribution;
+  protected $_financialTypeId = 1;
+  protected $_apiversion;
+  protected $_entity = 'Membership';
+  protected $_params;
+  protected $_ids = array();
+  protected $_paymentProcessorID;
+
+  /**
+   * Parameters to create payment processor.
+   *
+   * @var array
+   */
+  protected $_processorParams = array();
+
+  /**
+   * ID of created membership.
+   *
+   * @var int
+   */
+  protected $_membershipID;
+
+  /**
+   * Payment instrument mapping.
+   *
+   * @var array
+   */
+  protected $paymentInstruments = array();
 
   /**
    *  Test setup for every test.
@@ -62,6 +101,52 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         dirname(__FILE__) . '/dataset/data.xml'
       )
     );
+
+    $this->_apiversion = 3;
+    $this->_individualId = $this->individualCreate();
+    $this->_paymentProcessorID = $this->processorCreate();
+    $this->_params = array(
+      'contact_id' => $this->_individualId,
+      'receive_date' => '20120511',
+      'total_amount' => 100.00,
+      'financial_type_id' => $this->_financialTypeId,
+      'non_deductible_amount' => 10.00,
+      'fee_amount' => 5.00,
+      'net_amount' => 95.00,
+      'source' => 'SSF',
+      'contribution_status_id' => 1,
+    );
+    $this->_processorParams = array(
+      'domain_id' => 1,
+      'name' => 'Dummy',
+      'payment_processor_type_id' => 10,
+      'financial_account_id' => 12,
+      'is_active' => 1,
+      'user_name' => '',
+      'url_site' => 'http://dummy.com',
+      'url_recur' => 'http://dummy.com',
+      'billing_mode' => 1,
+    );
+    $this->_pageParams = array(
+      'title' => 'Test Contribution Page',
+      'financial_type_id' => 1,
+      'currency' => 'USD',
+      'financial_account_id' => 1,
+      'payment_processor' => $paymentProcessor->id,
+      'is_active' => 1,
+      'is_allow_other_amount' => 1,
+      'min_amount' => 10,
+      'max_amount' => 1000,
+    );
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $this->paymentInstruments = $instruments['values'];
+  }
+
+  /**
+   * Clean up after each test.
+   */
+  public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
@@ -385,6 +470,48 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     //  Should have found Current membership status
     $this->assertTrue($rc);
+  }
+
+  /**
+   * Test the submit function of the membership form.
+   */
+  public function testSubmit() {
+    $form = new CRM_Member_Form_Membership();
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      'membership_type_id' => array('13'),
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '1',
+      'source' => '',
+      'total_amount' => '50.00',
+      'financial_type_id' => '5', //Member dues, see data.xml
+      'soft_credit_type_id' => '',
+      'soft_credit_contact_id' => '',
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text_signup' => 'Thank you text',
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => array(
+        'M' => '9',
+        'Y' => '2019', // TODO: Future proof
+       ),
+       'credit_card_type' =>  'Visa',
+       'billing_first_name' =>  'Test',
+       'billing_middlename' => 'Last',
+       'billing_street_address-5' => '10 Test St',
+       'billing_city-5' => 'Test',
+       'billing_state_province_id-5' => '1003',
+       'billing_postal_code-5' => '90210',
+       'billing_country_id-5' => '1228',
+    );
+    $form->submit($params);
+    // TODO: This will still fail right now.
+    //$this->callAPISuccessGetCount('Membership', array('contact_id' => $this->_individualId), 1);
   }
 
 }
