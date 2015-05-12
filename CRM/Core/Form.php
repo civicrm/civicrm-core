@@ -901,6 +901,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @param string $name
+   * @param $title
+   * @param $values
+   * @param array $attributes
+   * @param null $separator
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_group
+   */
+  public function &addRadioGroup($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
+    return $this->addRadio($name, $title, $values, $attributes, $separator, $required);
+  }
+
+  /**
    * @param int $id
    * @param $title
    * @param bool $allowClear
@@ -974,6 +988,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'required'
       );
     }
+  }
+
+
+  /**
+   * @param int $id
+   * @param $title
+   * @param $values
+   * @param null $other
+   * @param null $attributes
+   * @param null $required
+   * @param null $javascriptMethod
+   * @param string $separator
+   * @param bool $flipValues
+   */
+  public function addCheckBoxGroup(
+  $id, $title, $values, $other = NULL, $attributes = NULL, $required = NULL,
+  $javascriptMethod = NULL, $separator = '<br />', $flipValues = FALSE
+  ) {
+    $this->addCheckBox(
+        $id, $title, $values, $other,
+        $attributes, $required, $javascriptMethod, $separator, $flipValues
+    );
   }
 
   public function resetValues() {
@@ -1197,7 +1233,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'Select Country',
           'Multi-Select Country',
           'AdvMulti-Select',
-          'CheckBox',
+          'CheckBoxGroup',
+          'RadioGroup',
           'Radio',
     )));
 
@@ -1294,6 +1331,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         $this->add('select', $name, $label, $options, $required, $props);
         // TODO: Add and/or option for fields that store multiple values
+        break;
+
+      case 'CheckBoxGroup':
+        $this->addCheckBoxGroup($name, $label, array_flip($options), $required, $props);
+        break;
+
+      case 'RadioGroup':
+        $this->addRadioGroup($name, $label, $options, $props, NULL, $required);
         break;
 
       //case 'AdvMulti-Select':
