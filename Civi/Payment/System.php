@@ -52,11 +52,15 @@ class System {
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
 
-        $this->cache[$id] = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
-        if ($this->cache[$id]->checkConfig()) {
-          $this->cache[$id] = NULL;
+        $processorObject = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
+        if ($processorObject->checkConfig()) {
+          $processorObject = NULL;
         }
-      }
+        else {
+          $processorObject->setPaymentProcessor($processor);
+        }
+}
+        $this->cache[$id] = $processorObject;
     }
     return $this->cache[$id];
   }
