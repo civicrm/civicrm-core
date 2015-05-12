@@ -1414,7 +1414,8 @@ AND civicrm_membership.is_test = %2";
         $membership = self::renewMembership($contactID, $membershipTypeID,
           $isTest, $form, NULL,
           CRM_Utils_Array::value('cms_contactID', $membershipParams),
-          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
+          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1),
+          (CRM_Utils_Array::value('contribution_status_id', $result) == 2 ? TRUE : FALSE)
         );
         if (isset($contribution[$index])) {
           //insert payment record
@@ -1511,7 +1512,8 @@ AND civicrm_membership.is_test = %2";
     $changeToday = NULL,
     $modifiedID = NULL,
     $customFieldsFormatted = NULL,
-    $numRenewTerms = 1
+    $numRenewTerms = 1,
+    $paymentConfirmed = FALSE
   ) {
     $statusFormat = '%Y-%m-%d';
     $format       = '%Y%m%d';
@@ -1540,6 +1542,9 @@ AND civicrm_membership.is_test = %2";
       ) {
         $pending = TRUE;
       }
+    }
+    if ($paymentConfirmed) {
+      $pending = FALSE;
     }
 
     //decide status here, if needed.
