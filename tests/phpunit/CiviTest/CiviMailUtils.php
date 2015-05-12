@@ -286,8 +286,14 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     foreach ($this->getAllMessages('ezc') as $message) {
       $recipients[] = CRM_Utils_Array::collect('email', $message->to);
     }
-    sort($recipients);
-    sort($expectedRecipients);
+    $cmp = function($a, $b) {
+      if ($a[0] == $b[0]) {
+        return 0;
+      }
+      return ($a[0] < $b[0]) ? 1 : -1;
+    };
+    usort($recipients, $cmp);
+    usort($expectedRecipients, $cmp);
     $this->_ut->assertEquals(
       $expectedRecipients,
       $recipients,
