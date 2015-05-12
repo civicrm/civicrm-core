@@ -60,60 +60,44 @@ class CRM_Contact_Form_Edit_Individual {
         'contact_edit_options', TRUE, NULL,
         FALSE, 'name', TRUE, 'AND v.filter = 2'
       );
-
-      //prefix
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addSelect('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
+      // Fixme: dear god why? these come out in a format that is NOT the name of the fields.
+      foreach ($nameFields as &$fix) {
+        $fix = str_replace(' ', '_', strtolower($fix));
+        if ($fix == 'prefix' || $fix == 'suffix') {
+          // God, why god?
+          $fix .= '_id';
+        }
       }
 
-      $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-
-      if (isset($nameFields['Formal Title'])) {
-        $form->addElement('text', 'formal_title', ts('Title'), $attributes['formal_title']);
-      }
-
-      // first_name
-      if (isset($nameFields['First Name'])) {
-        $form->addElement('text', 'first_name', ts('First Name'), $attributes['first_name']);
-      }
-
-      //middle_name
-      if (isset($nameFields['Middle Name'])) {
-        $form->addElement('text', 'middle_name', ts('Middle Name'), $attributes['middle_name']);
-      }
-
-      // last_name
-      if (isset($nameFields['Last Name'])) {
-        $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
-      }
-
-      // suffix
-      $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-      if (isset($nameFields['Suffix']) && $suffix) {
-        $form->addSelect('suffix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Suffix')));
+      foreach ($nameFields as $name) {
+        $props = array();
+        if ($name == 'prefix_id' || $name == 'suffix_id') {
+          $options = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name);
+          // Skip if we have no options available
+          if (!CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $name)) {
+            //continue;
+          }
+          $props = array('class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix'));
+        }
+        $form->addField($name, $props);
       }
     }
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
-      $form->addElement('text', 'nick_name', ts('Nickname'),
-        CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'nick_name')
-      );
+      $form->addField('nick_name');
 
       // job title
       // override the size for UI to look better
-      $attributes['job_title']['size'] = 30;
-      $form->addElement('text', 'job_title', ts('Job Title'), $attributes['job_title'], 'size="30"');
+      $form->addField('job_title', array('size' => '30'));
 
       //Current Employer Element
       $props = array(
         'api' => array('params' => array('contact_type' => 'Organization')),
         'create' => TRUE,
       );
-      $form->addEntityRef('employer_id', ts('Current Employer'), $props);
-      $attributes['source']['class'] = 'big';
-      $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
+      $form->addField('employer_id', $props);
+      $form->addField('contact_source', array('class' => 'big'));
     }
 
     if (!$inlineEditMode) {
@@ -129,16 +113,13 @@ class CRM_Contact_Form_Edit_Individual {
       $form->assign('checkSimilar', $checkSimilar);
 
       //External Identifier Element
-      $form->add('text', 'external_identifier', ts('External ID'),
-        CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE
-      );
+      $form->addField('external_identifier', array('label' => 'External ID'));
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
         array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
       );
-      $config = CRM_Core_Config::singleton();
       CRM_Core_ShowHideBlocks::links($form, 'demographics', '', '');
     }
   }

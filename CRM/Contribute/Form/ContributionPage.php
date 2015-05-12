@@ -83,6 +83,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_values;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contribution';
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void

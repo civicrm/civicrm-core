@@ -183,6 +183,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_session = NULL;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Profile';
+  }
+
+  /**
    * Pre processing work done here.
    *
    * gets session variables for table name, id of entity in table, type of entity and stores them.

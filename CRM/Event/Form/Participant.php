@@ -190,6 +190,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_onlinePendingContributionId = NULL;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Participant';
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -1202,7 +1209,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // CRM-15622: fix for incorrect contribution.fee_amount
       $paymentParams['fee_amount'] = NULL;
-      $result = $payment->doDirectPayment($paymentParams);
+      $result = $payment->doPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
