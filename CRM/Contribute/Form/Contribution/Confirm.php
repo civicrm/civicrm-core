@@ -57,12 +57,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param int $contactID
    * @param int $financialTypeID
-   * @param $online
+   * @param bool $online
    * @param int $contributionPageId
-   * @param $nonDeductibleAmount
+   * @param float $nonDeductibleAmount
    * @param int $campaignId
-   * @param $isMonetary
-   * @param $pending
+   * @param bool $isMonetary
+   * @param bool $pending
    * @param $paymentProcessorOutcome
    * @param $receiptDate
    * @param int $recurringContributionID
@@ -153,9 +153,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * CRM-11885
    *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
    * it.
-   * @param $params
-   * @param $financialType
-   * @param $online
+   *
+   * @param array $params
+   * @param CRM_Financial_BAO_FinancialType $financialType
+   * @param bool $online
    *
    * @return array
    */
@@ -202,8 +203,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -495,8 +494,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
@@ -726,8 +723,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $contactID = $this->getContactID();
@@ -1140,7 +1135,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the form.
    *
    * @param array $premiumParams
-   * @param $contribution
+   * @param CRM_Contribute_BAO_Contribution $contribution
    */
   public function postProcessPremium($premiumParams, $contribution) {
     $hour = $minute = $second = 0;
@@ -1307,7 +1302,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     else {
       $isPledge = FALSE;
     }
-
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
@@ -2069,8 +2063,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass
-   * in.
+   * Helper function for static submit function.
+   *
+   * Set relevant params - help us to build up an array that we can pass in.
    *
    * @param int $id
    * @param array $params
