@@ -434,6 +434,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $form = new CRM_Member_Form_Membership();
+    $this->createLoggedInUser();
     $params = array(
       'cid' => $this->_individualId,
       'join_date' => date('m/d/Y', time()),
