@@ -33,6 +33,8 @@
  *
  */
 
+use Civi\Payment\System;
+
 /**
  * This class generates form components for processing a contribution
  *
@@ -358,11 +360,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
 
             // ensure that processor has a valid config
-            $this->_paymentObject = &CRM_Core_Payment::singleton($this->_mode, $eachPaymentProcessor, $this);
-            $error = $this->_paymentObject->checkConfig();
-            if (!empty($error)) {
-              CRM_Core_Error::fatal($error);
-            }
+            $this->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($eachPaymentProcessor);
           }
         }
       }
