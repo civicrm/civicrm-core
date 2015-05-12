@@ -438,7 +438,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
               {$this->_where} 
                       AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
                       AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")  
-              {$this->_groupBy}";
+              GROUP BY {$this->_aliases['civicrm_contribution']}.id";
     CRM_Core_DAO::executeQuery($sql);
     $this->_from .= " 
               INNER JOIN civicrm_contribution_temp temp ON {$this->_aliases['civicrm_contribution']}.id = temp.id ";
