@@ -825,6 +825,39 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create a batch of external API calls which can
+   * be executed concurrently.
+   *
+   * @code
+   * $calls = $this->createExternalAPI()
+   *    ->addCall('Contact', 'get', ...)
+   *    ->addCall('Contact', 'get', ...)
+   *    ...
+   *    ->run()
+   *    ->getResults();
+   * @endcode
+   *
+   * @return \Civi\API\ExternalBatch
+   * @throws PHPUnit_Framework_SkippedTestError
+   */
+  public function createExternalAPI() {
+    global $civicrm_root;
+    $defaultParams = array(
+      'version' => $this->_apiversion,
+      'debug' => 1,
+    );
+
+    $calls = new \Civi\API\ExternalBatch($defaultParams);
+    $calls->setSettingsPath("$civicrm_root/tests/phpunit/CiviTest/civicrm.settings.cli.php");
+
+    if (!$calls->isSupported()) {
+      $this->markTestSkipped('The test relies on Civi\API\ExternalBatch. This is unsupported in the local environment.');
+    }
+
+    return $calls;
+  }
+
+  /**
    * This function exists to wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    *
