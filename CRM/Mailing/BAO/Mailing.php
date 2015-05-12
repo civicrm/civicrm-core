@@ -2906,7 +2906,7 @@ WHERE  civicrm_mailing_job.id = %1
     // CRM-8460
     $gotCronLock = FALSE;
 
-    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 1) {
+    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 0) {
       $lockArray = range(1, $config->mailerJobsMax);
       shuffle($lockArray);
 
