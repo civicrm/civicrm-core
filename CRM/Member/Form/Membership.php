@@ -114,6 +114,58 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     'receive_date' => array('default' => 'now'),
   );
 
+  /**
+   * @param $self
+   * @param $priceFieldIDS
+   */
+  public static function getSelectedMemberships($priceSetID, $params) {
+    $memTypeSelected = array();
+    $priceFieldIDS = self::getPriceFieldIDs($params);
+
+    if ($priceSetID && is_array($priceFieldIDS)) {
+      foreach ($priceFieldIDS as $priceFieldId) {
+        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
+          $memTypeSelected[$id] = $id;
+        }
+      }
+    }
+    else {
+      $memTypeSelected = $params['membership_type_id'][1];
+    }
+    return $memTypeSelected;
+  }
+
+  /**
+   * Extract price set fields and values from $params.
+   *
+   * @param $params
+   * @return array
+   */
+  public static function getPriceFieldIDs($params) {
+    $priceFieldIDS = $priceSet = $fieldIds = array();
+    if (isset(self::$priceSet) && is_array(self::$priceSet)) {
+      $priceSet = self::$_priceSet;
+      if (isset($priceSet['fields']) && is_array($priceSet['fields'])) {
+        $fieldIds = array_keys($priceSet['fields']);
+      }
+    }
+    foreach ($fieldIds as $fieldId) {
+      if (!empty($params['price_' . $fieldId])) {
+        if (is_array($params['price_' . $fieldId])) {
+          foreach ($params['price_' . $fieldId] as $priceFldVal => $isSet) {
+            if ($isSet) {
+              $priceFieldIDS[] = $priceFldVal;
+            }
+          }
+        }
+        else {
+          $priceFieldIDS[] = $params['price_' . $fieldId];
+        }
+      }
+    }
+    return $priceFieldIDS;
+  }
+
   public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -769,25 +821,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
 
+    $selectedMemberships = self::getSelectedMemberships($priceSetId, $params);
+
     if ($priceSetId) {
       CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
-      $priceFieldIDS = array();
-      foreach ($self->_priceSet['fields'] as $priceIds => $dontCare) {
-
-        if (!empty($params['price_' . $priceIds])) {
-          if (is_array($params['price_' . $priceIds])) {
-            foreach ($params['price_' . $priceIds] as $priceFldVal => $isSet) {
-              if ($isSet) {
-                $priceFieldIDS[] = $priceFldVal;
-              }
-            }
-          }
-          else {
-            $priceFieldIDS[] = $params['price_' . $priceIds];
-          }
-        }
-      }
+      $priceFieldIDS = self::getPriceFieldIDs($params, $self);
 
       if (!empty($priceFieldIDS)) {
         $ids = implode(',', $priceFieldIDS);
@@ -798,19 +837,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             $errors['_qf_default'] = ts('Select at most one option associated with the same membership type.');
           }
         }
-
-        foreach ($priceFieldIDS as $priceFieldId) {
-          if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-            $self->_memTypeSelected[$id] = $id;
-          }
-        }
       }
     }
     elseif (empty($params['membership_type_id'][1])) {
       $errors['membership_type_id'] = ts('Please select a membership type.');
-    }
-    else {
-      $self->_memTypeSelected[] = $params['membership_type_id'][1];
     }
 
     if (!$priceSetId) {
@@ -821,12 +851,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     // Return error if empty $self->_memTypeSelected
-    if ($priceSetId && empty($errors) && empty($self->_memTypeSelected)) {
+    if ($priceSetId && empty($errors) && empty($selectedMemberships)) {
       $errors['_qf_default'] = ts('Select at least one membership option.');
     }
 
-    if (!empty($errors) && (count($self->_memTypeSelected) > 1)) {
-      $memberOfContacts = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($self->_memTypeSelected);
+    if (!empty($errors) && (count($selectedMemberships) > 1)) {
+      $memberOfContacts = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($selectedMemberships);
       $duplicateMemberOfContacts = array_count_values($memberOfContacts);
       foreach ($duplicateMemberOfContacts as $countDuplicate) {
         if ($countDuplicate > 1) {
@@ -870,7 +900,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $joinDate = CRM_Utils_Date::processDate($params['join_date']);
 
-      foreach ($self->_memTypeSelected as $memType) {
+      foreach ($selectedMemberships as $memType) {
         $startDate = NULL;
         if (!empty($params['start_date'])) {
           $startDate = CRM_Utils_Date::processDate($params['start_date']);
