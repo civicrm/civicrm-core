@@ -312,12 +312,15 @@ function civicrm_api3_job_process_pledge($params) {
  * @return array
  */
 function civicrm_api3_job_process_mailing($params) {
+  $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
 
   if (!CRM_Mailing_BAO_Mailing::processQueue()) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array();
+    $values = array(
+      'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
+    );
     return civicrm_api3_create_success($values, $params, 'Job', 'process_mailing');
   }
 }
@@ -330,11 +333,15 @@ function civicrm_api3_job_process_mailing($params) {
  * @return array
  */
 function civicrm_api3_job_process_sms($params) {
+  $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
+
   if (!CRM_Mailing_BAO_Mailing::processQueue('sms')) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array();
+    $values = array(
+      'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
+    );
     return civicrm_api3_create_success($values, $params, 'Job', 'process_sms');
   }
 }
