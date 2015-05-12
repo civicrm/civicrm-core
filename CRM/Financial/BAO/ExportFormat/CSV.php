@@ -122,6 +122,8 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
       WHERE eb.batch_id = ( %1 )";
 
+    CRM_Utils_Hook::batchQuery($sql);
+
     $params = array(1 => array($batchId, 'String'));
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
@@ -175,6 +177,10 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     foreach ($export as $batchId => $dao) {
       $financialItems = array();
       $this->_batchIds = $batchId;
+
+      $batchItems = array();
+      $queryResults = array();
+
       while ($dao->fetch()) {
         $creditAccountName = $creditAccountType = $creditAccount = NULL;
         if ($dao->credit_account) {
@@ -211,7 +217,14 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           'Credit Account Type' => $creditAccountType,
           'Item Description' => $dao->item_description,
         );
+
+        end($financialItems);
+        $batchItems[] = &$financialItems[key($financialItems)];
+        $queryResults[] = get_object_vars($dao);
       }
+
+      CRM_Utils_Hook::batchItems($queryResults, $batchItems);
+
       $financialItems['headers'] = self::formatHeaders($financialItems);
       self::export($financialItems);
     }
