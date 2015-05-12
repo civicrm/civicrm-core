@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bd8520dfd68384402dfe4a986d8bcddc",
+    "hash": "fae511da43e5fb95d62ee09faa1f19b2",
     "packages": [
         {
             "name": "dompdf/dompdf",
@@ -275,6 +275,56 @@
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
             "time": "2014-12-02 19:42:47"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v2.3.28",
+            "target-dir": "Symfony/Component/Process",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Process.git",
+                "reference": "a8fe947ac58e081f8773e0d160807dcffbff7ed8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/a8fe947ac58e081f8773e0d160807dcffbff7ed8",
+                "reference": "a8fe947ac58e081f8773e0d160807dcffbff7ed8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "~2.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Process\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Process Component",
+            "homepage": "https://symfony.com",
+            "time": "2015-05-01 14:06:45"
         },
         {
             "name": "totten/ca-config",
