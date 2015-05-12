@@ -578,6 +578,18 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     return $isDelivered;
   }
 
+  /**
+   * @param array $fields
+   *   List of intended recipients.
+   *   Each recipient is an array with keys 'hash', 'contact_id', 'email', etc.
+   * @param $mailing
+   * @param $mailer
+   * @param $job_date
+   * @param $attachments
+   *
+   * @return bool|null
+   * @throws Exception
+   */
   public function deliverGroup(&$fields, &$mailing, &$mailer, &$job_date, &$attachments) {
     static $smtpConnectionErrors = 0;
 
