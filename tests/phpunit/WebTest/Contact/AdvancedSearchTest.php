@@ -255,6 +255,8 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
     $this->clickAjaxLink("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
+    $this->clickAjaxLink("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(), 'State')]");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(), 'State')]");
     $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
   }
 
