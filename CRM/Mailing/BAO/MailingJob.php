@@ -614,7 +614,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param $fields
+   * @param array $fields
+   *   List of intended recipients.
+   *   Each recipient is an array with keys 'hash', 'contact_id', 'email', etc.
    * @param $mailing
    * @param $mailer
    * @param $job_date
