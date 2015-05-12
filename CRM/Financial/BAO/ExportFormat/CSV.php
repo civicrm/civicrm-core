@@ -89,6 +89,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       cov.label AS payment_instrument,
       ft.check_number,
       c.source AS source,
+      c.id AS contribution_id,
+      c.contact_id AS contact_id,
+      eb.batch_id AS batch_id,
       ft.currency AS currency,
       cov_status.label AS status,
       CASE
@@ -186,6 +189,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
         }
 
         $financialItems[] = array(
+          'Batch ID' => $dao->batch_id,
+          'Invoice ID' => $dao->contribution_id,
+          'Contact ID' => $dao->contact_id,
           'Internal ID' => $dao->financial_trxn_id,
           'Transaction Date' => $dao->trxn_date,
           'Debit Account' => $dao->to_account_code,
