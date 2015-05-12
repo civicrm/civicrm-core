@@ -115,13 +115,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   );
 
   /**
-   * @param $self
-   * @param $priceFieldIDS
+   * Get selected membership type from the form values.
+   *
+   * @param int $priceSetID
+   * @param array $params
+   *
+   * @return array
    */
   public static function getSelectedMemberships($priceSetID, $params) {
     $memTypeSelected = array();
     $priceFieldIDS = self::getPriceFieldIDs($params);
-
     if ($priceSetID && is_array($priceFieldIDS)) {
       foreach ($priceFieldIDS as $priceFieldId) {
         if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
@@ -130,7 +133,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     else {
-      $memTypeSelected = $params['membership_type_id'][1];
+      $memTypeSelected = $params['membership_type_id'];
     }
     return $memTypeSelected;
   }
