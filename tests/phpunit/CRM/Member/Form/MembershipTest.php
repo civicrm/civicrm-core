@@ -102,51 +102,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       )
     );
 
-    $this->_apiversion = 3;
-    $this->_individualId = $this->individualCreate();
-    $this->_paymentProcessorID = $this->processorCreate();
-    $this->_params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => '20120511',
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
-      'non_deductible_amount' => 10.00,
-      'fee_amount' => 5.00,
-      'net_amount' => 95.00,
-      'source' => 'SSF',
-      'contribution_status_id' => 1,
-    );
-    $this->_processorParams = array(
-      'domain_id' => 1,
-      'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
-      'financial_account_id' => 12,
-      'is_active' => 1,
-      'user_name' => '',
-      'url_site' => 'http://dummy.com',
-      'url_recur' => 'http://dummy.com',
-      'billing_mode' => 1,
-    );
-    $this->_pageParams = array(
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
-      'currency' => 'USD',
-      'financial_account_id' => 1,
-      'payment_processor' => $paymentProcessor->id,
-      'is_active' => 1,
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10,
-      'max_amount' => 1000,
-    );
     $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->paymentInstruments = $instruments['values'];
-  }
-
-  /**
-   * Clean up after each test.
-   */
-  public function tearDown() {
-    $this->quickCleanUpFinancialEntities();
   }
 
   /**
@@ -482,13 +439,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('m/d/Y', time()),
       'start_date' => '',
       'end_date' => '',
-      'membership_type_id' => array('13'),
+      'membership_type_id' => array('25'),
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '50.00',
-      'financial_type_id' => '5', //Member dues, see data.xml
+      'financial_type_id' => '2', //Member dues, see data.xml
       'soft_credit_type_id' => '',
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
