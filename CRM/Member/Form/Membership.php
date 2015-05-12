@@ -1212,7 +1212,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   }
 
   /**
-   * @param $params array
+   * @param array $formValues
 
    * @return array
    */
@@ -1224,6 +1224,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $memType = $membershipType = NULL;
 
     $receiptSend = $mailSend = FALSE;
+    $priceSetID = CRM_Utils_Array::value('price_set_id', $formValues);
 
     $params = $softParams = $ids = array();
 
@@ -1239,7 +1240,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // In form mode these are set in preProcess.
     //TODO: set memberships, fixme
     $this->setContextVariables($formValues);
-    $self->_memTypeSelected = self::getSelectedMemberships($priceSetID, $params);
+    $this->_memTypeSelected = self::getSelectedMemberships($priceSetID, $formValues);
 
     $config = CRM_Core_Config::singleton();
 
@@ -1279,19 +1280,18 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     // process price set and get total amount and line items.
     $lineItem = array();
-    $priceSetId = NULL;
-    if (!$priceSetId = CRM_Utils_Array::value('price_set_id', $formValues)) {
-      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
+    if ($priceSetID) {
+      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetID);
     }
     $isQuickConfig = 0;
-    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
+    if ($priceSetID && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config')) {
       $isQuickConfig = 1;
     }
 
     $termsByType = array();
-    if ($priceSetId) {
+    if ($priceSetID) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$priceSetId]);
+        $this->_params, $lineItem[$priceSetID]);
       if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
         $params['tax_amount'] = $this->_params['tax_amount'];
       }
@@ -1817,12 +1817,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
     }
 
-    if (!empty($lineItem[$priceSetId])) {
+    if (!empty($lineItem[$priceSetID])) {
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $taxAmount = FALSE;
       $totalTaxAmount = 0;
-      foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
+      foreach ($lineItem[$priceSetID] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
           $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%B %E%f, %Y') : '-';
           $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'], '%B %E%f, %Y') : '-';
@@ -1837,7 +1837,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       if ($invoicing) {
         $dataArray = array();
-        foreach ($lineItem[$priceSetId] as $key => $value) {
+        foreach ($lineItem[$priceSetID] as $key => $value) {
           if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
             if (isset($dataArray[$value['tax_rate']])) {
               $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
