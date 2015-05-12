@@ -33,6 +33,8 @@
  *
  */
 
+use Civi\Payment\System;
+
 /**
  * This class generates form components for processing a contribution
  *
@@ -346,7 +348,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         if (isset($defaultProcessorId)) {
-          $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($defaultProcessorId, $this->_mode);
+          $this->_paymentProcessor = Civi\Payment\System::singleton()->getByProcessor($defaultProcessorId, $this->_mode);
           $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
         }
 
@@ -357,12 +359,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               CRM_Core_Error::fatal(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
             }
 
-            // ensure that processor has a valid config
-            $this->_paymentObject = &CRM_Core_Payment::singleton($this->_mode, $eachPaymentProcessor, $this);
-            $error = $this->_paymentObject->checkConfig();
-            if (!empty($error)) {
-              CRM_Core_Error::fatal($error);
-            }
+            $this->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($eachPaymentProcessor);
           }
         }
       }
