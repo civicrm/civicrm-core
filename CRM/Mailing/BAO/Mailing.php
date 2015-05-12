@@ -2928,6 +2928,11 @@ WHERE  civicrm_mailing_job.id = %1
         CRM_Core_Error::debug_log_message('Returning early, since max number of cronjobs running');
         return TRUE;
       }
+
+      if (getenv('CIVICRM_CRON_HOLD')) {
+        // In testing, we may need to simulate some slow activities.
+        sleep(getenv('CIVICRM_CRON_HOLD'));
+      }
     }
 
     // load bootstrap to call hooks
