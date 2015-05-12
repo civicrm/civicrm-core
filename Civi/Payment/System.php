@@ -53,6 +53,9 @@ class System {
         }
 
         $this->cache[$id] = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
+        if ($this->cache[$id]->checkConfig()) {
+          $this->cache[$id] = NULL;
+        }
       }
     }
     return $this->cache[$id];
