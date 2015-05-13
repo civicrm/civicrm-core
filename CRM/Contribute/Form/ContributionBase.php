@@ -348,7 +348,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
              if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count
                  ($this->_paymentProcessors) == 1)
              ) {
-               $this->_paymentProcessor = $processor;
+               $this->_paymentProcessor = $paymentProcessorDetail;
                $this->assign('paymentProcessor', $this->_paymentProcessor);
              }
            }

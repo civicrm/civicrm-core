@@ -29,7 +29,14 @@ class System {
   }
 
   /**
+   * Starting from the processor as an array retrieve the processor as an object.
+   *
+   * If there is no valid configuration it will not be retrieved.
+   *
    * @param array $processor
+   *
+   * @return CRM_Core_Payment|NULL
+   *
    * @throws \CRM_Core_Exception
    */
   public function getByProcessor($processor) {
