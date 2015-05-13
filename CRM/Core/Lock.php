@@ -34,6 +34,8 @@
  */
 class CRM_Core_Lock {
 
+  static $jobLog = FALSE;
+
   // lets have a 3 second timeout for now
   CONST TIMEOUT = 3;
 
@@ -69,12 +71,11 @@ class CRM_Core_Lock {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('trying to construct lock for ' . $this->_name);
     }
-    static $jobLog = FALSE;
-    if ($jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '{$jobLog}')")) {
-      return $this->hackyHandleBrokenCode($jobLog);
+    if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
+      return $this->hackyHandleBrokenCode(self::$jobLog);
     }
     if (stristr($name, 'civimail.job.')) {
-      $jobLog = $this->_name;
+      self::$jobLog = $this->_name;
     }
     //if (defined('CIVICRM_LOCK_DEBUG')) {
     //CRM_Core_Error::debug_var('backtrace', debug_backtrace());
@@ -88,10 +89,10 @@ class CRM_Core_Lock {
     $this->release();
   }
 
-  function acquire() {
-    if (defined('CIVICRM_LOCK_DEBUG')) {
-      CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
-    }
+  /**
+   * @return bool
+   */
+  public function acquire() {
     if (!$this->_hasLock) {
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = array(
@@ -100,15 +101,33 @@ class CRM_Core_Lock {
       );
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($res) {
+        if (defined('CIVICRM_LOCK_DEBUG')) {
+          CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
+        }
         $this->_hasLock = TRUE;
+      }
+      else {
+        if (defined('CIVICRM_LOCK_DEBUG')) {
+          CRM_Core_Error::debug_log_message('failed to acquire lock for ' . $this->_name);
+        }
       }
     }
     return $this->_hasLock;
   }
 
-  function release() {
+  /**
+   * @return null|string
+   */
+  public function release() {
+    if (defined('CIVICRM_LOCK_DEBUG')) {
+      CRM_Core_Error::debug_log_message('release lock for ' . $this->_name .  ' (' . ($this->_hasLock ? 'hasLock' : '!hasLock') . ')');
+    }
     if ($this->_hasLock) {
       $this->_hasLock = FALSE;
+
+      if (self::$jobLog == $this->_name) {
+        self::$jobLog = FALSE;
+      }
 
       $query = "SELECT RELEASE_LOCK( %1 )";
       $params = array(1 => array($this->_name, 'String'));
@@ -141,7 +160,8 @@ class CRM_Core_Lock {
    */
   function hackyHandleBrokenCode($jobLog) {
     if (stristr($this->_name, 'job')) {
-      throw new CRM_Core_Exception('lock aquisition for ' . $this->_name . 'attempted when ' . $jobLog . 'is not released');
+      CRM_Core_Error::debug_log_message('lock acquisition for ' . $this->_name . ' attempted when ' . $jobLog . ' is not released');
+      throw new CRM_Core_Exception('lock acquisition for ' . $this->_name . ' attempted when ' . $jobLog . ' is not released');
     }
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('(CRM-12856) faking lock for ' . $this->_name);
