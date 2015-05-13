@@ -543,7 +543,7 @@ WHERE  civicrm_group_contact.status = 'Added'
         "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT $idName, group_id FROM $tempTable
       ");
-      CRM_Core_DAO::executeQuery(" DROP TABLE $tempTable");
+      CRM_Core_DAO::executeQuery(" DROP TEMPORARY TABLE $tempTable");
     }
 
     self::updateCacheTime($groupIDs, $processed);

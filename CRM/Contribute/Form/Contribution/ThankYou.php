@@ -182,6 +182,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         TRUE,
         NULL
       );
+
+      if (!empty($params['auto_renew'])) {
+        $this->assign('auto_renew', TRUE);
+      }
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');

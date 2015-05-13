@@ -2036,7 +2036,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
   }
   if ($fieldValue) {
     if (!CRM_Utils_Rule::xssString($fieldValue)) {
-      throw new API_Exception('Illegal characters in input (potential scripting attack)', array("field" => $fieldName, "error_code" => "xss"));
+      throw new API_Exception('Input contains illegal SCRIPT tag.', array("field" => $fieldName, "error_code" => "xss"));
     }
   }
 }
@@ -2072,7 +2072,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if ($fieldValue) {
     foreach ((array) $fieldValue as $value) {
       if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Illegal characters in input (potential scripting attack)');
+        throw new Exception('Input contains illegal SCRIPT tag.');
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes
