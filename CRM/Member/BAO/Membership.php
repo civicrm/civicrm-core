@@ -1354,6 +1354,9 @@ AND civicrm_membership.is_test = %2";
     if ($isProcessSeparateMembershipTransaction) {
       try {
         $lineItems = $form->_lineItem = $membershipLineItems;
+        if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
+          unset($membershipParams['is_recur']);
+        }
         $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipParams, $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
       }
       catch (CRM_Core_Exception $e) {
@@ -2244,7 +2247,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // irrespective of the value, CRM-2888
     $tempParams['cms_create_account'] = 0;
 
-    $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : FALSE;
+    //CRM-16165, scenarios are
+    // 1) If contribution is_pay_later and if contribution amount is > 0.0 we set pending = TRUE, vice-versa FALSE
+    // 2) If not pay later but auto-renewal membership is chosen then pending = TRUE as it later triggers
+    //   pending recurring contribution, vice-versa FALSE
+    $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : (!empty($form->_params['auto_renew']) ? TRUE : FALSE);
 
     //set this variable as we are not creating pledge for
     //separate membership payment contribution.
@@ -2338,11 +2345,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
     if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
-      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later']) ||
-          (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct'
-          )
+      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
         ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) || !empty($form->_params['separate_membership_payment']) ||
+        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
           CRM_Utils_Array::value('record_contribution', $form->_params)
         )
       ) {

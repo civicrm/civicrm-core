@@ -115,7 +115,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   public static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
-    $xmlFile .= "<name>{$name}</name>\n";
+    $xmlFile .= "<name>" . self::encodeXmlString($name) . "</name>\n";
 
     if (array_key_exists('forkable', $definition)) {
       $xmlFile .= "<forkable>" . ((int) $definition['forkable']) . "</forkable>\n";
@@ -126,7 +126,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($definition['activityTypes'] as $values) {
         $xmlFile .= "<ActivityType>\n";
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+          $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
         }
         $xmlFile .= "</ActivityType>\n";
       }
@@ -145,7 +145,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
                 foreach ($setVal as $values) {
                   $xmlFile .= "<ActivityType>\n";
                   foreach ($values as $key => $value) {
-                    $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+                    $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
                   }
                   $xmlFile .= "</ActivityType>\n";
                 }
@@ -161,7 +161,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
               break;
 
             default:
-              $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
+              $xmlFile .= "<{$index}>" . self::encodeXmlString($setVal) . "</{$index}>\n";
           }
         }
 
@@ -176,7 +176,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+          $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
         }
         $xmlFile .= "</RelationshipType>\n";
       }
@@ -185,6 +185,21 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     $xmlFile .= '</CaseType>';
     return $xmlFile;
+  }
+
+  /**
+   * Ugh. This shouldn't exist. Use a real XML-encoder.
+   *
+   * Escape a string for use in XML.
+   *
+   * @param string $str
+   *   A string which should outputted to XML.
+   * @return string
+   * @deprecated
+   */
+  protected static function encodeXmlString($str) {
+    // PHP 5.4: return htmlspecialchars($str, ENT_XML1, 'UTF-8')
+    return htmlspecialchars($str);
   }
 
   /**

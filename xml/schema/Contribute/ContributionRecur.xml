@@ -135,6 +135,20 @@
     <add>1.6</add>
   </field>
   <field>
+    <name>payment_token_id</name>
+    <title>Payment Token ID</title>
+    <type>int unsigned</type>
+    <comment>Optionally used to store a link to a payment token used for this recurring contribution.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>payment_token_id</name>
+    <table>civicrm_payment_token</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
     <name>trxn_id</name>
     <title>Transaction ID</title>
     <type>varchar</type>

@@ -289,12 +289,26 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
       else {
         $membershipType = array_values($params['membership_type']);
+        $isRecur = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'is_recur');
         if (array_sum($membershipType) == 0) {
           $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
         }
         elseif (array_sum($membershipType) > CRM_Price_Form_Field::NUM_OPTION) {
           // for CRM-13079
           $errors['membership_type'] = ts('You cannot select more than %1 choices. For more complex functionality, please use a Price Set.', array(1 => CRM_Price_Form_Field::NUM_OPTION));
+        }
+        elseif ($isRecur) {
+          if (empty($params['is_separate_payment']) && array_sum($membershipType) != 0) {
+            $errors['is_separate_payment'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution');
+          }
+          elseif (!empty($params['is_separate_payment'])) {
+            foreach ($params['membership_type'] as $mt => $dontCare) {
+              if (!empty($params["auto_renew_$mt"])) {
+                $errors["auto_renew_$mt"] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page');
+                break;
+              }
+            }
+          }
         }
       }
 

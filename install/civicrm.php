@@ -235,7 +235,8 @@ function civicrm_config(&$config) {
     $params['crmRoot'] = addslashes($params['crmRoot']);
   }
 
-  $params['siteKey'] = md5(uniqid('', TRUE) . $params['baseURL']);
+  $params['siteKey'] = md5(rand() . mt_rand() . rand() . uniqid('', TRUE) . $params['baseURL']);
+  // Would prefer openssl_random_pseudo_bytes(), but I don't think it's universally available.
 
   $str = file_get_contents($tplPath . 'civicrm.settings.php.template');
   foreach ($params as $key => $value) {
