@@ -270,9 +270,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -431,8 +428,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
-    $config = CRM_Core_Config::singleton();
-    $this->assign('currency', $config->defaultCurrencySymbol);
+
+    $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     if (isset($invoicing)) {
@@ -587,9 +584,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $memTypeJs = array('onChange' => "CRM.buildCustomData( 'Membership', this.value );");
 
     //build the form for auto renew.
-    $recurProcessor = $autoRenew = array();
+    $autoRenew = array();
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-      $autoRenewElement = $this->addElement('checkbox',
+      $this->addElement('checkbox',
         'auto_renew',
         ts('Membership renewed automatically'),
         NULL,
