@@ -59,8 +59,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $_fromEmails = array();
 
   public function preProcess() {
+    // Check for edit permission.
+    if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
+    parent::preProcess();
     $params = array();
-    $params['action'] = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
@@ -69,7 +73,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
-    $this->assign('contactID', $this->_contactID);
   }
 
   /**
@@ -85,14 +88,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
       CRM_Member_BAO_Membership::retrieve($params, $defaults);
-    }
+      if (isset($defaults['minimum_fee'])) {
+        $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
+      }
 
-    if (isset($defaults['minimum_fee'])) {
-      $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
-    }
-
-    if (isset($defaults['status'])) {
-      $this->assign('membershipStatus', $defaults['status']);
+      if (isset($defaults['status'])) {
+        $this->assign('membershipStatus', $defaults['status']);
+      }
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -111,8 +113,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_mode) {
