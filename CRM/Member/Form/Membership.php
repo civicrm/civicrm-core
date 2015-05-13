@@ -594,13 +594,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         array('onclick' => "buildReceiptANDNotice( );")
       );
 
+      $this->assignPaymentRelatedVariables();
+
       if ($this->_mode) {
-        //get the valid recurring processors.
-        $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
-        $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-        $recurProcessor = array_intersect_key($this->_processors, $recurring);
-        $autoRenew = array();
-        if (!empty($recurProcessor)) {
+        if (!empty($this->_recurPaymentProcessors)) {
           if (!empty($membershipType)) {
             $sql = '
 SELECT  id,
@@ -626,16 +623,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             'onChange' =>
             "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
           );
+          $this->assign('allowAutoRenew', TRUE);
         }
       }
     }
-    $allowAutoRenew = FALSE;
-    if ($this->_mode && !empty($recurProcessor)) {
-      $allowAutoRenew = TRUE;
-    }
-    $this->assign('allowAutoRenew', $allowAutoRenew);
+
     $this->assign('autoRenewOptions', json_encode($autoRenew));
-    $this->assign('recurProcessor', json_encode($recurProcessor));
 
     // for max_related: a little JS to show/hide & set default value
     $memTypeJs['onChange'] = "buildMaxRelated(this.value,true); " . $memTypeJs['onChange'];
