@@ -69,7 +69,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->assign('mode', $form->_mode);
 
     if ($contactID) {
-      $form->_employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($contactID);
+      $form->_employers = CRM_Contact_BAO_Relationship::getPermissionedContacts($contactID);
 
       if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
         // renewal case - membership being renewed may or may not be for organization
