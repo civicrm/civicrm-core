@@ -823,7 +823,7 @@ class CRM_Core_Permission {
         $prefix . ts('edit message templates'),
       ),
       'view my invoices' => array(
-        $prefix . ts('download my invoices'),
+        $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
       ),
     );

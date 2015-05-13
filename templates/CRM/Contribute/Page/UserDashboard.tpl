@@ -53,16 +53,19 @@
                     {if $invoicing && $invoices}
                       {if $row.contribution_status_name != 'Cancelled'}
                         <td>
-              {assign var='id' value=$row.contribution_id}
-        {assign var='contact_id' value=$row.contact_id}
+                          {assign var='id' value=$row.contribution_id}
+                          {assign var='contact_id' value=$row.contact_id}
                           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
-        <a class="crm-invoiceButton" href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-              {if $row.contribution_status != 'Refunded'}
-                            <span>{ts}Print Invoice{/ts}</span>
-              {else}
-          <span>{ts}Print Invoice and Credit Note{/ts}</span>
-              {/if}
-                          </a>
+                          {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
+                            <a class="button no-popup " href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
+                              <span class="icon ui-icon-print"></span>
+                            {if $row.contribution_status != 'Refunded'}
+                              <span>{ts}Print Invoice{/ts}</span>
+                            {else}
+                              <span>{ts}Print Invoice and Credit Note{/ts}</span>
+                            {/if}
+                            </a>
+                          {/if}
                         </td>
                       {else}
             <td></td>
