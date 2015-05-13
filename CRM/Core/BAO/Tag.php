@@ -100,6 +100,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
     $refs = array();
+    $this->tree = array();
     while ($dao->fetch()) {
       $thisref = &$refs[$dao->id];
 
@@ -115,7 +116,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
       }
     }
-
   }
 
   /**
