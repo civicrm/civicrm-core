@@ -107,6 +107,36 @@ class CRM_Core_ScheduledJob {
       case 'Daily':
         $format = 'Ymd';
         break;
+
+      case 'Mondays':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfWeek = date('l',strtotime($now));
+        if ($lastRun < $dayAgo and $nowDayOfWeek=='Monday') {
+          return TRUE;
+        }
+
+      case '1stOfMth':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfMonth = date('j',strtotime($now));
+        if ($lastRun < $dayAgo and $nowDayOfMonth=='1') {
+          return TRUE;
+        }
+
+      case '1stOfQtr':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfMonth = date('j',strtotime($now));
+        $nowMonth = date('n',strtotime($now));
+        $qtrMonths = array('1','4','7','10');
+        if ($lastRun < $dayAgo and $nowDayOfMonth=='13' and in_array($nowMonth,$qtrMonths)) {
+          return TRUE;
+        }
+
     }
 
     $now = CRM_Utils_Date::currentDBDate();
