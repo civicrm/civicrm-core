@@ -205,6 +205,16 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $billingFieldSets = array();
 
   /**
+   * Pre process function with common actions.
+   */
+  public function preProcess() {
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->assign('contactID', $this->_contactID);
+
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+  }
+
+  /**
    * @param int $id
    */
   public function showRecordLinkMesssage($id) {

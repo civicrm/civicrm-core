@@ -233,12 +233,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Set variables up before form is built.
    */
   public function preProcess() {
-
     // Check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
-
     // @todo - if anyone ever figures out what this _cdType subroutine is about
     // (or even if it still applies) please add comments!!!!!!!!!!
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -248,6 +246,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Custom_Form_CustomData::preProcess($this);
       return;
     }
+
+    parent::preProcess();
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -259,11 +259,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Get the pledge payment id
     $this->_ppID = CRM_Utils_Request::retrieve('ppid', 'Positive', $this);
 
-    // Get the contact id
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
-    // Get the action.
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
 
     // Get the contribution id if update
