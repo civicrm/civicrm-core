@@ -527,7 +527,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
 
         //create temporary table to store voter ids.
         $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
-        CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
+        CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
 
         $query = "
      CREATE TEMPORARY TABLE {$tempTableName} (
