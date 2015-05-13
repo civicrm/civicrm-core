@@ -1027,7 +1027,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // get the submitted form values.
     $this->_params = $this->controller->exportValues($this->_name);
 
-    $createdMemberships = $this->submit($this->_params);
+    $this->submit($this->_params);
 
     $this->setUserContext();
   }
@@ -1211,9 +1211,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
-    $memType = $membershipType = NULL;
+    $membershipType = NULL;
 
-    $receiptSend = $mailSend = FALSE;
+    $mailSend = FALSE;
     $priceSetID = CRM_Utils_Array::value('price_set_id', $formValues);
 
     $params = $softParams = $ids = array();
@@ -1287,8 +1287,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
-      if (!empty($lineItem[$priceSetId])) {
-        foreach ($lineItem[$priceSetId] as &$li) {
+      if (!empty($lineItem[$priceSetID])) {
+        foreach ($lineItem[$priceSetID] as &$li) {
           if (!empty($li['membership_type_id'])) {
             if (!empty($li['membership_num_terms'])) {
               $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
@@ -1378,17 +1378,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     // membership type custom data
     foreach ($this->_memTypeSelected as $memType) {
-      $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE,
-        $memType
-      );
-
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-        CRM_Core_BAO_CustomField::getFields('Membership',
-          FALSE, FALSE,
-          NULL, NULL, TRUE
-        )
-      );
-
       $membershipTypeValues[$memType]['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
         $this->_id,
         'Membership'
@@ -1468,7 +1457,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
     $createdMemberships = array();
     if ($this->_mode) {
-      if (empty($formValues['total_amount']) && !$priceSetId) {
+      if (empty($formValues['total_amount']) && !$priceSetID) {
         // if total amount not provided minimum for membership type is used
         $params['total_amount'] = $formValues['total_amount'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
           $formValues['membership_type_id'][1], 'minimum_fee'
@@ -1478,9 +1467,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
       }
 
-      if ($priceSetId && !$isQuickConfig) {
+      if ($priceSetID && !$isQuickConfig) {
         $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',
-          $priceSetId,
+          $priceSetID,
           'financial_type_id'
         );
       }
