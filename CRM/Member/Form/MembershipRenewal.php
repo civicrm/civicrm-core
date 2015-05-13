@@ -148,8 +148,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     CRM_Utils_System::setTitle(ts('Renew Membership'));
-
-    parent::preProcess();
   }
 
   /**
