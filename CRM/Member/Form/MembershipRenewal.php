@@ -107,7 +107,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('cdType', FALSE);
     if ($this->_cdType) {
       $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
+      return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
     parent::preProcess();
@@ -148,8 +148,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     CRM_Utils_System::setTitle(ts('Renew Membership'));
-
-    parent::preProcess();
   }
 
   /**

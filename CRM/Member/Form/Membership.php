@@ -184,11 +184,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->set('priceSetId', $this->_priceSetId);
     $this->assign('priceSetId', $this->_priceSetId);
 
-    // check for edit permission
-    if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
-    }
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
       // check delete permission for contribution
@@ -429,8 +424,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_cdType) {
