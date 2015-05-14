@@ -58,12 +58,12 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       return TRUE;
     }
 
-    // During some extern/* calls we don't bootstrap CMS hence
-    // below constants are not set. In such cases, we don't need to
-    // check permission, hence directly return TRUE
+    //CRM-15629
     if (!defined('ABSPATH') || !defined('WPINC')) {
-      return TRUE;
+      require_once 'CRM/Utils/System.php';
+      CRM_Utils_System::loadBootStrap();
     }
+    //End CRM-15629
 
     require_once ABSPATH . WPINC . '/pluggable.php';
 
