@@ -33,6 +33,8 @@
  *
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   /**
    * @param $formValues
    */
@@ -130,13 +132,18 @@ address.postal_code    as postal_code
    * @return string
    */
   public function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
-                                       email.is_primary = 1 )
+                                       email.is_primary = 1 ) {$this->_aclFrom}
 ";
+    if ($this->_aclWhere) {
+      $this->_where .= " {$this->_aclWhere} ";
+    }
+    return $from;
   }
 
   /**
@@ -168,6 +175,8 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       2 => array(trim($high), 'Integer'),
     );
 
+    $where .= "{$this->_where} ";
+
     return $this->whereClause($where, $params);
   }
 
@@ -195,6 +204,13 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     else {
       CRM_Utils_System::setTitle(ts('Search'));
     }
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }
