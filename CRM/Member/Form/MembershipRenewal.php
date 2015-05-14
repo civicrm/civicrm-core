@@ -430,7 +430,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // The member form uses emailExists. Assigning both while we transition / synchronise.
     $this->assign('emailExists', $this->_contributorEmail);
 
-
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'mailing_backend'
     );
