@@ -801,7 +801,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);
         $this->assign('isPrimary', 1);
-        $this->assign(['receipt_text_renewal'], $this->_params['receipt_text']);
+        $this->assign('receipt_text_renewal', $this->_params['receipt_text']);
         if ($this->_mode == 'test') {
           $this->assign('action', '1024');
         }
