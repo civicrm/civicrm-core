@@ -29,20 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 use Civi\Payment\System;
 
 /**
- * This class generates form components for processing a contribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * The id of the contribution page that we are processsing
+   * The id of the contribution page that we are processing.
    *
    * @var int
    */
@@ -112,7 +109,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_fields = array();
 
   /**
-   * The billing location id for this contribiution page
+   * The billing location id for this contribution page.
    *
    * @var int
    */
@@ -206,8 +203,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
-
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
     // current contribution page id
@@ -256,7 +251,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $membershipType->id = $membership->membership_type_id;
               if ($membershipType->find(TRUE)) {
                 // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
-                // Convert to commma separated list.
+                // Convert to comma separated list.
                 $inheritedRelTypes = implode(CRM_Utils_Array::explodePadded($membershipType->relationship_type_id), ',');
                 $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
                 if (array_key_exists($membership->contact_id, $permContacts)) {
@@ -308,7 +303,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
       }
 
-      // also check for billing informatin
+      // also check for billing information.
       // get the billing location type
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
       // CRM-8108 remove ts around Billing location type
@@ -338,24 +333,23 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         $this->set('paymentProcessors', $this->_paymentProcessors);
 
-         if (!empty($this->_paymentProcessors)) {
-           foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
-             if (($processor = Civi\Payment\System::singleton()->getByProcessor($paymentProcessorDetail)) != FALSE) {
-               // We don't really know why we do this.
-               $this->_paymentObject = $processor;
-             }
+        if (!empty($this->_paymentProcessors)) {
+          foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
+            if (($processor = Civi\Payment\System::singleton()->getByProcessor($paymentProcessorDetail)) != FALSE) {
+              // We don't really know why we do this.
+              $this->_paymentObject = $processor;
+            }
 
-             if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count
-                 ($this->_paymentProcessors) == 1)
-             ) {
-               $this->_paymentProcessor = $paymentProcessorDetail;
-               $this->assign('paymentProcessor', $this->_paymentProcessor);
-             }
-           }
-           if (empty($this->_paymentObject)) {
-             throw new CRM_Core_Exception(ts('No valid payment processor'));
-           }
-         }
+            if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
+            ) {
+              $this->_paymentProcessor = $paymentProcessorDetail;
+              $this->assign('paymentProcessor', $this->_paymentProcessor);
+            }
+          }
+          if (empty($this->_paymentObject)) {
+            throw new CRM_Core_Exception(ts('No valid payment processor'));
+          }
+        }
         else {
           throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
         }
@@ -449,7 +443,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('pledgeBlock', TRUE);
     }
 
-    // check if one of the (amount , membership)  bloks is active or not
+    // check if one of the (amount , membership)  blocks is active or not.
     $this->_membershipBlock = $this->get('membershipBlock');
 
     if (!$this->_values['amount_block_is_active'] &&
@@ -516,8 +510,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Set the default values.
-   *
-   * @return void
    */
   public function setDefaultValues() {
     return $this->_defaults;
@@ -525,8 +517,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Assign the minimal set of variables to the template.
-   *
-   * @return void
    */
   public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
@@ -655,9 +645,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param string $name
    * @param bool $viewOnly
    * @param null $profileContactType
-   * @param null $fieldTypes
-   *
-   * @return void
+   * @param array $fieldTypes
    */
   public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
@@ -776,7 +764,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Check template file exists.
-   * @param null $suffix
+   *
+   * @param string $suffix
    *
    * @return null|string
    */
@@ -796,21 +785,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return string
    */
-  /**
-   * @return string
-   */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
   /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
+   * Add the extra.tpl in.
    *
-   * @return string
-   */
-  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we do not override - why isn't this done at the CRM_Core_Form level?
+   *
    * @return string
    */
   public function overrideExtraTemplateFileName() {
@@ -820,9 +805,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Authenticate pledge user during online payment.
-   *
-   *
-   * @return void
    */
   public function authenticatePledgeUser() {
     //get the userChecksum and contact id
@@ -871,10 +853,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Cancel recurring contributions.
+   *
    * In case user cancel recurring contribution,
    * When we get the control back from payment gate way
    * lets delete the recurring and related contribution.
-   *
    */
   public function cancelRecurring() {
     $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject);
