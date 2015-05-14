@@ -55,4 +55,5 @@ interface LockInterface {
    * @return bool
    */
   public function isAcquired();
+
 }
