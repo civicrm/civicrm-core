@@ -194,6 +194,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         left join civicrm_participant
         on civicrm_participant_payment.participant_id=civicrm_participant.id
 
+        left join civicrm_contact contact_a
+        on civicrm_participant.contact_id = contact_a.id
+
         left join civicrm_event on
         civicrm_participant.event_id = civicrm_event.id
 
