@@ -30,6 +30,7 @@ function contribution_page_submit_example() {
     'is_recur' => 1,
     'frequency_interval' => 1,
     'frequency_unit' => 'month',
+    'is_pay_later' => 1,
   );
 
   try{
