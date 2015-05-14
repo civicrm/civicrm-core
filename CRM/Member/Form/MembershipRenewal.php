@@ -244,7 +244,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
-    
+
     //CRM-13420
     if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
@@ -279,7 +279,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
- 
+
       // now fix all state country selectors, set correct state based on country
       CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
@@ -377,7 +377,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
       //get the valid recurring processors.
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-      $recurProcessor = array_intersect_assoc($this->_processors, $recurring);
+      $recurProcessor = array_intersect_key($this->_processors, $recurring);
       if (!empty($recurProcessor)) {
         $autoRenew = array();
         if (!empty($membershipType)) {
