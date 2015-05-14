@@ -46,9 +46,8 @@ class CiviReportMail {
     $config = CRM_Core_Config::singleton();
   }
 
-  function run() {
-    require_once 'CRM/Core/Lock.php';
-    $lock = new CRM_Core_Lock('CiviReportMail');
+  public function run() {
+    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.report.CiviReportMail');
 
     if ($lock->isAcquired()) {
       // try to unset any time limits
