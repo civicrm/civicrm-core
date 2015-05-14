@@ -888,7 +888,7 @@ WHERE  id = %1";
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
     }
     $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
-    $params['amount'] = $totalPrice;
+    $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
     $params['tax_amount'] = $totalTax;
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {
