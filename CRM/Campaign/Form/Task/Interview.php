@@ -625,7 +625,7 @@ WHERE {$clause}
 
         //create temporary table to store voter ids.
         $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
-        CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
+        CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
         $query = "
      CREATE TEMPORARY TABLE {$tempTableName} (
             id int unsigned NOT NULL AUTO_INCREMENT,
