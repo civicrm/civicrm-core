@@ -175,8 +175,6 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       2 => array(trim($high), 'Integer'),
     );
 
-    $where .= "{$this->_where} ";
-
     return $this->whereClause($where, $params);
   }
 

@@ -182,7 +182,7 @@ $having
     $this->buildACLClause('contact_a');
     $from = "
 civicrm_contribution AS contrib,
-civicrm_contact AS contact_a {$this->aclFrom}
+civicrm_contact AS contact_a {$this->_aclFrom}
 ";
     if ($this->_aclWhere) {
       $this->_where .= " {$this->_aclWhere} ";
@@ -234,7 +234,7 @@ civicrm_contact AS contact_a {$this->aclFrom}
       $clauses[] = "contrib.financial_type_id IN ($financial_type_ids)";
     }
 
-    return "{$this->_where} AND " . implode(' AND ', $clauses);
+    return implode(' AND ', $clauses);
   }
 
   /**
