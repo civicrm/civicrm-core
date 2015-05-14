@@ -2911,12 +2911,8 @@ WHERE  civicrm_mailing_job.id = %1
       shuffle($lockArray);
 
       // check if we are using global locks
-      $serverWideLock = CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'civimail_server_wide_lock'
-      );
       foreach ($lockArray as $lockID) {
-        $cronLock = new CRM_Core_Lock("civimail.cronjob.{$lockID}", NULL, $serverWideLock);
+        $cronLock = Civi\Core\Container::singleton()->get('lockManager')->acquire("worker.mailing.send.{$lockID}");
         if ($cronLock->isAcquired()) {
           $gotCronLock = TRUE;
           break;
