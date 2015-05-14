@@ -66,8 +66,8 @@ class System {
         else {
           $processorObject->setPaymentProcessor($processor);
         }
-}
-        $this->cache[$id] = $processorObject;
+      }
+      $this->cache[$id] = $processorObject;
     }
     return $this->cache[$id];
   }
