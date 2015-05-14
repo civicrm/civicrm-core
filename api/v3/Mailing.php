@@ -579,7 +579,9 @@ function civicrm_api3_mailing_send_test($params) {
 
   $testEmailParams = _civicrm_api3_generic_replace_base_params($params);
   $testEmailParams['is_test'] = 1;
-  $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
+  $job = civicrm_api3('MailingJob', 'create', $testEmailParams + array(
+    'options' => array('auto_recipients' => 0),
+  ));
   $testEmailParams['job_id'] = $job['id'];
   $testEmailParams['emails'] = explode(',', $testEmailParams['test_email']);
   if (!empty($params['test_email'])) {
