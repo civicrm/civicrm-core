@@ -130,7 +130,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
       return $this->hackyHandleBrokenCode(self::$jobLog);
     }
-    if (stristr($name, 'civimail.job.')) {
+    if (stristr($name, 'data.mailing.job.')) {
       self::$jobLog = $this->_name;
     }
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
