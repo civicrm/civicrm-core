@@ -356,6 +356,12 @@
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
+  <path>civicrm/contact/dedupemerge</path>
+   <title>Batch Merge Duplicate Contacts</title>
+   <page_callback>CRM_Contact_Page_DedupeMerge</page_callback>
+   <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
    <path>civicrm/dedupe/exception</path>
    <title>Dedupe Exceptions</title>
    <adminGroup>Manage</adminGroup>
@@ -377,6 +383,11 @@
      <path>civicrm/ajax/markSelection</path>
      <page_callback>CRM_Contact_Page_AJAX::selectUnselectContacts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/toggleDedupeSelect</path>
+     <page_callback>CRM_Contact_Page_AJAX::toggleDedupeSelect</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
   <path>civicrm/activity/sms/add</path>
