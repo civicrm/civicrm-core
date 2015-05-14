@@ -341,8 +341,7 @@ AND      c.receive_date < {$this->start_date_1}
 
       $clauses[] = " xg.contact_id IS NULL ";
     }
-
-    return "{$this->_where} AND " . implode(' AND ', $clauses);
+    return implode(' AND ', $clauses);
   }
 
   /**
