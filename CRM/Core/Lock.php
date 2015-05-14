@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Core_Lock {
+class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
 
   static $jobLog = FALSE;
 
@@ -44,20 +44,74 @@ class CRM_Core_Lock {
   protected $_name;
 
   /**
+   * Use MySQL's GET_LOCK(). Locks are shared across all Civi instances
+   * on the same MySQL server.
+   *
+   * @param string $name
+   *   Symbolic name for the lock. Names generally look like
+   *   "worker.mailing.EmailProcessor" ("{category}.{component}.{AdhocName}").
+   *
+   *   Categories: worker|data|cache|...
+   *   Component: core|mailing|member|contribute|...
+   * @return \Civi\Core\Lock\LockInterface
+   */
+  public static function createGlobalLock($name) {
+    return new static($name, NULL, TRUE);
+  }
+
+  /**
+   * Use MySQL's GET_LOCK(), but apply prefixes to the lock names.
+   * Locks are unique to each instance of Civi.
+   *
+   * @param string $name
+   *   Symbolic name for the lock. Names generally look like
+   *   "worker.mailing.EmailProcessor" ("{category}.{component}.{AdhocName}").
+   *
+   *   Categories: worker|data|cache|...
+   *   Component: core|mailing|member|contribute|...
+   * @return \Civi\Core\Lock\LockInterface
+   */
+  public static function createScopedLock($name) {
+    return new static($name);
+  }
+
+  /**
+   * Use MySQL's GET_LOCK(), but conditionally apply prefixes to the lock names
+   * (if civimail_server_wide_lock is disabled).
+   *
+   * @param string $name
+   *   Symbolic name for the lock. Names generally look like
+   *   "worker.mailing.EmailProcessor" ("{category}.{component}.{AdhocName}").
+   *
+   *   Categories: worker|data|cache|...
+   *   Component: core|mailing|member|contribute|...
+   * @return \Civi\Core\Lock\LockInterface
+   * @deprecated
+   */
+  public static function createCivimailLock($name) {
+    $serverWideLock = \CRM_Core_BAO_Setting::getItem(
+      \CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'civimail_server_wide_lock'
+    );
+    return new static($name, NULL, $serverWideLock);
+  }
+
+  /**
    * Initialize the constants used during lock acquire / release
    *
    * @param string $name
-   *   Name of the lock. Please prefix with component / functionality.
-   *                      e.g. civimail.cronjob.JOB_ID
+   *   Symbolic name for the lock. Names generally look like
+   *   "worker.mailing.EmailProcessor" ("{category}.{component}.{AdhocName}").
+   *
+   *   Categories: worker|data|cache|...
+   *   Component: core|mailing|member|contribute|...
    * @param int $timeout
    *   The number of seconds to wait to get the lock. 1 if not set.
    * @param bool $serverWideLock
    *   Should this lock be applicable across your entire mysql server.
-   *                                this is useful if you have multiple sites running on the same
-   *                                mysql server and you want to limit the number of parallel cron
-   *                                jobs - CRM-91XX
-   *
-   * @return \CRM_Core_Lock the lock object
+   *   this is useful if you have multiple sites running on the same
+   *   mysql server and you want to limit the number of parallel cron
+   *   jobs - CRM-91XX
    */
   public function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -80,8 +134,6 @@ class CRM_Core_Lock {
       self::$jobLog = $this->_name;
     }
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
-
-    $this->acquire();
   }
 
   public function __destruct() {
@@ -91,12 +143,12 @@ class CRM_Core_Lock {
   /**
    * @return bool
    */
-  public function acquire() {
+  public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = array(
         1 => array($this->_name, 'String'),
-        2 => array($this->_timeout, 'Integer'),
+        2 => array($timeout ? $timeout : $this->_timeout, 'Integer'),
       );
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($res) {
@@ -118,10 +170,10 @@ class CRM_Core_Lock {
    * @return null|string
    */
   public function release() {
-    if (defined('CIVICRM_LOCK_DEBUG')) {
-      CRM_Core_Error::debug_log_message('release lock for ' . $this->_name .  ' (' . ($this->_hasLock ? 'hasLock' : '!hasLock') . ')');
-    }
     if ($this->_hasLock) {
+      if (defined('CIVICRM_LOCK_DEBUG')) {
+        CRM_Core_Error::debug_log_message('release lock for ' . $this->_name);
+      }
       $this->_hasLock = FALSE;
 
       if (self::$jobLog == $this->_name) {
