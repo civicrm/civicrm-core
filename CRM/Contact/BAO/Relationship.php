@@ -1450,6 +1450,21 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
+    // CRM-15829 UPDATES
+    // acceptable statuses: one must consider active as well as pending, therefore get an array of status IDs of memebrships statuses that can be added to a contact.
+    $params = array();
+
+    $membershipStatus = new CRM_Member_DAO_MembershipStatus();
+    $membershipStatus->copyValues($params);
+    $membershipStatus->find();
+    while ($membershipStatus->fetch()) {
+      if ($membershipStatus->is_current_member == '1'
+        || $membershipStatus->id == '5'
+        ) {
+        $membershipStatusRecordIds[] = $membershipStatus->id;
+      }
+    }
+
     // Now get the active memberships for all the contacts.
     // If contact have any valid membership(s), then add it to
     // 'values' array.
@@ -1457,11 +1472,23 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $memParams = array('contact_id' => $cid);
       $memberships = array();
 
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active, TRUE);
+      // CRM-15829 UPDATES
+      // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE);
 
       if (empty($memberships)) {
         continue;
       }
+
+      // CRM-15829 UPDATES
+      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1456
+      $filteredMemberships = array();
+      foreach ($memberships as $key => $membership) {
+        if (in_array($memberships[$key]['status_id'], $membershipStatusRecordIds)) {
+          $filteredMemberships[$key] = $membership;
+        }
+      }
+      $memberships = $filteredMemberships;
 
       //get ownerMembershipIds for related Membership
       //this is to handle memberships being deleted and recreated
