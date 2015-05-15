@@ -1197,7 +1197,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'Select Country',
           'Multi-Select Country',
           'AdvMulti-Select',
-          'CheckBox',
+          'CheckBoxGroup',
+          'RadioGroup',
           'Radio',
     )));
 
@@ -1294,6 +1295,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         $this->add('select', $name, $label, $options, $required, $props);
         // TODO: Add and/or option for fields that store multiple values
+        break;
+
+      case 'CheckBoxGroup':
+        $this->addCheckBox($name, $label, array_flip($options), $required, $props);
+        break;
+
+      case 'RadioGroup':
+        $this->addRadio($name, $label, $options, $props, NULL, $required);
         break;
 
       //case 'AdvMulti-Select':
