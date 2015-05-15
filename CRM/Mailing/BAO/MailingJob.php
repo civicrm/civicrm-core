@@ -69,8 +69,14 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $job->is_test = $params['is_test'];
     $job->save();
     $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->getRecipients($job->id, $params['mailing_id'], NULL, NULL, TRUE, FALSE);
-    return $job;
+    $mailing->id = $params['mailing_id'];
+    if ($mailing->id && $mailing->find(TRUE)) {
+      $mailing->getRecipients($job->id, $params['mailing_id'], NULL, NULL, TRUE, $mailing->dedupe_email);
+      return $job;
+    }
+    else {
+      throw new CRM_Core_Exception("Failed to create job: Unknown mailing ID");
+    }
   }
 
   /**
