@@ -750,7 +750,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
       if ($primaryOfSameTypeFound) {
-        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', $primaryOfSameTypeFound);
+        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', array(1 => $primaryOfSameTypeFound));
       }
     }
   }
