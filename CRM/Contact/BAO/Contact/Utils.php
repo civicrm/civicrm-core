@@ -434,10 +434,10 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly organization contact id).
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
+
     $query = "UPDATE civicrm_contact
 SET organization_name=NULL, employer_id = NULL
 WHERE id={$contactId}; ";
-
     $dao = CRM_Core_DAO::executeQuery($query);
 
     // need to handle related meberships. CRM-3792
